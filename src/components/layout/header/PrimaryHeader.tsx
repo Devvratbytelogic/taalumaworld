@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, HelpCircle, FileText, Library, BookMarked, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { useRouter } from 'nextjs-toploader/app';
 import { usePathname } from 'next/navigation';
@@ -59,6 +60,7 @@ export default function PrimaryHeader() {
   const handleSignOut = () => {
     dispatch(signOut());
     setIsUserMenuOpen(false);
+    toast.success('Signed out successfully');
     router.push('/auth/signin');
   };
 
@@ -66,6 +68,8 @@ export default function PrimaryHeader() {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    } else {
+      toast.error('Please enter a search term');
     }
   };
 

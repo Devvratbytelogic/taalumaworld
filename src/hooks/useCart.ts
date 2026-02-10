@@ -8,12 +8,10 @@ import {
   selectIsInCart,
 } from '../store/slices/cartSlice';
 import { useGetAllChaptersQuery } from '../store/api/chaptersApi';
-import { toast } from 'sonner@2.0.3';
+import toast from 'react-hot-toast';
+import type { CartItem } from '../store/slices/cartSlice';
 
-export interface CartItem {
-  chapterId: string;
-  bookId: string;
-}
+export type { CartItem };
 
 export function useCart() {
   const dispatch = useAppDispatch();
@@ -28,57 +26,46 @@ export function useCart() {
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) {
       console.error('Chapter not found:', chapterId);
-      toast.error('Unable to add to cart', {
-        description: 'This chapter does not exist.',
-      });
+      toast.error('Unable to add to cart. This chapter does not exist.');
       return;
     }
 
     // Check if already owned
     if (ownedChapters && ownedChapters.includes(chapterId)) {
-      toast.info('Already Owned', {
-        description: 'You already own this chapter.',
-      });
+      toast('Already Owned — You already own this chapter.');
       return;
     }
 
     // Check if free chapter
     if (chapter.isFree) {
-      toast.info('Free Chapter', {
-        description: 'This chapter is free - no purchase needed!',
-      });
+      toast('Free Chapter — No purchase needed!');
       return;
     }
 
     // Check if already in cart
-    if (cartItems.some(item => item.chapterId === chapterId)) {
-      toast.info('Already in Cart', {
-        description: 'This chapter is already in your cart.',
-      });
+    if (cartItems.some(item => item.id === chapterId)) {
+      toast('Already in Cart — This chapter is already in your cart.');
       return;
     }
 
     // Add to cart
-    dispatch(addToCartAction({ chapterId, bookId }));
-    toast.success('Added to Cart', {
-      description: chapter.title,
-    });
+    dispatch(addToCartAction({ id: chapterId, type: 'chapter', bookId }));
+    toast.success(`Added to Cart: ${chapter.title}`);
   };
 
   const removeFromCart = (chapterId: string) => {
     const chapter = chapters.find(c => c.id === chapterId);
     dispatch(removeFromCartAction(chapterId));
-    toast.success('Removed from Cart', {
-      description: chapter?.title || 'Chapter removed',
-    });
+    toast.success(`Removed from Cart: ${chapter?.title ?? 'Chapter'}`);
   };
 
   const clearCart = () => {
     dispatch(clearCartAction());
+    toast.success('Cart cleared');
   };
 
   const isInCart = (chapterId: string) => {
-    return cartItems.some(item => item.chapterId === chapterId);
+    return cartItems.some(item => item.id === chapterId);
   };
 
   return {

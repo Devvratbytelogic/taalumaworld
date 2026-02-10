@@ -13,17 +13,26 @@ interface AuthState {
   user: User | null;
 }
 
-const initialState: AuthState = {
-  isAuthenticated: localStorage.getItem('is_authenticated') === 'true',
-  user: localStorage.getItem('user_email')
-    ? {
-        email: localStorage.getItem('user_email') || '',
-        fullName: localStorage.getItem('user_name') || '',
-        photo: localStorage.getItem('user_photo') || '',
-        role: 'user',
-      }
-    : null,
-};
+function getInitialAuthState(): AuthState {
+  if (typeof window === 'undefined' || typeof window.localStorage?.getItem !== 'function') {
+    return { isAuthenticated: false, user: null };
+  }
+  const isAuth = window.localStorage.getItem('is_authenticated') === 'true';
+  const email = window.localStorage.getItem('user_email');
+  return {
+    isAuthenticated: isAuth,
+    user: email
+      ? {
+          email: window.localStorage.getItem('user_email') || '',
+          fullName: window.localStorage.getItem('user_name') || '',
+          photo: window.localStorage.getItem('user_photo') || undefined,
+          role: 'user',
+        }
+      : null,
+  };
+}
+
+const initialState: AuthState = getInitialAuthState();
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -33,52 +42,53 @@ export const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload;
       
-      // Persist to localStorage
-      localStorage.setItem('is_authenticated', 'true');
-      localStorage.setItem('user_email', action.payload.email);
-      localStorage.setItem('user_name', action.payload.fullName);
-      if (action.payload.photo) {
-        localStorage.setItem('user_photo', action.payload.photo);
+      if (typeof window !== 'undefined' && window.localStorage?.setItem) {
+        window.localStorage.setItem('is_authenticated', 'true');
+        window.localStorage.setItem('user_email', action.payload.email);
+        window.localStorage.setItem('user_name', action.payload.fullName);
+        if (action.payload.photo) {
+          window.localStorage.setItem('user_photo', action.payload.photo);
+        }
       }
     },
-    
+
     signUp: (state, action: PayloadAction<User>) => {
       state.isAuthenticated = true;
       state.user = action.payload;
-      
-      // Persist to localStorage
-      localStorage.setItem('is_authenticated', 'true');
-      localStorage.setItem('user_email', action.payload.email);
-      localStorage.setItem('user_name', action.payload.fullName);
-      if (action.payload.photo) {
-        localStorage.setItem('user_photo', action.payload.photo);
+      if (typeof window !== 'undefined' && window.localStorage?.setItem) {
+        window.localStorage.setItem('is_authenticated', 'true');
+        window.localStorage.setItem('user_email', action.payload.email);
+        window.localStorage.setItem('user_name', action.payload.fullName);
+        if (action.payload.photo) {
+          window.localStorage.setItem('user_photo', action.payload.photo);
+        }
       }
     },
-    
+
     signOut: (state) => {
       state.isAuthenticated = false;
       state.user = null;
-      
-      // Clear localStorage
-      localStorage.removeItem('is_authenticated');
-      localStorage.removeItem('user_email');
-      localStorage.removeItem('user_name');
-      localStorage.removeItem('user_photo');
+      if (typeof window !== 'undefined' && window.localStorage?.removeItem) {
+        window.localStorage.removeItem('is_authenticated');
+        window.localStorage.removeItem('user_email');
+        window.localStorage.removeItem('user_name');
+        window.localStorage.removeItem('user_photo');
+      }
     },
-    
+
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
-        
-        // Update localStorage
-        if (action.payload.fullName) {
-          localStorage.setItem('user_name', action.payload.fullName);
-        }
-        if (action.payload.photo !== undefined) {
-          if (action.payload.photo) {
-            localStorage.setItem('user_photo', action.payload.photo);
-          } else {
-            localStorage.removeItem('user_photo');
+        if (typeof window !== 'undefined' && window.localStorage) {
+          if (action.payload.fullName) {
+            window.localStorage.setItem('user_name', action.payload.fullName);
+          }
+          if (action.payload.photo !== undefined) {
+            if (action.payload.photo) {
+              window.localStorage.setItem('user_photo', action.payload.photo);
+            } else {
+              window.localStorage.removeItem('user_photo');
+            }
           }
         }
       }

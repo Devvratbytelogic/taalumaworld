@@ -14,8 +14,11 @@ interface ReadingState {
 }
 
 const loadProgressFromStorage = (): ReadingProgress => {
+  if (typeof window === 'undefined' || typeof window.localStorage?.getItem !== 'function') {
+    return {};
+  }
   try {
-    const saved = localStorage.getItem('reading_progress');
+    const saved = window.localStorage.getItem('reading_progress');
     if (saved) {
       return JSON.parse(saved);
     }
@@ -39,7 +42,9 @@ export const readingSlice = createSlice({
         progress: action.payload.progress,
         lastRead: new Date().toISOString(),
       };
-      localStorage.setItem('reading_progress', JSON.stringify(state.progress));
+      if (typeof window !== 'undefined' && window.localStorage?.setItem) {
+        window.localStorage.setItem('reading_progress', JSON.stringify(state.progress));
+      }
     },
 
     setCurrentChapter: (state, action: PayloadAction<string | null>) => {
@@ -48,7 +53,9 @@ export const readingSlice = createSlice({
 
     clearProgress: (state, action: PayloadAction<string>) => {
       delete state.progress[action.payload];
-      localStorage.setItem('reading_progress', JSON.stringify(state.progress));
+      if (typeof window !== 'undefined' && window.localStorage?.setItem) {
+        window.localStorage.setItem('reading_progress', JSON.stringify(state.progress));
+      }
     },
   },
 });

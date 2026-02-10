@@ -1,9 +1,11 @@
 button {
-    @apply cursor-pointer min-w-[100px] bg-primary text-white rounded-md;
+    @apply cursor-pointer rounded-md;
     /* default height h-10 */
 }
 
-.btn_global {
+.global_btn {
+    @apply min-w-25 min-h-10 bg-primary text-white ;
+
     &.medium_height {
         @apply min-h-8;
     }
@@ -16,8 +18,16 @@ button {
         @apply rounded-full;
     }
 
+    &.rounded_btn_sm {
+        @apply rounded-full w-10 min-w-10 h-10 min-h-10 p-0;
+    }
+
+    &.w_fit {
+        @apply w-fit min-w-fit;
+    }
+
     &.bg_primary {
-        @apply bg-primary text-white;
+        @apply bg-primary text-white outline-none;
     }
 
     &.outline_primary {

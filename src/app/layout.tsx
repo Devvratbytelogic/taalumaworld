@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Roboto, Ubuntu } from "next/font/google";
 import "../styles/globals.css";
 import { AppProviders } from "../components/providers/AppProviders";
+import PrimaryHeader from "@/components/layout/header/PrimaryHeader";
+import PrimaryFooter from "@/components/layout/footer/PrimaryFooter";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -29,7 +31,9 @@ export default function RootLayout({
     <html lang="en" className={`${roboto.variable} ${ubuntu.variable}`}>
       <body className="antialiased">
         <AppProviders>
+          <PrimaryHeader />
           {children}
+          <PrimaryFooter />
         </AppProviders>
       </body>
     </html>

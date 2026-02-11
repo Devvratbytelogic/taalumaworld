@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { UserAvatar } from './UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getContactUsRoutePath } from '@/routes/routes';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -206,7 +206,7 @@ export default function PrimaryHeader() {
             About Us
           </Link>
           <Link
-            href="/contact"
+            href={getContactUsRoutePath()}
             className={`transition-colors ${isActive('/contact') ? 'text-primary' : 'hover:text-primary'
               }`}
           >

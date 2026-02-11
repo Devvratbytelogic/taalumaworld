@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
-import { getAboutUsRoutePath, getContactUsRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getContactUsRoutePath, getFAQRoutePath } from '@/routes/routes';
 
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
@@ -90,7 +90,7 @@ export default function PrimaryFooter() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/faq" className="hover:text-primary transition-colors">
+                                    <Link href={getFAQRoutePath()} className="hover:text-primary transition-colors">
                                         FAQs
                                     </Link>
                                 </li>

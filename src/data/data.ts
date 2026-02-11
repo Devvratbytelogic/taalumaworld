@@ -1,3 +1,4 @@
+import { HelpCircle, MessageSquare } from "lucide-react";
 
 export interface bannerProps {
     badgeText: string;
@@ -95,3 +96,39 @@ export const aboutBannerData: bannerProps = {
     },
 
 };
+
+export interface normalBannerData {
+    badge: {
+        text: string
+        icon: React.ElementType
+    }
+    heading: {
+        prefix: string
+        highlight: string
+    }
+    description: string
+}
+export const contactUsBannerData: normalBannerData = {
+    badge: {
+        text: "Get in Touch",
+        icon: MessageSquare,
+    },
+    heading: {
+        prefix: "We'd love to",
+        highlight: "hear from you",
+    },
+    description:
+        "Have a question, suggestion, or just want to say hi? Our team is here to help and would be happy to hear from you.",
+}
+export const faqBannerData: normalBannerData = {
+    badge: {
+        text: "Help Center",
+        icon: HelpCircle,
+    },
+    heading: {
+        prefix: "Frequently Asked",
+        highlight: "Questions",
+    },
+    description:
+        "Find quick answers to common questions about Taaluma. Can't find what you're looking for? Contact our support team.",
+}

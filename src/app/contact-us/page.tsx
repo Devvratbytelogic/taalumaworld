@@ -2,38 +2,15 @@ import React from 'react'
 import ContactUsPageForm from '@/components/forms/ContactUsPageForm'
 import { Clock, HelpCircle, Mail, MessageSquare } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import NormalBanner from '@/components/banners/NormalBanner'
+import { contactUsBannerData } from '@/data/data'
 
 export default function ContactUsPage() {
     return (
         <>
-            {/* Hero Section */}
-            <section className="relative py-16 md:py-24 overflow-hidden bg-accent/30">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full">
-                            <MessageSquare className="w-4 h-4 text-primary" />
-                            <span className="text-sm font-medium text-primary">
-                                Get in Touch
-                            </span>
-                        </div>
-
-                        {/* Heading */}
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                            We'd love to{' '}
-                            <span className="relative inline-block">
-                                <span className="relative z-10">hear from you</span>
-                                <span className="absolute bottom-2 left-0 w-full h-4 bg-primary/30 -rotate-1"></span>
-                            </span>
-                        </h1>
-
-                        {/* Description */}
-                        <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                            Have a question, suggestion, or just want to say hi? Our team is here to help
-                            and would be happy to hear from you.
-                        </p>
-                    </div>
-                </div>
+            {/* Contact Us Banner */}
+            <section className="relative py-16 md:pt-24 overflow-hidden bg-accent/30">
+                <NormalBanner data={contactUsBannerData} />
             </section>
 
             {/* Contact Cards Section */}

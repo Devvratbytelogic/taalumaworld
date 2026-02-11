@@ -15,6 +15,7 @@ import { UserAvatar } from './UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import { getAboutUsRoutePath, getContactUsRoutePath } from '@/routes/routes';
+import { openModal } from '@/store/slices/allModalSlice';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -157,12 +158,10 @@ export default function PrimaryHeader() {
                 )}
               </div>
             ) : (
-              <Link href="/auth/signin">
-                <Button className='hidden lg:flex global_btn rounded_full bg_primary'>
-                  <LogIn className="h-4 w-4" />
-                  Sign In
-                </Button>
-              </Link>
+              <Button className='hidden lg:flex global_btn rounded_full bg_primary' onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}>
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
             )}
 
             {/* Mobile Menu Toggle */}

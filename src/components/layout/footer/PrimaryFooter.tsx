@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
-import { getAboutUsRoutePath, getContactUsRoutePath, getFAQRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getContactUsRoutePath, getFAQRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
@@ -95,12 +95,12 @@ export default function PrimaryFooter() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/privacy" className="hover:text-primary transition-colors">
+                                    <Link href={getPrivacyPolicyRoutePath()} className="hover:text-primary transition-colors">
                                         Privacy Policy
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/terms" className="hover:text-primary transition-colors">
+                                    <Link href={getTermsOfServiceRoutePath()} className="hover:text-primary transition-colors">
                                         Terms of Service
                                     </Link>
                                 </li>
@@ -162,15 +162,15 @@ export default function PrimaryFooter() {
                                 <p className="text-xs text-gray-400">Designed and developed by Bytelogic Technologies</p>
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
-                                <Link href="/privacy" className="hover:text-primary transition-colors">
+                                <Link href={getPrivacyPolicyRoutePath()} className="hover:text-primary transition-colors">
                                     Privacy Policy
                                 </Link>
                                 <span className="text-gray-600">•</span>
-                                <Link href="/terms" className="hover:text-primary transition-colors">
+                                <Link href={getTermsOfServiceRoutePath()} className="hover:text-primary transition-colors">
                                     Terms of Service
                                 </Link>
                                 <span className="text-gray-600">•</span>
-                                <Link href="/contact" className="hover:text-primary transition-colors">
+                                <Link href={getContactUsRoutePath()} className="hover:text-primary transition-colors">
                                     Contact
                                 </Link>
                             </div>

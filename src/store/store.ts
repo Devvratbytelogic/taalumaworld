@@ -9,6 +9,7 @@ import authReducer from './slices/authSlice';
 import cartReducer from './slices/cartSlice';
 import contentModeReducer from './slices/contentModeSlice';
 import readingReducer from './slices/readingSlice';
+import allModalSlice from './slices/allModalSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,8 +19,8 @@ export const store = configureStore({
     [authorsApi.reducerPath]: authorsApi.reducer,
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
-    
     // Regular slices
+    allModal: allModalSlice,
     auth: authReducer,
     cart: cartReducer,
     contentMode: contentModeReducer,

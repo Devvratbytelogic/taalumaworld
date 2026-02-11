@@ -1,6 +1,7 @@
 import { FileText, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
+import { getFAQRoutePath } from '@/routes/routes';
 
 export default function HeaderToolbar() {
     return (
@@ -12,11 +13,11 @@ export default function HeaderToolbar() {
                             <p>Welcome to Taaluma - Empowering College Graduates & Young Professionals!</p>
                         </div>
                         <div className="hidden md:flex items-center gap-4">
-                            <Link href="#" className="hover:text-white/80 transition-colors flex items-center gap-1">
+                            <Link href={getFAQRoutePath()} className="hover:text-white/80 transition-colors flex items-center gap-1">
                                 <HelpCircle className="h-4 w-4" />
                                 <span>Help</span>
                             </Link>
-                            <Link href="#" className="hover:text-white/80 transition-colors flex items-center gap-1">
+                            <Link href={getFAQRoutePath()} className="hover:text-white/80 transition-colors flex items-center gap-1">
                                 <FileText className="h-4 w-4" />
                                 <span>FAQs</span>
                             </Link>

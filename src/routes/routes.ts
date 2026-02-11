@@ -10,6 +10,12 @@ export function getContactUsRoutePath(): string {
 export function getFAQRoutePath(): string {
     return `/faq`;
 }
+export function getPrivacyPolicyRoutePath(): string {
+    return `/privacy-policy`;
+}
+export function getTermsOfServiceRoutePath(): string {
+    return `/terms-of-service`;
+}
 // export function generateSingleProductRoutePath(type: string | string[], slug: string | string[]): string {
 //     return `/product/${type}/${slug}`;
 // }

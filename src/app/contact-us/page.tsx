@@ -159,7 +159,7 @@ export default function ContactUsPage() {
                             </p>
                             <div className="space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
                                         <Mail className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
@@ -173,7 +173,7 @@ export default function ContactUsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-secondary-accent/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <div className="w-10 h-10 rounded-full bg-secondary-accent/10 flex items-center justify-center shrink-0 mt-1">
                                         <Mail className="w-5 h-5 text-secondary-accent" />
                                     </div>
                                     <div>
@@ -187,7 +187,7 @@ export default function ContactUsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0 mt-1">
                                         <Mail className="w-5 h-5 text-success" />
                                     </div>
                                     <div>

@@ -3,11 +3,16 @@ import React from 'react'
 import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useContentMode } from '@/hooks/useContentMode';
+import { bannerProps } from '@/data/data';
 
-export default function Banner() {
+interface CommonBannerProps {
+    data: bannerProps;
+}
+export default function CommonBanner({ data }: CommonBannerProps) {
     // Use content mode hook to get current mode
     const { contentMode } = useContentMode();
     const displayMode = contentMode; // Use contentMode from the hook
+
 
     // Function to scroll to content section
     const scrollToContent = () => {
@@ -34,65 +39,67 @@ export default function Banner() {
                             {/* Badge */}
                             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full">
                                 <span className="text-sm font-medium text-foreground">
-                                    📚 Now live and ready to explore!
+                                    {data?.badgeText}
                                 </span>
                             </div>
 
                             {/* Heading */}
                             <div className="space-y-3">
                                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
-                                    Discover the joy of{' '}
+                                    {data?.heading?.prefix}{' '}
                                     <span className="relative inline-block">
-                                        <span className="relative z-10">reading</span>
+                                        <span className="relative z-10">{data?.heading?.highlight}</span>
                                         <span className="absolute bottom-2 left-0 w-full h-4 bg-primary/30 -rotate-1"></span>
                                     </span>
-                                    .
+                                    {data?.heading?.suffix}
                                 </h1>
                                 <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-xl">
-                                    Read chapter by chapter or get the full book. Your learning journey, your way.
+                                    {data?.description}
                                 </p>
                             </div>
 
                             {/* CTA Buttons */}
                             <div className="flex flex-col sm:flex-row items-start gap-4 pt-2">
-                                <Button
+                                {data?.primaryCta?.button_status && <Button
                                     className="global_btn rounded_full bg_primary"
                                     onPress={scrollToContent}
                                 >
-                                    {displayMode === 'chapters' ? 'Explore Chapters' : 'Explore Books'}
-                                </Button>
-                                {displayMode === 'books' && (
+                                    {data?.primaryCta?.title}
+                                </Button>}
+                                {displayMode === 'books' && data?.secondaryCta?.button_status && (
                                     <Button
                                         className="global_btn rounded_full bg_primary"
                                         onPress={scrollToCategories}
                                     >
-                                        Browse Categories
+                                        {data?.secondaryCta?.title}
                                     </Button>
                                 )}
                             </div>
 
                             {/* Stats */}
-                            <div className="flex items-center gap-6 pt-2">
+                            {data?.stats?.status && (<div className="flex items-center gap-6 pt-2">
                                 <div className="flex items-center gap-2">
                                     <div className="flex -space-x-2">
-                                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-medium border-2 border-background">
-                                            A
-                                        </div>
-                                        <div className="w-8 h-8 rounded-full bg-secondary-accent flex items-center justify-center text-white text-sm font-medium border-2 border-background">
-                                            B
+                                        {data?.stats?.avatars && data?.stats?.avatars?.length > 0 && data?.stats?.avatars.map((item, index) => (
+                                            <div key={index} className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background`} style={{ backgroundColor: item?.bgColor }}>
+                                                {item?.label}
+                                            </div>
+                                        ))}
+                                        {/* <div className="w-8 h-8 rounded-full bg-secondary-accent flex items-center justify-center text-white text-sm font-medium border-2 border-background">
+                                            {data?.stats?.avatars?.[1]?.label}
                                         </div>
                                         <div className="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white text-sm font-medium border-2 border-background">
-                                            C
+                                            {data?.stats?.avatars?.[2]?.label}
                                         </div>
                                         <div className="w-8 h-8 rounded-full bg-primary-dark flex items-center justify-center text-white text-xs font-medium border-2 border-background">
-                                            +5
-                                        </div>
+                                            {data?.stats?.avatars?.[3]?.label}
+                                        </div> */}
                                     </div>
                                     <span className="text-sm font-medium text-foreground">
-                                        500+ active readers
+                                        {data?.stats?.description}
                                     </span>
                                 </div>
-                            </div>
+                            </div>)}
                         </div>
 
                         {/* Right Column - Illustration */}
@@ -101,8 +108,8 @@ export default function Banner() {
                                 {/* Main Illustration */}
                                 <div className="relative z-10 rounded-3xl overflow-hidden" style={{ maxHeight: '650px' }}>
                                     <ImageComponent
-                                        src={`/images/banner/home-banner1.png`}
-                                        alt="Teen reading on laptop"
+                                        src={data?.image?.src}
+                                        alt={data?.image?.alt}
                                         object_cover={true}
                                     />
                                 </div>

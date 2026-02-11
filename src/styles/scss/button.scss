@@ -4,7 +4,7 @@ button {
 }
 
 .global_btn {
-    @apply min-w-25 min-h-10 bg-primary text-white ;
+    @apply min-w-30 px-6 min-h-10 bg-primary text-white ;
 
     &.medium_height {
         @apply min-h-8;

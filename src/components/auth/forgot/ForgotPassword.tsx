@@ -1,14 +1,14 @@
 'use client'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/react'
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
 import { Mail } from 'lucide-react';
 import { useFormik } from 'formik';
 import { forgotPasswordSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
-import { openModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 
 export default function ForgotPassword() {
     const dispatch = useDispatch();
@@ -27,7 +27,7 @@ export default function ForgotPassword() {
     });
 
     return (
-        <Modal isOpen={isOpen} className="modal_container">
+        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
@@ -70,30 +70,32 @@ export default function ForgotPassword() {
                             Send Code
                         </Button>
                     </form>
-                    <div className="pt-4 text-center text-sm text-muted-foreground space-y-2">
-                        <div>
-                            <span>Remember your password? </span>
-                            <button
-                                type="button"
-                                className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
-                                disabled={isSubmitting}
-                            >
-                                Sign In
-                            </button>
+                    <ModalFooter>
+                        <div className="w-full text-center text-sm text-muted-foreground space-y-2">
+                            <div>
+                                <span>Remember your password? </span>
+                                <button
+                                    type="button"
+                                    className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                    onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                                    disabled={isSubmitting}
+                                >
+                                    Sign In
+                                </button>
+                            </div>
+                            {/* <div>
+                                <span>Already have a code? </span>
+                                <button
+                                    type="button"
+                                    className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                    onClick={() => dispatch(openModal({ componentName: 'OtpVerification', data: '' }))}
+                                    disabled={isSubmitting}
+                                >
+                                    Verify Code
+                                </button>
+                            </div> */}
                         </div>
-                        <div>
-                            <span>Already have a code? </span>
-                            <button
-                                type="button"
-                                className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: 'OtpVerification', data: '' }))}
-                                disabled={isSubmitting}
-                            >
-                                Verify Code
-                            </button>
-                        </div>
-                    </div>
+                    </ModalFooter>
                 </ModalBody>
             </ModalContent>
         </Modal>

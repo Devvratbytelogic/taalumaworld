@@ -1,14 +1,14 @@
 'use client'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/react'
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import { useFormik } from 'formik';
 import { resetPasswordSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
-import { openModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 
 export default function ResetPassword() {
     const dispatch = useDispatch();
@@ -30,7 +30,7 @@ export default function ResetPassword() {
     });
 
     return (
-        <Modal isOpen={isOpen} className="modal_container">
+        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
@@ -113,17 +113,19 @@ export default function ResetPassword() {
                             Update Password
                         </Button>
                     </form>
-                    <div className="pt-4 text-center text-sm text-muted-foreground">
-                        <span>Remembered your password? </span>
-                        <button
-                            type="button"
-                            className="font-medium text-primary hover:text-primary/80 transition-colors"
-                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
-                            disabled={isSubmitting}
-                        >
-                            Sign In
-                        </button>
-                    </div>
+                    <ModalFooter>
+                        <div className="w-full text-center text-sm text-muted-foreground">
+                            <span>Remembered your password? </span>
+                            <button
+                                type="button"
+                                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                                disabled={isSubmitting}
+                            >
+                                Sign In
+                            </button>
+                        </div>
+                    </ModalFooter>
                 </ModalBody>
             </ModalContent>
         </Modal>

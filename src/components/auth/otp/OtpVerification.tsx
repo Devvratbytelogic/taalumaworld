@@ -1,13 +1,13 @@
 'use client'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/react'
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
 import { useFormik } from 'formik';
 import { otpVerificationSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
-import { openModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 
 export default function OtpVerification() {
     const dispatch = useDispatch();
@@ -31,7 +31,7 @@ export default function OtpVerification() {
     };
 
     return (
-        <Modal isOpen={isOpen} className="modal_container">
+        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
@@ -72,27 +72,29 @@ export default function OtpVerification() {
                             Verify Code
                         </Button>
                     </form>
-                    <div className="pt-4 text-center text-sm text-muted-foreground space-y-2">
-                        <button
-                            type="button"
-                            className="font-medium text-primary hover:text-primary/80 transition-colors"
-                            onClick={() => console.log('Resend verification code')}
-                            disabled={isSubmitting}
-                        >
-                            Resend code
-                        </button>
-                        <div>
-                            <span>Entered the wrong email? </span>
+                    <ModalFooter>
+                        <div className="w-full text-center text-sm text-muted-foreground space-y-2">
                             <button
                                 type="button"
                                 className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: 'ForgotPassword', data: '' }))}
+                                onClick={() => console.log('Resend verification code')}
                                 disabled={isSubmitting}
                             >
-                                Try again
+                                Resend code
                             </button>
+                            <div>
+                                <span>Entered the wrong email? </span>
+                                <button
+                                    type="button"
+                                    className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                    onClick={() => dispatch(openModal({ componentName: 'ForgotPassword', data: '' }))}
+                                    disabled={isSubmitting}
+                                >
+                                    Try again
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </ModalFooter>
                 </ModalBody>
             </ModalContent>
         </Modal>

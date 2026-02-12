@@ -1,20 +1,41 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/react'
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useFormik } from 'formik';
 import { signUpSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
-import { openModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
+
+const AVATAR_BORDER_COLOR = '#C8D7EE';
 
 export default function SignUp() {
     const dispatch = useDispatch();
     const { isOpen } = useSelector((state: RootState) => state.allModal);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [profileImage, setProfileImage] = useState<File | null>(null);
+    const [profilePreview, setProfilePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleAvatarClick = () => fileInputRef.current?.click();
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !file.type.startsWith('image/')) return;
+        setProfileImage(file);
+        const url = URL.createObjectURL(file);
+        setProfilePreview(url);
+    };
+    const clearProfileImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setProfileImage(null);
+        if (profilePreview) URL.revokeObjectURL(profilePreview);
+        setProfilePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: {
@@ -25,13 +46,16 @@ export default function SignUp() {
         },
         validationSchema: signUpSchema,
         onSubmit: (formValues, { resetForm }) => {
-            console.log('Sign up form submitted:', formValues);
+            console.log('Sign up form submitted:', { ...formValues, profileImage: profileImage ?? undefined });
+            if (profilePreview) URL.revokeObjectURL(profilePreview);
+            setProfileImage(null);
+            setProfilePreview(null);
             resetForm();
         },
     });
 
     return (
-        <Modal isOpen={isOpen} className="modal_container">
+        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
@@ -43,6 +67,46 @@ export default function SignUp() {
                 </ModalHeader>
                 <ModalBody>
                     <form className="space-y-3" onSubmit={handleSubmit}>
+                        {/* Profile Picture Upload */}
+                        <div className="flex flex-col items-center gap-2">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleAvatarChange}
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAvatarClick}
+                                className="relative w-20 h-20 rounded-full! border-2 border-dashed flex flex-col items-center justify-center gap-2 bg-white hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 overflow-hidden"
+                                style={{ borderColor: AVATAR_BORDER_COLOR }}
+                                disabled={isSubmitting}
+                            >
+                                {profilePreview ? (
+                                    <>
+                                        <img
+                                            src={profilePreview}
+                                            alt="Profile preview"
+                                            className="absolute inset-0 w-full h-full rounded-full object-cover"
+                                        />
+                                        <span
+                                            onClick={clearProfileImage}
+                                            className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity"
+                                        >
+                                            Change
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Camera className="h-6 w-6" style={{ color: AVATAR_BORDER_COLOR }} />
+                                        <span className="text-xs font-medium text-[#666666]">Upload</span>
+                                    </>
+                                )}
+                            </button>
+                            <span className="text-xs text-muted-foreground">Profile picture (optional)</span>
+                        </div>
+
                         {/* Name Field */}
                         <div className="space-y-2">
                             <label htmlFor="name" className="text-sm font-medium text-foreground">
@@ -160,17 +224,19 @@ export default function SignUp() {
                             Sign Up
                         </Button>
                     </form>
-                    <div className="pt-4 text-center text-sm text-muted-foreground">
-                        <span>Already have an account? </span>
-                        <button
-                            type="button"
-                            className="font-medium text-primary hover:text-primary/80 transition-colors"
-                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
-                            disabled={isSubmitting}
-                        >
-                            Sign In
-                        </button>
-                    </div>
+                    <ModalFooter>
+                        <div className="w-full text-center text-sm text-muted-foreground">
+                            <span>Already have an account? </span>
+                            <button
+                                type="button"
+                                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                                disabled={isSubmitting}
+                            >
+                                Sign In
+                            </button>
+                        </div>
+                    </ModalFooter>
                 </ModalBody>
             </ModalContent>
         </Modal>

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { useFormik } from 'formik';
 import { contactFormSchema } from '@/utils/formValidation';
 import { Send } from 'lucide-react';

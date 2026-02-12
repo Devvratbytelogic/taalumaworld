@@ -20,8 +20,8 @@
     "nextjs-toploader": "^3.9.17",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-hot-toast": "^2.6.0",
     "react-redux": "^9.2.0",
+    "sonner": "^2.0.7",
     "yup": "^1.7.1"
   },
   "devDependencies": {

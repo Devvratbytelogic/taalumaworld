@@ -8,7 +8,7 @@ import {
   selectIsInCart,
 } from '../store/slices/cartSlice';
 import { useGetAllChaptersQuery } from '../store/api/chaptersApi';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import type { CartItem } from '../store/slices/cartSlice';
 
 export type { CartItem };

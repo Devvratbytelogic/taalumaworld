@@ -4,10 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { Mail, Lock } from 'lucide-react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Loader2 } from 'lucide-react';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useFormik } from 'formik';
 import { signInSchema } from '@/utils/formValidation';
@@ -24,6 +23,7 @@ export default function SignIn() {
         validationSchema: signInSchema,
         onSubmit: (values, { resetForm }) => {
             console.log('Sign in form submitted:', values);
+            toast.success('Sign in successful!');
             resetForm();
         },
     });

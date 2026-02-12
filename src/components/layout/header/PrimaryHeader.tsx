@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, HelpCircle, FileText, Library, BookMarked, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { useRouter } from 'nextjs-toploader/app';
 import { usePathname } from 'next/navigation';

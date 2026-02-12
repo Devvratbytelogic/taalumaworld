@@ -12,7 +12,7 @@ import { useGetCategoriesQuery } from '@/store/api/categoriesApi';
 type ReadingProgressEntry = { chapterId: string; progress: number; lastRead: string };
 import { SlidersHorizontal } from 'lucide-react';
 import { ContinueReadingCard } from '@/components/cards/ContinueReadingCard';
-import toast from 'react-hot-toast';
+import toast from '@/utils/toast';
 import { Book, Chapter } from '@/data/mockData';
 import { Badge } from '@/components/ui/badge';
 import { ChapterCard } from '@/components/cards/ChapterCard';

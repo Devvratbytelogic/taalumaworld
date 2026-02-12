@@ -8,8 +8,10 @@ import toast from '@/utils/toast';
 import { Mail, Lock } from 'lucide-react';
 import { Eye, EyeOff } from 'lucide-react';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import { setAuthenticated } from '@/store/slices/authSlice';
 import { useFormik } from 'formik';
 import { signInSchema } from '@/utils/formValidation';
+import { setAuthCookie } from '@/utils/auth';
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
@@ -23,8 +25,11 @@ export default function SignIn() {
         validationSchema: signInSchema,
         onSubmit: (values, { resetForm }) => {
             console.log('Sign in form submitted:', values);
-            toast.success('Sign in successful!');
+            setAuthCookie();
+            dispatch(setAuthenticated({ fullName: 'User', email: values.email }));
+            dispatch(closeModal());
             resetForm();
+            toast.success('Sign in successful!');
         },
     });
     return (

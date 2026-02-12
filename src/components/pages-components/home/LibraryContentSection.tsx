@@ -2,8 +2,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import Button from '@/components/ui/Button';
 import { useContentMode } from '@/hooks/useContentMode';
-import { useAppSelector } from '@/store/hooks';
-import { selectIsAuthenticated } from '@/store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { openModal } from '@/store/slices/allModalSlice';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
 import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
 import { useGetAuthorsQuery } from '@/store/api/authorsApi';
@@ -20,8 +20,8 @@ import { BookCard } from '@/components/cards/BookCard';
 import { FilterModal } from '@/components/modals/FilterModal';
 
 export default function LibraryContentSection() {
-    const isAuthenticated = useAppSelector(selectIsAuthenticated);
-    // Use content mode hook to get current mode
+    const dispatch = useAppDispatch();
+    const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
     const { contentMode } = useContentMode();
     const displayMode = contentMode; // Use contentMode from the hook
 
@@ -44,8 +44,7 @@ export default function LibraryContentSection() {
     const [readingProgress, setReadingProgress] = useState<ReadingProgressEntry[]>([]);
     const [loginModalAction, setLoginModalAction] = useState<'cart' | 'read' | 'view' | 'purchase'>('read');
     const [loginModalItemType, setLoginModalItemType] = useState<'chapter' | 'book'>('chapter');
-    const [loginModalOpen, setLoginModalOpen] = useState(false);
-    const [pendingAction, setPendingAction] = useState<() => void>(() => { });
+    const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [currentReadingBook, setCurrentReadingBook] = useState<string | null>(null);
     const [currentReadingChapter, setCurrentReadingChapter] = useState<string | null>(null);
     const [isReading, setIsReading] = useState(false);
@@ -75,12 +74,12 @@ export default function LibraryContentSection() {
         if (chapter.isFree && !isAuthenticated) {
             setLoginModalAction('read');
             setLoginModalItemType('chapter');
-            setLoginModalOpen(true);
             setPendingAction(() => () => {
                 setCurrentReadingBook(bookId);
                 setCurrentReadingChapter(chapterId);
                 setIsReading(true);
             });
+            dispatch(openModal({ componentName: 'SignIn', data: '' }));
             return;
         }
 
@@ -102,11 +101,11 @@ export default function LibraryContentSection() {
         if (!chapter.isFree && !isAuthenticated) {
             setLoginModalAction('purchase');
             setLoginModalItemType('chapter');
-            setLoginModalOpen(true);
             setPendingAction(() => () => {
                 // After login, re-check if they need to purchase
                 handleStartReading(bookId, chapterId);
             });
+            dispatch(openModal({ componentName: 'SignIn', data: '' }));
             return;
         }
 
@@ -228,6 +227,14 @@ export default function LibraryContentSection() {
         });
     }, [chapters, books, searchQuery, selectedCategories, selectedAuthors, selectedBooks, selectedTags, selectedProgressFilters, ownedChapters, readingProgress]);
 
+
+    // Run pending action (e.g. start reading) after user logs in
+    useEffect(() => {
+        if (isAuthenticated && pendingAction) {
+            pendingAction();
+            setPendingAction(null);
+        }
+    }, [isAuthenticated, pendingAction]);
 
     // Load owned chapters from localStorage on mount
     useEffect(() => {

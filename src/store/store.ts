@@ -5,14 +5,15 @@ import { chaptersApi } from './api/chaptersApi';
 import { authorsApi } from './api/authorsApi';
 import { categoriesApi } from './api/categoriesApi';
 import { userApi } from './api/userApi';
-import authReducer from './slices/authSlice';
 import cartReducer from './slices/cartSlice';
 import contentModeReducer from './slices/contentModeSlice';
 import readingReducer from './slices/readingSlice';
 import allModalSlice from './slices/allModalSlice';
+import authReducer from './slices/authSlice';
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     // RTK Query APIs
     [booksApi.reducerPath]: booksApi.reducer,
     [chaptersApi.reducerPath]: chaptersApi.reducer,
@@ -21,7 +22,6 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     // Regular slices
     allModal: allModalSlice,
-    auth: authReducer,
     cart: cartReducer,
     contentMode: contentModeReducer,
     reading: readingReducer,

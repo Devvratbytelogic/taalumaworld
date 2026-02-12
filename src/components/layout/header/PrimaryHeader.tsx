@@ -2,20 +2,21 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import toast from '@/utils/toast';
-import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, HelpCircle, FileText, Library, BookMarked, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, BookMarked, LogOut, User } from 'lucide-react';
 import { useRouter } from 'nextjs-toploader/app';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectIsAuthenticated, selectUser, signOut } from '@/store/slices/authSlice';
 import { selectCartCount } from '@/store/slices/cartSlice';
 import { selectContentMode } from '@/store/slices/contentModeSlice';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
-import { UserAvatar } from './UserAvatar';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath, getContactUsRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getContactUsRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { openModal } from '@/store/slices/allModalSlice';
+import { signOut } from '@/store/slices/authSlice';
+import { clearAuthCookie } from '@/utils/auth';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,11 +29,11 @@ export default function PrimaryHeader() {
   const pathName = usePathname();
   const dispatch = useAppDispatch();
 
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const user = useAppSelector(selectUser);
   const cartCount = useAppSelector(selectCartCount);
   const contentMode = useAppSelector(selectContentMode);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
+  console.log('isAuthenticated', isAuthenticated);
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -60,10 +61,11 @@ export default function PrimaryHeader() {
   }, [isUserMenuOpen]);
 
   const handleSignOut = () => {
+    clearAuthCookie();
     dispatch(signOut());
     setIsUserMenuOpen(false);
     toast.success('Signed out successfully');
-    router.push('/auth/signin');
+    router.push('/');
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -276,18 +278,18 @@ export default function PrimaryHeader() {
               <div className="pt-4 border-t">
                 {isAuthenticated ? (
                   <>
-                    <Link href="/user-dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Link href={getUserDashboardRoutePath()} onClick={() => setIsMenuOpen(false)}>
                       <button className="w-full flex items-center gap-3 bg-linear-to-r from-primary/10 to-primary/5 rounded-2xl p-3">
                         <UserAvatar
                           userName={user?.fullName || user?.email || ''}
-                          userPhoto={user?.photo}
+                          userPhoto={user?.photo ?? undefined}
                           size="sm"
                         />
                         <span className="font-medium">{user?.fullName || 'My Account'}</span>
                       </button>
                     </Link>
                     <Button
-                      className='global_button rounded_full outline_primary'
+                      className='global_btn rounded_full outline_primary'
                       onPress={() => {
                         handleSignOut();
                         setIsMenuOpen(false);
@@ -297,9 +299,15 @@ export default function PrimaryHeader() {
                     </Button>
                   </>
                 ) : (
-                  <Link href="/auth/signin" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">Sign In</Button>
-                  </Link>
+                  <Button
+                    className="w-full"
+                    onPress={() => {
+                      dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Sign In
+                  </Button>
                 )}
               </div>
             </nav>

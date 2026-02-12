@@ -16,6 +16,12 @@ export function getPrivacyPolicyRoutePath(): string {
 export function getTermsOfServiceRoutePath(): string {
     return `/terms-of-service`;
 }
+export function getAdminRoutePath(): string {
+    return `/admin`;
+}
+export function getUserDashboardRoutePath(): string {
+    return `/user-dashboard`;
+}
 // export function generateSingleProductRoutePath(type: string | string[], slug: string | string[]): string {
 //     return `/product/${type}/${slug}`;
 // }

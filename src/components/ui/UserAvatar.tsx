@@ -1,7 +1,7 @@
 interface UserAvatarProps {
   userName: string;
   userPhoto?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
@@ -10,6 +10,7 @@ export function UserAvatar({ userName, userPhoto, size = 'md', className = '' }:
     sm: 'h-8 w-8 text-sm',
     md: 'h-10 w-10 text-base',
     lg: 'h-12 w-12 text-lg',
+    xl: 'h-14 w-14 text-xl',
   };
 
   // Get first letter of name
@@ -27,12 +28,12 @@ export function UserAvatar({ userName, userPhoto, size = 'md', className = '' }:
       'bg-yellow-500',
       'bg-teal-500',
     ];
-    
+
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     return colors[Math.abs(hash) % colors.length];
   };
 

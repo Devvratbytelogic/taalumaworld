@@ -34,4 +34,16 @@ button {
         @apply text-primary border border-primary bg-transparent;
     }
 
+
+    /* danger outline button */
+    &.danger_outline {
+        @apply text-red-500 border border-red-500 bg-transparent;
+    }
+
+    /* success outline button */
+    &.success_outline {
+        @apply text-success border border-success bg-transparent;
+    }
+
+
 }

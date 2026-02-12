@@ -6,6 +6,7 @@ import { store } from '@/store/store';
 import { Provider } from 'react-redux';
 import { Toaster } from 'sonner';
 import AllModal from '../modals/AllModal';
+import { AuthSync } from '../auth/AuthSync';
 
 interface ProvidersProps {
     children: React.ReactNode;
@@ -15,6 +16,7 @@ export function AppProviders({ children }: ProvidersProps) {
     return (
         <>
             <Provider store={store}>
+                <AuthSync />
                 <Toaster position="bottom-right" richColors closeButton />
                 <HeroUIProvider>
                     <NextTopLoader

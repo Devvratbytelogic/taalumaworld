@@ -545,3 +545,7 @@
     /* Firefox */
   }
 }
+
+.admin_panel .border {
+  border: 1px solid #E5E5E5!important;
+}

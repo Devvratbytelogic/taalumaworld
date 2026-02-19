@@ -15,6 +15,7 @@ import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import {
   getAboutUsRoutePath,
+  getAdminRoutePath,
   getAuthorsRoutePath,
   getBooksRoutePath,
   getCartRoutePath,
@@ -29,6 +30,7 @@ import {
 import { openModal } from '@/store/slices/allModalSlice';
 import { signOut } from '@/store/slices/authSlice';
 import { clearAuthCookie } from '@/utils/auth';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,6 +91,9 @@ export default function PrimaryHeader() {
   };
 
   const isActive = (path: string) => pathName === path;
+  if (pathName === getAdminRoutePath()) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -100,14 +105,21 @@ export default function PrimaryHeader() {
         <div className="flex items-center justify-between py-4 gap-4">
           {/* Logo */}
           <Link href={getHomeRoutePath()} className="flex items-center gap-2 shrink-0">
-            <div className="bg-primary rounded-xl p-2">
+            <div className="w-50">
+              <ImageComponent
+                src={'/images/logo.png'}
+                alt={'Taaluma'}
+                object_cover={false}
+              />
+            </div>
+            {/* <div className="bg-primary rounded-xl p-2">
               <BookOpen className="h-6 w-6 text-white" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-bold text-xl whitespace-nowrap">
+              <div className="text-2xl font-bold">
                 Taaluma<span className="text-primary">World</span>
-              </h1>
-            </div>
+              </div>
+            </div> */}
           </Link>
 
           {/* Center Search Bar */}

@@ -30,8 +30,15 @@ button {
         @apply bg-primary text-white outline-none;
     }
 
+    &.bg_transparent {
+        @apply bg-transparent outline-none text-black!;
+    }
+
     &.outline_primary {
         @apply text-primary border border-primary bg-transparent;
+    }
+    &.small_outline_primary {
+        @apply text-primary border border-primary bg-transparent h-8! min-h-8!;
     }
 
 
@@ -49,4 +56,7 @@ button {
 .fit_btn {
     min-width: fit-content !important;
     padding: 0 !important;
+}
+.icon_btn {
+    @apply rounded-full bg-transparent h-8! min-h-8! w-8! min-w-8!;
 }

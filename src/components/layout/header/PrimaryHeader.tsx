@@ -13,7 +13,19 @@ import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath, getContactUsRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import {
+  getAboutUsRoutePath,
+  getAuthorsRoutePath,
+  getBooksRoutePath,
+  getCartRoutePath,
+  getCategoriesRoutePath,
+  getContactUsRoutePath,
+  getHomeRoutePath,
+  getMyBooksRoutePath,
+  getMyChaptersRoutePath,
+  getSearchRoutePath,
+  getUserDashboardRoutePath,
+} from '@/routes/routes';
 import { openModal } from '@/store/slices/allModalSlice';
 import { signOut } from '@/store/slices/authSlice';
 import { clearAuthCookie } from '@/utils/auth';
@@ -64,13 +76,13 @@ export default function PrimaryHeader() {
     dispatch(signOut());
     setIsUserMenuOpen(false);
     toast.success('Signed out successfully');
-    router.push('/');
+    router.push(getHomeRoutePath());
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      router.push(getSearchRoutePath(searchQuery));
     } else {
       toast.error('Please enter a search term');
     }
@@ -87,7 +99,7 @@ export default function PrimaryHeader() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
+          <Link href={getHomeRoutePath()} className="flex items-center gap-2 shrink-0">
             <div className="bg-primary rounded-xl p-2">
               <BookOpen className="h-6 w-6 text-white" />
             </div>
@@ -107,7 +119,7 @@ export default function PrimaryHeader() {
           <div className="flex items-center gap-6 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
-              <Link href={contentMode === 'chapters' ? '/my-chapters' : '/my-books'} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
+              <Link href={contentMode === 'chapters' ? getMyChaptersRoutePath() : getMyBooksRoutePath()} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
                 <BookMarked className="h-5 w-5" />
                 <span className="font-medium text-sm">{contentMode === 'books' ? 'My Books' : 'My Chapters'}</span>
               </Link>
@@ -115,7 +127,7 @@ export default function PrimaryHeader() {
 
             {/* Cart */}
             {isAuthenticated && (
-              <Link href="/cart" className="relative hidden lg:block">
+              <Link href={getCartRoutePath()} className="relative hidden lg:block">
                 <button className="relative text-gray-700 hover:text-primary transition-colors">
                   <ShoppingCart className="h-6 w-6" />
                   {cartCount > 0 && (
@@ -143,7 +155,7 @@ export default function PrimaryHeader() {
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                     <div className="py-1">
-                      <Link href="/user-dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <Link href={getUserDashboardRoutePath()} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <User className="h-5 w-5 mr-2 inline-block" />
                         My Account
                       </Link>
@@ -192,22 +204,22 @@ export default function PrimaryHeader() {
         {/* Navigation Bar */}
         <nav className="hidden md:flex items-center gap-8 border-t py-3">
           <Link
-            href="/"
-            className={`transition-colors ${isActive('/') ? 'text-primary' : 'hover:text-primary'
+            href={getHomeRoutePath()}
+            className={`transition-colors ${isActive(getHomeRoutePath()) ? 'text-primary' : 'hover:text-primary'
               }`}
           >
             Home
           </Link>
           <Link
             href={getAboutUsRoutePath()}
-            className={`transition-colors ${isActive('/about') ? 'text-primary' : 'hover:text-primary'
+            className={`transition-colors ${isActive(getAboutUsRoutePath()) ? 'text-primary' : 'hover:text-primary'
               }`}
           >
             About Us
           </Link>
           <Link
             href={getContactUsRoutePath()}
-            className={`transition-colors ${isActive('/contact') ? 'text-primary' : 'hover:text-primary'
+            className={`transition-colors ${isActive(getContactUsRoutePath()) ? 'text-primary' : 'hover:text-primary'
               }`}
           >
             Contact
@@ -216,22 +228,22 @@ export default function PrimaryHeader() {
           {contentMode === 'books' && (
             <>
               <Link
-                href="/books"
-                className={`transition-colors font-medium ${isActive('/books') ? 'text-primary' : 'hover:text-primary'
+                href={getBooksRoutePath()}
+                className={`transition-colors font-medium ${isActive(getBooksRoutePath()) ? 'text-primary' : 'hover:text-primary'
                   }`}
               >
                 Books
               </Link>
               <Link
-                href="/categories"
-                className={`transition-colors font-medium ${isActive('/categories') ? 'text-primary' : 'hover:text-primary'
+                href={getCategoriesRoutePath()}
+                className={`transition-colors font-medium ${isActive(getCategoriesRoutePath()) ? 'text-primary' : 'hover:text-primary'
                   }`}
               >
                 Categories
               </Link>
               <Link
-                href="/authors"
-                className={`transition-colors font-medium ${isActive('/authors') ? 'text-primary' : 'hover:text-primary'
+                href={getAuthorsRoutePath()}
+                className={`transition-colors font-medium ${isActive(getAuthorsRoutePath()) ? 'text-primary' : 'hover:text-primary'
                   }`}
               >
                 Thought Leaders
@@ -244,32 +256,32 @@ export default function PrimaryHeader() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col gap-4">
-              <Link href="/" onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+              <Link href={getHomeRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                 Home
               </Link>
-              <Link href="/about" onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+              <Link href={getAboutUsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                 About Us
               </Link>
-              <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+              <Link href={getContactUsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                 Contact
               </Link>
 
               {contentMode === 'books' && (
                 <>
-                  <Link href="/books" onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                  <Link href={getBooksRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                     Books
                   </Link>
-                  <Link href="/categories" onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                  <Link href={getCategoriesRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                     Categories
                   </Link>
-                  <Link href="/authors" onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                  <Link href={getAuthorsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                     Thought Leaders
                   </Link>
                 </>
               )}
 
               {isAuthenticated && (
-                <Link href={contentMode === 'chapters' ? '/my-chapters' : '/my-books'} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                <Link href={contentMode === 'chapters' ? getMyChaptersRoutePath() : getMyBooksRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                   {contentMode === 'chapters' ? 'My Chapters' : 'My Books'}
                 </Link>
               )}

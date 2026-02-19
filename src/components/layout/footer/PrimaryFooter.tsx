@@ -6,7 +6,19 @@ import Link from 'next/link'
 import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
-import { getAboutUsRoutePath, getContactUsRoutePath, getFAQRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
+import {
+  getAboutUsRoutePath,
+  getAdminRoutePath,
+  getAuthorsRoutePath,
+  getBooksRoutePath,
+  getCategoriesRoutePath,
+  getContactUsRoutePath,
+  getDesignSystemRoutePath,
+  getFAQRoutePath,
+  getHomeRoutePath,
+  getPrivacyPolicyRoutePath,
+  getTermsOfServiceRoutePath,
+} from '@/routes/routes';
 
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
@@ -49,24 +61,24 @@ export default function PrimaryFooter() {
                             <h4 className="text-white font-semibold mb-4">Quick Links</h4>
                             <ul className="space-y-2 text-sm">
                                 <li>
-                                    <Link href="/" className="hover:text-primary transition-colors">
+                                    <Link href={getHomeRoutePath()} className="hover:text-primary transition-colors">
                                         Home
                                     </Link>
                                 </li>
                                 {contentMode === 'books' && (
                                     <>
                                         <li>
-                                            <Link href="/books" className="hover:text-primary transition-colors">
+                                            <Link href={getBooksRoutePath()} className="hover:text-primary transition-colors">
                                                 Browse Books
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link href="/categories" className="hover:text-primary transition-colors">
+                                            <Link href={getCategoriesRoutePath()} className="hover:text-primary transition-colors">
                                                 Categories
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link href="/authors" className="hover:text-primary transition-colors">
+                                            <Link href={getAuthorsRoutePath()} className="hover:text-primary transition-colors">
                                                 Thought Leaders
                                             </Link>
                                         </li>
@@ -105,12 +117,12 @@ export default function PrimaryFooter() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/admin" className="hover:text-primary transition-colors">
+                                    <Link href={getAdminRoutePath()} className="hover:text-primary transition-colors">
                                         Admin Panel
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/design-system" className="hover:text-primary transition-colors">
+                                    <Link href={getDesignSystemRoutePath()} className="hover:text-primary transition-colors">
                                         Design System
                                     </Link>
                                 </li>

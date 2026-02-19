@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
+import { getAuthorsRoutePath, getBooksRoutePath, getHomeWithSelectionRoutePath } from '@/routes/routes';
 import { Search, X, BookOpen, FileText, User, Clock } from 'lucide-react';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
 import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
@@ -110,7 +111,7 @@ export default function GlobalSearchBar() {
                   <button
                     key={book.id}
                     onClick={() => {
-                      router.push(`/books?id=${book.id}`);
+                      router.push(getBooksRoutePath({ id: book.id }));
                       setIsOpen(false);
                       setQuery('');
                       saveSearch(book.title);
@@ -135,7 +136,7 @@ export default function GlobalSearchBar() {
                     key={chapter.id}
                     onClick={() => {
                       // Navigate to home page with chapter selection
-                      router.push(`/?selectedChapterId=${chapter.id}&selectedBookId=${chapter.bookId}`);
+                      router.push(getHomeWithSelectionRoutePath(chapter.id, chapter.bookId));
                       setIsOpen(false);
                       setQuery('');
                       saveSearch(chapter.title);
@@ -159,7 +160,7 @@ export default function GlobalSearchBar() {
                   <button
                     key={author.id}
                     onClick={() => {
-                      router.push(`/authors?id=${author.id}`);
+                      router.push(getAuthorsRoutePath({ id: author.id }));
                       setIsOpen(false);
                       setQuery('');
                       saveSearch(author.name);

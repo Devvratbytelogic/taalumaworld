@@ -2,17 +2,20 @@ import { Book, Play, BookOpen, CheckCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
 import { useGetAuthorsQuery } from '@/store/api/authorsApi';
+import { getBooksRoutePath } from '@/routes/routes';
 
 interface MyBooksPageProps {
   ownedBooks: string[];
   readingProgress: Record<string, number>;
   onNavigate: (page: string) => void;
+  hideHeader?: boolean;
 }
 
 export function MyBooksPage({
   ownedBooks,
   readingProgress,
-  onNavigate
+  onNavigate,
+  hideHeader = false,
 }: MyBooksPageProps) {
   const { data: books = [] } = useGetAllBooksQuery();
   const { data: authors = [] } = useGetAuthorsQuery();
@@ -45,18 +48,19 @@ export function MyBooksPage({
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-2xl">
-            <Book className="h-6 w-6 text-primary" />
+      {!hideHeader && (
+        <div className="bg-white rounded-3xl p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-primary/10 rounded-2xl">
+              <Book className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-foreground">My Books</h1>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">My Books</h1>
+          <p className="text-muted-foreground">
+            {myBooks.length} {myBooks.length === 1 ? 'book' : 'books'} in your library
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          {myBooks.length} {myBooks.length === 1 ? 'book' : 'books'} in your library
-        </p>
-      </div>
+      )}
 
       {/* Books Grid */}
       {myBooks.length > 0 ? (
@@ -117,9 +121,8 @@ export function MyBooksPage({
 
                   {/* Action Button */}
                   <Button
-                    size="sm"
-                    className="w-full rounded-full gap-2"
-                    onClick={() => onNavigate('read-book')}
+                    className="global_btn rounded_full bg_primary w-full"
+                    onPress={() => onNavigate('read-book')}
                   >
                     {progress === 0 ? (
                       <>
@@ -161,7 +164,7 @@ export function MyBooksPage({
               You haven't purchased any books yet. Start exploring and build your collection!
             </p>
             <Button
-              onClick={() => onNavigate('books')}
+              onPress={() => onNavigate(getBooksRoutePath())}
               className="gap-2"
             >
               Browse Books

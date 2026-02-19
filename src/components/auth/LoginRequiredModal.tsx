@@ -1,4 +1,5 @@
 import React from 'react'
+import { getReadChapterRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { Modal, ModalContent, ModalBody, } from '@heroui/react'
@@ -93,7 +94,7 @@ export default function LoginRequiredModal() {
                 onPress={() => dispatch(openModal({
                   componentName: 'SignIn',
                   data: (action === 'read' && (data as { chapterId?: string })?.chapterId)
-                    ? { redirectTo: `/read-chapter/${(data as { chapterId: string }).chapterId}` }
+                    ? { redirectTo: getReadChapterRoutePath((data as { chapterId: string }).chapterId) }
                     : ''
                 }))}
                className='global_btn bg_primary w-full'
@@ -117,7 +118,7 @@ export default function LoginRequiredModal() {
                   onClick={() => dispatch(openModal({
                   componentName: 'SignUp',
                   data: (action === 'read' && (data as { chapterId?: string })?.chapterId)
-                    ? { redirectTo: `/read-chapter/${(data as { chapterId: string }).chapterId}` }
+                    ? { redirectTo: getReadChapterRoutePath((data as { chapterId: string }).chapterId) }
                     : ''
                 }))}
                   className="text-primary hover:text-primary/80 transition-colors font-semibold"

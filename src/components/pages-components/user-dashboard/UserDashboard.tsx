@@ -10,6 +10,7 @@ import { ReadingHistory } from './ReadingHistory';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
 import { cn } from '@/components/ui/utils';
+import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { signOut } from '@/store/slices/authSlice';
 import { selectReadingProgress } from '@/store/slices/readingSlice';
 import { useGetPurchasedItemsQuery } from '@/store/api/userApi';
@@ -50,16 +51,16 @@ export function UserDashboard() {
   }, []);
 
   const handleNavigate = (page: string, id?: string) => {
-    if (page === 'home') router.push('/');
-    else if (page === 'books') router.push('/');
-    else if (page === 'read-chapter' && id) router.push(`/read-chapter/${id}`);
-    else if (page === 'read-book') router.push('/');
-    else router.push('/');
+    if (page === 'home') router.push(getHomeRoutePath());
+    else if (page === 'books') router.push(getHomeRoutePath());
+    else if (page === 'read-chapter' && id) router.push(getReadChapterRoutePath(id));
+    else if (page === 'read-book') router.push(getHomeRoutePath());
+    else router.push(getHomeRoutePath());
   };
 
   const handleLogout = () => {
     dispatch(signOut());
-    router.push('/');
+    router.push(getHomeRoutePath());
   };
 
   // Load display mode from localStorage

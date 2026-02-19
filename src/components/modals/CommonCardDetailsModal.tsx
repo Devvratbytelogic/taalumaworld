@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
 import type { Chapter } from '@/data/mockData'
 import { books, authors } from '@/data/mockData'
+import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { RootState } from '@/store/store'
 import ImageComponent from '../ui/ImageComponent'
@@ -34,7 +35,7 @@ export default function CommonCardDetailsModal() {
       dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'read', itemType: 'chapter', chapterId: chapter.id } }))
     } else {
       dispatch(closeModal())
-      router.push(`/read-chapter/${chapter.id}`)
+      router.push(getReadChapterRoutePath(chapter.id))
     }
   }
 
@@ -42,7 +43,7 @@ export default function CommonCardDetailsModal() {
     if (!isAuthenticated) {
       dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'cart', itemType: 'chapter' } }))
     } else {
-      dispatch(closeModal())
+      router.push(getCartRoutePath())
     }
   }
 

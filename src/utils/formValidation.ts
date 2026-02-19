@@ -49,6 +49,25 @@ export const otpVerificationSchema = Yup.object({
 });
 
 
+// Checkout Payment Validation Schema
+export const checkoutSchema = Yup.object({
+  cardHolder: Yup.string()
+    .min(2, 'Name must be at least 2 characters')
+    .required('Cardholder name is required'),
+  cardNumber: Yup.string()
+    .required('Card number is required')
+    .test('cardNumber', 'Enter a valid 16-digit card number', (val) =>
+      !val ? false : val.replace(/\s/g, '').length === 16 && /^\d+$/.test(val.replace(/\s/g, ''))
+    )
+    .required('Card number is required'),
+  expiryDate: Yup.string()
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Use MM/YY format')
+    .required('Expiry date is required'),
+  cvv: Yup.string()
+    .matches(/^\d{3,4}$/, 'CVV must be 3 or 4 digits')
+    .required('CVV is required'),
+});
+
 // Contact Form Validation Schema
 export const contactFormSchema = Yup.object({
     name: Yup.string()

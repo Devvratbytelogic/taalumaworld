@@ -15,6 +15,7 @@ import { RootState } from '@/store/store';
 import { usePurchaseChapterMutation } from '@/store/api/userApi';
 import { useGetPurchasedItemsQuery } from '@/store/api/userApi';
 import { useCart } from '@/hooks/useCart';
+import { getCartRoutePath } from '@/routes/routes';
 
 interface ChapterPurchaseModalData {
   chapter: Chapter;
@@ -62,8 +63,9 @@ export function ChapterPurchaseModal() {
 
   const handleAddToCart = () => {
     if (book && chapter) {
-      addToCart(chapter.id, book.id, ownedChapters);
-      handleClose();
+      // addToCart(chapter.id, book.id, ownedChapters);
+      // handleClose();
+      router.push(getCartRoutePath());
     }
   };
 

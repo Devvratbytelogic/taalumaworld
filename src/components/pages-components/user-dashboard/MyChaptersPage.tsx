@@ -8,13 +8,15 @@ interface MyChaptersPageProps {
   readingProgress: Record<string, number>;
   onNavigate: (page: string, id?: string) => void;
   isAuthenticated?: boolean;
+  hideHeader?: boolean;
 }
 
 export function MyChaptersPage({
   ownedChapters,
   readingProgress,
   onNavigate,
-  isAuthenticated = false
+  isAuthenticated = false,
+  hideHeader = false,
 }: MyChaptersPageProps) {
   const { data: books = [] } = useGetAllBooksQuery();
   const { data: chapters = [] } = useGetAllChaptersQuery();
@@ -23,18 +25,19 @@ export function MyChaptersPage({
   if (!isAuthenticated) {
     return (
       <div className="space-y-6">
-        {/* Page Header */}
-        <div className="bg-white rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-2xl">
-              <BookOpen className="h-6 w-6 text-primary" />
+        {!hideHeader && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-primary/10 rounded-2xl">
+                <BookOpen className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-3xl font-bold text-foreground">My Chapters</h1>
             </div>
-            <h1 className="text-3xl font-bold text-foreground">My Chapters</h1>
+            <p className="text-muted-foreground">
+              0 chapters in your library
+            </p>
           </div>
-          <p className="text-muted-foreground">
-            0 chapters in your library
-          </p>
-        </div>
+        )}
 
         {/* Empty State - No Auth */}
         <div className="bg-white rounded-3xl p-12 text-center shadow-sm">
@@ -80,18 +83,19 @@ export function MyChaptersPage({
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-2xl">
-            <BookOpen className="h-6 w-6 text-primary" />
+      {!hideHeader && (
+        <div className="bg-white rounded-3xl p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-primary/10 rounded-2xl">
+              <BookOpen className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-foreground">My Chapters</h1>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">My Chapters</h1>
+          <p className="text-muted-foreground">
+            {myChapters.length} {myChapters.length === 1 ? 'chapter' : 'chapters'} in your library
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          {myChapters.length} {myChapters.length === 1 ? 'chapter' : 'chapters'} in your library
-        </p>
-      </div>
+      )}
 
       {/* Chapters List */}
       {myChapters.length > 0 ? (

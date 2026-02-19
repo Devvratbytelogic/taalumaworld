@@ -8,7 +8,10 @@ import SignUp from '../auth/signup/SignUp';
 import ForgotPassword from '../auth/forgot/ForgotPassword';
 import ResetPassword from '../auth/forgot/ResetPassword';
 import OtpVerification from '../auth/otp/OtpVerification';
-
+import FilterModal from './FilterModal';
+import CommonCardDetailsModal from './CommonCardDetailsModal';
+import LoginRequiredModal from '../auth/LoginRequiredModal';
+import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -31,7 +34,15 @@ export default function AllModal() {
                 return <ResetPassword />;
             case "OtpVerification":
                 return <OtpVerification />;
-            
+            case "FilterModal":
+                return <FilterModal />;
+            case "CommonCardDetailsModal":
+                return <CommonCardDetailsModal />;
+            case "LoginRequiredModal":
+                return <LoginRequiredModal />;
+            case "ChapterPurchaseModal":
+                return <ChapterPurchaseModal />;
+
             default:
                 return null;
         }

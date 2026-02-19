@@ -10,6 +10,7 @@ import contentModeReducer from './slices/contentModeSlice';
 import readingReducer from './slices/readingSlice';
 import allModalSlice from './slices/allModalSlice';
 import authReducer from './slices/authSlice';
+import chapterPurchaseReducer from './slices/chapterPurchaseSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     // Regular slices
     allModal: allModalSlice,
+    chapterPurchase: chapterPurchaseReducer,
     cart: cartReducer,
     contentMode: contentModeReducer,
     reading: readingReducer,

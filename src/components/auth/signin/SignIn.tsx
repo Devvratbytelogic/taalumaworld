@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { RootState } from '@/store/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
@@ -16,6 +17,7 @@ import { setAuthCookie } from '@/utils/auth';
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch()
+    const router = useRouter()
     const { isOpen, data } = useSelector((state: RootState) => state.allModal)
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: {
@@ -27,9 +29,13 @@ export default function SignIn() {
             console.log('Sign in form submitted:', values);
             setAuthCookie();
             dispatch(setAuthenticated({ fullName: 'User', email: values.email }));
+            const redirectTo = (data as { redirectTo?: string })?.redirectTo;
             dispatch(closeModal());
             resetForm();
             toast.success('Sign in successful!');
+            if (redirectTo) {
+                router.push(redirectTo);
+            }
         },
     });
     return (

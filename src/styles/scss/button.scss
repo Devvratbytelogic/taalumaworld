@@ -4,7 +4,7 @@ button {
 }
 
 .global_btn {
-    @apply min-w-30 px-6 min-h-10 bg-primary text-white ;
+    @apply min-w-30 px-6 min-h-10 bg-primary text-white;
 
     &.medium_height {
         @apply min-h-8;
@@ -44,6 +44,9 @@ button {
     &.success_outline {
         @apply text-success border border-success bg-transparent;
     }
+}
 
-
+.fit_btn {
+    min-width: fit-content !important;
+    padding: 0 !important;
 }

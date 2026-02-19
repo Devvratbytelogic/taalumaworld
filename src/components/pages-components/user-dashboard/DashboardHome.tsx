@@ -10,7 +10,7 @@ interface DashboardHomeProps {
   ownedChapters: string[];
   ownedBooks: string[];
   readingProgress: Record<string, number>;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, id?: string) => void;
   onPageChange: (page: 'my-chapters' | 'my-books' | 'history') => void;
 }
 
@@ -94,7 +94,7 @@ export function DashboardHome({
                   <div
                     key={id}
                     className="group bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => onNavigate('read-chapter')}
+                    onClick={() => onNavigate('read-chapter', id)}
                   >
                     <div className="aspect-video relative overflow-hidden bg-gray-100">
                       <img
@@ -127,7 +127,7 @@ export function DashboardHome({
                         className="w-full mt-3 rounded-full"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onNavigate('read-chapter');
+                          onNavigate('read-chapter', id);
                         }}
                       >
                         Continue Reading
@@ -144,7 +144,7 @@ export function DashboardHome({
                     className="group bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
                     onClick={() => onNavigate('read-book')}
                   >
-                    <div className="aspect-[3/4] relative overflow-hidden bg-gray-100">
+                    <div className="aspect-3/4 relative overflow-hidden bg-gray-100">
                       <img
                         src={book.coverImage}
                         alt={book.title}
@@ -194,7 +194,7 @@ export function DashboardHome({
         {displayMode === 'chapters' ? (
           <button
             onClick={() => onPageChange('my-chapters')}
-            className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
+            className="bg-linear-to-br from-primary/10 to-primary/5 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 bg-primary rounded-2xl">
@@ -213,7 +213,7 @@ export function DashboardHome({
         ) : (
           <button
             onClick={() => onPageChange('my-books')}
-            className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
+            className="bg-linear-to-br from-primary/10 to-primary/5 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 bg-primary rounded-2xl">
@@ -234,7 +234,7 @@ export function DashboardHome({
         {/* Reading History Card */}
         <button
           onClick={() => onPageChange('history')}
-          className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
+          className="bg-linear-to-br from-blue-50 to-blue-100/50 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
         >
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-blue-500 rounded-2xl">
@@ -254,7 +254,7 @@ export function DashboardHome({
         {/* Explore More Card */}
         <button
           onClick={() => onNavigate('home')}
-          className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
+          className="bg-linear-to-br from-purple-50 to-purple-100/50 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
         >
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-purple-500 rounded-2xl">
@@ -286,8 +286,8 @@ export function DashboardHome({
               You haven't started reading yet. Explore our collection and dive into amazing stories!
             </p>
             <Button
-              onClick={() => onNavigate('home')}
-              className="gap-2"
+              onPress={() => onNavigate('home')}
+              className='global_btn rounded_full bg_primary'
             >
               {displayMode === 'chapters' ? 'Browse Chapters' : 'Browse Books'}
               <ArrowRight className="h-4 w-4" />

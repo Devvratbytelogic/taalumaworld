@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin '../../hero.ts';
 @import "./scss/button.scss";
+@import "./scss/scrollbar.scss";
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 
 @custom-variant dark (&:is(.dark *));
@@ -542,10 +543,5 @@
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari, Opera */
   }
 }

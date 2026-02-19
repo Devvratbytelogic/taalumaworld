@@ -128,6 +128,20 @@ export const userApi = createApi({
       },
       invalidatesTags: ['User'],
     }),
+
+    purchaseChapter: builder.mutation<boolean, string>({
+      queryFn: async (chapterId) => {
+        await delay(500);
+        const owned = JSON.parse(localStorage.getItem('owned_chapters') || '[]');
+        if (owned.includes(chapterId)) {
+          return { data: true };
+        }
+        owned.push(chapterId);
+        localStorage.setItem('owned_chapters', JSON.stringify(owned));
+        return { data: true };
+      },
+      invalidatesTags: ['Purchases'],
+    }),
   }),
 });
 
@@ -137,4 +151,5 @@ export const {
   useGetReadingProgressQuery,
   useUpdateReadingProgressMutation,
   useUpdateUserProfileMutation,
+  usePurchaseChapterMutation,
 } = userApi;

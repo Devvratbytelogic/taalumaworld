@@ -33,7 +33,6 @@ export default function PrimaryHeader() {
   const contentMode = useAppSelector(selectContentMode);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
-  console.log('isAuthenticated', isAuthenticated);
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);

@@ -6,7 +6,7 @@ import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
 interface MyChaptersPageProps {
   ownedChapters: string[];
   readingProgress: Record<string, number>;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, id?: string) => void;
   isAuthenticated?: boolean;
 }
 
@@ -153,7 +153,7 @@ export function MyChaptersPage({
                   {/* Action Button */}
                   <Button
                     className='global_btn rounded_full bg_primary'
-                    onPress={() => onNavigate('read-chapter')}
+                    onPress={() => onNavigate('read-chapter', chapter.id)}
                   >
                     {progress === 0 ? (
                       <>

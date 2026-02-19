@@ -73,8 +73,8 @@ export function ContinueReadingCard({
           <Button
             size="sm"
             className="w-full rounded-full text-xs h-8"
-            onClick={(e) => {
-              e.stopPropagation();
+            onPress={(e) => {
+              // e.stopPropagation();
               onClick();
             }}
           >

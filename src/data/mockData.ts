@@ -21,6 +21,10 @@ export interface Author {
 export interface Chapter {
   id: string;
   bookId: string;
+  book?: {
+    title: string;
+    author?: { name: string };
+  };
   title: string;
   description: string;
   featuredImage: string;
@@ -212,6 +216,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-1-1',
     bookId: 'book-1',
+    book: { title: 'The Quantum Quest', author: { name: 'Sarah Johnson' } },
     title: 'The Discovery',
     description: 'Emma finds a mysterious device in her grandmother\'s attic.',
     featuredImage: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600',
@@ -249,6 +254,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-1-2',
     bookId: 'book-1',
+    book: { title: 'The Quantum Quest', author: { name: 'Sarah Johnson' } },
     title: 'First Jump',
     description: 'The team makes their first quantum leap.',
     featuredImage: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=600',
@@ -280,6 +286,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-1-3',
     bookId: 'book-1',
+    book: { title: 'The Quantum Quest', author: { name: 'Sarah Johnson' } },
     title: 'Parallel Problems',
     description: 'Things get complicated in an alternate reality.',
     featuredImage: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?w=600',
@@ -295,6 +302,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-2-1',
     bookId: 'book-2',
+    book: { title: 'Code Warriors Academy', author: { name: 'David Kim' } },
     title: 'Welcome to the Academy',
     description: 'Meet the contestants and learn the rules of the competition.',
     featuredImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600',
@@ -322,6 +330,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-2-2',
     bookId: 'book-2',
+    book: { title: 'Code Warriors Academy', author: { name: 'David Kim' } },
     title: 'Variables and Victory',
     description: 'First challenge: master variables to advance.',
     featuredImage: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600',
@@ -337,6 +346,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-3-1',
     bookId: 'book-3',
+    book: { title: 'Mysteries of Moonlight Manor', author: { name: 'Emily Rodriguez' } },
     title: 'The Invitation',
     description: 'A mysterious letter brings five strangers together.',
     featuredImage: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600',
@@ -364,6 +374,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-3-2',
     bookId: 'book-3',
+    book: { title: 'Mysteries of Moonlight Manor', author: { name: 'Emily Rodriguez' } },
     title: 'Hidden Passages',
     description: 'The manor reveals its first secret.',
     featuredImage: 'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=600',
@@ -379,6 +390,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-4-1',
     bookId: 'book-4',
+    book: { title: 'The Science of Superpowers', author: { name: 'Michael Chen' } },
     title: 'Could We Really Fly?',
     description: 'The physics of flight and what it would take for humans.',
     featuredImage: 'https://images.unsplash.com/photo-1473187983305-f615310e7daa?w=600',
@@ -394,6 +406,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-5-1',
     bookId: 'book-5',
+    book: { title: 'Island Survivors', author: { name: 'Sarah Johnson' } },
     title: 'The Storm',
     description: 'Everything goes wrong during what should have been a simple boat trip.',
     featuredImage: 'https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=600',
@@ -421,6 +434,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-5-2',
     bookId: 'book-5',
+    book: { title: 'Island Survivors', author: { name: 'Sarah Johnson' } },
     title: 'First Night',
     description: 'Finding shelter and making fire become matters of survival.',
     featuredImage: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600',
@@ -449,6 +463,7 @@ export const chapters: Chapter[] = [
   {
     id: 'ch-6-1',
     bookId: 'book-6',
+    book: { title: 'Your First Million Steps', author: { name: 'David Kim' } },
     title: 'Why Start Now?',
     description: 'Understanding why your teen years are perfect for entrepreneurship.',
     featuredImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600',

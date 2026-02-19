@@ -49,10 +49,11 @@ export function UserDashboard() {
     }
   }, []);
 
-  const handleNavigate = (page: string) => {
+  const handleNavigate = (page: string, id?: string) => {
     if (page === 'home') router.push('/');
     else if (page === 'books') router.push('/');
-    else if (page === 'read-chapter' || page === 'read-book') router.push('/');
+    else if (page === 'read-chapter' && id) router.push(`/read-chapter/${id}`);
+    else if (page === 'read-book') router.push('/');
     else router.push('/');
   };
 

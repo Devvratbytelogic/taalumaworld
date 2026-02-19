@@ -7,7 +7,7 @@ import { useGetAuthorsQuery } from '@/store/api/authorsApi';
 interface ReadingHistoryProps {
   readingProgress: Record<string, number>;
   displayMode: 'chapters' | 'books';
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, id?: string) => void;
 }
 
 export function ReadingHistory({
@@ -148,7 +148,7 @@ export function ReadingHistory({
                     <div className="shrink-0 flex items-center">
                       <Button
                         className='global_btn rounded_full outline_primary'
-                        onPress={() => onNavigate('read-chapter')}
+                        onPress={() => onNavigate('read-chapter', item.id)}
                       >
                         {item.progress < 100 ? 'Continue' : 'Read Again'}
                       </Button>

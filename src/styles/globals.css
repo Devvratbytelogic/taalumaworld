@@ -332,6 +332,7 @@
   /* Selection color */
   ::selection {
     background-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    /* background-color: transparent; */
     color: var(--foreground);
   }
 

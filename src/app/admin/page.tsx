@@ -20,7 +20,7 @@ import { AdminDashboardTab } from '@/components/admin/AdminDashboardTab';
 import { AdminBooksTab } from '@/components/admin/books/AdminBooksTab';
 import { AdminChaptersTab } from '@/components/admin/chapter/AdminChaptersTab';
 import { AdminCategoriesTab } from '@/components/admin/categories/AdminCategoriesTab';
-import { AdminAuthorsTab } from '@/components/admin/AdminAuthorsTab';
+import { AdminAuthorsTab } from '@/components/admin/authors/AdminAuthorsTab';
 import { AdminUsersTab } from '@/components/admin/AdminUsersTab';
 import { AdminRolesTab } from '@/components/admin/AdminRolesTab';
 import { AdminActivityLogsTab } from '@/components/admin/AdminActivityLogsTab';

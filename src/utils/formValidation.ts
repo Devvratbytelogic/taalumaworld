@@ -128,3 +128,14 @@ export const categorySchema = Yup.object({
     .required('Please enter a category name'),
   subcategories: Yup.array().of(Yup.string().trim().required()),
 });
+
+// Add / Edit Author (Thought Leader) Modal Validation Schema
+export const authorSchema = Yup.object({
+  name: Yup.string()
+    .trim()
+    .required('Please enter a name'),
+  bio: Yup.string(),
+  avatar: Yup.string()
+    .optional()
+    .test('url', 'Please enter a valid URL', (v) => !v || /^https?:\/\//.test(v)),
+});

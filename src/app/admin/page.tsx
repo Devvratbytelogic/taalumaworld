@@ -21,7 +21,7 @@ import { AdminBooksTab } from '@/components/admin/books/AdminBooksTab';
 import { AdminChaptersTab } from '@/components/admin/chapter/AdminChaptersTab';
 import { AdminCategoriesTab } from '@/components/admin/categories/AdminCategoriesTab';
 import { AdminAuthorsTab } from '@/components/admin/authors/AdminAuthorsTab';
-import { AdminUsersTab } from '@/components/admin/AdminUsersTab';
+import { AdminUsersTab } from '@/components/admin/users/AdminUsersTab';
 import { AdminRolesTab } from '@/components/admin/AdminRolesTab';
 import { AdminActivityLogsTab } from '@/components/admin/AdminActivityLogsTab';
 import { AdminPaymentsTab } from '@/components/admin/AdminPaymentsTab';

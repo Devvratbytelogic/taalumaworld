@@ -99,3 +99,24 @@ export const addBookSchema = Yup.object({
   tagsInput: Yup.string(),
   chapters: Yup.array(),
 });
+
+// Add Chapter Modal Validation Schema
+export const addChapterSchema = Yup.object({
+  bookId: Yup.string().required('Please select a book'),
+  title: Yup.string()
+    .trim()
+    .required('Please enter a chapter title'),
+  description: Yup.string(),
+  sequence: Yup.number()
+    .integer('Must be a whole number')
+    .min(1, 'Sequence must be at least 1')
+    .required('Sequence is required'),
+  isFree: Yup.boolean(),
+  price: Yup.number()
+    .min(0, 'Price cannot be negative')
+    .when('isFree', {
+      is: true,
+      then: (schema) => schema.optional(),
+      otherwise: (schema) => schema.required('Price is required when chapter is not free'),
+    }),
+});

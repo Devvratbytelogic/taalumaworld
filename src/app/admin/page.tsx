@@ -18,7 +18,7 @@ import toast from '@/utils/toast';
 // Import Tab Components
 import { AdminDashboardTab } from '@/components/admin/AdminDashboardTab';
 import { AdminBooksTab } from '@/components/admin/books/AdminBooksTab';
-import { AdminChaptersTab } from '@/components/admin/AdminChaptersTab';
+import { AdminChaptersTab } from '@/components/admin/chapter/AdminChaptersTab';
 import { AdminCategoriesTab } from '@/components/admin/AdminCategoriesTab';
 import { AdminAuthorsTab } from '@/components/admin/AdminAuthorsTab';
 import { AdminUsersTab } from '@/components/admin/AdminUsersTab';
@@ -143,7 +143,7 @@ export default function AdminPanelRoutePage() {
             case 'books':
                 return <AdminBooksTab />;
             case 'chapters':
-                return <AdminChaptersTab contentMode={contentMode} />;
+                return <AdminChaptersTab />;
             case 'categories':
                 return <AdminCategoriesTab />;
             case 'authors':

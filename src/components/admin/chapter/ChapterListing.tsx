@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { Plus, FileText, MoreVertical, Eye, Edit, Trash2, Search, Filter } from 'lucide-react';
-import Button from '../ui/Button';
-import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
+import { Plus, FileText, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
+import Button from '../../ui/Button';
+import { Badge } from '../../ui/badge';
 import {
   Table,
   TableBody,
@@ -10,75 +8,40 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table';
+} from '../../ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { useGetAllChaptersQuery } from '../../store/api/chaptersApi';
-import { useGetAllBooksQuery } from '../../store/api/booksApi';
-import { useGetAuthorsQuery } from '../../store/api/authorsApi';
-import type { ContentMode } from '../../types/admin';
+} from '../../ui/dropdown-menu';
+import type { Chapter } from '../../../data/mockData';
+import type { Book } from '../../../data/mockData';
+import type { Author } from '../../../data/mockData';
 
-interface AdminChaptersTabProps {
-  contentMode?: ContentMode;
+interface ChapterListingProps {
+  chapters: Chapter[];
+  books: Book[];
+  authors: Author[];
+  searchQuery: string;
+  onCreateChapter: () => void;
+  onPreview: (chapter: Chapter) => void;
+  onEdit: (chapter: Chapter) => void;
+  onDelete: (chapter: Chapter) => void;
 }
 
-export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const { data: chapters = [] } = useGetAllChaptersQuery();
-  const { data: books = [] } = useGetAllBooksQuery();
-  const { data: authors = [] } = useGetAuthorsQuery();
-
-  const filteredChapters = chapters.filter(chapter =>
-    chapter.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chapter.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+export function ChapterListing({
+  chapters,
+  books,
+  authors,
+  searchQuery,
+  onCreateChapter,
+  onPreview,
+  onEdit,
+  onDelete,
+}: ChapterListingProps) {
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Chapters Management
-            </h1>
-            <p className="text-muted-foreground">
-              Manage all chapters across all books
-            </p>
-          </div>
-          <Button onPress={() => setIsCreateModalOpen(true)} className="global_btn rounded_full bg_primary" startContent={<Plus className="h-4 w-4" />} >
-            Create New Chapter
-          </Button>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search chapters by title, book, or author..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Button className="global_btn rounded_full outline_primary">
-            <Filter className="h-4 w-4" />
-            Filters
-          </Button>
-        </div>
-      </div>
-
-      {/* Chapters Table */}
+    <>
       <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
@@ -92,7 +55,7 @@ export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabP
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredChapters.map((chapter) => {
+            {chapters.map((chapter) => {
               const book = books.find((b) => b.id === chapter.bookId);
               const author = book ? authors.find((a) => a.id === book.authorId) : null;
 
@@ -141,15 +104,18 @@ export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabP
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => onPreview(chapter)}>
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => onEdit(chapter)}>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onSelect={() => onDelete(chapter)}
+                        >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
                         </DropdownMenuItem>
@@ -162,7 +128,7 @@ export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabP
           </TableBody>
         </Table>
 
-        {filteredChapters.length === 0 && (
+        {chapters.length === 0 && (
           <div className="p-12">
             <div className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
@@ -171,11 +137,17 @@ export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabP
               <div>
                 <h3 className="font-bold">No chapters found</h3>
                 <p className="text-muted-foreground">
-                  {searchQuery ? 'Try adjusting your search query' : 'Create your first chapter to get started'}
+                  {searchQuery
+                    ? 'Try adjusting your search query'
+                    : 'Create your first chapter to get started'}
                 </p>
               </div>
               {!searchQuery && (
-                <Button onPress={() => setIsCreateModalOpen(true)} className="global_btn rounded_full bg_primary">
+                <Button
+                  onPress={onCreateChapter}
+                  className="global_btn rounded_full bg_primary"
+                  startContent={<Plus className="h-4 w-4" />}
+                >
                   Create Your First Chapter
                 </Button>
               )}
@@ -183,6 +155,6 @@ export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabP
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

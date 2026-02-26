@@ -120,3 +120,11 @@ export const addChapterSchema = Yup.object({
       otherwise: (schema) => schema.required('Price is required when chapter is not free'),
     }),
 });
+
+// Add / Edit Category Modal Validation Schema
+export const categorySchema = Yup.object({
+  name: Yup.string()
+    .trim()
+    .required('Please enter a category name'),
+  subcategories: Yup.array().of(Yup.string().trim().required()),
+});

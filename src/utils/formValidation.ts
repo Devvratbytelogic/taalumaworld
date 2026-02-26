@@ -84,3 +84,18 @@ export const contactFormSchema = Yup.object({
       .max(1000, 'Message must be less than 1000 characters')
       .required('Message is required'),
   });
+
+// Add Book Modal Validation Schema
+export const addBookSchema = Yup.object({
+  title: Yup.string()
+    .trim()
+    .required('Please enter a book title'),
+  description: Yup.string(),
+  authorId: Yup.string().required('Please select an author'),
+  categoryIds: Yup.array()
+    .of(Yup.string().required())
+    .min(1, 'Select at least one category'),
+  tags: Yup.array().of(Yup.string().required()),
+  tagsInput: Yup.string(),
+  chapters: Yup.array(),
+});

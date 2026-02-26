@@ -51,7 +51,7 @@ export interface Book {
   subcategoryId: string;
   tags: string[];
   coverImage: string;
-  pricingType: 'chapter' | 'book';
+  type: 'chapter' | 'book';
   bookPrice?: number;
   createdAt: string;
   totalChapters: number;
@@ -137,9 +137,10 @@ export const books: Book[] = [
     subcategoryId: 'sub-3',
     tags: ['Space', 'Adventure', 'Science Fiction', 'Time Travel'],
     coverImage: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=600',
-    pricingType: 'chapter',
+    type: 'book',
     createdAt: '2024-01-15',
     totalChapters: 12,
+    bookPrice: 19.99,
   },
   {
     id: 'book-2',
@@ -150,7 +151,7 @@ export const books: Book[] = [
     subcategoryId: 'sub-8',
     tags: ['Programming', 'Technology', 'Competition', 'Learning'],
     coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600',
-    pricingType: 'book',
+    type: 'book',
     bookPrice: 29.99,
     createdAt: '2024-02-01',
     totalChapters: 15,
@@ -164,9 +165,10 @@ export const books: Book[] = [
     subcategoryId: 'sub-2',
     tags: ['Mystery', 'Thriller', 'Friendship', 'Puzzle'],
     coverImage: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600',
-    pricingType: 'chapter',
+    type: 'book',
     createdAt: '2024-01-20',
     totalChapters: 10,
+    bookPrice: 39.99,
   },
   {
     id: 'book-4',
@@ -177,7 +179,7 @@ export const books: Book[] = [
     subcategoryId: 'sub-6',
     tags: ['Science', 'Physics', 'Biology', 'Fun Facts'],
     coverImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600',
-    pricingType: 'book',
+    type: 'book',
     bookPrice: 24.99,
     createdAt: '2024-02-10',
     totalChapters: 8,
@@ -191,9 +193,10 @@ export const books: Book[] = [
     subcategoryId: 'sub-1',
     tags: ['Adventure', 'Survival', 'Teamwork', 'Nature'],
     coverImage: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600',
-    pricingType: 'chapter',
+    type: 'book',
     createdAt: '2024-01-05',
     totalChapters: 14,
+    bookPrice: 13,
   },
   {
     id: 'book-6',
@@ -204,7 +207,7 @@ export const books: Book[] = [
     subcategoryId: 'sub-11',
     tags: ['Career', 'Entrepreneurship', 'Money', 'Success'],
     coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600',
-    pricingType: 'book',
+    type: 'book',
     bookPrice: 19.99,
     createdAt: '2024-02-15',
     totalChapters: 10,

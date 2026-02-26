@@ -17,7 +17,7 @@ import toast from '@/utils/toast';
 
 // Import Tab Components
 import { AdminDashboardTab } from '@/components/admin/AdminDashboardTab';
-import { AdminBooksTab } from '@/components/admin/AdminBooksTab';
+import { AdminBooksTab } from '@/components/admin/books/AdminBooksTab';
 import { AdminChaptersTab } from '@/components/admin/AdminChaptersTab';
 import { AdminCategoriesTab } from '@/components/admin/AdminCategoriesTab';
 import { AdminAuthorsTab } from '@/components/admin/AdminAuthorsTab';

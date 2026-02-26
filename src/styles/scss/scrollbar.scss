@@ -1,4 +1,6 @@
-
+.custom_scrollbar {
+  @apply px-2;
+}
 /* Scrollbar track */
 .custom_scrollbar::-webkit-scrollbar {
   height: 5px;

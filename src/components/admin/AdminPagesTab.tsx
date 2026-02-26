@@ -877,13 +877,13 @@ export function AdminPagesTab() {
           <p className="text-muted-foreground">Manage all pages including home page from one place</p>
         </div>
         <Button
-          className="gap-2"
-          onClick={() => {
+          className="global_btn rounded_full bg_primary"
+          onPress={() => {
             resetForm();
             setIsCreateModalOpen(true);
           }}
+          startContent={<Plus className="h-4 w-4" />}
         >
-          <Plus className="h-4 w-4" />
           Create Page
         </Button>
       </div>

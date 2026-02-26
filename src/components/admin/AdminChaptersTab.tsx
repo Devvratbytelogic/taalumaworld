@@ -52,8 +52,7 @@ export function AdminChaptersTab({ contentMode = 'chapters' }: AdminChaptersTabP
               Manage all chapters across all books
             </p>
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)} className="global_btn rounded_full bg_primary">
-            <Plus className="h-4 w-4" />
+          <Button onPress={() => setIsCreateModalOpen(true)} className="global_btn rounded_full bg_primary" startContent={<Plus className="h-4 w-4" />} >
             Create New Chapter
           </Button>
         </div>

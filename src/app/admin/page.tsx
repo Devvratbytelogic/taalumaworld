@@ -22,11 +22,11 @@ import { AdminChaptersTab } from '@/components/admin/chapter/AdminChaptersTab';
 import { AdminCategoriesTab } from '@/components/admin/categories/AdminCategoriesTab';
 import { AdminAuthorsTab } from '@/components/admin/authors/AdminAuthorsTab';
 import { AdminUsersTab } from '@/components/admin/users/AdminUsersTab';
-import { AdminRolesTab } from '@/components/admin/AdminRolesTab';
-import { AdminActivityLogsTab } from '@/components/admin/AdminActivityLogsTab';
-import { AdminPaymentsTab } from '@/components/admin/AdminPaymentsTab';
-import { AdminTransactionsTab } from '@/components/admin/AdminTransactionsTab';
-import { AdminReviewsTab } from '@/components/admin/AdminReviewsTab';
+import { AdminRolesTab } from '@/components/admin/roles-premissions/AdminRolesTab';
+import { AdminActivityLogsTab } from '@/components/admin/activity-logs/AdminActivityLogsTab';
+import { AdminPaymentsTab } from '@/components/admin/payments/AdminPaymentsTab';
+import { AdminTransactionsTab } from '@/components/admin/transaction/AdminTransactionsTab';
+import { AdminReviewsTab } from '@/components/admin/reviews/AdminReviewsTab';
 import { AdminModerationTab } from '@/components/admin/AdminModerationTab';
 import { AdminSettingsTab } from '@/components/admin/AdminSettingsTab';
 import { AdminPagesTab } from '@/components/admin/AdminPagesTab';
@@ -155,7 +155,7 @@ export default function AdminPanelRoutePage() {
             case 'activity_logs':
                 return <AdminActivityLogsTab />;
             case 'payments':
-                return <AdminPaymentsTab contentMode={contentMode} />;
+                return <AdminPaymentsTab />;
             case 'transactions':
                 return <AdminTransactionsTab />;
             case 'reviews':

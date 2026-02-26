@@ -15,7 +15,7 @@ export function TransactionStats({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="p-4">
+      <Card className="p-4 bg-white rounded-3xl shadow-sm border">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-green-50 rounded-lg">
             <DollarSign className="h-5 w-5 text-green-600" />
@@ -26,7 +26,7 @@ export function TransactionStats({
           </div>
         </div>
       </Card>
-      <Card className="p-4">
+      <Card className="p-4 bg-white rounded-3xl shadow-sm border">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-blue-50 rounded-lg">
             <TrendingUp className="h-5 w-5 text-blue-600" />
@@ -37,7 +37,7 @@ export function TransactionStats({
           </div>
         </div>
       </Card>
-      <Card className="p-4">
+      <Card className="p-4 bg-white rounded-3xl shadow-sm border">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-purple-50 rounded-lg">
             <DollarSign className="h-5 w-5 text-purple-600" />

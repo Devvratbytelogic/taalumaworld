@@ -16,7 +16,7 @@ import { getHomeRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 
 // Import Tab Components
-import { AdminDashboardTab } from '@/components/admin/AdminDashboardTab';
+import { AdminDashboardTab } from '@/components/admin/dashboard/AdminDashboardTab';
 import { AdminBooksTab } from '@/components/admin/books/AdminBooksTab';
 import { AdminChaptersTab } from '@/components/admin/chapter/AdminChaptersTab';
 import { AdminCategoriesTab } from '@/components/admin/categories/AdminCategoriesTab';
@@ -27,11 +27,11 @@ import { AdminActivityLogsTab } from '@/components/admin/activity-logs/AdminActi
 import { AdminPaymentsTab } from '@/components/admin/payments/AdminPaymentsTab';
 import { AdminTransactionsTab } from '@/components/admin/transaction/AdminTransactionsTab';
 import { AdminReviewsTab } from '@/components/admin/reviews/AdminReviewsTab';
-import { AdminModerationTab } from '@/components/admin/AdminModerationTab';
-import { AdminSettingsTab } from '@/components/admin/AdminSettingsTab';
-import { AdminPagesTab } from '@/components/admin/AdminPagesTab';
-import { AdminAnalyticsTab } from '@/components/admin/AdminAnalyticsTab';
-import { AdminReportsTab } from '@/components/admin/AdminReportsTab';
+import { AdminModerationTab } from '@/components/admin/moderation/AdminModerationTab';
+import { AdminSettingsTab } from '@/components/admin/settings/AdminSettingsTab';
+import { AdminPagesTab } from '@/components/admin/pages/AdminPagesTab';
+import { AdminAnalyticsTab } from '@/components/admin/analytics/AdminAnalyticsTab';
+import { AdminReportsTab } from '@/components/admin/reports/AdminReportsTab';
 
 
 

@@ -3,8 +3,10 @@
  * View all payment transactions
  */
 
+import { useState } from 'react';
 import type { TransactionEntry } from './TransactionListing';
 import { AdminTransactionsHeader } from './AdminTransactionsHeader';
+import { AdminTransactionsSearch } from './AdminTransactionsSearch';
 import { TransactionStats } from './TransactionStats';
 import { TransactionListing } from './TransactionListing';
 
@@ -44,18 +46,35 @@ const mockTransactions: TransactionEntry[] = [
 ];
 
 export function AdminTransactionsTab() {
-  const totalRevenue = mockTransactions.reduce((sum, t) => sum + t.amount, 0);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTransactions = mockTransactions.filter(
+    (txn) =>
+      txn.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      txn.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      txn.item.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalRevenue = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <AdminTransactionsHeader />
+
+      <AdminTransactionsSearch
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
       <TransactionStats
         totalRevenue={totalRevenue}
-        transactionCount={mockTransactions.length}
+        transactionCount={filteredTransactions.length}
       />
 
-      <TransactionListing transactions={mockTransactions} />
+      <TransactionListing
+        transactions={filteredTransactions}
+        searchQuery={searchQuery}
+      />
     </div>
   );
 }

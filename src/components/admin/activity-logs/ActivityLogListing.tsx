@@ -1,3 +1,4 @@
+import { Activity } from 'lucide-react';
 import { Card } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import type { LucideIcon } from 'lucide-react';
@@ -21,12 +22,13 @@ const TYPE_COLORS: Record<string, string> = {
 
 interface ActivityLogListingProps {
   logs: ActivityLogEntry[];
+  searchQuery?: string;
 }
 
-export function ActivityLogListing({ logs }: ActivityLogListingProps) {
+export function ActivityLogListing({ logs, searchQuery = '' }: ActivityLogListingProps) {
   return (
-    <Card className="p-6">
-      <div className="space-y-4">
+    <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+      <div className="p-6 space-y-4">
         {logs.map((log) => {
           const Icon = log.icon;
           const typeColor = TYPE_COLORS[log.type] ?? 'bg-gray-50 text-gray-600';
@@ -50,6 +52,24 @@ export function ActivityLogListing({ logs }: ActivityLogListingProps) {
           );
         })}
       </div>
-    </Card>
+
+      {logs.length === 0 && (
+        <div className="p-12 border-t">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+              <Activity className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-bold">No activity found</h3>
+              <p className="text-muted-foreground">
+                {searchQuery
+                  ? 'Try adjusting your search query'
+                  : 'There is no activity to display'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

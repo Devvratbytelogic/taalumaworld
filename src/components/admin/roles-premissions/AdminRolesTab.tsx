@@ -15,7 +15,7 @@ interface AdminRolesTabProps {
 
 export function AdminRolesTab({ adminUser }: AdminRolesTabProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <AdminRolesHeader />
 
       <CurrentRoleCard adminUser={adminUser} />

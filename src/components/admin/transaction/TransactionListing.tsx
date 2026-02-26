@@ -1,3 +1,4 @@
+import { Receipt } from 'lucide-react';
 import { Card } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import {
@@ -20,13 +21,15 @@ export interface TransactionEntry {
 
 interface TransactionListingProps {
   transactions: TransactionEntry[];
+  searchQuery?: string;
 }
 
 export function TransactionListing({
   transactions,
+  searchQuery = '',
 }: TransactionListingProps) {
   return (
-    <Card>
+    <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
@@ -61,6 +64,24 @@ export function TransactionListing({
           ))}
         </TableBody>
       </Table>
-    </Card>
+
+      {transactions.length === 0 && (
+        <div className="p-12">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+              <Receipt className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-bold">No transactions found</h3>
+              <p className="text-muted-foreground">
+                {searchQuery
+                  ? 'Try adjusting your search query'
+                  : 'There are no transactions to display'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

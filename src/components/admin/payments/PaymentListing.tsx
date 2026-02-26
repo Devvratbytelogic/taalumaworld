@@ -1,3 +1,4 @@
+import { DollarSign } from 'lucide-react';
 import { Badge } from '../../ui/badge';
 import {
   Table,
@@ -20,9 +21,10 @@ export interface PaymentEntry {
 
 interface PaymentListingProps {
   payments: PaymentEntry[];
+  searchQuery?: string;
 }
 
-export function PaymentListing({ payments }: PaymentListingProps) {
+export function PaymentListing({ payments, searchQuery = '' }: PaymentListingProps) {
   return (
     <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
       <Table>
@@ -64,6 +66,24 @@ export function PaymentListing({ payments }: PaymentListingProps) {
           ))}
         </TableBody>
       </Table>
+
+      {payments.length === 0 && (
+        <div className="p-12">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+              <DollarSign className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-bold">No payments found</h3>
+              <p className="text-muted-foreground">
+                {searchQuery
+                  ? 'Try adjusting your search query'
+                  : 'There are no payments to display'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

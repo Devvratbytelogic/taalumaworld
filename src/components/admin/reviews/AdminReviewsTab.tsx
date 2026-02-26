@@ -9,6 +9,7 @@ import type { ReviewEntry } from './ReviewListing';
 import { AdminReviewsHeader } from './AdminReviewsHeader';
 import { AdminReviewsSearch } from './AdminReviewsSearch';
 import { ReviewListing } from './ReviewListing';
+import { RemoveReviewDialog } from './RemoveReviewDialog';
 
 const mockReviews: ReviewEntry[] = [
   {
@@ -37,11 +38,13 @@ const mockReviews: ReviewEntry[] = [
 
 export function AdminReviewsTab() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [removeConfirmReview, setRemoveConfirmReview] = useState<ReviewEntry | null>(null);
 
   const filteredReviews = mockReviews.filter(
     (review) =>
       review.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      review.userName.toLowerCase().includes(searchQuery.toLowerCase())
+      review.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      review.itemTitle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleApprove = (review: ReviewEntry) => {
@@ -50,8 +53,15 @@ export function AdminReviewsTab() {
   };
 
   const handleRemove = (review: ReviewEntry) => {
-    toast.success(`Review by ${review.userName} removed`);
-    // TODO: wire to API + confirm dialog
+    setRemoveConfirmReview(review);
+  };
+
+  const confirmRemove = () => {
+    if (removeConfirmReview) {
+      toast.success(`Review by ${removeConfirmReview.userName} removed`);
+      setRemoveConfirmReview(null);
+      // TODO: wire to API
+    }
   };
 
   return (
@@ -65,8 +75,16 @@ export function AdminReviewsTab() {
 
       <ReviewListing
         reviews={filteredReviews}
+        searchQuery={searchQuery}
         onApprove={handleApprove}
         onRemove={handleRemove}
+      />
+
+      <RemoveReviewDialog
+        review={removeConfirmReview}
+        open={!!removeConfirmReview}
+        onOpenChange={(open) => !open && setRemoveConfirmReview(null)}
+        onConfirm={confirmRemove}
       />
     </div>
   );

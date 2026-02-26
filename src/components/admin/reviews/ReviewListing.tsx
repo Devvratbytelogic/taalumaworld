@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react';
+import { Star, MessageSquare } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Badge } from '../../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
@@ -17,17 +17,20 @@ export interface ReviewEntry {
 
 interface ReviewListingProps {
   reviews: ReviewEntry[];
+  searchQuery?: string;
   onApprove?: (review: ReviewEntry) => void;
   onRemove?: (review: ReviewEntry) => void;
 }
 
 export function ReviewListing({
   reviews,
+  searchQuery = '',
   onApprove,
   onRemove,
 }: ReviewListingProps) {
   return (
-    <div className="space-y-4">
+    <>
+      <div className="space-y-4">
       {reviews.map((review) => (
         <Card key={review.id} className="rounded-3xl shadow-sm">
           <CardHeader>
@@ -90,6 +93,25 @@ export function ReviewListing({
           </CardContent>
         </Card>
       ))}
-    </div>
+      </div>
+
+      {reviews.length === 0 && (
+        <div className="bg-white rounded-3xl p-12 shadow-sm">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+              <MessageSquare className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-bold">No reviews found</h3>
+              <p className="text-muted-foreground">
+                {searchQuery
+                  ? 'Try adjusting your search query'
+                  : 'There are no reviews to display'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

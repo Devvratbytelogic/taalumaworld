@@ -73,7 +73,7 @@ export function AdminPaymentsTab(props?: AdminPaymentsTabProps) {
         onSearchChange={setSearchQuery}
       />
 
-      <PaymentListing payments={filteredPayments} />
+      <PaymentListing payments={filteredPayments} searchQuery={searchQuery} />
     </div>
   );
 }

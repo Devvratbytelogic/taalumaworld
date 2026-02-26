@@ -3,8 +3,10 @@
  * View user and admin activity logs
  */
 
+import { useState } from 'react';
 import { User, FileText, DollarSign, Settings } from 'lucide-react';
 import { AdminActivityLogsHeader } from './AdminActivityLogsHeader';
+import { AdminActivityLogsSearch } from './AdminActivityLogsSearch';
 import { ActivityLogListing } from './ActivityLogListing';
 import type { ActivityLogEntry } from './ActivityLogListing';
 
@@ -48,10 +50,23 @@ const mockLogs: ActivityLogEntry[] = [
 ];
 
 export function AdminActivityLogsTab() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredLogs = mockLogs.filter(
+    (log) =>
+      log.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.resource.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <AdminActivityLogsHeader />
-      <ActivityLogListing logs={mockLogs} />
+      <AdminActivityLogsSearch
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+      <ActivityLogListing logs={filteredLogs} searchQuery={searchQuery} />
     </div>
   );
 }

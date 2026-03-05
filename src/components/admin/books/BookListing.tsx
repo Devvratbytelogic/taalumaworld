@@ -3,12 +3,12 @@ import Button from '../../ui/Button';
 import { BookCard } from './BookCard';
 import type { Book as BookType } from '../../../data/mockData';
 import type { Author } from '../../../data/mockData';
-import type { Category } from '../../../data/mockData';
+import type { CategoryEntity } from '@/types/categories';
 
 interface BookListingProps {
   books: BookType[];
   authors: Author[];
-  categories: Category[];
+  categories: CategoryEntity[];
   searchQuery: string;
   onCreateBook: () => void;
   onPreview: (book: BookType) => void;

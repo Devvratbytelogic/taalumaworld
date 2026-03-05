@@ -12,10 +12,15 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { setAuthenticated } from '@/store/slices/authSlice';
 import { useFormik } from 'formik';
 import { signInSchema } from '@/utils/formValidation';
-import { setAuthCookie } from '@/utils/auth';
+import { useLoginMutation } from '@/store/rtkQueries/adminAuth'
+import { setAuthCookies } from '@/utils/authCookies'
+// import { useLoginMutation } from '@/store/rtkQueries/adminAuthApi';
+// import { setAuthCookies } from '@/utils/authCookies';
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
+    const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+
     const dispatch = useDispatch()
     const router = useRouter()
     const { isOpen, data } = useSelector((state: RootState) => state.allModal)
@@ -25,16 +30,27 @@ export default function SignIn() {
             password: ''
         },
         validationSchema: signInSchema,
-        onSubmit: (values, { resetForm }) => {
-            console.log('Sign in form submitted:', values);
-            setAuthCookie();
-            dispatch(setAuthenticated({ fullName: 'User', email: values.email }));
-            const redirectTo = (data as { redirectTo?: string })?.redirectTo;
-            dispatch(closeModal());
-            resetForm();
-            toast.success('Sign in successful!');
-            if (redirectTo) {
-                router.push(redirectTo);
+        onSubmit: async (values, { resetForm }) => {
+            try {
+                const res = await login({ email: values.email, password: values.password }).unwrap();
+                if (res.success && res.data) {
+                    const { token, userRole } = res.data;
+                    setAuthCookies({
+                        token,
+                        user: { id: String(userRole.user_id), _id: userRole._id },
+                        role: { name: userRole.name, id: userRole.id, _id: userRole._id },
+                    });
+                    dispatch(setAuthenticated({ fullName: userRole.name, email: values.email }));
+                    const redirectTo = (data as { redirectTo?: string })?.redirectTo;
+                    dispatch(closeModal());
+                    resetForm();
+                    toast.success(res.message ?? 'Sign in successful!');
+                    if (redirectTo) {
+                        router.push(redirectTo);
+                    }
+                }
+            } catch {
+                toast.error('Invalid email or password. Please try again.');
             }
         },
     });
@@ -127,8 +143,8 @@ export default function SignIn() {
                             <Button
                                 type="submit"
                                 className='global_btn bg_primary w-full'
-                                disabled={isSubmitting}
-                                isLoading={isSubmitting}
+                                disabled={isSubmitting || isLoginLoading}
+                                isLoading={isSubmitting || isLoginLoading}
                             >
                                 Sign In
                             </Button>

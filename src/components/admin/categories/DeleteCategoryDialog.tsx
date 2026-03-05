@@ -7,13 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Category } from '../../../data/mockData';
+import type { CategoryEntity } from '@/types/categories';
 
 interface DeleteCategoryDialogProps {
-  category: Category | null;
+  category: CategoryEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  isDeleting?: boolean;
 }
 
 export function DeleteCategoryDialog({
@@ -21,6 +22,7 @@ export function DeleteCategoryDialog({
   open,
   onOpenChange,
   onConfirm,
+  isDeleting = false,
 }: DeleteCategoryDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -37,12 +39,15 @@ export function DeleteCategoryDialog({
           <Button
             onPress={() => onOpenChange(false)}
             className="global_btn rounded_full outline_primary"
+            isDisabled={isDeleting}
           >
             Cancel
           </Button>
           <Button
             onPress={onConfirm}
             className="global_btn rounded_full bg-destructive text-destructive-foreground"
+            isLoading={isDeleting}
+            isDisabled={isDeleting}
           >
             Delete
           </Button>

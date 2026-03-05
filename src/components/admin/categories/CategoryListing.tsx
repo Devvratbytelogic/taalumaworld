@@ -2,14 +2,14 @@ import { Plus, FolderTree, Edit, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
-import type { Category } from '../../../data/mockData';
+import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
 
 interface CategoryListingProps {
-  categories: Category[];
+  categories: IAllCategoriesAPIResponseData[];
   searchQuery: string;
   onCreateCategory: () => void;
-  onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
+  onEdit: (category: IAllCategoriesAPIResponseData) => void;
+  onDelete: (category: IAllCategoriesAPIResponseData) => void;
 }
 
 export function CategoryListing({
@@ -33,7 +33,7 @@ export function CategoryListing({
                   <div>
                     <CardTitle>{category.name}</CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      {category.subcategories.length} subcategories
+                      {(category.subcategories ?? []).length} subcategories
                     </p>
                   </div>
                 </div>
@@ -59,9 +59,9 @@ export function CategoryListing({
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {category.subcategories.map((sub) => (
-                  <Badge key={sub.id} variant="outline" className="mb-0">
-                    {sub.name}
+                {(category.subcategories ?? []).map((sub: SubcategoriesEntity | null) => (
+                  <Badge key={sub?.id ?? sub?._id ?? sub?.name} variant="outline" className="mb-0">
+                    {sub?.name}
                   </Badge>
                 ))}
               </div>

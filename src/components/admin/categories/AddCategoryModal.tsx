@@ -20,55 +20,80 @@ import {
 } from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { categorySchema } from '@/utils/formValidation';
-import type { Category } from '../../../data/mockData';
+import { IAllCategoriesAPIResponseData } from '@/types/categories';
 
 const initialFormValues = {
   name: '',
   subcategories: [] as string[],
 };
 
-function getSubcategoryOptions(categories: Category[]): string[] {
-  const set = new Set<string>();
-  categories.forEach((c) => c.subcategories.forEach((s) => set.add(s.name)));
-  return Array.from(set).sort();
+function slugFromName(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+}
+
+/** All categories and nested subcategories with id + name, for the subcategories selector */
+function getSubcategoryOptions(categories: IAllCategoriesAPIResponseData[]): { id: string; name: string }[] {
+  const seen = new Set<string>();
+  const options: { id: string; name: string }[] = [];
+  categories.forEach((c) => {
+    const id = c.id ?? c._id;
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      options.push({ id, name: c.name });
+    }
+    (c.subcategories ?? []).forEach((s) => {
+      if (!s) return;
+      const subId = s.id ?? s._id;
+      if (subId && !seen.has(subId)) {
+        seen.add(subId);
+        options.push({ id: subId, name: s.name });
+      }
+    });
+  });
+  return options.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 interface AddCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categories: Category[];
-  onSuccess?: () => void;
+  categories: IAllCategoriesAPIResponseData[];
+  onSubmit: (payload: any) => Promise<void>;
 }
 
 export function AddCategoryModal({
   open,
   onOpenChange,
   categories,
-  onSuccess,
+  onSubmit,
 }: AddCategoryModalProps) {
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(categories), [categories]);
 
-  const {
-    values,
-    errors,
-    touched,
-    isSubmitting,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setFieldValue,
-    setFieldTouched,
-    resetForm,
-  } = useFormik({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
     validationSchema: categorySchema,
-    onSubmit: () => {
+    onSubmit: async () => {
+      const payload = {
+        name: values.name.trim(),
+        slug: slugFromName(values.name),
+        subcategories: values.subcategories,
+      };
+      await onSubmit(payload);
       resetForm({ values: initialFormValues });
       onOpenChange(false);
-      toast.success('Category created successfully');
-      onSuccess?.();
     },
   });
+
+  const selectedNames = useMemo(
+    () =>
+      values.subcategories
+        .map((id) => subcategoryOptions.find((o) => o.id === id)?.name)
+        .filter(Boolean) as string[],
+    [values.subcategories, subcategoryOptions]
+  );
 
   useEffect(() => {
     if (!open) {
@@ -119,7 +144,7 @@ export function AddCategoryModal({
                     <span className={values.subcategories.length === 0 ? 'text-muted-foreground' : ''}>
                       {values.subcategories.length === 0
                         ? 'Select subcategories'
-                        : values.subcategories.join(', ')}
+                        : selectedNames.join(', ')}
                     </span>
                     <ChevronDownIcon className="opacity-50 shrink-0" />
                   </button>
@@ -127,22 +152,22 @@ export function AddCategoryModal({
                 <DropdownMenuContent align="start" className="max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width)">
                   {subcategoryOptions.length === 0 ? (
                     <div className="px-2 py-3 text-sm text-muted-foreground">
-                      No subcategories defined yet. Add categories with subcategories first.
+                      No categories yet. Create categories first to link them here.
                     </div>
                   ) : (
-                    subcategoryOptions.map((name) => (
+                    subcategoryOptions.map((opt) => (
                       <DropdownMenuCheckboxItem
-                        key={name}
-                        checked={values.subcategories.includes(name)}
+                        key={opt.id}
+                        checked={values.subcategories.includes(opt.id)}
                         onCheckedChange={(checked) => {
                           const next = checked
-                            ? [...values.subcategories, name]
-                            : values.subcategories.filter((n) => n !== name);
+                            ? [...values.subcategories, opt.id]
+                            : values.subcategories.filter((id) => id !== opt.id);
                           setFieldValue('subcategories', next);
                           setFieldTouched('subcategories', true);
                         }}
                       >
-                        {name}
+                        {opt.name}
                       </DropdownMenuCheckboxItem>
                     ))
                   )}

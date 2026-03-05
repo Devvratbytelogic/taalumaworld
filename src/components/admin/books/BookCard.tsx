@@ -10,19 +10,19 @@ import {
 } from '../../ui/dropdown-menu';
 import type { Book as BookType } from '../../../data/mockData';
 import type { Author } from '../../../data/mockData';
-import type { Category } from '../../../data/mockData';
+import type { CategoryEntity } from '@/types/categories';
 
 interface BookCardProps {
   book: BookType;
   author: Author | undefined;
-  category: Category | undefined;
+  category: CategoryEntity | undefined;
   onPreview: (book: BookType) => void;
   onEdit: (book: BookType) => void;
   onDelete: (book: BookType) => void;
 }
 
 export function BookCard({ book, author, category, onPreview, onEdit, onDelete }: BookCardProps) {
-  const subcategory = category?.subcategories.find((s) => s.id === book.subcategoryId);
+  const subcategory = category?.subcategories?.find((s) => s?.id === book.subcategoryId);
 
   return (
     <Card className="overflow-hidden rounded-3xl shadow-sm hover:shadow-lg transition-all">

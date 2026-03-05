@@ -20,9 +20,9 @@ import {
 } from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { categorySchema } from '@/utils/formValidation';
-import type { Category } from '../../../data/mockData';
+import type { IAllCategoriesAPIResponseData } from '@/types/categories';
 
-function getInitialValuesFromCategory(category: Category | null) {
+function getInitialValuesFromCategory(category: IAllCategoriesAPIResponseData | null) {
   if (!category) {
     return {
       name: '',
@@ -31,22 +31,40 @@ function getInitialValuesFromCategory(category: Category | null) {
   }
   return {
     name: category.name,
-    subcategories: category.subcategories.map((s) => s.name),
+    subcategories: (category.subcategories ?? [])
+      .map((s) => (s && (s.id ?? s._id)) || '')
+      .filter(Boolean),
   };
 }
 
-function getSubcategoryOptions(categories: Category[]): string[] {
-  const set = new Set<string>();
-  categories.forEach((c) => c.subcategories.forEach((s) => set.add(s.name)));
-  return Array.from(set).sort();
+/** All categories and nested subcategories with id + name, for the subcategories selector */
+function getSubcategoryOptions(categories: IAllCategoriesAPIResponseData[]): { id: string; name: string }[] {
+  const seen = new Set<string>();
+  const options: { id: string; name: string }[] = [];
+  categories.forEach((c) => {
+    const id = c.id ?? c._id;
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      options.push({ id, name: c.name });
+    }
+    (c.subcategories ?? []).forEach((s) => {
+      if (!s) return;
+      const subId = s.id ?? s._id;
+      if (subId && !seen.has(subId)) {
+        seen.add(subId);
+        options.push({ id: subId, name: s.name });
+      }
+    });
+  });
+  return options.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 interface EditCategoryModalProps {
-  category: Category | null;
+  category: IAllCategoriesAPIResponseData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categories: Category[];
-  onSuccess?: () => void;
+  categories: IAllCategoriesAPIResponseData[];
+  onSubmit: (id: string, values: { name: string; slug: string; subcategories: unknown[] }) => Promise<void>;
 }
 
 export function EditCategoryModal({
@@ -54,7 +72,7 @@ export function EditCategoryModal({
   open,
   onOpenChange,
   categories,
-  onSuccess,
+  onSubmit,
 }: EditCategoryModalProps) {
   const initialValues = getInitialValuesFromCategory(category);
   const subcategoryOptions = useMemo(() => getSubcategoryOptions(categories), [categories]);
@@ -74,12 +92,30 @@ export function EditCategoryModal({
     initialValues,
     validationSchema: categorySchema,
     enableReinitialize: true,
-    onSubmit: () => {
+    onSubmit: async () => {
+      if (!category) return;
+      const slug = values.name
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
+      await onSubmit(category.id, {
+        name: values.name.trim(),
+        slug,
+        subcategories: values.subcategories,
+      });
       onOpenChange(false);
-      toast.success('Category updated successfully');
-      onSuccess?.();
+      resetForm({ values: getInitialValuesFromCategory(null) });
     },
   });
+
+  const selectedNames = useMemo(
+    () =>
+      values.subcategories
+        .map((id) => subcategoryOptions.find((o) => o.id === id)?.name)
+        .filter(Boolean) as string[],
+    [values.subcategories, subcategoryOptions]
+  );
 
   useEffect(() => {
     if (!open) {
@@ -132,7 +168,7 @@ export function EditCategoryModal({
                     <span className={values.subcategories.length === 0 ? 'text-muted-foreground' : ''}>
                       {values.subcategories.length === 0
                         ? 'Select subcategories'
-                        : values.subcategories.join(', ')}
+                        : selectedNames.join(', ')}
                     </span>
                     <ChevronDownIcon className="opacity-50 shrink-0" />
                   </button>
@@ -143,19 +179,19 @@ export function EditCategoryModal({
                       No subcategories defined yet.
                     </div>
                   ) : (
-                    subcategoryOptions.map((name) => (
+                    subcategoryOptions.map((opt) => (
                       <DropdownMenuCheckboxItem
-                        key={name}
-                        checked={values.subcategories.includes(name)}
+                        key={opt.id}
+                        checked={values.subcategories.includes(opt.id)}
                         onCheckedChange={(checked) => {
                           const next = checked
-                            ? [...values.subcategories, name]
-                            : values.subcategories.filter((n) => n !== name);
+                            ? [...values.subcategories, opt.id]
+                            : values.subcategories.filter((id) => id !== opt.id);
                           setFieldValue('subcategories', next);
                           setFieldTouched('subcategories', true);
                         }}
                       >
-                        {name}
+                        {opt.name}
                       </DropdownMenuCheckboxItem>
                     ))
                   )}

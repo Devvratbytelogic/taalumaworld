@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useGetAllBooksQuery, useGetBookByIdQuery } from '@/store/api/booksApi';
 import { useGetAuthorsQuery } from '@/store/api/authorsApi';
-import { useGetCategoriesQuery } from '@/store/api/categoriesApi';
+import { useGetAllCategoriesQuery } from '@/store/rtkQueries/adminGetApi';
 import { getBooksRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import Button from '@/components/ui/Button';
@@ -19,7 +19,8 @@ export default function BooksPage() {
   const { data: book, isLoading: isLoadingBook } = useGetBookByIdQuery(bookId ?? '', { skip: !bookId });
   const { data: books = [] } = useGetAllBooksQuery();
   const { data: authors = [] } = useGetAuthorsQuery();
-  const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: categoriesResponse } = useGetAllCategoriesQuery();
+  const categories = categoriesResponse?.data ?? [];
 
   // Loading single book
   if (bookId && isLoadingBook) {
@@ -34,7 +35,7 @@ export default function BooksPage() {
   if (bookId && book) {
     const author = authors.find((a) => a.id === book.authorId);
     const category = categories.find((c) => c.id === book.categoryId);
-    const subcategory = category?.subcategories.find((s) => s.id === book.subcategoryId);
+    const subcategory = category?.subcategories?.find((s) => s?.id === book.subcategoryId);
 
     return (
       <div className="min-h-screen bg-gray-50">

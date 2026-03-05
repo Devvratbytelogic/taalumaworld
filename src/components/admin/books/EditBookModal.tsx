@@ -28,7 +28,8 @@ import {
 } from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
-import type { Author, Category, Book as BookType } from '../../../data/mockData';
+import type { Author, Book as BookType } from '../../../data/mockData';
+import type { CategoryEntity } from '@/types/categories';
 
 function getInitialValuesFromBook(book: BookType | null) {
   if (!book) {
@@ -64,7 +65,7 @@ interface EditBookModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   authors: Author[];
-  categories: Category[];
+  categories: CategoryEntity[];
   onSuccess?: () => void;
 }
 

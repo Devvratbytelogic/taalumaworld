@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGetAllBooksQuery } from '../../../store/api/booksApi';
 import { useGetAuthorsQuery } from '../../../store/api/authorsApi';
-import { useGetCategoriesQuery } from '../../../store/api/categoriesApi';
+import { useGetAllCategoriesQuery } from '@/store/rtkQueries/adminGetApi';
 import toast from '@/utils/toast';
 import { getBooksRoutePath } from '@/routes/routes';
 import type { Book as BookType } from '../../../data/mockData';
@@ -20,7 +20,8 @@ export function AdminBooksTab() {
 
   const { data: books = [] } = useGetAllBooksQuery();
   const { data: authors = [] } = useGetAuthorsQuery();
-  const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: categoriesResponse } = useGetAllCategoriesQuery();
+  const categories = categoriesResponse?.data ?? [];
 
   const filteredBooks = books.filter(
     (book) =>

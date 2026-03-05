@@ -28,7 +28,8 @@ import {
 } from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
-import type { Author, Category } from '../../../data/mockData';
+import type { Author } from '../../../data/mockData';
+import type { CategoryEntity } from '@/types/categories';
 
 export interface ChapterFormItem {
   id: string;
@@ -66,7 +67,7 @@ interface AddBookModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   authors: Author[];
-  categories: Category[];
+  categories: CategoryEntity[];
   onSuccess?: () => void;
 }
 

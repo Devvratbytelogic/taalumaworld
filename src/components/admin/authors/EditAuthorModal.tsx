@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
-import { Save, X } from 'lucide-react';
+import { Save, X, Upload } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
@@ -15,39 +15,54 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { authorSchema } from '@/utils/formValidation';
-import type { Author } from '../../../data/mockData';
+import type { LeadersEntity } from '@/types/authleaders';
 
-function getInitialValuesFromAuthor(author: Author | null) {
-  if (!author) {
+export type EditAuthorFormValues = {
+  fullName: string;
+  email: string;
+  professionalBio: string;
+  status: 'Active' | 'Inactive';
+  avatar: File | null;
+};
+
+function getInitialValuesFromLeader(leader: LeadersEntity | null): EditAuthorFormValues {
+  if (!leader) {
     return {
-      name: '',
-      bio: '',
-      avatar: '',
+      fullName: '',
+      email: '',
+      professionalBio: '',
+      status: 'Active',
+      avatar: null,
     };
   }
   return {
-    name: author.name,
-    bio: author.bio,
-    avatar: author.avatar || '',
+    fullName: leader.fullName ?? '',
+    email: leader.email ?? '',
+    professionalBio: leader.professionalBio ?? '',
+    status: (leader.status === 'Inactive' ? 'Inactive' : 'Active') as 'Active' | 'Inactive',
+    avatar: null,
   };
 }
 
 interface EditAuthorModalProps {
-  author: Author | null;
+  leader: LeadersEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  onSubmitForm?: (id: string, values: EditAuthorFormValues) => Promise<void>;
 }
 
 export function EditAuthorModal({
-  author,
+  leader,
   open,
   onOpenChange,
   onSuccess,
+  onSubmitForm,
 }: EditAuthorModalProps) {
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const initialValues = getInitialValuesFromAuthor(author);
+  const initialValues = getInitialValuesFromLeader(leader);
 
   const {
     values,
@@ -57,40 +72,65 @@ export function EditAuthorModal({
     handleChange,
     handleBlur,
     handleSubmit,
+    setFieldValue,
     resetForm,
   } = useFormik({
     initialValues,
     validationSchema: authorSchema,
     enableReinitialize: true,
-    onSubmit: () => {
+    onSubmit: async () => {
+      if (onSubmitForm && leader) {
+        const id = leader.id ?? leader._id;
+        await onSubmitForm(id, values);
+      }
       onOpenChange(false);
       toast.success('Thought leader updated successfully');
       onSuccess?.();
     },
   });
 
+  // Preview: new file takes precedence, else existing leader avatar URL
   useEffect(() => {
-    if (values.avatar && /^https?:\/\//.test(values.avatar)) {
-      setAvatarPreviewUrl(values.avatar);
+    if (values.avatar instanceof File) {
+      const url = URL.createObjectURL(values.avatar);
+      setAvatarPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    if (leader?.avatar && /^https?:\/\//.test(leader.avatar)) {
+      setAvatarPreviewUrl(leader.avatar);
     } else {
       setAvatarPreviewUrl(null);
     }
-  }, [values.avatar]);
+  }, [values.avatar, leader?.avatar]);
 
   useEffect(() => {
     if (!open) {
-      resetForm({ values: getInitialValuesFromAuthor(null) });
+      resetForm({ values: getInitialValuesFromLeader(null) });
       setAvatarPreviewUrl(null);
     }
   }, [open, resetForm]);
 
   const closeModal = () => {
-    resetForm({ values: getInitialValuesFromAuthor(null) });
+    resetForm({ values: getInitialValuesFromLeader(null) });
     setAvatarPreviewUrl(null);
     onOpenChange(false);
   };
 
-  if (!author) return null;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setFieldValue('avatar', null);
+        toast.error('Please select an image file');
+        return;
+      }
+      setFieldValue('avatar', file);
+    } else {
+      setFieldValue('avatar', null);
+    }
+  };
+
+  if (!leader) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -98,34 +138,51 @@ export function EditAuthorModal({
         <DialogHeader>
           <DialogTitle>Edit Thought Leader</DialogTitle>
           <DialogDescription>
-            Update the details for &quot;{author.name}&quot;.
+            Update the details for &quot;{leader.fullName}&quot;.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col min-h-0 admin_panel">
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-author-name">Name<span className="text-red-500">*</span></Label>
+              <Label htmlFor="edit-author-fullName">Full Name<span className="text-red-500">*</span></Label>
               <Input
-                id="edit-author-name"
-                name="name"
-                placeholder="e.g., Dr. Sarah Mitchell"
-                value={values.name}
+                id="edit-author-fullName"
+                name="fullName"
+                placeholder="e.g., Jane Doe"
+                value={values.fullName}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 disabled={isSubmitting}
-                className={errors.name && touched.name ? 'border-red-500' : ''}
+                className={errors.fullName && touched.fullName ? 'border-red-500' : ''}
               />
-              {errors.name && touched.name && (
-                <p className="text-sm text-red-600">{errors.name}</p>
+              {errors.fullName && touched.fullName && (
+                <p className="text-sm text-red-600">{errors.fullName}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-author-bio">Bio</Label>
+              <Label htmlFor="edit-author-email">Email<span className="text-red-500">*</span></Label>
+              <Input
+                id="edit-author-email"
+                name="email"
+                type="email"
+                placeholder="e.g., jane@example.com"
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={isSubmitting}
+                className={errors.email && touched.email ? 'border-red-500' : ''}
+              />
+              {errors.email && touched.email && (
+                <p className="text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-author-professionalBio">Professional Bio</Label>
               <Textarea
-                id="edit-author-bio"
-                name="bio"
-                placeholder="Brief bio or description..."
-                value={values.bio}
+                id="edit-author-professionalBio"
+                name="professionalBio"
+                placeholder="Expert in leadership..."
+                value={values.professionalBio}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 disabled={isSubmitting}
@@ -133,18 +190,42 @@ export function EditAuthorModal({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-author-avatar">Avatar URL</Label>
-              <Input
-                id="edit-author-avatar"
-                name="avatar"
-                type="url"
-                placeholder="https://..."
-                value={values.avatar}
-                onChange={handleChange}
+              <Label htmlFor="edit-author-status">Status<span className="text-red-500">*</span></Label>
+              <select
+                id="edit-author-status"
+                name="status"
+                value={values.status}
+                onChange={(e) => setFieldValue('status', e.target.value as 'Active' | 'Inactive')}
                 onBlur={handleBlur}
                 disabled={isSubmitting}
-                className={errors.avatar && touched.avatar ? 'border-red-500' : ''}
+                className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.status && touched.status ? 'border-red-500' : ''}`}
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+              {errors.status && touched.status && (
+                <p className="text-sm text-red-600">{errors.status}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-author-avatar">Avatar (optional)</Label>
+              <p className="text-xs text-muted-foreground">Select an image file to replace current avatar.</p>
+              <input
+                ref={fileInputRef}
+                id="edit-author-avatar"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
               />
+              <Button
+                type="button"
+                className="global_btn rounded_full outline_primary w-full"
+                onPress={() => fileInputRef.current?.click()}
+                startContent={<Upload className="h-4 w-4" />}
+              >
+                {values.avatar ? values.avatar.name : 'Choose image to replace'}
+              </Button>
               {errors.avatar && touched.avatar && (
                 <p className="text-sm text-red-600">{errors.avatar}</p>
               )}

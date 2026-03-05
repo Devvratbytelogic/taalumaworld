@@ -1,27 +1,47 @@
-/**
- * Admin Authors (Thought Leaders) Tab
- * Manage authors and thought leaders
- */
-
-import { useState } from 'react';
-import { useGetAuthorsQuery } from '../../../store/api/authorsApi';
+import { useMemo, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { useGetAllAuthorLeadersQuery } from '@/store/rtkQueries/adminGetApi';
+import {
+  useAddAuthorLeaderMutation,
+  useUpdateAuthorLeaderMutation,
+  useDeleteAuthorLeaderMutation,
+} from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import type { Author } from '../../../data/mockData';
+import type { LeadersEntity } from '@/types/authleaders';
 import { AdminAuthorsHeader } from './AdminAuthorsHeader';
 import { AdminAuthorsStats } from './AdminAuthorsStats';
 import { AdminAuthorsSearch } from './AdminAuthorsSearch';
 import { AuthorListing } from './AuthorListing';
-import { AddAuthorModal } from './AddAuthorModal';
-import { EditAuthorModal } from './EditAuthorModal';
+import { AddAuthorModal, type AddAuthorFormValues } from './AddAuthorModal';
+import { EditAuthorModal, type EditAuthorFormValues } from './EditAuthorModal';
 import { DeleteAuthorDialog } from './DeleteAuthorDialog';
+
+function mapLeaderToAuthor(leader: LeadersEntity): Author {
+  return {
+    id: leader.id ?? leader._id,
+    name: leader.fullName,
+    bio: leader.professionalBio ?? '',
+    avatar: leader.avatar ?? '',
+    booksCount: 0,
+  };
+}
 
 export function AdminAuthorsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
+  const [editingLeader, setEditingLeader] = useState<LeadersEntity | null>(null);
   const [deleteConfirmAuthor, setDeleteConfirmAuthor] = useState<Author | null>(null);
 
-  const { data: authors = [] } = useGetAuthorsQuery();
+  const { data: leadersResponse, isLoading } = useGetAllAuthorLeadersQuery();
+  const [addAuthorLeader] = useAddAuthorLeaderMutation();
+  const [updateAuthorLeader] = useUpdateAuthorLeaderMutation();
+  const [deleteAuthorLeader] = useDeleteAuthorLeaderMutation();
+
+  const authors: Author[] = useMemo(() => {
+    const leaders = leadersResponse?.data?.leaders ?? [];
+    return leaders.map(mapLeaderToAuthor);
+  }, [leadersResponse?.data?.leaders]);
 
   const filteredAuthors = authors.filter(
     (author) =>
@@ -30,19 +50,64 @@ export function AdminAuthorsTab() {
   );
 
   const handleEditAuthor = (author: Author) => {
-    setEditingAuthor(author);
+    const leader = leadersResponse?.data?.leaders?.find(
+      (l) => (l.id ?? l._id) === author.id
+    );
+    setEditingLeader(leader ?? null);
   };
 
   const handleDeleteAuthor = (author: Author) => {
     setDeleteConfirmAuthor(author);
   };
 
-  const confirmDeleteAuthor = () => {
-    if (deleteConfirmAuthor) {
+  const confirmDeleteAuthor = async () => {
+    if (!deleteConfirmAuthor) return;
+    try {
+      await deleteAuthorLeader({ id: deleteConfirmAuthor.id }).unwrap();
       toast.success(`"${deleteConfirmAuthor.name}" deleted`);
       setDeleteConfirmAuthor(null);
+    } catch {
+      toast.error('Failed to delete thought leader');
     }
   };
+
+  const handleAddAuthor = async (values: AddAuthorFormValues) => {
+    const formData = new FormData();
+    formData.append('fullName', values.fullName);
+    formData.append('email', values.email);
+    formData.append('professionalBio', values.professionalBio);
+    formData.append('status', values.status);
+    if (values.avatar) {
+      formData.append('avatar', values.avatar);
+    }
+    await addAuthorLeader(formData).unwrap();
+  };
+
+  const handleUpdateAuthor = async (
+    id: string,
+    values: EditAuthorFormValues
+  ) => {
+    const formData = new FormData();
+    formData.append('fullName', values.fullName);
+    formData.append('email', values.email);
+    formData.append('professionalBio', values.professionalBio);
+    formData.append('status', values.status);
+    if (values.avatar) {
+      formData.append('avatar', values.avatar);
+    }
+    await updateAuthorLeader({ id, values: formData }).unwrap();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-80">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 text-primary animate-spin mx-auto mb-3" />
+          <p className="text-muted-foreground">Loading thought leaders...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -66,12 +131,14 @@ export function AdminAuthorsTab() {
       <AddAuthorModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
+        onSubmitForm={handleAddAuthor}
       />
 
       <EditAuthorModal
-        author={editingAuthor}
-        open={!!editingAuthor}
-        onOpenChange={(open) => !open && setEditingAuthor(null)}
+        leader={editingLeader}
+        open={!!editingLeader}
+        onOpenChange={(open) => !open && setEditingLeader(null)}
+        onSubmitForm={handleUpdateAuthor}
       />
 
       <DeleteAuthorDialog

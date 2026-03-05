@@ -131,11 +131,21 @@ export const categorySchema = Yup.object({
 
 // Add / Edit Author (Thought Leader) Modal Validation Schema
 export const authorSchema = Yup.object({
-  name: Yup.string()
+  fullName: Yup.string()
     .trim()
-    .required('Please enter a name'),
-  bio: Yup.string(),
-  avatar: Yup.string()
+    .required('Please enter full name'),
+  email: Yup.string()
+    .trim()
+    .email('Please enter a valid email address')
+    .required('Email is required'),
+  professionalBio: Yup.string().trim(),
+  status: Yup.string()
+    .oneOf(['Active', 'Inactive'], 'Status must be Active or Inactive')
+    .required('Please select status'),
+  avatar: Yup.mixed()
     .optional()
-    .test('url', 'Please enter a valid URL', (v) => !v || /^https?:\/\//.test(v)),
+    .nullable()
+    .test('avatar', 'Avatar must be an image file or valid URL', (v) =>
+      !v || v instanceof File || (typeof v === 'string' && /^https?:\/\//.test(v))
+    ),
 });

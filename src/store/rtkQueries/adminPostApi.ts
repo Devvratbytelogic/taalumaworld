@@ -79,6 +79,32 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminBooks'],
         }),
+
+
+        /** Chapters */
+        addChapter: builder.mutation({
+            query: (payload: FormData) => ({
+                url: `/admin/chapters`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminChapters'],
+        }),
+        updateChapter: builder.mutation({
+            query: ({ id, values }) => ({
+                url: `/admin/chapters/${id}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminChapters'],
+        }),
+        deleteChapter: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/chapters/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['AdminChapters'],
+        }),
     }),
 });
 
@@ -97,4 +123,10 @@ export const {
     useAddBookMutation,
     useUpdateBookMutation,
     useDeleteBookMutation,
+
+
+    // Chapters
+    useAddChapterMutation,
+    useUpdateChapterMutation,
+    useDeleteChapterMutation,
 } = adminPostApi;

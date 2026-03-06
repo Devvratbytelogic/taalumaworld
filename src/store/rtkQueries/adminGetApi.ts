@@ -2,6 +2,7 @@ import { IAllCategoriesAPIResponse } from '@/types/categories';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IAllAuthorLeadersAPIResponse } from '@/types/authleaders';
 import { IAllBooksAPIResponse } from '@/types/books';
+import { IAllChaptersAPIResponse } from '@/types/chapter';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -31,6 +32,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminBooks'],
         }),
+
+        /** Chapters */
+        getAllChapters: builder.query<IAllChaptersAPIResponse, void>({
+            query: () => ({
+                url: `/admin/chapters`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminChapters'],
+        }),
     }),
 });
 
@@ -38,4 +48,5 @@ export const {
     useGetAllCategoriesQuery,
     useGetAllAuthorLeadersQuery,
     useGetAllBooksQuery,
+    useGetAllChaptersQuery,
 } = clientSideGetApis;

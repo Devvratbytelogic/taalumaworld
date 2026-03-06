@@ -103,17 +103,22 @@ export const addBookSchema = Yup.object({
   tagsInput: Yup.string(),
 });
 
-// Add Chapter Modal Validation Schema
+// Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, status, cover_image, page)
 export const addChapterSchema = Yup.object({
   bookId: Yup.string().required('Please select a book'),
   title: Yup.string()
     .trim()
     .required('Please enter a chapter title'),
   description: Yup.string(),
+  content: Yup.string(),
   sequence: Yup.number()
     .integer('Must be a whole number')
     .min(1, 'Sequence must be at least 1')
     .required('Sequence is required'),
+  page: Yup.number()
+    .integer('Must be a whole number')
+    .min(0, 'Page cannot be negative')
+    .required('Page is required'),
   isFree: Yup.boolean(),
   price: Yup.number()
     .min(0, 'Price cannot be negative')
@@ -122,6 +127,7 @@ export const addChapterSchema = Yup.object({
       then: (schema) => schema.optional(),
       otherwise: (schema) => schema.required('Price is required when chapter is not free'),
     }),
+  status: Yup.string().required('Status is required'),
 });
 
 // Add / Edit Category Modal Validation Schema

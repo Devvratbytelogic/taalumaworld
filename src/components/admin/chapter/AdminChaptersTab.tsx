@@ -1,10 +1,18 @@
-import { useState } from 'react';
-import { useGetAllChaptersQuery } from '../../../store/api/chaptersApi';
-import { useGetAllBooksQuery } from '../../../store/api/booksApi';
-import { useGetAuthorsQuery } from '../../../store/api/authorsApi';
+import { useState, useMemo } from 'react';
+import {
+  useGetAllChaptersQuery,
+  useGetAllBooksQuery,
+  useGetAllAuthorLeadersQuery,
+} from '@/store/rtkQueries/adminGetApi';
+import {
+  useAddChapterMutation,
+  useUpdateChapterMutation,
+  useDeleteChapterMutation,
+} from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import { getReadChapterRoutePath } from '@/routes/routes';
-import type { Chapter } from '../../../data/mockData';
+import type { Chapter, Book, Author } from '../../../data/mockData';
+import type { IAllChaptersAPIResponseDataEntity } from '@/types/chapter';
 import { AdminChaptersHeader } from './AdminChaptersHeader';
 import { AdminChaptersSearch } from './AdminChaptersSearch';
 import { ChapterListing } from './ChapterListing';
@@ -13,6 +21,21 @@ import { EditChapterModal } from './EditChapterModal';
 import { DeleteChapterDialog } from './DeleteChapterDialog';
 import { ChapterPreviewModal } from './ChapterPreviewModal';
 
+function normalizeChapterForListing(c: IAllChaptersAPIResponseDataEntity): Chapter {
+  return {
+    id: c.id ?? c._id,
+    bookId: c.book?._id ?? (c.book as { id?: string })?.id ?? '',
+    title: c.title,
+    description: c.description ?? '',
+    featuredImage: c.coverImage ?? '',
+    price: c.price,
+    isFree: c.isFree,
+    sequence: c.number,
+    page: c.page ?? undefined,
+    book: c.book ? { title: c.book.title, author: c.book.thoughtLeader ? { name: c.book.thoughtLeader.fullName } : undefined } : undefined,
+  } as Chapter;
+}
+
 export function AdminChaptersTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -20,9 +43,35 @@ export function AdminChaptersTab() {
   const [previewChapter, setPreviewChapter] = useState<Chapter | null>(null);
   const [deleteConfirmChapter, setDeleteConfirmChapter] = useState<Chapter | null>(null);
 
-  const { data: chapters = [] } = useGetAllChaptersQuery();
-  const { data: books = [] } = useGetAllBooksQuery();
-  const { data: authors = [] } = useGetAuthorsQuery();
+  const { data: chaptersResponse } = useGetAllChaptersQuery();
+  const { data: booksResponse } = useGetAllBooksQuery();
+  const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
+
+  const rawChapters = chaptersResponse?.data ?? [];
+  const rawBooks = booksResponse?.data ?? [];
+  const leaders = leadersResponse?.data?.leaders ?? [];
+
+  const chapters = useMemo(
+    () => rawChapters.map(normalizeChapterForListing),
+    [rawChapters]
+  );
+  const books = useMemo(
+    () =>
+      rawBooks.map((b) => ({
+        ...b,
+        id: b.id ?? b._id,
+        authorId: b.thoughtLeader?._id ?? (b.thoughtLeader as { id?: string })?.id,
+      })) as unknown as Book[],
+    [rawBooks]
+  );
+  const authors = useMemo(
+    () => leaders.map((l) => ({ id: l._id, name: l.fullName })) as unknown as Author[],
+    [leaders]
+  );
+
+  const [addChapter, { isLoading: isAdding }] = useAddChapterMutation();
+  const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
+  const [deleteChapter, { isLoading: isDeleting }] = useDeleteChapterMutation();
 
   const filteredChapters = chapters.filter(
     (chapter) =>
@@ -38,10 +87,14 @@ export function AdminChaptersTab() {
     setDeleteConfirmChapter(chapter);
   };
 
-  const confirmDeleteChapter = () => {
-    if (deleteConfirmChapter) {
+  const confirmDeleteChapter = async () => {
+    if (!deleteConfirmChapter) return;
+    try {
+      await deleteChapter({ id: deleteConfirmChapter.id }).unwrap();
       toast.success(`"${deleteConfirmChapter.title}" deleted`);
       setDeleteConfirmChapter(null);
+    } catch {
+      toast.error('Failed to delete chapter');
     }
   };
 
@@ -78,6 +131,8 @@ export function AdminChaptersTab() {
         onOpenChange={setIsCreateModalOpen}
         books={books}
         authors={authors}
+        onSubmit={addChapter}
+        isSubmitting={isAdding}
       />
 
       <EditChapterModal
@@ -86,6 +141,8 @@ export function AdminChaptersTab() {
         onOpenChange={(open) => !open && setEditingChapter(null)}
         books={books}
         authors={authors}
+        onSubmit={updateChapter}
+        isSubmitting={isUpdating}
       />
 
       <ChapterPreviewModal

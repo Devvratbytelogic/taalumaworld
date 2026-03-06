@@ -29,9 +29,12 @@ const initialFormValues = {
   bookId: '',
   title: '',
   description: '',
+  content: '',
   sequence: 1,
+  page: 1,
   isFree: false,
   price: 0 as number | undefined,
+  status: 'Published',
 };
 
 interface AddChapterModalProps {
@@ -39,6 +42,8 @@ interface AddChapterModalProps {
   onOpenChange: (open: boolean) => void;
   books: Book[];
   authors: Author[];
+  onSubmit?: (payload: FormData) => { unwrap: () => Promise<unknown> };
+  isSubmitting?: boolean;
   onSuccess?: () => void;
 }
 
@@ -46,6 +51,8 @@ export function AddChapterModal({
   open,
   onOpenChange,
   books,
+  onSubmit,
+  isSubmitting: isSubmittingProp = false,
   onSuccess,
 }: AddChapterModalProps) {
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
@@ -65,16 +72,48 @@ export function AddChapterModal({
   } = useFormik({
     initialValues: initialFormValues,
     validationSchema: addChapterSchema,
-    onSubmit: (vals) => {
-      if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
-      setFeaturedImageFile(null);
-      setFeaturedImagePreviewUrl(null);
-      resetForm({ values: initialFormValues });
-      onOpenChange(false);
-      toast.success('Chapter created successfully');
-      onSuccess?.();
+    onSubmit: async (vals) => {
+      if (!onSubmit) {
+        if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+        setFeaturedImageFile(null);
+        setFeaturedImagePreviewUrl(null);
+        resetForm({ values: initialFormValues });
+        onOpenChange(false);
+        toast.success('Chapter created successfully');
+        onSuccess?.();
+        return;
+      }
+      if (!featuredImageFile) {
+        toast.error('Cover image is required (upload a file)');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('book', vals.bookId);
+      formData.append('number', String(vals.sequence));
+      formData.append('title', vals.title);
+      formData.append('description', vals.description ?? '');
+      formData.append('content', vals.content ?? '');
+      formData.append('isFree', String(vals.isFree));
+      formData.append('price', String(vals.isFree ? 0 : (vals.price ?? 0)));
+      formData.append('status', vals.status);
+      formData.append('page', String(vals.page ?? 1));
+      formData.append('cover_image', featuredImageFile);
+      try {
+        await onSubmit(formData).unwrap();
+        if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+        setFeaturedImageFile(null);
+        setFeaturedImagePreviewUrl(null);
+        resetForm({ values: initialFormValues });
+        onOpenChange(false);
+        toast.success('Chapter created successfully');
+        onSuccess?.();
+      } catch {
+        toast.error('Failed to create chapter');
+      }
     },
   });
+
+  const isSubmittingState = isSubmitting || isSubmittingProp;
 
   useEffect(() => {
     if (!open) {
@@ -162,7 +201,7 @@ export function AddChapterModal({
                 value={values.title}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={isSubmitting}
+                disabled={isSubmittingState}
                 className={errors.title && touched.title ? 'border-red-500' : ''}
               />
               {errors.title && touched.title && (
@@ -179,12 +218,26 @@ export function AddChapterModal({
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={isSubmitting}
+                disabled={isSubmittingState}
                 rows={3}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="chapter-content">Content</Label>
+              <Textarea
+                id="chapter-content"
+                name="content"
+                placeholder="Full chapter content here..."
+                value={values.content}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={isSubmittingState}
+                rows={5}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="chapter-sequence">Sequence<span className="text-red-500">*</span></Label>
                 <Input
@@ -197,11 +250,30 @@ export function AddChapterModal({
                     setFieldValue('sequence', e.target.value ? parseInt(e.target.value, 10) : 1)
                   }
                   onBlur={handleBlur}
-                  disabled={isSubmitting}
+                  disabled={isSubmittingState}
                   className={errors.sequence && touched.sequence ? 'border-red-500' : ''}
                 />
                 {errors.sequence && touched.sequence && (
                   <p className="text-sm text-red-600">{errors.sequence}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="chapter-page">Page<span className="text-red-500">*</span></Label>
+                <Input
+                  id="chapter-page"
+                  name="page"
+                  type="number"
+                  min={0}
+                  value={values.page ?? ''}
+                  onChange={(e) =>
+                    setFieldValue('page', e.target.value ? parseInt(e.target.value, 10) : 0)
+                  }
+                  onBlur={handleBlur}
+                  disabled={isSubmittingState}
+                  className={errors.page && touched.page ? 'border-red-500' : ''}
+                />
+                {errors.page && touched.page && (
+                  <p className="text-sm text-red-600">{errors.page}</p>
                 )}
               </div>
               <div className="space-y-2 flex flex-col justify-end">
@@ -213,7 +285,7 @@ export function AddChapterModal({
                       setFieldValue('isFree', checked);
                       if (checked) setFieldValue('price', 0);
                     }}
-                    disabled={isSubmitting}
+                    disabled={isSubmittingState}
                   />
                   <Label htmlFor="chapter-free" className="cursor-pointer">
                     Free chapter
@@ -240,7 +312,7 @@ export function AddChapterModal({
                     )
                   }
                   onBlur={handleBlur}
-                  disabled={isSubmitting}
+                  disabled={isSubmittingState}
                   className={errors.price && touched.price ? 'border-red-500' : ''}
                 />
                 {errors.price && touched.price && (
@@ -248,6 +320,30 @@ export function AddChapterModal({
                 )}
               </div>
             )}
+
+            <div className="space-y-2">
+              <Label htmlFor="chapter-status">Status<span className="text-red-500">*</span></Label>
+              <Select
+                value={values.status}
+                onValueChange={(value) => {
+                  setFieldValue('status', value);
+                  setFieldTouched('status', true);
+                }}
+              >
+                <SelectTrigger
+                  className={errors.status && touched.status ? 'border-red-500' : ''}
+                >
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Published">Published</SelectItem>
+                  <SelectItem value="Draft">Draft</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.status && touched.status && (
+                <p className="text-sm text-red-600">{errors.status}</p>
+              )}
+            </div>
 
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">

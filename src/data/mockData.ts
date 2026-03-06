@@ -33,6 +33,8 @@ export interface Chapter {
   sequence: number;
   content: ContentBlock[];
   pageCount?: number;
+  /** Page number (API field) */
+  page?: number;
 }
 
 export interface ContentBlock {

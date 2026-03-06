@@ -23,6 +23,7 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { addChapterSchema } from '@/utils/formValidation';
+import type { UpdateChapterPayload } from '@/types/chapter';
 import type { Chapter, Book, Author } from '../../../data/mockData';
 
 function getInitialValuesFromChapter(chapter: Chapter | null) {
@@ -32,6 +33,7 @@ function getInitialValuesFromChapter(chapter: Chapter | null) {
       title: '',
       description: '',
       sequence: 1,
+      page: 1,
       isFree: false,
       price: 0 as number | undefined,
     };
@@ -41,17 +43,23 @@ function getInitialValuesFromChapter(chapter: Chapter | null) {
     title: chapter.title,
     description: chapter.description,
     sequence: chapter.sequence,
+    page: chapter.page ?? 1,
     isFree: chapter.isFree,
     price: chapter.price,
   };
 }
 
-interface EditChapterModalProps {
+export interface EditChapterModalProps {
   chapter: Chapter | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   books: Book[];
   authors: Author[];
+  onSubmit?: (payload: {
+    id: string;
+    values: UpdateChapterPayload;
+  }) => { unwrap: () => Promise<unknown> };
+  isSubmitting?: boolean;
   onSuccess?: () => void;
 }
 
@@ -60,6 +68,8 @@ export function EditChapterModal({
   open,
   onOpenChange,
   books,
+  onSubmit,
+  isSubmitting: isSubmittingProp = false,
   onSuccess,
 }: EditChapterModalProps) {
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
@@ -83,18 +93,47 @@ export function EditChapterModal({
     initialValues,
     validationSchema: addChapterSchema,
     enableReinitialize: true,
-    onSubmit: () => {
-      if (featuredImageIsObjectUrlRef.current && featuredImagePreviewUrl) {
-        URL.revokeObjectURL(featuredImagePreviewUrl);
+    onSubmit: async (vals) => {
+      if (!chapter) return;
+      if (onSubmit) {
+        const payload: UpdateChapterPayload = {
+          book: vals.bookId,
+          number: vals.sequence,
+          title: vals.title,
+          description: vals.description ?? '',
+          isFree: vals.isFree,
+          price: vals.isFree ? 0 : (vals.price ?? 0),
+          page: vals.page ?? 1,
+        };
+        try {
+          await onSubmit({ id: chapter.id, values: payload }).unwrap();
+          if (featuredImageIsObjectUrlRef.current && featuredImagePreviewUrl) {
+            URL.revokeObjectURL(featuredImagePreviewUrl);
+          }
+          setFeaturedImageFile(null);
+          setFeaturedImagePreviewUrl(null);
+          featuredImageIsObjectUrlRef.current = false;
+          onOpenChange(false);
+          toast.success('Chapter updated successfully');
+          onSuccess?.();
+        } catch {
+          toast.error('Failed to update chapter');
+        }
+      } else {
+        if (featuredImageIsObjectUrlRef.current && featuredImagePreviewUrl) {
+          URL.revokeObjectURL(featuredImagePreviewUrl);
+        }
+        setFeaturedImageFile(null);
+        setFeaturedImagePreviewUrl(null);
+        featuredImageIsObjectUrlRef.current = false;
+        onOpenChange(false);
+        toast.success('Chapter updated successfully');
+        onSuccess?.();
       }
-      setFeaturedImageFile(null);
-      setFeaturedImagePreviewUrl(null);
-      featuredImageIsObjectUrlRef.current = false;
-      onOpenChange(false);
-      toast.success('Chapter updated successfully');
-      onSuccess?.();
     },
   });
+
+  const submitting = isSubmittingProp || isSubmitting;
 
   useEffect(() => {
     if (open && chapter) {
@@ -202,7 +241,7 @@ export function EditChapterModal({
                 value={values.title}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={isSubmitting}
+                disabled={submitting}
                 className={errors.title && touched.title ? 'border-red-500' : ''}
               />
               {errors.title && touched.title && (
@@ -219,12 +258,12 @@ export function EditChapterModal({
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={isSubmitting}
+                disabled={submitting}
                 rows={3}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-chapter-sequence">Sequence<span className="text-red-500">*</span></Label>
                 <Input
@@ -237,11 +276,30 @@ export function EditChapterModal({
                     setFieldValue('sequence', e.target.value ? parseInt(e.target.value, 10) : 1)
                   }
                   onBlur={handleBlur}
-                  disabled={isSubmitting}
+                  disabled={submitting}
                   className={errors.sequence && touched.sequence ? 'border-red-500' : ''}
                 />
                 {errors.sequence && touched.sequence && (
                   <p className="text-sm text-red-600">{errors.sequence}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-chapter-page">Page<span className="text-red-500">*</span></Label>
+                <Input
+                  id="edit-chapter-page"
+                  name="page"
+                  type="number"
+                  min={0}
+                  value={values.page ?? ''}
+                  onChange={(e) =>
+                    setFieldValue('page', e.target.value ? parseInt(e.target.value, 10) : 0)
+                  }
+                  onBlur={handleBlur}
+                  disabled={submitting}
+                  className={errors.page && touched.page ? 'border-red-500' : ''}
+                />
+                {errors.page && touched.page && (
+                  <p className="text-sm text-red-600">{errors.page}</p>
                 )}
               </div>
               <div className="space-y-2 flex flex-col justify-end">
@@ -253,7 +311,7 @@ export function EditChapterModal({
                       setFieldValue('isFree', checked);
                       if (checked) setFieldValue('price', 0);
                     }}
-                    disabled={isSubmitting}
+                    disabled={submitting}
                   />
                   <Label htmlFor="edit-chapter-free" className="cursor-pointer">
                     Free chapter
@@ -280,7 +338,7 @@ export function EditChapterModal({
                     )
                   }
                   onBlur={handleBlur}
-                  disabled={isSubmitting}
+                  disabled={submitting}
                   className={errors.price && touched.price ? 'border-red-500' : ''}
                 />
                 {errors.price && touched.price && (
@@ -341,7 +399,7 @@ export function EditChapterModal({
               className="global_btn rounded_full outline_primary"
               onPress={closeModal}
               startContent={<X className="h-4 w-4" />}
-              isDisabled={isSubmitting}
+              isDisabled={submitting}
             >
               Cancel
             </Button>
@@ -349,8 +407,8 @@ export function EditChapterModal({
               type="submit"
               className="global_btn rounded_full bg_primary"
               startContent={<Save className="h-4 w-4" />}
-              isDisabled={isSubmitting}
-              isLoading={isSubmitting}
+              isDisabled={submitting}
+              isLoading={submitting}
             >
               Save Changes
             </Button>

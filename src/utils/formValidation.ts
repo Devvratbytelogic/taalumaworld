@@ -85,19 +85,22 @@ export const contactFormSchema = Yup.object({
       .required('Message is required'),
   });
 
-// Add Book Modal Validation Schema
+// Add Book Modal Validation Schema (matches API: title, thoughtLeader, category, subcategory, description, pricingModel, price, cover_image, tags)
 export const addBookSchema = Yup.object({
   title: Yup.string()
     .trim()
     .required('Please enter a book title'),
   description: Yup.string(),
-  authorId: Yup.string().required('Please select an author'),
-  categoryIds: Yup.array()
-    .of(Yup.string().required())
-    .min(1, 'Select at least one category'),
+  thoughtLeader: Yup.string().required('Please select a thought leader'),
+  category: Yup.string().required('Please select a category'),
+  subcategory: Yup.string(),
+  // pricingModel: Yup.string().oneOf(['book', 'chapter']).required(),
+  price: Yup.number()
+    .transform((v) => (v === '' || v == null ? undefined : Number(v)))
+    .min(0, 'Price cannot be negative')
+    .optional(),
   tags: Yup.array().of(Yup.string().required()),
   tagsInput: Yup.string(),
-  chapters: Yup.array(),
 });
 
 // Add Chapter Modal Validation Schema

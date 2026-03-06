@@ -7,13 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Book as BookType } from '../../../data/mockData';
+import type { BooksEntity } from '@/types/books';
 
 interface DeleteBookDialogProps {
-  book: BookType | null;
+  book: BooksEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  isDeleting?: boolean;
 }
 
 export function DeleteBookDialog({
@@ -21,6 +22,7 @@ export function DeleteBookDialog({
   open,
   onOpenChange,
   onConfirm,
+  isDeleting = false,
 }: DeleteBookDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -37,12 +39,15 @@ export function DeleteBookDialog({
           <Button
             onPress={() => onOpenChange(false)}
             className="global_btn rounded_full outline_primary"
+            isDisabled={isDeleting}
           >
             Cancel
           </Button>
           <Button
             onPress={onConfirm}
             className="global_btn rounded_full bg-destructive text-destructive-foreground"
+            isLoading={isDeleting}
+            isDisabled={isDeleting}
           >
             Delete
           </Button>

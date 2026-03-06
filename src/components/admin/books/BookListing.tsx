@@ -1,25 +1,19 @@
 import { Plus, Book } from 'lucide-react';
 import Button from '../../ui/Button';
 import { BookCard } from './BookCard';
-import type { Book as BookType } from '../../../data/mockData';
-import type { Author } from '../../../data/mockData';
-import type { CategoryEntity } from '@/types/categories';
+import type { BooksEntity } from '@/types/books';
 
 interface BookListingProps {
-  books: BookType[];
-  authors: Author[];
-  categories: CategoryEntity[];
+  books: BooksEntity[];
   searchQuery: string;
   onCreateBook: () => void;
-  onPreview: (book: BookType) => void;
-  onEdit: (book: BookType) => void;
-  onDelete: (book: BookType) => void;
+  onPreview: (book: BooksEntity) => void;
+  onEdit: (book: BooksEntity) => void;
+  onDelete: (book: BooksEntity) => void;
 }
 
 export function BookListing({
   books,
-  authors,
-  categories,
   searchQuery,
   onCreateBook,
   onPreview,
@@ -29,21 +23,15 @@ export function BookListing({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {books.map((book) => {
-          const author = authors.find((a) => a.id === book.authorId);
-          const category = categories.find((c) => c.id === book.categoryId);
-          return (
-            <BookCard
-              key={book.id}
-              book={book}
-              author={author}
-              category={category}
-              onPreview={onPreview}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          );
-        })}
+        {books.map((book) => (
+          <BookCard
+            key={book.id ?? book._id}
+            book={book}
+            onPreview={onPreview}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
       </div>
 
       {books.length === 0 && (
@@ -63,6 +51,7 @@ export function BookListing({
             {!searchQuery && (
               <Button
                 onPress={onCreateBook}
+                onClick={(e) => { e.preventDefault(); onCreateBook(); }}
                 className="global_btn rounded_full bg_primary"
                 startContent={<Plus className="h-4 w-4" />}
               >

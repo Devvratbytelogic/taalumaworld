@@ -1,10 +1,17 @@
 import { useState } from 'react';
-import { useGetAllBooksQuery } from '../../../store/api/booksApi';
-import { useGetAuthorsQuery } from '../../../store/api/authorsApi';
-import { useGetAllCategoriesQuery } from '@/store/rtkQueries/adminGetApi';
+import {
+  useGetAllBooksQuery,
+  useGetAllAuthorLeadersQuery,
+  useGetAllCategoriesQuery,
+} from '@/store/rtkQueries/adminGetApi';
+import {
+  useAddBookMutation,
+  useUpdateBookMutation,
+  useDeleteBookMutation,
+} from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import { getBooksRoutePath } from '@/routes/routes';
-import type { Book as BookType } from '../../../data/mockData';
+import type { BooksEntity } from '@/types/books';
 import { AdminBooksHeader } from './AdminBooksHeader';
 import { AdminBooksSearch } from './AdminBooksSearch';
 import { BookListing } from './BookListing';
@@ -15,37 +22,47 @@ import { DeleteBookDialog } from './DeleteBookDialog';
 export function AdminBooksTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingBook, setEditingBook] = useState<BookType | null>(null);
-  const [deleteConfirmBook, setDeleteConfirmBook] = useState<BookType | null>(null);
+  const [editingBook, setEditingBook] = useState<BooksEntity | null>(null);
+  const [deleteConfirmBook, setDeleteConfirmBook] = useState<BooksEntity | null>(null);
 
-  const { data: books = [] } = useGetAllBooksQuery();
-  const { data: authors = [] } = useGetAuthorsQuery();
+  const { data: booksResponse } = useGetAllBooksQuery();
+  const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
   const { data: categoriesResponse } = useGetAllCategoriesQuery();
+  const books = booksResponse?.data ?? [];
+  const thoughtLeaders = leadersResponse?.data?.leaders ?? [];
   const categories = categoriesResponse?.data ?? [];
+
+  const [addBook, { isLoading: isAdding }] = useAddBookMutation();
+  const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
+  const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
 
   const filteredBooks = books.filter(
     (book) =>
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (book.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleEditBook = (book: BookType) => {
+  const handleEditBook = (book: BooksEntity) => {
     setEditingBook(book);
   };
 
-  const handleDeleteBook = (book: BookType) => {
+  const handleDeleteBook = (book: BooksEntity) => {
     setDeleteConfirmBook(book);
   };
 
-  const confirmDeleteBook = () => {
-    if (deleteConfirmBook) {
+  const confirmDeleteBook = async () => {
+    if (!deleteConfirmBook) return;
+    try {
+      await deleteBook({ id: deleteConfirmBook._id }).unwrap();
       toast.success(`"${deleteConfirmBook.title}" deleted`);
       setDeleteConfirmBook(null);
+    } catch {
+      toast.error('Failed to delete book');
     }
   };
 
-  const openPreview = (book: BookType) => {
-    window.open(getBooksRoutePath({ id: book.id }), '_blank');
+  const openPreview = (book: BooksEntity) => {
+    window.open(getBooksRoutePath({ id: book.id ?? book._id }), '_blank');
   };
 
   return (
@@ -59,8 +76,6 @@ export function AdminBooksTab() {
 
       <BookListing
         books={filteredBooks}
-        authors={authors}
-        categories={categories}
         searchQuery={searchQuery}
         onCreateBook={() => setIsCreateModalOpen(true)}
         onPreview={openPreview}
@@ -71,16 +86,20 @@ export function AdminBooksTab() {
       <AddBookModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        authors={authors}
+        thoughtLeaders={thoughtLeaders}
         categories={categories}
+        onSubmit={addBook}
+        isSubmitting={isAdding}
       />
 
       <EditBookModal
         book={editingBook}
         open={!!editingBook}
         onOpenChange={(open) => !open && setEditingBook(null)}
-        authors={authors}
+        thoughtLeaders={thoughtLeaders}
         categories={categories}
+        onSubmit={updateBook}
+        isSubmitting={isUpdating}
       />
 
       <DeleteBookDialog
@@ -88,6 +107,7 @@ export function AdminBooksTab() {
         open={!!deleteConfirmBook}
         onOpenChange={(open) => !open && setDeleteConfirmBook(null)}
         onConfirm={confirmDeleteBook}
+        isDeleting={isDeleting}
       />
     </div>
   );

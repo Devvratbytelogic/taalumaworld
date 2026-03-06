@@ -8,27 +8,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu';
-import type { Book as BookType } from '../../../data/mockData';
-import type { Author } from '../../../data/mockData';
-import type { CategoryEntity } from '@/types/categories';
+import type { BooksEntity } from '@/types/books';
 
 interface BookCardProps {
-  book: BookType;
-  author: Author | undefined;
-  category: CategoryEntity | undefined;
-  onPreview: (book: BookType) => void;
-  onEdit: (book: BookType) => void;
-  onDelete: (book: BookType) => void;
+  book: BooksEntity;
+  onPreview: (book: BooksEntity) => void;
+  onEdit: (book: BooksEntity) => void;
+  onDelete: (book: BooksEntity) => void;
 }
 
-export function BookCard({ book, author, category, onPreview, onEdit, onDelete }: BookCardProps) {
-  const subcategory = category?.subcategories?.find((s) => s?.id === book.subcategoryId);
+export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
+  const category = book.category;
+  const subcategory = book.subcategory;
 
   return (
     <Card className="overflow-hidden rounded-3xl shadow-sm hover:shadow-lg transition-all">
       <div className="aspect-3/4 overflow-hidden bg-muted relative">
         <img
-          src={book.coverImage}
+          src={book.coverImage ?? ''}
           alt={book.title}
           className="w-full h-full object-cover"
         />
@@ -66,13 +63,15 @@ export function BookCard({ book, author, category, onPreview, onEdit, onDelete }
       <CardHeader className="pb-3">
         <h3 className="line-clamp-1 font-bold">{book.title}</h3>
         <p className="text-sm text-muted-foreground line-clamp-1">
-          by {author?.name || 'Unknown Thought Leader'}
+          by {book.thoughtLeader?.fullName ?? 'Unknown Thought Leader'}
         </p>
         <div className="flex items-center gap-2 flex-wrap pt-2">
-          <Badge variant="outline" className="text-xs">
-            {category?.name}
-          </Badge>
-          {subcategory && (
+          {category?.name && (
+            <Badge variant="outline" className="text-xs">
+              {category.name}
+            </Badge>
+          )}
+          {subcategory?.name && (
             <Badge variant="outline" className="text-xs">
               {subcategory.name}
             </Badge>
@@ -82,24 +81,18 @@ export function BookCard({ book, author, category, onPreview, onEdit, onDelete }
 
       <CardContent className="pb-3 space-y-2">
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {book.description}
+          {book.description ?? ''}
         </p>
 
-        <div className="grid grid-cols-2 gap-2 pt-2">
-          <div className="text-sm">
-            <span className="text-muted-foreground">Chapters:</span>
-            <span className="ml-1 font-medium">{book.totalChapters}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Type:</span>
-            <span className="ml-1 font-medium capitalize">{book.type}</span>
-          </div>
+        <div className="text-sm">
+          <span className="text-muted-foreground">Type:</span>
+          <span className="ml-1 font-medium capitalize">{book.pricingModel ?? 'book'}</span>
         </div>
 
-        {book.type === 'book' && book.bookPrice && (
+        {book.pricingModel === 'book' && book.price != null && (
           <div className="pt-2">
             <span className="text-lg font-bold text-primary">
-              ${book.bookPrice.toFixed(2)}
+              ${Number(book.price).toFixed(2)}
             </span>
             <span className="text-sm text-muted-foreground ml-1">
               full book

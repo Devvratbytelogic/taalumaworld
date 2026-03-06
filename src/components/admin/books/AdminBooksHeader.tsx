@@ -17,7 +17,11 @@ export function AdminBooksHeader({ onCreateBook }: AdminBooksHeaderProps) {
             Manage all books on the platform
           </p>
         </div>
-        <Button onPress={onCreateBook} className="global_btn rounded_full bg_primary">
+        <Button
+          onPress={onCreateBook}
+          onClick={(e) => { e.preventDefault(); onCreateBook(); }}
+          className="global_btn rounded_full bg_primary"
+        >
           <Plus className="h-4 w-4" />
           Create New Book
         </Button>

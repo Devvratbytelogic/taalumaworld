@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
-import { Save, X, ChevronDownIcon } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
@@ -20,62 +20,70 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-  DropdownMenuTrigger,
-} from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
-import type { Author, Book as BookType } from '../../../data/mockData';
+import type { BooksEntity } from '@/types/books';
+import type { LeadersEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
+import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
 
-function getInitialValuesFromBook(book: BookType | null) {
-  if (!book) {
-    return {
-      title: '',
-      description: '',
-      authorId: '',
-      categoryIds: [] as string[],
-      tags: [] as string[],
-      tagsInput: '',
-      pricingType: 'book' as 'chapter' | 'book',
-      defaultChapterPrice: undefined as number | undefined,
-      bookPrice: undefined as number | undefined,
-      chapters: [],
-    };
-  }
+const emptyFormValues = {
+  title: '',
+  description: '',
+  thoughtLeader: '',
+  category: '',
+  subcategory: '',
+  tags: [] as string[],
+  tagsInput: '',
+  pricingModel: 'book',
+  price: '' as number | '',
+};
+
+function getInitialValuesFromBook(book: BooksEntity | null): typeof emptyFormValues {
+  if (!book) return emptyFormValues;
+  const thoughtLeaderId = typeof book.thoughtLeader === 'object' && book.thoughtLeader
+    ? (book.thoughtLeader as { _id?: string })._id ?? ''
+    : '';
+  const categoryId = typeof book.category === 'object' && book.category
+    ? (book.category as { _id?: string })._id ?? ''
+    : '';
+  const subcategoryId = book.subcategory && typeof book.subcategory === 'object'
+    ? (book.subcategory as { _id?: string })._id ?? ''
+    : '';
+  const tags = Array.isArray(book.tags)
+    ? (book.tags.filter(Boolean) as string[])
+    : [];
   return {
-    title: book.title,
-    description: book.description,
-    authorId: book.authorId,
-    categoryIds: book.categoryId ? [book.categoryId] : [],
-    tags: [...(book.tags ?? [])],
+    title: book.title ?? '',
+    description: book.description ?? '',
+    thoughtLeader: thoughtLeaderId,
+    category: categoryId,
+    subcategory: subcategoryId,
+    tags,
     tagsInput: '',
-    pricingType: book.type,
-    defaultChapterPrice: undefined as number | undefined,
-    bookPrice: book.bookPrice,
-    chapters: [],
+    pricingModel: book.pricingModel,
+    price: book.price != null ? book.price : '',
   };
 }
 
 interface EditBookModalProps {
-  book: BookType | null;
+  book: BooksEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  authors: Author[];
+  thoughtLeaders: LeadersEntity[];
   categories: CategoryEntity[];
-  onSuccess?: () => void;
+  onSubmit: (args: { id: string; values: FormData }) => { unwrap: () => Promise<unknown> };
+  isSubmitting?: boolean;
 }
 
 export function EditBookModal({
   book,
   open,
   onOpenChange,
-  authors,
+  thoughtLeaders,
   categories,
-  onSuccess,
+  onSubmit,
+  isSubmitting = false,
 }: EditBookModalProps) {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
@@ -87,7 +95,6 @@ export function EditBookModal({
     values,
     errors,
     touched,
-    isSubmitting,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -98,18 +105,38 @@ export function EditBookModal({
     initialValues,
     validationSchema: addBookSchema,
     enableReinitialize: true,
-    onSubmit: (vals) => {
-      if (coverIsObjectUrlRef.current && coverPreviewUrl) {
-        URL.revokeObjectURL(coverPreviewUrl);
+    onSubmit: async (vals) => {
+      if (!book) return;
+      const formData = new FormData();
+      formData.append('title', vals.title);
+      formData.append('thoughtLeader', vals.thoughtLeader);
+      formData.append('category', vals.category);
+      if (vals.subcategory) formData.append('subcategory', vals.subcategory);
+      formData.append('description', vals.description ?? '');
+      formData.append('pricingModel', vals.pricingModel);
+      formData.append('price', String(vals.price === '' ? 0 : vals.price));
+      if (coverFile) formData.append('cover_image', coverFile);
+      formData.append('tags', values.tags.join(','));
+
+      try {
+        await onSubmit({ id: book._id, values: formData }).unwrap();
+        if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+        setCoverFile(null);
+        setCoverPreviewUrl(null);
+        coverIsObjectUrlRef.current = false;
+        onOpenChange(false);
+        toast.success('Book updated successfully');
+      } catch {
+        toast.error('Failed to update book');
       }
-      setCoverFile(null);
-      setCoverPreviewUrl(null);
-      coverIsObjectUrlRef.current = false;
-      onOpenChange(false);
-      toast.success('Book updated successfully');
-      onSuccess?.();
     },
   });
+
+  const subcategories: SubcategoriesEntity[] = (() => {
+    if (!values.category) return [];
+    const cat = categories.find((c) => (c as IAllCategoriesAPIResponseData).id === values.category || (c as IAllCategoriesAPIResponseData)._id === values.category);
+    return (cat?.subcategories ?? []).filter(Boolean) as SubcategoriesEntity[];
+  })();
 
   useEffect(() => {
     if (open && book) {
@@ -121,16 +148,13 @@ export function EditBookModal({
 
   useEffect(() => {
     if (!open) {
-      if (coverIsObjectUrlRef.current && coverPreviewUrl) {
-        URL.revokeObjectURL(coverPreviewUrl);
-      }
+      if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
       setCoverFile(null);
       setCoverPreviewUrl(null);
       coverIsObjectUrlRef.current = false;
-      resetForm({ values: getInitialValuesFromBook(null) });
+      resetForm({ values: emptyFormValues });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when modal closes
-  }, [open]);
+  }, [open, resetForm]);
 
   const addTag = (tag: string) => {
     const t = tag.trim();
@@ -140,10 +164,7 @@ export function EditBookModal({
   };
 
   const removeTag = (index: number) => {
-    setFieldValue(
-      'tags',
-      values.tags.filter((_, i) => i !== index)
-    );
+    setFieldValue('tags', values.tags.filter((_, i) => i !== index));
   };
 
   const handleTagsInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -160,9 +181,7 @@ export function EditBookModal({
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (coverIsObjectUrlRef.current && coverPreviewUrl) {
-        URL.revokeObjectURL(coverPreviewUrl);
-      }
+      if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
       setCoverFile(file);
       setCoverPreviewUrl(URL.createObjectURL(file));
       coverIsObjectUrlRef.current = true;
@@ -171,24 +190,23 @@ export function EditBookModal({
   };
 
   const clearCoverImage = () => {
-    if (coverIsObjectUrlRef.current && coverPreviewUrl) {
-      URL.revokeObjectURL(coverPreviewUrl);
-    }
+    if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     setCoverFile(null);
     setCoverPreviewUrl(book?.coverImage || null);
     coverIsObjectUrlRef.current = false;
   };
 
   const closeModal = () => {
-    if (coverIsObjectUrlRef.current && coverPreviewUrl) {
-      URL.revokeObjectURL(coverPreviewUrl);
-    }
+    if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     setCoverFile(null);
     setCoverPreviewUrl(null);
     coverIsObjectUrlRef.current = false;
-    resetForm({ values: getInitialValuesFromBook(null) });
+    resetForm({ values: emptyFormValues });
     onOpenChange(false);
   };
+
+  const getCategoryId = (c: CategoryEntity) => (c as IAllCategoriesAPIResponseData).id ?? (c as IAllCategoriesAPIResponseData)._id;
+  const getLeaderId = (l: LeadersEntity) => l.id ?? l._id;
 
   if (!book) return null;
 
@@ -236,71 +254,77 @@ export function EditBookModal({
               <div className="space-y-2">
                 <Label>Thought Leader<span className="text-red-500">*</span></Label>
                 <Select
-                  value={values.authorId}
+                  value={values.thoughtLeader}
                   onValueChange={(value) => {
-                    setFieldValue('authorId', value);
-                    setFieldTouched('authorId', true);
+                    setFieldValue('thoughtLeader', value);
+                    setFieldTouched('thoughtLeader', true);
                   }}
                 >
                   <SelectTrigger
-                    className={errors.authorId && touched.authorId ? 'border-red-500' : ''}
+                    className={errors.thoughtLeader && touched.thoughtLeader ? 'border-red-500' : ''}
                   >
-                    <SelectValue placeholder="Select author" />
+                    <SelectValue placeholder="Select thought leader" />
                   </SelectTrigger>
                   <SelectContent>
-                    {authors.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.name}
+                    {thoughtLeaders.map((l) => (
+                      <SelectItem key={getLeaderId(l)} value={l._id}>
+                        {l.fullName}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.authorId && touched.authorId && (
-                  <p className="text-sm text-red-600">{errors.authorId}</p>
+                {errors.thoughtLeader && touched.thoughtLeader && (
+                  <p className="text-sm text-red-600">{errors.thoughtLeader}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Categories<span className="text-red-500">*</span></Label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className={`border-input flex h-9 w-full items-center justify-between gap-2 rounded-full border bg-input-background px-4 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 ${errors.categoryIds && touched.categoryIds ? 'border-red-500' : ''}`}
-                    >
-                      <span className={values.categoryIds.length === 0 ? 'text-muted-foreground' : ''}>
-                        {values.categoryIds.length === 0
-                          ? 'Select categories'
-                          : values.categoryIds
-                              .map((id) => categories.find((c) => c.id === id)?.name)
-                              .filter(Boolean)
-                              .join(', ')}
-                      </span>
-                      <ChevronDownIcon className="opacity-50 shrink-0" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width)">
+                <Label>Category<span className="text-red-500">*</span></Label>
+                <Select
+                  value={values.category}
+                  onValueChange={(value) => {
+                    setFieldValue('category', value);
+                    setFieldValue('subcategory', '');
+                    setFieldTouched('category', true);
+                  }}
+                >
+                  <SelectTrigger
+                    className={errors.category && touched.category ? 'border-red-500' : ''}
+                  >
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {categories.map((c) => (
-                      <DropdownMenuCheckboxItem
-                        key={c.id}
-                        checked={values.categoryIds.includes(c.id)}
-                        onCheckedChange={(checked) => {
-                          const next = checked
-                            ? [...values.categoryIds, c.id]
-                            : values.categoryIds.filter((id) => id !== c.id);
-                          setFieldValue('categoryIds', next);
-                          setFieldTouched('categoryIds', true);
-                        }}
-                      >
+                      <SelectItem key={getCategoryId(c)} value={(c as IAllCategoriesAPIResponseData)._id}>
                         {c.name}
-                      </DropdownMenuCheckboxItem>
+                      </SelectItem>
                     ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {errors.categoryIds && touched.categoryIds && (
-                  <p className="text-sm text-red-600">{errors.categoryIds}</p>
+                  </SelectContent>
+                </Select>
+                {errors.category && touched.category && (
+                  <p className="text-sm text-red-600">{errors.category}</p>
                 )}
               </div>
             </div>
+            {subcategories.length > 0 && (
+              <div className="space-y-2">
+                <Label>Subcategory (optional)</Label>
+                <Select
+                  value={values.subcategory}
+                  onValueChange={(value) => setFieldValue('subcategory', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select subcategory" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subcategories.map((s) => (
+                      <SelectItem key={s.id ?? s._id} value={s._id}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="edit-book-tags">Tags</Label>
               <Input
@@ -379,51 +403,49 @@ export function EditBookModal({
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Type</Label>
+              {/* <div className="space-y-2">
+                <Label>Pricing model</Label>
                 <Select
-                  value={values.pricingType}
-                  onValueChange={(value: 'chapter' | 'book') =>
-                    setFieldValue('pricingType', value)
+                  value={values.pricingModel}
+                  onValueChange={(value: 'book' | 'chapter') =>
+                    setFieldValue('pricingModel', value)
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="chapter" disabled>
-                      chapter
-                    </SelectItem>
+                    <SelectItem value="chapter">chapter</SelectItem>
                     <SelectItem value="book">book</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              {values.pricingType === 'book' && (
+              </div> */}
+              {/* {values.pricingModel === 'book' && ( */}
                 <div className="space-y-2">
-                  <Label htmlFor="edit-book-price">Book Price ($)</Label>
+                  <Label htmlFor="edit-book-price">Price ($)</Label>
                   <Input
                     id="edit-book-price"
-                    name="bookPrice"
+                    name="price"
                     type="number"
                     min={0}
                     step={0.01}
                     placeholder="0.00"
-                    value={values.bookPrice ?? ''}
+                    value={values.price === '' ? '' : values.price}
                     onChange={(e) =>
                       setFieldValue(
-                        'bookPrice',
-                        e.target.value ? Number(e.target.value) : undefined
+                        'price',
+                        e.target.value === '' ? '' : Number(e.target.value)
                       )
                     }
                     onBlur={handleBlur}
                     disabled={isSubmitting}
-                    className={errors.bookPrice && touched.bookPrice ? 'border-red-500' : ''}
+                    className={errors.price && touched.price ? 'border-red-500' : ''}
                   />
-                  {errors.bookPrice && touched.bookPrice && (
-                    <p className="text-sm text-red-600">{errors.bookPrice}</p>
+                  {errors.price && touched.price && (
+                    <p className="text-sm text-red-600">{errors.price}</p>
                   )}
                 </div>
-              )}
+              {/* )} */}
             </div>
           </div>
           <DialogFooter>

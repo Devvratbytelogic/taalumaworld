@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
-import { Save, X, Plus, Trash2, ChevronDownIcon } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
@@ -20,63 +20,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-  DropdownMenuTrigger,
-} from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
-import type { Author } from '../../../data/mockData';
+import type { LeadersEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
-
-export interface ChapterFormItem {
-  id: string;
-  title: string;
-  description: string;
-  featuredImageFile: File | null;
-  featuredImagePreviewUrl: string | null;
-  price?: number;
-}
-
-function newChapterFormItem(sequence: number): ChapterFormItem {
-  return {
-    id: `ch-${Date.now()}-${sequence}`,
-    title: '',
-    description: '',
-    featuredImageFile: null,
-    featuredImagePreviewUrl: null,
-  };
-}
+import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
 
 const initialFormValues = {
   title: '',
   description: '',
-  authorId: '',
-  categoryIds: [] as string[],
+  thoughtLeader: '',
+  category: '',
+  subcategory: '',
   tags: [] as string[],
   tagsInput: '',
-  pricingType: 'book' as 'chapter' | 'book',
-  defaultChapterPrice: undefined as number | undefined,
-  bookPrice: undefined as number | undefined,
-  chapters: [] as ChapterFormItem[],
+  pricingModel: 'book',
+  price: '' as number | '',
 };
 
 interface AddBookModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  authors: Author[];
+  thoughtLeaders: LeadersEntity[];
   categories: CategoryEntity[];
-  onSuccess?: () => void;
+  onSubmit: (payload: FormData) => { unwrap: () => Promise<unknown> };
+  isSubmitting?: boolean;
 }
 
 export function AddBookModal({
   open,
   onOpenChange,
-  authors,
+  thoughtLeaders,
   categories,
-  onSuccess,
+  onSubmit,
+  isSubmitting = false,
 }: AddBookModalProps) {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
@@ -85,7 +62,6 @@ export function AddBookModal({
     values,
     errors,
     touched,
-    isSubmitting,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -95,27 +71,45 @@ export function AddBookModal({
   } = useFormik({
     initialValues: initialFormValues,
     validationSchema: addBookSchema,
-    onSubmit: (vals, { resetForm: reset }) => {
-      if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
-      revokeChapterPreviews(vals.chapters);
-      setCoverFile(null);
-      setCoverPreviewUrl(null);
-      reset({ values: initialFormValues });
-      onOpenChange(false);
-      toast.success('Book created successfully');
-      onSuccess?.();
+    onSubmit: async (vals) => {
+      if (!coverFile) {
+        toast.error('Cover image is required');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('title', vals.title);
+      formData.append('thoughtLeader', vals.thoughtLeader);
+      formData.append('category', vals.category);
+      if (vals.subcategory) formData.append('subcategory', vals.subcategory);
+      formData.append('description', vals.description ?? '');
+      formData.append('pricingModel', vals.pricingModel);
+      formData.append('price', String(vals.price === '' ? 0 : vals.price));
+      formData.append('cover_image', coverFile);
+      formData.append('tags', vals.tags.join(','));
+
+      try {
+        await onSubmit(formData).unwrap();
+        if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+        setCoverFile(null);
+        setCoverPreviewUrl(null);
+        resetForm({ values: initialFormValues });
+        onOpenChange(false);
+        toast.success('Book created successfully');
+      } catch {
+        toast.error('Failed to create book');
+      }
     },
   });
 
-  const revokeChapterPreviews = useCallback((chapters: ChapterFormItem[]) => {
-    chapters.forEach((ch) => {
-      if (ch.featuredImagePreviewUrl) URL.revokeObjectURL(ch.featuredImagePreviewUrl);
-    });
-  }, []);
+  const subcategories: SubcategoriesEntity[] = (() => {
+    if (!values.category) return [];
+    const cat = categories.find((c) => (c as IAllCategoriesAPIResponseData).id === values.category || (c as IAllCategoriesAPIResponseData)._id === values.category);
+    return (cat?.subcategories ?? []).filter(Boolean) as SubcategoriesEntity[];
+  })();
 
   useEffect(() => {
     if (!open) {
-      revokeChapterPreviews(values.chapters);
+      setFieldValue('subcategory', '');
       resetForm({ values: initialFormValues });
       setCoverFile(null);
       setCoverPreviewUrl((prev) => {
@@ -123,8 +117,7 @@ export function AddBookModal({
         return null;
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when modal closes
-  }, [open]);
+  }, [open, resetForm, setFieldValue]);
 
   const addTag = (tag: string) => {
     const t = tag.trim();
@@ -134,10 +127,7 @@ export function AddBookModal({
   };
 
   const removeTag = (index: number) => {
-    setFieldValue(
-      'tags',
-      values.tags.filter((_, i) => i !== index)
-    );
+    setFieldValue('tags', values.tags.filter((_, i) => i !== index));
   };
 
   const handleTagsInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -146,7 +136,6 @@ export function AddBookModal({
       addTag(values.tagsInput);
     }
   };
-
 
   const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -175,6 +164,9 @@ export function AddBookModal({
     resetForm({ values: initialFormValues });
     onOpenChange(false);
   };
+
+  const getCategoryId = (c: CategoryEntity) => (c as IAllCategoriesAPIResponseData).id ?? (c as IAllCategoriesAPIResponseData)._id;
+  const getLeaderId = (l: LeadersEntity) => l.id ?? l._id;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -220,71 +212,77 @@ export function AddBookModal({
               <div className="space-y-2">
                 <Label>Thought Leader<span className="text-red-500">*</span></Label>
                 <Select
-                  value={values.authorId}
+                  value={values.thoughtLeader}
                   onValueChange={(value) => {
-                    setFieldValue('authorId', value);
-                    setFieldTouched('authorId', true);
+                    setFieldValue('thoughtLeader', value);
+                    setFieldTouched('thoughtLeader', true);
                   }}
                 >
                   <SelectTrigger
-                    className={errors.authorId && touched.authorId ? 'border-red-500' : ''}
+                    className={errors.thoughtLeader && touched.thoughtLeader ? 'border-red-500' : ''}
                   >
-                    <SelectValue placeholder="Select author" />
+                    <SelectValue placeholder="Select thought leader" />
                   </SelectTrigger>
                   <SelectContent>
-                    {authors.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.name}
+                    {thoughtLeaders.map((l) => (
+                      <SelectItem key={getLeaderId(l)} value={l._id}>
+                        {l.fullName}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.authorId && touched.authorId && (
-                  <p className="text-sm text-red-600">{errors.authorId}</p>
+                {errors.thoughtLeader && touched.thoughtLeader && (
+                  <p className="text-sm text-red-600">{errors.thoughtLeader}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Categories<span className="text-red-500">*</span></Label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className={`border-input flex h-9 w-full items-center justify-between gap-2 rounded-full border bg-input-background px-4 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 ${errors.categoryIds && touched.categoryIds ? 'border-red-500' : ''}`}
-                    >
-                      <span className={values.categoryIds.length === 0 ? 'text-muted-foreground' : ''}>
-                        {values.categoryIds.length === 0
-                          ? 'Select categories'
-                          : values.categoryIds
-                              .map((id) => categories.find((c) => c.id === id)?.name)
-                              .filter(Boolean)
-                              .join(', ')}
-                      </span>
-                      <ChevronDownIcon className="opacity-50 shrink-0" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width)">
+                <Label>Category<span className="text-red-500">*</span></Label>
+                <Select
+                  value={values.category}
+                  onValueChange={(value) => {
+                    setFieldValue('category', value);
+                    setFieldValue('subcategory', '');
+                    setFieldTouched('category', true);
+                  }}
+                >
+                  <SelectTrigger
+                    className={errors.category && touched.category ? 'border-red-500' : ''}
+                  >
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {categories.map((c) => (
-                      <DropdownMenuCheckboxItem
-                        key={c.id}
-                        checked={values.categoryIds.includes(c.id)}
-                        onCheckedChange={(checked) => {
-                          const next = checked
-                            ? [...values.categoryIds, c.id]
-                            : values.categoryIds.filter((id) => id !== c.id);
-                          setFieldValue('categoryIds', next);
-                          setFieldTouched('categoryIds', true);
-                        }}
-                      >
+                      <SelectItem key={getCategoryId(c)} value={(c as IAllCategoriesAPIResponseData)._id}>
                         {c.name}
-                      </DropdownMenuCheckboxItem>
+                      </SelectItem>
                     ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {errors.categoryIds && touched.categoryIds && (
-                  <p className="text-sm text-red-600">{errors.categoryIds}</p>
+                  </SelectContent>
+                </Select>
+                {errors.category && touched.category && (
+                  <p className="text-sm text-red-600">{errors.category}</p>
                 )}
               </div>
             </div>
+            {subcategories.length > 0 && (
+              <div className="space-y-2">
+                <Label>Subcategory (optional)</Label>
+                <Select
+                  value={values.subcategory}
+                  onValueChange={(value) => setFieldValue('subcategory', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select subcategory" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subcategories.map((s) => (
+                      <SelectItem key={s.id ?? s._id} value={s._id}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="book-tags">Tags</Label>
               <Input
@@ -317,97 +315,95 @@ export function AddBookModal({
                 </div>
               )}
             </div>
-          <div className="flex justify-between gap-4">
-            <div className="space-y-2 flex-1 min-w-0">
-              <Label htmlFor="book-cover">Cover Image</Label>
-              <label
-                htmlFor="book-cover"
-                className="border-input bg-input-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full cursor-pointer items-center rounded-full border px-4 py-1 text-sm text-muted-foreground transition-[color,box-shadow] outline-none focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50"
-              >
-                <input
-                  id="book-cover"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCoverFileChange}
-                  className="sr-only"
-                />
-                <span className="truncate">
-                  {coverFile ? coverFile.name : 'Select image...'}
-                </span>
-              </label>
-            </div>
-            {coverPreviewUrl ? (
-              <div className="mt-3 relative inline-block">
-                <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-4/4 max-w-24">
-                  <img
-                    src={coverPreviewUrl}
-                    alt="Cover preview"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <Button
-                  type="button"
-                  isIconOnly={true}
-                  className="absolute top-2 right-2 global_btn rounded_full outline_primary icon_btn fit_btn"
-                  onPress={clearCoverImage}
+            <div className="flex justify-between gap-4">
+              <div className="space-y-2 flex-1 min-w-0">
+                <Label htmlFor="book-cover">Cover Image<span className="text-red-500">*</span></Label>
+                <label
+                  htmlFor="book-cover"
+                  className="border-input bg-input-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full cursor-pointer items-center rounded-full border px-4 py-1 text-sm text-muted-foreground transition-[color,box-shadow] outline-none focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50"
                 >
-                  <X className="h-4 w-4" />
-                </Button>
+                  <input
+                    id="book-cover"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverFileChange}
+                    className="sr-only"
+                  />
+                  <span className="truncate">
+                    {coverFile ? coverFile.name : 'Select image...'}
+                  </span>
+                </label>
               </div>
-            ) : (
-              <div className="mt-3 rounded-2xl border border-dashed border-muted-foreground/30 aspect-4/4 max-w-24 flex items-center justify-center bg-muted/30">
-                <span className="text-xs text-muted-foreground px-3 text-center">
-                  Select an image to preview
-                </span>
-              </div>
-            )}
-          </div>
+              {coverPreviewUrl ? (
+                <div className="mt-3 relative inline-block">
+                  <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-4/4 max-w-24">
+                    <img
+                      src={coverPreviewUrl}
+                      alt="Cover preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    isIconOnly={true}
+                    className="absolute top-2 right-2 global_btn rounded_full outline_primary icon_btn fit_btn"
+                    onPress={clearCoverImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-3 rounded-2xl border border-dashed border-muted-foreground/30 aspect-4/4 max-w-24 flex items-center justify-center bg-muted/30">
+                  <span className="text-xs text-muted-foreground px-3 text-center">
+                    Select an image to preview
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Type</Label>
+              {/* <div className="space-y-2">
+                <Label>Pricing model</Label>
                 <Select
-                  value={values.pricingType}
-                  onValueChange={(value: 'chapter' | 'book') =>
-                    setFieldValue('pricingType', value)
+                  value={values.pricingModel}
+                  onValueChange={(value: 'book' | 'chapter') =>
+                    setFieldValue('pricingModel', value)
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="chapter" disabled>
-                      chapter
-                    </SelectItem>
+                    <SelectItem value="chapter">chapter</SelectItem>
                     <SelectItem value="book">book</SelectItem>
                   </SelectContent>
                 </Select>
+              </div> */}
+              {/* {values.pricingModel === 'book' && ( */}
+              <div className="space-y-2">
+                <Label htmlFor="book-price">Price ($)</Label>
+                <Input
+                  id="book-price"
+                  name="price"
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  placeholder="0.00"
+                  value={values.price === '' ? '' : values.price}
+                  onChange={(e) =>
+                    setFieldValue(
+                      'price',
+                      e.target.value === '' ? '' : Number(e.target.value)
+                    )
+                  }
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className={errors.price && touched.price ? 'border-red-500' : ''}
+                />
+                {errors.price && touched.price && (
+                  <p className="text-sm text-red-600">{errors.price}</p>
+                )}
               </div>
-              {values.pricingType === 'book' && (
-                <div className="space-y-2">
-                  <Label htmlFor="book-price">Book Price ($)</Label>
-                  <Input
-                    id="book-price"
-                    name="bookPrice"
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    placeholder="0.00"
-                    value={values.bookPrice ?? ''}
-                    onChange={(e) =>
-                      setFieldValue(
-                        'bookPrice',
-                        e.target.value ? Number(e.target.value) : undefined
-                      )
-                    }
-                    onBlur={handleBlur}
-                    disabled={isSubmitting}
-                    className={errors.bookPrice && touched.bookPrice ? 'border-red-500' : ''}
-                  />
-                  {errors.bookPrice && touched.bookPrice && (
-                    <p className="text-sm text-red-600">{errors.bookPrice}</p>
-                  )}
-                </div>
-              )}
+              {/* )} */}
             </div>
           </div>
           <DialogFooter>

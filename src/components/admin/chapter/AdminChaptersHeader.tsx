@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import Button from '../../ui/Button';
+import { getCreateChapterRoutePath } from '@/routes/routes';
 
 interface AdminChaptersHeaderProps {
   onCreateChapter: () => void;
@@ -17,10 +19,12 @@ export function AdminChaptersHeader({ onCreateChapter }: AdminChaptersHeaderProp
             Manage all chapters across all books
           </p>
         </div>
-        <Button onPress={onCreateChapter} className="global_btn rounded_full bg_primary">
-          <Plus className="h-4 w-4" />
-          Create New Chapter
-        </Button>
+        <Link href={getCreateChapterRoutePath()}>
+          <Button className="global_btn rounded_full bg_primary">
+            <Plus className="h-4 w-4" />
+            Create New Chapter
+          </Button>
+        </Link>
       </div>
     </div>
   );

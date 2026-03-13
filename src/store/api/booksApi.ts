@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { books, categories } from '../../data/mockData';
-import type { Book } from '../../data/mockData';
+import type { Book } from '@/types/content';
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

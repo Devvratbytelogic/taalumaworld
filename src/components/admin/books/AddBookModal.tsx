@@ -361,7 +361,7 @@ export function AddBookModal({
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* <div className="space-y-2">
+              <div className="space-y-2">
                 <Label>Pricing model</Label>
                 <Select
                   value={values.pricingModel}
@@ -377,8 +377,8 @@ export function AddBookModal({
                     <SelectItem value="book">book</SelectItem>
                   </SelectContent>
                 </Select>
-              </div> */}
-              {/* {values.pricingModel === 'book' && ( */}
+              </div>
+              {values.pricingModel === 'book' && (
               <div className="space-y-2">
                 <Label htmlFor="book-price">Price ($)</Label>
                 <Input
@@ -403,7 +403,7 @@ export function AddBookModal({
                   <p className="text-sm text-red-600">{errors.price}</p>
                 )}
               </div>
-              {/* )} */}
+              )}
             </div>
           </div>
           <DialogFooter>

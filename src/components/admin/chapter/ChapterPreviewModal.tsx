@@ -8,9 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Chapter } from '../../../data/mockData';
-import type { Book } from '../../../data/mockData';
-import type { Author } from '../../../data/mockData';
+import type { Chapter, Book, Author } from '@/types/content';
 
 interface ChapterPreviewModalProps {
   chapter: Chapter | null;

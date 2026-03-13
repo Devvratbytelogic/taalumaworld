@@ -54,6 +54,8 @@ export interface Book {
   tags: string[];
   coverImage: string;
   type: 'chapter' | 'book';
+  /** When set (from API), overrides type: 'book' = whole book price, 'chapter' = per-chapter price */
+  pricingModel?: 'book' | 'chapter';
   bookPrice?: number;
   createdAt: string;
   totalChapters: number;

@@ -2,7 +2,7 @@ import { BookOpen, Book, Clock, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
 import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
-import type { Book as BookType, Chapter } from '@/data/mockData';
+import type { Book as BookType, Chapter } from '@/types/content';
 
 interface DashboardHomeProps {
   userName: string;

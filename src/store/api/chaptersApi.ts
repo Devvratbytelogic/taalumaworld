@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { chapters, books } from '../../data/mockData';
-import type { Chapter } from '../../data/mockData';
+import type { Chapter } from '@/types/content';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

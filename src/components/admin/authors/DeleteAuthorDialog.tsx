@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Author } from '../../../data/mockData';
+import type { Author } from '@/types/content';
 
 interface DeleteAuthorDialogProps {
   author: Author | null;

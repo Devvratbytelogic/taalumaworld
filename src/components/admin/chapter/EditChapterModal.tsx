@@ -24,7 +24,7 @@ import {
 import toast from '@/utils/toast';
 import { addChapterSchema } from '@/utils/formValidation';
 import type { UpdateChapterPayload } from '@/types/chapter';
-import type { Chapter, Book, Author } from '../../../data/mockData';
+import type { Chapter, Book, Author } from '@/types/content';
 
 function getInitialValuesFromChapter(chapter: Chapter | null) {
   if (!chapter) {
@@ -101,8 +101,8 @@ export function EditChapterModal({
           number: vals.sequence,
           title: vals.title,
           description: vals.description ?? '',
-          isFree: vals.isFree,
-          price: vals.isFree ? 0 : (vals.price ?? 0),
+          isFree: chapterPricingEnabled ? vals.isFree : true,
+          price: chapterPricingEnabled && !vals.isFree ? (vals.price ?? 0) : 0,
           page: vals.page ?? 1,
         };
         try {
@@ -116,8 +116,12 @@ export function EditChapterModal({
           onOpenChange(false);
           toast.success('Chapter updated successfully');
           onSuccess?.();
-        } catch {
-          toast.error('Failed to update chapter');
+        } catch (err: unknown) {
+          const message =
+            (err as { data?: { message?: string }; message?: string })?.data?.message ||
+            (err as { message?: string })?.message ||
+            'Failed to update chapter';
+          toast.error(message);
         }
       } else {
         if (featuredImageIsObjectUrlRef.current && featuredImagePreviewUrl) {
@@ -135,13 +139,23 @@ export function EditChapterModal({
 
   const submitting = isSubmittingProp || isSubmitting;
 
+  const selectedBook = books.find((b) => b.id === values.bookId);
+  const pricingModel = selectedBook?.pricingModel ?? (selectedBook as { type?: string })?.type ?? 'chapter';
+  const chapterPricingEnabled = pricingModel === 'chapter';
+
   useEffect(() => {
     if (open && chapter) {
       setFeaturedImagePreviewUrl(chapter.featuredImage || null);
       featuredImageIsObjectUrlRef.current = false;
       setFeaturedImageFile(null);
+      const book = books.find((b) => b.id === chapter.bookId || (chapter as { book?: { id?: string } }).book?.id);
+      const model = book?.pricingModel ?? (book as { type?: string })?.type ?? 'chapter';
+      if (model === 'book') {
+        setFieldValue('isFree', true);
+        setFieldValue('price', 0);
+      }
     }
-  }, [open, chapter]);
+  }, [open, chapter, books, setFieldValue]);
 
   useEffect(() => {
     if (!open) {
@@ -208,16 +222,23 @@ export function EditChapterModal({
             <div className="space-y-2">
               <Label htmlFor="edit-chapter-book">Book<span className="text-red-500">*</span></Label>
               <Select
-                value={values.bookId}
+                value={values.bookId || undefined}
                 onValueChange={(value) => {
-                  setFieldValue('bookId', value);
+                  setFieldValue('bookId', value ?? '');
                   setFieldTouched('bookId', true);
+                  const book = books.find((b) => b.id === value);
+                  const model = book?.pricingModel ?? (book as { type?: string })?.type ?? 'chapter';
+                  if (model === 'book') {
+                    setFieldValue('isFree', true);
+                    setFieldValue('price', 0);
+                  }
                 }}
+                disabled={books.length === 0}
               >
                 <SelectTrigger
                   className={errors.bookId && touched.bookId ? 'border-red-500' : ''}
                 >
-                  <SelectValue placeholder="Select book" />
+                  <SelectValue placeholder={books.length === 0 ? 'No books available' : 'Select book'} />
                 </SelectTrigger>
                 <SelectContent>
                   {books.map((book) => (
@@ -272,9 +293,10 @@ export function EditChapterModal({
                   type="number"
                   min={1}
                   value={values.sequence}
-                  onChange={(e) =>
-                    setFieldValue('sequence', e.target.value ? parseInt(e.target.value, 10) : 1)
-                  }
+                  onChange={(e) => {
+                    const n = e.target.value === '' ? 1 : parseInt(e.target.value, 10);
+                    setFieldValue('sequence', Number.isNaN(n) ? 1 : Math.max(1, n));
+                  }}
                   onBlur={handleBlur}
                   disabled={submitting}
                   className={errors.sequence && touched.sequence ? 'border-red-500' : ''}
@@ -291,9 +313,10 @@ export function EditChapterModal({
                   type="number"
                   min={0}
                   value={values.page ?? ''}
-                  onChange={(e) =>
-                    setFieldValue('page', e.target.value ? parseInt(e.target.value, 10) : 0)
-                  }
+                  onChange={(e) => {
+                    const n = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                    setFieldValue('page', Number.isNaN(n) ? 0 : Math.max(0, n));
+                  }}
                   onBlur={handleBlur}
                   disabled={submitting}
                   className={errors.page && touched.page ? 'border-red-500' : ''}
@@ -302,50 +325,60 @@ export function EditChapterModal({
                   <p className="text-sm text-red-600">{errors.page}</p>
                 )}
               </div>
-              <div className="space-y-2 flex flex-col justify-end">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="edit-chapter-free"
-                    checked={values.isFree}
-                    onCheckedChange={(checked) => {
-                      setFieldValue('isFree', checked);
-                      if (checked) setFieldValue('price', 0);
-                    }}
-                    disabled={submitting}
-                  />
-                  <Label htmlFor="edit-chapter-free" className="cursor-pointer">
-                    Free chapter
-                  </Label>
+              {chapterPricingEnabled ? (
+                <>
+                  <div className="space-y-2 flex flex-col justify-end">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        id="edit-chapter-free"
+                        checked={values.isFree}
+                        onCheckedChange={(checked) => {
+                          setFieldValue('isFree', checked);
+                          if (checked) setFieldValue('price', 0);
+                        }}
+                        disabled={submitting}
+                      />
+                      <Label htmlFor="edit-chapter-free" className="cursor-pointer">
+                        Free chapter
+                      </Label>
+                    </div>
+                  </div>
+                  {!values.isFree && (
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-chapter-price">Price ($)<span className="text-red-500">*</span></Label>
+                      <Input
+                        id="edit-chapter-price"
+                        name="price"
+                        type="number"
+                        min={0}
+                        step={0.01}
+                        placeholder="0.00"
+                        value={values.price ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            setFieldValue('price', undefined);
+                            return;
+                          }
+                          const n = Number(val);
+                          setFieldValue('price', Number.isNaN(n) ? undefined : Math.max(0, n));
+                        }}
+                        onBlur={handleBlur}
+                        disabled={submitting}
+                        className={errors.price && touched.price ? 'border-red-500' : ''}
+                      />
+                      {errors.price && touched.price && (
+                        <p className="text-sm text-red-600">{errors.price}</p>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-2 flex flex-col justify-end text-sm text-muted-foreground">
+                  <span>Pricing is set at book level; this chapter has no separate price.</span>
                 </div>
-              </div>
+              )}
             </div>
-
-            {!values.isFree && (
-              <div className="space-y-2">
-                <Label htmlFor="edit-chapter-price">Price ($)<span className="text-red-500">*</span></Label>
-                <Input
-                  id="edit-chapter-price"
-                  name="price"
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  placeholder="0.00"
-                  value={values.price ?? ''}
-                  onChange={(e) =>
-                    setFieldValue(
-                      'price',
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  onBlur={handleBlur}
-                  disabled={submitting}
-                  className={errors.price && touched.price ? 'border-red-500' : ''}
-                />
-                {errors.price && touched.price && (
-                  <p className="text-sm text-red-600">{errors.price}</p>
-                )}
-              </div>
-            )}
 
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">

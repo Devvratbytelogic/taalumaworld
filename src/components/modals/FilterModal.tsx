@@ -10,7 +10,7 @@ import { Divider } from '@heroui/react';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { categories, authors, books } from '@/data/mockData';
-import type { Category, Author, Book } from '@/data/mockData';
+import type { Category, Author, Book } from '@/types/content';
 
 const PARAM_KEYS = {
   categories: 'categories',

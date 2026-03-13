@@ -61,7 +61,7 @@ function getInitialValuesFromBook(book: BooksEntity | null): typeof emptyFormVal
     subcategory: subcategoryId,
     tags,
     tagsInput: '',
-    pricingModel: book.pricingModel,
+    pricingModel: book.pricingModel === 'chapter' ? 'chapter' : 'book',
     price: book.price != null ? book.price : '',
   };
 }
@@ -403,7 +403,7 @@ export function EditBookModal({
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* <div className="space-y-2">
+              <div className="space-y-2">
                 <Label>Pricing model</Label>
                 <Select
                   value={values.pricingModel}
@@ -419,8 +419,8 @@ export function EditBookModal({
                     <SelectItem value="book">book</SelectItem>
                   </SelectContent>
                 </Select>
-              </div> */}
-              {/* {values.pricingModel === 'book' && ( */}
+              </div>
+              {values.pricingModel === 'book' && (
                 <div className="space-y-2">
                   <Label htmlFor="edit-book-price">Price ($)</Label>
                   <Input
@@ -445,7 +445,7 @@ export function EditBookModal({
                     <p className="text-sm text-red-600">{errors.price}</p>
                   )}
                 </div>
-              {/* )} */}
+              )}
             </div>
           </div>
           <DialogFooter>

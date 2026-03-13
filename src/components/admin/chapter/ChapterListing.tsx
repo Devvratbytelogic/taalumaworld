@@ -15,9 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu';
-import type { Chapter } from '../../../data/mockData';
-import type { Book } from '../../../data/mockData';
-import type { Author } from '../../../data/mockData';
+import type { Chapter, Book, Author } from '@/types/content';
 
 interface ChapterListingProps {
   chapters: Chapter[];

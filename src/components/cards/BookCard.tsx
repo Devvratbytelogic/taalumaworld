@@ -1,6 +1,6 @@
 import { BookOpen, User, FileText } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
-import type { Book, Author } from '../../data/mockData';
+import type { Book, Author } from '@/types/content';
 import { Badge } from '@/components/ui/badge';
 
 interface BookCardProps {

@@ -1,6 +1,6 @@
 import { Users, Book, Star } from 'lucide-react';
 import { Card } from '../../ui/card';
-import type { Author } from '../../../data/mockData';
+import type { Author } from '@/types/content';
 
 interface AdminAuthorsStatsProps {
   authors: Author[];

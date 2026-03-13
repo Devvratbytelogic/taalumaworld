@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import Button from '@/components/ui/Button';
-import type { Chapter, Book, Author } from '../../data/mockData';
+import type { Chapter, Book, Author } from '@/types/content';
 import ImageComponent from '../ui/ImageComponent';
 import { Badge } from '@/components/ui/badge';
 

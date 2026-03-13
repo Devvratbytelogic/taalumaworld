@@ -7,7 +7,7 @@ import {
   useDeleteAuthorLeaderMutation,
 } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
-import type { Author } from '../../../data/mockData';
+import type { Author } from '@/types/content';
 import type { LeadersEntity } from '@/types/authleaders';
 import { AdminAuthorsHeader } from './AdminAuthorsHeader';
 import { AdminAuthorsStats } from './AdminAuthorsStats';

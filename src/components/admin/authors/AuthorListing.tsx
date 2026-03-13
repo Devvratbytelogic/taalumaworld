@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu';
-import type { Author } from '../../../data/mockData';
+import type { Author } from '@/types/content';
 
 interface AuthorListingProps {
   authors: Author[];

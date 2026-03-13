@@ -550,3 +550,41 @@
 .admin_panel .border {
   border: 1px solid #E5E5E5!important;
 }
+
+/* TipTap / ProseMirror editor placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+}
+.ProseMirror {
+  min-height: 200px;
+}
+
+/* TipTap table in editor */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0.75rem 0;
+}
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  min-width: 80px;
+  vertical-align: top;
+}
+.ProseMirror th {
+  background: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+.ProseMirror img {
+  border-radius: 0.5rem;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}

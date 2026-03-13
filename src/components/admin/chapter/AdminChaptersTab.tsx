@@ -11,7 +11,7 @@ import {
 } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import { getReadChapterRoutePath } from '@/routes/routes';
-import type { Chapter, Book, Author } from '../../../data/mockData';
+import type { Chapter, Book, Author } from '@/types/content';
 import type { IAllChaptersAPIResponseDataEntity } from '@/types/chapter';
 import { AdminChaptersHeader } from './AdminChaptersHeader';
 import { AdminChaptersSearch } from './AdminChaptersSearch';

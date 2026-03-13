@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Chapter } from '../../../data/mockData';
+import type { Chapter } from '@/types/content';
 
 interface DeleteChapterDialogProps {
   chapter: Chapter | null;

@@ -7,7 +7,7 @@ import { X, BookOpen, User, FileText, DollarSign, ShoppingCart } from 'lucide-re
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react'
 import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
-import type { Chapter } from '@/data/mockData'
+import type { Chapter } from '@/types/content'
 import { books, authors } from '@/data/mockData'
 import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'

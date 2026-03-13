@@ -12,7 +12,7 @@ import { useGetChapterByIdQuery, useGetChaptersByBookQuery } from '@/store/api/c
 import { useGetPurchasedItemsQuery } from '@/store/api/userApi';
 import { useUpdateReadingProgressMutation } from '@/store/api/userApi';
 import { books } from '@/data/mockData';
-import type { Chapter, Book, ContentBlock } from '@/data/mockData';
+import type { Chapter, Book, ContentBlock } from '@/types/content';
 
 export default function ReadChapterPage() {
   const params = useParams();

@@ -28,6 +28,10 @@ export function getAdminRoutePath(): string {
   return '/admin';
 }
 
+export function getCreateChapterRoutePath(): string {
+  return '/admin/create-chapter';
+}
+
 export function getDesignSystemRoutePath(): string {
   return '/design-system';
 }

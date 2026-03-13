@@ -8,7 +8,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import type { Chapter, Book } from '@/data/mockData';
+import type { Chapter, Book } from '@/types/content';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { setChapterPurchased } from '@/store/slices/chapterPurchaseSlice';
 import { RootState } from '@/store/store';

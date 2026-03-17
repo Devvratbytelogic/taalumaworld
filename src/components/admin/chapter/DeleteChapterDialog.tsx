@@ -7,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Chapter } from '@/types/content';
+import { IAllChaptersAPIResponseData } from '@/types/chapter';
 
 interface DeleteChapterDialogProps {
-  chapter: Chapter | null;
+  chapter: IAllChaptersAPIResponseData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;

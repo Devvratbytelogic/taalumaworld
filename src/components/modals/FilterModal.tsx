@@ -76,7 +76,7 @@ export default function FilterModal() {
     { id: 'purchased', label: 'Purchased', icon: CheckCircle, description: 'Chapters you own' },
   ];
 
-  const allTags = Array.from(new Set(books.flatMap((b: Book) => b.tags))).sort();
+  const allTags = Array.from(new Set(books.flatMap((b: any) => b.tags))).sort();
 
   const handleProgressFilterToggle = (filterId: string) => {
     setTempProgressFilters((prev) =>
@@ -217,7 +217,7 @@ export default function FilterModal() {
                   Categories
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {categories.map((category: Category) => (
+                  {categories.map((category: any) => (
                     <div
                       key={category.id}
                       className={`flex items-center space-x-2 p-3 rounded-xl border transition-all cursor-pointer ${tempCategories.includes(category.id) ? 'bg-primary/5 border-primary/30' : 'border-border hover:border-primary/20'
@@ -244,7 +244,7 @@ export default function FilterModal() {
                   Authors
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                  {authors.map((author: Author) => (
+                  {authors.map((author: any) => (
                     <div
                       key={author.id}
                       className={`flex items-center space-x-2 p-3 rounded-xl border transition-all cursor-pointer ${tempAuthors.includes(author.id) ? 'bg-primary/5 border-primary/30' : 'border-border hover:border-primary/20'

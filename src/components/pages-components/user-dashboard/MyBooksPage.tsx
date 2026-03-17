@@ -22,10 +22,10 @@ export function MyBooksPage({
 
   // Get book details for owned books
   const myBooks = ownedBooks
-    .map(bookId => books.find(b => b.id === bookId))
+    .map(bookId => books.find((b: any) => b.id === bookId))
     .filter(Boolean)
     .map(book => {
-      const author = authors.find(a => a.id === book!.authorId);
+      const author = authors.find((a: any) => a.id === book!.thoughtLeader._id);
       const progress = readingProgress[book!.id] || 0;
       return { book: book!, author, progress };
     })
@@ -144,7 +144,7 @@ export function MyBooksPage({
 
                   {/* Book Details */}
                   <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{book.totalChapters} chapters</span>
+                    <span>{0} chapters</span>
                     <span className={status.color}>{status.label}</span>
                   </div>
                 </div>

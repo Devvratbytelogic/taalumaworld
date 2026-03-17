@@ -100,7 +100,7 @@ export function ChapterPurchaseModal() {
           <div className="bg-accent/30 rounded-2xl p-4 space-y-3">
             <div className="flex items-start gap-3">
               <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full">
-                Chapter {chapter.sequence}
+                Chapter {chapter.number}
               </Badge>
             </div>
             <h3 className="font-bold text-lg">{chapter.title}</h3>

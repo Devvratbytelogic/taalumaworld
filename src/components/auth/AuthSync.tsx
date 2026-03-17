@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks';
 import { setAuthenticated, signOut } from '@/store/slices/authSlice';
-import { hasAuthCookie } from '@/utils/auth';
+import { hasAuthCookie } from '@/utils/authCookies';
 
 /**
  * Syncs auth state from cookie on mount (client-only).

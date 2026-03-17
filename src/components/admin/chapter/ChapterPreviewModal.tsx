@@ -8,29 +8,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { Chapter, Book, Author } from '@/types/content';
+import ImageComponent from '@/components/ui/ImageComponent';
+import { IAllChaptersAPIResponseData } from '@/types/chapter';
 
 interface ChapterPreviewModalProps {
-  chapter: Chapter | null;
+  chapter: IAllChaptersAPIResponseData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  books: Book[];
-  authors: Author[];
-  onOpenFullPage?: (chapter: Chapter) => void;
 }
 
 export function ChapterPreviewModal({
   chapter,
   open,
   onOpenChange,
-  books,
-  authors,
-  onOpenFullPage,
 }: ChapterPreviewModalProps) {
   if (!chapter) return null;
 
-  const book = books.find((b) => b.id === chapter.bookId);
-  const author = book ? authors.find((a) => a.id === book.authorId) : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,12 +36,12 @@ export function ChapterPreviewModal({
         </DialogHeader>
         <div className="space-y-4 py-4 max-h-[70vh] custom_scrollbar overflow-y-auto">
           <div className="flex gap-4">
-            {chapter.featuredImage ? (
+            {chapter?.coverImage ? (
               <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-4/4 w-32 shrink-0">
-                <img
-                  src={chapter.featuredImage}
+                <ImageComponent
+                  src={chapter?.coverImage ?? undefined}
                   alt={chapter.title}
-                  className="w-full h-full object-cover"
+                  object_cover={true}
                 />
               </div>
             ) : (
@@ -59,11 +52,11 @@ export function ChapterPreviewModal({
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-xl font-semibold text-foreground">{chapter.title}</h3>
               <p className="text-sm text-muted-foreground">
-                Chapter {chapter.sequence}
-                {book && ` · ${book.title}`}
+                Chapter {chapter.number}
+                {chapter?.book?.title && ` · ${chapter?.book?.title}`}
               </p>
-              {author && (
-                <p className="text-sm text-muted-foreground">Thought Leader: {author.name}</p>
+              {chapter?.book?.thoughtLeader?.fullName && (
+                <p className="text-sm text-muted-foreground">Thought Leader: {chapter?.book?.thoughtLeader?.fullName}</p>
               )}
               <div className="flex items-center gap-2 pt-1">
                 <span className="font-semibold text-primary">
@@ -88,15 +81,15 @@ export function ChapterPreviewModal({
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div>
               <dt className="text-muted-foreground">Book</dt>
-              <dd className="font-medium">{book?.title ?? 'N/A'}</dd>
+              <dd className="font-medium">{chapter?.book?.title ?? 'N/A'}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Thought Leader</dt>
-              <dd className="font-medium">{author?.name ?? 'Unknown'}</dd>
+              <dd className="font-medium">{chapter?.book?.thoughtLeader?.fullName ?? 'Unknown'}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Sequence</dt>
-              <dd className="font-medium">{chapter.sequence}</dd>
+              <dd className="font-medium">{chapter.number}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Price</dt>
@@ -114,7 +107,7 @@ export function ChapterPreviewModal({
           >
             Close
           </Button>
-          {onOpenFullPage && (
+          {/* {onOpenFullPage && (
             <Button
               type="button"
               className="global_btn rounded_full bg_primary"
@@ -123,7 +116,7 @@ export function ChapterPreviewModal({
             >
               Open full page
             </Button>
-          )}
+          )} */}
         </DialogFooter>
       </DialogContent>
     </Dialog>

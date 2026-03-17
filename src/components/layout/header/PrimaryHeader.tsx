@@ -29,7 +29,7 @@ import {
 } from '@/routes/routes';
 import { openModal } from '@/store/slices/allModalSlice';
 import { signOut } from '@/store/slices/authSlice';
-import { clearAuthCookie } from '@/utils/auth';
+import { clearAuthCookies } from '@/utils/authCookies';
 import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryHeader() {
@@ -74,7 +74,7 @@ export default function PrimaryHeader() {
   }, [isUserMenuOpen]);
 
   const handleSignOut = () => {
-    clearAuthCookie();
+    clearAuthCookies();
     dispatch(signOut());
     setIsUserMenuOpen(false);
     toast.success('Signed out successfully');

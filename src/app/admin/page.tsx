@@ -11,7 +11,7 @@ import type { AdminSection, ContentMode, AdminRole } from '@/types/admin';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { selectContentMode, setContentMode as setReduxContentMode } from '@/store/slices/contentModeSlice';
 import { signOut } from '@/store/slices/authSlice';
-import { clearAuthCookie } from '@/utils/auth';
+import { clearAuthCookies } from '@/utils/authCookies';
 import { getHomeRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 
@@ -52,7 +52,7 @@ export default function AdminPanelRoutePage() {
 
     const onNavigateToWebsite = () => router.push(getHomeRoutePath());
     const onLogout = () => {
-        clearAuthCookie();
+        clearAuthCookies();
         dispatch(signOut());
         toast.success('Signed out successfully');
         router.push(getHomeRoutePath());

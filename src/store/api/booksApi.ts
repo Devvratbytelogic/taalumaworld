@@ -10,7 +10,7 @@ export const booksApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
   tagTypes: ['Books'],
   endpoints: (builder) => ({
-    getAllBooks: builder.query<Book[], void>({
+    getAllBooks: builder.query<any[], void>({
       queryFn: async () => {
         await delay(500);
         return { data: [...books] };
@@ -18,7 +18,7 @@ export const booksApi = createApi({
       providesTags: ['Books'],
     }),
     
-    getBooks: builder.query<Book[], { 
+    getBooks: builder.query<any[], { 
       categoryId?: string; 
       authorId?: string;
       featured?: boolean;
@@ -53,7 +53,7 @@ export const booksApi = createApi({
       providesTags: ['Books'],
     }),
     
-    getBookById: builder.query<Book | undefined, string>({
+    getBookById: builder.query<any | undefined, string>({
       queryFn: async (id) => {
         await delay(300);
         const book = books.find(b => b.id === id);
@@ -62,7 +62,7 @@ export const booksApi = createApi({
       providesTags: (result, error, id) => [{ type: 'Books', id }],
     }),
     
-    searchBooks: builder.query<Book[], string>({
+    searchBooks: builder.query<any[], string>({
       queryFn: async (query) => {
         await delay(400);
         const lowerQuery = query.toLowerCase();
@@ -75,7 +75,7 @@ export const booksApi = createApi({
       },
     }),
     
-    getBooksByAuthor: builder.query<Book[], string>({
+    getBooksByAuthor: builder.query<any[], string>({
       queryFn: async (authorId) => {
         await delay(400);
         const authorBooks = books.filter(book => book.authorId === authorId);
@@ -84,7 +84,7 @@ export const booksApi = createApi({
       providesTags: ['Books'],
     }),
     
-    getBooksByCategory: builder.query<Book[], string>({
+    getBooksByCategory: builder.query<any[], string>({
       queryFn: async (categoryId) => {
         await delay(400);
         const categoryBooks = books.filter(book => book.categoryId === categoryId);

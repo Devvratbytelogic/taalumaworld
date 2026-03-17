@@ -8,7 +8,7 @@ interface AdminAuthorsStatsProps {
 
 export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {
   const totalAuthors = authors.length;
-  const publishedBooks = authors.reduce((sum, a) => sum + a.booksCount, 0);
+  const publishedBooks = authors.reduce((sum, a) => sum + (a.booksCount ?? 0), 0);
   // Avg. Rating and Total Followers can be wired when API supports them
   const avgRating = '—';
   const totalFollowers = '—';

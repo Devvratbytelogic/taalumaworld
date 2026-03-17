@@ -4,13 +4,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Card, CardContent } from '../ui/card'
 import ImageComponent from '../ui/ImageComponent'
 import { Badge } from '../ui/badge'
-import type { Chapter } from '@/types/content'
+// import type { Chapter } from '@/types/content'
 import { BookOpen, FileText, User } from 'lucide-react'
 import { openModal } from '@/store/slices/allModalSlice'
 import { RootState } from '@/store/store'
 
 interface CommonCardProps {
-    data: Chapter;
+    data: any;
 }
 
 export default function CommonCard({ data }: CommonCardProps) {

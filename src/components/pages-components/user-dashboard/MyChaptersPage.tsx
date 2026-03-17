@@ -1,7 +1,5 @@
 import { BookOpen, Play, CheckCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetAllBooksQuery } from '@/store/api/booksApi'; 
-import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
 
 interface MyChaptersPageProps {
   ownedChapters: string[];
@@ -18,8 +16,8 @@ export function MyChaptersPage({
   isAuthenticated = false,
   hideHeader = false,
 }: MyChaptersPageProps) {
-  const { data: books = [] } = useGetAllBooksQuery();
-  const { data: chapters = [] } = useGetAllChaptersQuery();
+  const books: any = [];
+  const chapters: any = [];
 
   // If user is not authenticated, show empty state with no data
   if (!isAuthenticated) {
@@ -57,10 +55,10 @@ export function MyChaptersPage({
 
   // Get chapter details for owned chapters
   const myChapters = ownedChapters
-    .map(chapterId => chapters.find(c => c.id === chapterId))
+    .map(chapterId => chapters.find((c: any) => c.id === chapterId))
     .filter(Boolean)
     .map(chapter => {
-      const book = books.find(b => b.id === chapter!.bookId);
+      const book = books.find((b: any) => b.id === chapter!.bookId);
       const progress = readingProgress[chapter!.id] || 0;
       return { chapter: chapter!, book, progress };
     })
@@ -68,10 +66,10 @@ export function MyChaptersPage({
       // Sort by progress (in-progress first, then not started, then completed)
       const aProgress = a.progress;
       const bProgress = b.progress;
-      
+
       if (aProgress > 0 && aProgress < 100 && !(bProgress > 0 && bProgress < 100)) return -1;
       if (bProgress > 0 && bProgress < 100 && !(aProgress > 0 && aProgress < 100)) return 1;
-      
+
       return 0;
     });
 
@@ -102,7 +100,7 @@ export function MyChaptersPage({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {myChapters.map(({ chapter, book, progress }) => {
             const status = getProgressStatus(progress);
-            
+
             return (
               <div
                 key={chapter.id}
@@ -115,7 +113,7 @@ export function MyChaptersPage({
                     alt={chapter.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  
+
                   {/* Progress Badge */}
                   {progress === 100 && (
                     <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">

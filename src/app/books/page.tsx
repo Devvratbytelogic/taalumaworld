@@ -33,9 +33,10 @@ export default function BooksPage() {
 
   // Single book preview
   if (bookId && book) {
-    const author = authors.find((a) => a.id === book.authorId);
-    const category = categories.find((c) => c.id === book.categoryId);
-    const subcategory = category?.subcategories?.find((s) => s?.id === book.subcategoryId);
+    const author = book.thoughtLeader ?? authors.find((a) => a.id === book.thoughtLeader?.id);
+    const category =
+      typeof book.category === 'object' ? book.category : categories.find((c) => c.id === book.category);
+    const subcategory = book.subcategory ?? null;
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -70,13 +71,13 @@ export default function BooksPage() {
                 {author && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <User className="h-4 w-4" />
-                    <span>{author.name}</span>
+                    <span>{author.name ?? author.fullName}</span>
                   </div>
                 )}
                 <p className="text-muted-foreground">{book.description}</p>
-                {book.type === 'book' && book.bookPrice != null && (
+                {book.price != null && book.price > 0 && (
                   <p className="text-lg font-semibold text-primary">
-                    ${book.bookPrice.toFixed(2)} (full book)
+                    ${book.price.toFixed(2)} (full book)
                   </p>
                 )}
                 <div className="pt-4 flex flex-wrap gap-3">
@@ -139,8 +140,9 @@ export default function BooksPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {books.map((b) => {
-            const author = authors.find((a) => a.id === b.authorId);
-            const category = categories.find((c) => c.id === b.categoryId);
+            const author = b.thoughtLeader ?? authors.find((a) => a.id === b.thoughtLeader?.id);
+            const category =
+              typeof b.category === 'object' ? b.category : categories.find((c) => c.id === b.category);
             return (
               <Card
                 key={b.id}
@@ -159,7 +161,7 @@ export default function BooksPage() {
                   <CardHeader className="pb-2">
                     <h3 className="font-bold line-clamp-1">{b.title}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-1">
-                      by {author?.name ?? 'Unknown'}
+                      by {author?.name ?? author?.fullName ?? 'Unknown'}
                     </p>
                     {category && (
                       <Badge variant="outline" className="text-xs w-fit mt-1">

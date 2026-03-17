@@ -45,7 +45,7 @@ export function AdminAuthorsTab() {
 
   const filteredAuthors = authors.filter(
     (author) =>
-      author.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      author?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (author.bio && author.bio.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 

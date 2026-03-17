@@ -1,8 +1,5 @@
 import { Clock, Calendar } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetBooksQuery } from '@/store/api/booksApi';
-import { useGetChaptersQuery } from '@/store/api/chaptersApi';
-import { useGetAuthorsQuery } from '@/store/api/authorsApi';
 
 interface ReadingHistoryProps {
   readingProgress: Record<string, number>;
@@ -15,17 +12,17 @@ export function ReadingHistory({
   displayMode,
   onNavigate
 }: ReadingHistoryProps) {
-  const { data: books = [] } = useGetBooksQuery({});
-  const { data: chapters = [] } = useGetChaptersQuery({});
-  const { data: authors = [] } = useGetAuthorsQuery();
+  const books: any = [];
+  const chapters: any = [];
+  const authors: any = [];
 
   // Get all items with reading progress
   const historyItems = Object.entries(readingProgress)
     .map(([id, progress]) => {
       if (displayMode === 'chapters') {
-        const chapter = chapters.find(c => c.id === id);
+        const chapter = chapters.find((c: any) => c.id === id);
         if (chapter) {
-          const book = books.find(b => b.id === chapter.bookId);
+          const book = books.find((b: any) => b.id === chapter.bookId);
           return {
             type: 'chapter' as const,
             id,
@@ -37,9 +34,9 @@ export function ReadingHistory({
           };
         }
       } else {
-        const book = books.find(b => b.id === id);
+        const book = books.find((b: any) => b.id === id);
         if (book) {
-          const author = authors.find(a => a.id === book.authorId);
+          const author = authors.find((a: any) => a.id === book.authorId);
           return {
             type: 'book' as const,
             id,

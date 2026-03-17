@@ -14,8 +14,6 @@ import { useFormik } from 'formik';
 import { signInSchema } from '@/utils/formValidation';
 import { useLoginMutation } from '@/store/rtkQueries/adminAuth'
 import { setAuthCookies } from '@/utils/authCookies'
-// import { useLoginMutation } from '@/store/rtkQueries/adminAuthApi';
-// import { setAuthCookies } from '@/utils/authCookies';
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);

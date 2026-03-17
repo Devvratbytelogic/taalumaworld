@@ -3,11 +3,7 @@ import { Plus } from 'lucide-react';
 import Button from '../../ui/Button';
 import { getCreateChapterRoutePath } from '@/routes/routes';
 
-interface AdminChaptersHeaderProps {
-  onCreateChapter: () => void;
-}
-
-export function AdminChaptersHeader({ onCreateChapter }: AdminChaptersHeaderProps) {
+export function AdminChaptersHeader() {
   return (
     <div className="bg-white rounded-3xl p-8 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -66,12 +66,12 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
           by {book.thoughtLeader?.fullName ?? 'Unknown Thought Leader'}
         </p>
         <div className="flex items-center gap-2 flex-wrap pt-2">
-          {category?.name && (
+          {category && category !== 'N/A' && (
             <Badge variant="outline" className="text-xs">
-              {category.name}
+              {category as string}
             </Badge>
           )}
-          {subcategory?.name && (
+          {subcategory?.name && subcategory?.name !== 'N/A' && (
             <Badge variant="outline" className="text-xs">
               {subcategory.name}
             </Badge>

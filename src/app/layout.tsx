@@ -5,7 +5,7 @@ import "../styles/globals.css";
 import { AppProviders } from "../components/providers/AppProviders";
 import PrimaryHeader from "@/components/layout/header/PrimaryHeader";
 import PrimaryFooter from "@/components/layout/footer/PrimaryFooter";
-import { AUTH_COOKIE_NAME } from "@/utils/auth";
+import { AUTH_COOKIE_NAME } from "@/utils/authCookies";
 
 const roboto = Roboto({
   variable: "--font-roboto",

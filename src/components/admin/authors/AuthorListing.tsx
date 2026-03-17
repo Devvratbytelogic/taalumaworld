@@ -52,7 +52,7 @@ export function AuthorListing({
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={author.avatar} alt={author.name} />
-                      <AvatarFallback>{author.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>{author?.fullName?.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-medium">{author.name}</p>

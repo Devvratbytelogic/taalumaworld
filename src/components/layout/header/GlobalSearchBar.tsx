@@ -3,9 +3,8 @@ import { useRouter } from 'nextjs-toploader/app';
 import { getAuthorsRoutePath, getBooksRoutePath, getHomeWithSelectionRoutePath } from '@/routes/routes';
 import { Search, X, BookOpen, FileText, User, Clock } from 'lucide-react';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
-import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
 import { useGetAuthorsQuery } from '@/store/api/authorsApi';
-import { Input } from '@/components/ui/input';  
+import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
 import { useAppSelector } from '@/store/hooks';
 import { selectContentMode } from '@/store/slices/contentModeSlice';
@@ -18,8 +17,8 @@ export default function GlobalSearchBar() {
   const displayMode = useAppSelector(selectContentMode);
 
   const { data: books = [] } = useGetAllBooksQuery();
-  const { data: chapters = [] } = useGetAllChaptersQuery();
-  const { data: authors = [] } = useGetAuthorsQuery();
+  const chapters: any = [];
+  const authors: any = [];
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -31,7 +30,7 @@ export default function GlobalSearchBar() {
 
   const saveSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) return;
-    
+
     const updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
     setRecentSearches(updated);
     localStorage.setItem('taaluma_recent_searches', JSON.stringify(updated));
@@ -45,24 +44,24 @@ export default function GlobalSearchBar() {
   // Only show books and authors in Books Mode
   const filteredBooks = query && displayMode === 'books'
     ? books.filter((book) =>
-        book.title.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 3)
+      book.title.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 3)
     : [];
 
   // Only show chapters in Chapters Mode
-  const filteredChapters = query && displayMode === 'chapters'
-    ? chapters.filter((chapter) =>
-        chapter.title.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 3)
-    : [];
+  // const filteredChapters = query && displayMode === 'chapters'
+  //   ? chapters.filter((chapter) =>
+  //     chapter.title.toLowerCase().includes(query.toLowerCase())
+  //   ).slice(0, 3)
+  //   : [];
 
-  const filteredAuthors = query && displayMode === 'books'
-    ? authors.filter((author) =>
-        author.name.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 3)
-    : [];
+  // const filteredAuthors = query && displayMode === 'books'
+  //   ? authors.filter((author) =>
+  //     author.name.toLowerCase().includes(query.toLowerCase())
+  //   ).slice(0, 3)
+  //   : [];
 
-  const hasResults = filteredBooks.length > 0 || filteredChapters.length > 0 || filteredAuthors.length > 0;
+  const hasResults = filteredBooks.length > 0 || chapters.length > 0 || authors.length > 0;
   const showSuggestions = !query && recentSearches.length > 0;
 
   return (
@@ -119,19 +118,19 @@ export default function GlobalSearchBar() {
                     className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <div className="font-medium">{book.title}</div>
-                    <div className="text-xs text-gray-500">{book.categoryId ? book.categoryId : 'N/A'}</div>
+                    <div className="text-xs text-gray-500">N/A</div>
                   </button>
                 ))}
               </div>
             )}
 
-            {filteredChapters.length > 0 && (
+            {chapters.length > 0 && (
               <div className="p-2 border-t">
                 <div className="flex items-center gap-2 px-3 py-2">
                   <FileText className="h-4 w-4 text-primary" />
                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Chapters</span>
                 </div>
-                {filteredChapters.map((chapter) => (
+                {chapters && chapters?.length > 0 && chapters?.map((chapter: any) => (
                   <button
                     key={chapter.id}
                     onClick={() => {
@@ -144,31 +143,31 @@ export default function GlobalSearchBar() {
                     className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <div className="font-medium">{chapter.title}</div>
-                    <div className="text-xs text-gray-500">Chapter {chapter.sequence}</div>
+                    <div className="text-xs text-gray-500">Chapter {chapter.number}</div>
                   </button>
                 ))}
               </div>
             )}
 
-            {filteredAuthors.length > 0 && (
+            {authors.length > 0 && (
               <div className="p-2 border-t">
                 <div className="flex items-center gap-2 px-3 py-2">
                   <User className="h-4 w-4 text-primary" />
                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Thought Leaders</span>
                 </div>
-                {filteredAuthors.map((author) => (
+                {authors && authors?.length > 0 && authors?.map((author: any) => (
                   <button
                     key={author.id}
                     onClick={() => {
-                      router.push(getAuthorsRoutePath({ id: author.id }));
+                      router.push(getAuthorsRoutePath({ id: author._id }));
                       setIsOpen(false);
                       setQuery('');
-                      saveSearch(author.name);
+                      saveSearch(author.fullName);
                     }}
                     className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
-                    <div className="font-medium">{author.name}</div>
-                    <div className="text-xs text-gray-500">{author.booksCount ? author.booksCount : 0} books</div>
+                    <div className="font-medium">{author.fullName}</div>
+                    <div className="text-xs text-gray-500">{author.followersCount ? author.followersCount : 0} followers</div>
                   </button>
                 ))}
               </div>

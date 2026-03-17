@@ -19,7 +19,7 @@ export default function CommonCardDetailsModal() {
   const dispatch = useDispatch()
   const router = useRouter()
   const { isOpen, data } = useSelector((state: RootState) => state.allModal)
-  const chapter = (data as { chapter?: Chapter })?.chapter
+  const chapter = data as any
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
 
   const fullBook = chapter ? books.find((b) => b.id === chapter.bookId) : undefined

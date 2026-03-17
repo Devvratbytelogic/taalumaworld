@@ -5,7 +5,7 @@ import ImageComponent from '../ui/ImageComponent';
 import { Badge } from '@/components/ui/badge';
 
 interface ContinueReadingCardProps {
-  chapter: Chapter;
+  chapter: any;
   book?: Book;
   author?: Author;
   onClick: () => void;

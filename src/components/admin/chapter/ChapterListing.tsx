@@ -15,29 +15,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu';
-import type { Chapter, Book, Author } from '@/types/content';
+import { useRouter } from 'next/navigation';
+import { IAllChaptersAPIResponseData } from '@/types/chapter';
+import { getEditChapterRoutePath } from '@/routes/routes';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 interface ChapterListingProps {
-  chapters: Chapter[];
-  books: Book[];
-  authors: Author[];
-  searchQuery: string;
-  onCreateChapter: () => void;
-  onPreview: (chapter: Chapter) => void;
-  onEdit: (chapter: Chapter) => void;
-  onDelete: (chapter: Chapter) => void;
+  data: IAllChaptersAPIResponseData[];
+  setPreviewChapter: (chapter: IAllChaptersAPIResponseData | null) => void;
+  setDeleteConfirmChapter: (chapter: IAllChaptersAPIResponseData | null) => void;
 }
 
-export function ChapterListing({
-  chapters,
-  books,
-  authors,
-  searchQuery,
-  onCreateChapter,
-  onPreview,
-  onEdit,
-  onDelete,
-}: ChapterListingProps) {
+export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapter }: ChapterListingProps) {
+  const router = useRouter();
   return (
     <>
       <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
@@ -53,36 +43,33 @@ export function ChapterListing({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {chapters.map((chapter) => {
-              const book = books.find((b) => b.id === chapter.bookId);
-              const author = book ? authors.find((a) => a.id === book.authorId) : null;
-
+            {data && data.length > 0 && data?.map((chapter) => {
               return (
                 <TableRow key={chapter.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-lg bg-muted shrink-0 overflow-hidden">
-                        {chapter.featuredImage && (
-                          <img
-                            src={chapter.featuredImage}
+                        {chapter?.coverImage && (
+                          <ImageComponent
+                            src={chapter?.coverImage}
                             alt={chapter.title}
-                            className="w-full h-full object-cover"
+                            object_cover={true}
                           />
                         )}
                       </div>
                       <div className="min-w-0">
                         <div className="font-medium line-clamp-1">{chapter.title}</div>
                         <div className="text-sm text-muted-foreground line-clamp-1">
-                          Chapter {chapter.sequence}
+                          Chapter {chapter.number}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="line-clamp-1">{book?.title || 'N/A'}</div>
+                    <div className="line-clamp-1">{chapter?.book?.title || 'N/A'}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="line-clamp-1">{author?.name || 'Unknown'}</div>
+                    <div className="line-clamp-1">{chapter?.book?.thoughtLeader?.fullName || 'Unknown'}</div>
                   </TableCell>
                   <TableCell>
                     <span className="font-semibold text-primary">
@@ -102,17 +89,17 @@ export function ChapterListing({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => onPreview(chapter)}>
+                        <DropdownMenuItem onSelect={() => setPreviewChapter(chapter)}>
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => onEdit(chapter)}>
+                        <DropdownMenuItem onSelect={() => router.push(getEditChapterRoutePath(chapter.id))}>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
-                          onSelect={() => onDelete(chapter)}
+                          onSelect={() => setDeleteConfirmChapter(chapter)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
@@ -126,7 +113,7 @@ export function ChapterListing({
           </TableBody>
         </Table>
 
-        {chapters.length === 0 && (
+        {data && data.length === 0 && (
           <div className="p-12">
             <div className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
@@ -135,20 +122,9 @@ export function ChapterListing({
               <div>
                 <h3 className="font-bold">No chapters found</h3>
                 <p className="text-muted-foreground">
-                  {searchQuery
-                    ? 'Try adjusting your search query'
-                    : 'Create your first chapter to get started'}
+                  Create your first chapter to get started
                 </p>
               </div>
-              {!searchQuery && (
-                <Button
-                  onPress={onCreateChapter}
-                  className="global_btn rounded_full bg_primary"
-                  startContent={<Plus className="h-4 w-4" />}
-                >
-                  Create Your First Chapter
-                </Button>
-              )}
             </div>
           </div>
         )}

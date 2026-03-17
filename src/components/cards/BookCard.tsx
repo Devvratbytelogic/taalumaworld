@@ -4,7 +4,7 @@ import type { Book, Author } from '@/types/content';
 import { Badge } from '@/components/ui/badge';
 
 interface BookCardProps {
-  book: Book;
+  book: any;
   author?: Author;
   chaptersCount: number;
   onClick: () => void;
@@ -27,7 +27,7 @@ export function BookCard({ book, author, chaptersCount, onClick }: BookCardProps
           {/* Pricing Type Badge on Image */}
           <div className="absolute top-3.5 right-3.5">
             <Badge className="text-primary border-primary/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs font-medium">
-              {book.type === 'book' ? 'Full Book' : 'By Chapter'}
+              {book?.type === 'full-book' ? 'Full Book' : 'By Chapter'}
             </Badge>
           </div>
         </div>
@@ -36,7 +36,7 @@ export function BookCard({ book, author, chaptersCount, onClick }: BookCardProps
       <CardContent className="px-4 space-y-1.5 flex flex-col flex-1">
         {/* Category/Tags Badges */}
         <div className="flex items-center gap-2 flex-wrap">
-          {book.tags.slice(0, 2).map((tag) => (
+          {book.tags && book.tags.slice(0, 2).map((tag: any) => (
             <Badge
               key={tag}
               variant="outline"
@@ -77,8 +77,8 @@ export function BookCard({ book, author, chaptersCount, onClick }: BookCardProps
             <span>{chaptersCount} chapters</span>
           </div>
 
-          {book.type === 'book' && book.bookPrice ? (
-            <span className="font-semibold text-lg text-primary">${book.bookPrice.toFixed(2)}</span>
+          {book.type === 'full-book' && book.price !== undefined ? (
+            <span className="font-semibold text-lg text-primary">${book.price?.toString() ?? '0'}</span>
           ) : (
             <span className="font-medium text-sm text-muted-foreground tracking-tight">View Chapters</span>
           )}

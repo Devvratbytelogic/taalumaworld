@@ -1,40 +1,59 @@
-import type { Book, Chapter } from './content';
-
-export type { Book, Chapter };
-
-/** Payload for POST /admin/chapters (add chapter) */
-export interface AddChapterPayload {
-  book: string;
-  number: number;
-  title: string;
-  description: string;
-  content: string;
-  isFree: boolean;
-  price: number;
-  status: string;
-}
-
-/** Payload for PUT /admin/chapters/:id (update chapter) */
-export interface UpdateChapterPayload {
-  book: string;
-  number: number;
-  title: string;
-  description: string;
-  content?: string;
-  isFree: boolean;
-  price: number;
-  status?: string;
-  page?: number;
-}
-
 export interface IAllChaptersAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data?: Chapter[] | null;
+  data?: (IAllChaptersAPIResponseData)[] | null;
   message: string;
   timestamp: string;
 }
-
-/** @deprecated Use Chapter from @/types/content */
-export type IAllChaptersAPIResponseDataEntity = Chapter;
+export interface IAllChaptersAPIResponseData {
+  _id: string;
+  book: Book;
+  number: number;
+  page: number;
+  title: string;
+  description: string;
+  content: string;
+  isFree: boolean;
+  coverImage: string;
+  price: number;
+  status: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  id: string;
+}
+export interface Book {
+  _id: string;
+  title: string;
+  thoughtLeader: ThoughtLeader;
+  category: string;
+  subcategory: string;
+  description: string;
+  coverImage: string;
+  pricingModel: string;
+  price: number;
+  tags?: (string)[] | null;
+  createdBy: string;
+  deletedAt?: null;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  id: string;
+}
+export interface ThoughtLeader {
+  _id: string;
+  fullName: string;
+  email: string;
+  professionalBio: string;
+  avatar: string;
+  status: string;
+  followersCount: number;
+  createdBy: string;
+  deletedAt?: null;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  id: string;
+}

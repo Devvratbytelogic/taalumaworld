@@ -29,7 +29,11 @@ export function getAdminRoutePath(): string {
 }
 
 export function getCreateChapterRoutePath(): string {
-  return '/admin/create-chapter';
+  return '/admin/chapter/create';
+}
+
+export function getEditChapterRoutePath(chapterId: string): string {
+  return `/admin/chapter/edit/${chapterId}`;
 }
 
 export function getDesignSystemRoutePath(): string {

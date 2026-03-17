@@ -1,8 +1,8 @@
 import { BookOpen, Book, Clock, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetAllBooksQuery } from '@/store/api/booksApi';
-import { useGetAllChaptersQuery } from '@/store/api/chaptersApi';
+import { useGetAllBooksQuery, useGetAllChaptersQuery } from '@/store/rtkQueries/adminGetApi';
 import type { Book as BookType, Chapter } from '@/types/content';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 interface DashboardHomeProps {
   userName: string;
@@ -25,9 +25,10 @@ export function DashboardHome({
 }: DashboardHomeProps) {
   const firstName = userName.split(' ')[0] || userName;
 
-  const { data: books = [] } = useGetAllBooksQuery();
-  const { data: chapters = [] } = useGetAllChaptersQuery();
-
+  const { data: books } = useGetAllBooksQuery();
+  const booksData = books?.data ?? [];
+  const { data: chapters } = useGetAllChaptersQuery();
+  const chaptersData = chapters?.data ?? [];
   // Get continue reading items (items with progress > 0 and < 100)
   const continueReadingItems = Object.entries(readingProgress)
     .filter(([id, progress]) => progress > 0 && progress < 100)
@@ -39,13 +40,13 @@ export function DashboardHome({
   // Get chapter or book details for continue reading
   const getContinueReadingItem = (id: string) => {
     if (displayMode === 'chapters') {
-      const chapter = chapters.find(c => c.id === id);
+      const chapter = chaptersData.find((c) => c.id === id);
       if (chapter) {
-        const book = books.find(b => b.id === chapter.bookId);
+        const book = booksData.find((b) => b.id === chapter.book._id);
         return { type: 'chapter', item: chapter, book };
       }
     } else {
-      const book = books.find(b => b.id === id);
+      const book = booksData.find((b) => b.id === id);
       if (book) {
         return { type: 'book', item: book };
       }
@@ -61,7 +62,7 @@ export function DashboardHome({
           Welcome back, {firstName}! 👋
         </h1>
         <p className="text-muted-foreground">
-          {displayMode === 'chapters' 
+          {displayMode === 'chapters'
             ? "Continue your reading journey or explore new chapters"
             : "Continue your reading journey or explore new books"}
         </p>
@@ -87,9 +88,9 @@ export function DashboardHome({
               if (!item) return null;
 
               if (item.type === 'chapter') {
-                const chapter = item.item as Chapter;
-                const book = item.book as BookType;
-                
+                const chapter = item.item;
+                const book = item.book;
+
                 return (
                   <div
                     key={id}
@@ -97,18 +98,20 @@ export function DashboardHome({
                     onClick={() => onNavigate('read-chapter', id)}
                   >
                     <div className="aspect-video relative overflow-hidden bg-gray-100">
-                      <img
-                        src={chapter.featuredImage}
-                        alt={chapter.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      <div className='group-hover:scale-105 transition-transform duration-300'>
+                        <ImageComponent
+                          src={chapter.coverImage}
+                          alt={chapter.title}
+                          object_cover={true}
+                        />
+                      </div>
                     </div>
                     <div className="p-4">
                       <p className="text-xs text-muted-foreground mb-1">{book?.title}</p>
                       <h3 className="font-semibold text-sm mb-2 line-clamp-2">
                         {chapter.title}
                       </h3>
-                      
+
                       {/* Progress Bar */}
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs text-muted-foreground">
@@ -137,7 +140,7 @@ export function DashboardHome({
                 );
               } else {
                 const book = item.item as BookType;
-                
+
                 return (
                   <div
                     key={id}
@@ -155,7 +158,7 @@ export function DashboardHome({
                       <h3 className="font-semibold text-sm mb-2 line-clamp-2">
                         {book.title}
                       </h3>
-                      
+
                       {/* Progress Bar */}
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs text-muted-foreground">

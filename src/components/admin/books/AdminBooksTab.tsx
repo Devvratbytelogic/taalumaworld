@@ -1,29 +1,21 @@
 import { useState } from 'react';
-import {
-  useGetAllBooksQuery,
-  useGetAllAuthorLeadersQuery,
-  useGetAllCategoriesQuery,
-} from '@/store/rtkQueries/adminGetApi';
-import {
-  useAddBookMutation,
-  useUpdateBookMutation,
-  useDeleteBookMutation,
-} from '@/store/rtkQueries/adminPostApi';
+import { useGetAllBooksQuery, useGetAllAuthorLeadersQuery, useGetAllCategoriesQuery, } from '@/store/rtkQueries/adminGetApi';
+import { useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import { getBooksRoutePath } from '@/routes/routes';
-import type { BooksEntity } from '@/types/books';
 import { AdminBooksHeader } from './AdminBooksHeader';
 import { AdminBooksSearch } from './AdminBooksSearch';
 import { BookListing } from './BookListing';
 import { AddBookModal } from './AddBookModal';
 import { EditBookModal } from './EditBookModal';
 import { DeleteBookDialog } from './DeleteBookDialog';
+import { IAllBooksAPIResponseDataEntity } from '@/types/books';
 
 export function AdminBooksTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingBook, setEditingBook] = useState<BooksEntity | null>(null);
-  const [deleteConfirmBook, setDeleteConfirmBook] = useState<BooksEntity | null>(null);
+  const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
+  const [deleteConfirmBook, setDeleteConfirmBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
 
   const { data: booksResponse } = useGetAllBooksQuery();
   const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
@@ -42,11 +34,11 @@ export function AdminBooksTab() {
       (book.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleEditBook = (book: BooksEntity) => {
+  const handleEditBook = (book: IAllBooksAPIResponseDataEntity) => {
     setEditingBook(book);
   };
 
-  const handleDeleteBook = (book: BooksEntity) => {
+  const handleDeleteBook = (book: IAllBooksAPIResponseDataEntity) => {
     setDeleteConfirmBook(book);
   };
 
@@ -61,7 +53,7 @@ export function AdminBooksTab() {
     }
   };
 
-  const openPreview = (book: BooksEntity) => {
+  const openPreview = (book: IAllBooksAPIResponseDataEntity) => {
     window.open(getBooksRoutePath({ id: book.id ?? book._id }), '_blank');
   };
 

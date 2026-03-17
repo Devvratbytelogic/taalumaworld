@@ -2,19 +2,14 @@ import { MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Card, CardContent, CardHeader } from '../../ui/card';
 import { Badge } from '../../ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../ui/dropdown-menu';
-import type { BooksEntity } from '@/types/books';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown-menu';
+import { IAllBooksAPIResponseDataEntity } from '@/types/books';
 
 interface BookCardProps {
-  book: BooksEntity;
-  onPreview: (book: BooksEntity) => void;
-  onEdit: (book: BooksEntity) => void;
-  onDelete: (book: BooksEntity) => void;
+  book: IAllBooksAPIResponseDataEntity;
+  onPreview: (book: IAllBooksAPIResponseDataEntity) => void;
+  onEdit: (book: IAllBooksAPIResponseDataEntity) => void;
+  onDelete: (book: IAllBooksAPIResponseDataEntity) => void;
 }
 
 export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
@@ -66,9 +61,9 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
           by {book.thoughtLeader?.fullName ?? 'Unknown Thought Leader'}
         </p>
         <div className="flex items-center gap-2 flex-wrap pt-2">
-          {category && category !== 'N/A' && (
+          {category && category.name !== 'N/A' && (
             <Badge variant="outline" className="text-xs">
-              {category as string}
+              {category.name}
             </Badge>
           )}
           {subcategory?.name && subcategory?.name !== 'N/A' && (

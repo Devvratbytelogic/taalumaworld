@@ -22,7 +22,7 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
-import type { BooksEntity } from '@/types/books';
+import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
 import type { LeadersEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
 import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
@@ -39,7 +39,7 @@ const emptyFormValues = {
   price: '' as number | '',
 };
 
-function getInitialValuesFromBook(book: BooksEntity | null): typeof emptyFormValues {
+function getInitialValuesFromBook(book: IAllBooksAPIResponseDataEntity | null): typeof emptyFormValues {
   if (!book) return emptyFormValues;
   const thoughtLeaderId = typeof book.thoughtLeader === 'object' && book.thoughtLeader
     ? (book.thoughtLeader as { _id?: string })._id ?? ''
@@ -67,7 +67,7 @@ function getInitialValuesFromBook(book: BooksEntity | null): typeof emptyFormVal
 }
 
 interface EditBookModalProps {
-  book: BooksEntity | null;
+  book: IAllBooksAPIResponseDataEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   thoughtLeaders: LeadersEntity[];

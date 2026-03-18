@@ -1,15 +1,15 @@
 import { Plus, Book } from 'lucide-react';
 import Button from '../../ui/Button';
 import { BookCard } from './BookCard';
-import type { BooksEntity } from '@/types/books';
+import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
 
 interface BookListingProps {
-  books: BooksEntity[];
+  books: IAllBooksAPIResponseDataEntity[];
   searchQuery: string;
   onCreateBook: () => void;
-  onPreview: (book: BooksEntity) => void;
-  onEdit: (book: BooksEntity) => void;
-  onDelete: (book: BooksEntity) => void;
+  onPreview: (book: IAllBooksAPIResponseDataEntity) => void;
+  onEdit: (book: IAllBooksAPIResponseDataEntity) => void;
+  onDelete: (book: IAllBooksAPIResponseDataEntity) => void;
 }
 
 export function BookListing({

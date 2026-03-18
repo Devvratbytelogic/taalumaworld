@@ -7,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { BooksEntity } from '@/types/books';
+import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
 
 interface DeleteBookDialogProps {
-  book: BooksEntity | null;
+  book: IAllBooksAPIResponseDataEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;

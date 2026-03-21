@@ -12,15 +12,8 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
         }),
         removeCartItem: builder.mutation<void, string>({
             query: (cartItemId) => ({
-                url: `/user/cart/${cartItemId}`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: ['Cart'],
-        }),
-        clearCart: builder.mutation<void, void>({
-            query: () => ({
-                url: `/user/cart`,
-                method: 'DELETE',
+                url: `/user/remove-cart/${cartItemId}`,
+                method: 'GET',
             }),
             invalidatesTags: ['Cart'],
         }),
@@ -38,6 +31,5 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
 export const {
     useAddChapterToCartMutation,
     useRemoveCartItemMutation,
-    useClearCartMutation,
     useDirectPurchaseChapterMutation,
 } = clientSidePostApis;

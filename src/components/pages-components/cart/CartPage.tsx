@@ -5,8 +5,11 @@ import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { useDispatch } from 'react-redux';
+import { openModal } from '@/store/slices/allModalSlice';
 
 export default function CartDetailsComponent() {
+  const dispatch = useDispatch();
   const { data: cartResponse, isLoading } = useGetCartQuery();
 
   const cartData = cartResponse?.data?.[0];
@@ -18,8 +21,8 @@ export default function CartDetailsComponent() {
   );
   const total = cartData?.total_amount ?? subtotal;
 
-  const onRemoveFromCart = (itemId: string) => {
-    console.log('Remove from cart:', itemId);
+  const onRemoveFromCart = (itemId: string, chapterTitle: string) => {
+    dispatch(openModal({ componentName: 'ConfirmRemoveCartModal', data: { itemId, chapterTitle } }));
   };
 
   const onCheckout = () => {
@@ -133,10 +136,10 @@ export default function CartDetailsComponent() {
 
                       {/* Remove Button */}
                       <Button
-                        onPress={() => onRemoveFromCart(item._id)}
+                        onPress={() => onRemoveFromCart(item._id, chapter.title)}
                         className="global_btn danger_outline"
+                        startContent={<Trash2 className="h-4 w-4 mr-2" />}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
                         Remove
                       </Button>
                     </div>

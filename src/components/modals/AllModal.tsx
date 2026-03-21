@@ -12,6 +12,7 @@ import FilterModal from './FilterModal';
 import CommonCardDetailsModal from './CommonCardDetailsModal';
 import LoginRequiredModal from '../auth/LoginRequiredModal';
 import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
+import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -42,6 +43,8 @@ export default function AllModal() {
                 return <LoginRequiredModal />;
             case "ChapterPurchaseModal":
                 return <ChapterPurchaseModal />;
+            case "ConfirmRemoveCartModal":
+                return <ConfirmRemoveCartModal />;
 
             default:
                 return null;

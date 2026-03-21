@@ -118,7 +118,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         formData.append('cover_image', featuredImageFile);
       }
       if (pdfFile) {
-        formData.append('pdf', pdfFile);
+        formData.append('pdf_file', pdfFile);
       }
       try {
         await updateChapter({ id: chapterId, values: formData }).unwrap();

@@ -12,6 +12,7 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import AddToCartButton from '@/components/ui/AddToCartButton'
 import { RootState } from '@/store/store'
 import ImageComponent from '../ui/ImageComponent'
+import { useAuth } from '@/hooks/useAuth'
 
 
 export default function CommonCardDetailsModal() {
@@ -19,7 +20,7 @@ export default function CommonCardDetailsModal() {
   const router = useRouter()
   const { isOpen, data } = useSelector((state: RootState) => state.allModal)
   const chapter = data?.chapter
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const { isAuthenticated } = useAuth()
 
   const bookData = chapter?.bookId
   const authorName = chapter?.author ?? bookData?.thoughtLeader?.fullName

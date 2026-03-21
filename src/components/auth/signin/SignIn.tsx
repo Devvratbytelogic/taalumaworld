@@ -9,18 +9,18 @@ import toast from '@/utils/toast';
 import { Mail, Lock } from 'lucide-react';
 import { Eye, EyeOff } from 'lucide-react';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
-import { setAuthenticated } from '@/store/slices/authSlice';
 import { useFormik } from 'formik';
 import { signInSchema } from '@/utils/formValidation';
 import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth'
 import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
-import { setAuthCookies } from '@/utils/authCookies'
+import { setAuthCookies, setUserDisplayData } from '@/utils/authCookies'
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup'
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
 
-    const dispatch = useDispatch()
-    const router = useRouter()
+                    const dispatch = useDispatch();
+    const router = useRouter();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal)
     const isAdmin = (data as { isAdmin?: boolean })?.isAdmin === true;
 
@@ -41,21 +41,24 @@ export default function SignIn() {
                 if (res.success && res.data) {
                     if (isAdmin) {
                         const { token, userRole } = res.data;
+                        setUserDisplayData({ fullName: userRole.name, email: values.email });
                         setAuthCookies({
                             token,
                             user: { id: String(userRole.user_id), _id: userRole._id },
                             role: { name: userRole.name, id: userRole.id, _id: userRole._id },
                         });
-                        dispatch(setAuthenticated({ fullName: userRole.name, email: values.email }));
                     } else {
                         const { token, user } = res.data;
+                        setUserDisplayData({ fullName: user.name, email: values.email });
                         setAuthCookies({
                             token,
                             user: { id: String(user.id ?? user._id), _id: user._id },
                             role: 'user',
                         });
-                        dispatch(setAuthenticated({ fullName: user.name, email: values.email }));
                     }
+                    dispatch(rtkQuerieSetup.util.invalidateTags([
+                        'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
+                    ]));
                     const redirectTo = (data as { redirectTo?: string })?.redirectTo;
                     dispatch(closeModal());
                     resetForm();

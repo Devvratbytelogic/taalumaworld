@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useDispatch } from 'react-redux';
 import { BookOpen, Book, Clock, User, Settings, Home } from 'lucide-react';
 import { DashboardHome } from './DashboardHome';
 import { MyChaptersPage } from './MyChaptersPage';
@@ -10,9 +9,9 @@ import { ReadingHistory } from './ReadingHistory';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
 import { cn } from '@/components/ui/utils';
-import { signOut } from '@/store/slices/authSlice';
+import { clearAuthCookies } from '@/utils/authCookies';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
-import { getUserDashboardRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 
 type DashboardPage = 'dashboard' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings';
 
@@ -21,7 +20,6 @@ const VALID_PAGES: DashboardPage[] = ['dashboard', 'my-chapters', 'my-books', 'h
 function UserDashboardInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const dispatch = useDispatch();
   const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
   const tabParam = searchParams.get('tab') as DashboardPage | null;
@@ -45,8 +43,8 @@ function UserDashboardInner() {
   }, []);
 
   const handleLogout = () => {
-    dispatch(signOut());
-    router.push('/');
+    clearAuthCookies();
+    window.location.href = getHomeRoutePath();
   };
 
   const setCurrentPage = (page: DashboardPage) => {

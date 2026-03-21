@@ -10,7 +10,6 @@ import { canAccessSection, getRoleName, getRoleDescription } from '@/utils/admin
 import type { AdminSection, ContentMode, AdminRole } from '@/types/admin';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { selectContentMode, setContentMode as setReduxContentMode } from '@/store/slices/contentModeSlice';
-import { signOut } from '@/store/slices/authSlice';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { getHomeRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
@@ -53,9 +52,8 @@ export default function AdminPanelRoutePage() {
     const onNavigateToWebsite = () => router.push(getHomeRoutePath());
     const onLogout = () => {
         clearAuthCookies();
-        dispatch(signOut());
         toast.success('Signed out successfully');
-        router.push(getHomeRoutePath());
+        window.location.href = getHomeRoutePath();
     };
     const [searchQuery, setSearchQuery] = useState('');
     const [notifications, setNotifications] = useState(3);

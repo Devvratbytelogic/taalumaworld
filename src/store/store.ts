@@ -7,13 +7,11 @@ import cartReducer from './slices/cartSlice';
 import contentModeReducer from './slices/contentModeSlice';
 import readingReducer from './slices/readingSlice';
 import allModalSlice from './slices/allModalSlice';
-import authReducer from './slices/authSlice';
 import chapterPurchaseReducer from './slices/chapterPurchaseSlice';
 import { rtkQuerieSetup } from "./services/rtkQuerieSetup";
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
     // RTK Query APIs
     [rtkQuerieSetup.reducerPath]: rtkQuerieSetup.reducer,
     [booksApi.reducerPath]: booksApi.reducer,

@@ -21,6 +21,40 @@ export interface AuthResponseData {
  * Uses session cookies so the user is logged out when the browser is closed.
  * Handles common API shapes: token or access_token; user._id or user.id; role.id, role.name.
  */
+export interface UserDisplayData {
+    fullName: string;
+    email: string;
+    photo?: string | null;
+}
+
+const USER_DISPLAY_KEY = 'auth_user_display'
+
+export function setUserDisplayData(data: UserDisplayData): void {
+    if (typeof window === 'undefined') return
+    localStorage.setItem(USER_DISPLAY_KEY, JSON.stringify(data))
+}
+
+export function getUserDisplayData(): UserDisplayData | null {
+    if (typeof window === 'undefined') return null
+    try {
+        const raw = localStorage.getItem(USER_DISPLAY_KEY)
+        return raw ? (JSON.parse(raw) as UserDisplayData) : null
+    } catch {
+        return null
+    }
+}
+
+function clearUserDisplayData(): void {
+    if (typeof window === 'undefined') return
+    localStorage.removeItem(USER_DISPLAY_KEY)
+}
+
+function dispatchAuthChanged(): void {
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth-changed'))
+    }
+}
+
 export function setAuthCookies(data: AuthResponseData): void {
     const token = data.token ?? data.access_token
     if (token) {
@@ -39,6 +73,8 @@ export function setAuthCookies(data: AuthResponseData): void {
             Cookies.set('user_role', String(roleValue), SESSION_COOKIE_OPTIONS)
         }
     }
+
+    dispatchAuthChanged()
 }
 
 export function getAuthToken(): string | undefined {
@@ -80,6 +116,8 @@ export function clearAuthCookies(): void {
     Cookies.remove('auth_token', { path: '/' })
     Cookies.remove('userID', { path: '/' })
     Cookies.remove('user_role', { path: '/' })
+    clearUserDisplayData()
+    dispatchAuthChanged()
 }
 
 /** Clear all cookies for the current domain and reload the page (e.g. after logout). */

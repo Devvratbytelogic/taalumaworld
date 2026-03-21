@@ -15,8 +15,8 @@ import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getSearchRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { openModal } from '@/store/slices/allModalSlice';
-import { signOut } from '@/store/slices/authSlice';
 import { clearAuthCookies } from '@/utils/authCookies';
+import { useAuth } from '@/hooks/useAuth';
 import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryHeader() {
@@ -30,7 +30,8 @@ export default function PrimaryHeader() {
   const dispatch = useAppDispatch();
 
   const contentMode = useAppSelector(selectContentMode);
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
 
   const { data: cartData } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const cartCount = cartData?.data?.[0]?.item_count ?? 0;
@@ -55,10 +56,9 @@ export default function PrimaryHeader() {
 
   const handleSignOut = () => {
     clearAuthCookies();
-    dispatch(signOut());
     setIsUserMenuOpen(false);
     toast.success('Signed out successfully');
-    router.push(getHomeRoutePath());
+    window.location.href = getHomeRoutePath();
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -147,13 +147,20 @@ export default function PrimaryHeader() {
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                     <div className="py-1">
-                      <Link href={getUserDashboardRoutePath()} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <User className="h-5 w-5 mr-2 inline-block" />
-                        My Account
-                      </Link>
+                      {isAdmin ? (
+                        <Link href={getAdminRoutePath()} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <User className="h-5 w-5 mr-2 inline-block" />
+                          Admin Panel
+                        </Link>
+                      ) : (
+                        <Link href={getUserDashboardRoutePath()} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <User className="h-5 w-5 mr-2 inline-block" />
+                          My Account
+                        </Link>
+                      )}
                       <button
                         onClick={handleSignOut}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-2 text-left w-full hover:bg-gray-100 rounded-none!"
                       >
                         <LogOut className="h-5 w-5 mr-2 inline-block" />
                         Sign Out
@@ -281,14 +288,14 @@ export default function PrimaryHeader() {
               <div className="pt-4 border-t">
                 {isAuthenticated ? (
                   <>
-                    <Link href={getUserDashboardRoutePath()} onClick={() => setIsMenuOpen(false)}>
+                    <Link href={isAdmin ? getAdminRoutePath() : getUserDashboardRoutePath()} onClick={() => setIsMenuOpen(false)}>
                       <button className="w-full flex items-center gap-3 bg-linear-to-r from-primary/10 to-primary/5 rounded-2xl p-3">
                         <UserAvatar
                           userName={user?.fullName || user?.email || ''}
                           userPhoto={user?.photo ?? undefined}
                           size="sm"
                         />
-                        <span className="font-medium">{user?.fullName || 'My Account'}</span>
+                        <span className="font-medium">{isAdmin ? 'Admin Panel' : (user?.fullName || 'My Account')}</span>
                       </button>
                     </Link>
                     <Button

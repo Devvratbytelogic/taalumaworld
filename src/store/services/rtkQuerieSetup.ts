@@ -32,7 +32,9 @@ const baseQuery = fetchBaseQuery({
         // headers.set('clientsecret', API_CLIENT_SECRET);
         headers.set('device', deviceId);
         headers.set('userID', userId);
-        headers.set('Authorization', `Bearer ${token}`);
+        if (token) {
+            headers.set('Authorization', `Bearer ${token}`);
+        }
         return headers;
     },
 });
@@ -92,6 +94,6 @@ const baseQueryWithAuth: BaseQueryFn<
 export const rtkQuerieSetup = createApi({
     reducerPath: 'RTKServices',
     baseQuery: baseQueryWithAuth,
-    tagTypes: ['AdminCategories', 'AdminAuthorLeaders', 'AdminBooks', 'AdminChapters', 'SingleChapter', 'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory'],
+    tagTypes: ['AdminCategories', 'AdminAuthorLeaders', 'AdminBooks', 'AdminChapters', 'SingleChapter', 'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',],
     endpoints: () => ({}),
 });

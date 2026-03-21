@@ -13,12 +13,12 @@ import { closeModal } from '@/store/slices/allModalSlice';
 import { initiateRazorpayPayment } from './Razorpay';
 import { RootState } from '@/store/store';
 import { useDirectPurchaseChapterMutation } from '@/store/rtkQueries/userPostAPI';
-import { IHomeAllChaptersAPIResponseItemsEntity } from '@/types/user/HomeAllChapters';
+import { IChapterItem } from '@/types/user/HomeAllChapters';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import { getCartRoutePath } from '@/routes/routes';
 
 interface ChapterPurchaseModalData {
-  chapter: IHomeAllChaptersAPIResponseItemsEntity;
+  chapter: IChapterItem;
   book?: { title: string; id?: string } | null;
   closeBehavior?: 'goBack' | 'dismiss';
 }

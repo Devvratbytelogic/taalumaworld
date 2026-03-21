@@ -6,9 +6,18 @@ import { IUserProfileAPIResponse } from '@/types/user/user';
 import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
 import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
+import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
+        /** get global settings */
+        getGlobalSettings: builder.query<IGlobalSettingsAPIResponse, void>({
+            query: () => ({
+                url: `/user/get-global`,
+                method: 'GET',
+            }),
+            providesTags: ['GlobalSettings'],
+        }),
         /** categories */
         getAllChapters: builder.query<IHomeAllChaptersAPIResponse, void>({
             query: () => ({
@@ -73,6 +82,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
 });
 
 export const {
+    useGetGlobalSettingsQuery,
     useGetAllChaptersQuery,
     useGetSingleChapterQuery,
     useGetCartQuery,

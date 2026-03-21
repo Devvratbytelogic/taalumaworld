@@ -6,13 +6,19 @@ import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { SlidersHorizontal } from 'lucide-react';
 import { openModal } from '@/store/slices/allModalSlice';
+import { VISIBLE } from '@/constants/contentMode';
+
+interface FilterOptionsProps {
+    total?: number;
+    viewMode?: string;
+}
 
 function parseArrayParam(value: string | null): string[] {
     if (!value) return [];
     return value.split(',').filter(Boolean);
 }
 
-export default function FilterOptions() {
+export default function FilterOptions({ total = 0, viewMode }: FilterOptionsProps) {
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
 
@@ -23,11 +29,13 @@ export default function FilterOptions() {
     const progress = parseArrayParam(searchParams.get('progress'));
     const activeFilterCount = categories.length + authors.length + books.length + tags.length + progress.length;
 
+    const contentLabel = viewMode === VISIBLE.BOOK ? 'books' : 'chapters';
+
     return (
         <>
             <div className="flex items-center gap-4">
                 <Button
-                    onPress={() => dispatch(openModal({ componentName: 'FilterModal', data: { displayMode: 'chapters' } }))}
+                    onPress={() => dispatch(openModal({ componentName: 'FilterModal', data: { displayMode: contentLabel } }))}
                     className="global_btn rounded_full outline_primary"
                     startContent={<SlidersHorizontal className="h-5 w-5" />}
                 >
@@ -39,8 +47,7 @@ export default function FilterOptions() {
                     )}
                 </Button>
                 <p className="text-muted-foreground">
-                    {/* {filteredCount} chapter{filteredCount !== 1 ? 's' : ''} found */}
-                    11 chapters found
+                    {total} {contentLabel} found
                 </p>
             </div>
         </>

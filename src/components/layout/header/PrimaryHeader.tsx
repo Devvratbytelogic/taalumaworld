@@ -5,16 +5,16 @@ import toast from '@/utils/toast';
 import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, BookMarked, LogOut, User } from 'lucide-react';
 import { useRouter } from 'nextjs-toploader/app';
 import { usePathname } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectContentMode } from '@/store/slices/contentModeSlice';
-import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
+import { useAppDispatch } from '@/store/hooks';
+import { useGetCartQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
+import { openModal } from '@/store/slices/allModalSlice';
+import { VISIBLE } from '@/constants/contentMode';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getSearchRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
-import { openModal } from '@/store/slices/allModalSlice';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { useAuth } from '@/hooks/useAuth';
 import ImageComponent from '@/components/ui/ImageComponent';
@@ -29,7 +29,9 @@ export default function PrimaryHeader() {
   const pathName = usePathname();
   const dispatch = useAppDispatch();
 
-  const contentMode = useAppSelector(selectContentMode);
+  const { data: globalSettings } = useGetGlobalSettingsQuery();
+  const contentMode = globalSettings?.data?.visible;
+
   const { isAuthenticated, user } = useAuth();
   const isAdmin = user?.role?.toLowerCase() === 'admin';
 
@@ -92,14 +94,6 @@ export default function PrimaryHeader() {
                 object_cover={false}
               />
             </div>
-            {/* <div className="bg-primary rounded-xl p-2">
-              <BookOpen className="h-6 w-6 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <div className="text-2xl font-bold">
-                Taaluma<span className="text-primary">World</span>
-              </div>
-            </div> */}
           </Link>
 
           {/* Center Search Bar */}
@@ -111,9 +105,9 @@ export default function PrimaryHeader() {
           <div className="flex items-center gap-6 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
-              <Link href={contentMode === 'chapters' ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
+              <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
                 <BookMarked className="h-5 w-5" />
-                <span className="font-medium text-sm">{contentMode === 'books' ? 'My Books' : 'My Chapters'}</span>
+                <span className="font-medium text-sm">{contentMode === VISIBLE.BOOK ? 'My Books' : 'My Chapters'}</span>
               </Link>
             )}
 
@@ -224,25 +218,25 @@ export default function PrimaryHeader() {
             Contact
           </Link>
 
-          {contentMode === 'books' && (
+          {contentMode === VISIBLE.BOOK && (
             <>
               <Link
                 href={getBooksRoutePath()}
-                className={`transition-colors font-medium ${isActive(getBooksRoutePath()) ? 'text-primary' : 'hover:text-primary'
+                className={`transition-colors ${isActive(getBooksRoutePath()) ? 'text-primary' : 'hover:text-primary'
                   }`}
               >
                 Books
               </Link>
               <Link
                 href={getCategoriesRoutePath()}
-                className={`transition-colors font-medium ${isActive(getCategoriesRoutePath()) ? 'text-primary' : 'hover:text-primary'
+                className={`transition-colors ${isActive(getCategoriesRoutePath()) ? 'text-primary' : 'hover:text-primary'
                   }`}
               >
                 Categories
               </Link>
               <Link
                 href={getAuthorsRoutePath()}
-                className={`transition-colors font-medium ${isActive(getAuthorsRoutePath()) ? 'text-primary' : 'hover:text-primary'
+                className={`transition-colors ${isActive(getAuthorsRoutePath()) ? 'text-primary' : 'hover:text-primary'
                   }`}
               >
                 Thought Leaders
@@ -265,7 +259,7 @@ export default function PrimaryHeader() {
                 Contact
               </Link>
 
-              {contentMode === 'books' && (
+              {contentMode === VISIBLE.BOOK && (
                 <>
                   <Link href={getBooksRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                     Books
@@ -276,12 +270,12 @@ export default function PrimaryHeader() {
                   <Link href={getAuthorsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                     Thought Leaders
                   </Link>
-                </>
+                </> 
               )}
 
               {isAuthenticated && (
-                <Link href={contentMode === 'chapters' ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                  {contentMode === 'chapters' ? 'My Chapters' : 'My Books'}
+                <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                  {contentMode === VISIBLE.CHAPTER ? 'My Chapters' : 'My Books'}
                 </Link>
               )}
 

@@ -8,6 +8,8 @@ import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryC
 export default function LibraryContentSection() {
     const { data, isLoading } = useGetAllChaptersQuery();
     const chapters = data?.data?.items;
+    const total = data?.data?.total ?? 0;
+    const viewMode = data?.data?.viewMode;
 
     if (isLoading) {
         return <LibraryContentSectionSkeleton />;
@@ -17,7 +19,7 @@ export default function LibraryContentSection() {
         <>
             <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-6">
-                    <FilterOptions />
+                    <FilterOptions total={total} viewMode={viewMode} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

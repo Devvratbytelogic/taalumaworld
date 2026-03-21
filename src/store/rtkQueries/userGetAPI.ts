@@ -5,6 +5,7 @@ import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
 import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
+import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -56,6 +57,18 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['ReadingHistory'],
         }),
+        getTestimonials: builder.query<ITestimonialsAPIResponse, void>({
+            query: () => ({
+                url: `/user/testimonial`,
+                method: 'GET',
+            }),
+        }),
+        getFAQ: builder.query<IFAQAPIResponse, void>({
+            query: () => ({
+                url: `/user/faqs`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -66,4 +79,6 @@ export const {
     useGetUserProfileQuery,
     useGetMyChaptersQuery,
     useGetReadingHistoryQuery,
+    useGetTestimonialsQuery,
+    useGetFAQQuery,
 } = clientSideGetApis;

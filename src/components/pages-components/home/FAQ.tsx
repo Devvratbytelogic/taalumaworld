@@ -1,7 +1,12 @@
 'use client';
 import React, { useState } from 'react'
+import { useGetFAQQuery } from '@/store/rtkQueries/userGetAPI'
+import FAQSkeleton from '@/components/skeleton-loader/FAQSkeleton'
 
 export default function FAQ() {
+    const { data, isLoading } = useGetFAQQuery()
+    const faqs = data?.data
+
     return (
         <>
             <section className="py-16 bg-background">
@@ -14,38 +19,16 @@ export default function FAQ() {
                     </div>
 
                     <div className="space-y-4">
-                        <FAQItem
-                            question="How does chapter-by-chapter purchasing work?"
-                            answer="You can buy individual chapters to read at your own pace! Each chapter is priced separately, and many books offer the first chapter free so you can try before you buy. If you love the book, you can also purchase all remaining chapters at once."
-                        />
-                        <FAQItem
-                            question="Can I buy the entire book instead of individual chapters?"
-                            answer="Absolutely! While we focus on chapter-by-chapter reading, many authors also offer a 'full book' option. You'll see both options on the book detail page. Buying the full book is often a better value if you're already hooked!"
-                        />
-                        <FAQItem
-                            question="Are there free chapters available?"
-                            answer="Yes! Most books offer their first chapter completely free. This lets you explore different genres, discover new authors, and find stories you love without spending anything upfront."
-                        />
-                        <FAQItem
-                            question="How do I know which books are right for me?"
-                            answer="Use our filtering system to browse by category, author, or tags. Each book and chapter has a detailed description, and you can read reviews from other readers. Plus, with free first chapters, you can try before you commit!"
-                        />
-                        <FAQItem
-                            question="What payment methods do you accept?"
-                            answer="We accept all major credit and debit cards, as well as digital payment methods like PayPal and Apple Pay. All transactions are secure and encrypted to protect your information."
-                        />
-                        <FAQItem
-                            question="Can I access my purchased chapters on different devices?"
-                            answer="Yes! Once you purchase a chapter or book, it's linked to your account and you can access it from any device where you're logged in - your phone, tablet, or computer."
-                        />
-                        <FAQItem
-                            question="How do authors benefit from this platform?"
-                            answer="Authors earn money every time someone purchases their chapters or books. We provide them with tools to manage their content, set their own prices, and connect directly with readers like you. When you buy, you're directly supporting the authors you love!"
-                        />
-                        <FAQItem
-                            question="Is my information safe?"
-                            answer="Yes! We take your privacy seriously. We use industry-standard encryption to protect your personal and payment information. We never share your data with third parties without your permission."
-                        />
+                        {isLoading
+                            ? <FAQSkeleton />
+                            : faqs?.map((faq) => (
+                                <FAQItem
+                                    key={faq._id}
+                                    question={faq.question}
+                                    answer={faq.answer}
+                                />
+                            ))
+                        }
                     </div>
                 </div>
             </section>

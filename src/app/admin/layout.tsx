@@ -24,7 +24,6 @@ import type { AdminSection, ContentMode, AdminRole } from '@/types/admin';
 
 const NAV_ITEMS = [
     { id: 'dashboard' as AdminSection, label: 'Dashboard', icon: LayoutDashboard, category: 'system' },
-    { id: 'pages' as AdminSection, label: 'Pages', icon: FileEdit, category: 'system' },
     { id: 'settings' as AdminSection, label: 'Settings', icon: Settings, category: 'system' },
     { id: 'books' as AdminSection, label: 'Books', icon: Book, category: 'content' },
     { id: 'chapters' as AdminSection, label: 'Chapters', icon: FileText, category: 'content' },
@@ -36,7 +35,8 @@ const NAV_ITEMS = [
     { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: Receipt, category: 'commerce' },
     { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
-    { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
+    { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
+    // { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
     { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
     { id: 'reports' as AdminSection, label: 'Reports', icon: FileSpreadsheet, category: 'analytics' },
 ];
@@ -44,7 +44,6 @@ const NAV_ITEMS = [
 // Maps URL path → section id (to highlight active nav item)
 const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/dashboard': 'dashboard',
-    '/admin/pages': 'pages',
     '/admin/settings': 'settings',
     '/admin/books': 'books',
     '/admin/chapters': 'chapters',
@@ -56,7 +55,8 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/payments': 'payments',
     '/admin/transactions': 'transactions',
     '/admin/reviews': 'reviews',
-    '/admin/moderation': 'moderation',
+    '/admin/testimonials': 'testimonials',
+    // '/admin/moderation': 'moderation',
     '/admin/analytics': 'analytics',
     '/admin/reports': 'reports',
 };

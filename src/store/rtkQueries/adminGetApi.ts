@@ -4,6 +4,8 @@ import { IAllAuthorLeadersAPIResponse } from '@/types/authleaders';
 import { IAllBooksAPIResponse } from '@/types/books';
 import { IAllChaptersAPIResponse } from '@/types/chapter';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
+import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
+import { IAllUsersAPIResponse } from '@/types/allUsers';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -50,6 +52,25 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        /** users */
+        getAllUsers: builder.query<IAllUsersAPIResponse, void>({
+            query: () => ({
+                url: `/admin/get-all-users`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminUsers'],
+        }),
+
+
+        /** testimonials */
+        getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, void>({
+            query: () => ({
+                url: `/admin/testimonial`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminTestimonials'],
+        }),
     }),
 });
 
@@ -59,4 +80,6 @@ export const {
     useGetAllBooksQuery,
     useGetAllChaptersQuery,
     useGetGlobalSettingsQuery,
+    useGetAllUsersQuery,
+    useGetAllTestimonialsQuery,
 } = clientSideGetApis;

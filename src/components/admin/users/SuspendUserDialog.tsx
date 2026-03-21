@@ -14,6 +14,7 @@ interface SuspendUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 export function SuspendUserDialog({
@@ -21,6 +22,7 @@ export function SuspendUserDialog({
   open,
   onOpenChange,
   onConfirm,
+  isLoading,
 }: SuspendUserDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,15 +38,17 @@ export function SuspendUserDialog({
         <DialogFooter>
           <Button
             onPress={() => onOpenChange(false)}
+            isDisabled={isLoading}
             className="global_btn rounded_full outline_primary"
           >
             Cancel
           </Button>
           <Button
             onPress={onConfirm}
+            isDisabled={isLoading}
             className="global_btn rounded_full bg-destructive text-destructive-foreground"
           >
-            Suspend
+            {isLoading ? 'Suspending...' : 'Suspend'}
           </Button>
         </DialogFooter>
       </DialogContent>

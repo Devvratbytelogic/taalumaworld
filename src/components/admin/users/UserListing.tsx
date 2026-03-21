@@ -31,6 +31,7 @@ export interface AdminListUser {
 interface UserListingProps {
   users: AdminListUser[];
   searchQuery: string;
+  isLoading?: boolean;
   onViewProfile?: (user: AdminListUser) => void;
   onSendEmail?: (user: AdminListUser) => void;
   onSuspend?: (user: AdminListUser) => void;
@@ -39,6 +40,7 @@ interface UserListingProps {
 export function UserListing({
   users,
   searchQuery,
+  isLoading,
   onViewProfile,
   onSendEmail,
   onSuspend,
@@ -58,7 +60,17 @@ export function UserListing({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
+          {isLoading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: 7 }).map((__, j) => (
+                    <TableCell key={j}>
+                      <div className="h-4 bg-gray-100 rounded animate-pulse" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            : users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>
                 <div className="flex items-center gap-3">

@@ -23,7 +23,8 @@ export type AdminSection =
   | 'reviews'
   | 'moderation'
   | 'analytics'
-  | 'reports';
+  | 'reports'
+  | 'testimonials';
 
 export type AdminPermissions = {
   canViewDashboard: boolean;
@@ -42,6 +43,7 @@ export type AdminPermissions = {
   canViewAnalytics: boolean;
   canViewReports: boolean;
   canManageSettings: boolean;
+  canManageTestimonials: boolean;
 };
 
 export interface AdminUser {
@@ -73,6 +75,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewAnalytics: true,
     canViewReports: true,
     canManageSettings: true,
+    canManageTestimonials: true,
   },
   content_manager: {
     canViewDashboard: true,
@@ -91,6 +94,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewAnalytics: true,
     canViewReports: true,
     canManageSettings: false,
+    canManageTestimonials: true,
   },
   support_agent: {
     canViewDashboard: true,
@@ -109,6 +113,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewAnalytics: false,
     canViewReports: false,
     canManageSettings: false,
+    canManageTestimonials: false,
   },
   analytics_manager: {
     canViewDashboard: true,
@@ -127,6 +132,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewAnalytics: true,
     canViewReports: true,
     canManageSettings: false,
+    canManageTestimonials: false,
   },
   finance_manager: {
     canViewDashboard: true,
@@ -145,5 +151,6 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewAnalytics: true,
     canViewReports: true,
     canManageSettings: false,
+    canManageTestimonials: false,
   },
 };

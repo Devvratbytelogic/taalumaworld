@@ -115,6 +115,42 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminChapters'],
         }),
+
+
+        /** users */
+        suspendUser: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/block-user/${id}`,
+                method: 'PUT',
+            }),
+            invalidatesTags: ['AdminUsers'],
+        }),
+
+        /** testimonials */
+        addTestimonial: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/testimonial`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminTestimonials'],
+        }),
+        updateTestimonial: builder.mutation({
+            query: ({ id, values }) => ({
+                url: `/admin/testimonial/${id}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminTestimonials'],
+        }),
+        deleteTestimonial: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/testimonial/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['AdminTestimonials'],
+        }),
+
     }),
 });
 
@@ -142,4 +178,12 @@ export const {
     useAddChapterMutation,
     useUpdateChapterMutation,
     useDeleteChapterMutation,
+
+    // Users
+    useSuspendUserMutation,
+
+    // Testimonials
+    useAddTestimonialMutation,
+    useUpdateTestimonialMutation,
+    useDeleteTestimonialMutation,
 } = adminPostApi;

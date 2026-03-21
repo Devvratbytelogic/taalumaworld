@@ -94,6 +94,19 @@ const baseQueryWithAuth: BaseQueryFn<
 export const rtkQuerieSetup = createApi({
     reducerPath: 'RTKServices',
     baseQuery: baseQueryWithAuth,
-    tagTypes: ['AdminCategories', 'AdminAuthorLeaders', 'AdminBooks', 'AdminChapters', 'SingleChapter', 'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',],
+    tagTypes: [
+        'AdminCategories',
+        'AdminAuthorLeaders',
+        'AdminBooks',
+        'AdminChapters',
+        'SingleChapter',
+        'AllChapters',
+        'Cart',
+        'UserProfile',
+        'MyChapters',
+        'ReadingHistory',
+        'AdminUsers',
+        'AdminTestimonials'
+    ],
     endpoints: () => ({}),
 });

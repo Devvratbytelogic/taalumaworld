@@ -17,6 +17,7 @@ const sectionToPermission: Record<AdminSection, keyof AdminUser['permissions']> 
   moderation: 'canModerateContent',
   analytics: 'canViewAnalytics',
   reports: 'canViewReports',
+  testimonials: 'canManageTestimonials',
 };
 
 export function canAccessSection(adminUser: AdminUser, section: AdminSection): boolean {

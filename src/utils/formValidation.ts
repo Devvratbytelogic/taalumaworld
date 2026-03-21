@@ -92,8 +92,8 @@ export const addBookSchema = Yup.object({
     .required('Please enter a book title'),
   description: Yup.string(),
   thoughtLeader: Yup.string().required('Please select a thought leader'),
-  category: Yup.string().required('Please select a category'),
-  subcategory: Yup.string(),
+  // category: Yup.string().required('Please select a category'),
+  // subcategory: Yup.string(),
   // pricingModel: Yup.string().oneOf(['book', 'chapter']).required(),
   price: Yup.number()
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))

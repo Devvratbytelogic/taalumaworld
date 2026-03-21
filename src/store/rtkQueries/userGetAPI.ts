@@ -4,6 +4,7 @@ import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
 import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
+import { IMyBooksAPIResponse } from '@/types/user/myBooks';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
 import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
@@ -18,7 +19,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['GlobalSettings'],
         }),
-        /** categories */
+        /** chapters */
         getAllChapters: builder.query<IHomeAllChaptersAPIResponse, void>({
             query: () => ({
                 url: `/user/content`,
@@ -58,6 +59,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['MyChapters'],
         }),
+        /** get my books */
+        getMyBooks: builder.query<IMyBooksAPIResponse, void>({
+            query: () => ({
+                url: `/user/my-books`,
+                method: 'GET',
+            }),
+            providesTags: ['MyChapters'],
+        }),
         /** get reading history */
         getReadingHistory: builder.query<IMyReadingHistoryAPIResponse, void>({
             query: () => ({
@@ -66,12 +75,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['ReadingHistory'],
         }),
+        /** get testimonials */
         getTestimonials: builder.query<ITestimonialsAPIResponse, void>({
             query: () => ({
                 url: `/user/testimonial`,
                 method: 'GET',
             }),
         }),
+        /** get FAQs */
         getFAQ: builder.query<IFAQAPIResponse, void>({
             query: () => ({
                 url: `/user/faqs`,
@@ -88,6 +99,7 @@ export const {
     useGetCartQuery,
     useGetUserProfileQuery,
     useGetMyChaptersQuery,
+    useGetMyBooksQuery,
     useGetReadingHistoryQuery,
     useGetTestimonialsQuery,
     useGetFAQQuery,

@@ -17,6 +17,7 @@ import { getUserDashboardRoutePath } from '@/routes/routes';
 import { initiateRazorpayPayment, RazorpayPaymentResponse } from '@/components/pages-components/chapter/Razorpay';
 import PaymentLoader from './PaymentLoader';
 import PaymentConfirmed from './PaymentConfirmed';
+import { VISIBLE } from '@/constants/contentMode';
 
 export default function CartDetailsComponent() {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export default function CartDetailsComponent() {
   const cartItems = cartData?.cart_item ?? [];
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + (item.chapter.isFree ? 0 : (item.selling_price ?? 0)),
+    (sum, item) => sum + (item.chapter?.isFree ? 0 : (item.selling_price ?? 0)),
     0
   );
   const total = cartData?.total_amount ?? subtotal;
@@ -93,71 +94,79 @@ export default function CartDetailsComponent() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cartItems.map(item => (
-              <div key={item._id} className="bg-white rounded-3xl p-6 shadow-sm border border-border">
-                <div className="flex gap-4">
-                  {/* Chapter Image */}
-                  <div className="shrink-0">
-                    <div className="w-24 h-32 rounded-2xl overflow-hidden">
-                      <ImageComponent
-                        src={item.chapter.coverImage}
-                        alt={item.chapter.title}
-                        object_cover={true}
-                      />
-                    </div>
-                  </div>
+            {cartItems.map(item => {
+              const isBookItem = item.type === VISIBLE.BOOK
+              const coverImage = isBookItem ? item.book?.coverImage : item.chapter?.coverImage
+              const title = isBookItem ? item.book?.title : item.chapter?.title
+              const authorName = isBookItem
+                ? item.book?.thoughtLeader?.fullName
+                : item.chapter?.book?.thoughtLeader?.fullName
+              const bookTitle = !isBookItem ? item.chapter?.book?.title : null
 
-                  {/* Chapter Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className="text-xs rounded-full">
-                            Chapter {item.chapter.number}
-                          </Badge>
+              return (
+                <div key={item._id} className="bg-white rounded-3xl p-6 shadow-sm border border-border">
+                  <div className="flex gap-4">
+                    {/* Cover Image */}
+                    <div className="shrink-0">
+                      <div className="w-24 h-32 rounded-2xl overflow-hidden">
+                        <ImageComponent
+                          src={coverImage ?? ''}
+                          alt={title ?? ''}
+                          object_cover={true}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Item Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs rounded-full">
+                              {isBookItem ? 'Full Book' : `Chapter ${item.chapter?.number}`}
+                            </Badge>
+                          </div>
+                          <h3 className="font-bold text-lg mb-1 line-clamp-2">{title}</h3>
+                          {bookTitle && (
+                            <p className="text-sm text-muted-foreground mb-1 line-clamp-1">
+                              <BookOpen className="h-3.5 w-3.5 inline mr-1" />
+                              {bookTitle}
+                            </p>
+                          )}
+                          {authorName && (
+                            <p className="text-sm text-muted-foreground line-clamp-1">
+                              by {authorName}
+                            </p>
+                          )}
                         </div>
-                        <h3 className="font-bold text-lg mb-1 line-clamp-2">
-                          {item.chapter.title}
-                        </h3>
-                        {item.chapter.book && (
-                          <p className="text-sm text-muted-foreground mb-1 line-clamp-1">
-                            <BookOpen className="h-3.5 w-3.5 inline mr-1" />
-                            {item.chapter.book.title}
-                          </p>
-                        )}
-                        {item.chapter.book?.thoughtLeader && (
-                          <p className="text-sm text-muted-foreground line-clamp-1">
-                            by {item.chapter.book?.thoughtLeader?.fullName}
-                          </p>
-                        )}
+
+                        {/* Price */}
+                        <div className="text-right shrink-0">
+                          {item.chapter?.isFree ? (
+                            <Badge className="bg-success/10 text-success border-success/20 rounded-full">
+                              Free
+                            </Badge>
+                          ) : (
+                            <p className="text-xl font-bold text-primary">
+                              ₹{item.selling_price?.toFixed(2)}
+                            </p>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Price */}
-                      <div className="text-right shrink-0">
-                        {item.chapter.isFree ? (
-                          <Badge className="bg-success/10 text-success border-success/20 rounded-full">
-                            Free
-                          </Badge>
-                        ) : (
-                          <p className="text-xl font-bold text-primary">
-                            ₹{item.selling_price?.toFixed(2)}
-                          </p>
-                        )}
-                      </div>
+                      {/* Remove Button */}
+                      <Button
+                        onPress={() => onRemoveFromCart(item._id, title ?? '')}
+                        className="global_btn danger_outline"
+                        startContent={<Trash2 className="h-4 w-4 mr-2" />}
+                      >
+                        Remove
+                      </Button>
                     </div>
-
-                    {/* Remove Button */}
-                    <Button
-                      onPress={() => onRemoveFromCart(item._id, item.chapter.title)}
-                      className="global_btn danger_outline"
-                      startContent={<Trash2 className="h-4 w-4 mr-2" />}
-                    >
-                      Remove
-                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Order Summary */}

@@ -29,8 +29,8 @@ export interface CartItemEntity {
   cart_id: string;
   user_id: string;
   guest_user?: null;
-  chapter_id: string;
-  book_id?: null;
+  chapter_id?: string | null;
+  book_id?: string | null;
   quantity: number;
   type: string;
   single_price: number;
@@ -42,7 +42,8 @@ export interface CartItemEntity {
   updatedAt: string;
   id: number;
   __v: number;
-  chapter: Chapter;
+  chapter?: Chapter | null;
+  book?: CartBook | null;
 }
 export interface Chapter {
   _id: string;
@@ -68,6 +69,16 @@ export interface Book {
   thoughtLeader: ThoughtLeader;
   category: string;
   subcategory?: null;
+}
+export interface CartBook {
+  _id: string;
+  title: string;
+  coverImage: string;
+  description: string;
+  price: number;
+  pricingModel: string;
+  thoughtLeader?: ThoughtLeader | null;
+  category?: string | null;
 }
 export interface ThoughtLeader {
   _id: string;

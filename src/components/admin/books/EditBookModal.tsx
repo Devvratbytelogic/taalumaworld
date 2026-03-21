@@ -305,7 +305,7 @@ export function EditBookModal({
                 )}
               </div>
             </div>
-            {subcategories.length > 0 && (
+            {/* {subcategories.length > 0 && (
               <div className="space-y-2">
                 <Label>Subcategory (optional)</Label>
                 <Select
@@ -324,7 +324,7 @@ export function EditBookModal({
                   </SelectContent>
                 </Select>
               </div>
-            )}
+            )} */}
             <div className="space-y-2">
               <Label htmlFor="edit-book-tags">Tags</Label>
               <Input

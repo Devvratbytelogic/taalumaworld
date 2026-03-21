@@ -4,9 +4,10 @@ import { ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import Button from '@/components/ui/Button';
 import { useAddChapterToCartMutation } from '@/store/rtkQueries/userPostAPI';
+import { VISIBLE } from '@/constants/contentMode';
 
 interface AddToCartButtonProps {
-    chapterId: string;
+    chapterId?: string;
     bookId?: string;
     type?: string;
     price?: number;
@@ -29,7 +30,7 @@ export default function AddToCartButton({
     const handleAddToCart = async () => {
         try {
             await addChapterToCart({
-                chapter_id: chapterId,
+                ...(type !== VISIBLE.BOOK && chapterId && { chapter_id: chapterId }),
                 ...(bookId && { book_id: bookId }),
                 type,
                 ...(price !== undefined && { price: String(price) }),

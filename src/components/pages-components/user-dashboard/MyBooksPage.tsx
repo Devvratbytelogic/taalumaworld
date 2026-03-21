@@ -1,88 +1,164 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import { Book, Play, BookOpen, CheckCircle } from 'lucide-react';
+import { Book, BookOpen, TrendingUp, CheckCircle, Play } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetAllBooksQuery } from '@/store/api/booksApi';
-import { useGetAuthorsQuery } from '@/store/api/authorsApi';
-import { selectReadingProgress } from '@/store/slices/readingSlice';
-import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
+import { useGetMyBooksQuery } from '@/store/rtkQueries/userGetAPI';
+import { cn } from '@/components/ui/utils';
+import { getBooksRoutePath } from '@/routes/routes';
+import type { IMyBookItem } from '@/types/user/myBooks';
+
+type FilterType = 'all' | 'reading' | 'completed' | 'unread';
 
 export function MyBooksPage() {
   const router = useRouter();
-  const readingProgressRaw = useSelector(selectReadingProgress);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  const readingProgress = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(readingProgressRaw).map(([id, data]) => [id, data.progress])
-      ),
-    [readingProgressRaw]
+  const { data: myBooksData, isLoading } = useGetMyBooksQuery();
+  const books: IMyBookItem[] = myBooksData?.data?.items ?? [];
+
+  const stats = useMemo(
+    () => ({
+      total: books.length,
+      reading: books.filter((b) => b.progressPercent > 0 && !b.completed).length,
+      completed: books.filter((b) => b.completed).length,
+      unread: books.filter((b) => b.progressPercent === 0 && !b.completed).length,
+    }),
+    [books]
   );
 
-  const ownedBooks: string[] = useMemo(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      return JSON.parse(localStorage.getItem('owned_books') || '[]');
-    } catch {
-      return [];
+  const filteredBooks = useMemo(() => {
+    switch (activeFilter) {
+      case 'reading':
+        return books.filter((b) => b.progressPercent > 0 && !b.completed);
+      case 'completed':
+        return books.filter((b) => b.completed);
+      case 'unread':
+        return books.filter((b) => b.progressPercent === 0 && !b.completed);
+      default:
+        return books;
     }
-  }, []);
+  }, [books, activeFilter]);
 
-  const { data: books = [], isLoading: booksLoading } = useGetAllBooksQuery();
-  const { data: authors = [], isLoading: authorsLoading } = useGetAuthorsQuery();
-
-  if (booksLoading || authorsLoading) {
-    return <MyBooksPageSkeleton />;
-  }
-
-  const myBooks = ownedBooks
-    .map(bookId => books.find((b: any) => b.id === bookId))
-    .filter(Boolean)
-    .map(book => {
-      const author = authors.find((a: any) => a.id === book!.thoughtLeader._id);
-      const progress = readingProgress[book!.id] || 0;
-      return { book: book!, author, progress };
-    })
-    .sort((a, b) => {
-      const aProgress = a.progress;
-      const bProgress = b.progress;
-      if (aProgress > 0 && aProgress < 100 && !(bProgress > 0 && bProgress < 100)) return -1;
-      if (bProgress > 0 && bProgress < 100 && !(aProgress > 0 && aProgress < 100)) return 1;
-      return 0;
-    });
-
-  const getProgressStatus = (progress: number) => {
-    if (progress === 0) return { label: 'Not Started', color: 'text-gray-500' };
-    if (progress < 100) return { label: 'In Progress', color: 'text-primary' };
-    return { label: 'Completed', color: 'text-green-600' };
+  const getProgressStatus = (progressPercent: number, completed: boolean) => {
+    if (completed || progressPercent === 100) return { label: 'Completed', color: 'text-green-600' };
+    if (progressPercent > 0) return { label: 'In Progress', color: 'text-primary' };
+    return { label: 'Not Started', color: 'text-gray-500' };
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white rounded-3xl p-5 shadow-sm animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 bg-gray-200 rounded-full" />
+                <div className="space-y-2">
+                  <div className="h-6 bg-gray-200 rounded w-10" />
+                  <div className="h-3 bg-gray-100 rounded w-24" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-3xl overflow-hidden animate-pulse">
+              <div className="aspect-3/4 bg-gray-200" />
+              <div className="p-5 space-y-3">
+                <div className="h-3 bg-gray-100 rounded w-24" />
+                <div className="h-5 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                <div className="h-10 bg-gray-200 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-2xl">
-            <Book className="h-6 w-6 text-primary" />
+      <div className="mb-2">
+        <h1 className="text-3xl font-bold mb-1">My Books</h1>
+        <p className="text-muted-foreground">Your personal collection of purchased books</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-3xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-primary/20 rounded-full">
+              <Book className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Total Books</div>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">My Books</h1>
         </div>
-        <p className="text-muted-foreground">
-          {myBooks.length} {myBooks.length === 1 ? 'book' : 'books'} in your library
+        <div className="bg-linear-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-3xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-200 rounded-full">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">{stats.reading}</div>
+              <div className="text-sm text-muted-foreground tracking-tight">In Progress</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-linear-to-br from-green-50 to-green-100/50 border border-green-200 rounded-3xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-200 rounded-full">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">{stats.completed}</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Completed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex gap-2 flex-wrap">
+          {(
+            [
+              { key: 'all', label: `All (${stats.total})` },
+              { key: 'reading', label: `Reading (${stats.reading})` },
+              { key: 'completed', label: `Completed (${stats.completed})` },
+              { key: 'unread', label: `Unread (${stats.unread})` },
+            ] as { key: FilterType; label: string }[]
+          ).map(({ key, label }) => (
+            <Button
+              key={key}
+              className={cn('global_btn rounded_full', activeFilter === key ? 'bg_primary' : 'outline_primary')}
+              onPress={() => setActiveFilter(key)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+        <p className="text-muted-foreground text-sm">
+          {filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''}
         </p>
       </div>
 
       {/* Books Grid */}
-      {myBooks.length > 0 ? (
+      {filteredBooks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myBooks.map(({ book, author, progress }) => {
-            const status = getProgressStatus(progress);
+          {filteredBooks.map((book) => {
+            const progress = book.progressPercent;
+            const status = getProgressStatus(progress, book.completed);
 
             return (
               <div
-                key={book.id}
+                key={book.bookId}
                 className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all group"
               >
                 {/* Book Cover */}
@@ -93,14 +169,14 @@ export function MyBooksPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
 
-                  {/* Progress Badge */}
-                  {progress === 100 && (
+                  {/* Status Badge */}
+                  {book.completed && (
                     <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
                       Completed
                     </div>
                   )}
-                  {progress > 0 && progress < 100 && (
+                  {!book.completed && progress > 0 && (
                     <div className="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
                       {Math.round(progress)}%
                     </div>
@@ -109,9 +185,7 @@ export function MyBooksPage() {
 
                 {/* Book Info */}
                 <div className="p-5">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {author?.name || 'Unknown Author'}
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">{book.author}</p>
                   <h3 className="font-bold text-base mb-2 line-clamp-2">{book.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{book.description}</p>
 
@@ -130,7 +204,7 @@ export function MyBooksPage() {
                   {/* Action Button */}
                   <Button
                     className="global_btn rounded_full bg_primary w-full"
-                    onPress={() => router.push('/books')}
+                    onPress={() => router.push(`/books/${book.bookId}`)}
                   >
                     {progress === 0 ? (
                       <>
@@ -152,7 +226,7 @@ export function MyBooksPage() {
 
                   {/* Book Details */}
                   <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{book.chapters?.length ?? 0} chapters</span>
+                    <span>{book.chapterCount} chapters</span>
                     <span className={status.color}>{status.label}</span>
                   </div>
                 </div>
@@ -167,16 +241,31 @@ export function MyBooksPage() {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Book className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="text-xl font-bold mb-2">No Books Yet</h3>
+            <h3 className="text-xl font-bold mb-2">
+              {activeFilter === 'all'
+                ? 'No Books Yet'
+                : `No ${activeFilter === 'reading' ? 'In Progress' : activeFilter === 'completed' ? 'Completed' : 'Unread'} Books`}
+            </h3>
             <p className="text-muted-foreground mb-6">
-              You haven't purchased any books yet. Start exploring and build your collection!
+              {activeFilter === 'all'
+                ? "You haven't purchased any books yet. Start exploring and build your collection!"
+                : 'No books match this filter.'}
             </p>
-            <Button
-              onPress={() => router.push('/books')}
-              className='global_btn rounded_full bg_primary'
-            >
-              Browse Books
-            </Button>
+            {activeFilter === 'all' ? (
+              <Button
+                onPress={() => router.push(getBooksRoutePath())}
+                className="global_btn rounded_full bg_primary"
+              >
+                Browse Books
+              </Button>
+            ) : (
+              <Button
+                onPress={() => setActiveFilter('all')}
+                className="global_btn rounded_full outline_primary"
+              >
+                Show All Books
+              </Button>
+            )}
           </div>
         </div>
       )}

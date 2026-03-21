@@ -263,7 +263,7 @@ export function AddBookModal({
                 )}
               </div>
             </div>
-            {subcategories.length > 0 && (
+            {/* {subcategories.length > 0 && (
               <div className="space-y-2">
                 <Label>Subcategory (optional)</Label>
                 <Select
@@ -282,7 +282,7 @@ export function AddBookModal({
                   </SelectContent>
                 </Select>
               </div>
-            )}
+            )} */}
             <div className="space-y-2">
               <Label htmlFor="book-tags">Tags</Label>
               <Input

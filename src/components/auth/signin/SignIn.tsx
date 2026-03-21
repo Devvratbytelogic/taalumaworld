@@ -67,8 +67,9 @@ export default function SignIn() {
                         router.push(redirectTo);
                     }
                 }
-            } catch {
-                toast.error('Invalid email or password. Please try again.');
+            } catch (error) {
+                console.log(error);
+                // toast.error('Invalid email or password. Please try again.');
             }
         },
     });

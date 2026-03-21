@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetAllChaptersQuery, useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
+import type { IChapterItem } from '@/types/user/HomeAllChapters';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
@@ -54,11 +55,11 @@ export default function ReadChapterPage() {
   }, [currentChapter, isLocked]);
 
   // All chapters from the same book, sorted by chapter number
-  const bookChapters = useMemo(() => {
+  const bookChapters = useMemo((): IChapterItem[] => {
     const items = allChaptersResponse?.data?.items ?? [];
-    if (!currentChapter) return items;
+    if (!currentChapter) return [];
     return [...items]
-      .filter((c) => c.bookId._id === currentChapter.bookId)
+      .filter((c): c is IChapterItem => c.type === 'chapter' && c.bookId?._id === currentChapter.bookId)
       .sort((a, b) => a.chapterNumber - b.chapterNumber);
   }, [allChaptersResponse, currentChapter]);
 

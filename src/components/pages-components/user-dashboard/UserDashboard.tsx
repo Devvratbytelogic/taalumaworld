@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BookOpen, Book, Clock, User, Settings, Home } from 'lucide-react';
 import { DashboardHome } from './DashboardHome';
@@ -20,27 +20,9 @@ const VALID_PAGES: DashboardPage[] = ['dashboard', 'my-chapters', 'my-books', 'h
 function UserDashboardInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
   const tabParam = searchParams.get('tab') as DashboardPage | null;
   const currentPage: DashboardPage = tabParam && VALID_PAGES.includes(tabParam) ? tabParam : 'dashboard';
-
-  useEffect(() => {
-    const savedMode = localStorage.getItem('display-mode');
-    if (savedMode === 'books' || savedMode === 'chapters') {
-      setDisplayMode(savedMode);
-    }
-
-    const handleDisplayModeChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ mode: 'chapters' | 'books' }>;
-      setDisplayMode(customEvent.detail.mode);
-    };
-
-    window.addEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
-    return () => {
-      window.removeEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
-    };
-  }, []);
 
   const handleLogout = () => {
     clearAuthCookies();
@@ -54,8 +36,8 @@ function UserDashboardInner() {
   const navItems = [
     { id: 'dashboard' as DashboardPage, label: 'Dashboard', icon: Home, show: true },
     { id: 'profile' as DashboardPage, label: 'Profile', icon: User, show: true },
-    { id: 'my-chapters' as DashboardPage, label: 'My Chapters', icon: BookOpen, show: displayMode === 'chapters' },
-    { id: 'my-books' as DashboardPage, label: 'My Books', icon: Book, show: displayMode === 'books' },
+    { id: 'my-chapters' as DashboardPage, label: 'My Chapters', icon: BookOpen, show: true },
+    { id: 'my-books' as DashboardPage, label: 'My Books', icon: Book, show: true },
     { id: 'history' as DashboardPage, label: 'Reading History', icon: Clock, show: true },
     { id: 'settings' as DashboardPage, label: 'Settings', icon: Settings, show: true },
   ].filter(item => item.show);

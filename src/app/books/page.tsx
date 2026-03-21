@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useGetAllBooksQuery, useGetBookByIdQuery } from '@/store/api/booksApi';
@@ -13,6 +14,18 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { BookOpen, ArrowLeft, User } from 'lucide-react';
 
 export default function BooksPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    }>
+      <BooksContent />
+    </Suspense>
+  );
+}
+
+function BooksContent() {
   const searchParams = useSearchParams();
   const bookId = searchParams.get('id');
 

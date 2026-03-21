@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import Cookies from 'js-cookie';
+import { API_BASE_URL } from '@/utils/config';
 
 export interface UserProfile {
   id: string;
@@ -25,121 +25,71 @@ export interface ReadingProgress {
   lastRead: string;
 }
 
+interface APIEnvelope<T> {
+  data: T;
+  success: boolean;
+  message: string;
+}
+
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: API_BASE_URL,
+    prepareHeaders: (headers) => {
+      const token = Cookies.get('auth_token') || null;
+      const deviceId = Cookies.get('device') || '';
+      const userId = Cookies.get('userID') || '';
+      headers.set('device', deviceId);
+      headers.set('userID', userId);
+      headers.set('Authorization', `Bearer ${token}`);
+      return headers;
+    },
+  }),
   tagTypes: ['User', 'Purchases', 'Progress'],
   endpoints: (builder) => ({
     getUserProfile: builder.query<UserProfile, void>({
-      queryFn: async () => {
-        await delay(500);
-        
-        // Get from localStorage (mock)
-        const userEmail = localStorage.getItem('user_email') || '';
-        const userName = localStorage.getItem('user_name') || '';
-        const userPhoto = localStorage.getItem('user_photo') || '';
-        
-        const profile: UserProfile = {
-          id: 'user-1',
-          email: userEmail,
-          fullName: userName,
-          photo: userPhoto,
-          role: 'user',
-          createdAt: new Date().toISOString(),
-        };
-        
-        return { data: profile };
-      },
+      query: () => ({ url: '/user/profile', method: 'GET' }),
+      transformResponse: (res: APIEnvelope<UserProfile>) => res.data,
       providesTags: ['User'],
     }),
-    
+
     getPurchasedItems: builder.query<PurchasedItem[], void>({
-      queryFn: async () => {
-        await delay(400);
-        
-        // Get from localStorage
-        const ownedChapters = JSON.parse(localStorage.getItem('owned_chapters') || '[]');
-        
-        const purchases: PurchasedItem[] = ownedChapters.map((chapterId: string, index: number) => ({
-          id: `purchase-${index}`,
-          chapterId,
-          purchaseDate: new Date().toISOString(),
-          price: 2.99,
-        }));
-        
-        return { data: purchases };
-      },
+      query: () => ({ url: '/user/purchases', method: 'GET' }),
+      transformResponse: (res: APIEnvelope<PurchasedItem[]>) => res.data,
       providesTags: ['Purchases'],
     }),
-    
+
     getReadingProgress: builder.query<ReadingProgress[], void>({
-      queryFn: async () => {
-        await delay(400);
-        
-        // Get from localStorage
-        const progress = JSON.parse(localStorage.getItem('reading_progress') || '{}');
-        
-        const progressArray: ReadingProgress[] = Object.entries(progress).map(([chapterId, data]: [string, any]) => ({
-          chapterId,
-          progress: data.progress || 0,
-          lastRead: data.lastRead || new Date().toISOString(),
-        }));
-        
-        return { data: progressArray };
-      },
+      query: () => ({ url: '/user/progress', method: 'GET' }),
+      transformResponse: (res: APIEnvelope<ReadingProgress[]>) => res.data,
       providesTags: ['Progress'],
     }),
-    
+
     updateReadingProgress: builder.mutation<void, { chapterId: string; progress: number }>({
-      queryFn: async ({ chapterId, progress }) => {
-        await delay(300);
-        
-        // Update localStorage
-        const currentProgress = JSON.parse(localStorage.getItem('reading_progress') || '{}');
-        currentProgress[chapterId] = {
-          progress,
-          lastRead: new Date().toISOString(),
-        };
-        localStorage.setItem('reading_progress', JSON.stringify(currentProgress));
-        
-        return { data: undefined };
-      },
+      query: ({ chapterId, progress }) => ({
+        url: `/user/progress/${chapterId}`,
+        method: 'PATCH',
+        body: { progress },
+      }),
       invalidatesTags: ['Progress'],
     }),
-    
+
     updateUserProfile: builder.mutation<UserProfile, Partial<UserProfile>>({
-      queryFn: async (updates) => {
-        await delay(500);
-        
-        // Update localStorage
-        if (updates.fullName) localStorage.setItem('user_name', updates.fullName);
-        if (updates.photo) localStorage.setItem('user_photo', updates.photo);
-        
-        const profile: UserProfile = {
-          id: 'user-1',
-          email: localStorage.getItem('user_email') || '',
-          fullName: localStorage.getItem('user_name') || '',
-          photo: localStorage.getItem('user_photo') || '',
-          role: 'user',
-          createdAt: new Date().toISOString(),
-        };
-        
-        return { data: profile };
-      },
+      query: (updates) => ({
+        url: '/user/profile',
+        method: 'PATCH',
+        body: updates,
+      }),
+      transformResponse: (res: APIEnvelope<UserProfile>) => res.data,
       invalidatesTags: ['User'],
     }),
 
     purchaseChapter: builder.mutation<boolean, string>({
-      queryFn: async (chapterId) => {
-        await delay(500);
-        const owned = JSON.parse(localStorage.getItem('owned_chapters') || '[]');
-        if (owned.includes(chapterId)) {
-          return { data: true };
-        }
-        owned.push(chapterId);
-        localStorage.setItem('owned_chapters', JSON.stringify(owned));
-        return { data: true };
-      },
+      query: (chapterId) => ({
+        url: `/user/purchase/chapter/${chapterId}`,
+        method: 'POST',
+      }),
+      transformResponse: (res: APIEnvelope<boolean>) => res.data,
       invalidatesTags: ['Purchases'],
     }),
   }),

@@ -3,12 +3,10 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
-import { X, BookOpen, User, FileText, DollarSign, ShoppingCart } from 'lucide-react'
+import { BookOpen, User, FileText, DollarSign, ShoppingCart } from 'lucide-react'
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react'
 import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
-import type { Chapter } from '@/types/content'
-import { books, authors } from '@/data/mockData'
 import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { RootState } from '@/store/store'
@@ -19,13 +17,12 @@ export default function CommonCardDetailsModal() {
   const dispatch = useDispatch()
   const router = useRouter()
   const { isOpen, data } = useSelector((state: RootState) => state.allModal)
-  const chapter = data as any
+  console.log('data', data)
+  const chapter = data?.chapter
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
 
-  const fullBook = chapter ? books.find((b) => b.id === chapter.bookId) : undefined
-  const author =
-    chapter?.book?.author ??
-    (fullBook ? authors.find((a) => a.id === fullBook.authorId) : undefined)
+  const bookData = chapter?.bookId
+  const authorName = chapter?.author ?? bookData?.thoughtLeader?.fullName
 
   const onClose = () => dispatch(closeModal())
 
@@ -67,15 +64,13 @@ export default function CommonCardDetailsModal() {
       <ModalContent>
         {/* Header with Featured Image */}
         <div className="relative shrink-0">
-          {chapter.featuredImage && (
-            <div className="aspect-3/1 overflow-hidden bg-muted">
-              <ImageComponent
-                src={chapter.featuredImage}
-                alt={chapter.title}
-                object_cover={true}
-              />
-            </div>
-          )}
+          <div className="aspect-3/1 overflow-hidden bg-muted">
+            <ImageComponent
+              src={chapter.coverImage}
+              alt={chapter.title}
+              object_cover={true}
+            />
+          </div>
         </div>
 
         <ModalBody className="p-5 space-y-4 overflow-y-auto max-h-[25vh] custom_scrollbar min-w-0">
@@ -83,17 +78,17 @@ export default function CommonCardDetailsModal() {
           <div className="space-y-2 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-xs font-medium">
-                Chapter {chapter.sequence}
+                Chapter {chapter.chapterNumber}
               </Badge>
               {chapter.isFree && (
                 <Badge className="bg-success/10 text-success border-success/20 rounded-full px-3 py-1 text-xs font-medium">
                   Free
                 </Badge>
               )}
-              {(fullBook || chapter.book) && (
+              {chapter.bookTitle && (
                 <Badge variant="outline" className="rounded-full px-3 py-1 text-xs font-medium max-w-50">
                   <BookOpen className="h-3 w-3 mr-1.5 shrink-0" />
-                  <span className="truncate">{(fullBook ?? chapter.book)?.title}</span>
+                  <span className="truncate">{chapter.bookTitle}</span>
                 </Badge>
               )}
             </div>
@@ -102,10 +97,10 @@ export default function CommonCardDetailsModal() {
               {chapter.title}
             </h2>
 
-            {author && (
+            {authorName && (
               <div className="flex items-center gap-2 text-muted-foreground text-sm tracking-tight min-w-0">
                 <User className="h-4 w-4 shrink-0" />
-                <span className="truncate">{author.name}</span>
+                <span className="truncate">{authorName}</span>
               </div>
             )}
           </div>
@@ -138,13 +133,13 @@ export default function CommonCardDetailsModal() {
                 </div>
               </div>
             </div>
-            {(fullBook || chapter.book) && (
+            {chapter.bookTitle && (
               <div className="flex items-start gap-2">
                 <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div className="min-w-0">
                   <div className="text-xs text-muted-foreground tracking-tight">Part of</div>
                   <div className="font-semibold text-sm line-clamp-1 tracking-tight">
-                    {(fullBook ?? chapter.book)?.title}
+                    {chapter.bookTitle}
                   </div>
                 </div>
               </div>
@@ -152,25 +147,27 @@ export default function CommonCardDetailsModal() {
           </div>
 
           {/* Book Context - More Compact */}
-          {fullBook && (
+          {bookData && (
             <div className="border-t pt-3">
               <h3 className="font-semibold text-sm mb-2 tracking-tight">About the Book</h3>
               <div className="flex gap-3">
-                {fullBook.coverImage && (
-                  <img
-                    src={fullBook.coverImage}
-                    alt={fullBook.title}
-                    className="w-16 h-20 object-cover rounded-2xl shrink-0"
-                  />
+                {bookData.coverImage && (
+                  <div className='w-16 h-20 object-cover rounded-2xl shrink-0 overflow-hidden'>
+                    <ImageComponent
+                      src={bookData.coverImage}
+                      alt={bookData.title}
+                      object_cover={true}
+                    />
+                  </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-sm mb-1 tracking-tight">{fullBook.title}</h4>
+                  <h4 className="font-medium text-sm mb-1 tracking-tight">{bookData.title}</h4>
                   <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed tracking-tight">
-                    {fullBook.description}
+                    {bookData.description}
                   </p>
-                  {fullBook.tags && fullBook.tags.length > 0 && (
+                  {bookData.tags && bookData.tags.filter(Boolean).length > 0 && (
                     <div className="flex gap-1 mt-1.5 flex-wrap">
-                      {fullBook.tags.slice(0, 3).map((tag) => (
+                      {(bookData.tags as unknown as string[]).filter(Boolean).slice(0, 3).map((tag) => (
                         <Badge key={tag} variant="outline" className="rounded-full px-2 py-0 text-xs">
                           {tag}
                         </Badge>

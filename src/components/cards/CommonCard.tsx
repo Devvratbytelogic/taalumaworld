@@ -1,16 +1,16 @@
 'use client'
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Card, CardContent } from '../ui/card'
 import ImageComponent from '../ui/ImageComponent'
 import { Badge } from '../ui/badge'
 // import type { Chapter } from '@/types/content'
 import { BookOpen, FileText, User } from 'lucide-react'
 import { openModal } from '@/store/slices/allModalSlice'
-import { RootState } from '@/store/store'
+import { IHomeAllChaptersAPIResponseItemsEntity } from '@/types/user/HomeAllChapters'
 
 interface CommonCardProps {
-    data: any;
+    data: IHomeAllChaptersAPIResponseItemsEntity;
 }
 
 export default function CommonCard({ data }: CommonCardProps) {
@@ -23,37 +23,37 @@ export default function CommonCard({ data }: CommonCardProps) {
                 onClick={() => dispatch(openModal({ componentName: 'CommonCardDetailsModal', data: { chapter: data } }))}
             >
                 {/* Chapter Featured Image with Free Badge Overlay */}
-                {data?.featuredImage && (
-                    <div className="aspect-2/1 overflow-hidden bg-muted relative shrink-0">
-                        <div className="transition-transform hover:scale-105 rounded-[-214px]">
-                            <ImageComponent
-                                src={data?.featuredImage}
-                                alt={data?.title}
-                                object_cover={true}
-                            />
-                        </div>
-                        {/* Free Badge on Image */}
-                        {data?.isFree && (
-                            <div className="absolute top-3.5 right-3.5">
-                                <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs font-medium">
-                                    Free
-                                </Badge>
-                            </div>
-                        )}
+                {/* {data?.featuredImage && ( */}
+                <div className="aspect-2/1 overflow-hidden bg-muted relative shrink-0">
+                    <div className="transition-transform hover:scale-105 rounded-[-214px]">
+                        <ImageComponent
+                            src={data?.coverImage}
+                            alt={data?.title}
+                            object_cover={true}
+                        />
                     </div>
-                )}
+                    {/* Free Badge on Image */}
+                    {data?.isFree && (
+                        <div className="absolute top-3.5 right-3.5">
+                            <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs font-medium">
+                                Free
+                            </Badge>
+                        </div>
+                    )}
+                </div>
+                {/* )} */}
 
                 <CardContent className="px-4 space-y-1.5 flex flex-col flex-1">
                     {/* Book Title and Chapter Number Badges */}
                     <div className="flex items-center gap-2 flex-wrap">
-                        {data?.book && (
+                        {data?.bookTitle && (
                             <Badge variant="outline" className="text-xs font-medium rounded-full px-3 py-1 max-w-37">
                                 <BookOpen className="h-3 w-3 mr-1.5 shrink-0" />
-                                <span className="truncate">{data?.book?.title}</span>
+                                <span className="truncate">{data?.bookTitle}</span>
                             </Badge>
                         )}
                         <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-xs font-medium">
-                            Chapter {data?.sequence}
+                            Chapter {data?.chapterNumber}
                         </Badge>
                     </div>
 
@@ -70,10 +70,10 @@ export default function CommonCard({ data }: CommonCardProps) {
                     )}
 
                     {/* Author */}
-                    {data?.book?.author && (
+                    {data?.author && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground tracking-tight">
                             <User className="h-4 w-4" />
-                            <span>{data?.book?.author?.name}</span>
+                            <span>{data?.author}</span>
                         </div>
                     )}
 

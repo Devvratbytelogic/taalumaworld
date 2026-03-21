@@ -64,7 +64,7 @@ export const homeBannerData: bannerProps = {
 };
 
 export const aboutBannerData: bannerProps = {
-    badgeText: 'About Taaluma',
+    badgeText: 'About Taaluma.World',
     heading: {
         prefix: 'Empowering young readers,',
         highlight: 'one chapter',

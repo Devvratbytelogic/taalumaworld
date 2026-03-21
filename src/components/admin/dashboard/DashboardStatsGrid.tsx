@@ -1,7 +1,7 @@
+import Link from 'next/link';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Card } from '../../ui/card';
 import { cn } from '../../ui/utils';
-import type { ContentMode } from '../../../types/admin';
 
 export interface StatCard {
   title: string;
@@ -9,6 +9,7 @@ export interface StatCard {
   change: number;
   icon: React.ElementType;
   color: 'blue' | 'green' | 'purple' | 'orange';
+  href?: string;
 }
 
 const colorClasses = {
@@ -20,15 +21,35 @@ const colorClasses = {
 
 interface DashboardStatsGridProps {
   stats: StatCard[];
+  isLoading?: boolean;
 }
 
-export function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
+export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="p-6 border-2 animate-pulse">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-muted" />
+              <div className="w-14 h-5 rounded bg-muted" />
+            </div>
+            <div className="space-y-2">
+              <div className="w-24 h-4 rounded bg-muted" />
+              <div className="w-16 h-7 rounded bg-muted" />
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat) => {
         const Icon = stat.icon;
         const isPositive = stat.change >= 0;
-        return (
+        const card = (
           <Card key={stat.title} className="p-6 hover-lift cursor-pointer border-2">
             <div className="flex items-start justify-between mb-4">
               <div className={cn('p-3 rounded-2xl', colorClasses[stat.color])}>
@@ -48,6 +69,9 @@ export function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
             </div>
           </Card>
         );
+        return stat.href
+          ? <Link key={stat.title} href={stat.href} className="block">{card}</Link>
+          : card;
       })}
     </div>
   );

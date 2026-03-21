@@ -1,11 +1,11 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 
-export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
+export const userAuthApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
-        adminLogin: builder.mutation({
+        userLogin: builder.mutation({
             query: (body) => ({
-                url: `/admin/login`,
+                url: `/user/login`,
                 method: 'POST',
                 body,
             }),
@@ -14,5 +14,5 @@ export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
 });
 
 export const {
-    useAdminLoginMutation,
-} = adminAuthApi;
+    useUserLoginMutation,
+} = userAuthApi;

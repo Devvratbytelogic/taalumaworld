@@ -1,7 +1,9 @@
 'use client';
 import React from 'react'
 import { useAppSelector } from '@/store/hooks';
+import { useDispatch } from 'react-redux';
 import { selectContentMode } from '@/store/slices/contentModeSlice';
+import { openModal } from '@/store/slices/allModalSlice';
 import Link from 'next/link'
 import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -23,6 +25,7 @@ import {
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
     const currentYear = new Date().getFullYear();
+    const dispatch = useDispatch();
 
     return (
         <>
@@ -117,9 +120,12 @@ export default function PrimaryFooter() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href={getAdminRoutePath()} className="hover:text-primary transition-colors">
+                                    <button
+                                        onClick={() => dispatch(openModal({ componentName: 'SignIn', data: { isAdmin: true } }))}
+                                        className="hover:text-primary transition-colors"
+                                    >
                                         Admin Panel
-                                    </Link>
+                                    </button>
                                 </li>
                                 <li>
                                     <Link href={getDesignSystemRoutePath()} className="hover:text-primary transition-colors">

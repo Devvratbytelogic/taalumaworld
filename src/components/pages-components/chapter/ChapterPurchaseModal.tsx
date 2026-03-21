@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { initiateRazorpayPayment } from './Razorpay';
 import { RootState } from '@/store/store';
+import { useDirectPurchaseChapterMutation } from '@/store/rtkQueries/userPostAPI';
 import { IHomeAllChaptersAPIResponseItemsEntity } from '@/types/user/HomeAllChapters';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import { getCartRoutePath } from '@/routes/routes';
@@ -28,6 +29,7 @@ export function ChapterPurchaseModal() {
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const { chapter, book, closeBehavior = 'dismiss' } = data;
   const [isProcessing, setIsProcessing] = useState(false);
+  const [directPurchaseChapter] = useDirectPurchaseChapterMutation();
 
   const handleClose = () => {
     if (closeBehavior === 'goBack') {
@@ -44,8 +46,16 @@ export function ChapterPurchaseModal() {
       await initiateRazorpayPayment({
         amount: chapter.price ?? 0,
         description: `Chapter ${chapter.chapterNumber}: ${chapter.title}`,
-        onSuccess: () => {
+        onSuccess: async (response) => {
+          await directPurchaseChapter({
+            type: 'chapter',
+            payment_method: 'Razorpay',
+            transaction_id: response.razorpay_payment_id,
+            payment_status: 'Paid',
+            chapter_id: chapter.id,
+          }).unwrap();
           toast.success('Chapter purchased successfully!');
+          setIsProcessing(false);
           dispatch(closeModal());
         },
         onDismiss: () => setIsProcessing(false),
@@ -124,10 +134,11 @@ export function ChapterPurchaseModal() {
             <Button
               onPress={handleQuickPurchase}
               className="global_btn rounded_full bg_primary w-full"
-              disabled={isProcessing}
-              startContent={<ShoppingCart className="h-5 w-5" />}
+              isLoading={isProcessing}
+              isDisabled={isProcessing}
+              startContent={!isProcessing && <ShoppingCart className="h-5 w-5" />}
             >
-              {isProcessing ? 'Processing Payment...' : 'Purchase & Continue Reading'}
+              {isProcessing ? 'Processing...' : 'Purchase & Continue Reading'}
             </Button>
             <AddToCartButton
               chapterId={chapter.id}

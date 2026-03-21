@@ -112,7 +112,7 @@ export default function CartDetailsComponent() {
                           )}
                           {chapter.book?.thoughtLeader && (
                             <p className="text-sm text-muted-foreground line-clamp-1">
-                              by {chapter.book.thoughtLeader}
+                              by {chapter.book?.thoughtLeader?.fullName}
                             </p>
                           )}
                         </div>

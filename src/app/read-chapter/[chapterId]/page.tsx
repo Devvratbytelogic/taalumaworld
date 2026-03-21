@@ -8,29 +8,24 @@ import { useGetAllChaptersQuery, useGetSingleChapterQuery } from '@/store/rtkQue
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import { openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import type { Chapter } from '@/types/content';
 
 export default function ReadChapterPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
   const chapterId = params?.chapterId as string | undefined;
-  const { isOpen, componentName } = useSelector((state: RootState) => state.allModal);
 
   const { data: chapterResponse, isLoading } = useGetSingleChapterQuery(chapterId!, { skip: !chapterId });
   const { data: allChaptersResponse } = useGetAllChaptersQuery();
 
   const currentChapter = chapterResponse?.data ?? null;
   const book = currentChapter ? { title: currentChapter.bookTitle } : null;
-  console.log('currentChapter', currentChapter)
   const isLocked = !currentChapter?.canRead;
-  console.log('isLocked', isLocked);
-
   // Map API shape to the Chapter type expected by ChapterPurchaseModal
   const chapterForModal = currentChapter
     ? {
-      _id: currentChapter.id,
-      id: currentChapter.id,
+      _id: currentChapter.chapterId,
+      id: currentChapter.chapterId,
       number: currentChapter.chapterNumber,
       title: currentChapter.title,
       description: currentChapter.description,
@@ -40,9 +35,6 @@ export default function ReadChapterPage() {
       coverImage: currentChapter.coverImage,
       type: currentChapter.type,
       status: 'published',
-      createdBy: '',
-      createdAt: '',
-      updatedAt: '',
     }
     : null;
 

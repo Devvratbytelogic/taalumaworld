@@ -12,16 +12,23 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { setAuthenticated } from '@/store/slices/authSlice';
 import { useFormik } from 'formik';
 import { signInSchema } from '@/utils/formValidation';
-import { useLoginMutation } from '@/store/rtkQueries/adminAuth'
+import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth'
+import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { setAuthCookies } from '@/utils/authCookies'
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
-    const [login, { isLoading: isLoginLoading }] = useLoginMutation();
 
     const dispatch = useDispatch()
     const router = useRouter()
     const { isOpen, data } = useSelector((state: RootState) => state.allModal)
+    const isAdmin = (data as { isAdmin?: boolean })?.isAdmin === true;
+
+    const [adminLogin, { isLoading: isAdminLoginLoading }] = useAdminLoginMutation();
+    const [userLogin, { isLoading: isUserLoginLoading }] = useUserLoginMutation();
+
+    const login = isAdmin ? adminLogin : userLogin;
+    const isLoginLoading = isAdminLoginLoading || isUserLoginLoading;
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: {
             email: '',
@@ -32,13 +39,23 @@ export default function SignIn() {
             try {
                 const res = await login({ email: values.email, password: values.password }).unwrap();
                 if (res.success && res.data) {
-                    const { token, userRole } = res.data;
-                    setAuthCookies({
-                        token,
-                        user: { id: String(userRole.user_id), _id: userRole._id },
-                        role: { name: userRole.name, id: userRole.id, _id: userRole._id },
-                    });
-                    dispatch(setAuthenticated({ fullName: userRole.name, email: values.email }));
+                    if (isAdmin) {
+                        const { token, userRole } = res.data;
+                        setAuthCookies({
+                            token,
+                            user: { id: String(userRole.user_id), _id: userRole._id },
+                            role: { name: userRole.name, id: userRole.id, _id: userRole._id },
+                        });
+                        dispatch(setAuthenticated({ fullName: userRole.name, email: values.email }));
+                    } else {
+                        const { token, user } = res.data;
+                        setAuthCookies({
+                            token,
+                            user: { id: String(user.id ?? user._id), _id: user._id },
+                            role: 'user',
+                        });
+                        dispatch(setAuthenticated({ fullName: user.name, email: values.email }));
+                    }
                     const redirectTo = (data as { redirectTo?: string })?.redirectTo;
                     dispatch(closeModal());
                     resetForm();

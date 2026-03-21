@@ -18,6 +18,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/content/chapter/${id}`,
                 method: 'GET',
             }),
+            providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
         }),
         /** get cart */
         getCart: builder.query<ICartAPIResponse, void>({
@@ -25,6 +26,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/get-cart`,
                 method: 'GET',
             }),
+            providesTags: ['Cart'],
         }),
     }),
 });

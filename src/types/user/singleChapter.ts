@@ -8,6 +8,7 @@ export interface ISingleChapterAPIResponse {
   }
   export interface ISingleChapterAPIResponseData {
     id: string;
+    chapterId: string;
     type: string;
     chapterNumber: number;
     title: string;

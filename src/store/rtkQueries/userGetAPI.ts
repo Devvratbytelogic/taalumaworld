@@ -1,3 +1,4 @@
+import { ICartAPIResponse } from '@/types/user/cart';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
@@ -19,9 +20,9 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
         }),
         /** get cart */
-        getCart: builder.query<any, void>({
+        getCart: builder.query<ICartAPIResponse, void>({
             query: () => ({
-                url: `/user/cart`,
+                url: `/user/get-cart`,
                 method: 'GET',
             }),
         }),
@@ -31,4 +32,5 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
 export const {
     useGetAllChaptersQuery,
     useGetSingleChapterQuery,
+    useGetCartQuery,
 } = clientSideGetApis;

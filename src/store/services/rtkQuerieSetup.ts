@@ -49,10 +49,19 @@ const baseQueryWithAuth: BaseQueryFn<
         const result = await baseQuery(args, api, extraOptions);
         const res = result.data as IAPIResponse;
         if (result.error) {
-            const errorData = result.error as IAPIError;
-            console.error(`API: ${args}, Failed to fetch data`);
-            throw new Error(errorData?.data?.message || "Unknown API error");
-        }else{
+            const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string } };
+            const status = errorData?.status;
+            const responseData = errorData?.data;
+            const message = (responseData as { message?: string })?.message || "Unknown API error";
+            addToast({ title: "Error", description: responseData?.message ?? "Unknown error", color: "danger", timeout: 2000 })
+            return {
+                error: {
+                    status: "CUSTOM_ERROR",
+                    data: { message, httpStatus: status },
+                    error: message,
+                },
+            };
+        } else {
             return { data: res };
         }
 
@@ -65,7 +74,7 @@ const baseQueryWithAuth: BaseQueryFn<
                 error: error.message,
             };
 
-            addToast({title:errorResponse?.error , color:'danger',timeout:2000})
+            addToast({ title: errorResponse?.error, color: 'danger', timeout: 2000 })
         } else {
             errorResponse = {
                 status: "CUSTOM_ERROR",

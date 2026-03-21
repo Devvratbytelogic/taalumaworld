@@ -1,6 +1,6 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
-export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
+export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         addChapterToCart: builder.mutation({
             query: (body) => ({
@@ -9,9 +9,23 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
         }),
+        removeCartItem: builder.mutation<void, string>({
+            query: (cartItemId) => ({
+                url: `/user/cart/${cartItemId}`,
+                method: 'DELETE',
+            }),
+        }),
+        clearCart: builder.mutation<void, void>({
+            query: () => ({
+                url: `/user/cart`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
 export const {
     useAddChapterToCartMutation,
-} = clientSideGetApis;
+    useRemoveCartItemMutation,
+    useClearCartMutation,
+} = clientSidePostApis;

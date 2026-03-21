@@ -104,19 +104,24 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     enableReinitialize: true,
     validationSchema: addChapterSchema,
     onSubmit: async (vals) => {
-      const payload = {
-        book: vals.bookId,
-        number: vals.sequence,
-        title: vals.title,
-        description: vals.description ?? '',
-        content: vals.content ?? '',
-        isFree: chapterPricingEnabled ? vals.isFree : true,
-        price: chapterPricingEnabled && !vals.isFree ? (vals.price ?? 0) : 0,
-        status: vals.status,
-        page: vals.page ?? 1,
-      };
+      const formData = new FormData();
+      formData.append('book', vals.bookId);
+      formData.append('number', String(vals.sequence));
+      formData.append('title', vals.title);
+      formData.append('description', vals.description ?? '');
+      formData.append('content', vals.content ?? '');
+      formData.append('isFree', String(chapterPricingEnabled ? vals.isFree : true));
+      formData.append('price', String(chapterPricingEnabled && !vals.isFree ? (vals.price ?? 0) : 0));
+      formData.append('status', vals.status);
+      formData.append('page', String(vals.page ?? 1));
+      if (featuredImageFile) {
+        formData.append('cover_image', featuredImageFile);
+      }
+      if (pdfFile) {
+        formData.append('pdf', pdfFile);
+      }
       try {
-        await updateChapter({ id: chapterId, values: payload }).unwrap();
+        await updateChapter({ id: chapterId, values: formData }).unwrap();
         if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
         setFeaturedImageFile(null);
         setFeaturedImagePreviewUrl(null);

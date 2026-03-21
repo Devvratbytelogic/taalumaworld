@@ -73,7 +73,7 @@ export default function CommonCardDetailsModal() {
           </div>
         </div>
 
-        <ModalBody className="p-5 space-y-4 overflow-y-auto max-h-[25vh] custom_scrollbar min-w-0">
+        <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[25vh] custom_scrollbar min-w-0">
           {/* Chapter Header */}
           <div className="space-y-2 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">

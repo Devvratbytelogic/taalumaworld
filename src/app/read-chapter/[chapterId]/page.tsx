@@ -22,31 +22,33 @@ export default function ReadChapterPage() {
 
   const currentChapter = chapterResponse?.data ?? null;
   const book = currentChapter ? { title: currentChapter.bookTitle } : null;
-
-  const isLocked = currentChapter ? !currentChapter.isFree : false;
+  console.log('currentChapter', currentChapter)
+  const isLocked = !currentChapter?.canRead;
+  console.log('isLocked', isLocked);
 
   // Map API shape to the Chapter type expected by ChapterPurchaseModal
-  const chapterForModal: Chapter | null = currentChapter
+  const chapterForModal = currentChapter
     ? {
-        _id: currentChapter.id,
-        id: currentChapter.id,
-        number: currentChapter.chapterNumber,
-        title: currentChapter.title,
-        description: currentChapter.description,
-        content: currentChapter.content,
-        isFree: currentChapter.isFree,
-        price: currentChapter.price,
-        coverImage: currentChapter.coverImage,
-        status: 'published',
-        createdBy: '',
-        createdAt: '',
-        updatedAt: '',
-      }
+      _id: currentChapter.id,
+      id: currentChapter.id,
+      number: currentChapter.chapterNumber,
+      title: currentChapter.title,
+      description: currentChapter.description,
+      content: currentChapter.content,
+      isFree: currentChapter.isFree,
+      price: currentChapter.price,
+      coverImage: currentChapter.coverImage,
+      type: currentChapter.type,
+      status: 'published',
+      createdBy: '',
+      createdAt: '',
+      updatedAt: '',
+    }
     : null;
 
   // Open purchase modal when landing on a locked chapter
   useEffect(() => {
-    if (isLocked && chapterForModal && !(isOpen && componentName === 'ChapterPurchaseModal')) {
+    if (currentChapter && isLocked) {
       dispatch(
         openModal({
           componentName: 'ChapterPurchaseModal',
@@ -54,7 +56,7 @@ export default function ReadChapterPage() {
         })
       );
     }
-  }, [isLocked, currentChapter?.id, isOpen, componentName]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentChapter, isLocked]);
 
   // All chapters from the same book, sorted by chapter number
   const bookChapters = useMemo(() => {

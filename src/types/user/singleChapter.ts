@@ -24,6 +24,7 @@ export interface ISingleChapterAPIResponse {
     authorAvatar?: null;
     category: Category;
     subcategory?: null;
+    canRead: boolean;
   }
   export interface Category {
     _id: string;

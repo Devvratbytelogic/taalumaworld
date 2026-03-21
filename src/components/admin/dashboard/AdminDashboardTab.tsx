@@ -73,9 +73,10 @@ export function AdminDashboardTab() {
   const pendingTestimonials = allTestimonials.filter(
     (t) => t.status !== 'approved' && t.status !== 'active',
   ).length;
-  const inactiveContent = allChapters.filter(
-    (c) => c.status !== 'active' && c.status !== 'published',
-  ).length;
+  const inactiveContent = allChapters.filter((c) => {
+    const s = c.status?.toLowerCase();
+    return s !== 'active' && s !== 'published';
+  }).length;
 
   const totalUsers = allUsers.length;
   const totalBooks = allBooks.length;

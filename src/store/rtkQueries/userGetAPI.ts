@@ -10,6 +10,9 @@ import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimon
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { ISingleBookAPIResponse } from '@/types/user/singleBook';
 import { ISearchResultsAPIResponse } from '@/types/user/saech';
+import { IUserAllCategoriesAPIResponse } from '@/types/user/allCategory';
+import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
+import { IUserAllTagsAPIResponse } from '@/types/user/allTags';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -37,12 +40,33 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
         }),
+        /** single book */
         getSingleBook: builder.query<ISingleBookAPIResponse, string>({
             query: (id) => ({
                 url: `/user/content/book/${id}`,
                 method: 'GET',
             }),
             providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
+        }),
+        getUserAllCategories: builder.query<IUserAllCategoriesAPIResponse, void>({
+            query: () => ({
+                url: `/user/categories`,
+                method: 'GET',
+            }),
+        }),
+        /** get all authors */
+        getUserAllAuthors: builder.query<IUserAllAuthorsAPIResponse, void>({
+            query: () => ({
+                url: `/user/authors`,
+                method: 'GET',
+            }),
+        }),
+        /** get all tags */
+        getAllTags: builder.query<IUserAllTagsAPIResponse, void>({
+            query: () => ({
+                url: `/user/tags`,
+                method: 'GET',
+            }),
         }),
         /** get cart */
         getCart: builder.query<ICartAPIResponse, void>({
@@ -114,6 +138,9 @@ export const {
     useGetAllChaptersQuery,
     useGetSingleChapterQuery,
     useGetSingleBookQuery,
+    useGetUserAllCategoriesQuery,
+    useGetUserAllAuthorsQuery,
+    useGetAllTagsQuery,
     useGetCartQuery,
     useGetUserProfileQuery,
     useGetMyChaptersQuery,

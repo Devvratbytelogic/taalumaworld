@@ -7,18 +7,16 @@ import { Button } from '@heroui/react';
 import {
     LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree,
     MessageSquare, FileEdit, BarChart3, DollarSign, Shield, Activity,
-    Receipt, AlertCircle as Moderation, FileSpreadsheet, UserCircle,
+    Receipt, FileSpreadsheet, UserCircle,
 } from 'lucide-react';
 
 import { useAdminUser } from '@/hooks/useAdminUser';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { selectContentMode, setContentMode as setReduxContentMode } from '@/store/slices/contentModeSlice';
 import { canAccessSection } from '@/utils/adminPermissions';
 import { getHomeRoutePath } from '@/routes/routes';
 
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
-import type { AdminSection, ContentMode, AdminRole } from '@/types/admin';
+import type { AdminSection } from '@/types/admin';
 
 // ── Nav items definition ─────────────────────────────────────────────────────
 
@@ -30,7 +28,6 @@ const NAV_ITEMS = [
     { id: 'categories' as AdminSection, label: 'Categories', icon: FolderTree, category: 'content' },
     { id: 'authors' as AdminSection, label: 'Thought Leaders', icon: Users, category: 'content' },
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
-    { id: 'roles' as AdminSection, label: 'Roles & Permissions', icon: Shield, category: 'users' },
     { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
     { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: Receipt, category: 'commerce' },
@@ -51,7 +48,6 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/categories': 'categories',
     '/admin/authors': 'authors',
     '/admin/users': 'users',
-    '/admin/roles': 'roles',
     '/admin/activity-logs': 'activity_logs',
     '/admin/payments': 'payments',
     '/admin/transactions': 'transactions',
@@ -68,21 +64,13 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
-    const dispatch = useAppDispatch();
 
-    const { adminUser, isLoading, switchRole } = useAdminUser();
-    const contentMode = useAppSelector(selectContentMode);
+    const { adminUser, isLoading } = useAdminUser();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     // Which section is currently active (based on URL)
     const activeSection = PATH_TO_SECTION[pathname] ?? 'dashboard';
-
-    // Toggle between chapter-mode and book-mode
-    const handleContentModeToggle = (checked: boolean) => {
-        const newMode: ContentMode = checked ? 'books' : 'chapters';
-        dispatch(setReduxContentMode(newMode));
-    };
 
     // Only show nav items the current admin role has access to
     const accessibleNavItems = adminUser
@@ -126,14 +114,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     return (
         <div className="min-h-screen bg-gray-50 admin_panel">
 
-            <AdminHeader
-                adminUser={adminUser}
-                contentMode={contentMode}
-                mobileMenuOpen={mobileMenuOpen}
-                onContentModeToggle={handleContentModeToggle}
-                onMobileMenuToggle={() => setMobileMenuOpen(prev => !prev)}
-                onSwitchRole={(role: AdminRole) => switchRole(role)}
-            />
+            <AdminHeader />
 
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col lg:flex-row gap-8">

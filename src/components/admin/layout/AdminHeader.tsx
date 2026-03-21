@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -14,26 +15,36 @@ import { getRoleName } from '@/utils/adminPermissions';
 import { getAdminSectionRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import toast from '@/utils/toast';
-import type { AdminUser, ContentMode, AdminRole } from '@/types/admin';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { selectContentMode, setContentMode } from '@/store/slices/contentModeSlice';
+import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
+import type { ContentMode } from '@/store/slices/contentModeSlice';
+import type { AdminRole } from '@/types/admin';
 
-interface AdminHeaderProps {
-    adminUser: AdminUser;
-    contentMode: ContentMode;
-    mobileMenuOpen: boolean;
-    onContentModeToggle: (checked: boolean) => void;
-    onMobileMenuToggle: () => void;
-    onSwitchRole: (role: AdminRole) => void;
-}
+const DUMMY_ADMIN = {
+    name: 'Admin User',
+    email: 'admin@taaluma.world',
+    avatar: '',
+    role: 'super_admin' as AdminRole,
+};
 
-export function AdminHeader({
-    adminUser,
-    contentMode,
-    mobileMenuOpen,
-    onContentModeToggle,
-    onMobileMenuToggle,
-    onSwitchRole,
-}: AdminHeaderProps) {
+export function AdminHeader() {
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    const contentMode = useAppSelector(selectContentMode);
+    const [updateGlobalSettings] = useUpdateGlobalSettingsMutation();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [adminUser, setAdminUser] = useState(DUMMY_ADMIN);
+
+    const onMobileMenuToggle = () => setMobileMenuOpen(prev => !prev);
+
+    const onSwitchRole = (role: AdminRole) => setAdminUser(prev => ({ ...prev, role }));
+
+    const onContentModeToggle = async (isBooks: boolean) => {
+        const newMode: ContentMode = isBooks ? 'books' : 'chapters';
+        dispatch(setContentMode(newMode));
+        await updateGlobalSettings({ contentMode: newMode });
+    };
 
     const handleLogout = () => {
         clearAuthCookies();

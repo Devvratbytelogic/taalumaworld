@@ -31,7 +31,7 @@ export default async function EditChapterPage({ params }: Props) {
                 </div>
             </div>
 
-            <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border max-w-4xl">
+            <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
                 <EditChapterForm chapterId={id} />
             </div>
         </div>

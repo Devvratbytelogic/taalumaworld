@@ -1,9 +1,9 @@
 'use client';
 import React from 'react'
-import { useAppSelector } from '@/store/hooks';
-import { useDispatch } from 'react-redux';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { selectContentMode } from '@/store/slices/contentModeSlice';
 import { openModal } from '@/store/slices/allModalSlice';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link'
 import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,9 @@ import {
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
     const currentYear = new Date().getFullYear();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
+    const { isAuthenticated, user } = useAuth();
+    const isAdmin = user?.role?.toLowerCase() === 'admin';
 
     return (
         <>
@@ -120,12 +122,18 @@ export default function PrimaryFooter() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <button
-                                        onClick={() => dispatch(openModal({ componentName: 'SignIn', data: { isAdmin: true } }))}
-                                        className="hover:text-primary transition-colors"
-                                    >
-                                        Admin Panel
-                                    </button>
+                                    {isAuthenticated && isAdmin ? (
+                                        <Link href={getAdminRoutePath()} className="hover:text-primary transition-colors">
+                                            Admin Panel
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: { isAdmin: true } }))}
+                                            className="hover:text-primary transition-colors"
+                                        >
+                                            Admin Panel
+                                        </button>
+                                    )}
                                 </li>
                                 <li>
                                     <Link href={getDesignSystemRoutePath()} className="hover:text-primary transition-colors">

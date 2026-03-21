@@ -3,6 +3,7 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IAllAuthorLeadersAPIResponse } from '@/types/authleaders';
 import { IAllBooksAPIResponse } from '@/types/books';
 import { IAllChaptersAPIResponse } from '@/types/chapter';
+import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -40,6 +41,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
             providesTags: ['AdminChapters'],
+        }),
+
+        /** global settings */
+        getGlobalSettings: builder.query<IGlobalSettingsAPIResponse, void>({
+            query: () => ({
+                url: `/admin/get-global`,
+                method: 'GET',
+            }),
         }),
     }),
 });

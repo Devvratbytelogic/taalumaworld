@@ -2,6 +2,16 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const adminPostApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
+        /** global settings */
+        updateGlobalSettings: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/update-global-setting`,
+                method: 'POST',
+                body: payload,
+            }),
+        }),
+
+
         /** categories */
         addCategory: builder.mutation({
             query: (payload) => ({

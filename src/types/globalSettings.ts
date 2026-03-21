@@ -1,0 +1,62 @@
+export interface IGlobalSettingsAPIResponse {
+    http_status_code: number;
+    http_status_msg: string;
+    success: boolean;
+    data: IGlobalSettingsAPIResponseData;
+    message: string;
+    timestamp: string;
+  }
+  export interface IGlobalSettingsAPIResponseData {
+    _id: string;
+    alt_phone: string;
+    android_app_url: string;
+    copy_right_text: string;
+    email: string;
+    facebook_pixel: string;
+    google_analytics_id: string;
+    google_tag_manager: string;
+    iphone_app_url: string;
+    marketplace_name: string;
+    meta_description: string;
+    meta_keywords: string;
+    meta_title: string;
+    og_tag: string;
+    phone: string;
+    schema_markup: string;
+    search_console: string;
+    instagram_link: string;
+    facebook_link: string;
+    x_link: string;
+    youtube_link: string;
+    linkdin_link: string;
+    pinterest_link: string;
+    whatsapp_link: string;
+    microsoft_clarity: string;
+    bing_tracking_code: string;
+    created_by: number;
+    checkout_status: boolean;
+    address: string;
+    header_text: string;
+    header_text_status: boolean;
+    visible: string;
+    platformName: string;
+    platformDescription: string;
+    supportEmail: string;
+    emailNotificationsNewUsers: boolean;
+    emailNotificationsPurchases: boolean;
+    dailySummaryReports: boolean;
+    alertFlaggedContent: boolean;
+    createdAt: string;
+    updatedAt: string;
+    id: number;
+    __v: number;
+    pinterest_logo?: null;
+    linkdin_logo?: null;
+    youtube_logo?: null;
+    x_logo?: null;
+    facebook_logo?: null;
+    instagram_logo?: null;
+    logo?: null;
+    icon_image?: null;
+  }
+  

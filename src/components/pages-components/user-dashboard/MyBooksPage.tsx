@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
 import { useGetAuthorsQuery } from '@/store/api/authorsApi';
 import { getBooksRoutePath } from '@/routes/routes';
+import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
 
 interface MyBooksPageProps {
   ownedBooks: string[];
@@ -17,8 +18,12 @@ export function MyBooksPage({
   onNavigate,
   hideHeader = false,
 }: MyBooksPageProps) {
-  const { data: books = [] } = useGetAllBooksQuery();
-  const { data: authors = [] } = useGetAuthorsQuery();
+  const { data: books = [], isLoading: booksLoading } = useGetAllBooksQuery();
+  const { data: authors = [], isLoading: authorsLoading } = useGetAuthorsQuery();
+
+  if (booksLoading || authorsLoading) {
+    return <MyBooksPageSkeleton />;
+  }
 
   // Get book details for owned books
   const myBooks = ownedBooks

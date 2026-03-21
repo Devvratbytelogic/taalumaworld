@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button';
 import { useGetAllBooksQuery, useGetAllChaptersQuery } from '@/store/rtkQueries/adminGetApi';
 import type { Book as BookType, Chapter } from '@/types/content';
 import ImageComponent from '@/components/ui/ImageComponent';
+import DashboardHomeSkeleton from '@/components/skeleton-loader/DashboardHomeSkeleton';
 
 interface DashboardHomeProps {
   userName: string;
@@ -25,10 +26,14 @@ export function DashboardHome({
 }: DashboardHomeProps) {
   const firstName = userName.split(' ')[0] || userName;
 
-  const { data: books } = useGetAllBooksQuery();
+  const { data: books, isLoading: booksLoading } = useGetAllBooksQuery();
   const booksData = books?.data ?? [];
-  const { data: chapters } = useGetAllChaptersQuery();
+  const { data: chapters, isLoading: chaptersLoading } = useGetAllChaptersQuery();
   const chaptersData = chapters?.data ?? [];
+
+  if (booksLoading || chaptersLoading) {
+    return <DashboardHomeSkeleton />;
+  }
   // Get continue reading items (items with progress > 0 and < 100)
   const continueReadingItems = Object.entries(readingProgress)
     .filter(([id, progress]) => progress > 0 && progress < 100)

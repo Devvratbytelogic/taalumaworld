@@ -7,6 +7,7 @@ import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useDispatch } from 'react-redux';
 import { openModal } from '@/store/slices/allModalSlice';
+import CartPageSkeleton from '@/components/skeleton-loader/CartPageSkeleton';
 
 export default function CartDetailsComponent() {
   const dispatch = useDispatch();
@@ -30,11 +31,7 @@ export default function CartDetailsComponent() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-muted-foreground">Loading cart...</p>
-      </div>
-    );
+    return <CartPageSkeleton />;
   }
 
   if (cartItems.length === 0) {

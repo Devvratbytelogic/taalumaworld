@@ -6,6 +6,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetAllChaptersQuery, useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 
@@ -94,11 +95,7 @@ export default function ReadChapterPage() {
   const canGoNext = currentIndex < bookChapters.length - 1;
 
   if (isLoading || !chapterId) {
-    return (
-      <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
-        <div className="text-muted-foreground">Loading chapter...</div>
-      </div>
-    );
+    return <ReadChapterPageSkeleton />;
   }
 
   if (!currentChapter) {

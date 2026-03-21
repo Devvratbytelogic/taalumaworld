@@ -15,6 +15,7 @@ import { signOut } from '@/store/slices/authSlice';
 import { selectReadingProgress } from '@/store/slices/readingSlice';
 import { useGetPurchasedItemsQuery } from '@/store/api/userApi';
 import type { RootState } from '@/store/store';
+import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 
 type DashboardPage = 'home' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings';
 
@@ -26,7 +27,7 @@ export function UserDashboard() {
 
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const readingProgressRaw = useSelector(selectReadingProgress);
-  const { data: purchasedItems = [] } = useGetPurchasedItemsQuery(undefined, { skip: !isAuthenticated });
+  const { data: purchasedItems = [], isLoading: purchasedLoading } = useGetPurchasedItemsQuery(undefined, { skip: !isAuthenticated });
 
   const readingProgress = useMemo(
     () =>
@@ -94,6 +95,10 @@ export function UserDashboard() {
     { id: 'history' as DashboardPage, label: 'Reading History', icon: Clock, show: true },
     { id: 'settings' as DashboardPage, label: 'Settings', icon: Settings, show: true },
   ].filter(item => item.show);
+
+  if (isAuthenticated && purchasedLoading) {
+    return <UserDashboardSkeleton />;
+  }
 
   const renderPage = () => {
     switch (currentPage) {

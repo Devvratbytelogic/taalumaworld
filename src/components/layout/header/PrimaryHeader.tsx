@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getMyBooksRoutePath, getMyChaptersRoutePath, getSearchRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getSearchRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { openModal } from '@/store/slices/allModalSlice';
 import { signOut } from '@/store/slices/authSlice';
 import { clearAuthCookies } from '@/utils/authCookies';
@@ -111,7 +111,7 @@ export default function PrimaryHeader() {
           <div className="flex items-center gap-6 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
-              <Link href={contentMode === 'chapters' ? getMyChaptersRoutePath() : getMyBooksRoutePath()} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
+              <Link href={contentMode === 'chapters' ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
                 <BookMarked className="h-5 w-5" />
                 <span className="font-medium text-sm">{contentMode === 'books' ? 'My Books' : 'My Chapters'}</span>
               </Link>
@@ -273,7 +273,7 @@ export default function PrimaryHeader() {
               )}
 
               {isAuthenticated && (
-                <Link href={contentMode === 'chapters' ? getMyChaptersRoutePath() : getMyBooksRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                <Link href={contentMode === 'chapters' ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                   {contentMode === 'chapters' ? 'My Chapters' : 'My Books'}
                 </Link>
               )}

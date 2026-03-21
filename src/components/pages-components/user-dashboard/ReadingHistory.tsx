@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation';
 import { Clock, Calendar } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetReadingHistoryQuery } from '@/store/rtkQueries/userGetAPI';
-import type { IReadingHistoryItem } from '@/types/user/readingHistory';
+import type { IMyReadingHistoryAPIResponseItemsEntity } from '@/types/user/readingHistory';
 
 export function ReadingHistory() {
   const router = useRouter();
   const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
   const { data: historyData, isLoading } = useGetReadingHistoryQuery();
-  const historyItems: IReadingHistoryItem[] = historyData?.data?.items ?? [];
+  const historyItems: IMyReadingHistoryAPIResponseItemsEntity[] = historyData?.data?.items ?? [];
 
   useEffect(() => {
     const savedMode = localStorage.getItem('display-mode');
@@ -100,8 +100,8 @@ export function ReadingHistory() {
                 {/* Chapter Image */}
                 <div className="shrink-0 w-32 aspect-video rounded-xl overflow-hidden bg-gray-100">
                   <img
-                    src={item.coverImage}
-                    alt={item.title}
+                    src={item.chapterCoverImage}
+                    alt={item.chapterTitle}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -109,7 +109,7 @@ export function ReadingHistory() {
                 {/* Chapter Info */}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground mb-1">{item.bookTitle}</p>
-                  <h3 className="font-bold text-base mb-1 line-clamp-1">{item.title}</h3>
+                  <h3 className="font-bold text-base mb-1 line-clamp-1">{item.chapterTitle}</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Chapter {item.chapterNumber}
                   </p>

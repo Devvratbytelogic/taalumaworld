@@ -14,6 +14,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/content`,
                 method: 'GET',
             }),
+            providesTags: ['AllChapters'],
         }),
         /** single chapter */
         getSingleChapter: builder.query<ISingleChapterAPIResponse, string>({

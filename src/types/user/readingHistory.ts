@@ -5,34 +5,47 @@ export interface IMyReadingHistoryAPIResponse {
     data: IMyReadingHistoryAPIResponseData;
     message: string;
     timestamp: string;
-}
-export interface IMyReadingHistoryAPIResponseData {
+  }
+  export interface IMyReadingHistoryAPIResponseData {
     summary: Summary;
-    items?: IReadingHistoryItem[] | null;
+    items?: (IMyReadingHistoryAPIResponseItemsEntity)[] | null;
     pagination: Pagination;
-}
-export interface IReadingHistoryItem {
-    chapterId: string;
-    chapterNumber: number;
-    title: string;
-    description: string;
-    bookId: string;
-    bookTitle: string;
-    coverImage: string;
-    progressPercent: number;
-    completed: boolean;
-    lastReadAt: string;
-    author: string;
-    authorAvatar?: string | null;
-}
-export interface Summary {
+  }
+  export interface Summary {
     total: number;
     completed: number;
     inProgress: number;
-}
-export interface Pagination {
+  }
+  export interface IMyReadingHistoryAPIResponseItemsEntity {
+    progressId: string;
+    lastReadAt: string;
+    createdAt: string;
+    lastPageRead: number;
+    completed: boolean;
+    progressPercent: number;
+    readStatus: string;
+    chapterId: string;
+    chapterNumber: number;
+    chapterTitle: string;
+    chapterCoverImage: string;
+    pageCount: number;
+    bookId: string;
+    bookTitle: string;
+    bookCoverImage: string;
+    author: string;
+    authorAvatar?: null;
+    category: Category;
+    subcategory?: null;
+  }
+  export interface Category {
+    _id: string;
+    name: string;
+    slug: string;
+  }
+  export interface Pagination {
     totalItems: number;
     totalPages: number;
     currentPage: number;
     itemsPerPage: number;
-}
+  }
+  

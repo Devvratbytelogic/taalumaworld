@@ -12,6 +12,7 @@ import { SettingsPage } from './SettingsPage';
 import { cn } from '@/components/ui/utils';
 import { signOut } from '@/store/slices/authSlice';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
+import { getUserDashboardRoutePath } from '@/routes/routes';
 
 type DashboardPage = 'dashboard' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings';
 
@@ -49,7 +50,7 @@ function UserDashboardInner() {
   };
 
   const setCurrentPage = (page: DashboardPage) => {
-    router.push(`/user-dashboard?tab=${page}`);
+    router.push(`${getUserDashboardRoutePath()}?tab=${page}`);
   };
 
   const navItems = [

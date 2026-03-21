@@ -1,11 +1,5 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
-export interface ICheckOutCartPayload {
-  payment_method: 'Razorpay';
-  amount: number;
-  transaction_id: string;
-  payment_status: 'Paid';
-}
 
 export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -17,7 +11,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['Cart'],
         }),
-        removeCartItem: builder.mutation<void, string>({
+        removeCartItem: builder.mutation({
             query: (cartItemId) => ({
                 url: `/user/remove-cart/${cartItemId}`,
                 method: 'GET',
@@ -30,15 +24,23 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: (_, __, body) => [{ type: 'SingleChapter', id: body.chapter_id }],
+            invalidatesTags: (_, __, body) => [{ type: 'SingleChapter', id: body.chapter_id }, 'AllChapters', 'MyChapters'],
         }),
-        checkOutCart: builder.mutation<void, ICheckOutCartPayload>({
+        checkOutCart: builder.mutation({
             query: (body) => ({
                 url: `/user/checkout`,
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['Cart'],
+            invalidatesTags: ['Cart', 'AllChapters', 'MyChapters'],
+        }),
+        updateReadingProgress: builder.mutation({
+            query: (body) => ({
+                url: `/user/content/reading-progress`,
+                method: 'PUT',
+                body,
+            }),
+            invalidatesTags: ['ReadingHistory', 'MyChapters'],
         }),
     }),
 });
@@ -48,4 +50,5 @@ export const {
     useRemoveCartItemMutation,
     useDirectPurchaseChapterMutation,
     useCheckOutCartMutation,
+    useUpdateReadingProgressMutation,
 } = clientSidePostApis;

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
 import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
+import AddToCartButton from '@/components/ui/AddToCartButton'
 import { RootState } from '@/store/store'
 import ImageComponent from '../ui/ImageComponent'
 
@@ -17,7 +18,6 @@ export default function CommonCardDetailsModal() {
   const dispatch = useDispatch()
   const router = useRouter()
   const { isOpen, data } = useSelector((state: RootState) => state.allModal)
-  console.log('data', data)
   const chapter = data?.chapter
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
 
@@ -39,8 +39,6 @@ export default function CommonCardDetailsModal() {
   const handleAddToCart = () => {
     if (!isAuthenticated) {
       dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'cart', itemType: 'chapter' } }))
-    } else {
-      router.push(getCartRoutePath())
     }
   }
 
@@ -181,14 +179,27 @@ export default function CommonCardDetailsModal() {
         </ModalBody>
 
         <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
-          {chapter.isFree ? (
+          {(chapter.isFree || chapter.canRead) ? (
             <Button className='global_btn rounded_full bg_primary w-full' onPress={handleReadClick} startContent={<BookOpen className="h-4 w-4" />}>
-              Read Free Chapter
+              {chapter.isFree ? 'Read Free Chapter' : 'Read Chapter'}
             </Button>
-          ) : (
+          ) : !isAuthenticated ? (
             <Button className='global_btn rounded_full bg_primary w-full' onPress={handleAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
               Add to Cart - ${chapter.price?.toFixed(2) ?? '0.00'}
             </Button>
+          ) : (
+            <AddToCartButton
+              chapterId={chapter.id}
+              bookId={bookData?.id}
+              type={chapter.type}
+              price={chapter.price}
+              className='global_btn rounded_full bg_primary w-full'
+              label={`Add to Cart - $${chapter.price?.toFixed(2) ?? '0.00'}`}
+              onSuccess={() => {
+                dispatch(closeModal())
+                router.push(getCartRoutePath())
+              }}
+            />
           )}
         </ModalFooter>
       </ModalContent>

@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { HeroUIProvider } from '@heroui/react';
+import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import NextTopLoader from 'nextjs-toploader';
 import { store } from '@/store/store';
 import { Provider } from 'react-redux';
@@ -19,6 +19,7 @@ export function AppProviders({ children }: ProvidersProps) {
                 <AuthSync />
                 <Toaster position="bottom-right" richColors closeButton />
                 <HeroUIProvider>
+                    <ToastProvider />
                     <NextTopLoader
                         color="#f7941d"
                     // showSpinner={false}

@@ -74,7 +74,7 @@ const baseQueryWithAuth: BaseQueryFn<
                 error: error.message,
             };
 
-            addToast({ title: errorResponse?.error, color: 'danger', timeout: 2000 })
+            addToast({ title: "Error", description: errorResponse?.error ?? "An unexpected error occurred", color: "danger", timeout: 2000 })
         } else {
             errorResponse = {
                 status: "CUSTOM_ERROR",
@@ -92,6 +92,6 @@ const baseQueryWithAuth: BaseQueryFn<
 export const rtkQuerieSetup = createApi({
     reducerPath: 'RTKServices',
     baseQuery: baseQueryWithAuth,
-    tagTypes: ['AdminCategories', 'AdminAuthorLeaders', 'AdminBooks', 'AdminChapters', 'SingleChapter', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory'],
+    tagTypes: ['AdminCategories', 'AdminAuthorLeaders', 'AdminBooks', 'AdminChapters', 'SingleChapter', 'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory'],
     endpoints: () => ({}),
 });

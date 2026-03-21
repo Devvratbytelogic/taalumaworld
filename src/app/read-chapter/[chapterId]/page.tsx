@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -10,6 +10,7 @@ import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPag
 import { openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { getReadChapterRoutePath } from '@/routes/routes';
+import { useUpdateReadingProgressMutation } from '@/store/rtkQueries/userPostAPI';
 
 export default function ReadChapterPage() {
   const params = useParams();
@@ -66,12 +67,27 @@ export default function ReadChapterPage() {
   const [showControls, setShowControls] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
 
+  const [updateReadingProgress] = useUpdateReadingProgressMutation();
+  const hasMarkedStarted = useRef(false);
+  const hasMarkedCompleted = useRef(false);
+
+  // Mark chapter as in-progress when it first loads
+  useEffect(() => {
+    if (chapterId && currentChapter && !isLocked && !hasMarkedStarted.current) {
+      hasMarkedStarted.current = true;
+      hasMarkedCompleted.current = false;
+      updateReadingProgress({ chapterId, lastPageRead: 0, percent: 0, completed: false });
+    }
+  }, [chapterId, currentChapter, isLocked]);
+
   const onClose = () => router.back();
 
   const handlePreviousChapter = () => {
     const prev = bookChapters[currentIndex - 1];
     if (prev) {
       setScrollProgress(0);
+      hasMarkedStarted.current = false;
+      hasMarkedCompleted.current = false;
       router.push(getReadChapterRoutePath(prev.id));
     }
   };
@@ -80,6 +96,8 @@ export default function ReadChapterPage() {
     const next = bookChapters[currentIndex + 1];
     if (next) {
       setScrollProgress(0);
+      hasMarkedStarted.current = false;
+      hasMarkedCompleted.current = false;
       router.push(getReadChapterRoutePath(next.id));
     }
   };
@@ -90,6 +108,11 @@ export default function ReadChapterPage() {
     const maxScroll = target.scrollHeight - target.clientHeight;
     const progress = maxScroll > 0 ? (scrolled / maxScroll) * 100 : 0;
     setScrollProgress(progress);
+
+    if (progress >= 95 && chapterId && !hasMarkedCompleted.current) {
+      hasMarkedCompleted.current = true;
+      updateReadingProgress({ chapterId, lastPageRead: 1, percent: Math.round(progress), completed: true });
+    }
   };
 
   const canGoPrevious = currentIndex > 0;

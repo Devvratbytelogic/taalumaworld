@@ -10,7 +10,7 @@ import MarkdownContent from '@/components/ui/MarkdownContent';
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import { getReadChapterRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { useUpdateReadingProgressMutation } from '@/store/rtkQueries/userPostAPI';
 
 export default function ReadChapterPage() {
@@ -81,7 +81,9 @@ export default function ReadChapterPage() {
     }
   }, [chapterId, currentChapter, isLocked]);
 
-  const onClose = () => router.back();
+  const onClose = () => {
+    router.push(getHomeRoutePath());
+  };
 
   const handlePreviousChapter = () => {
     const prev = bookChapters[currentIndex - 1];

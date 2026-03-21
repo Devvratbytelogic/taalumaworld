@@ -8,6 +8,7 @@ import { IMyBooksAPIResponse } from '@/types/user/myBooks';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
 import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
+import { ISingleBookAPIResponse } from '@/types/user/singleBook';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -31,6 +32,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         getSingleChapter: builder.query<ISingleChapterAPIResponse, string>({
             query: (id) => ({
                 url: `/user/content/chapter/${id}`,
+                method: 'GET',
+            }),
+            providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
+        }),
+        getSingleBook: builder.query<ISingleBookAPIResponse, string>({
+            query: (id) => ({
+                url: `/user/content/book/${id}`,
                 method: 'GET',
             }),
             providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
@@ -96,6 +104,7 @@ export const {
     useGetGlobalSettingsQuery,
     useGetAllChaptersQuery,
     useGetSingleChapterQuery,
+    useGetSingleBookQuery,
     useGetCartQuery,
     useGetUserProfileQuery,
     useGetMyChaptersQuery,

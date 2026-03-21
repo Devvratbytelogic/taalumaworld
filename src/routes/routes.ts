@@ -118,6 +118,10 @@ export function getReadChapterRoutePath(chapterId: string): string {
   return `/read-chapter/${chapterId}`;
 }
 
+export function getReadBookRoutePath(bookId: string): string {
+  return `/read-book/${bookId}`;
+}
+
 export function getHomeWithSelectionRoutePath(selectedChapterId: string, selectedBookId: string): string {
   return `/?selectedChapterId=${selectedChapterId}&selectedBookId=${selectedBookId}`;
 }

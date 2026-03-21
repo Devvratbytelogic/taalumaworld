@@ -7,7 +7,7 @@ import { BookOpen, User, FileText, DollarSign, ShoppingCart, Layers } from 'luci
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react'
 import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
-import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes'
+import { getCartRoutePath, getReadBookRoutePath, getReadChapterRoutePath } from '@/routes/routes'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import AddToCartButton from '@/components/ui/AddToCartButton'
 import { RootState } from '@/store/store'
@@ -112,6 +112,11 @@ function BookModalContent({
 }) {
   const isFullBook = chapter.pricingModel === VISIBLE.BOOK
   const hasPrice = chapter.price > 0
+
+  const handleReadBook = () => {
+    onClose()
+    router.push(getReadBookRoutePath(chapter.id))
+  }
 
   const handleBuyBook = () => {
     if (!isAuthenticated) {
@@ -243,7 +248,7 @@ function BookModalContent({
       <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
         {isFullBook && hasPrice ? (
           chapter.isPurchased ? (
-            <Button className="global_btn rounded_full bg_primary w-full" startContent={<BookOpen className="h-4 w-4" />}>
+            <Button className="global_btn rounded_full bg_primary w-full" onPress={handleReadBook} startContent={<BookOpen className="h-4 w-4" />}>
               Read Book
             </Button>
           ) : !isAuthenticated ? (
@@ -268,7 +273,11 @@ function BookModalContent({
               }}
             />
           )
-        ) : (null)}
+        ) : (
+          <Button className="global_btn rounded_full bg_primary w-full" onPress={handleReadBook} startContent={<BookOpen className="h-4 w-4" />}>
+            Read Book
+          </Button>
+        )}
       </ModalFooter>
     </>
   )

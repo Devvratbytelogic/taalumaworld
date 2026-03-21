@@ -28,6 +28,32 @@ export function getAdminRoutePath(): string {
   return '/admin';
 }
 
+export function getAdminDashboardRoutePath(): string {
+  return '/admin/dashboard';
+}
+
+export function getAdminSectionRoutePath(section: string): string {
+  const map: Record<string, string> = {
+    dashboard: '/admin/dashboard',
+    pages: '/admin/pages',
+    settings: '/admin/settings',
+    books: '/admin/books',
+    chapters: '/admin/chapters',
+    categories: '/admin/categories',
+    authors: '/admin/authors',
+    users: '/admin/users',
+    roles: '/admin/roles',
+    activity_logs: '/admin/activity-logs',
+    payments: '/admin/payments',
+    transactions: '/admin/transactions',
+    reviews: '/admin/reviews',
+    moderation: '/admin/moderation',
+    analytics: '/admin/analytics',
+    reports: '/admin/reports',
+  };
+  return map[section] ?? '/admin/dashboard';
+}
+
 export function getCreateChapterRoutePath(): string {
   return '/admin/chapter/create';
 }

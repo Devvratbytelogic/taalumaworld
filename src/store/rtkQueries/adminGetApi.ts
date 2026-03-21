@@ -58,4 +58,5 @@ export const {
     useGetAllAuthorLeadersQuery,
     useGetAllBooksQuery,
     useGetAllChaptersQuery,
+    useGetGlobalSettingsQuery,
 } = clientSideGetApis;

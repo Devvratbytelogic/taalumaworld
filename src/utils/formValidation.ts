@@ -146,6 +146,55 @@ export const updateProfileSchema = Yup.object({
     .required('Name is required'),
 });
 
+// Global Settings Validation Schema
+const urlSchema = Yup.string().url('Must be a valid URL (https://...)');
+export const globalSettingsSchema = Yup.object({
+  // Platform
+  platformName: Yup.string().trim().required('Platform name is required'),
+  marketplace_name: Yup.string().trim().required('Marketplace name is required'),
+  platformDescription: Yup.string().trim(),
+  supportEmail: Yup.string().email('Enter a valid support email').required('Support email is required'),
+  email: Yup.string().email('Enter a valid contact email'),
+  phone: Yup.string().matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid phone number'),
+  alt_phone: Yup.string().matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid alternate phone number'),
+  address: Yup.string().trim(),
+  copy_right_text: Yup.string().trim(),
+  // Header
+  header_text: Yup.string().trim(),
+  header_text_status: Yup.boolean(),
+  visible: Yup.string().oneOf(['chapter', 'book'], 'Select a valid option'),
+  checkout_status: Yup.boolean(),
+  // App URLs
+  android_app_url: urlSchema,
+  iphone_app_url: urlSchema,
+  // SEO
+  meta_title: Yup.string().trim(),
+  meta_description: Yup.string().trim(),
+  meta_keywords: Yup.string().trim(),
+  og_tag: Yup.string().trim(),
+  search_console: Yup.string().trim(),
+  schema_markup: Yup.string().trim(),
+  // Analytics
+  google_analytics_id: Yup.string().trim(),
+  google_tag_manager: Yup.string().trim(),
+  facebook_pixel: Yup.string().trim(),
+  microsoft_clarity: Yup.string().trim(),
+  bing_tracking_code: Yup.string().trim(),
+  // Social Links
+  instagram_link: urlSchema,
+  facebook_link: urlSchema,
+  x_link: urlSchema,
+  youtube_link: urlSchema,
+  linkdin_link: urlSchema,
+  pinterest_link: urlSchema,
+  whatsapp_link: urlSchema,
+  // Notifications
+  emailNotificationsNewUsers: Yup.boolean(),
+  emailNotificationsPurchases: Yup.boolean(),
+  dailySummaryReports: Yup.boolean(),
+  alertFlaggedContent: Yup.boolean(),
+});
+
 // Add / Edit Author (Thought Leader) Modal Validation Schema
 export const authorSchema = Yup.object({
   fullName: Yup.string()

@@ -119,6 +119,9 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
 });
 
 export const {
+    // Global Settings
+    useUpdateGlobalSettingsMutation,
+
     // Categories
     useAddCategoryMutation,
     useUpdateCategoryMutation,

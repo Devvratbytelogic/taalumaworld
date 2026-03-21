@@ -138,6 +138,14 @@ export const categorySchema = Yup.object({
   subcategories: Yup.array().of(Yup.string().trim().required()),
 });
 
+// Update Profile Validation Schema
+export const updateProfileSchema = Yup.object({
+  fullName: Yup.string()
+    .trim()
+    .min(2, 'Name must be at least 2 characters')
+    .required('Name is required'),
+});
+
 // Add / Edit Author (Thought Leader) Modal Validation Schema
 export const authorSchema = Yup.object({
   fullName: Yup.string()

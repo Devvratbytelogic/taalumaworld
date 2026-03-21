@@ -1,127 +1,181 @@
-import { BookOpen, Play, CheckCircle } from 'lucide-react';
+'use client';
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { BookOpen, TrendingUp, CheckCircle, Play } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useGetMyChaptersQuery } from '@/store/rtkQueries/userGetAPI';
+import { cn } from '@/components/ui/utils';
+import type { ItemsEntity } from '@/types/user/myChapters';
 
-interface MyChaptersPageProps {
-  ownedChapters: string[];
-  readingProgress: Record<string, number>;
-  onNavigate: (page: string, id?: string) => void;
-  isAuthenticated?: boolean;
-  hideHeader?: boolean;
-}
+type FilterType = 'all' | 'reading' | 'completed' | 'unread';
 
-export function MyChaptersPage({
-  ownedChapters,
-  readingProgress,
-  onNavigate,
-  isAuthenticated = false,
-  hideHeader = false,
-}: MyChaptersPageProps) {
-  const books: any = [];
-  const chapters: any = [];
+export function MyChaptersPage() {
+  const router = useRouter();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  // If user is not authenticated, show empty state with no data
-  if (!isAuthenticated) {
+  const { data: myChaptersData, isLoading } = useGetMyChaptersQuery();
+  const chapters: ItemsEntity[] = myChaptersData?.data?.items ?? [];
+
+  const stats = useMemo(
+    () => ({
+      total: chapters.length,
+      reading: chapters.filter((c) => c.progressPercent > 0 && !c.completed).length,
+      completed: chapters.filter((c) => c.completed).length,
+      unread: chapters.filter((c) => c.progressPercent === 0 && !c.completed).length,
+    }),
+    [chapters]
+  );
+
+  const filteredChapters = useMemo(() => {
+    switch (activeFilter) {
+      case 'reading':
+        return chapters.filter((c) => c.progressPercent > 0 && !c.completed);
+      case 'completed':
+        return chapters.filter((c) => c.completed);
+      case 'unread':
+        return chapters.filter((c) => c.progressPercent === 0 && !c.completed);
+      default:
+        return chapters;
+    }
+  }, [chapters, activeFilter]);
+
+  const getProgressStatus = (progressPercent: number, completed: boolean) => {
+    if (completed || progressPercent === 100) return { label: 'Completed', color: 'text-green-600' };
+    if (progressPercent > 0) return { label: 'In Progress', color: 'text-primary' };
+    return { label: 'Not Started', color: 'text-gray-500' };
+  };
+
+  if (isLoading) {
     return (
       <div className="space-y-6">
-        {!hideHeader && (
-          <div className="bg-white rounded-3xl p-8 shadow-sm">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-primary/10 rounded-2xl">
-                <BookOpen className="h-6 w-6 text-primary" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white rounded-3xl p-5 shadow-sm animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 bg-gray-200 rounded-full" />
+                <div className="space-y-2">
+                  <div className="h-6 bg-gray-200 rounded w-10" />
+                  <div className="h-3 bg-gray-100 rounded w-24" />
+                </div>
               </div>
-              <h1 className="text-3xl font-bold text-foreground">My Chapters</h1>
             </div>
-            <p className="text-muted-foreground">
-              0 chapters in your library
-            </p>
-          </div>
-        )}
-
-        {/* Empty State - No Auth */}
-        <div className="bg-white rounded-3xl p-12 text-center shadow-sm">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="h-8 w-8 text-primary" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-3xl overflow-hidden animate-pulse">
+              <div className="aspect-video bg-gray-200" />
+              <div className="p-5 space-y-3">
+                <div className="h-3 bg-gray-100 rounded w-24" />
+                <div className="h-5 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                <div className="h-10 bg-gray-200 rounded-full" />
+              </div>
             </div>
-            <h3 className="text-xl font-bold mb-2">Please Log In</h3>
-            <p className="text-muted-foreground mb-6">
-              You need to be logged in to view your chapter collection.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     );
   }
 
-  // Get chapter details for owned chapters
-  const myChapters = ownedChapters
-    .map(chapterId => chapters.find((c: any) => c.id === chapterId))
-    .filter(Boolean)
-    .map(chapter => {
-      const book = books.find((b: any) => b.id === chapter!.bookId);
-      const progress = readingProgress[chapter!.id] || 0;
-      return { chapter: chapter!, book, progress };
-    })
-    .sort((a, b) => {
-      // Sort by progress (in-progress first, then not started, then completed)
-      const aProgress = a.progress;
-      const bProgress = b.progress;
-
-      if (aProgress > 0 && aProgress < 100 && !(bProgress > 0 && bProgress < 100)) return -1;
-      if (bProgress > 0 && bProgress < 100 && !(aProgress > 0 && aProgress < 100)) return 1;
-
-      return 0;
-    });
-
-  const getProgressStatus = (progress: number) => {
-    if (progress === 0) return { label: 'Not Started', color: 'text-gray-500' };
-    if (progress < 100) return { label: 'In Progress', color: 'text-primary' };
-    return { label: 'Completed', color: 'text-green-600' };
-  };
-
   return (
     <div className="space-y-6">
-      {!hideHeader && (
-        <div className="bg-white rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-2xl">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">My Chapters</h1>
-          </div>
-          <p className="text-muted-foreground">
-            {myChapters.length} {myChapters.length === 1 ? 'chapter' : 'chapters'} in your library
-          </p>
-        </div>
-      )}
+      {/* Page Header */}
+      <div className="mb-2">
+        <h1 className="text-3xl font-bold mb-1">My Chapters</h1>
+        <p className="text-muted-foreground">Your personal collection of purchased chapters</p>
+      </div>
 
-      {/* Chapters List */}
-      {myChapters.length > 0 ? (
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-3xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-primary/20 rounded-full">
+              <BookOpen className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Total Chapters</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-linear-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-3xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-200 rounded-full">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">{stats.reading}</div>
+              <div className="text-sm text-muted-foreground tracking-tight">In Progress</div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-linear-to-br from-green-50 to-green-100/50 border border-green-200 rounded-3xl p-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-green-200 rounded-full">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">{stats.completed}</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Completed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex gap-2 flex-wrap">
+          {(
+            [
+              { key: 'all', label: `All (${stats.total})` },
+              { key: 'reading', label: `Reading (${stats.reading})` },
+              { key: 'completed', label: `Completed (${stats.completed})` },
+              { key: 'unread', label: `Unread (${stats.unread})` },
+            ] as { key: FilterType; label: string }[]
+          ).map(({ key, label }) => (
+            <Button
+              key={key}
+              className={cn('global_btn rounded_full', activeFilter === key ? 'bg_primary' : 'outline_primary')}
+              onPress={() => setActiveFilter(key)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+        <p className="text-muted-foreground text-sm">
+          {filteredChapters.length} chapter{filteredChapters.length !== 1 ? 's' : ''}
+        </p>
+      </div>
+
+      {/* Chapters Grid */}
+      {filteredChapters.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myChapters.map(({ chapter, book, progress }) => {
-            const status = getProgressStatus(progress);
+          {filteredChapters.map((chapter) => {
+            const progress = chapter.progressPercent;
+            const status = getProgressStatus(progress, chapter.completed);
 
             return (
               <div
-                key={chapter.id}
+                key={chapter.chapterId}
                 className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all group"
               >
                 {/* Chapter Image */}
                 <div className="aspect-video relative overflow-hidden bg-gray-100">
                   <img
-                    src={chapter.featuredImage}
+                    src={chapter.coverImage}
                     alt={chapter.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
 
                   {/* Progress Badge */}
-                  {progress === 100 && (
+                  {chapter.completed && (
                     <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
                       Completed
                     </div>
                   )}
-                  {progress > 0 && progress < 100 && (
+                  {!chapter.completed && progress > 0 && (
                     <div className="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
                       {Math.round(progress)}%
                     </div>
@@ -130,15 +184,9 @@ export function MyChaptersPage({
 
                 {/* Chapter Info */}
                 <div className="p-5">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {book?.title || 'Unknown Book'}
-                  </p>
-                  <h3 className="font-bold text-base mb-2 line-clamp-2">
-                    {chapter.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                    {chapter.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">{chapter.bookTitle}</p>
+                  <h3 className="font-bold text-base mb-2 line-clamp-2">{chapter.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{chapter.description}</p>
 
                   {/* Progress Bar */}
                   {progress > 0 && (
@@ -155,7 +203,7 @@ export function MyChaptersPage({
                   {/* Action Button */}
                   <Button
                     className='global_btn rounded_full bg_primary'
-                    onPress={() => onNavigate('read-chapter', chapter.id)}
+                    onPress={() => router.push(`/read-chapter/${chapter.chapterId}`)}
                   >
                     {progress === 0 ? (
                       <>
@@ -175,9 +223,9 @@ export function MyChaptersPage({
                     )}
                   </Button>
 
-                  {/* Chapter Number */}
+                  {/* Chapter Number & Status */}
                   <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Chapter {chapter.sequence}</span>
+                    <span>Chapter {chapter.chapterNumber}</span>
                     <span className={status.color}>{status.label}</span>
                   </div>
                 </div>
@@ -192,16 +240,30 @@ export function MyChaptersPage({
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <BookOpen className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="text-xl font-bold mb-2">No Chapters Yet</h3>
+            <h3 className="text-xl font-bold mb-2">
+              {activeFilter === 'all' ? 'No Chapters Yet' : `No ${activeFilter === 'reading' ? 'In Progress' : activeFilter === 'completed' ? 'Completed' : 'Unread'} Chapters`}
+            </h3>
             <p className="text-muted-foreground mb-6">
-              You haven't purchased any chapters yet. Start exploring and build your collection!
+              {activeFilter === 'all'
+                ? "You haven't purchased any chapters yet. Start exploring and build your collection!"
+                : 'No chapters match this filter.'}
             </p>
-            <Button
-              onPress={() => onNavigate('home')}
-              className='global_btn rounded_full bg_primary'
-            >
-              Browse Chapters
-            </Button>
+            {activeFilter === 'all' && (
+              <Button
+                onPress={() => router.push('/')}
+                className='global_btn rounded_full bg_primary'
+              >
+                Browse Chapters
+              </Button>
+            )}
+            {activeFilter !== 'all' && (
+              <Button
+                onPress={() => setActiveFilter('all')}
+                className='global_btn rounded_full outline_primary'
+              >
+                Show All Chapters
+              </Button>
+            )}
           </div>
         </div>
       )}

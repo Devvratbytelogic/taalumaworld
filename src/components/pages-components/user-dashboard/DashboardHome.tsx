@@ -1,30 +1,76 @@
+'use client';
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { BookOpen, Book, Clock, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetAllBooksQuery, useGetAllChaptersQuery } from '@/store/rtkQueries/adminGetApi';
-import type { Book as BookType, Chapter } from '@/types/content';
+import type { Book as BookType } from '@/types/content';
 import ImageComponent from '@/components/ui/ImageComponent';
 import DashboardHomeSkeleton from '@/components/skeleton-loader/DashboardHomeSkeleton';
+import { selectReadingProgress } from '@/store/slices/readingSlice';
+import { useGetMyChaptersQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 
-interface DashboardHomeProps {
-  userName: string;
-  displayMode: 'chapters' | 'books';
-  ownedChapters: string[];
-  ownedBooks: string[];
-  readingProgress: Record<string, number>;
-  onNavigate: (page: string, id?: string) => void;
-  onPageChange: (page: 'my-chapters' | 'my-books' | 'history') => void;
-}
+export function DashboardHome() {
+  const router = useRouter();
+  const readingProgressRaw = useSelector(selectReadingProgress);
+  const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
-export function DashboardHome({
-  userName,
-  displayMode,
-  ownedChapters,
-  ownedBooks,
-  readingProgress,
-  onNavigate,
-  onPageChange
-}: DashboardHomeProps) {
+  const { data: myChaptersData } = useGetMyChaptersQuery();
+  const { data: profileData } = useGetUserProfileQuery();
+
+  const userName = profileData?.data?.name ?? 'User';
   const firstName = userName.split(' ')[0] || userName;
+
+  const readingProgress = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(readingProgressRaw).map(([id, data]) => [id, data.progress])
+      ),
+    [readingProgressRaw]
+  );
+
+  const ownedChapters = myChaptersData?.data?.items ?? [];
+
+  const ownedBooks = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      return JSON.parse(localStorage.getItem('owned_books') || '[]');
+    } catch {
+      return [];
+    }
+  }, []);
+
+  useEffect(() => {
+    const savedMode = localStorage.getItem('display-mode');
+    if (savedMode === 'books' || savedMode === 'chapters') {
+      setDisplayMode(savedMode);
+    }
+
+    const handleDisplayModeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ mode: 'chapters' | 'books' }>;
+      setDisplayMode(customEvent.detail.mode);
+    };
+
+    window.addEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
+    return () => {
+      window.removeEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
+    };
+  }, []);
+
+  const onPageChange = (page: string) => {
+    router.push(`/user-dashboard?tab=${page}`);
+  };
+
+  const onNavigate = (page: string, id?: string) => {
+    if (page === 'home') {
+      router.push('/');
+    } else if (page === 'read-chapter' && id) {
+      router.push(`/read-chapter/${id}`);
+    } else if (page === 'read-book') {
+      router.push('/books');
+    }
+  };
 
   const { data: books, isLoading: booksLoading } = useGetAllBooksQuery();
   const booksData = books?.data ?? [];
@@ -34,15 +80,14 @@ export function DashboardHome({
   if (booksLoading || chaptersLoading) {
     return <DashboardHomeSkeleton />;
   }
-  // Get continue reading items (items with progress > 0 and < 100)
+
   const continueReadingItems = Object.entries(readingProgress)
-    .filter(([id, progress]) => progress > 0 && progress < 100)
-    .sort((a, b) => b[1] - a[1]) // Sort by progress
+    .filter(([, progress]) => progress > 0 && progress < 100)
+    .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
   const hasContinueReading = continueReadingItems.length > 0;
 
-  // Get chapter or book details for continue reading
   const getContinueReadingItem = (id: string) => {
     if (displayMode === 'chapters') {
       const chapter = chaptersData.find((c) => c.id === id);

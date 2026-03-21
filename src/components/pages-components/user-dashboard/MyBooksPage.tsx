@@ -1,23 +1,35 @@
+'use client';
+import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { Book, Play, BookOpen, CheckCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetAllBooksQuery } from '@/store/api/booksApi';
 import { useGetAuthorsQuery } from '@/store/api/authorsApi';
-import { getBooksRoutePath } from '@/routes/routes';
+import { selectReadingProgress } from '@/store/slices/readingSlice';
 import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
 
-interface MyBooksPageProps {
-  ownedBooks: string[];
-  readingProgress: Record<string, number>;
-  onNavigate: (page: string) => void;
-  hideHeader?: boolean;
-}
+export function MyBooksPage() {
+  const router = useRouter();
+  const readingProgressRaw = useSelector(selectReadingProgress);
 
-export function MyBooksPage({
-  ownedBooks,
-  readingProgress,
-  onNavigate,
-  hideHeader = false,
-}: MyBooksPageProps) {
+  const readingProgress = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(readingProgressRaw).map(([id, data]) => [id, data.progress])
+      ),
+    [readingProgressRaw]
+  );
+
+  const ownedBooks: string[] = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      return JSON.parse(localStorage.getItem('owned_books') || '[]');
+    } catch {
+      return [];
+    }
+  }, []);
+
   const { data: books = [], isLoading: booksLoading } = useGetAllBooksQuery();
   const { data: authors = [], isLoading: authorsLoading } = useGetAuthorsQuery();
 
@@ -25,7 +37,6 @@ export function MyBooksPage({
     return <MyBooksPageSkeleton />;
   }
 
-  // Get book details for owned books
   const myBooks = ownedBooks
     .map(bookId => books.find((b: any) => b.id === bookId))
     .filter(Boolean)
@@ -35,13 +46,10 @@ export function MyBooksPage({
       return { book: book!, author, progress };
     })
     .sort((a, b) => {
-      // Sort by progress (in-progress first, then not started, then completed)
       const aProgress = a.progress;
       const bProgress = b.progress;
-
       if (aProgress > 0 && aProgress < 100 && !(bProgress > 0 && bProgress < 100)) return -1;
       if (bProgress > 0 && bProgress < 100 && !(aProgress > 0 && aProgress < 100)) return 1;
-
       return 0;
     });
 
@@ -53,19 +61,18 @@ export function MyBooksPage({
 
   return (
     <div className="space-y-6">
-      {!hideHeader && (
-        <div className="bg-white rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-2xl">
-              <Book className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">My Books</h1>
+      {/* Page Header */}
+      <div className="bg-white rounded-3xl p-8 shadow-sm">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-primary/10 rounded-2xl">
+            <Book className="h-6 w-6 text-primary" />
           </div>
-          <p className="text-muted-foreground">
-            {myBooks.length} {myBooks.length === 1 ? 'book' : 'books'} in your library
-          </p>
+          <h1 className="text-3xl font-bold text-foreground">My Books</h1>
         </div>
-      )}
+        <p className="text-muted-foreground">
+          {myBooks.length} {myBooks.length === 1 ? 'book' : 'books'} in your library
+        </p>
+      </div>
 
       {/* Books Grid */}
       {myBooks.length > 0 ? (
@@ -105,12 +112,8 @@ export function MyBooksPage({
                   <p className="text-xs text-muted-foreground mb-1">
                     {author?.name || 'Unknown Author'}
                   </p>
-                  <h3 className="font-bold text-base mb-2 line-clamp-2">
-                    {book.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                    {book.description}
-                  </p>
+                  <h3 className="font-bold text-base mb-2 line-clamp-2">{book.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{book.description}</p>
 
                   {/* Progress Bar */}
                   {progress > 0 && (
@@ -127,7 +130,7 @@ export function MyBooksPage({
                   {/* Action Button */}
                   <Button
                     className="global_btn rounded_full bg_primary w-full"
-                    onPress={() => onNavigate('read-book')}
+                    onPress={() => router.push('/books')}
                   >
                     {progress === 0 ? (
                       <>
@@ -149,7 +152,7 @@ export function MyBooksPage({
 
                   {/* Book Details */}
                   <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{0} chapters</span>
+                    <span>{book.chapters?.length ?? 0} chapters</span>
                     <span className={status.color}>{status.label}</span>
                   </div>
                 </div>
@@ -169,8 +172,8 @@ export function MyBooksPage({
               You haven't purchased any books yet. Start exploring and build your collection!
             </p>
             <Button
-              onPress={() => onNavigate(getBooksRoutePath())}
-              className="gap-2"
+              onPress={() => router.push('/books')}
+              className='global_btn rounded_full bg_primary'
             >
               Browse Books
             </Button>

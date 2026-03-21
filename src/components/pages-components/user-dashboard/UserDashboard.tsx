@@ -1,8 +1,8 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
-import { BookOpen, Book, Clock, User, Settings } from 'lucide-react';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { BookOpen, Book, Clock, User, Settings, Home } from 'lucide-react';
 import { DashboardHome } from './DashboardHome';
 import { MyChaptersPage } from './MyChaptersPage';
 import { MyBooksPage } from './MyBooksPage';
@@ -10,70 +10,27 @@ import { ReadingHistory } from './ReadingHistory';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
 import { cn } from '@/components/ui/utils';
-import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { signOut } from '@/store/slices/authSlice';
-import { selectReadingProgress } from '@/store/slices/readingSlice';
-import { useGetPurchasedItemsQuery } from '@/store/api/userApi';
-import type { RootState } from '@/store/store';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 
-type DashboardPage = 'home' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings';
+type DashboardPage = 'dashboard' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings';
 
-export function UserDashboard() {
+const VALID_PAGES: DashboardPage[] = ['dashboard', 'my-chapters', 'my-books', 'history', 'profile', 'settings'];
+
+function UserDashboardInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState<DashboardPage>('home');
   const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const readingProgressRaw = useSelector(selectReadingProgress);
-  const { data: purchasedItems = [], isLoading: purchasedLoading } = useGetPurchasedItemsQuery(undefined, { skip: !isAuthenticated });
+  const tabParam = searchParams.get('tab') as DashboardPage | null;
+  const currentPage: DashboardPage = tabParam && VALID_PAGES.includes(tabParam) ? tabParam : 'dashboard';
 
-  const readingProgress = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(readingProgressRaw).map(([id, data]) => [id, data.progress])
-      ),
-    [readingProgressRaw]
-  );
-
-  const ownedChapters = useMemo(
-    () => purchasedItems.map((p) => p.chapterId).filter((id): id is string => !!id),
-    [purchasedItems]
-  );
-
-  const ownedBooks = useMemo(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      return JSON.parse(localStorage.getItem('owned_books') || '[]');
-    } catch {
-      return [];
-    }
-  }, []);
-
-  const handleNavigate = (page: string, id?: string) => {
-    if (page === 'home') router.push(getHomeRoutePath());
-    else if (page === 'books') router.push(getHomeRoutePath());
-    else if (page === 'read-chapter' && id) router.push(getReadChapterRoutePath(id));
-    else if (page === 'read-book') router.push(getHomeRoutePath());
-    else router.push(getHomeRoutePath());
-  };
-
-  const handleLogout = () => {
-    dispatch(signOut());
-    router.push(getHomeRoutePath());
-  };
-
-  // Load display mode from localStorage
   useEffect(() => {
-    const loadDisplayMode = () => {
-      const savedMode = localStorage.getItem('display-mode');
-      if (savedMode === 'books' || savedMode === 'chapters') {
-        setDisplayMode(savedMode);
-      }
-    };
-
-    loadDisplayMode();
+    const savedMode = localStorage.getItem('display-mode');
+    if (savedMode === 'books' || savedMode === 'chapters') {
+      setDisplayMode(savedMode);
+    }
 
     const handleDisplayModeChange = (event: Event) => {
       const customEvent = event as CustomEvent<{ mode: 'chapters' | 'books' }>;
@@ -81,14 +38,22 @@ export function UserDashboard() {
     };
 
     window.addEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
-
     return () => {
       window.removeEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
     };
   }, []);
 
-  // Navigation items based on display mode
+  const handleLogout = () => {
+    dispatch(signOut());
+    router.push('/');
+  };
+
+  const setCurrentPage = (page: DashboardPage) => {
+    router.push(`/user-dashboard?tab=${page}`);
+  };
+
   const navItems = [
+    { id: 'dashboard' as DashboardPage, label: 'Dashboard', icon: Home, show: true },
     { id: 'profile' as DashboardPage, label: 'Profile', icon: User, show: true },
     { id: 'my-chapters' as DashboardPage, label: 'My Chapters', icon: BookOpen, show: displayMode === 'chapters' },
     { id: 'my-books' as DashboardPage, label: 'My Books', icon: Book, show: displayMode === 'books' },
@@ -96,63 +61,20 @@ export function UserDashboard() {
     { id: 'settings' as DashboardPage, label: 'Settings', icon: Settings, show: true },
   ].filter(item => item.show);
 
-  if (isAuthenticated && purchasedLoading) {
-    return <UserDashboardSkeleton />;
-  }
-
   const renderPage = () => {
     switch (currentPage) {
-      case 'home':
-        return (
-          <DashboardHome
-            userName={user?.fullName ?? ''}
-            displayMode={displayMode}
-            ownedChapters={ownedChapters}
-            ownedBooks={ownedBooks}
-            readingProgress={readingProgress}
-            onNavigate={handleNavigate}
-            onPageChange={setCurrentPage}
-          />
-        );
+      case 'dashboard':
+        return <DashboardHome />;
       case 'my-chapters':
-        return (
-          <MyChaptersPage
-            ownedChapters={ownedChapters}
-            readingProgress={readingProgress}
-            onNavigate={handleNavigate}
-            isAuthenticated={isAuthenticated}
-          />
-        );
+        return <MyChaptersPage />;
       case 'my-books':
-        return (
-          <MyBooksPage
-            ownedBooks={ownedBooks}
-            readingProgress={readingProgress}
-            onNavigate={handleNavigate}
-          />
-        );
+        return <MyBooksPage />;
       case 'history':
-        return (
-          <ReadingHistory
-            readingProgress={readingProgress}
-            displayMode={displayMode}
-            onNavigate={handleNavigate}
-          />
-        );
+        return <ReadingHistory />;
       case 'profile':
-        return (
-          <ProfilePage
-            userEmail={user?.email ?? ''}
-            userName={user?.fullName ?? ''}
-            userPhoto={user?.photo ?? ''}
-          />
-        );
+        return <ProfilePage />;
       case 'settings':
-        return (
-          <SettingsPage
-            onLogout={handleLogout}
-          />
-        );
+        return <SettingsPage onLogout={handleLogout} />;
       default:
         return null;
     }
@@ -195,5 +117,13 @@ export function UserDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function UserDashboard() {
+  return (
+    <Suspense fallback={<UserDashboardSkeleton />}>
+      <UserDashboardInner />
+    </Suspense>
   );
 }

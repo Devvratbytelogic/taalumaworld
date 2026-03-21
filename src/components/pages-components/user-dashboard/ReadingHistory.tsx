@@ -1,59 +1,37 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Clock, Calendar } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useGetReadingHistoryQuery } from '@/store/rtkQueries/userGetAPI';
+import type { IReadingHistoryItem } from '@/types/user/readingHistory';
 
-interface ReadingHistoryProps {
-  readingProgress: Record<string, number>;
-  displayMode: 'chapters' | 'books';
-  onNavigate: (page: string, id?: string) => void;
-}
+export function ReadingHistory() {
+  const router = useRouter();
+  const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
-export function ReadingHistory({
-  readingProgress,
-  displayMode,
-  onNavigate
-}: ReadingHistoryProps) {
-  const books: any = [];
-  const chapters: any = [];
-  const authors: any = [];
+  const { data: historyData, isLoading } = useGetReadingHistoryQuery();
+  const historyItems: IReadingHistoryItem[] = historyData?.data?.items ?? [];
 
-  // Get all items with reading progress
-  const historyItems = Object.entries(readingProgress)
-    .map(([id, progress]) => {
-      if (displayMode === 'chapters') {
-        const chapter = chapters.find((c: any) => c.id === id);
-        if (chapter) {
-          const book = books.find((b: any) => b.id === chapter.bookId);
-          return {
-            type: 'chapter' as const,
-            id,
-            item: chapter,
-            book,
-            progress,
-            // Mock last read date (in real app, this would come from backend)
-            lastRead: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000)
-          };
-        }
-      } else {
-        const book = books.find((b: any) => b.id === id);
-        if (book) {
-          const author = authors.find((a: any) => a.id === book.authorId);
-          return {
-            type: 'book' as const,
-            id,
-            item: book,
-            author,
-            progress,
-            // Mock last read date (in real app, this would come from backend)
-            lastRead: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000)
-          };
-        }
-      }
-      return null;
-    })
-    .filter(Boolean)
-    .sort((a, b) => b!.lastRead.getTime() - a!.lastRead.getTime());
+  useEffect(() => {
+    const savedMode = localStorage.getItem('display-mode');
+    if (savedMode === 'books' || savedMode === 'chapters') {
+      setDisplayMode(savedMode);
+    }
 
-  const formatLastRead = (date: Date) => {
+    const handleDisplayModeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ mode: 'chapters' | 'books' }>;
+      setDisplayMode(customEvent.detail.mode);
+    };
+
+    window.addEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
+    return () => {
+      window.removeEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
+    };
+  }, []);
+
+  const formatLastRead = (dateStr: string) => {
+    const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -71,6 +49,29 @@ export function ReadingHistory({
     if (progress > 0) return 'text-orange-600 bg-orange-50';
     return 'text-gray-500 bg-gray-50';
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-3xl p-8 shadow-sm animate-pulse">
+          <div className="h-8 bg-gray-200 rounded-xl w-48 mb-2" />
+          <div className="h-4 bg-gray-100 rounded-xl w-64" />
+        </div>
+        <div className="bg-white rounded-3xl p-6 shadow-sm space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex gap-4 p-4 rounded-2xl border border-gray-100 animate-pulse">
+              <div className="shrink-0 w-32 aspect-video rounded-xl bg-gray-200" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-gray-100 rounded w-24" />
+                <div className="h-5 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -91,127 +92,59 @@ export function ReadingHistory({
       {historyItems.length > 0 ? (
         <div className="bg-white rounded-3xl p-6 shadow-sm">
           <div className="space-y-4">
-            {historyItems.map((item) => {
-              if (!item) return null;
+            {historyItems.map((item) => (
+              <div
+                key={item.chapterId}
+                className="flex gap-4 p-4 rounded-2xl border border-gray-200 hover:shadow-md transition-all group"
+              >
+                {/* Chapter Image */}
+                <div className="shrink-0 w-32 aspect-video rounded-xl overflow-hidden bg-gray-100">
+                  <img
+                    src={item.coverImage}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
 
-              if (item.type === 'chapter') {
-                return (
-                  <div
-                    key={item.id}
-                    className="flex gap-4 p-4 rounded-2xl border border-gray-200 hover:shadow-md transition-all group"
-                  >
-                    {/* Chapter Image */}
-                    <div className="shrink-0 w-32 aspect-video rounded-xl overflow-hidden bg-gray-100">
-                      <img
-                        src={item.item.featuredImage}
-                        alt={item.item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
+                {/* Chapter Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-muted-foreground mb-1">{item.bookTitle}</p>
+                  <h3 className="font-bold text-base mb-1 line-clamp-1">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Chapter {item.chapterNumber}
+                  </p>
 
-                    {/* Chapter Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        {item.book?.title || 'Unknown Book'}
-                      </p>
-                      <h3 className="font-bold text-base mb-1 line-clamp-1">
-                        {item.item.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        Chapter {item.item.sequence}
-                      </p>
-
-                      {/* Progress Info */}
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <div className="h-2 w-24 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary rounded-full transition-all"
-                              style={{ width: `${item.progress}%` }}
-                            />
-                          </div>
-                          <span className="text-xs font-medium text-muted-foreground">
-                            {Math.round(item.progress)}%
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          {formatLastRead(item.lastRead)}
-                        </div>
+                  {/* Progress Info */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-24 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: `${item.progressPercent}%` }}
+                        />
                       </div>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getProgressColor(item.progressPercent)}`}>
+                        {Math.round(item.progressPercent)}%
+                      </span>
                     </div>
-
-                    {/* Action Button */}
-                    <div className="shrink-0 flex items-center">
-                      <Button
-                        className='global_btn rounded_full outline_primary'
-                        onPress={() => onNavigate('read-chapter', item.id)}
-                      >
-                        {item.progress < 100 ? 'Continue' : 'Read Again'}
-                      </Button>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      {formatLastRead(item.lastReadAt)}
                     </div>
                   </div>
-                );
-              } else {
-                return (
-                  <div
-                    key={item.id}
-                    className="flex gap-4 p-4 rounded-2xl border border-gray-200 hover:shadow-md transition-all group"
+                </div>
+
+                {/* Action Button */}
+                <div className="shrink-0 flex items-center">
+                  <Button
+                    className='global_btn rounded_full outline_primary'
+                    onPress={() => router.push(`/read-chapter/${item.chapterId}`)}
                   >
-                    {/* Book Cover */}
-                    <div className="shrink-0 w-24 aspect-3/4 rounded-xl overflow-hidden bg-gray-100">
-                      <img
-                        src={item.item.coverImage}
-                        alt={item.item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    {/* Book Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        {item.author?.name || 'Unknown Author'}
-                      </p>
-                      <h3 className="font-bold text-base mb-1 line-clamp-1">
-                        {item.item.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {item.item.totalChapters} chapters
-                      </p>
-
-                      {/* Progress Info */}
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <div className="h-2 w-24 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary rounded-full transition-all"
-                              style={{ width: `${item.progress}%` }}
-                            />
-                          </div>
-                          <span className="text-xs font-medium text-muted-foreground">
-                            {Math.round(item.progress)}%
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          {formatLastRead(item.lastRead)}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="shrink-0 flex items-center">
-                      <Button
-                        className='global_btn rounded_full outline_primary'
-                        onPress={() => onNavigate('read-book')}
-                      >
-                        {item.progress < 100 ? 'Continue' : 'Read Again'}
-                      </Button>
-                    </div>
-                  </div>
-                );
-              }
-            })}
+                    {item.progressPercent < 100 ? 'Continue' : 'Read Again'}
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ) : (
@@ -226,7 +159,7 @@ export function ReadingHistory({
               Start reading to build your history. Your recently read {displayMode === 'chapters' ? 'chapters' : 'books'} will appear here.
             </p>
             <Button
-              onPress={() => onNavigate('home')}
+              onPress={() => router.push('/')}
               className='global_btn rounded_full bg_primary'
             >
               {displayMode === 'chapters' ? 'Browse Chapters' : 'Browse Books'}

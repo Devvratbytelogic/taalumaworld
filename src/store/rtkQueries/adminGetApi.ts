@@ -52,6 +52,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 url: `/admin/get-global`,
                 method: 'GET',
             }),
+            providesTags: ['GlobalSettings'],
         }),
 
         /** users */

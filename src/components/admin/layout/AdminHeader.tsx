@@ -2,48 +2,39 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-    BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X,
-} from 'lucide-react';
-import {
-    Button, Input, Switch, Avatar, Dropdown, DropdownTrigger,
-    DropdownMenu, DropdownItem, DropdownSection, Select, SelectItem,
-} from '@heroui/react';
+import { BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X, } from 'lucide-react';
+import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Select, SelectItem, } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 import { getRoleName } from '@/utils/adminPermissions';
 import { getAdminSectionRoutePath, getHomeRoutePath } from '@/routes/routes';
-import { clearAuthCookies } from '@/utils/authCookies';
+import { clearAuthCookies, getUserDisplayData } from '@/utils/authCookies';
 import toast from '@/utils/toast';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { selectContentMode, setContentMode } from '@/store/slices/contentModeSlice';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
-import type { ContentMode } from '@/store/slices/contentModeSlice';
+import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import type { AdminRole } from '@/types/admin';
-
-const DUMMY_ADMIN = {
-    name: 'Admin User',
-    email: 'admin@taaluma.world',
-    avatar: '',
-    role: 'super_admin' as AdminRole,
-};
 
 export function AdminHeader() {
     const router = useRouter();
-    const dispatch = useAppDispatch();
-    const contentMode = useAppSelector(selectContentMode);
-    const [updateGlobalSettings] = useUpdateGlobalSettingsMutation();
+    const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
+    const { data: globalSettings, isFetching: isSettingsLoading } = useGetGlobalSettingsQuery();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [adminUser, setAdminUser] = useState(DUMMY_ADMIN);
+
+    const visible = globalSettings?.data?.visible ?? 'chapter';
+
+    const userDisplay = getUserDisplayData();
+    const adminUser = {
+        name: userDisplay?.fullName ?? 'Admin User',
+        email: userDisplay?.email ?? '',
+        avatar: userDisplay?.photo ?? '',
+        role: 'super_admin' as AdminRole,
+    };
 
     const onMobileMenuToggle = () => setMobileMenuOpen(prev => !prev);
 
-    const onSwitchRole = (role: AdminRole) => setAdminUser(prev => ({ ...prev, role }));
-
     const onContentModeToggle = async (isBooks: boolean) => {
-        const newMode: ContentMode = isBooks ? 'books' : 'chapters';
-        dispatch(setContentMode(newMode));
-        await updateGlobalSettings({ contentMode: newMode });
+        const newMode = isBooks ? 'book' : 'chapter';
+        await updateGlobalSettings({ visible: newMode });
     };
 
     const handleLogout = () => {
@@ -70,13 +61,22 @@ export function AdminHeader() {
                     <div className="flex items-center gap-2">
                         <span className="text-xs hidden md:block">Content Mode:</span>
                         <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
-                            <span className={cn("text-xs", contentMode === 'chapters' ? 'font-semibold' : 'opacity-70')}>
-                                Chapters
-                            </span>
-                            <Switch isSelected={contentMode === 'books'} onValueChange={onContentModeToggle} size="sm" />
-                            <span className={cn("text-xs", contentMode === 'books' ? 'font-semibold' : 'opacity-70')}>
-                                Books
-                            </span>
+                            {isSettingsLoading || isToggling ? (
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                    <span className="text-xs opacity-80">Loading…</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <span className={cn("text-xs", visible === 'chapter' ? 'font-semibold' : 'opacity-70')}>
+                                        Chapters
+                                    </span>
+                                    <Switch isSelected={visible === 'book'} onValueChange={onContentModeToggle} size="sm" />
+                                    <span className={cn("text-xs", visible === 'book' ? 'font-semibold' : 'opacity-70')}>
+                                        Books
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -150,22 +150,6 @@ export function AdminHeader() {
                                         <p className="text-sm font-medium">{adminUser.name}</p>
                                         <p className="text-xs text-muted-foreground">{adminUser.email}</p>
                                         <Badge variant="secondary" className="w-fit mt-1">{getRoleName(adminUser.role)}</Badge>
-                                        <p className="text-xs text-muted-foreground mt-3 mb-1">Switch Role (Demo)</p>
-                                        <Select
-                                            selectedKeys={new Set([adminUser.role])}
-                                            onSelectionChange={(keys) => {
-                                                const key = keys instanceof Set ? Array.from(keys)[0] : null;
-                                                if (key) onSwitchRole(key as AdminRole);
-                                            }}
-                                            size="sm"
-                                            classNames={{ trigger: 'w-full' }}
-                                        >
-                                            <SelectItem key="super_admin">Super Admin</SelectItem>
-                                            <SelectItem key="content_manager">Content Manager</SelectItem>
-                                            <SelectItem key="support_agent">Support Agent</SelectItem>
-                                            <SelectItem key="analytics_manager">Analytics Manager</SelectItem>
-                                            <SelectItem key="finance_manager">Finance Manager</SelectItem>
-                                        </Select>
                                     </div>
                                 }
                             >

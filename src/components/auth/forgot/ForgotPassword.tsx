@@ -9,20 +9,28 @@ import { useFormik } from 'formik';
 import { forgotPasswordSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import { useUserForgotPasswordMutation } from '@/store/rtkQueries/userAuthApi';
+import toast from '@/utils/toast';
 
 export default function ForgotPassword() {
     const dispatch = useDispatch();
     const { isOpen } = useSelector((state: RootState) => state.allModal);
+    const [userForgotPassword, { isLoading: isSending }] = useUserForgotPasswordMutation();
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: {
             email: '',
         },
         validationSchema: forgotPasswordSchema,
-        onSubmit: (formValues, { resetForm }) => {
-            console.log('Forgot password form submitted:', formValues);
-            resetForm();
-            dispatch(openModal({ componentName: 'OtpVerification', data: '' }));
+        onSubmit: async (formValues, { resetForm }) => {
+            try {
+                const res = await userForgotPassword({ user_id: formValues.email }).unwrap();
+                toast.success((res as { message?: string }).message ?? 'Verification code sent to your email.');
+                resetForm();
+                dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'verify' } }));
+            } catch {
+                toast.error('Failed to send reset code. Please check your email and try again.');
+            }
         },
     });
 
@@ -64,8 +72,8 @@ export default function ForgotPassword() {
                         <Button
                             type="submit"
                             className="global_btn bg_primary w-full"
-                            disabled={isSubmitting}
-                            isLoading={isSubmitting}
+                            disabled={isSubmitting || isSending}
+                            isLoading={isSubmitting || isSending}
                         >
                             Send Code
                         </Button>

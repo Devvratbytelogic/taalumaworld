@@ -9,12 +9,16 @@ import { useFormik } from 'formik';
 import { resetPasswordSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import { useUserResetPasswordMutation } from '@/store/rtkQueries/userAuthApi';
+import toast from '@/utils/toast';
 
 export default function ResetPassword() {
     const dispatch = useDispatch();
-    const { isOpen } = useSelector((state: RootState) => state.allModal);
+    const { isOpen, data } = useSelector((state: RootState) => state.allModal);
+    const modalData = data as { email: string; code: string; token: string } | null;
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [userResetPassword, { isLoading: isResetting }] = useUserResetPasswordMutation();
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: {
@@ -22,10 +26,21 @@ export default function ResetPassword() {
             confirmPassword: '',
         },
         validationSchema: resetPasswordSchema,
-        onSubmit: (formValues, { resetForm }) => {
-            console.log('Reset password form submitted:', formValues);
-            resetForm();
-            dispatch(openModal({ componentName: 'SignIn', data: '' }));
+        onSubmit: async (formValues, { resetForm }) => {
+            try {
+                const res = await userResetPassword({
+                    email: modalData?.email ?? '',
+                    code: modalData?.code ?? '',
+                    password: formValues.password,
+                    password_confirmation: formValues.confirmPassword,
+                },
+                ).unwrap();
+                toast.success((res as { message?: string }).message ?? 'Password updated successfully!');
+                resetForm();
+                dispatch(openModal({ componentName: 'SignIn', data: '' }));
+            } catch {
+                toast.error('Failed to reset password. Please try again.');
+            }
         },
     });
 
@@ -107,8 +122,8 @@ export default function ResetPassword() {
                         <Button
                             type="submit"
                             className="global_btn bg_primary w-full"
-                            disabled={isSubmitting}
-                            isLoading={isSubmitting}
+                            disabled={isSubmitting || isResetting}
+                            isLoading={isSubmitting || isResetting}
                         >
                             Update Password
                         </Button>

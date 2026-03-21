@@ -43,7 +43,7 @@ export const resetPasswordSchema = Yup.object({
 
 export const otpVerificationSchema = Yup.object({
   code: Yup.string()
-    .length(6, 'Enter the 6-digit code')
+    .length(4, 'Enter the 4-digit code')
     .matches(/^[0-9]+$/, 'Code must contain only numbers')
     .required('Verification code is required'),
 });

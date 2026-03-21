@@ -9,6 +9,8 @@ import { useFormik } from 'formik';
 import { signUpSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi';
+import toast from '@/utils/toast';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -20,6 +22,7 @@ export default function SignUp() {
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [profilePreview, setProfilePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation();
 
     const handleAvatarClick = () => fileInputRef.current?.click();
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,12 +48,27 @@ export default function SignUp() {
             confirmPassword: '',
         },
         validationSchema: signUpSchema,
-        onSubmit: (formValues, { resetForm }) => {
-            console.log('Sign up form submitted:', { ...formValues, profileImage: profileImage ?? undefined });
-            if (profilePreview) URL.revokeObjectURL(profilePreview);
-            setProfileImage(null);
-            setProfilePreview(null);
-            resetForm();
+        onSubmit: async (formValues, { resetForm }) => {
+            try {
+                const formData = new FormData();
+                formData.append('name', formValues.name);
+                formData.append('email', formValues.email);
+                formData.append('password', formValues.password);
+                formData.append('password_confirmation', formValues.confirmPassword);
+                if (profileImage) formData.append('profile_pic', profileImage);
+
+                const res = await userRegister(formData).unwrap();
+
+                if (profilePreview) URL.revokeObjectURL(profilePreview);
+                setProfileImage(null);
+                setProfilePreview(null);
+                resetForm();
+
+                toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.');
+                dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }));
+            } catch {
+                toast.error('Registration failed. Please try again.');
+            }
         },
     });
 
@@ -218,8 +236,8 @@ export default function SignUp() {
                         <Button
                             type="submit"
                             className="global_btn bg_primary w-full"
-                            disabled={isSubmitting}
-                            isLoading={isSubmitting}
+                            disabled={isSubmitting || isRegistering}
+                            isLoading={isSubmitting || isRegistering}
                         >
                             Sign Up
                         </Button>

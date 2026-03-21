@@ -9,6 +9,7 @@ import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
 import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { ISingleBookAPIResponse } from '@/types/user/singleBook';
+import { ISearchResultsAPIResponse } from '@/types/user/saech';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -97,6 +98,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        /** get search results */
+        getSearchResults: builder.query<ISearchResultsAPIResponse, string>({
+            query: (query) => ({
+                url: `/user/content/search`,
+                method: 'GET',
+                params: { query },
+            }),
+        }),
     }),
 });
 
@@ -112,4 +121,5 @@ export const {
     useGetReadingHistoryQuery,
     useGetTestimonialsQuery,
     useGetFAQQuery,
+    useGetSearchResultsQuery,
 } = clientSideGetApis;

@@ -2,30 +2,27 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import toast from '@/utils/toast';
-import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, BookMarked, LogOut, User } from 'lucide-react';
-import { useRouter } from 'nextjs-toploader/app';
+import { Menu, X, ShoppingCart, LogIn, BookMarked, LogOut, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { useGetCartQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
 import { openModal } from '@/store/slices/allModalSlice';
 import { VISIBLE } from '@/constants/contentMode';
 import Button from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getSearchRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import MobileSearchBar from './MobileSearchBar';
+import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { useAuth } from '@/hooks/useAuth';
 import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const router = useRouter();
   const pathName = usePathname();
   const dispatch = useAppDispatch();
 
@@ -61,15 +58,6 @@ export default function PrimaryHeader() {
     setIsUserMenuOpen(false);
     toast.success('Signed out successfully');
     window.location.href = getHomeRoutePath();
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(getSearchRoutePath(searchQuery));
-    } else {
-      toast.error('Please enter a search term');
-    }
   };
 
   const isActive = (path: string) => pathName === path;
@@ -173,7 +161,7 @@ export default function PrimaryHeader() {
             {/* Mobile Menu Toggle */}
             <div
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2"
+              className="lg:hidden p-2"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </div>
@@ -181,18 +169,7 @@ export default function PrimaryHeader() {
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="lg:hidden pb-4">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-2 rounded-full border-2 border-gray-200 focus:border-primary transition-colors"
-            />
-          </form>
-        </div>
+        <MobileSearchBar />
 
         {/* Navigation Bar */}
         <nav className="hidden md:flex items-center gap-8 border-t py-3">

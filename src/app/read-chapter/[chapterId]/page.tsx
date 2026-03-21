@@ -9,6 +9,7 @@ import MarkdownContent from '@/components/ui/MarkdownContent';
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
+import { getReadChapterRoutePath } from '@/routes/routes';
 
 export default function ReadChapterPage() {
   const params = useParams();
@@ -71,7 +72,7 @@ export default function ReadChapterPage() {
     const prev = bookChapters[currentIndex - 1];
     if (prev) {
       setScrollProgress(0);
-      router.push(`/read-chapter/${prev.id}`);
+      router.push(getReadChapterRoutePath(prev.id));
     }
   };
 
@@ -79,7 +80,7 @@ export default function ReadChapterPage() {
     const next = bookChapters[currentIndex + 1];
     if (next) {
       setScrollProgress(0);
-      router.push(`/read-chapter/${next.id}`);
+      router.push(getReadChapterRoutePath(next.id));
     }
   };
 
@@ -95,7 +96,7 @@ export default function ReadChapterPage() {
   const canGoNext = currentIndex < bookChapters.length - 1;
 
   if (isLoading || !chapterId) {
-    return <ReadChapterPageSkeleton />;
+    return <div className='fixed inset-0 bg-white z-50 flex items-center justify-center'><ReadChapterPageSkeleton /></div>;
   }
 
   if (!currentChapter) {

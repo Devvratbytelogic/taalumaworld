@@ -1,5 +1,12 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
+export interface ICheckOutCartPayload {
+  payment_method: 'Razorpay';
+  amount: number;
+  transaction_id: string;
+  payment_status: 'Paid';
+}
+
 export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         addChapterToCart: builder.mutation({
@@ -25,6 +32,14 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: (_, __, body) => [{ type: 'SingleChapter', id: body.chapter_id }],
         }),
+        checkOutCart: builder.mutation<void, ICheckOutCartPayload>({
+            query: (body) => ({
+                url: `/user/checkout`,
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['Cart'],
+        }),
     }),
 });
 
@@ -32,4 +47,5 @@ export const {
     useAddChapterToCartMutation,
     useRemoveCartItemMutation,
     useDirectPurchaseChapterMutation,
+    useCheckOutCartMutation,
 } = clientSidePostApis;

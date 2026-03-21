@@ -6,27 +6,14 @@ import { BookOpen, Search, Menu, X, ShoppingCart, LogIn, BookMarked, LogOut, Use
 import { useRouter } from 'nextjs-toploader/app';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectCartCount } from '@/store/slices/cartSlice';
 import { selectContentMode } from '@/store/slices/contentModeSlice';
+import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
-import {
-  getAboutUsRoutePath,
-  getAdminRoutePath,
-  getAuthorsRoutePath,
-  getBooksRoutePath,
-  getCartRoutePath,
-  getCategoriesRoutePath,
-  getContactUsRoutePath,
-  getHomeRoutePath,
-  getMyBooksRoutePath,
-  getMyChaptersRoutePath,
-  getSearchRoutePath,
-  getUserDashboardRoutePath,
-} from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getMyBooksRoutePath, getMyChaptersRoutePath, getSearchRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { openModal } from '@/store/slices/allModalSlice';
 import { signOut } from '@/store/slices/authSlice';
 import { clearAuthCookies } from '@/utils/authCookies';
@@ -34,7 +21,6 @@ import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -43,18 +29,12 @@ export default function PrimaryHeader() {
   const pathName = usePathname();
   const dispatch = useAppDispatch();
 
-  const cartCount = useAppSelector(selectCartCount);
   const contentMode = useAppSelector(selectContentMode);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+  const { data: cartData } = useGetCartQuery(undefined, { skip: !isAuthenticated });
+  const cartCount = cartData?.data?.[0]?.item_count ?? 0;
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Close user menu when clicking outside
   useEffect(() => {

@@ -80,7 +80,7 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
 
         userResetPassword: builder.mutation({
             query: ({ token, payload }) => ({
-                url: `/new-password`,
+                url: `/user/new-password`,
                 method: "POST",
                 body: payload,
                 headers: { Authorization: `Bearer ${token}` },

@@ -13,6 +13,7 @@ import { CategoryListing } from './CategoryListing';
 import { AddCategoryModal } from './AddCategoryModal';
 import { EditCategoryModal } from './EditCategoryModal';
 import { DeleteCategoryDialog } from './DeleteCategoryDialog';
+import AdminCategoriesSkeleton from '@/components/skeleton-loader/AdminCategoriesSkeleton';
 
 export function AdminCategoriesTab() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +21,7 @@ export function AdminCategoriesTab() {
   const [editingCategory, setEditingCategory] = useState<IAllCategoriesAPIResponseData | null>(null);
   const [deleteConfirmCategory, setDeleteConfirmCategory] = useState<IAllCategoriesAPIResponseData | null>(null);
 
-  const { data: categoriesResponse } = useGetAllCategoriesQuery();
+  const { data: categoriesResponse, isLoading, isFetching } = useGetAllCategoriesQuery();
   const [addCategory] = useAddCategoryMutation();
   const [updateCategory] = useUpdateCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
@@ -86,6 +87,9 @@ export function AdminCategoriesTab() {
         onSearchChange={setSearchQuery}
       />
 
+      {isLoading || isFetching ? (
+        <AdminCategoriesSkeleton />
+      ) : (
       <CategoryListing
         categories={filteredCategories}
         searchQuery={searchQuery}
@@ -93,6 +97,7 @@ export function AdminCategoriesTab() {
         onEdit={handleEditCategory}
         onDelete={handleDeleteCategory}
       />
+      )}
 
       <AddCategoryModal
         open={isCreateModalOpen}

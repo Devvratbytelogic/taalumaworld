@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { BookOpen, Book, Clock, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetAllBooksQuery, useGetAllChaptersQuery } from '@/store/rtkQueries/adminGetApi';
+import { useGetAllBooksQuery, useGetAllAdminChaptersQuery } from '@/store/rtkQueries/adminGetApi';
 import type { Book as BookType } from '@/types/content';
 import ImageComponent from '@/components/ui/ImageComponent';
 import DashboardHomeSkeleton from '@/components/skeleton-loader/DashboardHomeSkeleton';
@@ -74,7 +74,7 @@ export function DashboardHome() {
 
   const { data: books, isLoading: booksLoading } = useGetAllBooksQuery();
   const booksData = books?.data ?? [];
-  const { data: chapters, isLoading: chaptersLoading } = useGetAllChaptersQuery();
+  const { data: chapters, isLoading: chaptersLoading } = useGetAllAdminChaptersQuery();
   const chaptersData = chapters?.data ?? [];
 
   if (booksLoading || chaptersLoading) {

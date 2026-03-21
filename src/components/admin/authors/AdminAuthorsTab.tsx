@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { useGetAllAuthorLeadersQuery } from '@/store/rtkQueries/adminGetApi';
+import AdminAuthorsSkeleton from '@/components/skeleton-loader/AdminAuthorsSkeleton';
 import {
   useAddAuthorLeaderMutation,
   useUpdateAuthorLeaderMutation,
@@ -100,11 +100,9 @@ export function AdminAuthorsTab() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-80">
-        <div className="text-center">
-          <Loader2 className="h-10 w-10 text-primary animate-spin mx-auto mb-3" />
-          <p className="text-muted-foreground">Loading thought leaders...</p>
-        </div>
+      <div className="space-y-8">
+        <AdminAuthorsHeader onCreateAuthor={() => setIsCreateModalOpen(true)} />
+        <AdminAuthorsSkeleton />
       </div>
     );
   }

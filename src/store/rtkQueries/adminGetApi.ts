@@ -6,6 +6,7 @@ import { IAllChaptersAPIResponse } from '@/types/chapter';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
 import { IAllUsersAPIResponse } from '@/types/allUsers';
+import { IAllFaqsAPIResponse } from '@/types/faqs';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -37,7 +38,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Chapters */
-        getAllChapters: builder.query<IAllChaptersAPIResponse, void>({
+        getAllAdminChapters: builder.query<IAllChaptersAPIResponse, void>({
             query: () => ({
                 url: `/admin/chapters`,
                 method: 'GET',
@@ -62,7 +63,6 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminUsers'],
         }),
 
-
         /** testimonials */
         getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, void>({
             query: () => ({
@@ -71,6 +71,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminTestimonials'],
         }),
+
+        /** Faqs */
+        getAllFaqs: builder.query<IAllFaqsAPIResponse, void>({
+            query: () => ({
+                url: `/admin/faqs`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminFAQs'],
+        }),
     }),
 });
 
@@ -78,8 +87,9 @@ export const {
     useGetAllCategoriesQuery,
     useGetAllAuthorLeadersQuery,
     useGetAllBooksQuery,
-    useGetAllChaptersQuery,
+    useGetAllAdminChaptersQuery,
     useGetGlobalSettingsQuery,
     useGetAllUsersQuery,
     useGetAllTestimonialsQuery,
+    useGetAllFaqsQuery,
 } = clientSideGetApis;

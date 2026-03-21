@@ -14,6 +14,7 @@ import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
+import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
 
 const defaultValues = {
   platformName: '',
@@ -165,6 +166,10 @@ export function GeneralSettingsCard() {
     onBlur: handleBlur,
     className: `mt-2${errors[name] && touched[name] ? ' border-red-500' : ''}`,
   });
+
+  if (isLoading) {
+    return <AdminSettingsSkeleton />;
+  }
 
   return (
     <Card className="p-6 rounded-3xl">

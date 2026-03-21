@@ -151,6 +151,30 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminTestimonials'],
         }),
 
+        /** FAQs */
+        addFAQ: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/faqs`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminFAQs'],
+        }),
+        updateFAQ: builder.mutation({
+            query: ({ id, values }) => ({
+                url: `/admin/faqs/${id}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminFAQs'],
+        }),
+        deleteFAQ: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/faqs/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['AdminFAQs'],
+        }),
     }),
 });
 
@@ -186,4 +210,10 @@ export const {
     useAddTestimonialMutation,
     useUpdateTestimonialMutation,
     useDeleteTestimonialMutation,
+
+
+    // FAQs
+    useAddFAQMutation,
+    useUpdateFAQMutation,
+    useDeleteFAQMutation,
 } = adminPostApi;

@@ -23,7 +23,7 @@ import { useUpdateChapterMutation } from '@/store/rtkQueries/adminPostApi';
 import {
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
-  useGetAllChaptersQuery,
+  useGetAllAdminChaptersQuery,
 } from '@/store/rtkQueries/adminGetApi';
 import type { Book, Author } from '@/types/content';
 import type { IAllChaptersAPIResponseData } from '@/types/chapter';
@@ -67,7 +67,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
   const { data: booksResponse } = useGetAllBooksQuery();
   const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
-  const { data: chaptersResponse } = useGetAllChaptersQuery();
+  const { data: chaptersResponse } = useGetAllAdminChaptersQuery();
   const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
 
   const chapter = useMemo(() => {

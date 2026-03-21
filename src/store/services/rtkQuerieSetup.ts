@@ -106,7 +106,8 @@ export const rtkQuerieSetup = createApi({
         'MyChapters',
         'ReadingHistory',
         'AdminUsers',
-        'AdminTestimonials'
+        'AdminTestimonials',
+        'AdminFAQs'
     ],
     endpoints: () => ({}),
 });

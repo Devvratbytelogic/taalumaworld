@@ -10,6 +10,7 @@ import { AddBookModal } from './AddBookModal';
 import { EditBookModal } from './EditBookModal';
 import { DeleteBookDialog } from './DeleteBookDialog';
 import { IAllBooksAPIResponseDataEntity } from '@/types/books';
+import AdminBooksSkeleton from '@/components/skeleton-loader/AdminBooksSkeleton';
 
 export function AdminBooksTab() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,7 +18,7 @@ export function AdminBooksTab() {
   const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
   const [deleteConfirmBook, setDeleteConfirmBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
 
-  const { data: booksResponse } = useGetAllBooksQuery();
+  const { data: booksResponse, isLoading: isBooksLoading, isFetching: isBooksFetching } = useGetAllBooksQuery();
   const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
   const { data: categoriesResponse } = useGetAllCategoriesQuery();
   const books = booksResponse?.data ?? [];
@@ -66,14 +67,18 @@ export function AdminBooksTab() {
         onSearchChange={setSearchQuery}
       />
 
-      <BookListing
-        books={filteredBooks}
-        searchQuery={searchQuery}
-        onCreateBook={() => setIsCreateModalOpen(true)}
-        onPreview={openPreview}
-        onEdit={handleEditBook}
-        onDelete={handleDeleteBook}
-      />
+      {isBooksLoading || isBooksFetching ? (
+        <AdminBooksSkeleton />
+      ) : (
+        <BookListing
+          books={filteredBooks}
+          searchQuery={searchQuery}
+          onCreateBook={() => setIsCreateModalOpen(true)}
+          onPreview={openPreview}
+          onEdit={handleEditBook}
+          onDelete={handleDeleteBook}
+        />
+      )}
 
       <AddBookModal
         open={isCreateModalOpen}

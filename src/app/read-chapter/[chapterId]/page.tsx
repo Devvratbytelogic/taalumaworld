@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { useGetAllChaptersQuery, useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
 import type { IChapterItem } from '@/types/user/HomeAllChapters';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import PdfViewer from '@/components/ui/PdfViewer';
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
@@ -64,6 +65,8 @@ export default function ReadChapterPage() {
   }, [allChaptersResponse, currentChapter]);
 
   const currentIndex = bookChapters.findIndex((c) => c.id === chapterId);
+
+  const hasPdf = !!currentChapter?.pdf;
 
   const [showControls, setShowControls] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -199,10 +202,14 @@ export default function ReadChapterPage() {
           </div>
 
           {/* Chapter Content */}
-          <MarkdownContent
-            content={currentChapter.content}
-            emptyMessage="No content available for this chapter."
-          />
+          {hasPdf ? (
+            <PdfViewer url={currentChapter.pdf!} title={currentChapter.title} />
+          ) : (
+            <MarkdownContent
+              content={currentChapter.content}
+              emptyMessage="No content available for this chapter."
+            />
+          )}
 
           {/* End of Chapter */}
           {canGoNext && (

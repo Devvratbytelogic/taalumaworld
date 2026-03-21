@@ -15,7 +15,7 @@ export interface ISingleChapterAPIResponse {
     description: string;
     pageCount: number;
     content: string;
-    pdf?: null;
+    pdf?: string | null;
     price: number;
     isFree: boolean;
     coverImage: string;

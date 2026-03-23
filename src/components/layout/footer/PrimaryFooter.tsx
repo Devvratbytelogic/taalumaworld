@@ -5,22 +5,11 @@ import { selectContentMode } from '@/store/slices/contentModeSlice';
 import { openModal } from '@/store/slices/allModalSlice';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link'
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
+import { FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon, PinterestIcon, WhatsAppIcon } from '@/components/ui/AllSVG';
 import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
-import {
-  getAboutUsRoutePath,
-  getAdminRoutePath,
-  getAuthorsRoutePath,
-  getBooksRoutePath,
-  getCategoriesRoutePath,
-  getContactUsRoutePath,
-  getDesignSystemRoutePath,
-  getFAQRoutePath,
-  getHomeRoutePath,
-  getPrivacyPolicyRoutePath,
-  getTermsOfServiceRoutePath,
-} from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
 import ImageComponent from '@/components/ui/ImageComponent';
 
@@ -29,7 +18,8 @@ export default function PrimaryFooter() {
     const dispatch = useAppDispatch();
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
-
+    console.log('isAuthenticated', isAuthenticated);
+    
     const { data: globalSettings } = useGetGlobalSettingsQuery();
     const settings = globalSettings?.data;
 
@@ -41,13 +31,18 @@ export default function PrimaryFooter() {
     const copyRight = settings?.copy_right_text || '';
     const logo = settings?.logo as string | null | undefined;
 
+
     const socialLinks = [
-        { href: settings?.facebook_link, icon: Facebook, label: 'Facebook' },
-        { href: settings?.x_link, icon: Twitter, label: 'X / Twitter' },
-        { href: settings?.instagram_link, icon: Instagram, label: 'Instagram' },
-        { href: settings?.youtube_link, icon: Youtube, label: 'YouTube' },
-        { href: settings?.linkdin_link, icon: Linkedin, label: 'LinkedIn' },
+        { href: settings?.facebook_link, icon: FacebookIcon, label: 'Facebook' },
+        { href: settings?.x_link, icon: TwitterIcon, label: 'X / Twitter' },
+        { href: settings?.instagram_link, icon: InstagramIcon, label: 'Instagram' },
+        { href: settings?.youtube_link, icon: YoutubeIcon, label: 'YouTube' },
+        { href: settings?.linkdin_link, icon: LinkedinIcon, label: 'LinkedIn' },
+        { href: settings?.pinterest_link, icon: PinterestIcon, label: 'Pinterest' },
+        { href: settings?.whatsapp_link, icon: WhatsAppIcon, label: 'WhatsApp' },
     ].filter((s) => !!s.href);
+
+    console.log('settings', settings);
 
     return (
         <>
@@ -96,7 +91,7 @@ export default function PrimaryFooter() {
                                         Home
                                     </Link>
                                 </li>
-                                {contentMode === 'books' && (
+                                {/* {contentMode === 'books' ? (
                                     <>
                                         <li>
                                             <Link href={getBooksRoutePath()} className="hover:text-primary transition-colors">
@@ -114,14 +109,13 @@ export default function PrimaryFooter() {
                                             </Link>
                                         </li>
                                     </>
-                                )}
-                            </ul>
-                        </div>
-
-                        {/* Company */}
-                        <div>
-                            <h4 className="text-white font-semibold mb-4">Company</h4>
-                            <ul className="space-y-2 text-sm">
+                                ) : (
+                                    <li>
+                                        <Link href={getAuthorsRoutePath()} className="hover:text-primary transition-colors">
+                                            Thought Leaders
+                                        </Link>
+                                    </li>
+                                )} */}
                                 <li>
                                     <Link href={getAboutUsRoutePath()} className="hover:text-primary transition-colors">
                                         About Us
@@ -132,6 +126,13 @@ export default function PrimaryFooter() {
                                         Contact Us
                                     </Link>
                                 </li>
+                            </ul>
+                        </div>
+
+                        {/* Legal & Account */}
+                        <div>
+                            <h4 className="text-white font-semibold mb-4">Legal & Support</h4>
+                            <ul className="space-y-2 text-sm">
                                 <li>
                                     <Link href={getFAQRoutePath()} className="hover:text-primary transition-colors">
                                         FAQs
@@ -147,24 +148,28 @@ export default function PrimaryFooter() {
                                         Terms of Service
                                     </Link>
                                 </li>
-                                <li>
+                                <li className="pt-2">
                                     {isAuthenticated && isAdmin ? (
-                                        <Link href={getAdminRoutePath()} className="hover:text-primary transition-colors">
+                                        <Link
+                                            href={getAdminRoutePath()}
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-primary hover:bg-primary hover:text-white transition-colors text-xs font-medium"
+                                        >
+                                            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                            </svg>
                                             Admin Panel
                                         </Link>
                                     ) : (
                                         <button
                                             onClick={() => dispatch(openModal({ componentName: 'SignIn', data: { isAdmin: true } }))}
-                                            className="hover:text-primary transition-colors"
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 border border-gray-700 text-gray-400 hover:border-primary/50 hover:text-primary transition-colors text-xs font-medium"
                                         >
-                                            Admin Panel
+                                            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                            Admin Login
                                         </button>
                                     )}
-                                </li>
-                                <li>
-                                    <Link href={getDesignSystemRoutePath()} className="hover:text-primary transition-colors">
-                                        Design System
-                                    </Link>
                                 </li>
                             </ul>
                         </div>
@@ -219,7 +224,7 @@ export default function PrimaryFooter() {
                                         <span className="text-white">{brandName}</span>
                                     </p>
                                 )}
-                                <p className="text-xs text-gray-400">Designed and developed by Bytelogic Technologies</p>
+                                <p className="text-xs text-gray-400">Designed and developed by <Link href="https://bytelogicindia.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Bytelogic Technologies</Link></p>
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
                                 <Link href={getPrivacyPolicyRoutePath()} className="hover:text-primary transition-colors">

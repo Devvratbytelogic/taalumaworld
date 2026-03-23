@@ -28,6 +28,8 @@ export default function PrimaryHeader() {
 
   const { data: globalSettings } = useGetGlobalSettingsQuery();
   const contentMode = globalSettings?.data?.visible;
+  const logo = globalSettings?.data?.logo as string | null | undefined;
+  const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
 
   const { isAuthenticated, user } = useAuth();
   const isAdmin = user?.role?.toLowerCase() === 'admin';
@@ -75,13 +77,15 @@ export default function PrimaryHeader() {
         <div className="flex items-center justify-between py-4 gap-4">
           {/* Logo */}
           <Link href={getHomeRoutePath()} className="flex items-center gap-2 shrink-0">
-            <div className="w-50">
-              <ImageComponent
-                src={'/images/logo.png'}
-                alt={'Taaluma'}
-                object_cover={false}
-              />
-            </div>
+            {logo ? (
+              <div className="h-10 w-[160px]">
+                <ImageComponent src={logo} alt={brandName} object_cover={false} />
+              </div>
+            ) : (
+              <div className="h-10 w-[160px]">
+                <ImageComponent src={'/images/logo.png'} alt={brandName} object_cover={false} />
+              </div>
+            )}
           </Link>
 
           {/* Center Search Bar */}

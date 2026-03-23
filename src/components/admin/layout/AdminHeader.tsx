@@ -13,6 +13,7 @@ import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import type { AdminRole } from '@/types/admin';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 export function AdminHeader() {
     const router = useRouter();
@@ -21,6 +22,8 @@ export function AdminHeader() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const visible = globalSettings?.data?.visible ?? 'chapter';
+    const logo = globalSettings?.data?.logo as string | null | undefined;
+    const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
 
     const userDisplay = getUserDisplayData();
     const adminUser = {
@@ -55,7 +58,7 @@ export function AdminHeader() {
             {/* ── Top Bar ─────────────────────────────────────────── */}
             <div className="bg-primary text-white">
                 <div className="container mx-auto px-4 h-10 flex items-center justify-between text-sm">
-                    <span className="font-medium hidden sm:block">Admin Panel - Taaluma.world</span>
+                    <span className="font-medium hidden sm:block">Admin Panel - {brandName}</span>
                     <span className="font-medium sm:hidden">Admin</span>
 
                     <div className="flex items-center gap-2">
@@ -92,15 +95,21 @@ export function AdminHeader() {
                             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                         </Button>
                         <Link href="/admin/dashboard" className="flex items-center gap-2 shrink-0">
-                            <div className="bg-primary rounded-xl p-2">
-                                <BookOpen className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-lg font-bold leading-none">
-                                    Taaluma<span className="text-primary">World</span>
-                                </p>
-                                <p className="text-xs text-muted-foreground hidden sm:block">Admin Panel</p>
-                            </div>
+                            {logo ? (
+                                <div className="h-10 w-[160px]">
+                                    <ImageComponent src={logo} alt={brandName} object_cover={false} />
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="bg-primary rounded-xl p-2">
+                                        <BookOpen className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-bold leading-none">{brandName}</p>
+                                        <p className="text-xs text-muted-foreground hidden sm:block">Admin Panel</p>
+                                    </div>
+                                </>
+                            )}
                         </Link>
                     </div>
 

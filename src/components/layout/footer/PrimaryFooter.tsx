@@ -5,7 +5,7 @@ import { selectContentMode } from '@/store/slices/contentModeSlice';
 import { openModal } from '@/store/slices/allModalSlice';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link'
-import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
 import {
@@ -21,13 +21,33 @@ import {
   getPrivacyPolicyRoutePath,
   getTermsOfServiceRoutePath,
 } from '@/routes/routes';
+import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
-    const currentYear = new Date().getFullYear();
     const dispatch = useAppDispatch();
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
+
+    const { data: globalSettings } = useGetGlobalSettingsQuery();
+    const settings = globalSettings?.data;
+
+    const brandName = settings?.marketplace_name || settings?.platformName || 'TaalumaWorld';
+    const description = settings?.platformDescription || settings?.meta_description || '';
+    const email = settings?.supportEmail || settings?.email || '';
+    const phone = settings?.phone || '';
+    const address = settings?.address || '';
+    const copyRight = settings?.copy_right_text || '';
+    const logo = settings?.logo as string | null | undefined;
+
+    const socialLinks = [
+        { href: settings?.facebook_link, icon: Facebook, label: 'Facebook' },
+        { href: settings?.x_link, icon: Twitter, label: 'X / Twitter' },
+        { href: settings?.instagram_link, icon: Instagram, label: 'Instagram' },
+        { href: settings?.youtube_link, icon: Youtube, label: 'YouTube' },
+        { href: settings?.linkdin_link, icon: Linkedin, label: 'LinkedIn' },
+    ].filter((s) => !!s.href);
 
     return (
         <>
@@ -38,27 +58,33 @@ export default function PrimaryFooter() {
                         {/* About Section */}
                         <div>
                             <div className="mb-4">
-                                <h3 className="text-white font-bold text-lg">
-                                    Taaluma<span className="text-primary">World</span>
-                                </h3>
+                                {logo ? (
+                                    <div className="h-10 w-[160px]">
+                                        <ImageComponent src={logo} alt={brandName} object_cover={false} />
+                                    </div>
+                                ) : (
+                                    <h3 className="text-white font-bold text-lg">{brandName}</h3>
+                                )}
                             </div>
-                            <p className="text-sm mb-4">
-                                Empowering college graduates and young professionals with career-focused insights from thought leaders worldwide. Access curated knowledge to accelerate your professional journey.
-                            </p>
-                            <div className="flex gap-3">
-                                <button className="bg-gray-800 p-2 rounded-lg hover:bg-primary transition-colors">
-                                    <Facebook className="h-5 w-5" />
-                                </button>
-                                <button className="bg-gray-800 p-2 rounded-lg hover:bg-primary transition-colors">
-                                    <Twitter className="h-5 w-5" />
-                                </button>
-                                <button className="bg-gray-800 p-2 rounded-lg hover:bg-primary transition-colors">
-                                    <Instagram className="h-5 w-5" />
-                                </button>
-                                <button className="bg-gray-800 p-2 rounded-lg hover:bg-primary transition-colors">
-                                    <Youtube className="h-5 w-5" />
-                                </button>
-                            </div>
+                            {description && (
+                                <p className="text-sm text-white mb-4">{description}</p>
+                            )}
+                            {socialLinks.length > 0 && (
+                                <div className="flex gap-3 flex-wrap">
+                                    {socialLinks.map(({ href, icon: Icon, label }) => (
+                                        <a
+                                            key={label}
+                                            href={href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label={label}
+                                            className="bg-gray-800 p-2 rounded-lg hover:bg-primary transition-colors"
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Quick Links */}
@@ -147,18 +173,24 @@ export default function PrimaryFooter() {
                         <div>
                             <h4 className="text-white font-semibold mb-4">Stay Connected</h4>
                             <ul className="space-y-3 text-sm mb-4">
-                                <li className="flex items-start gap-2">
-                                    <Mail className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                                    <span>support@taaluma.world</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Phone className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                                    <span>+1 (555) 123-4567</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                                    <span>123 Book Street, Reading City, RC 12345</span>
-                                </li>
+                                {email && (
+                                    <li className="flex items-start gap-2">
+                                        <Mail className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                                        <a href={`mailto:${email}`} className="hover:text-primary transition-colors">{email}</a>
+                                    </li>
+                                )}
+                                {phone && (
+                                    <li className="flex items-start gap-2">
+                                        <Phone className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                                        <a href={`tel:${phone}`} className="hover:text-primary transition-colors">{phone}</a>
+                                    </li>
+                                )}
+                                {address && (
+                                    <li className="flex items-start gap-2">
+                                        <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                                        <span>{address}</span>
+                                    </li>
+                                )}
                             </ul>
                             <div className="space-y-2">
                                 <p className="text-sm font-medium text-white">Subscribe to our newsletter</p>
@@ -179,12 +211,14 @@ export default function PrimaryFooter() {
                     <div className="container mx-auto px-4 py-6">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
                             <div className="text-center md:text-left">
-                                <p className="mb-1">
-                                    © All rights reserved by{' '}
-                                    <span className="text-white">
-                                        Taaluma<span className="text-primary">World</span>
-                                    </span>
-                                </p>
+                                {copyRight ? (
+                                    <p className="mb-1">{copyRight}</p>
+                                ) : (
+                                    <p className="mb-1">
+                                        © All rights reserved by{' '}
+                                        <span className="text-white">{brandName}</span>
+                                    </p>
+                                )}
                                 <p className="text-xs text-gray-400">Designed and developed by Bytelogic Technologies</p>
                             </div>
                             <div className="flex flex-wrap items-center gap-4">

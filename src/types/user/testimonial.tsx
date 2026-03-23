@@ -34,6 +34,7 @@ export interface IFAQAPIResponseDataEntity {
     _id: string;
     question: string;
     answer: string;
+    type: 'payment' | 'reading' | 'account';
     createdAt: string;
     updatedAt: string;
     id: number;

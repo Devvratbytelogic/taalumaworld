@@ -124,10 +124,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
         }),
         /** get FAQs */
-        getFAQ: builder.query<IFAQAPIResponse, void>({
-            query: () => ({
+        getFAQ: builder.query<IFAQAPIResponse, { type?: string } | void>({
+            query: (params) => ({
                 url: `/user/faqs`,
                 method: 'GET',
+                params: params && (params as { type?: string }).type
+                    ? { type: (params as { type?: string }).type }
+                    : undefined,
             }),
         }),
         /** get search results */

@@ -52,7 +52,7 @@ export function AdminBooksSearch({ searchQuery, onSearchChange }: AdminBooksSear
             className="hidden"
             id="ppt-upload"
           />
-          <label htmlFor="ppt-upload">
+          {/* <label htmlFor="ppt-upload">
             <Button
               className="global_btn rounded_full outline_primary"
               disabled={isUploadingPPT}
@@ -60,7 +60,7 @@ export function AdminBooksSearch({ searchQuery, onSearchChange }: AdminBooksSear
             >
               {isUploadingPPT ? 'Uploading...' : 'Upload PowerPoint'}
             </Button>
-          </label>
+          </label> */}
         </div>
       </div>
     </div>

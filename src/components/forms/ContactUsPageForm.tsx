@@ -6,9 +6,11 @@ import { contactFormSchema } from '@/utils/formValidation';
 import { Send } from 'lucide-react';
 import { Input } from '../ui/input';
 import Button from '../ui/Button';
+import { usePostContactUsMutation } from '@/store/rtkQueries/userPostAPI';
 
 export default function ContactUsPageForm() {
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [postContactUs, { isLoading }] = usePostContactUsMutation();
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -17,14 +19,23 @@ export default function ContactUsPageForm() {
             message: ''
         },
         validationSchema: contactFormSchema,
-        onSubmit: (values, { resetForm }) => {
-            console.log('Contact form submitted:', values);
-            setIsSubmitted(true);
-            toast.success('Message sent successfully!');
-            setTimeout(() => {
-                setIsSubmitted(false);
-                resetForm();
-            }, 3000);
+        onSubmit: async (values, { resetForm }) => {
+            try {
+                await postContactUs({
+                    name: values.name,
+                    email: values.email,
+                    subject: values.subject,
+                    message: values.message,
+                }).unwrap();
+                setIsSubmitted(true);
+                toast.success('Message sent successfully!');
+                setTimeout(() => {
+                    setIsSubmitted(false);
+                    resetForm();
+                }, 3000);
+            } catch {
+                toast.error('Failed to send message. Please try again.');
+            }
         },
     });
     return (
@@ -125,9 +136,9 @@ export default function ContactUsPageForm() {
                     <Button
                         type="submit"
                         className='global_btn rounded_full bg_primary w-full'
-                        disabled={formik.isSubmitting}
+                        disabled={formik.isSubmitting || isLoading}
                     >
-                        Send Message
+                        {isLoading ? 'Sending...' : 'Send Message'}
                     </Button>
                 </form>
             )}

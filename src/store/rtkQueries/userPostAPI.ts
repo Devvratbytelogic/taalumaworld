@@ -42,6 +42,20 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['ReadingHistory', 'MyChapters'],
         }),
+        postContactUs: builder.mutation({
+            query: (body) => ({
+                url: `/user/post-contact-us`,
+                method: 'POST',
+                body,
+            }),
+        }),
+        subscribeToNewsletter: builder.mutation({
+            query: (body) => ({
+                url: `/user/post-subscribers`,
+                method: 'POST',
+                body,
+            }),
+        }),
     }),
 });
 
@@ -51,4 +65,6 @@ export const {
     useDirectPurchaseChapterMutation,
     useCheckOutCartMutation,
     useUpdateReadingProgressMutation,
+    usePostContactUsMutation,
+    useSubscribeToNewsletterMutation,
 } = clientSidePostApis;

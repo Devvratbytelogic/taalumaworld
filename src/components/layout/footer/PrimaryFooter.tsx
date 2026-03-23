@@ -1,5 +1,5 @@
 'use client';
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { selectContentMode } from '@/store/slices/contentModeSlice';
 import { openModal } from '@/store/slices/allModalSlice';
@@ -11,13 +11,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
 import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
+import { useSubscribeToNewsletterMutation } from '@/store/rtkQueries/userPostAPI';
 import ImageComponent from '@/components/ui/ImageComponent';
+import toast from '@/utils/toast';
 
 export default function PrimaryFooter() {
     const contentMode = useAppSelector(selectContentMode);
     const dispatch = useAppDispatch();
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
+    const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [subscribeToNewsletter, { isLoading: isSubscribing }] = useSubscribeToNewsletterMutation();
     
     const { data: globalSettings } = useGetGlobalSettingsQuery();
     const settings = globalSettings?.data;
@@ -200,9 +204,26 @@ export default function PrimaryFooter() {
                                 <div className="flex gap-2">
                                     <Input
                                         placeholder="Your email"
+                                        type="email"
+                                        value={newsletterEmail}
+                                        onChange={(e) => setNewsletterEmail(e.target.value)}
                                         className="bg-gray-800 h-auto border-gray-700 text-white placeholder:text-gray-500"
                                     />
-                                    <Button className='global_btn rounded_full bg_primary'>Subscribe</Button>
+                                    <Button
+                                        className='global_btn rounded_full bg_primary'
+                                        disabled={isSubscribing || !newsletterEmail}
+                                        onPress={async () => {
+                                            try {
+                                                await subscribeToNewsletter({ email: newsletterEmail }).unwrap();
+                                                toast.success('Subscribed successfully!');
+                                                setNewsletterEmail('');
+                                            } catch {
+                                                toast.error('Failed to subscribe. Please try again.');
+                                            }
+                                        }}
+                                    >
+                                        {isSubscribing ? 'Subscribing...' : 'Subscribe'}
+                                    </Button>
                                 </div>
                             </div>
                         </div>

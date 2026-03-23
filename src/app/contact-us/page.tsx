@@ -1,11 +1,43 @@
+'use client'
 import React from 'react'
 import ContactUsPageForm from '@/components/forms/ContactUsPageForm'
-import { Clock, HelpCircle, Mail, MessageSquare } from 'lucide-react'
+import { Clock, HelpCircle, Mail, Phone, MapPin } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import NormalBanner from '@/components/banners/NormalBanner'
 import { contactUsBannerData } from '@/data/data'
+import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI'
+import { getFAQRoutePath } from '@/routes/routes'
+import {
+    FacebookIcon,
+    TwitterIcon,
+    InstagramIcon,
+    YoutubeIcon,
+    LinkedinIcon,
+    PinterestIcon,
+    WhatsAppIcon,
+} from '@/components/ui/AllSVG'
+import Link from 'next/link'
 
 export default function ContactUsPage() {
+    const { data: globalSettings } = useGetGlobalSettingsQuery();
+    const gs = globalSettings?.data;
+
+    const supportEmail = gs?.supportEmail || gs?.email;
+    const phone = gs?.phone;
+    const altPhone = gs?.alt_phone;
+    const address = gs?.address;
+    const platformName = gs?.platformName || gs?.marketplace_name;
+
+    const socialLinks = [
+        { href: gs?.facebook_link, label: 'Facebook', Icon: FacebookIcon, colorClass: 'text-primary', bgClass: 'bg-primary/10' },
+        { href: gs?.x_link, label: 'Twitter / X', Icon: TwitterIcon, colorClass: 'text-secondary-accent', bgClass: 'bg-secondary-accent/10' },
+        { href: gs?.instagram_link, label: 'Instagram', Icon: InstagramIcon, colorClass: 'text-pink-500', bgClass: 'bg-pink-500/10' },
+        { href: gs?.youtube_link, label: 'YouTube', Icon: YoutubeIcon, colorClass: 'text-red-500', bgClass: 'bg-red-500/10' },
+        { href: gs?.linkdin_link, label: 'LinkedIn', Icon: LinkedinIcon, colorClass: 'text-blue-600', bgClass: 'bg-blue-600/10' },
+        { href: gs?.pinterest_link, label: 'Pinterest', Icon: PinterestIcon, colorClass: 'text-red-600', bgClass: 'bg-red-600/10' },
+        { href: gs?.whatsapp_link, label: 'WhatsApp', Icon: WhatsAppIcon, colorClass: 'text-success', bgClass: 'bg-success/10' },
+    ].filter(({ href }) => !!href);
+
     return (
         <>
             {/* Contact Us Banner */}
@@ -26,12 +58,14 @@ export default function ContactUsPage() {
                             <p className="text-sm text-muted-foreground mb-3">
                                 Send us an email anytime
                             </p>
-                            <a
-                                href="mailto:support@taaluma.world"
-                                className="text-primary hover:text-primary-dark font-medium text-sm"
-                            >
-                                support@taaluma.world
-                            </a>
+                            {supportEmail && (
+                                <a
+                                    href={`mailto:${supportEmail}`}
+                                    className="text-primary hover:text-primary-dark font-medium text-sm break-all"
+                                >
+                                    {supportEmail}
+                                </a>
+                            )}
                         </div>
 
                         {/* Response Time Card */}
@@ -55,12 +89,12 @@ export default function ContactUsPage() {
                             <p className="text-sm text-muted-foreground mb-3">
                                 Find quick answers
                             </p>
-                            <a
-                                href="#"
+                            <Link
+                                href={getFAQRoutePath()}
                                 className="text-primary hover:text-primary-dark font-medium text-sm"
                             >
                                 Browse FAQs
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -70,10 +104,9 @@ export default function ContactUsPage() {
                             <div className="text-center mb-8">
                                 <h2 className="text-2xl md:text-3xl font-bold mb-3">Send Us a Message</h2>
                                 <p className="text-muted-foreground">
-                                    Fill out the form below and we'll get back to you as soon as possible
+                                    Fill out the form below and we&apos;ll get back to you as soon as possible
                                 </p>
                             </div>
-
                             <ContactUsPageForm />
                         </div>
                     </div>
@@ -92,91 +125,89 @@ export default function ContactUsPage() {
 
                     <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                         {/* Social Media Card */}
-                        <div className="bg-white rounded-3xl p-8 shadow-sm">
-                            <h3 className="text-xl font-semibold mb-4">Connect on Social Media</h3>
-                            <p className="text-muted-foreground mb-6">
-                                Follow us for updates, reading tips, and community highlights
-                            </p>
-                            <div className="space-y-3">
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-3 p-3 rounded-full bg-accent/50 hover:bg-accent transition-colors"
-                                >
-                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <span className="text-primary font-semibold">f</span>
-                                    </div>
-                                    <span className="font-medium">Facebook</span>
-                                </a>
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-3 p-3 rounded-full bg-accent/50 hover:bg-accent transition-colors"
-                                >
-                                    <div className="w-10 h-10 rounded-full bg-secondary-accent/10 flex items-center justify-center">
-                                        <span className="text-secondary-accent font-semibold">𝕏</span>
-                                    </div>
-                                    <span className="font-medium">Twitter / X</span>
-                                </a>
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-3 p-3 rounded-full bg-accent/50 hover:bg-accent transition-colors"
-                                >
-                                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
-                                        <span className="text-success font-semibold">in</span>
-                                    </div>
-                                    <span className="font-medium">Instagram</span>
-                                </a>
+                        {socialLinks.length > 0 && (
+                            <div className="bg-white rounded-3xl p-8 shadow-sm">
+                                <h3 className="text-xl font-semibold mb-4">Connect on Social Media</h3>
+                                <p className="text-muted-foreground mb-6">
+                                    Follow {platformName ? `${platformName}` : 'us'} for updates, reading tips, and community highlights
+                                </p>
+                                <div className="space-y-3">
+                                    {socialLinks.map(({ href, label, Icon, colorClass, bgClass }) => (
+                                        <a
+                                            key={label}
+                                            href={href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-3 p-3 rounded-full bg-accent/50 hover:bg-accent transition-colors"
+                                        >
+                                            <div className={`w-10 h-10 rounded-full ${bgClass} flex items-center justify-center`}>
+                                                <Icon className={`h-5 w-5 ${colorClass}`} />
+                                            </div>
+                                            <span className="font-medium">{label}</span>
+                                        </a>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Business Inquiries Card */}
+                        {/* Contact Details Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm">
-                            <h3 className="text-xl font-semibold mb-4">Business Inquiries</h3>
+                            <h3 className="text-xl font-semibold mb-4">Contact Details</h3>
                             <p className="text-muted-foreground mb-6">
-                                For partnerships, press, or author onboarding
+                                Reach out to us directly through any of the channels below
                             </p>
                             <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                                        <Mail className="w-5 h-5 text-primary" />
+                                {supportEmail && (
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1">
+                                            <Mail className="w-5 h-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium mb-1">Email</p>
+                                            <a
+                                                href={`mailto:${supportEmail}`}
+                                                className="text-sm text-primary hover:text-primary-dark break-all"
+                                            >
+                                                {supportEmail}
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-medium mb-1">Partnerships</p>
-                                        <a
-                                            href="mailto:partners@taaluma.world"
-                                            className="text-sm text-primary hover:text-primary-dark"
-                                        >
-                                            partners@taaluma.world
-                                        </a>
+                                )}
+                                {phone && (
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-secondary-accent/10 flex items-center justify-center shrink-0 mt-1">
+                                            <Phone className="w-5 h-5 text-secondary-accent" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium mb-1">Phone</p>
+                                            <a
+                                                href={`tel:${phone}`}
+                                                className="text-sm text-primary hover:text-primary-dark"
+                                            >
+                                                {phone}
+                                            </a>
+                                            {altPhone && (
+                                                <a
+                                                    href={`tel:${altPhone}`}
+                                                    className="block text-sm text-primary hover:text-primary-dark mt-0.5"
+                                                >
+                                                    {altPhone}
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-secondary-accent/10 flex items-center justify-center shrink-0 mt-1">
-                                        <Mail className="w-5 h-5 text-secondary-accent" />
+                                )}
+                                {address && (
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0 mt-1">
+                                            <MapPin className="w-5 h-5 text-success" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium mb-1">Address</p>
+                                            <p className="text-sm text-muted-foreground">{address}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-medium mb-1">Press & Media</p>
-                                        <a
-                                            href="mailto:press@taaluma.world"
-                                            className="text-sm text-primary hover:text-primary-dark"
-                                        >
-                                            press@taaluma.world
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0 mt-1">
-                                        <Mail className="w-5 h-5 text-success" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium mb-1">Authors</p>
-                                        <a
-                                            href="mailto:authors@taaluma.world"
-                                            className="text-sm text-primary hover:text-primary-dark"
-                                        >
-                                            authors@taaluma.world
-                                        </a>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -191,9 +222,11 @@ export default function ContactUsPage() {
                         <p className="text-lg text-muted-foreground mb-8">
                             Check out our FAQ section for commonly asked questions
                         </p>
-                        <Button className='global_btn rounded_full outline_primary hover-lift'>
-                            Visit FAQ Page
-                        </Button>
+                        <Link href={getFAQRoutePath()}>
+                            <Button className='global_btn rounded_full outline_primary hover-lift'>
+                                Visit FAQ Page
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </section>

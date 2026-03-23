@@ -130,7 +130,7 @@ export default function PrimaryHeader() {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                     <div className="py-1">
                       {isAdmin ? (
-                        <Link href={getAdminRoutePath()} className="block px-4 py-2 text-sm hover:bg-gray-100">
+                        <Link href={getAdminRoutePath()} className="block px-4 py-2 hover:bg-gray-100">
                           <User className="h-5 w-5 mr-2 inline-block" />
                           Admin Panel
                         </Link>
@@ -266,7 +266,7 @@ export default function PrimaryHeader() {
                           userPhoto={user?.photo ?? undefined}
                           size="sm"
                         />
-                        <span className="font-medium">{isAdmin ? 'Admin Panel' : (user?.fullName || 'My Account')}</span>
+                        <span className="text-base">{isAdmin ? 'Admin Panel' : (user?.fullName || 'My Account')}</span>
                       </button>
                     </Link>
                     <Button

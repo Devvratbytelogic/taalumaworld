@@ -4,12 +4,13 @@ import CommonCard from '@/components/cards/CommonCard';
 import FilterOptions from './FilterOptions';
 import { useGetAllChaptersQuery } from '@/store/rtkQueries/userGetAPI';
 import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryContentSectionSkeleton';
+import NoDataFound from '@/components/ui/NoDataFound';
 import { useSearchParams } from 'next/navigation';
 
 export default function LibraryContentSection() {
     const searchParams = useSearchParams();
 
-    const { data, isLoading } = useGetAllChaptersQuery({
+    const { data, isLoading, isFetching } = useGetAllChaptersQuery({
         categoryId: searchParams.get('categoryId') ?? undefined,
         thoughtLeaderId: searchParams.get('thoughtLeaderId') ?? undefined,
         tags: searchParams.get('tags') ?? undefined,
@@ -19,7 +20,7 @@ export default function LibraryContentSection() {
     const total = data?.data?.total ?? 0;
     const viewMode = data?.data?.viewMode;
 
-    if (isLoading) {
+    if (isLoading || isFetching) {
         return <LibraryContentSectionSkeleton />;
     }
 
@@ -31,10 +32,14 @@ export default function LibraryContentSection() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {
-                        chapters && chapters.length > 0 && chapters.map((chapter) => (
+                    {chapters && chapters.length > 0
+                        ? chapters.map((chapter) => (
                             <CommonCard key={chapter.id} data={chapter} />
                         ))
+                        : <NoDataFound
+                            title="No content found"
+                            description="Try adjusting your filters or check back later."
+                          />
                     }
                 </div>
             </section>

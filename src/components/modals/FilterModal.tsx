@@ -81,9 +81,9 @@ export default function FilterModal() {
   const allTags = tagsResponse?.data?.tags ?? [];
 
   const progressFilters = [
-    { id: 'continue', label: 'Continue Reading', icon: BookOpen, description: 'Chapters you started' },
+    { id: 'continueReading', label: 'Continue Reading', icon: BookOpen, description: 'Chapters you started' },
     { id: 'unread', label: 'Unread Chapters', icon: BookMarked, description: 'New chapters to explore' },
-    { id: 'free', label: 'Free to Read', icon: Gift, description: 'Free chapters available' },
+    { id: 'freeToRead', label: 'Free to Read', icon: Gift, description: 'Free chapters available' },
     { id: 'purchased', label: 'Purchased', icon: CheckCircle, description: 'Chapters you own' },
   ];
 

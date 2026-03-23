@@ -18,7 +18,6 @@ export default function PrimaryFooter() {
     const dispatch = useAppDispatch();
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
-    console.log('isAuthenticated', isAuthenticated);
     
     const { data: globalSettings } = useGetGlobalSettingsQuery();
     const settings = globalSettings?.data;
@@ -42,7 +41,6 @@ export default function PrimaryFooter() {
         { href: settings?.whatsapp_link, icon: WhatsAppIcon, label: 'WhatsApp' },
     ].filter((s) => !!s.href);
 
-    console.log('settings', settings);
 
     return (
         <>

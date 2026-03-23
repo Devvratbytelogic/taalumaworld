@@ -14,6 +14,13 @@ import { IUserAllCategoriesAPIResponse } from '@/types/user/allCategory';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import { IUserAllTagsAPIResponse } from '@/types/user/allTags';
 
+export interface IGetAllChaptersParams {
+    categoryId?: string | null;
+    thoughtLeaderId?: string | null;
+    tags?: string | null;
+    readingProgress?: string | null;
+}
+
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         /** get global settings */
@@ -25,10 +32,11 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['GlobalSettings'],
         }),
         /** chapters */
-        getAllChapters: builder.query<IHomeAllChaptersAPIResponse, void>({
-            query: () => ({
+        getAllChapters: builder.query<IHomeAllChaptersAPIResponse, IGetAllChaptersParams>({
+            query: (params) => ({
                 url: `/user/content`,
                 method: 'GET',
+                params,
             }),
             providesTags: ['AllChapters'],
         }),

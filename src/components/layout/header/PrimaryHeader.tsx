@@ -93,7 +93,7 @@ export default function PrimaryHeader() {
           <div className="flex items-center gap-6 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
-              <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-primary transition-colors">
+              <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 hover:text-primary transition-colors">
                 <BookMarked className="h-5 w-5" />
                 <span className="font-medium text-sm">{contentMode === VISIBLE.BOOK ? 'My Books' : 'My Chapters'}</span>
               </Link>
@@ -102,7 +102,7 @@ export default function PrimaryHeader() {
             {/* Cart */}
             {isAuthenticated && (
               <Link href={getCartRoutePath()} className="relative hidden lg:block">
-                <button className="relative text-gray-700 hover:text-primary transition-colors">
+                <button className="relative hover:text-primary transition-colors">
                   <ShoppingCart className="h-6 w-6" />
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -130,12 +130,12 @@ export default function PrimaryHeader() {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                     <div className="py-1">
                       {isAdmin ? (
-                        <Link href={getAdminRoutePath()} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <Link href={getAdminRoutePath()} className="block px-4 py-2 text-sm hover:bg-gray-100">
                           <User className="h-5 w-5 mr-2 inline-block" />
                           Admin Panel
                         </Link>
                       ) : (
-                        <Link href={getUserDashboardRoutePath()} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <Link href={getUserDashboardRoutePath()} className="block px-4 py-2 hover:bg-gray-100">
                           <User className="h-5 w-5 mr-2 inline-block" />
                           My Account
                         </Link>
@@ -195,7 +195,7 @@ export default function PrimaryHeader() {
             Contact
           </Link>
 
-          {contentMode === VISIBLE.BOOK && (
+          {/* {contentMode === VISIBLE.BOOK && (
             <>
               <Link
                 href={getBooksRoutePath()}
@@ -219,12 +219,12 @@ export default function PrimaryHeader() {
                 Thought Leaders
               </Link>
             </>
-          )}
+          )} */}
         </nav>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
+          <div className="lg:hidden py-4 border-t">
             <nav className="flex flex-col gap-4">
               <Link href={getHomeRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                 Home
@@ -236,7 +236,7 @@ export default function PrimaryHeader() {
                 Contact
               </Link>
 
-              {contentMode === VISIBLE.BOOK && (
+              {/* {contentMode === VISIBLE.BOOK && (
                 <>
                   <Link href={getBooksRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
                     Books
@@ -248,7 +248,7 @@ export default function PrimaryHeader() {
                     Thought Leaders
                   </Link>
                 </> 
-              )}
+              )} */}
 
               {isAuthenticated && (
                 <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
@@ -260,7 +260,7 @@ export default function PrimaryHeader() {
                 {isAuthenticated ? (
                   <>
                     <Link href={isAdmin ? getAdminRoutePath() : getUserDashboardRoutePath()} onClick={() => setIsMenuOpen(false)}>
-                      <button className="w-full flex items-center gap-3 bg-linear-to-r from-primary/10 to-primary/5 rounded-2xl p-3">
+                      <button className="w-full flex items-center gap-3 bg-linear-to-r from-primary/10 to-primary/5 rounded-2xl p-3 mb-3">
                         <UserAvatar
                           userName={user?.fullName || user?.email || ''}
                           userPhoto={user?.photo ?? undefined}

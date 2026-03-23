@@ -70,6 +70,7 @@ export interface IBookChapterItem {
   description: string;
   content: string;
   isFree: boolean;
+  canRead: boolean;
   coverImage: string;
   pdf: string | null;
   price: number;

@@ -26,6 +26,7 @@ export default function BookReadPage() {
   const onClose = () => router.push(getHomeRoutePath());
 
   const handleChapterClick = (chapter: IBookChapterItem) => {
+    if (!chapter.canRead) return;
     router.push(getReadChapterRoutePath(chapter._id));
   };
 
@@ -106,7 +107,7 @@ export default function BookReadPage() {
           ) : (
             <div className="space-y-3">
               {chapters.map((chapter) => {
-                const isLocked = !chapter.isFree && !book.isPurchased;
+                const isLocked = !chapter.canRead;
                 return (
                   <div
                     key={chapter._id}
@@ -114,7 +115,7 @@ export default function BookReadPage() {
                     tabIndex={0}
                     onClick={() => handleChapterClick(chapter)}
                     onKeyDown={(e) => e.key === 'Enter' && handleChapterClick(chapter)}
-                    className="w-full text-left p-4 rounded-2xl border border-border bg-white hover:border-primary/40 hover:shadow-sm cursor-pointer transition-all duration-200 flex items-center gap-4"
+                    className={`w-full text-left p-4 rounded-2xl border border-border bg-white transition-all duration-200 flex items-center gap-4 ${isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/40 hover:shadow-sm cursor-pointer'}`}
                   >
                     {/* Chapter number badge */}
                     <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">

@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import LibraryContentSection from '@/components/pages-components/home/LibraryContentSection';
 import ReaderTestimonials from '@/components/pages-components/home/ReaderTestimonials';
 import FAQ from '@/components/pages-components/home/FAQ';
 import CommonBanner from '@/components/banners/CommonBanner';
 import { homeBannerData } from '@/data/data';
+import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryContentSectionSkeleton';
 
 export default function HomePage() {
   return (
@@ -13,7 +14,9 @@ export default function HomePage() {
         <CommonBanner data={homeBannerData} />
 
         {/* Main Content */}
-        <LibraryContentSection />
+        <Suspense fallback={<LibraryContentSectionSkeleton />}>
+          <LibraryContentSection />
+        </Suspense>
 
         {/* Reader Testimonials */}
         <ReaderTestimonials />

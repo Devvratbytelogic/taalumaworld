@@ -4,9 +4,17 @@ import CommonCard from '@/components/cards/CommonCard';
 import FilterOptions from './FilterOptions';
 import { useGetAllChaptersQuery } from '@/store/rtkQueries/userGetAPI';
 import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryContentSectionSkeleton';
+import { useSearchParams } from 'next/navigation';
 
 export default function LibraryContentSection() {
-    const { data, isLoading } = useGetAllChaptersQuery();
+    const searchParams = useSearchParams();
+
+    const { data, isLoading } = useGetAllChaptersQuery({
+        categoryId: searchParams.get('categoryId') ?? undefined,
+        thoughtLeaderId: searchParams.get('thoughtLeaderId') ?? undefined,
+        tags: searchParams.get('tags') ?? undefined,
+        readingProgress: searchParams.get('readingProgress') ?? undefined,
+    });
     const chapters = data?.data?.items;
     const total = data?.data?.total ?? 0;
     const viewMode = data?.data?.viewMode;

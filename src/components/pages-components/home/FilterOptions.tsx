@@ -22,12 +22,11 @@ export default function FilterOptions({ total = 0, viewMode }: FilterOptionsProp
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
 
-    const categories = parseArrayParam(searchParams.get('categories'));
-    const authors = parseArrayParam(searchParams.get('authors'));
-    const books = parseArrayParam(searchParams.get('books'));
+    const categoryId = parseArrayParam(searchParams.get('categoryId'));
+    const thoughtLeaderId = parseArrayParam(searchParams.get('thoughtLeaderId'));
     const tags = parseArrayParam(searchParams.get('tags'));
-    const progress = parseArrayParam(searchParams.get('progress'));
-    const activeFilterCount = categories.length + authors.length + books.length + tags.length + progress.length;
+    const readingProgress = parseArrayParam(searchParams.get('readingProgress'));
+    const activeFilterCount = categoryId.length + thoughtLeaderId.length + tags.length + readingProgress.length;
 
     const contentLabel = viewMode === VISIBLE.BOOK ? 'books' : 'chapters';
 

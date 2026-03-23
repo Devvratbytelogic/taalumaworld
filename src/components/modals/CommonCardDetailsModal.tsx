@@ -323,7 +323,14 @@ function BookChapterRow({
         )}
       </div>
       <div className="shrink-0">
-        {chapter.isFree ? (null) : !isAuthenticated ? (
+        {chapter.canRead ? (
+          <Button
+            className="global_btn rounded_full bg_primary text-xs px-3 py-1 h-auto min-h-0"
+            onPress={onRead}
+          >
+            Read
+          </Button>
+        ) : !isAuthenticated ? (
           <Button
             className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
             onPress={onLoginRequired}

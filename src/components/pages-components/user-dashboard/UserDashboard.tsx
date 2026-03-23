@@ -79,7 +79,7 @@ function UserDashboardInner() {
                         "w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all",
                         currentPage === item.id
                           ? "bg-primary text-white shadow-md"
-                          : "text-gray-700 hover:bg-gray-100"
+                          : "hover:bg-gray-100"
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -101,7 +101,7 @@ function UserDashboardInner() {
   );
 }
 
-export function UserDashboard() {
+export function   UserDashboard() {
   return (
     <Suspense fallback={<UserDashboardSkeleton />}>
       <UserDashboardInner />

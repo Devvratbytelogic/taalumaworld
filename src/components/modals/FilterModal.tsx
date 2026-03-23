@@ -9,15 +9,18 @@ import { Badge } from '@/components/ui/badge';
 import { Divider } from '@heroui/react';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import { categories, authors, books } from '@/data/mockData';
-import type { Category, Author, Book } from '@/types/content';
+import {
+  useGetUserAllCategoriesQuery,
+  useGetUserAllAuthorsQuery,
+  useGetAllTagsQuery,
+} from '@/store/rtkQueries/userGetAPI';
+import FilterModalSkeleton from '@/components/skeleton-loader/FilterModalSkeleton';
 
 const PARAM_KEYS = {
-  categories: 'categories',
-  authors: 'authors',
-  books: 'books',
+  categoryId: 'categoryId',
+  thoughtLeaderId: 'thoughtLeaderId',
   tags: 'tags',
-  progress: 'progress',
+  readingProgress: 'readingProgress',
 } as const;
 
 function parseArrayParam(value: string | null): string[] {
@@ -27,7 +30,7 @@ function parseArrayParam(value: string | null): string[] {
 
 function buildSearchParams(
   params: URLSearchParams,
-  updates: { categories?: string[]; authors?: string[]; books?: string[]; tags?: string[]; progress?: string[] }
+  updates: { categoryId?: string[]; thoughtLeaderId?: string[]; tags?: string[]; readingProgress?: string[] }
 ): URLSearchParams {
   const next = new URLSearchParams(params);
   Object.entries(updates).forEach(([key, values]) => {
@@ -56,18 +59,26 @@ export default function FilterModal() {
 
   const [tempCategories, setTempCategories] = useState<string[]>([]);
   const [tempAuthors, setTempAuthors] = useState<string[]>([]);
-  const [tempBooks, setTempBooks] = useState<string[]>([]);
   const [tempTags, setTempTags] = useState<string[]>([]);
   const [tempProgressFilters, setTempProgressFilters] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isOpen) return;
-    setTempCategories(parseArrayParam(searchParams.get(PARAM_KEYS.categories)));
-    setTempAuthors(parseArrayParam(searchParams.get(PARAM_KEYS.authors)));
-    setTempBooks(parseArrayParam(searchParams.get(PARAM_KEYS.books)));
+    setTempCategories(parseArrayParam(searchParams.get(PARAM_KEYS.categoryId)));
+    setTempAuthors(parseArrayParam(searchParams.get(PARAM_KEYS.thoughtLeaderId)));
     setTempTags(parseArrayParam(searchParams.get(PARAM_KEYS.tags)));
-    setTempProgressFilters(parseArrayParam(searchParams.get(PARAM_KEYS.progress)));
+    setTempProgressFilters(parseArrayParam(searchParams.get(PARAM_KEYS.readingProgress)));
   }, [isOpen, searchParams]);
+
+  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetUserAllCategoriesQuery();
+  const { data: authorsResponse, isLoading: isLoadingAuthors } = useGetUserAllAuthorsQuery();
+  const { data: tagsResponse, isLoading: isLoadingTags } = useGetAllTagsQuery();
+
+  const isLoadingFilters = isLoadingCategories || isLoadingAuthors || isLoadingTags;
+
+  const categories = categoriesResponse?.data ?? [];
+  const authors = authorsResponse?.data?.items ?? [];
+  const allTags = tagsResponse?.data?.tags ?? [];
 
   const progressFilters = [
     { id: 'continue', label: 'Continue Reading', icon: BookOpen, description: 'Chapters you started' },
@@ -75,8 +86,6 @@ export default function FilterModal() {
     { id: 'free', label: 'Free to Read', icon: Gift, description: 'Free chapters available' },
     { id: 'purchased', label: 'Purchased', icon: CheckCircle, description: 'Chapters you own' },
   ];
-
-  const allTags = Array.from(new Set(books.flatMap((b: any) => b.tags))).sort();
 
   const handleProgressFilterToggle = (filterId: string) => {
     setTempProgressFilters((prev) =>
@@ -104,11 +113,10 @@ export default function FilterModal() {
 
   const handleApply = () => {
     const next = buildSearchParams(searchParams, {
-      categories: tempCategories,
-      authors: tempAuthors,
-      books: tempBooks,
+      categoryId: tempCategories,
+      thoughtLeaderId: tempAuthors,
       tags: tempTags,
-      progress: tempProgressFilters,
+      readingProgress: tempProgressFilters,
     });
     router.replace(`${pathname}${next.toString() ? `?${next.toString()}` : ''}`);
     dispatch(closeModal());
@@ -117,15 +125,13 @@ export default function FilterModal() {
   const handleReset = () => {
     setTempCategories([]);
     setTempAuthors([]);
-    setTempBooks([]);
     setTempTags([]);
     setTempProgressFilters([]);
     const next = buildSearchParams(searchParams, {
-      categories: [],
-      authors: [],
-      books: [],
+      categoryId: [],
+      thoughtLeaderId: [],
       tags: [],
-      progress: [],
+      readingProgress: [],
     });
     router.replace(`${pathname}${next.toString() ? `?${next.toString()}` : ''}`);
   };
@@ -133,7 +139,7 @@ export default function FilterModal() {
   const activeFilterCount =
     displayMode === 'chapters'
       ? tempProgressFilters.length
-      : tempCategories.length + tempAuthors.length + tempBooks.length + tempTags.length;
+      : tempCategories.length + tempAuthors.length + tempTags.length;
 
   return (
     <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container" size="2xl">
@@ -157,7 +163,9 @@ export default function FilterModal() {
         </ModalHeader>
 
         <ModalBody className="overflow-y-auto max-h-[calc(90vh-220px)] p-6">
-          {displayMode === 'chapters' ? (
+          {isLoadingFilters ? (
+            <FilterModalSkeleton displayMode={displayMode === 'chapters' ? 'chapters' : 'books'} />
+          ) : displayMode === 'chapters' ? (
             <div className="space-y-4">
               <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-1">
@@ -181,7 +189,7 @@ export default function FilterModal() {
                       onClick={() => handleProgressFilterToggle(filter.id)}
                     >
                       <Checkbox
-                        id={`progress-${filter.id}`}
+                        id={`readingProgress-${filter.id}`}
                         checked={tempProgressFilters.includes(filter.id)}
                         onCheckedChange={() => handleProgressFilterToggle(filter.id)}
                         className="rounded-md mt-0.5"
@@ -189,7 +197,7 @@ export default function FilterModal() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <Icon className="h-4 w-4 text-primary" />
-                          <label htmlFor={`progress-${filter.id}`} className="text-sm font-medium cursor-pointer tracking-tight">
+                          <label htmlFor={`readingProgress-${filter.id}`} className="text-sm font-medium cursor-pointer tracking-tight">
                             {filter.label}
                           </label>
                         </div>
@@ -217,7 +225,7 @@ export default function FilterModal() {
                   Categories
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {categories.map((category: any) => (
+                  {categories.map((category) => (
                     <div
                       key={category.id}
                       className={`flex items-center space-x-2 p-3 rounded-xl border transition-all cursor-pointer ${tempCategories.includes(category.id) ? 'bg-primary/5 border-primary/30' : 'border-border hover:border-primary/20'
@@ -244,7 +252,7 @@ export default function FilterModal() {
                   Authors
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                  {authors.map((author: any) => (
+                  {authors.map((author) => (
                     <div
                       key={author.id}
                       className={`flex items-center space-x-2 p-3 rounded-xl border transition-all cursor-pointer ${tempAuthors.includes(author.id) ? 'bg-primary/5 border-primary/30' : 'border-border hover:border-primary/20'
@@ -258,7 +266,7 @@ export default function FilterModal() {
                         className="rounded-md"
                       />
                       <label htmlFor={`author-${author.id}`} className="text-sm cursor-pointer tracking-tight flex-1">
-                        {author.name}
+                        {author.fullName}
                       </label>
                     </div>
                   ))}

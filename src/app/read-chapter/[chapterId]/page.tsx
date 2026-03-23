@@ -1,16 +1,15 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetAllChaptersQuery, useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
-import type { IChapterItem } from '@/types/user/HomeAllChapters';
+import { useGetSingleBookQuery, useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
+import type { IBookChapterItem } from '@/types/user/singleBook';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import PdfViewer from '@/components/ui/PdfViewer';
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
-import { RootState } from '@/store/store';
 import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { useUpdateReadingProgressMutation } from '@/store/rtkQueries/userPostAPI';
 
@@ -21,11 +20,12 @@ export default function ReadChapterPage() {
   const chapterId = params?.chapterId as string | undefined;
 
   const { data: chapterResponse, isLoading } = useGetSingleChapterQuery(chapterId!, { skip: !chapterId });
-  const { data: allChaptersResponse } = useGetAllChaptersQuery();
 
   const currentChapter = chapterResponse?.data ?? null;
   const book = currentChapter ? { title: currentChapter.bookTitle } : null;
   const isLocked = !currentChapter?.canRead;
+
+  const { data: bookResponse } = useGetSingleBookQuery(currentChapter?.bookId!, { skip: !currentChapter?.bookId });
   // Map API shape to the Chapter type expected by ChapterPurchaseModal
   const chapterForModal = currentChapter
     ? {
@@ -56,15 +56,12 @@ export default function ReadChapterPage() {
   }, [currentChapter, isLocked]);
 
   // All chapters from the same book, sorted by chapter number
-  const bookChapters = useMemo((): IChapterItem[] => {
-    const items = allChaptersResponse?.data?.items ?? [];
-    if (!currentChapter) return [];
-    return [...items]
-      .filter((c): c is IChapterItem => c.type === 'chapter' && c.bookId?._id === currentChapter.bookId)
-      .sort((a, b) => a.chapterNumber - b.chapterNumber);
-  }, [allChaptersResponse, currentChapter]);
+  const bookChapters = useMemo((): IBookChapterItem[] => {
+    if (!bookResponse?.data?.chapters?.length) return [];
+    return [...bookResponse.data.chapters].sort((a, b) => a.number - b.number);
+  }, [bookResponse]);
 
-  const currentIndex = bookChapters.findIndex((c) => c.id === chapterId);
+  const currentIndex = bookChapters.findIndex((c) => c._id === chapterId);
 
   const hasPdf = !!currentChapter?.pdf;
 
@@ -94,7 +91,7 @@ export default function ReadChapterPage() {
       setScrollProgress(0);
       hasMarkedStarted.current = false;
       hasMarkedCompleted.current = false;
-      router.push(getReadChapterRoutePath(prev.id));
+      router.push(getReadChapterRoutePath(prev._id));
     }
   };
 
@@ -104,7 +101,7 @@ export default function ReadChapterPage() {
       setScrollProgress(0);
       hasMarkedStarted.current = false;
       hasMarkedCompleted.current = false;
-      router.push(getReadChapterRoutePath(next.id));
+      router.push(getReadChapterRoutePath(next._id));
     }
   };
 
@@ -243,7 +240,7 @@ export default function ReadChapterPage() {
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Button
             onPress={handlePreviousChapter}
-            disabled={!canGoPrevious}
+            isDisabled={!canGoPrevious}
             className='global_btn rounded_full outline_primary'
             startContent={<ChevronLeft className="h-4 w-4" />}
           >
@@ -263,7 +260,7 @@ export default function ReadChapterPage() {
 
           <Button
             onPress={handleNextChapter}
-            disabled={!canGoNext}
+            isDisabled={!canGoNext}
             className="global_btn rounded_full bg_primary"
             endContent={<ChevronRight className="h-4 w-4" />}
           >

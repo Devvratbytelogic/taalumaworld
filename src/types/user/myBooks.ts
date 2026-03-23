@@ -22,6 +22,7 @@ export interface IMyBooksSummary {
 
 export interface IMyBookItem {
     bookId: string;
+    id: string;
     title: string;
     description: string;
     coverImage: string;

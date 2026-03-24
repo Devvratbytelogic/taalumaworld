@@ -52,7 +52,7 @@ export function RolesOverview({ adminUser }: RolesOverviewProps) {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Users</span>
                   <Badge variant="outline">
-                    {role === 'super_admin' ? 2 : Math.floor(Math.random() * 10) + 1}
+                    {role === 'admin' ? 2 : Math.floor(Math.random() * 10) + 1}
                   </Badge>
                 </div>
               </div>

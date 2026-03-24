@@ -94,7 +94,7 @@ export function AdminProfileTab() {
 
     const displayPhoto = tempPhoto || profile?.profile_pic || '';
     const displayName = values.name || profile?.name || 'Admin';
-    const roleName = getRoleName((profile?.role?.name ?? 'super_admin') as AdminRole);
+    const roleName = getRoleName(profile?.role?.name ?? 'admin');
 
     const formatDate = (iso?: string) => {
         if (!iso) return '—';

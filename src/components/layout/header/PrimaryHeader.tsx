@@ -32,7 +32,7 @@ export default function PrimaryHeader() {
   const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
 
   const { isAuthenticated, user } = useAuth();
-  const isAdmin = user?.role?.toLowerCase() === 'admin';
+  const isAdmin = ['admin', 'author'].includes(user?.role?.toLowerCase() ?? '');
 
   const { data: cartData } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const cartCount = cartData?.data?.[0]?.item_count ?? 0;

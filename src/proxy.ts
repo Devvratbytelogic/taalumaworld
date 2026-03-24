@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ADMIN_ROLE_VALUE = 'Admin';
+const ADMIN_ROLES = ['admin', 'author'];
 const ADMIN_PATH_PREFIX = '/admin';
 
 function isAdminPath(pathname: string): boolean {
@@ -9,7 +9,7 @@ function isAdminPath(pathname: string): boolean {
 }
 
 function isAdminRole(role: string | undefined): boolean {
-    return role?.trim().toLowerCase() === ADMIN_ROLE_VALUE.toLowerCase();
+    return ADMIN_ROLES.includes(role?.trim().toLowerCase() ?? '');
 }
 
 /**

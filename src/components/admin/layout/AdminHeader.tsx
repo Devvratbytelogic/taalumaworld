@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 import { getRoleName } from '@/utils/adminPermissions';
 import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath } from '@/routes/routes';
-import { clearAuthCookies } from '@/utils/authCookies';
+import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
@@ -30,8 +30,10 @@ export function AdminHeader() {
         name: profileData?.data?.name ?? 'Admin User',
         email: profileData?.data?.email ?? '',
         avatar: profileData?.data?.profile_pic ?? '',
-        role: (profileData?.data?.role?.name ?? 'super_admin') as AdminRole,
+        role: (profileData?.data?.role?.name?.toLowerCase() === 'author' ? 'author' : 'admin') as AdminRole,
     };
+
+    const isAuthor = adminUser.role === 'author' || getUserRole()?.toLowerCase() === 'author';
 
     const onMobileMenuToggle = () => setMobileMenuOpen(prev => !prev);
 
@@ -62,27 +64,29 @@ export function AdminHeader() {
                     <span className="font-medium hidden sm:block">Admin Panel - {brandName}</span>
                     <span className="font-medium sm:hidden">Admin</span>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs hidden md:block">Content Mode:</span>
-                        <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
-                            {isSettingsLoading || isToggling ? (
-                                <div className="flex items-center gap-2 px-1">
-                                    <div className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                    <span className="text-xs opacity-80">Loading…</span>
-                                </div>
-                            ) : (
-                                <>
-                                    <span className={cn("text-xs", visible === 'chapter' ? 'font-semibold' : 'opacity-70')}>
-                                        Chapters
-                                    </span>
-                                    <Switch isSelected={visible === 'book'} onValueChange={onContentModeToggle} size="sm" />
-                                    <span className={cn("text-xs", visible === 'book' ? 'font-semibold' : 'opacity-70')}>
-                                        Books
-                                    </span>
-                                </>
-                            )}
+                    {!isAuthor && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs hidden md:block">Content Mode:</span>
+                            <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
+                                {isSettingsLoading || isToggling ? (
+                                    <div className="flex items-center gap-2 px-1">
+                                        <div className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                        <span className="text-xs opacity-80">Loading…</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className={cn("text-xs", visible === 'chapter' ? 'font-semibold' : 'opacity-70')}>
+                                            Chapters
+                                        </span>
+                                        <Switch isSelected={visible === 'book'} onValueChange={onContentModeToggle} size="sm" />
+                                        <span className={cn("text-xs", visible === 'book' ? 'font-semibold' : 'opacity-70')}>
+                                            Books
+                                        </span>
+                                    </>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
@@ -164,7 +168,7 @@ export function AdminHeader() {
                                 }
                             >
                                 <DropdownItem key="profile" startContent={<UserCircle className="h-4 w-4" />}>My Profile</DropdownItem>
-                                <DropdownItem key="settings" startContent={<Settings className="h-4 w-4" />}>Settings</DropdownItem>
+                                {isAuthor ? null : <DropdownItem key="settings" startContent={<Settings className="h-4 w-4" />}>Settings</DropdownItem>}
                                 <DropdownItem key="website" startContent={<Home className="h-4 w-4" />}>Back to Website</DropdownItem>
                                 <DropdownSection>
                                     <DropdownItem key="logout" startContent={<LogOut className="h-4 w-4" />} className="text-danger" color="danger">

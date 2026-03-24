@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { BookOpen, AlertCircle } from 'lucide-react';
@@ -12,7 +12,7 @@ import {
 
 import { useAdminUser } from '@/hooks/useAdminUser';
 import { canAccessSection } from '@/utils/adminPermissions';
-import { getHomeRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
 
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -71,6 +71,15 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
 
     // Which section is currently active (based on URL)
     const activeSection = PATH_TO_SECTION[pathname] ?? 'dashboard';
+
+    // Redirect author to books if they land on a section they cannot access
+    useEffect(() => {
+        if (!adminUser || isLoading) return;
+        const section = PATH_TO_SECTION[pathname];
+        if (section && !canAccessSection(adminUser, section)) {
+            router.replace(getAdminSectionRoutePath('books'));
+        }
+    }, [adminUser, isLoading, pathname, router]);
 
     // Only show nav items the current admin role has access to
     const accessibleNavItems = adminUser

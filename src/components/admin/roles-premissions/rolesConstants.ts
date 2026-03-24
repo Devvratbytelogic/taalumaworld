@@ -2,13 +2,7 @@ import type { AdminRole, AdminPermissions } from '@/types/admin';
 
 export type PermissionKey = keyof AdminPermissions;
 
-export const ROLES: AdminRole[] = [
-  'super_admin',
-  'content_manager',
-  'support_agent',
-  'analytics_manager',
-  'finance_manager',
-];
+export const ROLES: AdminRole[] = ['admin', 'author'];
 
 export const PERMISSION_CATEGORIES: Record<string, PermissionKey[]> = {
   'Dashboard & Pages': ['canViewDashboard', 'canManagePages'],

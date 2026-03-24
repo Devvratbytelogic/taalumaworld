@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import type { AdminUser, AdminRole } from '@/types/admin';
 import { rolePermissions } from '@/types/admin';
+import { getUserRole } from '@/utils/authCookies';
 
 /**
  * Mock admin user for demonstration
@@ -18,8 +19,14 @@ export function useAdminUser() {
   useEffect(() => {
     const loadAdminUser = () => {
       try {
+        const validRoles: AdminRole[] = ['admin', 'author'];
+        // Derive role: cookie (from API) takes precedence, then localStorage override, then default 'admin'
+        const cookieRole = getUserRole()?.trim().toLowerCase() as AdminRole | undefined;
         const savedRole = localStorage.getItem('taaluma_admin_role') as AdminRole | null;
-        const role: AdminRole = savedRole || 'super_admin';
+        const role: AdminRole =
+          (cookieRole && validRoles.includes(cookieRole)) ? cookieRole :
+          (savedRole && validRoles.includes(savedRole)) ? savedRole :
+          'admin';
 
         const mockUser: AdminUser = {
           id: 'admin-001',

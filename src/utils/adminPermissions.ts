@@ -26,24 +26,22 @@ export function canAccessSection(adminUser: AdminUser, section: AdminSection): b
   return adminUser.permissions[permissionKey] ?? false;
 }
 
-export function getRoleName(role: AdminRole): string {
-  const names: Record<AdminRole, string> = {
-    super_admin: 'Super Admin',
-    content_manager: 'Content Manager',
-    support_agent: 'Support Agent',
-    analytics_manager: 'Analytics Manager',
-    finance_manager: 'Finance Manager',
+export function getRoleName(role: AdminRole | string): string {
+  const names: Record<string, string> = {
+    admin: 'Admin',
+    Admin: 'Admin',
+    author: 'Author',
+    Author: 'Author',
   };
   return names[role] ?? role;
 }
 
-export function getRoleDescription(role: AdminRole): string {
-  const descriptions: Record<AdminRole, string> = {
-    super_admin: 'Full access to all admin features and settings.',
-    content_manager: 'Manage books, chapters, categories, and authors.',
-    support_agent: 'Support users, moderate content, and view activity.',
-    analytics_manager: 'View analytics, reports, and activity logs.',
-    finance_manager: 'Manage payments, transactions, and financial reports.',
+export function getRoleDescription(role: AdminRole | string): string {
+  const descriptions: Record<string, string> = {
+    admin: 'Full access to all admin features and settings.',
+    Admin: 'Full access to all admin features and settings.',
+    author: 'Manage books, chapters, and categories.',
+    Author: 'Manage books, chapters, and categories.',
   };
   return descriptions[role] ?? '';
 }

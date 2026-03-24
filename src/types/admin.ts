@@ -1,11 +1,6 @@
 export type ContentMode = 'chapters' | 'books';
 
-export type AdminRole =
-  | 'super_admin'
-  | 'content_manager'
-  | 'support_agent'
-  | 'analytics_manager'
-  | 'finance_manager';
+export type AdminRole = 'admin' | 'author';
 
 export type AdminSection =
   | 'dashboard'
@@ -60,7 +55,7 @@ export interface AdminUser {
 }
 
 export const rolePermissions: Record<AdminRole, AdminPermissions> = {
-  super_admin: {
+  admin: {
     canViewDashboard: true,
     canManagePages: true,
     canManageBooks: true,
@@ -80,82 +75,22 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canManageTestimonials: true,
     canManageFAQs: true,
   },
-  content_manager: {
-    canViewDashboard: true,
-    canManagePages: true,
+  author: {
+    canViewDashboard: false,
+    canManagePages: false,
     canManageBooks: true,
     canManageChapters: true,
     canManageCategories: true,
-    canManageAuthors: true,
+    canManageAuthors: false,
     canManageUsers: false,
     canManageRoles: false,
     canViewActivityLogs: false,
     canManagePayments: false,
     canViewTransactions: false,
-    canManageReviews: true,
-    canModerateContent: true,
-    canViewAnalytics: true,
-    canViewReports: true,
-    canManageSettings: false,
-    canManageTestimonials: true,
-    canManageFAQs: true,
-  },
-  support_agent: {
-    canViewDashboard: true,
-    canManagePages: false,
-    canManageBooks: false,
-    canManageChapters: false,
-    canManageCategories: false,
-    canManageAuthors: false,
-    canManageUsers: true,
-    canManageRoles: false,
-    canViewActivityLogs: true,
-    canManagePayments: false,
-    canViewTransactions: true,
-    canManageReviews: true,
-    canModerateContent: true,
+    canManageReviews: false,
+    canModerateContent: false,
     canViewAnalytics: false,
     canViewReports: false,
-    canManageSettings: false,
-    canManageTestimonials: false,
-    canManageFAQs: false,
-  },
-  analytics_manager: {
-    canViewDashboard: true,
-    canManagePages: false,
-    canManageBooks: false,
-    canManageChapters: false,
-    canManageCategories: false,
-    canManageAuthors: false,
-    canManageUsers: false,
-    canManageRoles: false,
-    canViewActivityLogs: true,
-    canManagePayments: false,
-    canViewTransactions: true,
-    canManageReviews: false,
-    canModerateContent: false,
-    canViewAnalytics: true,
-    canViewReports: true,
-    canManageSettings: false,
-    canManageTestimonials: false,
-    canManageFAQs: false,
-  },
-  finance_manager: {
-    canViewDashboard: true,
-    canManagePages: false,
-    canManageBooks: false,
-    canManageChapters: false,
-    canManageCategories: false,
-    canManageAuthors: false,
-    canManageUsers: false,
-    canManageRoles: false,
-    canViewActivityLogs: false,
-    canManagePayments: true,
-    canViewTransactions: true,
-    canManageReviews: false,
-    canModerateContent: false,
-    canViewAnalytics: true,
-    canViewReports: true,
     canManageSettings: false,
     canManageTestimonials: false,
     canManageFAQs: false,

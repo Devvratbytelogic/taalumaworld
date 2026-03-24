@@ -65,6 +65,8 @@ export default function SignIn() {
                     toast.success(res.message ?? 'Sign in successful!');
                     if (redirectTo) {
                         router.push(redirectTo);
+                    } else if (isAdmin) {
+                        router.push('/admin/dashboard');
                     }
                 }
             } catch (error) {

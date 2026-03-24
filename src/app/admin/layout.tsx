@@ -28,15 +28,15 @@ const NAV_ITEMS = [
     { id: 'categories' as AdminSection, label: 'Categories', icon: FolderTree, category: 'content' },
     { id: 'authors' as AdminSection, label: 'Thought Leaders', icon: Users, category: 'content' },
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
-    { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
+    // { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
     { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: Receipt, category: 'commerce' },
-    { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
+    // { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
     { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
     { id: 'faqs' as AdminSection, label: 'FAQs', icon: FileEdit, category: 'community' },
     // { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
-    { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
-    { id: 'reports' as AdminSection, label: 'Reports', icon: FileSpreadsheet, category: 'analytics' },
+    // { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
+    // { id: 'reports' as AdminSection, label: 'Reports', icon: FileSpreadsheet, category: 'analytics' },
 ];
 
 // Maps URL path → section id (to highlight active nav item)

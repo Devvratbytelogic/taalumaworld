@@ -6,10 +6,13 @@ export interface IAllFaqsAPIResponse {
     message: string;
     timestamp: string;
 }
+export type FAQType = 'reading' | 'payment' | 'account';
+
 export interface IAllFaqsDataEntity {
     _id: string;
     question: string;
     answer: string;
+    type: FAQType;
     createdAt: string;
     updatedAt: string;
     id: number;

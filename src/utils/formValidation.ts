@@ -121,11 +121,13 @@ export const addChapterSchema = Yup.object({
     .required('Page is required'),
   isFree: Yup.boolean(),
   price: Yup.number()
-    .min(0, 'Price cannot be negative')
     .when('isFree', {
       is: true,
-      then: (schema) => schema.optional(),
-      otherwise: (schema) => schema.required('Price is required when chapter is not free'),
+      then: (schema) => schema.min(0).optional(),
+      otherwise: (schema) =>
+        schema
+          .min(1, 'Price must be greater than 0 for paid chapters')
+          .required('Price is required when chapter is not free'),
     }),
   status: Yup.string().required('Status is required'),
 });

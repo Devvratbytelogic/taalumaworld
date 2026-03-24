@@ -27,7 +27,7 @@ import {
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
 import type { Book, Author } from '@/types/content';
-import { getAdminRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 
 const initialFormValues = {
@@ -86,8 +86,10 @@ export function CreateChapterForm() {
       formData.append('title', vals.title);
       formData.append('description', vals.description ?? '');
       formData.append('content', vals.content ?? '');
-      formData.append('isFree', String(chapterPricingEnabled ? vals.isFree : true));
-      formData.append('price', String(chapterPricingEnabled && !vals.isFree ? (vals.price ?? 0) : 0));
+      if (chapterPricingEnabled) {
+        formData.append('isFree', String(vals.isFree));
+        formData.append('price', String(!vals.isFree ? (vals.price ?? 0) : 0));
+      }
       formData.append('status', vals.status);
       formData.append('page', String(vals.page ?? 1));
       formData.append('cover_image', featuredImageFile);
@@ -95,14 +97,14 @@ export function CreateChapterForm() {
         formData.append('pdf_file', pdfFile);
       }
       try {
-        await addChapter(formData).unwrap();
+        const res = await addChapter(formData).unwrap();
         if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
         setFeaturedImageFile(null);
         setFeaturedImagePreviewUrl(null);
         setPdfFile(null);
         resetForm({ values: initialFormValues });
         toast.success('Chapter created successfully');
-        router.push(getAdminRoutePath());
+        router.push(`/admin/chapters`);
       } catch (err: unknown) {
         const message =
           (err as { data?: { message?: string }; message?: string })?.data?.message ||
@@ -283,12 +285,20 @@ export function CreateChapterForm() {
               name="sequence"
               type="number"
               min={1}
-              value={values.sequence}
+              value={values.sequence ?? ''}
               onChange={(e) => {
-                const n = e.target.value === '' ? 1 : parseInt(e.target.value, 10);
+                if (e.target.value === '') {
+                  setFieldValue('sequence', '');
+                  return;
+                }
+                const n = parseInt(e.target.value, 10);
                 setFieldValue('sequence', Number.isNaN(n) ? 1 : Math.max(1, n));
               }}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                const n = parseInt(e.target.value, 10);
+                setFieldValue('sequence', Number.isNaN(n) || n < 1 ? 1 : n);
+                handleBlur(e);
+              }}
               disabled={isSubmittingState}
               className={errors.sequence && touched.sequence ? 'border-red-500' : ''}
             />
@@ -305,10 +315,18 @@ export function CreateChapterForm() {
               min={0}
               value={values.page ?? ''}
               onChange={(e) => {
-                const n = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                if (e.target.value === '') {
+                  setFieldValue('page', '');
+                  return;
+                }
+                const n = parseInt(e.target.value, 10);
                 setFieldValue('page', Number.isNaN(n) ? 0 : Math.max(0, n));
               }}
-              onBlur={handleBlur}
+              onBlur={(e) => {
+                const n = parseInt(e.target.value, 10);
+                setFieldValue('page', Number.isNaN(n) || n < 0 ? 0 : n);
+                handleBlur(e);
+              }}
               disabled={isSubmittingState}
               className={errors.page && touched.page ? 'border-red-500' : ''}
             />
@@ -453,7 +471,7 @@ export function CreateChapterForm() {
         >
           Create Chapter
         </Button>
-        <Link href={getAdminRoutePath()}>
+        <Link href={getAdminSectionRoutePath('chapters')}>
           <Button
             type="button"
             className="global_btn rounded_full outline_primary"

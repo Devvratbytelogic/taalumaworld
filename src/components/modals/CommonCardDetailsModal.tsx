@@ -159,7 +159,7 @@ function BookModalContent({
           {chapter.author && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground tracking-tight">
               {chapter.authorAvatar ? (
-                <div className="h-7 w-7 rounded-full object-cover shrink-0">
+                <div className="h-7 w-7 rounded-full object-cover overflow-hidden shrink-0">
                   <ImageComponent src={chapter.authorAvatar} alt={chapter.author} object_cover={true} />
                 </div>
               ) : (

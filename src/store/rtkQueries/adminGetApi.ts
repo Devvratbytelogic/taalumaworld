@@ -7,6 +7,7 @@ import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
 import { IAllUsersAPIResponse } from '@/types/allUsers';
 import { IAllFaqsAPIResponse } from '@/types/faqs';
+import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -81,6 +82,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminFAQs'],
         }),
+
+        /** Admin Profile */
+        getAdminProfile: builder.query<IAdminProfileAPIResponse, void>({
+            query: () => ({
+                url: `/admin/get-profile`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminProfile'],
+        }),
     }),
 });
 
@@ -93,4 +103,5 @@ export const {
     useGetAllUsersQuery,
     useGetAllTestimonialsQuery,
     useGetAllFaqsQuery,
+    useGetAdminProfileQuery,
 } = clientSideGetApis;

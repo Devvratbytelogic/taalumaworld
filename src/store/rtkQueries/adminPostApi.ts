@@ -152,6 +152,16 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminTestimonials'],
         }),
 
+        /** Admin Profile */
+        updateAdminProfile: builder.mutation({
+            query: (payload: FormData) => ({
+                url: `/admin/update-profile`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminProfile'],
+        }),
+
         /** FAQs */
         addFAQ: builder.mutation({
             query: (payload) => ({
@@ -217,4 +227,7 @@ export const {
     useAddFAQMutation,
     useUpdateFAQMutation,
     useDeleteFAQMutation,
+
+    // Admin Profile
+    useUpdateAdminProfileMutation,
 } = adminPostApi;

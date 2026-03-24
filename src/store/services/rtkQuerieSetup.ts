@@ -103,6 +103,7 @@ export const rtkQuerieSetup = createApi({
         'AllChapters',
         'Cart',
         'UserProfile',
+        'AdminProfile',
         'MyChapters',
         'ReadingHistory',
         'AdminUsers',

@@ -32,6 +32,10 @@ export function getAdminDashboardRoutePath(): string {
   return '/admin/dashboard';
 }
 
+export function getAdminProfileRoutePath(): string {
+  return '/admin/profile';
+}
+
 export function getAdminSectionRoutePath(section: string): string {
   const map: Record<string, string> = {
     dashboard: '/admin/dashboard',

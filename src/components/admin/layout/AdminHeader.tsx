@@ -2,16 +2,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X, } from 'lucide-react';
+import { BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X, UserCircle, } from 'lucide-react';
 import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Select, SelectItem, } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 import { getRoleName } from '@/utils/adminPermissions';
-import { getAdminSectionRoutePath, getHomeRoutePath } from '@/routes/routes';
-import { clearAuthCookies, getUserDisplayData } from '@/utils/authCookies';
+import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath } from '@/routes/routes';
+import { clearAuthCookies } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
-import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
+import { useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import type { AdminRole } from '@/types/admin';
 import ImageComponent from '@/components/ui/ImageComponent';
 
@@ -19,18 +19,18 @@ export function AdminHeader() {
     const router = useRouter();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
     const { data: globalSettings, isFetching: isSettingsLoading } = useGetAdminGlobalSettingsQuery();
+    const { data: profileData } = useGetAdminProfileQuery();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const visible = globalSettings?.data?.visible ?? 'chapter';
     const logo = globalSettings?.data?.logo as string | null | undefined;
     const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
 
-    const userDisplay = getUserDisplayData();
     const adminUser = {
-        name: userDisplay?.fullName ?? 'Admin User',
-        email: userDisplay?.email ?? '',
-        avatar: userDisplay?.photo ?? '',
-        role: 'super_admin' as AdminRole,
+        name: profileData?.data?.name ?? 'Admin User',
+        email: profileData?.data?.email ?? '',
+        avatar: profileData?.data?.profile_pic ?? '',
+        role: (profileData?.data?.role?.name ?? 'super_admin') as AdminRole,
     };
 
     const onMobileMenuToggle = () => setMobileMenuOpen(prev => !prev);
@@ -47,6 +47,7 @@ export function AdminHeader() {
     };
 
     const handleDropdownAction = (key: React.Key) => {
+        if (key === 'profile') router.push(getAdminProfileRoutePath());
         if (key === 'settings') router.push(getAdminSectionRoutePath('settings'));
         if (key === 'website') router.push(getHomeRoutePath());
         if (key === 'logout') handleLogout();
@@ -162,6 +163,7 @@ export function AdminHeader() {
                                     </div>
                                 }
                             >
+                                <DropdownItem key="profile" startContent={<UserCircle className="h-4 w-4" />}>My Profile</DropdownItem>
                                 <DropdownItem key="settings" startContent={<Settings className="h-4 w-4" />}>Settings</DropdownItem>
                                 <DropdownItem key="website" startContent={<Home className="h-4 w-4" />}>Back to Website</DropdownItem>
                                 <DropdownSection>

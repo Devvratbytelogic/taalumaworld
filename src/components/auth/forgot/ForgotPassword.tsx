@@ -29,7 +29,8 @@ export default function ForgotPassword() {
                 resetForm();
                 dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'verify' } }));
             } catch {
-                toast.error('Failed to send reset code. Please check your email and try again.');
+                // toast.error('Failed to send reset code. Please check your email and try again.');
+                console.log('Failed to send reset code. Please check your email and try again.');
             }
         },
     });

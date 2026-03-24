@@ -30,7 +30,11 @@ function UserDashboardInner() {
   };
 
   const setCurrentPage = (page: DashboardPage) => {
-    router.push(`${getUserDashboardRoutePath()}?tab=${page}`);
+    if (page === 'dashboard') {
+      router.push(getUserDashboardRoutePath());
+    } else {
+      router.push(`${getUserDashboardRoutePath()}?tab=${page}`);
+    }
   };
 
   const navItems = [

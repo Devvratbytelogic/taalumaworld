@@ -1,62 +1,24 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
 import { BookOpen, Book, Clock, ArrowRight } from 'lucide-react';
-import Button from '@/components/ui/Button';
-import { useGetAllBooksQuery, useGetAllAdminChaptersQuery } from '@/store/rtkQueries/adminGetApi';
-import type { Book as BookType } from '@/types/content';
-import ImageComponent from '@/components/ui/ImageComponent';
 import DashboardHomeSkeleton from '@/components/skeleton-loader/DashboardHomeSkeleton';
-import { selectReadingProgress } from '@/store/slices/readingSlice';
-import { useGetMyChaptersQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetGlobalSettingsQuery, useGetMyBooksQuery, useGetMyChaptersQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 
 export function DashboardHome() {
   const router = useRouter();
-  const readingProgressRaw = useSelector(selectReadingProgress);
-  const [displayMode, setDisplayMode] = useState<'chapters' | 'books'>('chapters');
 
-  const { data: myChaptersData } = useGetMyChaptersQuery();
+  const { data: globalSettingsData, isLoading: globalSettingsLoading } = useGetGlobalSettingsQuery();
+  const { data: myChaptersData, isLoading: chaptersLoading } = useGetMyChaptersQuery();
+  const { data: myBooksData, isLoading: booksLoading } = useGetMyBooksQuery();
   const { data: profileData } = useGetUserProfileQuery();
+
+  const displayMode = globalSettingsData?.data?.visible === 'book' ? 'books' : 'chapters';
 
   const userName = profileData?.data?.name ?? 'User';
   const firstName = userName.split(' ')[0] || userName;
 
-  const readingProgress = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(readingProgressRaw).map(([id, data]) => [id, data.progress])
-      ),
-    [readingProgressRaw]
-  );
-
   const ownedChapters = myChaptersData?.data?.items ?? [];
-
-  const ownedBooks = useMemo(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      return JSON.parse(localStorage.getItem('owned_books') || '[]');
-    } catch {
-      return [];
-    }
-  }, []);
-
-  useEffect(() => {
-    const savedMode = localStorage.getItem('display-mode');
-    if (savedMode === 'books' || savedMode === 'chapters') {
-      setDisplayMode(savedMode);
-    }
-
-    const handleDisplayModeChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ mode: 'chapters' | 'books' }>;
-      setDisplayMode(customEvent.detail.mode);
-    };
-
-    window.addEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
-    return () => {
-      window.removeEventListener('display-mode-changed', handleDisplayModeChange as EventListener);
-    };
-  }, []);
+  const ownedBooks = myBooksData?.data?.items ?? [];
 
   const onPageChange = (page: string) => {
     router.push(`/user-dashboard?tab=${page}`);
@@ -72,37 +34,10 @@ export function DashboardHome() {
     }
   };
 
-  const { data: books, isLoading: booksLoading } = useGetAllBooksQuery();
-  const booksData = books?.data ?? [];
-  const { data: chapters, isLoading: chaptersLoading } = useGetAllAdminChaptersQuery();
-  const chaptersData = chapters?.data ?? [];
-
-  if (booksLoading || chaptersLoading) {
+  if (globalSettingsLoading || booksLoading || chaptersLoading) {
     return <DashboardHomeSkeleton />;
   }
 
-  const continueReadingItems = Object.entries(readingProgress)
-    .filter(([, progress]) => progress > 0 && progress < 100)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
-
-  const hasContinueReading = continueReadingItems.length > 0;
-
-  const getContinueReadingItem = (id: string) => {
-    if (displayMode === 'chapters') {
-      const chapter = chaptersData.find((c) => c.id === id);
-      if (chapter) {
-        const book = booksData.find((b) => b.id === chapter.book._id);
-        return { type: 'chapter', item: chapter, book };
-      }
-    } else {
-      const book = booksData.find((b) => b.id === id);
-      if (book) {
-        return { type: 'book', item: book };
-      }
-    }
-    return null;
-  };
 
   return (
     <div className="space-y-8">
@@ -118,128 +53,7 @@ export function DashboardHome() {
         </p>
       </div>
 
-      {/* Continue Reading Section - Only show if there's progress */}
-      {hasContinueReading && (
-        <div className="bg-white rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-foreground">Continue Reading</h2>
-            <Button
-              className='global_btn rounded_full outline_primary'
-              onPress={() => onPageChange('history')}
-            >
-              View All
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {continueReadingItems.map(([id, progress]) => {
-              const item = getContinueReadingItem(id);
-              if (!item) return null;
-
-              if (item.type === 'chapter') {
-                const chapter = item.item;
-                const book = item.book;
-
-                return (
-                  <div
-                    key={id}
-                    className="group bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => onNavigate('read-chapter', id)}
-                  >
-                    <div className="aspect-video relative overflow-hidden bg-gray-100">
-                      <div className='group-hover:scale-105 transition-transform duration-300'>
-                        <ImageComponent
-                          src={chapter.coverImage}
-                          alt={chapter.title}
-                          object_cover={true}
-                        />
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-xs text-muted-foreground mb-1">{book?.title}</p>
-                      <h3 className="font-semibold text-sm mb-2 line-clamp-2">
-                        {chapter.title}
-                      </h3>
-
-                      {/* Progress Bar */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{Math.round(progress)}% complete</span>
-                        </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full transition-all"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <Button
-                        size="sm"
-                        className="w-full mt-3 rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onNavigate('read-chapter', id);
-                        }}
-                      >
-                        Continue Reading
-                      </Button>
-                    </div>
-                  </div>
-                );
-              } else {
-                const book = item.item as BookType;
-
-                return (
-                  <div
-                    key={id}
-                    className="group bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => onNavigate('read-book')}
-                  >
-                    <div className="aspect-3/4 relative overflow-hidden bg-gray-100">
-                      <img
-                        src={book.coverImage}
-                        alt={book.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-sm mb-2 line-clamp-2">
-                        {book.title}
-                      </h3>
-
-                      {/* Progress Bar */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{Math.round(progress)}% complete</span>
-                        </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full transition-all"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <Button
-                        size="sm"
-                        className="w-full mt-3 rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onNavigate('read-book');
-                        }}
-                      >
-                        Continue Reading
-                      </Button>
-                    </div>
-                  </div>
-                );
-              }
-            })}
-          </div>
-        </div>
-      )}
+      
 
       {/* Quick Access Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -327,27 +141,6 @@ export function DashboardHome() {
         </button>
       </div>
 
-      {/* Empty State if no reading progress */}
-      {!hasContinueReading && (
-        <div className="bg-white rounded-3xl p-12 text-center shadow-sm">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Start Your Reading Journey</h3>
-            <p className="text-muted-foreground mb-6">
-              You haven't started reading yet. Explore our collection and dive into amazing stories!
-            </p>
-            <Button
-              onPress={() => onNavigate('home')}
-              className='global_btn rounded_full bg_primary'
-            >
-              {displayMode === 'chapters' ? 'Browse Chapters' : 'Browse Books'}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

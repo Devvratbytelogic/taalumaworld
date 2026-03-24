@@ -3,12 +3,14 @@ import { Settings, Lock, LogOut, Eye, EyeOff, Check } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import toast from '@/utils/toast';
+import { useUserChangePasswordMutation } from '@/store/rtkQueries/userAuthApi';
 
 interface SettingsPageProps {
   onLogout: () => void;
 }
 
 export function SettingsPage({ onLogout }: SettingsPageProps) {
+  const [changePassword, { isLoading: isSaving }] = useUserChangePasswordMutation();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -16,7 +18,6 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<{
     currentPassword?: string;
     newPassword?: string;
@@ -51,20 +52,22 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
   const handlePasswordChange = async () => {
     if (!validatePasswordChange()) return;
 
-    setIsSaving(true);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // In a real app, this would call the backend to change password
-    setIsSaving(false);
-    setIsChangingPassword(false);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setErrors({});
-    
-    toast.success('Password changed successfully!');
+    try {
+      const res = await changePassword({
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      }).unwrap();
+      toast.success((res as { message?: string }).message ?? 'Password changed successfully!');
+      setIsChangingPassword(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setErrors({});
+    } catch (err) {
+      const message = (err as { data?: { message?: string } })?.data?.message;
+      toast.error(message ?? 'Failed to change password. Please try again.');
+    }
   };
 
   const handleLogout = () => {

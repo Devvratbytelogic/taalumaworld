@@ -10,7 +10,7 @@ import { Textarea } from '../../ui/textarea';
 import Button from '../../ui/Button';
 import { Switch } from '../../ui/switch';
 import { cn } from '../../ui/utils';
-import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
+import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
@@ -90,7 +90,7 @@ function CheckboxField({ id, label, checked, onChange }: { id: string; label: st
 }
 
 export function GeneralSettingsCard() {
-  const { data: res, isLoading } = useGetGlobalSettingsQuery();
+  const { data: res, isLoading } = useGetAdminGlobalSettingsQuery();
   const [updateGlobalSettings, { isLoading: isUpdating }] = useUpdateGlobalSettingsMutation();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);

@@ -15,13 +15,7 @@ import { DashboardRecentActivity } from './DashboardRecentActivity';
 import { DashboardTopContent } from './DashboardTopContent';
 import { DashboardQuickActions } from './DashboardQuickActions';
 import { useAdminUser } from '../../../hooks/useAdminUser';
-import {
-  useGetAllUsersQuery,
-  useGetAllBooksQuery,
-  useGetAllAdminChaptersQuery,
-  useGetAllTestimonialsQuery,
-  useGetGlobalSettingsQuery,
-} from '../../../store/rtkQueries/adminGetApi';
+import { useGetAllUsersQuery, useGetAllBooksQuery, useGetAllAdminChaptersQuery, useGetAllTestimonialsQuery, useGetAdminGlobalSettingsQuery } from '../../../store/rtkQueries/adminGetApi';
 import { getAdminSectionRoutePath } from '../../../routes/routes';
 
 function timeAgo(dateStr: string): string {
@@ -55,7 +49,7 @@ export function AdminDashboardTab() {
   const { data: booksData, isLoading: booksLoading } = useGetAllBooksQuery();
   const { data: chaptersData, isLoading: chaptersLoading } = useGetAllAdminChaptersQuery();
   const { data: testimonialsData, isLoading: testimonialsLoading } = useGetAllTestimonialsQuery();
-  const { data: globalSettingsData } = useGetGlobalSettingsQuery();
+  const { data: globalSettingsData } = useGetAdminGlobalSettingsQuery();
 
   const isLoading = usersLoading || booksLoading || chaptersLoading || testimonialsLoading;
 

@@ -47,7 +47,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** global settings */
-        getGlobalSettings: builder.query<IGlobalSettingsAPIResponse, void>({
+        getAdminGlobalSettings: builder.query<IGlobalSettingsAPIResponse, void>({
             query: () => ({
                 url: `/admin/get-global`,
                 method: 'GET',
@@ -89,7 +89,7 @@ export const {
     useGetAllAuthorLeadersQuery,
     useGetAllBooksQuery,
     useGetAllAdminChaptersQuery,
-    useGetGlobalSettingsQuery,
+    useGetAdminGlobalSettingsQuery,
     useGetAllUsersQuery,
     useGetAllTestimonialsQuery,
     useGetAllFaqsQuery,

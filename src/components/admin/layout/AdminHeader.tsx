@@ -11,14 +11,14 @@ import { getAdminSectionRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { clearAuthCookies, getUserDisplayData } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
-import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
+import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import type { AdminRole } from '@/types/admin';
 import ImageComponent from '@/components/ui/ImageComponent';
 
 export function AdminHeader() {
     const router = useRouter();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
-    const { data: globalSettings, isFetching: isSettingsLoading } = useGetGlobalSettingsQuery();
+    const { data: globalSettings, isFetching: isSettingsLoading } = useGetAdminGlobalSettingsQuery();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const visible = globalSettings?.data?.visible ?? 'chapter';

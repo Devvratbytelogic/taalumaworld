@@ -1,11 +1,57 @@
 import * as Yup from 'yup';
 
 
+const passwordRules = Yup.string()
+  .min(8, 'Password must be at least 8 characters')
+  .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .matches(/[0-9]/, 'Password must contain at least one number')
+  .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, 'Password must contain at least one special character')
+  .required('Password is required');
+
+
+// Basic email shape: local + @ + domain with TLD (used for initial format check)
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+
+/**
+ * Validates email with strict rules:
+ * - Local: no leading/trailing dot or hyphen; no consecutive dots
+ * - Domain: no label starting/ending with hyphen; no consecutive hyphens
+ */
+export function validateEmail(email: string): boolean {
+  const trimmed = email.trim()
+  if (!trimmed || !EMAIL_REGEX.test(trimmed)) return false
+
+  const atIndex = trimmed.indexOf('@')
+  const local = trimmed.slice(0, atIndex)
+  const domain = trimmed.slice(atIndex + 1)
+
+  // Local part: no leading/trailing dot or hyphen, no consecutive dots
+  if (local.startsWith('.') || local.endsWith('.')) return false
+  if (local.startsWith('-') || local.endsWith('-')) return false
+  if (/\.\./.test(local)) return false
+
+  // Domain: no consecutive dots (no empty labels)
+  const labels = domain.split('.')
+  if (labels.some((label) => label.length === 0)) return false
+
+  // Each domain label: no leading/trailing hyphen, no consecutive hyphens
+  for (const label of labels) {
+    if (label.startsWith('-') || label.endsWith('-')) return false
+    if (/--/.test(label)) return false
+  }
+
+  return true
+}
+
+const EMAIL_VALIDATION_MESSAGE = 'Please enter a valid email address'
+
+const emailRules = Yup.string()
+  .required('Email is required')
+  .test('strict-email', EMAIL_VALIDATION_MESSAGE, (v) => !v || validateEmail(v))
+
 // Sign In Validation Schema
 export const signInSchema = Yup.object({
-  email: Yup.string()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
+  email: emailRules,
   password: Yup.string()
     .min(6, 'Password must be at least 6 characters')
     .required('Password is required'),
@@ -15,27 +61,19 @@ export const signUpSchema = Yup.object({
   name: Yup.string()
     .min(2, 'Name must be at least 2 characters')
     .required('Name is required'),
-  email: Yup.string()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+  email: emailRules,
+  password: passwordRules,
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords must match')
     .required('Please confirm your password'),
 });
 
 export const forgotPasswordSchema = Yup.object({
-  email: Yup.string()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
+  email: emailRules,
 });
 
 export const resetPasswordSchema = Yup.object({
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+  password: passwordRules,
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords must match')
     .required('Please confirm your password'),
@@ -70,20 +108,18 @@ export const checkoutSchema = Yup.object({
 
 // Contact Form Validation Schema
 export const contactFormSchema = Yup.object({
-    name: Yup.string()
-      .min(2, 'Name must be at least 2 characters')
-      .required('Name is required'),
-    email: Yup.string()
-      .email('Please enter a valid email address')
-      .required('Email is required'),
-    subject: Yup.string()
-      .min(5, 'Subject must be at least 5 characters')
-      .required('Subject is required'),
-    message: Yup.string()
-      .min(10, 'Message must be at least 10 characters')
-      .max(1000, 'Message must be less than 1000 characters')
-      .required('Message is required'),
-  });
+  name: Yup.string()
+    .min(2, 'Name must be at least 2 characters')
+    .required('Name is required'),
+  email: emailRules,
+  subject: Yup.string()
+    .min(5, 'Subject must be at least 5 characters')
+    .required('Subject is required'),
+  message: Yup.string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(1000, 'Message must be less than 1000 characters')
+    .required('Message is required'),
+});
 
 // Add Book Modal Validation Schema (matches API: title, thoughtLeader, category, subcategory, description, pricingModel, price, cover_image, tags)
 export const addBookSchema = Yup.object({
@@ -155,8 +191,8 @@ export const globalSettingsSchema = Yup.object({
   platformName: Yup.string().trim().required('Platform name is required'),
   marketplace_name: Yup.string().trim().required('Marketplace name is required'),
   platformDescription: Yup.string().trim(),
-  supportEmail: Yup.string().email('Enter a valid support email').required('Support email is required'),
-  email: Yup.string().email('Enter a valid contact email'),
+  supportEmail: emailRules.label('Support email'),
+  email: Yup.string().test('strict-email', 'Enter a valid contact email', (v) => !v || validateEmail(v)),
   phone: Yup.string().matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid phone number'),
   alt_phone: Yup.string().matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid alternate phone number'),
   address: Yup.string().trim(),
@@ -202,10 +238,7 @@ export const authorSchema = Yup.object({
   fullName: Yup.string()
     .trim()
     .required('Please enter full name'),
-  email: Yup.string()
-    .trim()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
+  email: emailRules,
   professionalBio: Yup.string().trim(),
   status: Yup.string()
     .oneOf(['Active', 'Inactive'], 'Status must be Active or Inactive')

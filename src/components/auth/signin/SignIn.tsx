@@ -70,8 +70,14 @@ export default function SignIn() {
                     }
                 }
             } catch (error) {
-                console.log(error);
-                // toast.error('Invalid email or password. Please try again.');
+                const errMsg = (error as { data?: { message?: string } })?.data?.message ?? '';
+                if (errMsg.toLowerCase().includes('verify your account')) {
+                    toast.info(errMsg);
+                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: values.email, type: 'account' } }));
+                } else {
+                    // toast.error(errMsg || 'Invalid email or password. Please try again.');
+                    console.log(errMsg || 'Invalid email or password. Please try again.');
+                }
             }
         },
     });

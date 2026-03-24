@@ -11,6 +11,8 @@ import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi';
 import toast from '@/utils/toast';
+import Link from 'next/link';
+import { getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -80,7 +82,7 @@ export default function SignUp() {
                         Create Account
                     </p>
                     <p className="text-sm text-muted-foreground font-normal">
-                        Join TaalumaWorld and unlock tailored learning experiences
+                        Join <span className="text-foreground font-bold">Taaluma</span><span className="text-primary font-bold">World</span> and start your reading journey!
                     </p>
                 </ModalHeader>
                 <ModalBody>
@@ -241,8 +243,10 @@ export default function SignUp() {
                         >
                             Sign Up
                         </Button>
+
+                        
                     </form>
-                    <ModalFooter>
+                    <ModalFooter className='px-0!'>
                         <div className="w-full text-center text-sm text-muted-foreground">
                             <span>Already have an account? </span>
                             <button
@@ -253,6 +257,16 @@ export default function SignUp() {
                             >
                                 Sign In
                             </button>
+                            <p className="text-center text-sm text-muted-foreground">
+                            By creating an account, you agree to our{' '}
+                            <Link href={getTermsOfServiceRoutePath()} target='_blank' className="font-semibold text-primary hover:text-primary/80 transition-colors">
+                                Terms &amp; Conditions
+                            </Link>
+                            {' '}and{' '}
+                            <Link href={getPrivacyPolicyRoutePath()} target='_blank' className="font-semibold text-primary hover:text-primary/80 transition-colors">
+                                Privacy Policy
+                            </Link>
+                        </p>
                         </div>
                     </ModalFooter>
                 </ModalBody>

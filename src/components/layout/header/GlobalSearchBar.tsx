@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
-import { getAuthorsRoutePath, getSearchRoutePath } from '@/routes/routes';
+import { getAuthorsRoutePath } from '@/routes/routes';
 import { Search, X, BookOpen, FileText, User, Clock } from 'lucide-react';
 import { useGetSearchResultsQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
 import { Input } from '@/components/ui/input';
@@ -115,8 +115,8 @@ export default function GlobalSearchBar() {
     e.preventDefault();
     if (!query.trim()) return;
     saveSearch(query.trim());
-    router.push(getSearchRoutePath(query.trim()));
-    clearAndClose();
+    // router.push(getSearchRoutePath(query.trim()));
+    // clearAndClose();
   };
 
   return (
@@ -287,7 +287,7 @@ export default function GlobalSearchBar() {
               )}
 
               {/* View all results */}
-              <div className="p-2 border-t">
+              {/* <div className="p-2 border-t">
                 <button
                   onClick={() => {
                     saveSearch(debouncedQuery);
@@ -301,7 +301,7 @@ export default function GlobalSearchBar() {
                     See all results for &quot;{debouncedQuery}&quot;
                   </span>
                 </button>
-              </div>
+              </div> */}
             </>
           )}
 

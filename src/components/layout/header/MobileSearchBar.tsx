@@ -5,7 +5,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/Button';
 import { useGetSearchResultsQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
-import { getSearchRoutePath, getAuthorsRoutePath } from '@/routes/routes';
+import { getAuthorsRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
 import { useAppDispatch } from '@/store/hooks';
 import { openModal } from '@/store/slices/allModalSlice';
@@ -131,8 +131,8 @@ export default function MobileSearchBar() {
       return;
     }
     saveSearch(searchQuery.trim());
-    router.push(getSearchRoutePath(searchQuery.trim()));
-    clearAndClose();
+    // router.push(getSearchRoutePath(searchQuery.trim()));
+    // clearAndClose();
   };
 
   const handleRecentClick = (term: string) => {
@@ -306,7 +306,7 @@ export default function MobileSearchBar() {
                 )}
 
                 {/* View all results */}
-                <div className="p-2 border-t">
+                {/* <div className="p-2 border-t">
                   <button
                     onClick={() => {
                       saveSearch(debouncedQuery);
@@ -320,7 +320,7 @@ export default function MobileSearchBar() {
                       See all results for &quot;{debouncedQuery}&quot;
                     </span>
                   </button>
-                </div>
+                </div> */}
               </>
             )}
 

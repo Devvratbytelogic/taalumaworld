@@ -11,11 +11,12 @@ import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useUserResetPasswordMutation } from '@/store/rtkQueries/userAuthApi';
 import toast from '@/utils/toast';
+import Cookies from 'js-cookie';
 
 export default function ResetPassword() {
     const dispatch = useDispatch();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-    const modalData = data as { email: string; code: string; token: string } | null;
+    const modalData = data as { email: string; code: string } | null;
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [userResetPassword, { isLoading: isResetting }] = useUserResetPasswordMutation();
@@ -27,19 +28,22 @@ export default function ResetPassword() {
         },
         validationSchema: resetPasswordSchema,
         onSubmit: async (formValues, { resetForm }) => {
+            const token = Cookies.get('reset_password_token') ?? '';
             try {
                 const res = await userResetPassword({
-                    email: modalData?.email ?? '',
-                    code: modalData?.code ?? '',
-                    password: formValues.password,
-                    password_confirmation: formValues.confirmPassword,
-                },
-                ).unwrap();
+                    token,
+                    payload: {
+                        password: formValues.password,
+                        confirm_password: formValues.confirmPassword,
+                    },
+                }).unwrap();
                 toast.success((res as { message?: string }).message ?? 'Password updated successfully!');
+                Cookies.remove('reset_password_token');
                 resetForm();
                 dispatch(openModal({ componentName: 'SignIn', data: '' }));
             } catch {
-                toast.error('Failed to reset password. Please try again.');
+                // toast.error('Failed to reset password. Please try again.');
+                console.log('Failed to reset password. Please try again.');
             }
         },
     });

@@ -32,7 +32,7 @@ export interface bannerProps {
 
 
 export const homeBannerData: bannerProps = {
-    badgeText: 'Now live and ready to explore!',
+    badgeText: '📚 Now live and ready to explore!',
     heading: {
         prefix: 'Discover the joy of',
         highlight: 'reading',

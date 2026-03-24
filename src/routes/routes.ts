@@ -112,9 +112,9 @@ export function getMyBooksRoutePath(): string {
   return '/my-books';
 }
 
-export function getSearchRoutePath(query: string): string {
-  return `/search?q=${encodeURIComponent(query)}`;
-}
+// export function getSearchRoutePath(query: string): string {
+//   return `/search?q=${encodeURIComponent(query)}`;
+// }
 
 // ─── Dynamic Routes ────────────────────────────────────────────────────────
 

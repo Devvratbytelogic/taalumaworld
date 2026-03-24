@@ -10,6 +10,7 @@ import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useUserVerifyOtpMutation, useUserResendOtpMutation } from '@/store/rtkQueries/userAuthApi';
 import toast from '@/utils/toast';
+import Cookies from 'js-cookie';
 
 export default function OtpVerification() {
     const dispatch = useDispatch();
@@ -40,7 +41,8 @@ export default function OtpVerification() {
                     dispatch(openModal({ componentName: 'SignIn', data: '' }));
                 } else {
                     const tempToken = (res as { data?: string }).data ?? '';
-                    dispatch(openModal({ componentName: 'ResetPassword', data: { email: modalData.email, code: formValues.code, token: tempToken } }));
+                    Cookies.set('reset_password_token', tempToken, { expires: 1 / 24, sameSite: 'strict' });
+                    dispatch(openModal({ componentName: 'ResetPassword', data: { email: modalData.email, code: formValues.code } }));
                 }
             } catch {
                 toast.error('Invalid or expired code. Please try again.');

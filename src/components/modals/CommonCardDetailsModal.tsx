@@ -237,7 +237,7 @@ function BookModalContent({
               <div className="min-w-0">
                 <p className="font-medium text-sm tracking-tight">{chapter.author}</p>
                 {chapter.authorBio && (
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{chapter.authorBio}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">{chapter.authorBio}</p>
                 )}
               </div>
             </div>
@@ -457,7 +457,7 @@ function ChapterModalContent({
               )}
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium text-sm mb-1 tracking-tight">{bookData.title}</h4>
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed tracking-tight">
+                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed tracking-tight">
                   {bookData.description}
                 </p>
                 {bookData.tags && bookData.tags.filter(Boolean).length > 0 && (

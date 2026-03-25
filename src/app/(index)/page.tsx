@@ -14,9 +14,11 @@ export default function HomePage() {
         <CommonBanner data={homeBannerData} />
 
         {/* Main Content */}
-        <Suspense fallback={<LibraryContentSectionSkeleton />}>
-          <LibraryContentSection />
-        </Suspense>
+        <div id="content-section" style={{ scrollMarginTop: '200px' }}>
+          <Suspense fallback={<LibraryContentSectionSkeleton />}>
+            <LibraryContentSection />
+          </Suspense>
+        </div>
 
         {/* Reader Testimonials */}
         <ReaderTestimonials />

@@ -55,7 +55,12 @@ const baseQueryWithAuth: BaseQueryFn<
             const status = errorData?.status;
             const responseData = errorData?.data;
             const message = (responseData as { message?: string })?.message || "Unknown API error";
-            addToast({ title: "Error", description: responseData?.message ?? "Unknown error", color: "danger", timeout: 2000 })
+            // Suppress silent background errors (401, 403, 404) but show all other errors to the user
+            // const SILENT_STATUSES = [401, 403, 404];
+            // const shouldShowToast = !status || !SILENT_STATUSES.includes(status);
+            // if (shouldShowToast) {
+                addToast({ title: "Error", description: responseData?.message ?? "Unknown error", color: "danger", timeout: 2000 });
+            // }
             return {
                 error: {
                     status: "CUSTOM_ERROR",

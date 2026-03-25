@@ -1,8 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { booksApi } from './api/booksApi';
-import { authorsApi } from './api/authorsApi';
-import { userApi } from './api/userApi';
 import cartReducer from './slices/cartSlice';
 import contentModeReducer from './slices/contentModeSlice';
 import readingReducer from './slices/readingSlice';
@@ -12,12 +9,7 @@ import { rtkQuerieSetup } from "./services/rtkQuerieSetup";
 
 export const store = configureStore({
   reducer: {
-    // RTK Query APIs
     [rtkQuerieSetup.reducerPath]: rtkQuerieSetup.reducer,
-    [booksApi.reducerPath]: booksApi.reducer,
-    [authorsApi.reducerPath]: authorsApi.reducer,
-    [userApi.reducerPath]: userApi.reducer,
-    // Regular slices
     allModal: allModalSlice,
     chapterPurchase: chapterPurchaseReducer,
     cart: cartReducer,
@@ -26,9 +18,6 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
-      booksApi.middleware,
-      authorsApi.middleware,
-      userApi.middleware,
       rtkQuerieSetup.middleware
     ),
 });

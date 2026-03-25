@@ -21,9 +21,9 @@ export default function CreateChapterPage() {
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                             Create New Chapter
                         </h1>
-                        <p className="text-muted-foreground mt-0.5">
+                        {/* <p className="text-muted-foreground mt-0.5">
                             Add a new chapter with rich content and optional PDF attachment
-                        </p>
+                        </p> */}
                     </div>
                 </div>
             </div>

@@ -87,7 +87,7 @@ export default function BookReadPage() {
               <h2 className="font-bold text-lg leading-tight mb-1">{book.title}</h2>
               <p className="text-sm text-muted-foreground mb-2">{book.author}</p>
               {book.description && (
-                <p className="text-xs text-muted-foreground line-clamp-3">{book.description}</p>
+                <p className="text-muted-foreground line-clamp-3">{book.description}</p>
               )}
             </div>
           </div>

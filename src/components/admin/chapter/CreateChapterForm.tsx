@@ -36,7 +36,7 @@ const initialFormValues = {
   description: '',
   content: '',
   sequence: 1,
-  page: 1,
+  // page: 1,
   isFree: false,
   price: 0 as number | undefined,
   status: 'Published',
@@ -91,7 +91,7 @@ export function CreateChapterForm() {
         formData.append('price', String(!vals.isFree ? (vals.price ?? 0) : 0));
       }
       formData.append('status', vals.status);
-      formData.append('page', String(vals.page ?? 1));
+      // formData.append('page', String(vals.page ?? 1));
       formData.append('cover_image', featuredImageFile);
       if (pdfFile) {
         formData.append('pdf_file', pdfFile);
@@ -306,7 +306,7 @@ export function CreateChapterForm() {
               <p className="text-sm text-red-600">{errors.sequence}</p>
             )}
           </div>
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="chapter-page">Page<span className="text-red-500">*</span></Label>
             <Input
               id="chapter-page"
@@ -333,7 +333,7 @@ export function CreateChapterForm() {
             {errors.page && touched.page && (
               <p className="text-sm text-red-600">{errors.page}</p>
             )}
-          </div>
+          </div> */}
           {chapterPricingEnabled ? (
             <>
               <div className="space-y-2 flex flex-col justify-end">

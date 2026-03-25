@@ -20,7 +20,7 @@ export function AppProviders({ children }: ProvidersProps) {
                     <ToastProvider />
                     <NextTopLoader
                         color="#f7941d"
-                    // showSpinner={false}
+                        showSpinner={false}
                     />
                     <AllModal />
                     {children}

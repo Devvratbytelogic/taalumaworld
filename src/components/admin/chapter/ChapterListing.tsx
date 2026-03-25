@@ -58,7 +58,7 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-medium line-clamp-1">{chapter.title}</div>
+                        <div className="font-medium line-clamp-1 truncate max-w-40">{chapter.title}</div>
                         <div className="text-sm text-muted-foreground line-clamp-1">
                           Chapter {chapter.number}
                         </div>
@@ -66,10 +66,10 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="line-clamp-1">{chapter?.book?.title || 'N/A'}</div>
+                    <div className="line-clamp-1 truncate max-w-40">{chapter?.book?.title || 'N/A'}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="line-clamp-1">{chapter?.book?.thoughtLeader?.fullName || 'Unknown'}</div>
+                    <div className="line-clamp-1 truncate max-w-40">{chapter?.book?.thoughtLeader?.fullName || 'Unknown'}</div>
                   </TableCell>
                   <TableCell>
                     <span className="font-semibold text-primary">

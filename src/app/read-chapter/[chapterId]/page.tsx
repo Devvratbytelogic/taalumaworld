@@ -7,7 +7,16 @@ import Button from '@/components/ui/Button';
 import { useGetSingleBookQuery, useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
 import type { IBookChapterItem } from '@/types/user/singleBook';
 import MarkdownContent from '@/components/ui/MarkdownContent';
-import PdfViewer from '@/components/ui/PdfViewer';
+import dynamic from 'next/dynamic';
+
+const PdfViewer = dynamic(() => import('@/components/ui/PdfViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center py-16">
+      <p className="text-muted-foreground text-sm animate-pulse">Loading PDF…</p>
+    </div>
+  ),
+});
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';

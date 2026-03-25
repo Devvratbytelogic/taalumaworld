@@ -151,10 +151,10 @@ export const addChapterSchema = Yup.object({
     .integer('Must be a whole number')
     .min(1, 'Sequence must be at least 1')
     .required('Sequence is required'),
-  page: Yup.number()
-    .integer('Must be a whole number')
-    .min(0, 'Page cannot be negative')
-    .required('Page is required'),
+  // page: Yup.number()
+  //   .integer('Must be a whole number')
+  //   .min(0, 'Page cannot be negative')
+  //   .required('Page is required'),
   isFree: Yup.boolean(),
   price: Yup.number()
     .when('isFree', {

@@ -18,6 +18,7 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [errors, setErrors] = useState<{
     currentPassword?: string;
     newPassword?: string;
@@ -55,8 +56,8 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
     try {
       const res = await changePassword({
         current_password: currentPassword,
-        new_password: newPassword,
-        confirm_password: confirmPassword,
+        password: newPassword,
+        password_confirmation: confirmPassword,
       }).unwrap();
       toast.success((res as { message?: string }).message ?? 'Password changed successfully!');
       setIsChangingPassword(false);
@@ -66,15 +67,15 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
       setErrors({});
     } catch (err) {
       const message = (err as { data?: { message?: string } })?.data?.message;
-      toast.error(message ?? 'Failed to change password. Please try again.');
+      // toast.error(message ?? 'Failed to change password. Please try again.');
+      console.log(message);
     }
   };
 
   const handleLogout = () => {
-    if (confirm('Are you sure you want to log out?')) {
-      toast.success('Logged out successfully');
-      onLogout();
-    }
+    toast.success('Logged out successfully');
+    setShowLogoutModal(false);
+    onLogout();
   };
 
   const handleCancel = () => {
@@ -117,9 +118,9 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
 
           {!isChangingPassword ? (
             <div>
-              <p className="text-sm text-muted-foreground mb-4">
+              {/* <p className="text-sm text-muted-foreground mb-4">
                 Last changed: Never
-              </p>
+              </p> */}
               <Button className='global_btn rounded_full bg_primary' onPress={() => setIsChangingPassword(true)}>
                 Change Password
               </Button>
@@ -286,13 +287,49 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
 
           <Button
             className='global_btn rounded_full danger_outline'
-            onPress={handleLogout}
+            onPress={() => setShowLogoutModal(true)}
           >
             <LogOut className="h-4 w-4" />
             Logout
           </Button>
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowLogoutModal(false)}
+          />
+          <div className="relative bg-white rounded-3xl shadow-xl p-8 w-full max-w-sm flex flex-col items-center gap-4">
+            <div className="p-3 bg-red-100 rounded-2xl">
+              <LogOut className="h-7 w-7 text-red-500" />
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-foreground mb-1">Log out?</h3>
+              <p className="text-sm text-muted-foreground">
+                Are you sure you want to sign out of your account?
+              </p>
+            </div>
+            <div className="flex gap-3 w-full pt-1">
+              <Button
+                className="global_btn rounded_full outline_primary flex-1"
+                onPress={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="global_btn rounded_full danger_btn flex-1"
+                onPress={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                Log out
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

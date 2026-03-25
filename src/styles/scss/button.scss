@@ -47,6 +47,11 @@ button {
         @apply text-red-500 border border-red-500 bg-transparent;
     }
 
+    /* danger filled button */
+    &.danger_btn {
+        @apply bg-red-500 text-white border border-red-500 outline-none;
+    }
+
     /* success outline button */
     &.success_outline {
         @apply text-success border border-success bg-transparent;

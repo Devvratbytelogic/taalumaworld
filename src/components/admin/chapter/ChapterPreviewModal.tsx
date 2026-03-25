@@ -60,7 +60,7 @@ export function ChapterPreviewModal({
               )}
               <div className="flex items-center gap-2 pt-1">
                 <span className="font-semibold text-primary">
-                  {chapter.isFree ? 'Free' : `$${chapter.price.toFixed(2)}`}
+                  {chapter.isFree ? 'Free' : `KSH ${chapter.price.toFixed(2)}`}
                 </span>
                 {chapter.isFree && (
                   <span className="text-xs text-muted-foreground">(Free chapter)</span>
@@ -94,7 +94,7 @@ export function ChapterPreviewModal({
             <div>
               <dt className="text-muted-foreground">Price</dt>
               <dd className="font-medium">
-                {chapter.isFree ? 'Free' : `$${chapter.price.toFixed(2)}`}
+                {chapter.isFree ? 'Free' : `KSH ${chapter.price.toFixed(2)}`}
               </dd>
             </div>
           </dl>

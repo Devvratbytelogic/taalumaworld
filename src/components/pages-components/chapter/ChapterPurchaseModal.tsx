@@ -123,7 +123,7 @@ export function ChapterPurchaseModal() {
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium text-foreground">Chapter Price:</span>
                 <span className="text-2xl font-bold text-primary">
-                  ${chapter.price?.toFixed(2) || '0.00'}
+                  KSH {chapter.price?.toFixed(2) || '0.00'}
                 </span>
               </div>
             </div>

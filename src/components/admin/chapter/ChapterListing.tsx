@@ -73,7 +73,7 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
                   </TableCell>
                   <TableCell>
                     <span className="font-semibold text-primary">
-                      ${chapter.price.toFixed(2)}
+                      KSH {chapter.price.toFixed(2)}
                     </span>
                   </TableCell>
                   <TableCell>

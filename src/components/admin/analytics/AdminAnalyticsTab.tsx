@@ -24,7 +24,7 @@ export function AdminAnalyticsTab({ contentMode }: AdminAnalyticsTabProps) {
       changeType: 'positive',
       icon: BookOpen,
     },
-    { title: 'Total Revenue', value: '$45,231', change: '+23.1%', changeType: 'positive', icon: DollarSign },
+    { title: 'Total Revenue', value: 'KSH 45,231', change: '+23.1%', changeType: 'positive', icon: DollarSign },
     { title: 'Page Views', value: '128,543', change: '+15.3%', changeType: 'positive', icon: Eye },
   ];
 

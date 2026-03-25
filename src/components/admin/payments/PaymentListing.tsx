@@ -51,7 +51,7 @@ export function PaymentListing({ payments, searchQuery = '' }: PaymentListingPro
                 </Badge>
               </TableCell>
               <TableCell className="font-semibold text-primary">
-                ${payment.amount.toFixed(2)}
+                KSH {payment.amount.toFixed(2)}
               </TableCell>
               <TableCell>{payment.date}</TableCell>
               <TableCell>

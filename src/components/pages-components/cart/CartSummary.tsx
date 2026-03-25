@@ -29,7 +29,7 @@ export default function CartSummary({
       <div className="space-y-3 mb-6 pb-6 border-b">
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Subtotal</span>
-          <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+          <span className="font-medium">KSH {subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Items</span>
@@ -39,14 +39,14 @@ export default function CartSummary({
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Discount</span>
             <span className="font-medium text-success">
-              -₹{discountAmount.toFixed(2)}
+              -KSH {discountAmount.toFixed(2)}
             </span>
           </div>
         )}
         {taxAmount > 0 && (
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Tax</span>
-            <span className="font-medium">₹{taxAmount.toFixed(2)}</span>
+            <span className="font-medium">KSH {taxAmount.toFixed(2)}</span>
           </div>
         )}
       </div>
@@ -54,7 +54,7 @@ export default function CartSummary({
       <div className="flex justify-between mb-6 pb-6 border-b">
         <span className="font-bold text-lg">Total</span>
         <span className="font-bold text-2xl text-primary">
-          ₹{total.toFixed(2)}
+          KSH {total.toFixed(2)}
         </span>
       </div>
 

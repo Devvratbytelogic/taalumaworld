@@ -150,7 +150,7 @@ export default function BookReadPage() {
                       )}
                       {/* For chapter-pricing books only, show individual chapter price */}
                       {!isFullBook && !chapter.isFree && chapter.price > 0 && (
-                        <p className="text-xs text-primary font-medium mt-0.5">${chapter.price}</p>
+                        <p className="text-xs text-primary font-medium mt-0.5">KSH {chapter.price}</p>
                       )}
                     </div>
 
@@ -176,7 +176,7 @@ export default function BookReadPage() {
         <div className="absolute bottom-0 left-0 right-0 bg-white border-t px-4 py-3 flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm tracking-tight">Unlock all {chapters.length} chapters</p>
-            <p className="text-xs text-muted-foreground">One-time purchase · ${book!.price.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground">One-time purchase · KSH {book!.price.toFixed(2)}</p>
           </div>
           {!isAuthenticated ? (
             <Button
@@ -184,7 +184,7 @@ export default function BookReadPage() {
               onPress={handleLoginRequired}
               startContent={<ShoppingCart className="h-4 w-4" />}
             >
-              Buy Book · ${book!.price.toFixed(2)}
+              Buy Book · KSH {book!.price.toFixed(2)}
             </Button>
           ) : (
             <AddToCartButton
@@ -193,7 +193,7 @@ export default function BookReadPage() {
               type="book"
               price={book!.price}
               className="global_btn rounded_full bg_primary shrink-0"
-              label={`Buy Book · $${book!.price.toFixed(2)}`}
+              label={`Buy Book · KSH ${book!.price.toFixed(2)}`}
             />
           )}
         </div>

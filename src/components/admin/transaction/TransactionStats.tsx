@@ -22,7 +22,7 @@ export function TransactionStats({
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">${totalRevenue.toFixed(2)}</p>
+            <p className="text-2xl font-bold">KSH {totalRevenue.toFixed(2)}</p>
           </div>
         </div>
       </Card>
@@ -45,7 +45,7 @@ export function TransactionStats({
           <div>
             <p className="text-sm text-muted-foreground">Avg. Transaction</p>
             <p className="text-2xl font-bold">
-              ${avgTransaction.toFixed(2)}
+              KSH {avgTransaction.toFixed(2)}
             </p>
           </div>
         </div>

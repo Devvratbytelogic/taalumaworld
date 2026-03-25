@@ -350,7 +350,7 @@ export function CheckoutPage() {
                           </span>
                         ) : (
                           <span className="text-sm font-semibold">
-                            ${chapter.price?.toFixed(2)}
+                            KSH {chapter.price?.toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -362,7 +362,7 @@ export function CheckoutPage() {
               <div className="space-y-3 mb-6 pb-6 border-t pt-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium">KSH {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Items</span>
@@ -373,7 +373,7 @@ export function CheckoutPage() {
               <div className="flex justify-between mb-6 pb-6 border-b">
                 <span className="font-bold text-lg">Total</span>
                 <span className="font-bold text-2xl text-primary">
-                  ${total.toFixed(2)}
+                  KSH {total.toFixed(2)}
                 </span>
               </div>
 

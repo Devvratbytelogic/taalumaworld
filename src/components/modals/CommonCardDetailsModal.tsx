@@ -177,7 +177,7 @@ function BookModalContent({
               <p className="font-semibold text-sm tracking-tight">Complete Book</p>
               <p className="text-xs text-muted-foreground">Access all {chapter.chapterCount} chapters</p>
             </div>
-            <span className="font-bold text-2xl text-primary">${chapter.price.toFixed(2)}</span>
+            <span className="font-bold text-2xl text-primary">KSH {chapter.price.toFixed(2)}</span>
           </div>
         )}
 
@@ -258,7 +258,7 @@ function BookModalContent({
               onPress={handleBuyBook}
               startContent={<ShoppingCart className="h-4 w-4" />}
             >
-              Buy Complete Book - ${chapter.price.toFixed(2)}
+              Buy Complete Book - KSH {chapter.price.toFixed(2)}
             </Button>
           ) : (
             <AddToCartButton
@@ -267,7 +267,7 @@ function BookModalContent({
               type="book"
               price={chapter.price}
               className="global_btn rounded_full bg_primary w-full"
-              label={`Buy Complete Book - $${chapter.price.toFixed(2)}`}
+              label={`Buy Complete Book - KSH ${chapter.price.toFixed(2)}`}
               onSuccess={() => {
                 dispatch(closeModal())
                 router.push(getCartRoutePath())
@@ -331,7 +331,7 @@ function BookChapterRow({
           className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
           onPress={onLoginRequired}
         >
-          ${chapter.price?.toFixed(2) ?? '0.00'}
+          KSH {chapter.price?.toFixed(2) ?? '0.00'}
         </Button>
       )
     }
@@ -343,7 +343,7 @@ function BookChapterRow({
         type="chapter"
         price={chapter.price}
         className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
-        label={`$${chapter.price?.toFixed(2) ?? '0.00'}`}
+        label={`KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
       />
     )
   }
@@ -411,7 +411,7 @@ function ChapterModalContent({
       if (!isAuthenticated) {
         return (
           <Button className="global_btn rounded_full bg_primary w-full" onPress={onAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-            Buy Complete Book - ${bookPrice.toFixed(2)}
+            Buy Complete Book - KSH {bookPrice.toFixed(2)}
           </Button>
         )
       }
@@ -422,7 +422,7 @@ function ChapterModalContent({
           type="book"
           price={bookPrice}
           className="global_btn rounded_full bg_primary w-full"
-          label={`Buy Complete Book - $${bookPrice.toFixed(2)}`}
+          label={`Buy Complete Book - KSH ${bookPrice.toFixed(2)}`}
           onSuccess={() => {
             dispatch(closeModal())
             router.push(getCartRoutePath())
@@ -435,7 +435,7 @@ function ChapterModalContent({
     if (!isAuthenticated) {
       return (
         <Button className="global_btn rounded_full bg_primary w-full" onPress={onAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-          Add to Cart - ${chapter.price?.toFixed(2) ?? '0.00'}
+          Add to Cart - KSH {chapter.price?.toFixed(2) ?? '0.00'}
         </Button>
       )
     }
@@ -446,7 +446,7 @@ function ChapterModalContent({
         type={chapter.type}
         price={chapter.price}
         className="global_btn rounded_full bg_primary w-full"
-        label={`Add to Cart - $${chapter.price?.toFixed(2) ?? '0.00'}`}
+        label={`Add to Cart - KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
         onSuccess={() => {
           dispatch(closeModal())
           router.push(getCartRoutePath())
@@ -516,8 +516,8 @@ function ChapterModalContent({
                 {chapter.isFree
                   ? 'Free'
                   : isBookPricing
-                    ? `$${bookPrice.toFixed(2)} (book)`
-                    : `$${chapter.price?.toFixed(2) ?? '0.00'}`}
+                    ? `KSH ${bookPrice.toFixed(2)} (book)`
+                    : `KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
               </div>
             </div>
           </div>

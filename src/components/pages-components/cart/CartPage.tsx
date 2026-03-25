@@ -155,7 +155,7 @@ export default function CartDetailsComponent() {
                             </Badge>
                           ) : (
                             <p className="text-xl font-bold text-primary">
-                              ₹{item.selling_price?.toFixed(2)}
+                              KSH {item.selling_price?.toFixed(2)}
                             </p>
                           )}
                         </div>

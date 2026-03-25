@@ -87,7 +87,7 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
         {book.pricingModel === 'book' && book.price != null && (
           <div className="pt-2">
             <span className="text-lg font-bold text-primary">
-              ${Number(book.price).toFixed(2)}
+              KSH {Number(book.price).toFixed(2)}
             </span>
             <span className="text-sm text-muted-foreground ml-1">
               full book

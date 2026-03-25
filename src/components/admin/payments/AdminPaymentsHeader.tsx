@@ -24,7 +24,7 @@ export function AdminPaymentsHeader({
         </div>
         <div className="flex items-center gap-4">
           <Badge variant="outline" className="text-lg px-4 py-2">
-            Total Revenue: ${totalRevenue.toFixed(2)}
+            Total Revenue: KSH {totalRevenue.toFixed(2)}
           </Badge>
           <Button className="gap-2 global_btn rounded_full bg_primary text_white" onPress={onExport}>
             <Download className="h-4 w-4" />

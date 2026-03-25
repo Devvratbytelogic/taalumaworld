@@ -105,7 +105,7 @@ export default function CommonCard({ data }: CommonCardProps) {
 
                     {isBook ? (
                         data.price > 0 ? (
-                            <span className="font-semibold text-lg text-primary">${data.price.toFixed(2)}</span>
+                            <span className="font-semibold text-lg text-primary">KSH {data.price.toFixed(2)}</span>
                         ) : (
                             <span className="text-primary text-sm tracking-tight">View Chapters</span>
                         )
@@ -113,7 +113,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                         data.isFree ? (
                             <span className="font-medium text-success tracking-tight">Free to Read</span>
                         ) : data.price > 0 ? (
-                            <span className="font-semibold text-lg text-primary">${data.price.toFixed(2)}</span>
+                            <span className="font-semibold text-lg text-primary">KSH {data.price.toFixed(2)}</span>
                         ) : null
                     )}
                 </div>

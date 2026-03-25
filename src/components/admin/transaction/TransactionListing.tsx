@@ -48,7 +48,7 @@ export function TransactionListing({
               <TableCell>{txn.user}</TableCell>
               <TableCell>{txn.item}</TableCell>
               <TableCell className="font-medium">
-                ${txn.amount.toFixed(2)}
+                KSH {txn.amount.toFixed(2)}
               </TableCell>
               <TableCell>
                 <Badge

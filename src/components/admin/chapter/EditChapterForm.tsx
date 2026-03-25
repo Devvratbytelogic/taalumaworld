@@ -306,7 +306,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="chapter-sequence">Sequence<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-sequence">Chapter Number<span className="text-red-500">*</span></Label>
             <Input
               id="chapter-sequence"
               name="sequence"

@@ -88,7 +88,7 @@ export function ChapterPreviewModal({
               <dd className="font-medium">{chapter?.book?.thoughtLeader?.fullName ?? 'Unknown'}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Sequence</dt>
+              <dt className="text-muted-foreground">Chapter Number</dt>
               <dd className="font-medium">{chapter.number}</dd>
             </div>
             <div>

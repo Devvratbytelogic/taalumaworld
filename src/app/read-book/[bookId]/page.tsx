@@ -1,22 +1,31 @@
 'use client';
 import { useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { X, Lock, BookOpen, ChevronRight } from 'lucide-react';
+import { X, Lock, BookOpen, ChevronRight, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import { useGetSingleBookQuery } from '@/store/rtkQueries/userGetAPI';
 import type { ISingleBookAPIResponseData, IBookChapterItem } from '@/types/user/singleBook';
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
 import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import AddToCartButton from '@/components/ui/AddToCartButton';
+import { useAuth } from '@/hooks/useAuth';
+import { useDispatch } from 'react-redux';
+import { openModal } from '@/store/slices/allModalSlice';
 
 export default function BookReadPage() {
   const params = useParams();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useAuth();
   const bookId = params?.bookId as string | undefined;
 
   const { data: bookResponse, isLoading } = useGetSingleBookQuery(bookId!, { skip: !bookId });
 
   const book: ISingleBookAPIResponseData | null = bookResponse?.data ?? null;
+
+  const isFullBook = book?.pricingModel === 'book';
+  const needsBookPurchase = isFullBook && !book?.isPurchased && (book?.price ?? 0) > 0;
 
   const chapters = useMemo((): IBookChapterItem[] => {
     if (!book?.chapters?.length) return [];
@@ -28,6 +37,10 @@ export default function BookReadPage() {
   const handleChapterClick = (chapter: IBookChapterItem) => {
     if (!chapter.canRead) return;
     router.push(getReadChapterRoutePath(chapter._id));
+  };
+
+  const handleLoginRequired = () => {
+    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'cart', itemType: 'book' } }));
   };
 
   if (isLoading || !bookId) {
@@ -73,7 +86,7 @@ export default function BookReadPage() {
       </div>
 
       {/* Chapter List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" style={needsBookPurchase ? { paddingBottom: '5rem' } : undefined}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
 
           {/* Book summary */}
@@ -135,8 +148,9 @@ export default function BookReadPage() {
                       {chapter.description && (
                         <p className="text-xs text-muted-foreground line-clamp-2">{chapter.description}</p>
                       )}
-                      {!chapter.isFree && chapter.price > 0 && (
-                        <p className="text-xs text-primary font-medium mt-0.5">₹{chapter.price}</p>
+                      {/* For chapter-pricing books only, show individual chapter price */}
+                      {!isFullBook && !chapter.isFree && chapter.price > 0 && (
+                        <p className="text-xs text-primary font-medium mt-0.5">${chapter.price}</p>
                       )}
                     </div>
 
@@ -156,6 +170,34 @@ export default function BookReadPage() {
 
         </div>
       </div>
+
+      {/* Sticky "Buy Complete Book" footer — only for book-level pricing */}
+      {needsBookPurchase && (
+        <div className="absolute bottom-0 left-0 right-0 bg-white border-t px-4 py-3 flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm tracking-tight">Unlock all {chapters.length} chapters</p>
+            <p className="text-xs text-muted-foreground">One-time purchase · ${book!.price.toFixed(2)}</p>
+          </div>
+          {!isAuthenticated ? (
+            <Button
+              className="global_btn rounded_full bg_primary shrink-0"
+              onPress={handleLoginRequired}
+              startContent={<ShoppingCart className="h-4 w-4" />}
+            >
+              Buy Book · ${book!.price.toFixed(2)}
+            </Button>
+          ) : (
+            <AddToCartButton
+              chapterId={book!.id}
+              bookId={book!.id}
+              type="book"
+              price={book!.price}
+              className="global_btn rounded_full bg_primary shrink-0"
+              label={`Buy Book · $${book!.price.toFixed(2)}`}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

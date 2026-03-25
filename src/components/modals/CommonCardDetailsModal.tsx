@@ -3,7 +3,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
-import { BookOpen, User, FileText, DollarSign, ShoppingCart, Layers } from 'lucide-react'
+import { BookOpen, User, FileText, DollarSign, ShoppingCart, Layers, Lock } from 'lucide-react'
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react'
 import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
@@ -205,6 +205,7 @@ function BookModalContent({
                   key={ch._id}
                   chapter={ch}
                   isAuthenticated={isAuthenticated}
+                  isFullBook={isFullBook}
                   onLoginRequired={() => onLoginRequired('read', 'chapter')}
                   onRead={() => {
                     dispatch(closeModal())
@@ -287,6 +288,7 @@ function BookModalContent({
 function BookChapterRow({
   chapter,
   isAuthenticated,
+  isFullBook,
   onLoginRequired,
   onRead,
   onAddToCart,
@@ -294,11 +296,58 @@ function BookChapterRow({
 }: {
   chapter: IBookChapterItem
   isAuthenticated: boolean
+  isFullBook: boolean
   onLoginRequired: () => void
   onRead: () => void
   onAddToCart: () => void
   bookId: string
 }) {
+  const renderAction = () => {
+    if (chapter.canRead) {
+      return (
+        <Button
+          className="global_btn rounded_full bg_primary text-xs px-3 py-1 h-auto min-h-0"
+          onPress={onRead}
+        >
+          Read
+        </Button>
+      )
+    }
+
+    // When the whole book is sold as a unit, individual chapters can't be
+    // purchased separately — show a lock icon pointing to the book purchase.
+    if (isFullBook) {
+      return (
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
+          <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+        </div>
+      )
+    }
+
+    // Chapter-level pricing: show per-chapter buy button
+    if (!isAuthenticated) {
+      return (
+        <Button
+          className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
+          onPress={onLoginRequired}
+        >
+          ${chapter.price?.toFixed(2) ?? '0.00'}
+        </Button>
+      )
+    }
+
+    return (
+      <AddToCartButton
+        chapterId={chapter._id}
+        bookId={bookId}
+        type="chapter"
+        price={chapter.price}
+        className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
+        label={`$${chapter.price?.toFixed(2) ?? '0.00'}`}
+      />
+    )
+  }
+
   return (
     <div className="flex items-center gap-3 p-3 rounded-2xl border border-border hover:bg-accent/30 transition-colors">
       {chapter.coverImage && (
@@ -311,43 +360,13 @@ function BookChapterRow({
           <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2 py-0 text-xs">
             Chapter {chapter.number}
           </Badge>
-          {/* {chapter.isFree && (
-            <Badge className="bg-success/10 text-success border-success/20 rounded-full px-2 py-0 text-xs">
-              Free
-            </Badge>
-          )} */}
         </div>
         <p className="font-medium text-sm line-clamp-1 tracking-tight">{chapter.title}</p>
         {chapter.description && (
           <p className="text-xs text-muted-foreground line-clamp-1 tracking-tight">{chapter.description}</p>
         )}
       </div>
-      <div className="shrink-0">
-        {chapter.canRead ? (
-          <Button
-            className="global_btn rounded_full bg_primary text-xs px-3 py-1 h-auto min-h-0"
-            onPress={onRead}
-          >
-            Read
-          </Button>
-        ) : !isAuthenticated ? (
-          <Button
-            className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
-            onPress={onLoginRequired}
-          >
-            ${chapter.price?.toFixed(2) ?? '0.00'}
-          </Button>
-        ) : (
-          <AddToCartButton
-            chapterId={chapter._id}
-            bookId={bookId}
-            type="chapter"
-            price={chapter.price}
-            className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
-            label={`$${chapter.price?.toFixed(2) ?? '0.00'}`}
-          />
-        )}
-      </div>
+      <div className="shrink-0">{renderAction()}</div>
     </div>
   )
 }
@@ -371,6 +390,70 @@ function ChapterModalContent({
   dispatch: any
 }) {
   const bookData = chapter?.bookId
+
+  // When the parent book uses book-level pricing, this chapter can only be
+  // unlocked by purchasing the full book — not individually.
+  const isBookPricing = bookData?.pricingModel === 'book'
+  const bookPrice: number = bookData?.price ?? 0
+  const bookDbId: string = bookData?._id ?? ''
+
+  const renderFooter = () => {
+    if (chapter.isFree || chapter.canRead) {
+      return (
+        <Button className="global_btn rounded_full bg_primary w-full" onPress={onReadClick} startContent={<BookOpen className="h-4 w-4" />}>
+          {chapter.isFree ? 'Read Free Chapter' : 'Read Chapter'}
+        </Button>
+      )
+    }
+
+    if (isBookPricing) {
+      // Must purchase the whole book to access this chapter
+      if (!isAuthenticated) {
+        return (
+          <Button className="global_btn rounded_full bg_primary w-full" onPress={onAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+            Buy Complete Book - ${bookPrice.toFixed(2)}
+          </Button>
+        )
+      }
+      return (
+        <AddToCartButton
+          chapterId={bookDbId}
+          bookId={bookDbId}
+          type="book"
+          price={bookPrice}
+          className="global_btn rounded_full bg_primary w-full"
+          label={`Buy Complete Book - $${bookPrice.toFixed(2)}`}
+          onSuccess={() => {
+            dispatch(closeModal())
+            router.push(getCartRoutePath())
+          }}
+        />
+      )
+    }
+
+    // Chapter-level pricing
+    if (!isAuthenticated) {
+      return (
+        <Button className="global_btn rounded_full bg_primary w-full" onPress={onAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+          Add to Cart - ${chapter.price?.toFixed(2) ?? '0.00'}
+        </Button>
+      )
+    }
+    return (
+      <AddToCartButton
+        chapterId={chapter.id}
+        bookId={bookDbId}
+        type={chapter.type}
+        price={chapter.price}
+        className="global_btn rounded_full bg_primary w-full"
+        label={`Add to Cart - $${chapter.price?.toFixed(2) ?? '0.00'}`}
+        onSuccess={() => {
+          dispatch(closeModal())
+          router.push(getCartRoutePath())
+        }}
+      />
+    )
+  }
 
   return (
     <>
@@ -430,7 +513,11 @@ function ChapterModalContent({
             <div>
               <div className="text-xs text-muted-foreground tracking-tight">Price</div>
               <div className="font-semibold text-sm tracking-tight">
-                {chapter.isFree ? 'Free' : `$${chapter.price?.toFixed(2) ?? '0.00'}`}
+                {chapter.isFree
+                  ? 'Free'
+                  : isBookPricing
+                    ? `$${bookPrice.toFixed(2)} (book)`
+                    : `$${chapter.price?.toFixed(2) ?? '0.00'}`}
               </div>
             </div>
           </div>
@@ -444,6 +531,16 @@ function ChapterModalContent({
             </div>
           )}
         </div>
+
+        {/* Book pricing notice for book-level priced chapters */}
+        {isBookPricing && !chapter.canRead && (
+          <div className="flex items-center gap-3 p-3 bg-accent/40 rounded-2xl border border-border">
+            <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              This chapter is only available as part of the complete book purchase.
+            </p>
+          </div>
+        )}
 
         {/* Book context */}
         {bookData && (
@@ -476,28 +573,7 @@ function ChapterModalContent({
       </ModalBody>
 
       <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
-        {(chapter.isFree || chapter.canRead) ? (
-          <Button className="global_btn rounded_full bg_primary w-full" onPress={onReadClick} startContent={<BookOpen className="h-4 w-4" />}>
-            {chapter.isFree ? 'Read Free Chapter' : 'Read Chapter'}
-          </Button>
-        ) : !isAuthenticated ? (
-          <Button className="global_btn rounded_full bg_primary w-full" onPress={onAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-            Add to Cart - ${chapter.price?.toFixed(2) ?? '0.00'}
-          </Button>
-        ) : (
-          <AddToCartButton
-            chapterId={chapter.id}
-            bookId={bookData?.id}
-            type={chapter.type}
-            price={chapter.price}
-            className="global_btn rounded_full bg_primary w-full"
-            label={`Add to Cart - $${chapter.price?.toFixed(2) ?? '0.00'}`}
-            onSuccess={() => {
-              dispatch(closeModal())
-              router.push(getCartRoutePath())
-            }}
-          />
-        )}
+        {renderFooter()}
       </ModalFooter>
     </>
   )

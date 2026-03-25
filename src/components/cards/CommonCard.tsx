@@ -95,17 +95,12 @@ export default function CommonCard({ data }: CommonCardProps) {
                 {/* Footer */}
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground tracking-tight">
-                        {isBook ? (
+                        {isBook &&
                             <>
                                 <BookOpen className="h-4 w-4" />
                                 <span>{data.chapterCount} chapters</span>
                             </>
-                        ) : (
-                            <>
-                                <FileText className="h-4 w-4" />
-                                <span>{data.pageCount} pages</span>
-                            </>
-                        )}
+                        }
                     </div>
 
                     {isBook ? (

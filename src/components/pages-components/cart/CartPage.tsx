@@ -30,6 +30,15 @@ export default function CartDetailsComponent() {
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
 
+  const bookCount = cartItems.filter(item => item.type === VISIBLE.BOOK).length;
+  const chapterCount = cartItems.filter(item => item.type !== VISIBLE.BOOK).length;
+  const cartSummaryText = (() => {
+    const parts: string[] = [];
+    if (bookCount > 0) parts.push(`${bookCount} ${bookCount === 1 ? 'book' : 'books'}`);
+    if (chapterCount > 0) parts.push(`${chapterCount} ${chapterCount === 1 ? 'chapter' : 'chapters'}`);
+    return `${parts.join(' and ')} ready for checkout`;
+  })();
+
   const subtotal = cartItems.reduce(
     (sum, item) => sum + (item.chapter?.isFree ? 0 : (item.selling_price ?? 0)),
     0
@@ -45,7 +54,7 @@ export default function CartDetailsComponent() {
     try {
       await initiateRazorpayPayment({
         amount: total,
-        description: `Purchase of ${cartItems.length} chapter${cartItems.length !== 1 ? 's' : ''}`,
+        description: `Purchase of ${cartSummaryText.replace(' ready for checkout', '')}`,
         onSuccess: async (response: RazorpayPaymentResponse) => {
           await checkOutCart({
             payment_method: 'Razorpay',
@@ -86,9 +95,7 @@ export default function CartDetailsComponent() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Shopping Cart</h1>
-          <p className="text-muted-foreground">
-            {cartItems.length} {cartItems.length === 1 ? 'chapter' : 'chapters'} ready for checkout
-          </p>
+          <p className="text-muted-foreground">{cartSummaryText}</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">

@@ -192,6 +192,7 @@ export default function FilterModal() {
                         id={`readingProgress-${filter.id}`}
                         checked={tempProgressFilters.includes(filter.id)}
                         onCheckedChange={() => handleProgressFilterToggle(filter.id)}
+                        onClick={(e) => e.stopPropagation()}
                         className="rounded-md mt-0.5"
                       />
                       <div className="flex-1">
@@ -236,6 +237,7 @@ export default function FilterModal() {
                         id={`cat-${category.id}`}
                         checked={tempCategories.includes(category.id)}
                         onCheckedChange={() => handleCategoryToggle(category.id)}
+                        onClick={(e) => e.stopPropagation()}
                         className="rounded-md"
                       />
                       <label htmlFor={`cat-${category.id}`} className="text-sm cursor-pointer tracking-tight flex-1">
@@ -263,6 +265,7 @@ export default function FilterModal() {
                         id={`author-${author.id}`}
                         checked={tempAuthors.includes(author.id)}
                         onCheckedChange={() => handleAuthorToggle(author.id)}
+                        onClick={(e) => e.stopPropagation()}
                         className="rounded-md"
                       />
                       <label htmlFor={`author-${author.id}`} className="text-sm cursor-pointer tracking-tight flex-1">

@@ -1,7 +1,16 @@
+'use client'
+
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import Button from '../ui/Button'
+import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI'
+import { VISIBLE } from '@/constants/contentMode'
 
 export default function CommonCTA() {
+    const router = useRouter()
+    const { data: globalSettings } = useGetGlobalSettingsQuery()
+    const isChapterMode = globalSettings?.data?.visible === VISIBLE.CHAPTER
+
     return (
         <>
             <section className="py-16 bg-linear-to-br from-primary/10 to-secondary-accent/10">
@@ -14,13 +23,16 @@ export default function CommonCTA() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
                             <Button
+                                onPress={() => router.push('/#content-section')}
                                 className='global_btn rounded_full bg_primary hover-lift'
                             >
-                                Start Reading
+                                {isChapterMode ? 'Start Reading' : 'Explore Books'}
                             </Button>
                             <Button
-                                className='global_btn rounded_full outline_primary hover-lift'>
-                                Browse Books
+                                onPress={() => router.push('/#content-section')}
+                                className='global_btn rounded_full outline_primary hover-lift'
+                            >
+                                {isChapterMode ? 'Browse Chapters' : 'Browse Content'}
                             </Button>
                         </div>
                     </div>

@@ -83,7 +83,7 @@ function AuthorsList() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-lg leading-tight">{author.fullName}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">{author.followersCount} followers</p>
+                  <p className="text-sm text-muted-foreground mt-1">{author.followersCount} followers</p>
                   {author.professionalBio && (
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{author.professionalBio}</p>
                   )}
@@ -226,7 +226,7 @@ function AuthorDetail({ id }: { id: string }) {
                   <div className="p-4 flex flex-col gap-1 flex-1">
                     <h3 className="font-bold line-clamp-1">{contentItem.title}</h3>
                     {!isBook && (
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         Ch. {(contentItem as IChapterItem).chapterNumber} · {(contentItem as IChapterItem).bookTitle}
                       </p>
                     )}

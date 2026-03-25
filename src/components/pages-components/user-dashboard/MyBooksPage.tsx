@@ -144,13 +144,13 @@ console.log('filteredBooks', filteredBooks);
 
                   {/* Status Badge */}
                   {book.completed && (
-                    <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
                       Completed
                     </div>
                   )}
                   {!book.completed && progress > 0 && (
-                    <div className="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <div className="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
                       {Math.round(progress)}%
                     </div>
                   )}
@@ -158,7 +158,7 @@ console.log('filteredBooks', filteredBooks);
 
                 {/* Book Info */}
                 <div className="p-5">
-                  <p className="text-xs text-muted-foreground mb-1">{book.author}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{book.author}</p>
                   <h3 className="font-bold text-base mb-2 line-clamp-2">{book.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{book.description}</p>
 
@@ -198,7 +198,7 @@ console.log('filteredBooks', filteredBooks);
                   </Button>
 
                   {/* Book Details */}
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">
                     <span>{book.chapterCount} chapters</span>
                     <span className={status.color}>{status.label}</span>
                   </div>

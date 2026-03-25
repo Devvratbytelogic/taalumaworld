@@ -91,7 +91,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                         <div className="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white text-sm font-medium border-2 border-background">
                                             {data?.stats?.avatars?.[2]?.label}
                                         </div>
-                                        <div className="w-8 h-8 rounded-full bg-primary-dark flex items-center justify-center text-white text-xs font-medium border-2 border-background">
+                                        <div className="w-8 h-8 rounded-full bg-primary-dark flex items-center justify-center text-white text-sm font-medium border-2 border-background">
                                             {data?.stats?.avatars?.[3]?.label}
                                         </div> */}
                                     </div>

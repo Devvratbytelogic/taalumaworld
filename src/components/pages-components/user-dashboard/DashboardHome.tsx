@@ -73,7 +73,7 @@ export function DashboardHome() {
             <p className="text-sm text-muted-foreground mb-3">
               {ownedChapters.length} {ownedChapters.length === 1 ? 'chapter' : 'chapters'} owned
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Access all your purchased chapters
             </p>
           </button>
@@ -92,7 +92,7 @@ export function DashboardHome() {
             <p className="text-sm text-muted-foreground mb-3">
               {ownedBooks.length} {ownedBooks.length === 1 ? 'book' : 'books'} owned
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Access all your purchased books
             </p>
           </button>
@@ -113,7 +113,7 @@ export function DashboardHome() {
           <p className="text-sm text-muted-foreground mb-3">
             Track your reading activity
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             View all your recently read items
           </p>
         </button>
@@ -135,7 +135,7 @@ export function DashboardHome() {
           <p className="text-sm text-muted-foreground mb-3">
             Discover new stories
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Browse and find your next read
           </p>
         </button>

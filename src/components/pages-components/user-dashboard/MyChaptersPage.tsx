@@ -172,13 +172,13 @@ export function MyChaptersPage() {
 
                   {/* Progress Badge */}
                   {chapter.completed && (
-                    <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
                       Completed
                     </div>
                   )}
                   {!chapter.completed && progress > 0 && (
-                    <div className="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <div className="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
                       {Math.round(progress)}%
                     </div>
                   )}
@@ -186,7 +186,7 @@ export function MyChaptersPage() {
 
                 {/* Chapter Info */}
                 <div className="p-5">
-                  <p className="text-xs text-muted-foreground mb-1">{chapter.bookTitle}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{chapter.bookTitle}</p>
                   <h3 className="font-bold text-base mb-2 line-clamp-2">{chapter.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{chapter.description}</p>
 
@@ -226,7 +226,7 @@ export function MyChaptersPage() {
                   </Button>
 
                   {/* Chapter Number & Status */}
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">
                     <span>Chapter {chapter.chapterNumber}</span>
                     <span className={status.color}>{status.label}</span>
                   </div>

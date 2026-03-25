@@ -66,20 +66,20 @@ export function AdminHeader() {
 
                     {!isAuthor && (
                         <div className="flex items-center gap-2">
-                            <span className="text-xs hidden md:block">Content Mode:</span>
+                            <span className="text-sm hidden md:block">Content Mode:</span>
                             <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
                                 {isSettingsLoading || isToggling ? (
                                     <div className="flex items-center gap-2 px-1">
                                         <div className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                        <span className="text-xs opacity-80">Loading…</span>
+                                        <span className="text-sm opacity-80">Loading…</span>
                                     </div>
                                 ) : (
                                     <>
-                                        <span className={cn("text-xs", visible === 'chapter' ? 'font-semibold' : 'opacity-70')}>
+                                        <span className={cn("text-sm", visible === 'chapter' ? 'font-semibold' : 'opacity-70')}>
                                             Chapters
                                         </span>
                                         <Switch isSelected={visible === 'book'} onValueChange={onContentModeToggle} size="sm" />
-                                        <span className={cn("text-xs", visible === 'book' ? 'font-semibold' : 'opacity-70')}>
+                                        <span className={cn("text-sm", visible === 'book' ? 'font-semibold' : 'opacity-70')}>
                                             Books
                                         </span>
                                     </>
@@ -111,7 +111,7 @@ export function AdminHeader() {
                                     </div>
                                     <div>
                                         <p className="text-lg font-bold leading-none">{brandName}</p>
-                                        <p className="text-xs text-muted-foreground hidden sm:block">Admin Panel</p>
+                                        <p className="text-sm text-muted-foreground hidden sm:block">Admin Panel</p>
                                     </div>
                                 </>
                             )}
@@ -141,7 +141,7 @@ export function AdminHeader() {
 
                         <div className="relative">
                             <Bell className="h-5 w-5" />
-                            <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                            <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-sm">
                                 3
                             </Badge>
                         </div>
@@ -162,7 +162,7 @@ export function AdminHeader() {
                                 topContent={
                                     <div className="px-2 py-2">
                                         <p className="text-sm font-medium">{adminUser.name}</p>
-                                        <p className="text-xs text-muted-foreground">{adminUser.email}</p>
+                                        <p className="text-sm text-muted-foreground">{adminUser.email}</p>
                                         <Badge variant="secondary" className="w-fit mt-1">{getRoleName(adminUser.role)}</Badge>
                                     </div>
                                 }

@@ -159,7 +159,7 @@ export function ChapterPurchaseModal() {
         </ModalBody>
         <ModalFooter>
           {/* Info Note */}
-          <div className="text-xs text-muted-foreground text-center bg-accent/20 rounded-2xl p-3">
+          <div className="text-sm text-muted-foreground text-center bg-accent/20 rounded-2xl p-3">
             💡 Once purchased, you&apos;ll have unlimited access to this chapter and can read it
             anytime.
           </div>

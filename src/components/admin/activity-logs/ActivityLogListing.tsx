@@ -45,7 +45,7 @@ export function ActivityLogListing({ logs, searchQuery = '' }: ActivityLogListin
                 <p className="text-sm text-muted-foreground">
                   {log.user} · {log.resource}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">{log.time}</p>
+                <p className="text-sm text-muted-foreground mt-1">{log.time}</p>
               </div>
               <Badge variant="secondary">{log.type}</Badge>
             </div>

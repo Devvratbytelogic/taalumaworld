@@ -31,12 +31,12 @@ export function CurrentRoleCard({ adminUser }: CurrentRoleCardProps) {
             <p className="text-sm font-medium mb-2">Your Permissions ({enabled.length})</p>
             <div className="flex flex-wrap gap-2">
               {enabled.slice(0, 8).map((permission: PermissionKey) => (
-                <Badge key={permission} variant="secondary" className="text-xs">
+                <Badge key={permission} variant="secondary" className="text-sm">
                   {formatPermissionKey(permission)}
                 </Badge>
               ))}
               {enabled.length > 8 && (
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-sm">
                   +{enabled.length - 8} more
                 </Badge>
               )}

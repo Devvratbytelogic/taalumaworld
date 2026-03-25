@@ -34,7 +34,7 @@ export function RolesOverview({ adminUser }: RolesOverviewProps) {
                   <div>
                     <h4 className="font-semibold">{getRoleName(role)}</h4>
                     {isCurrent && (
-                      <Badge variant="default" className="mt-1 text-xs">
+                      <Badge variant="default" className="mt-1 text-sm">
                         Current
                       </Badge>
                     )}

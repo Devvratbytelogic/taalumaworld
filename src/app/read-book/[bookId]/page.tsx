@@ -78,7 +78,7 @@ export default function BookReadPage() {
           </Button>
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-sm truncate">{book.title}</h1>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-sm text-muted-foreground truncate">
               {book.author} • {chapters.length} chapter{chapters.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function BookReadPage() {
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="h-4 w-4 text-primary" />
             <h3 className="font-semibold text-sm">All Chapters</h3>
-            <span className="ml-auto text-xs text-muted-foreground">{chapters.length} total</span>
+            <span className="ml-auto text-sm text-muted-foreground">{chapters.length} total</span>
           </div>
 
           {/* Chapter cards */}
@@ -131,7 +131,7 @@ export default function BookReadPage() {
                     className={`w-full text-left p-4 rounded-2xl border border-border bg-white transition-all duration-200 flex items-center gap-4 ${isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/40 hover:shadow-sm cursor-pointer'}`}
                   >
                     {/* Chapter number badge */}
-                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
                       {chapter.number}
                     </div>
 
@@ -140,17 +140,17 @@ export default function BookReadPage() {
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-medium text-sm truncate">{chapter.title}</p>
                         {chapter.isFree && (
-                          <span className="shrink-0 text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                          <span className="shrink-0 text-sm px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
                             Free
                           </span>
                         )}
                       </div>
                       {chapter.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">{chapter.description}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-2">{chapter.description}</p>
                       )}
                       {/* For chapter-pricing books only, show individual chapter price */}
                       {!isFullBook && !chapter.isFree && chapter.price > 0 && (
-                        <p className="text-xs text-primary font-medium mt-0.5">KSH {chapter.price}</p>
+                        <p className="text-sm text-primary font-medium mt-0.5">KSH {chapter.price}</p>
                       )}
                     </div>
 
@@ -176,7 +176,7 @@ export default function BookReadPage() {
         <div className="absolute bottom-0 left-0 right-0 bg-white border-t px-4 py-3 flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm tracking-tight">Unlock all {chapters.length} chapters</p>
-            <p className="text-xs text-muted-foreground">One-time purchase · KSH {book!.price.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">One-time purchase · KSH {book!.price.toFixed(2)}</p>
           </div>
           {!isAuthenticated ? (
             <Button

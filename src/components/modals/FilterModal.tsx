@@ -172,7 +172,7 @@ export default function FilterModal() {
                   <FileText className="h-4 w-4 text-primary" />
                   <span className="font-semibold text-sm text-primary tracking-tight">Reading Progress</span>
                 </div>
-                <p className="text-xs text-muted-foreground tracking-tight">
+                <p className="text-sm text-muted-foreground tracking-tight">
                   Filter chapters based on your reading journey
                 </p>
               </div>
@@ -202,7 +202,7 @@ export default function FilterModal() {
                             {filter.label}
                           </label>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 tracking-tight">{filter.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1 tracking-tight">{filter.description}</p>
                       </div>
                     </div>
                   );
@@ -216,13 +216,13 @@ export default function FilterModal() {
                   <Sparkles className="h-4 w-4 text-primary" />
                   <span className="font-semibold text-sm text-primary tracking-tight">Discover & Explore</span>
                 </div>
-                <p className="text-xs text-muted-foreground tracking-tight">
+                <p className="text-sm text-muted-foreground tracking-tight">
                   Find books by category, author, or genre
                 </p>
               </div>
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs">{tempCategories.length}</span>
+                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempCategories.length}</span>
                   Categories
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -250,7 +250,7 @@ export default function FilterModal() {
               <Divider />
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs">{tempAuthors.length}</span>
+                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempAuthors.length}</span>
                   Authors
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
@@ -278,7 +278,7 @@ export default function FilterModal() {
               <Divider />
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs">{tempTags.length}</span>
+                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempTags.length}</span>
                   Genres & Topics
                 </h4>
                 <div className="flex flex-wrap gap-2">

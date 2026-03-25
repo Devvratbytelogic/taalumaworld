@@ -209,7 +209,7 @@ export function EditAuthorModal({
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-author-avatar">Avatar (optional)</Label>
-              <p className="text-xs text-muted-foreground">Select an image file to replace current avatar.</p>
+              <p className="text-sm text-muted-foreground">Select an image file to replace current avatar.</p>
               <input
                 ref={fileInputRef}
                 id="edit-author-avatar"

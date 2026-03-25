@@ -154,7 +154,7 @@ export default function PrimaryFooter() {
                                     {isAuthenticated && isAdmin ? (
                                         <Link
                                             href={getAdminRoutePath()}
-                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-primary hover:bg-primary hover:text-white transition-colors text-xs font-medium"
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-primary hover:bg-primary hover:text-white transition-colors text-sm font-medium"
                                         >
                                             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -164,7 +164,7 @@ export default function PrimaryFooter() {
                                     ) : (
                                         <button
                                             onClick={() => dispatch(openModal({ componentName: 'SignIn', data: { isAdmin: true } }))}
-                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 border border-gray-700 text-gray-400 hover:border-primary/50 hover:text-primary transition-colors text-xs font-medium"
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 border border-gray-700 text-gray-400 hover:border-primary/50 hover:text-primary transition-colors text-sm font-medium"
                                         >
                                             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -243,7 +243,7 @@ export default function PrimaryFooter() {
                                         <span className="text-white">{brandName}</span>
                                     </p>
                                 )}
-                                <p className="text-xs text-gray-400">Designed and developed by <Link href="https://bytelogicindia.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Bytelogic Technologies</Link></p>
+                                <p className="text-sm text-gray-400">Designed and developed by <Link href="https://bytelogicindia.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Bytelogic Technologies</Link></p>
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
                                 <Link href={getPrivacyPolicyRoutePath()} className="hover:text-primary transition-colors">

@@ -62,12 +62,12 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
         </p>
         <div className="flex items-center gap-2 flex-wrap pt-2">
           {category && category.name !== 'N/A' && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-sm">
               {category.name}
             </Badge>
           )}
           {subcategory?.name && subcategory?.name !== 'N/A' && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-sm">
               {subcategory.name}
             </Badge>
           )}

@@ -984,7 +984,7 @@ export function AdminPagesTab() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                  <code className="text-sm bg-gray-100 px-2 py-1 rounded">
                     {page.slug === '/' ? '/' : `/${page.slug}`}
                   </code>
                 </TableCell>
@@ -1068,7 +1068,7 @@ export function AdminPagesTab() {
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Leave blank to auto-generate from title
               </p>
             </div>
@@ -1101,7 +1101,7 @@ export function AdminPagesTab() {
                 rows={12}
                 className="font-mono text-sm"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 You can use HTML or Markdown formatting
               </p>
             </div>
@@ -1188,7 +1188,7 @@ export function AdminPagesTab() {
                 rows={12}
                 className="font-mono text-sm"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 You can use HTML or Markdown formatting
               </p>
             </div>

@@ -160,7 +160,7 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
                   </button>
                 </div>
                 {errors.currentPassword && (
-                  <p className="text-xs text-red-600 mt-1">{errors.currentPassword}</p>
+                  <p className="text-sm text-red-600 mt-1">{errors.currentPassword}</p>
                 )}
               </div>
 
@@ -197,7 +197,7 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
                   </button>
                 </div>
                 {errors.newPassword && (
-                  <p className="text-xs text-red-600 mt-1">{errors.newPassword}</p>
+                  <p className="text-sm text-red-600 mt-1">{errors.newPassword}</p>
                 )}
               </div>
 
@@ -234,7 +234,7 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>
+                  <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>
                 )}
               </div>
 

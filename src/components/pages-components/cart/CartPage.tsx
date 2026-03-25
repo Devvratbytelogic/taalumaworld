@@ -129,7 +129,7 @@ export default function CartDetailsComponent() {
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="outline" className="text-xs rounded-full">
+                            <Badge variant="outline" className="text-sm rounded-full">
                               {isBookItem ? 'Full Book' : `Chapter ${item.chapter?.number}`}
                             </Badge>
                           </div>

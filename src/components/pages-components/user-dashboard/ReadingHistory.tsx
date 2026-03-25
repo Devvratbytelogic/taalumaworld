@@ -108,7 +108,7 @@ export function ReadingHistory() {
 
                 {/* Chapter Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-muted-foreground mb-1">{item.bookTitle}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{item.bookTitle}</p>
                   <h3 className="font-bold text-base mb-1 line-clamp-1">{item.chapterTitle}</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Chapter {item.chapterNumber}
@@ -123,11 +123,11 @@ export function ReadingHistory() {
                           style={{ width: `${item.progressPercent}%` }}
                         />
                       </div>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getProgressColor(item.progressPercent)}`}>
+                      <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${getProgressColor(item.progressPercent)}`}>
                         {Math.round(item.progressPercent)}%
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
                       {formatLastRead(item.lastReadAt)}
                     </div>

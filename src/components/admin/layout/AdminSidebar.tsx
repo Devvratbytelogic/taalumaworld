@@ -49,14 +49,14 @@ export function AdminSidebar({
                         <Shield className="h-4 w-4 text-primary" />
                         <span className="text-sm font-semibold">{getRoleName(adminUser.role)}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">{getRoleDescription(adminUser.role)}</p>
+                    <p className="text-sm text-muted-foreground">{getRoleDescription(adminUser.role)}</p>
                 </div>
 
                 {/* Nav groups */}
                 <nav className="space-y-6">
                     {Object.entries(navItemsByCategory).map(([category, items]) => (
                         <div key={category}>
-                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+                            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
                                 {CATEGORY_LABELS[category]}
                             </h4>
                             <div className="space-y-1">

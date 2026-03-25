@@ -46,7 +46,7 @@ export function ChapterPreviewModal({
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-muted-foreground/30 aspect-4/4 w-32 shrink-0 flex items-center justify-center bg-muted/30">
-                <span className="text-xs text-muted-foreground px-2 text-center">No image</span>
+                <span className="text-sm text-muted-foreground px-2 text-center">No image</span>
               </div>
             )}
             <div className="min-w-0 flex-1 space-y-1">
@@ -63,7 +63,7 @@ export function ChapterPreviewModal({
                   {chapter.isFree ? 'Free' : `KSH ${chapter.price.toFixed(2)}`}
                 </span>
                 {chapter.isFree && (
-                  <span className="text-xs text-muted-foreground">(Free chapter)</span>
+                  <span className="text-sm text-muted-foreground">(Free chapter)</span>
                 )}
               </div>
             </div>

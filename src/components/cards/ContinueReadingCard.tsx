@@ -43,7 +43,7 @@ export function ContinueReadingCard({
         {/* Right Side - Content */}
         <div className="flex-1 pt-4 px-4 pb-4 flex flex-col gap-2.5">
           {/* Chapter Number Badge */}
-          <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2.5 py-0.5 text-xs font-medium w-fit">
+          <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2.5 py-0.5 text-sm font-medium w-fit">
             Chapter {chapter.sequence}
           </Badge>
 
@@ -55,8 +55,8 @@ export function ContinueReadingCard({
           {/* Progress Bar */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Progress</span>
-              <span className="text-xs font-medium text-primary">{progressPercentage}%</span>
+              <span className="text-sm text-muted-foreground">Progress</span>
+              <span className="text-sm font-medium text-primary">{progressPercentage}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
               <div
@@ -72,7 +72,7 @@ export function ContinueReadingCard({
           {/* Continue Reading Button */}
           <Button
             size="sm"
-            className="w-full rounded-full text-xs h-8"
+            className="w-full rounded-full text-sm h-8"
             onPress={(e) => {
               // e.stopPropagation();
               onClick();

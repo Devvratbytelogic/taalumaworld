@@ -102,7 +102,7 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
           >
             {values.photo ? values.photo.name : 'Choose image'}
           </Button>
-          <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — max 5 MB</p>
+          <p className="text-sm text-gray-400 mt-1">JPG, PNG, WEBP — max 5 MB</p>
         </div>
       </div>
 

@@ -132,16 +132,16 @@ function BookModalContent({
         <div className="space-y-2 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             {chapter.category?.name && (
-              <Badge variant="outline" className="rounded-full px-3 py-1 text-xs font-medium">
+              <Badge variant="outline" className="rounded-full px-3 py-1 text-sm font-medium">
                 {chapter.category.name}
               </Badge>
             )}
             {/* {chapter.subcategory?.name && (
-              <Badge variant="outline" className="rounded-full px-3 py-1 text-xs font-medium">
+              <Badge variant="outline" className="rounded-full px-3 py-1 text-sm font-medium">
                 {chapter.subcategory.name}
               </Badge>
             )} */}
-            {/* <Badge className={`rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm bg-white border ${isFullBook ? 'text-blue-600 border-blue-200' : 'text-gray-700 border-gray-200'}`}>
+            {/* <Badge className={`rounded-full px-3 py-1 text-sm font-medium backdrop-blur-sm bg-white border ${isFullBook ? 'text-blue-600 border-blue-200' : 'text-gray-700 border-gray-200'}`}>
               {isFullBook ? 'Full Book' : 'By Chapter'}
             </Badge> */}
           </div>
@@ -175,7 +175,7 @@ function BookModalContent({
           <div className="flex items-center justify-between p-4 bg-accent/40 rounded-2xl border border-border">
             <div>
               <p className="font-semibold text-sm tracking-tight">Complete Book</p>
-              <p className="text-xs text-muted-foreground">Access all {chapter.chapterCount} chapters</p>
+              <p className="text-sm text-muted-foreground">Access all {chapter.chapterCount} chapters</p>
             </div>
             <span className="font-bold text-2xl text-primary">KSH {chapter.price.toFixed(2)}</span>
           </div>
@@ -185,7 +185,7 @@ function BookModalContent({
         {!isFullBook && (
           <div className="p-4 bg-accent/40 rounded-2xl border border-border">
             <p className="font-semibold text-sm tracking-tight mb-0.5">Purchase Options</p>
-            <p className="text-xs text-muted-foreground">Purchase individual chapters below</p>
+            <p className="text-sm text-muted-foreground">Purchase individual chapters below</p>
           </div>
         )}
 
@@ -219,7 +219,7 @@ function BookModalContent({
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground py-2">No chapters available yet.</p>
+            <p className="text-sm text-muted-foreground py-2">No chapters available yet.</p>
           )}
         </div>
 
@@ -306,7 +306,7 @@ function BookChapterRow({
     if (chapter.canRead) {
       return (
         <Button
-          className="global_btn rounded_full bg_primary text-xs px-3 py-1 h-auto min-h-0"
+          className="global_btn rounded_full bg_primary text-sm px-3 py-1 h-auto min-h-0"
           onPress={onRead}
         >
           Read
@@ -328,7 +328,7 @@ function BookChapterRow({
     if (!isAuthenticated) {
       return (
         <Button
-          className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
+          className="global_btn rounded_full outline_primary text-sm px-3 py-1 h-auto min-h-0"
           onPress={onLoginRequired}
         >
           KSH {chapter.price?.toFixed(2) ?? '0.00'}
@@ -342,7 +342,7 @@ function BookChapterRow({
         bookId={bookId}
         type="chapter"
         price={chapter.price}
-        className="global_btn rounded_full outline_primary text-xs px-3 py-1 h-auto min-h-0"
+        className="global_btn rounded_full outline_primary text-sm px-3 py-1 h-auto min-h-0"
         label={`KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
       />
     )
@@ -357,13 +357,13 @@ function BookChapterRow({
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-          <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2 py-0 text-xs">
+          <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2 py-0 text-sm">
             Chapter {chapter.number}
           </Badge>
         </div>
         <p className="font-medium text-sm line-clamp-1 tracking-tight">{chapter.title}</p>
         {chapter.description && (
-          <p className="text-xs text-muted-foreground line-clamp-1 tracking-tight">{chapter.description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-1 tracking-tight">{chapter.description}</p>
         )}
       </div>
       <div className="shrink-0">{renderAction()}</div>
@@ -461,16 +461,16 @@ function ChapterModalContent({
         {/* Chapter Header */}
         <div className="space-y-2 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-xs font-medium">
+            <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-sm font-medium">
               Chapter {chapter.chapterNumber}
             </Badge>
             {chapter.isFree && (
-              <Badge className="bg-success/10 text-success border-success/20 rounded-full px-3 py-1 text-xs font-medium">
+              <Badge className="bg-success/10 text-success border-success/20 rounded-full px-3 py-1 text-sm font-medium">
                 Free
               </Badge>
             )}
             {chapter.bookTitle && (
-              <Badge variant="outline" className="rounded-full px-3 py-1 text-xs font-medium max-w-50">
+              <Badge variant="outline" className="rounded-full px-3 py-1 text-sm font-medium max-w-50">
                 <BookOpen className="h-3 w-3 mr-1.5 shrink-0" />
                 <span className="truncate">{chapter.bookTitle}</span>
               </Badge>
@@ -504,14 +504,14 @@ function ChapterModalContent({
           <div className="flex items-start gap-2">
             <FileText className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <div>
-              <div className="text-xs text-muted-foreground tracking-tight">Pages</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Pages</div>
               <div className="font-semibold text-sm tracking-tight">{chapter.pageCount ?? 0}</div>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <DollarSign className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <div>
-              <div className="text-xs text-muted-foreground tracking-tight">Price</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Price</div>
               <div className="font-semibold text-sm tracking-tight">
                 {chapter.isFree
                   ? 'Free'
@@ -525,7 +525,7 @@ function ChapterModalContent({
             <div className="flex items-start gap-2">
               <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
               <div className="min-w-0">
-                <div className="text-xs text-muted-foreground tracking-tight">Part of</div>
+                <div className="text-sm text-muted-foreground tracking-tight">Part of</div>
                 <div className="font-semibold text-sm line-clamp-1 tracking-tight">{chapter.bookTitle}</div>
               </div>
             </div>
@@ -536,7 +536,7 @@ function ChapterModalContent({
         {isBookPricing && !chapter.canRead && (
           <div className="flex items-center gap-3 p-3 bg-accent/40 rounded-2xl border border-border">
             <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               This chapter is only available as part of the complete book purchase.
             </p>
           </div>
@@ -560,7 +560,7 @@ function ChapterModalContent({
                 {bookData.tags && bookData.tags.filter(Boolean).length > 0 && (
                   <div className="flex gap-1 mt-1.5 flex-wrap">
                     {(bookData.tags as unknown as string[]).filter(Boolean).slice(0, 3).map((tag: string) => (
-                      <Badge key={tag} variant="outline" className="rounded-full px-2 py-0 text-xs">
+                      <Badge key={tag} variant="outline" className="rounded-full px-2 py-0 text-sm">
                         {tag}
                       </Badge>
                     ))}

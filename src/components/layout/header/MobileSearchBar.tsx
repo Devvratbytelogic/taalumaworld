@@ -187,7 +187,7 @@ export default function MobileSearchBar() {
                 <div className="flex items-center justify-between px-2 mb-2">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                       Recent Searches
                     </span>
                   </div>
@@ -195,7 +195,7 @@ export default function MobileSearchBar() {
                     variant="ghost"
                     size="sm"
                     onPress={clearRecentSearches}
-                    className="h-auto py-1 px-2 text-xs rounded-full hover:bg-gray-100"
+                    className="h-auto py-1 px-2 text-sm rounded-full hover:bg-gray-100"
                   >
                     Clear
                   </Button>
@@ -228,7 +228,7 @@ export default function MobileSearchBar() {
                   <div className="p-2">
                     <div className="flex items-center gap-2 px-3 py-1.5">
                       <BookOpen className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                         Books
                       </span>
                     </div>
@@ -243,7 +243,7 @@ export default function MobileSearchBar() {
                         className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                       >
                         <div className="text-sm font-medium line-clamp-1">{book.title}</div>
-                        <div className="text-xs text-gray-500">{book.author}</div>
+                        <div className="text-sm text-gray-500">{book.author}</div>
                       </button>
                     ))}
                   </div>
@@ -254,7 +254,7 @@ export default function MobileSearchBar() {
                   <div className="p-2 border-t">
                     <div className="flex items-center gap-2 px-3 py-1.5">
                       <FileText className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                         Chapters
                       </span>
                     </div>
@@ -269,7 +269,7 @@ export default function MobileSearchBar() {
                         className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                       >
                         <div className="text-sm font-medium line-clamp-1">{chapter.title}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-sm text-gray-500">
                           Ch. {chapter.chapterNumber} · {chapter.bookTitle}
                         </div>
                       </button>
@@ -282,7 +282,7 @@ export default function MobileSearchBar() {
                   <div className="p-2 border-t">
                     <div className="flex items-center gap-2 px-3 py-1.5">
                       <User className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                         Thought Leaders
                       </span>
                     </div>
@@ -297,7 +297,7 @@ export default function MobileSearchBar() {
                         className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                       >
                         <div className="text-sm font-medium">{author.fullName}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-sm text-gray-500">
                           {author.followersCount ?? 0} followers
                         </div>
                       </button>

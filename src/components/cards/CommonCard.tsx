@@ -31,11 +31,11 @@ export default function CommonCard({ data }: CommonCardProps) {
                 {/* Top-right badge */}
                 <div className="absolute top-3.5 right-3.5">
                     {isBook ? (
-                        <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs font-medium ${data.pricingModel === VISIBLE.BOOK ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
+                        <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium ${data.pricingModel === VISIBLE.BOOK ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
                             {data.pricingModel === VISIBLE.BOOK ? 'Full Book' : 'By Chapter'}
                         </Badge>
                     ) : data.isFree ? (
-                        <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs font-medium">
+                        <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium">
                             Free
                         </Badge>
                     ) : null}
@@ -47,12 +47,12 @@ export default function CommonCard({ data }: CommonCardProps) {
                     /* Book mode — category + subcategory tags */
                     <div className="flex items-center gap-2 flex-wrap">
                         {data.category?.name && (
-                            <Badge variant="outline" className="text-xs font-medium rounded-full px-3 py-1">
+                            <Badge variant="outline" className="text-sm font-medium rounded-full px-3 py-1">
                                 {data.category.name}
                             </Badge>
                         )}
                         {/* {data.subcategory?.name && (
-                            <Badge variant="outline" className="text-xs font-medium rounded-full px-3 py-1">
+                            <Badge variant="outline" className="text-sm font-medium rounded-full px-3 py-1">
                                 {data.subcategory.name}
                             </Badge>
                         )} */}
@@ -61,12 +61,12 @@ export default function CommonCard({ data }: CommonCardProps) {
                     /* Chapter mode — book title + chapter number */
                     <div className="flex items-center gap-2 flex-wrap">
                         {data.bookTitle && (
-                            <Badge variant="outline" className="text-xs font-medium rounded-full px-3 py-1 max-w-37">
+                            <Badge variant="outline" className="text-sm font-medium rounded-full px-3 py-1 max-w-37">
                                 <BookOpen className="h-3 w-3 mr-1.5 shrink-0" />
                                 <span className="truncate">{data.bookTitle}</span>
                             </Badge>
                         )}
-                        <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-xs font-medium">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-sm font-medium">
                             Chapter {data.chapterNumber}
                         </Badge>
                     </div>

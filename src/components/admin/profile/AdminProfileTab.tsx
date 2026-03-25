@@ -155,12 +155,12 @@ export function AdminProfileTab() {
                             <p className="font-semibold text-gray-900 text-lg">{profile?.name ?? '—'}</p>
                             <p className="text-sm text-gray-500">{profile?.email ?? '—'}</p>
                         </div>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium border border-purple-100">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-sm font-medium border border-purple-100">
                             <Shield className="h-3 w-3" />
                             {roleName}
                         </span>
                         {profile?.createdAt && (
-                            <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1">
+                            <div className="flex items-center gap-1.5 text-sm text-gray-400 mt-1">
                                 <Calendar className="h-3.5 w-3.5" />
                                 <span>Joined {formatDate(profile.createdAt)}</span>
                             </div>
@@ -184,7 +184,7 @@ export function AdminProfileTab() {
                             />
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-900 mb-1">Profile Photo</p>
-                                <p className="text-xs text-gray-500 mb-3">
+                                <p className="text-sm text-gray-500 mb-3">
                                     JPG or PNG, max 5 MB. Displayed in the admin header.
                                 </p>
                                 {isEditing && (
@@ -223,29 +223,29 @@ export function AdminProfileTab() {
                             <>
                                 <div className="space-y-5">
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Full Name</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Full Name</p>
                                         <p className="text-sm font-semibold text-gray-900">{profile?.name ?? '—'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Email Address</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Email Address</p>
                                         <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                                             <Mail className="h-4 w-4 text-gray-400" />
                                             {profile?.email ?? '—'}
                                         </div>
-                                        <p className="text-xs text-gray-400 mt-1">Email cannot be changed</p>
+                                        <p className="text-sm text-gray-400 mt-1">Email cannot be changed</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Role</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Role</p>
                                         <p className="text-sm font-semibold text-gray-900">{roleName}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Bio</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Bio</p>
                                         <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">
                                             {profile?.professionalBio?.trim() || <span className="text-gray-400">No bio added yet</span>}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Member Since</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Member Since</p>
                                         <p className="text-sm font-semibold text-gray-900">{formatDate(profile?.createdAt)}</p>
                                     </div>
                                 </div>
@@ -265,7 +265,7 @@ export function AdminProfileTab() {
                             <form onSubmit={handleSubmit}>
                                 <div className="space-y-5">
                                     <div>
-                                        <label htmlFor="name" className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+                                        <label htmlFor="name" className="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
                                             Full Name
                                         </label>
                                         <Input
@@ -279,12 +279,12 @@ export function AdminProfileTab() {
                                             className={`max-w-md ${errors.name && touched.name ? 'border-red-500' : ''}`}
                                         />
                                         {errors.name && touched.name && (
-                                            <p className="text-xs text-red-600 mt-1">{errors.name}</p>
+                                            <p className="text-sm text-red-600 mt-1">{errors.name}</p>
                                         )}
                                     </div>
 
                                     <div>
-                                        <label htmlFor="professionalBio" className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+                                        <label htmlFor="professionalBio" className="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
                                             Bio
                                         </label>
                                         <textarea
@@ -300,25 +300,25 @@ export function AdminProfileTab() {
                                         />
                                         <div className="flex items-center justify-between max-w-md mt-1">
                                             {errors.professionalBio && touched.professionalBio ? (
-                                                <p className="text-xs text-red-600">{errors.professionalBio}</p>
+                                                <p className="text-sm text-red-600">{errors.professionalBio}</p>
                                             ) : (
                                                 <span />
                                             )}
-                                            <p className="text-xs text-gray-400 ml-auto">{values.professionalBio?.length ?? 0}/500</p>
+                                            <p className="text-sm text-gray-400 ml-auto">{values.professionalBio?.length ?? 0}/500</p>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Email Address</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Email Address</p>
                                         <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 py-2">
                                             <Mail className="h-4 w-4 text-gray-400" />
                                             {profile?.email ?? '—'}
                                         </div>
-                                        <p className="text-xs text-gray-400">Email cannot be changed</p>
+                                        <p className="text-sm text-gray-400">Email cannot be changed</p>
                                     </div>
 
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Role</p>
+                                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Role</p>
                                         <p className="text-sm font-semibold text-gray-900">{roleName}</p>
                                     </div>
                                 </div>

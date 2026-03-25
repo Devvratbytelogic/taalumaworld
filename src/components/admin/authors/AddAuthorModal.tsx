@@ -186,7 +186,7 @@ export function AddAuthorModal({
             </div>
             <div className="space-y-2">
               <Label htmlFor="author-avatar">Avatar (optional)</Label>
-              <p className="text-xs text-muted-foreground">Select an image file.</p>
+              <p className="text-sm text-muted-foreground">Select an image file.</p>
               <input
                 ref={fileInputRef}
                 id="author-avatar"

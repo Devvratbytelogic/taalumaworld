@@ -172,7 +172,7 @@ export default function ReadChapterPage() {
                 {currentChapter.title}
               </h1>
               {book && (
-                <p className="text-xs text-muted-foreground truncate">
+                <p className="text-sm text-muted-foreground truncate">
                   {book.title} • Chapter {currentChapter.chapterNumber}
                 </p>
               )}
@@ -198,7 +198,7 @@ export default function ReadChapterPage() {
         <div className="max-w-3xl mx-auto px-6 sm:px-8 py-12">
           {/* Chapter Title */}
           <div className="mb-10 text-center">
-            <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-xs mb-3">
+            <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm mb-3">
               Chapter {currentChapter.chapterNumber}
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">{currentChapter.title}</h1>

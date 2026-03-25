@@ -212,7 +212,7 @@ export function ProfilePage() {
                       {profile?.email ?? '—'}
                     </span>
                   </div>
-                  <p className="text-xs mt-1" style={{ color: '#666666' }}>
+                  <p className="text-sm mt-1" style={{ color: '#666666' }}>
                     Email address cannot be changed
                   </p>
                 </div>
@@ -271,7 +271,7 @@ export function ProfilePage() {
                       {profile?.email ?? '—'}
                     </span>
                   </div>
-                  <p className="text-xs mt-1" style={{ color: '#666666' }}>
+                  <p className="text-sm mt-1" style={{ color: '#666666' }}>
                     Email address cannot be changed
                   </p>
                 </div>

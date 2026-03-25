@@ -48,7 +48,7 @@ export function TestimonialCard({
           </div>
           <div>
             <p className="font-semibold text-gray-900 text-sm leading-tight">{t.name}</p>
-            <p className="text-xs text-gray-500">{t.title}</p>
+            <p className="text-sm text-gray-500">{t.title}</p>
           </div>
         </div>
         <Chip

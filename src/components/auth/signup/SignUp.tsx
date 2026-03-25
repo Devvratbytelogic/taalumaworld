@@ -120,11 +120,11 @@ export default function SignUp() {
                                 ) : (
                                     <>
                                         <Camera className="h-6 w-6" style={{ color: AVATAR_BORDER_COLOR }} />
-                                        <span className="text-xs font-medium text-[#666666]">Upload</span>
+                                        <span className="text-sm font-medium text-[#666666]">Upload</span>
                                     </>
                                 )}
                             </button>
-                            <span className="text-xs text-muted-foreground">Profile picture (optional)</span>
+                            <span className="text-sm text-muted-foreground">Profile picture (optional)</span>
                         </div>
 
                         {/* Name Field */}

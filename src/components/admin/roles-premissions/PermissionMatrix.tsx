@@ -36,7 +36,7 @@ export function PermissionMatrix() {
                       <TableHead className="w-62.5">Permission</TableHead>
                       {ROLES.map((role: AdminRole) => (
                         <TableHead key={role} className="text-center">
-                          <div className="text-xs">
+                          <div className="text-sm">
                             {getRoleName(role).split(' ')[0]}
                           </div>
                         </TableHead>

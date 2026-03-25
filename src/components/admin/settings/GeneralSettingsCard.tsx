@@ -62,7 +62,7 @@ type FormValues = typeof defaultValues;
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
-  return <p className="mt-1 text-xs text-red-500">{msg}</p>;
+  return <p className="mt-1 text-sm text-red-500">{msg}</p>;
 }
 
 function SectionHeading({ title }: { title: string }) {
@@ -291,7 +291,7 @@ export function GeneralSettingsCard() {
                         <span>Click to select a logo image</span>
                       )}
                     </button>
-                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, SVG or WebP recommended</p>
+                    <p className="text-sm text-muted-foreground mt-1">PNG, JPG, SVG or WebP recommended</p>
                   </div>
                 </div>
               </div>
@@ -304,7 +304,7 @@ export function GeneralSettingsCard() {
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium text-sm">Content Visibility Mode</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-sm text-muted-foreground mt-0.5">
                     Platform is currently in <span className="font-semibold">{values.visible === 'book' ? 'Book' : 'Chapter'}</span> mode
                   </p>
                 </div>
@@ -358,7 +358,7 @@ export function GeneralSettingsCard() {
               </div>
               <div>
                 <Label htmlFor="schema_markup">Schema Markup</Label>
-                <Textarea {...field('schema_markup')} rows={3} placeholder='<script type="application/ld+json">...</script>' className={`mt-2 font-mono text-xs${errors.schema_markup && touched.schema_markup ? ' border-red-500' : ''}`} />
+                <Textarea {...field('schema_markup')} rows={3} placeholder='<script type="application/ld+json">...</script>' className={`mt-2 font-mono text-sm${errors.schema_markup && touched.schema_markup ? ' border-red-500' : ''}`} />
                 <FieldError msg={touched.schema_markup ? errors.schema_markup : ''} />
               </div>
             </div>

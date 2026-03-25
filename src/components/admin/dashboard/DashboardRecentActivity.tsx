@@ -60,7 +60,7 @@ export function DashboardRecentActivity({ items, isLoading }: DashboardRecentAct
                         </>
                       )}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{activity.time}</p>
                   </div>
                 </div>
               ))}

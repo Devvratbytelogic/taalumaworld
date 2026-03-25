@@ -138,7 +138,7 @@ export function CheckoutPage() {
                         <p className="font-semibold text-sm line-clamp-1">
                           {chapter.title}
                         </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
+                        <p className="text-sm text-muted-foreground line-clamp-1">
                           {book?.title}
                         </p>
                       </div>
@@ -309,7 +309,7 @@ export function CheckoutPage() {
                     <p className="text-sm font-medium text-blue-900 mb-1">
                       Secure Payment
                     </p>
-                    <p className="text-xs text-blue-700">
+                    <p className="text-sm text-blue-700">
                       Your payment information is encrypted and secure. We never
                       store your card details.
                     </p>
@@ -336,16 +336,16 @@ export function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold line-clamp-2 text-xs mb-1">
+                        <p className="font-semibold line-clamp-2 text-sm mb-1">
                           {chapter.title}
                         </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
+                        <p className="text-sm text-muted-foreground line-clamp-1">
                           {book?.title}
                         </p>
                       </div>
                       <div className="text-right shrink-0">
                         {chapter.isFree ? (
-                          <span className="text-xs text-success font-medium">
+                          <span className="text-sm text-success font-medium">
                             Free
                           </span>
                         ) : (

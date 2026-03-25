@@ -354,7 +354,7 @@ export function AddBookModal({
                 </div>
               ) : (
                 <div className="mt-3 rounded-2xl border border-dashed border-muted-foreground/30 aspect-4/4 max-w-24 flex items-center justify-center bg-muted/30">
-                  <span className="text-xs text-muted-foreground px-3 text-center">
+                  <span className="text-sm text-muted-foreground px-3 text-center">
                     Select an image to preview
                   </span>
                 </div>

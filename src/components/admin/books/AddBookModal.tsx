@@ -380,7 +380,7 @@ export function AddBookModal({
               </div>
               {values.pricingModel === 'book' && (
               <div className="space-y-2">
-                <Label htmlFor="book-price">Price ($)</Label>
+                <Label htmlFor="book-price">Price ($) <span className="text-red-500">*</span></Label>
                 <Input
                   id="book-price"
                   name="price"

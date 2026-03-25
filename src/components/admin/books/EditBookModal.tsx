@@ -422,7 +422,7 @@ export function EditBookModal({
               </div>
               {values.pricingModel === 'book' && (
                 <div className="space-y-2">
-                  <Label htmlFor="edit-book-price">Price ($)</Label>
+                  <Label htmlFor="edit-book-price">Price ($) <span className="text-red-500">*</span></Label>
                   <Input
                     id="edit-book-price"
                     name="price"

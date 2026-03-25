@@ -133,8 +133,8 @@ export const addBookSchema = Yup.object({
   // pricingModel: Yup.string().oneOf(['book', 'chapter']).required(),
   price: Yup.number()
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-    .min(0, 'Price cannot be negative')
-    .optional(),
+    .min(1, 'Price must be greater than 1')
+    .required('Price is required'),
   tags: Yup.array().of(Yup.string().required()),
   tagsInput: Yup.string(),
 });

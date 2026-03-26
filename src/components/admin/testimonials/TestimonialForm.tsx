@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Upload, UserCircle } from 'lucide-react';
 import { Button } from '@heroui/react';
 import type { ITestimonialsDataEntity } from '@/types/testimonial';
+import toast from '@/utils/toast';
 
 interface FormValues {
   name: string;
@@ -47,9 +48,16 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setValues((prev) => ({ ...prev, photo: file }));
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file (e.g. JPG, PNG)');
+      return;
     }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+    setValues((prev) => ({ ...prev, photo: file }));
   };
 
   const handleSubmit = async () => {

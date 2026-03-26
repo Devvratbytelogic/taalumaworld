@@ -277,7 +277,22 @@ export function GeneralSettingsCard() {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] ?? null;
+                        if (file) {
+                          if (!file.type.startsWith('image/')) {
+                            toast.error('Please select an image file (e.g. JPG, PNG)');
+                            e.target.value = '';
+                            return;
+                          }
+                          if (file.size > 2 * 1024 * 1024) {
+                            toast.error('Image must be less than 2MB');
+                            e.target.value = '';
+                            return;
+                          }
+                        }
+                        setLogoFile(file);
+                      }}
                     />
                     <button
                       type="button"

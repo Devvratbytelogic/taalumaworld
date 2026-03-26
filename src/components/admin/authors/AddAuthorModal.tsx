@@ -103,6 +103,11 @@ export function AddAuthorModal({
         toast.error('Please select an image file');
         return;
       }
+      if (file.size > 2 * 1024 * 1024) {
+        setFieldValue('avatar', null);
+        toast.error('Image must be less than 2MB');
+        return;
+      }
       setFieldValue('avatar', file);
     } else {
       setFieldValue('avatar', null);

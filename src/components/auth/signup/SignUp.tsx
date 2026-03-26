@@ -29,7 +29,15 @@ export default function SignUp() {
     const handleAvatarClick = () => fileInputRef.current?.click();
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file || !file.type.startsWith('image/')) return;
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file (e.g. JPG, PNG)');
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image must be less than 2MB');
+            return;
+        }
         setProfileImage(file);
         const url = URL.createObjectURL(file);
         setProfilePreview(url);

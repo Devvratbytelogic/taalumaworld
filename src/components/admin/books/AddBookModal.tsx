@@ -142,6 +142,10 @@ export function AddBookModal({
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image must be less than 2MB');
+        return;
+      }
       if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
       setCoverFile(file);
       setCoverPreviewUrl(URL.createObjectURL(file));

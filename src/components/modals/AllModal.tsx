@@ -13,6 +13,12 @@ import CommonCardDetailsModal from './CommonCardDetailsModal';
 import LoginRequiredModal from '../auth/LoginRequiredModal';
 import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
+import AuthorSignIn from '../auth/author/AuthorSignIn';
+import AuthorRegister from '../auth/author/AuthorRegister';
+import AuthorForgotPassword from '../auth/author/AuthorForgotPassword';
+import AuthorOtpVerification from '../auth/author/AuthorOtpVerification';
+import AuthorResetPassword from '../auth/author/AuthorResetPassword';
+import AuthorChangePassword from '../auth/author/AuthorChangePassword';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -45,6 +51,18 @@ export default function AllModal() {
                 return <ChapterPurchaseModal />;
             case "ConfirmRemoveCartModal":
                 return <ConfirmRemoveCartModal />;
+            case "AuthorSignIn":
+                return <AuthorSignIn />;
+            case "AuthorRegister":
+                return <AuthorRegister />;
+            case "AuthorForgotPassword":
+                return <AuthorForgotPassword />;
+            case "AuthorOtpVerification":
+                return <AuthorOtpVerification />;
+            case "AuthorResetPassword":
+                return <AuthorResetPassword />;
+            case "AuthorChangePassword":
+                return <AuthorChangePassword />;
 
             default:
                 return null;

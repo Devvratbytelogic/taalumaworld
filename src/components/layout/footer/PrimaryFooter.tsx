@@ -163,7 +163,7 @@ export default function PrimaryFooter() {
                                         </Link>
                                     ) : (
                                         <button
-                                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: { isAdmin: true } }))}
+                                            onClick={() => dispatch(openModal({ componentName: 'AuthorSignIn', data: '' }))}
                                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 border border-gray-700 text-gray-400 hover:border-primary/50 hover:text-primary transition-colors text-sm font-medium"
                                         >
                                             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>

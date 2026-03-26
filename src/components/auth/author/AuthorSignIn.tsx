@@ -1,27 +1,27 @@
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { RootState } from '@/store/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
-import toast from '@/utils/toast'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { closeModal, openModal } from '@/store/slices/allModalSlice'
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { useFormik } from 'formik'
 import { signInSchema } from '@/utils/formValidation'
-import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
+import { RootState } from '@/store/store'
+import { closeModal, openModal } from '@/store/slices/allModalSlice'
+import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth'
 import { setAuthCookies, setUserDisplayData } from '@/utils/authCookies'
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup'
+import toast from '@/utils/toast'
 
-export default function SignIn() {
+export default function AuthorSignIn() {
     const [showPassword, setShowPassword] = useState(false)
     const dispatch = useDispatch()
     const router = useRouter()
-    const { isOpen, data } = useSelector((state: RootState) => state.allModal)
+    const { isOpen } = useSelector((state: RootState) => state.allModal)
 
-    const [userLogin, { isLoading }] = useUserLoginMutation()
+    const [adminLogin, { isLoading }] = useAdminLoginMutation()
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: {
@@ -31,31 +31,28 @@ export default function SignIn() {
         validationSchema: signInSchema,
         onSubmit: async (values, { resetForm }) => {
             try {
-                const res = await userLogin({ email: values.email, password: values.password }).unwrap()
+                const res = await adminLogin({ email: values.email, password: values.password }).unwrap()
                 if (res.success && res.data) {
-                    const { token, user } = res.data
-                    setUserDisplayData({ fullName: user.name, email: values.email })
+                    const { token, userRole } = res.data
+                    setUserDisplayData({ fullName: userRole.name, email: values.email })
                     setAuthCookies({
                         token,
-                        user: { id: String(user.id ?? user._id), _id: user._id },
-                        role: 'user',
+                        user: { id: String(userRole.user_id), _id: userRole._id },
+                        role: { name: userRole.name, id: userRole.id, _id: userRole._id },
                     })
                     dispatch(rtkQuerieSetup.util.invalidateTags([
                         'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
                     ]))
-                    const redirectTo = (data as { redirectTo?: string })?.redirectTo
                     dispatch(closeModal())
                     resetForm()
                     toast.success(res.message ?? 'Sign in successful!')
-                    if (redirectTo) {
-                        router.push(redirectTo)
-                    }
+                    router.push('/admin/dashboard')
                 }
             } catch (error) {
                 const errMsg = (error as { data?: { message?: string } })?.data?.message ?? ''
                 if (errMsg.toLowerCase().includes('verify your account')) {
                     toast.info(errMsg)
-                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: values.email, type: 'account' } }))
+                    dispatch(openModal({ componentName: 'AuthorOtpVerification', data: { email: values.email, type: 'account' } }))
                 } else {
                     console.log(errMsg || 'Invalid email or password. Please try again.')
                 }
@@ -68,10 +65,10 @@ export default function SignIn() {
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
-                        Sign In
+                        Author Sign In
                     </p>
                     <p className="text-sm text-muted-foreground font-normal">
-                        Continue your learning journey with TaalumaWorld
+                        Sign in to your author account
                     </p>
                 </ModalHeader>
                 <ModalBody>
@@ -131,7 +128,7 @@ export default function SignIn() {
                         <div className="text-right">
                             <button
                                 type="button"
-                                onClick={() => dispatch(openModal({ componentName: 'ForgotPassword', data: '' }))}
+                                onClick={() => dispatch(openModal({ componentName: 'AuthorForgotPassword', data: '' }))}
                                 className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
                                 disabled={isSubmitting}
                             >
@@ -154,10 +151,10 @@ export default function SignIn() {
                             <button
                                 type="button"
                                 className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                                onClick={() => dispatch(openModal({ componentName: 'AuthorRegister', data: '' }))}
                                 disabled={isSubmitting}
                             >
-                                Sign Up
+                                Register
                             </button>
                         </div>
                     </ModalFooter>

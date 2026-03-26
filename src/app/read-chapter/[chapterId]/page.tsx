@@ -131,17 +131,20 @@ export default function ReadChapterPage() {
 
     if (!chapterId) return;
 
-    // Mark completed once when scroll reaches 95%+
-    if (progress >= 95 && !hasMarkedCompleted.current) {
+    // Mark completed once when scroll reaches 100%
+    if (progress >= 100 && !hasMarkedCompleted.current) {
       hasMarkedCompleted.current = true;
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      lastSavedPercentage.current = rounded;
-      updateReadingProgress({ chapterId, lastPageRead: 1, percentage: rounded, completed: true });
+      lastSavedPercentage.current = 100;
+      updateReadingProgress({ chapterId, lastPageRead: 1, percentage: 100, completed: true });
       return;
     }
 
-    // Save progress every 10% increment via debounce (300ms after scroll stops)
-    const threshold = Math.floor(rounded / 10) * 10;
+    // Stop all further saves once completed — prevents overwriting completed: true
+    if (hasMarkedCompleted.current) return;
+
+    // Save progress every 20% increment via debounce (300ms after scroll stops)
+    const threshold = Math.floor(rounded / 20) * 20;
     if (threshold > lastSavedPercentage.current) {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(() => {

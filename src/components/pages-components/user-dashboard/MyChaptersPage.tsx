@@ -1,11 +1,12 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, TrendingUp, CheckCircle, Play } from 'lucide-react';
+import { BookOpen, TrendingUp, CheckCircle, Play, BookMarked } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetMyChaptersQuery } from '@/store/rtkQueries/userGetAPI';
 import { cn } from '@/components/ui/utils';
 import type { ItemsEntity } from '@/types/user/myChapters';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 type FilterType = 'all' | 'reading' | 'completed' | 'unread';
 
@@ -153,22 +154,25 @@ export function MyChaptersPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredChapters.map((chapter) => {
             // console.log('chapter', chapter);
-            
+
             const progress = chapter.progressPercent;
             const status = getProgressStatus(progress, chapter.completed);
 
             return (
               <div
                 key={chapter.chapterId}
-                className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all group"
+                className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all group flex flex-col"
               >
                 {/* Chapter Image */}
-                <div className="aspect-video relative overflow-hidden bg-gray-100">
-                  <img
-                    src={chapter.coverImage}
-                    alt={chapter.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                <div className="aspect-video relative overflow-hidden bg-gray-100 shrink-0">
+                  <div className="w-full h-full group-hover:scale-105 transition-transform duration-300">
+                    <ImageComponent
+                      key={chapter.chapterId}
+                      src={chapter.coverImage}
+                      alt={chapter.title}
+                      object_cover={true}
+                    />
+                  </div>
 
                   {/* Progress Badge */}
                   {chapter.completed && (
@@ -185,50 +189,55 @@ export function MyChaptersPage() {
                 </div>
 
                 {/* Chapter Info */}
-                <div className="p-5">
-                  <p className="text-sm text-muted-foreground mb-1">{chapter.bookTitle}</p>
-                  <h3 className="font-bold text-base mb-2 line-clamp-2">{chapter.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{chapter.description}</p>
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1 min-w-0">
+                    <BookMarked className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{chapter.bookTitle}</span>
+                  </div>
+                  <h3 className="font-bold text-base mb-2 line-clamp-2 min-h-12">{chapter.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-10">{chapter.description}</p>
 
                   {/* Progress Bar */}
-                  {progress > 0 && (
-                    <div className="mb-4">
+                  <div className="mb-4 h-2">
+                    {progress > 0 && (
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-primary rounded-full transition-all"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                    </div>
-                  )}
-
-                  {/* Action Button */}
-                  <Button
-                    className='global_btn rounded_full bg_primary'
-                    onPress={() => router.push(`/read-chapter/${chapter.chapterId}`)}
-                  >
-                    {progress === 0 ? (
-                      <>
-                        <Play className="h-4 w-4" />
-                        Start Reading
-                      </>
-                    ) : progress < 100 ? (
-                      <>
-                        <BookOpen className="h-4 w-4" />
-                        Continue Reading
-                      </>
-                    ) : (
-                      <>
-                        <BookOpen className="h-4 w-4" />
-                        Read Again
-                      </>
                     )}
-                  </Button>
+                  </div>
 
-                  {/* Chapter Number & Status */}
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Chapter {chapter.chapterNumber}</span>
-                    <span className={status.color}>{status.label}</span>
+                  {/* Action Button — always at bottom */}
+                  <div className="mt-auto space-y-3">
+                    <Button
+                      className='global_btn rounded_full bg_primary w-full'
+                      onPress={() => router.push(`/read-chapter/${chapter.chapterId}`)}
+                    >
+                      {progress === 0 ? (
+                        <>
+                          <Play className="h-4 w-4" />
+                          Start Reading
+                        </>
+                      ) : progress < 100 ? (
+                        <>
+                          <BookOpen className="h-4 w-4" />
+                          Continue Reading
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="h-4 w-4" />
+                          Read Again
+                        </>
+                      )}
+                    </Button>
+
+                    {/* Chapter Number & Status */}
+                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Chapter {chapter.chapterNumber}</span>
+                      <span className={status.color}>{status.label}</span>
+                    </div>
                   </div>
                 </div>
               </div>

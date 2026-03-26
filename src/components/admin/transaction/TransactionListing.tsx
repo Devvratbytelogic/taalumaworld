@@ -1,5 +1,4 @@
 import { Receipt } from 'lucide-react';
-import { Card } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import {
   Table,
@@ -15,6 +14,7 @@ export interface TransactionEntry {
   user: string;
   amount: number;
   item: string;
+  type: string;
   status: string;
   date: string;
 }
@@ -36,6 +36,7 @@ export function TransactionListing({
             <TableHead>Transaction ID</TableHead>
             <TableHead>User</TableHead>
             <TableHead>Item</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Date</TableHead>
@@ -44,22 +45,19 @@ export function TransactionListing({
         <TableBody>
           {transactions.map((txn) => (
             <TableRow key={txn.id}>
-              <TableCell className="font-mono text-sm">{txn.id}</TableCell>
-              <TableCell>{txn.user}</TableCell>
-              <TableCell>{txn.item}</TableCell>
-              <TableCell className="font-medium">
+              <TableCell className="font-mono text-sm max-w-36 truncate">{txn.id}</TableCell>
+              <TableCell className="max-w-32 truncate">{txn.user}</TableCell>
+              <TableCell className="max-w-40 truncate">{txn.item}</TableCell>
+              <TableCell className="capitalize max-w-24 truncate">{txn.type}</TableCell>
+              <TableCell className="font-medium whitespace-nowrap">
                 KSH {txn.amount.toFixed(2)}
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={
-                    txn.status === 'completed' ? 'default' : 'secondary'
-                  }
-                >
+                <Badge variant={txn.status === 'completed' ? 'default' : 'secondary'}>
                   {txn.status || 'pending'}
                 </Badge>
               </TableCell>
-              <TableCell>{txn.date}</TableCell>
+              <TableCell className="whitespace-nowrap">{txn.date}</TableCell>
             </TableRow>
           ))}
         </TableBody>

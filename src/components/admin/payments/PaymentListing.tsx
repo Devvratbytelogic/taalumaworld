@@ -42,18 +42,18 @@ export function PaymentListing({ payments, searchQuery = '' }: PaymentListingPro
         <TableBody>
           {payments.map((payment) => (
             <TableRow key={payment.id}>
-              <TableCell className="font-mono text-sm">{payment.id}</TableCell>
-              <TableCell className="font-medium">{payment.user}</TableCell>
-              <TableCell>{payment.item}</TableCell>
+              <TableCell className="font-mono text-sm max-w-36 truncate">{payment.id}</TableCell>
+              <TableCell className="max-w-32 truncate font-medium">{payment.user}</TableCell>
+              <TableCell className="max-w-40 truncate">{payment.item}</TableCell>
               <TableCell>
                 <Badge variant="outline">
                   {payment.type === 'chapter' ? 'Focus Area' : 'Book'}
                 </Badge>
               </TableCell>
-              <TableCell className="font-semibold text-primary">
+              <TableCell className="font-semibold text-primary whitespace-nowrap">
                 KSH {payment.amount.toFixed(2)}
               </TableCell>
-              <TableCell>{payment.date}</TableCell>
+              <TableCell className="whitespace-nowrap">{payment.date}</TableCell>
               <TableCell>
                 <Badge
                   variant="outline"

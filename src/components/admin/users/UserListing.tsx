@@ -72,22 +72,22 @@ export function UserListing({
               ))
             : users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar>
+              <TableCell className="max-w-40">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar className="shrink-0">
                     <AvatarImage src={user.avatar} />
                     <AvatarFallback>{user.name[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="font-medium">{user.name}</span>
+                  <span className="font-medium truncate">{user.name}</span>
                 </div>
               </TableCell>
-              <TableCell>{user.email}</TableCell>
+              <TableCell className="max-w-48 truncate">{user.email}</TableCell>
               <TableCell>
                 <Badge variant={user.role === 'Premium User' ? 'default' : 'outline'}>
                   {user.role}
                 </Badge>
               </TableCell>
-              <TableCell>{user.joinDate}</TableCell>
+              <TableCell className="whitespace-nowrap">{user.joinDate}</TableCell>
               <TableCell>{user.purchases}</TableCell>
               <TableCell>
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">

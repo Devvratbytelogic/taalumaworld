@@ -95,7 +95,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         /** Transactions */
         getAllTransactions: builder.query<IAllTransactionsAPIResponse, void>({
             query: () => ({
-                url: `/admin/transactions`,
+                url: `/admin/payment-report`,
                 method: 'GET',
             }),
             // providesTags: ['AdminTransactions'],
@@ -113,4 +113,5 @@ export const {
     useGetAllTestimonialsQuery,
     useGetAllFaqsQuery,
     useGetAdminProfileQuery,
+    useGetAllTransactionsQuery,
 } = clientSideGetApis;

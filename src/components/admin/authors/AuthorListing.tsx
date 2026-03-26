@@ -48,23 +48,21 @@ export function AuthorListing({
           <TableBody>
             {authors.map((author) => (
               <TableRow key={author.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
+                <TableCell className="max-w-44">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="h-10 w-10 shrink-0">
                       <AvatarImage src={author.avatar} alt={author.name} />
                       <AvatarFallback>{author?.fullName?.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <div>
-                      <p className="font-medium">{author.name}</p>
-                    </div>
+                    <p className="font-medium truncate">{author.name}</p>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <p className="text-sm text-muted-foreground line-clamp-2 max-w-md">
+                <TableCell className="max-w-sm">
+                  <p className="text-sm text-muted-foreground line-clamp-2">
                     {author.bio || '—'}
                   </p>
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                   <span className="font-medium">{author.booksCount}</span>
                   <span className="text-muted-foreground text-sm"> books</span>
                 </TableCell>

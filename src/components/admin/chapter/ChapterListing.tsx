@@ -71,7 +71,7 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
                   <TableCell>
                     <div className="line-clamp-1 truncate max-w-40">{chapter?.book?.thoughtLeader?.fullName || 'Unknown'}</div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <span className="font-semibold text-primary">
                       KSH {chapter.price.toFixed(2)}
                     </span>

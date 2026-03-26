@@ -4,11 +4,13 @@ import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useContentMode } from '@/hooks/useContentMode';
 import { bannerProps } from '@/data/data';
+import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI';
 
 interface CommonBannerProps {
     data: bannerProps;
 }
 export default function CommonBanner({ data }: CommonBannerProps) {
+    const { data: activeReadersData } = useGetActiveReadersQuery();
     // Use content mode hook to get current mode
     const { contentMode } = useContentMode();
     const displayMode = contentMode; // Use contentMode from the hook
@@ -76,30 +78,49 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                 )}
                             </div>
 
-                            {/* Stats */}
-                            {data?.stats?.status && (<div className="flex items-center gap-6 pt-2">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex -space-x-2">
-                                        {data?.stats?.avatars && data?.stats?.avatars?.length > 0 && data?.stats?.avatars.map((item, index) => (
-                                            <div key={index} className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background`} style={{ backgroundColor: item?.bgColor }}>
-                                                {item?.label}
+                            {/* Active Readers Stats */}
+                            {activeReadersData?.data && activeReadersData.data.totalReaders > 0 && (() => {
+                                const avatarColors = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed'];
+                                const users = activeReadersData.data.users ?? [];
+                                const total = activeReadersData.data.totalReaders;
+                                const remaining = activeReadersData.data.remainingReaders;
+                                return (
+                                    <div className="flex items-center gap-6 pt-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex -space-x-2">
+                                                {users && users.length > 0 && users?.map((user, index) => (
+                                                    user.profilePic ? (
+                                                        <div className='w-8 h-8 rounded-full border-2 overflow-hidden border-background'>
+                                                            <ImageComponent
+                                                                key={user.id}
+                                                                src={user.profilePic}
+                                                                alt={user.name}
+                                                                object_cover={true}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            key={user.id}
+                                                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background"
+                                                            style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
+                                                        >
+                                                            {user.name.charAt(0).toUpperCase()}
+                                                        </div>
+                                                    )
+                                                ))}
+                                                {remaining > 0 && (
+                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-background bg-primary">
+                                                        +{remaining}
+                                                    </div>
+                                                )}
                                             </div>
-                                        ))}
-                                        {/* <div className="w-8 h-8 rounded-full bg-secondary-accent flex items-center justify-center text-white text-sm font-medium border-2 border-background">
-                                            {data?.stats?.avatars?.[1]?.label}
+                                            <span className="text-sm font-medium text-foreground">
+                                                {total.toLocaleString()}+ active readers
+                                            </span>
                                         </div>
-                                        <div className="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white text-sm font-medium border-2 border-background">
-                                            {data?.stats?.avatars?.[2]?.label}
-                                        </div>
-                                        <div className="w-8 h-8 rounded-full bg-primary-dark flex items-center justify-center text-white text-sm font-medium border-2 border-background">
-                                            {data?.stats?.avatars?.[3]?.label}
-                                        </div> */}
                                     </div>
-                                    <span className="text-sm font-medium text-foreground">
-                                        {data?.stats?.description}
-                                    </span>
-                                </div>
-                            </div>)}
+                                );
+                            })()}
                         </div>
 
                         {/* Right Column - Illustration */}

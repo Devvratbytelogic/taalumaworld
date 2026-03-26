@@ -80,13 +80,16 @@ export default function ReadChapterPage() {
   const [updateReadingProgress] = useUpdateReadingProgressMutation();
   const hasMarkedStarted = useRef(false);
   const hasMarkedCompleted = useRef(false);
+  const lastSavedPercentage = useRef(-1);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Mark chapter as in-progress when it first loads
   useEffect(() => {
     if (chapterId && currentChapter && !isLocked && !hasMarkedStarted.current) {
       hasMarkedStarted.current = true;
       hasMarkedCompleted.current = false;
-      updateReadingProgress({ chapterId, lastPageRead: 0, percent: 0, completed: false });
+      lastSavedPercentage.current = 0;
+      updateReadingProgress({ chapterId, lastPageRead: 0, percentage: 0, completed: false });
     }
   }, [chapterId, currentChapter, isLocked]);
 
@@ -94,12 +97,18 @@ export default function ReadChapterPage() {
     router.push(getHomeRoutePath());
   };
 
+  const resetProgressRefs = () => {
+    setScrollProgress(0);
+    hasMarkedStarted.current = false;
+    hasMarkedCompleted.current = false;
+    lastSavedPercentage.current = -1;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+  };
+
   const handlePreviousChapter = () => {
     const prev = bookChapters[currentIndex - 1];
     if (prev) {
-      setScrollProgress(0);
-      hasMarkedStarted.current = false;
-      hasMarkedCompleted.current = false;
+      resetProgressRefs();
       router.push(getReadChapterRoutePath(prev._id));
     }
   };
@@ -107,9 +116,7 @@ export default function ReadChapterPage() {
   const handleNextChapter = () => {
     const next = bookChapters[currentIndex + 1];
     if (next) {
-      setScrollProgress(0);
-      hasMarkedStarted.current = false;
-      hasMarkedCompleted.current = false;
+      resetProgressRefs();
       router.push(getReadChapterRoutePath(next._id));
     }
   };
@@ -119,11 +126,28 @@ export default function ReadChapterPage() {
     const scrolled = target.scrollTop;
     const maxScroll = target.scrollHeight - target.clientHeight;
     const progress = maxScroll > 0 ? (scrolled / maxScroll) * 100 : 0;
+    const rounded = Math.round(progress);
     setScrollProgress(progress);
 
-    if (progress >= 95 && chapterId && !hasMarkedCompleted.current) {
+    if (!chapterId) return;
+
+    // Mark completed once when scroll reaches 95%+
+    if (progress >= 95 && !hasMarkedCompleted.current) {
       hasMarkedCompleted.current = true;
-      updateReadingProgress({ chapterId, lastPageRead: 1, percent: Math.round(progress), completed: true });
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      lastSavedPercentage.current = rounded;
+      updateReadingProgress({ chapterId, lastPageRead: 1, percentage: rounded, completed: true });
+      return;
+    }
+
+    // Save progress every 10% increment via debounce (300ms after scroll stops)
+    const threshold = Math.floor(rounded / 10) * 10;
+    if (threshold > lastSavedPercentage.current) {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(() => {
+        lastSavedPercentage.current = threshold;
+        updateReadingProgress({ chapterId, lastPageRead: 0, percentage: threshold, completed: false });
+      }, 300);
     }
   };
 

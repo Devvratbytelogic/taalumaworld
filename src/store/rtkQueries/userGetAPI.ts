@@ -13,6 +13,7 @@ import { ISearchResultsAPIResponse } from '@/types/user/saech';
 import { IUserAllCategoriesAPIResponse } from '@/types/user/allCategory';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import { IUserAllTagsAPIResponse } from '@/types/user/allTags';
+import { IActiveReadersAPIResponse } from '@/types/activeReaders';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -30,6 +31,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
             providesTags: ['GlobalSettings'],
+        }),
+        /** get active readers */
+        getActiveReaders: builder.query<IActiveReadersAPIResponse, void>({
+            query: () => ({
+                url: `/user/active-readers`,
+                method: 'GET',
+            }),
         }),
         /** chapters */
         getAllChapters: builder.query<IHomeAllChaptersAPIResponse, IGetAllChaptersParams>({
@@ -146,6 +154,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
 
 export const {
     useGetGlobalSettingsQuery,
+    useGetActiveReadersQuery,
     useGetAllChaptersQuery,
     useGetSingleChapterQuery,
     useGetSingleBookQuery,

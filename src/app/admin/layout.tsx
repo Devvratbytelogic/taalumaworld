@@ -7,7 +7,7 @@ import { Button } from '@heroui/react';
 import {
     LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree,
     MessageSquare, FileEdit, BarChart3, DollarSign, Shield, Activity,
-    Receipt, FileSpreadsheet, UserCircle,
+    Receipt, FileSpreadsheet, UserCircle, Mail,
 } from 'lucide-react';
 
 import { useAdminUser } from '@/hooks/useAdminUser';
@@ -34,6 +34,7 @@ const NAV_ITEMS = [
     // { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
     { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
     { id: 'faqs' as AdminSection, label: 'FAQs', icon: FileEdit, category: 'community' },
+    { id: 'contact_us' as AdminSection, label: 'Contact Us', icon: Mail, category: 'community' },
     // { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
     // { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
     // { id: 'reports' as AdminSection, label: 'Reports', icon: FileSpreadsheet, category: 'analytics' },
@@ -55,6 +56,7 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/reviews': 'reviews',
     '/admin/testimonials': 'testimonials',
     '/admin/faqs': 'faqs',
+    '/admin/all-contact-us': 'contact_us',
     // '/admin/moderation': 'moderation',
     '/admin/analytics': 'analytics',
     '/admin/reports': 'reports',

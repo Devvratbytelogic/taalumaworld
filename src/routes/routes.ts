@@ -53,6 +53,7 @@ export function getAdminSectionRoutePath(section: string): string {
     reviews: '/admin/reviews',
     testimonials: '/admin/testimonials',
     faqs: '/admin/faqs',
+    contact_us: '/admin/all-contact-us',
     moderation: '/admin/moderation',
     analytics: '/admin/analytics',
     reports: '/admin/reports',

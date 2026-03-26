@@ -186,6 +186,7 @@ export const addChapterSchema = Yup.object({
           .required('Price is required when chapter is not free'),
     }),
   status: Yup.string().required('Status is required'),
+  cover_image: Yup.mixed().required('Cover image is required'),
 });
 
 // Add / Edit Category Modal Validation Schema

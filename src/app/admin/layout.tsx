@@ -45,6 +45,7 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/settings': 'settings',
     '/admin/books': 'books',
     '/admin/chapters': 'chapters',
+    '/admin/chapter': 'chapters',   // create & edit sub-routes (/admin/chapter/create, /admin/chapter/edit/[id])
     '/admin/categories': 'categories',
     '/admin/authors': 'authors',
     '/admin/users': 'users',
@@ -69,8 +70,13 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    // Which section is currently active (based on URL)
-    const activeSection = PATH_TO_SECTION[pathname] ?? 'dashboard';
+    // Exact match first, then prefix match (segment-boundary safe) so that
+    // sub-routes like /admin/chapter/create or /admin/chapter/edit/[id]
+    // correctly highlight their parent section instead of falling back to Dashboard.
+    const activeSection: AdminSection =
+        PATH_TO_SECTION[pathname] ??
+        Object.entries(PATH_TO_SECTION).find(([path]) => pathname.startsWith(path + '/'))?.[1] ??
+        'dashboard';
 
     // Redirect author to books if they land on a section they cannot access
     useEffect(() => {

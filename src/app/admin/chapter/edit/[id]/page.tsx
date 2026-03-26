@@ -24,9 +24,9 @@ export default async function EditChapterPage({ params }: Props) {
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                             Edit Chapter
                         </h1>
-                        <p className="text-muted-foreground mt-0.5">
+                        {/* <p className="text-muted-foreground mt-0.5">
                             Edit a chapter with rich content and optional PDF attachment
-                        </p>
+                        </p> */}
                     </div>
                 </div>
             </div>

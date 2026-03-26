@@ -1,4 +1,6 @@
-import { Plus, FileText, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
+'use client';
+
+import { FileText, MoreVertical, Eye, Edit, Trash2, ChevronDown, Loader2 } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Badge } from '../../ui/badge';
 import {
@@ -14,11 +16,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from '../../ui/dropdown-menu';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IAllChaptersAPIResponseData } from '@/types/chapter';
 import { getEditChapterRoutePath } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { useUpdateChapterMutation } from '@/store/rtkQueries/adminPostApi';
+import toast from '@/utils/toast';
 
 interface ChapterListingProps {
   data: IAllChaptersAPIResponseData[];
@@ -26,8 +33,41 @@ interface ChapterListingProps {
   setDeleteConfirmChapter: (chapter: IAllChaptersAPIResponseData | null) => void;
 }
 
+const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
+  Published: {
+    badge: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+    dot: 'bg-green-500',
+    label: 'Published',
+  },
+  Draft: {
+    badge: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
+    dot: 'bg-yellow-500',
+    label: 'Draft',
+  },
+};
+
+const STATUSES = ['Published', 'Draft'] as const;
+
 export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapter }: ChapterListingProps) {
   const router = useRouter();
+  const [updateChapter] = useUpdateChapterMutation();
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const handleStatusChange = async (chapter: IAllChaptersAPIResponseData, status: string) => {
+    if (status === chapter.status || updatingId) return;
+    const formData = new FormData();
+    formData.append('status', status);
+    setUpdatingId(chapter.id);
+    try {
+      await updateChapter({ id: chapter.id, values: formData }).unwrap();
+      toast.success(`Chapter marked as ${status}`);
+    } catch {
+      toast.error('Failed to update status');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   return (
     <>
       <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
@@ -77,9 +117,44 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      Published
-                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild disabled={!!updatingId}>
+                        <button className="focus:outline-none">
+                          <Badge
+                            variant="outline"
+                            className={`cursor-pointer select-none transition-colors flex items-center gap-1.5 ${(STATUS_CONFIG[chapter.status] ?? STATUS_CONFIG['Draft']).badge}`}
+                          >
+                            {updatingId === chapter.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <span className={`h-1.5 w-1.5 rounded-full ${(STATUS_CONFIG[chapter.status] ?? STATUS_CONFIG['Draft']).dot}`} />
+                            )}
+                            {chapter.status}
+                            <ChevronDown className="h-3 w-3 opacity-60" />
+                          </Badge>
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-40">
+                        <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
+                          Change status
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {STATUSES.map((s) => (
+                          <DropdownMenuItem
+                            key={s}
+                            onSelect={() => handleStatusChange(chapter, s)}
+                            className="flex items-center gap-2"
+                            disabled={chapter.status === s}
+                          >
+                            <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[s].dot}`} />
+                            {STATUS_CONFIG[s].label}
+                            {chapter.status === s && (
+                              <span className="ml-auto text-xs text-muted-foreground">current</span>
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

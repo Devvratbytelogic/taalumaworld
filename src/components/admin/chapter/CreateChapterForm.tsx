@@ -40,6 +40,7 @@ const initialFormValues = {
   isFree: false,
   price: 0 as number | undefined,
   status: 'Published',
+  cover_image: null as File | null,
 };
 
 export function CreateChapterForm() {
@@ -76,10 +77,6 @@ export function CreateChapterForm() {
     initialValues: initialFormValues,
     validationSchema: addChapterSchema,
     onSubmit: async (vals) => {
-      if (!featuredImageFile) {
-        toast.error('Cover image is required (upload a file)');
-        return;
-      }
       const formData = new FormData();
       formData.append('book', vals.bookId);
       formData.append('number', String(vals.sequence));
@@ -92,7 +89,7 @@ export function CreateChapterForm() {
       }
       formData.append('status', vals.status);
       // formData.append('page', String(vals.page ?? 1));
-      formData.append('cover_image', featuredImageFile);
+      if (featuredImageFile) formData.append('cover_image', featuredImageFile);
       if (pdfFile) {
         formData.append('pdf_file', pdfFile);
       }
@@ -135,6 +132,8 @@ export function CreateChapterForm() {
       if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
       setFeaturedImageFile(file);
       setFeaturedImagePreviewUrl(URL.createObjectURL(file));
+      setFieldValue('cover_image', file);
+      setFieldTouched('cover_image', true);
     }
     e.target.value = '';
   };
@@ -155,6 +154,8 @@ export function CreateChapterForm() {
     if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
     setFeaturedImageFile(null);
     setFeaturedImagePreviewUrl(null);
+    setFieldValue('cover_image', null);
+    setFieldTouched('cover_image', true);
   };
 
   const clearPdf = () => setPdfFile(null);
@@ -416,7 +417,7 @@ export function CreateChapterForm() {
             <Label htmlFor="chapter-image">Featured Image<span className="text-red-500">*</span></Label>
             <label
               htmlFor="chapter-image"
-              className="border-input bg-input-background focus-visible:border-ring flex h-10 w-full cursor-pointer items-center rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50"
+              className={`border-input bg-input-background focus-visible:border-ring flex h-10 w-full cursor-pointer items-center rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 ${errors.cover_image && touched.cover_image ? 'border-red-500' : ''}`}
             >
               <input
                 id="chapter-image"
@@ -429,6 +430,9 @@ export function CreateChapterForm() {
                 {featuredImageFile ? featuredImageFile.name : 'Select cover image...'}
               </span>
             </label>
+            {errors.cover_image && touched.cover_image && (
+              <p className="text-sm text-red-600">{errors.cover_image as string}</p>
+            )}
           </div>
           {featuredImagePreviewUrl ? (
             <div className="relative inline-block">
@@ -455,6 +459,7 @@ export function CreateChapterForm() {
               </span>
             </div>
           )}
+        
         </div>
 
 

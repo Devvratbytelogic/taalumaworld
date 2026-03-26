@@ -40,6 +40,7 @@ const initialFormValues = {
   isFree: false,
   price: 0 as number | undefined,
   status: 'Published',
+  cover_image: null as File | string | null,
 };
 
 function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
@@ -54,6 +55,7 @@ function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
     isFree: chapter.isFree ?? false,
     price: (chapter.price ?? 0) as number | undefined,
     status: chapter.status ?? 'Published',
+    cover_image: (chapter.coverImage ?? null) as File | string | null,
   };
 }
 
@@ -160,6 +162,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
       setFeaturedImageFile(file);
       setFeaturedImagePreviewUrl(URL.createObjectURL(file));
+      setFieldValue('cover_image', file);
+      setFieldTouched('cover_image', true);
     }
     e.target.value = '';
   };
@@ -180,6 +184,9 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
     setFeaturedImageFile(null);
     setFeaturedImagePreviewUrl(null);
+    // Revert to the existing server URL if available so validation stays satisfied
+    setFieldValue('cover_image', existingCoverUrl ?? null);
+    setFieldTouched('cover_image', true);
   };
 
   const clearPdf = () => setPdfFile(null);
@@ -440,10 +447,10 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         </div>
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="space-y-2 flex-1 ">
-            <Label htmlFor="chapter-image">Featured Image{!chapter ? <span className="text-red-500">*</span> : null}</Label>
+            <Label htmlFor="chapter-image">Featured Image<span className="text-red-500">*</span></Label>
             <label
               htmlFor="chapter-image"
-              className="border-input bg-input-background focus-visible:border-ring flex h-10 w-full cursor-pointer items-center rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50"
+              className={`border-input bg-input-background focus-visible:border-ring flex h-10 w-full cursor-pointer items-center rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 ${errors.cover_image && touched.cover_image ? 'border-red-500' : ''}`}
             >
               <input
                 id="chapter-image"
@@ -453,9 +460,12 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                 className="sr-only"
               />
               <span className="truncate">
-                {featuredImageFile ? featuredImageFile.name : chapter ? 'Replace cover image (optional)...' : 'Select cover image...'}
+                {featuredImageFile ? featuredImageFile.name : existingCoverUrl ? 'Replace cover image (optional)...' : 'Select cover image...'}
               </span>
             </label>
+            {errors.cover_image && touched.cover_image && (
+              <p className="text-sm text-red-600">{errors.cover_image as string}</p>
+            )}
           </div>
           {showCoverPreview ? (
             <div className="relative inline-block">

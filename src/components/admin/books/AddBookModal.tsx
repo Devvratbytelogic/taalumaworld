@@ -36,6 +36,7 @@ const initialFormValues = {
   tagsInput: '',
   pricingModel: 'book',
   price: '' as number | '',
+  cover_image: null as File | null,
 };
 
 interface AddBookModalProps {
@@ -72,10 +73,6 @@ export function AddBookModal({
     initialValues: initialFormValues,
     validationSchema: addBookSchema,
     onSubmit: async (vals) => {
-      if (!coverFile) {
-        toast.error('Cover image is required');
-        return;
-      }
       const formData = new FormData();
       formData.append('title', vals.title);
       formData.append('thoughtLeader', vals.thoughtLeader);
@@ -84,7 +81,7 @@ export function AddBookModal({
       formData.append('description', vals.description ?? '');
       formData.append('pricingModel', vals.pricingModel);
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
-      formData.append('cover_image', coverFile);
+      if (coverFile) formData.append('cover_image', coverFile);
       formData.append('tags', vals.tags.join(','));
 
       try {
@@ -96,7 +93,8 @@ export function AddBookModal({
         onOpenChange(false);
         toast.success('Book created successfully');
       } catch {
-        toast.error('Failed to create book');
+        // toast.error('Failed to create book');
+        console.error('Failed to create book');
       }
     },
   });
@@ -147,6 +145,8 @@ export function AddBookModal({
       if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
       setCoverFile(file);
       setCoverPreviewUrl(URL.createObjectURL(file));
+      setFieldValue('cover_image', file);
+      setFieldTouched('cover_image', true);
     }
     e.target.value = '';
   };
@@ -155,6 +155,7 @@ export function AddBookModal({
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     setCoverFile(null);
     setCoverPreviewUrl(null);
+    setFieldValue('cover_image', null);
   };
 
   const closeModal = () => {
@@ -196,7 +197,7 @@ export function AddBookModal({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="book-desc">Description</Label>
+              <Label htmlFor="book-desc">Description<span className="text-red-500">*</span></Label>
               <Textarea
                 id="book-desc"
                 name="description"
@@ -206,7 +207,11 @@ export function AddBookModal({
                 onBlur={handleBlur}
                 disabled={isSubmitting}
                 rows={3}
+                className={errors.description && touched.description ? 'border-red-500' : ''}
               />
+              {errors.description && touched.description && (
+                <p className="text-sm text-red-600">{errors.description}</p>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -236,7 +241,7 @@ export function AddBookModal({
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Category<span className="text-red-500">*</span></Label>
+              <Label>Category<span className="text-red-500">*</span></Label>
                 <Select
                   value={values.category}
                   onValueChange={(value) => {
@@ -320,7 +325,7 @@ export function AddBookModal({
                 <Label htmlFor="book-cover">Cover Image<span className="text-red-500">*</span></Label>
                 <label
                   htmlFor="book-cover"
-                  className="border-input bg-input-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full cursor-pointer items-center rounded-full border px-4 py-1 text-sm text-muted-foreground transition-[color,box-shadow] outline-none focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50"
+                  className={`border-input bg-input-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full cursor-pointer items-center rounded-full border px-4 py-1 text-sm text-muted-foreground transition-[color,box-shadow] outline-none focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50 ${errors.cover_image && touched.cover_image ? 'border-red-500' : ''}`}
                 >
                   <input
                     id="book-cover"
@@ -333,6 +338,9 @@ export function AddBookModal({
                     {coverFile ? coverFile.name : 'Select image...'}
                   </span>
                 </label>
+                {errors.cover_image && touched.cover_image && (
+                  <p className="text-sm text-red-600">{errors.cover_image as string}</p>
+                )}
               </div>
               {coverPreviewUrl ? (
                 <div className="mt-3 relative inline-block">
@@ -380,7 +388,7 @@ export function AddBookModal({
               </div>
               {values.pricingModel === 'book' && (
               <div className="space-y-2">
-                <Label htmlFor="book-price">Price ($) <span className="text-red-500">*</span></Label>
+                <Label htmlFor="book-price">Price (KSH) <span className="text-red-500">*</span></Label>
                 <Input
                   id="book-price"
                   name="price"

@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
-import { addBookSchema } from '@/utils/formValidation';
+import { editBookSchema } from '@/utils/formValidation';
 import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
 import type { LeadersEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
@@ -37,6 +37,7 @@ const emptyFormValues = {
   tagsInput: '',
   pricingModel: 'book',
   price: '' as number | '',
+  cover_image: null as File | null,
 };
 
 function getInitialValuesFromBook(book: IAllBooksAPIResponseDataEntity | null): typeof emptyFormValues {
@@ -63,6 +64,7 @@ function getInitialValuesFromBook(book: IAllBooksAPIResponseDataEntity | null): 
     tagsInput: '',
     pricingModel: book.pricingModel === 'chapter' ? 'chapter' : 'book',
     price: book.price != null ? book.price : '',
+    cover_image: null as File | null,
   };
 }
 
@@ -103,7 +105,7 @@ export function EditBookModal({
     resetForm,
   } = useFormik({
     initialValues,
-    validationSchema: addBookSchema,
+    validationSchema: editBookSchema,
     enableReinitialize: true,
     onSubmit: async (vals) => {
       if (!book) return;
@@ -185,6 +187,8 @@ export function EditBookModal({
       setCoverFile(file);
       setCoverPreviewUrl(URL.createObjectURL(file));
       coverIsObjectUrlRef.current = true;
+      setFieldValue('cover_image', file);
+      setFieldTouched('cover_image', true);
     }
     e.target.value = '';
   };
@@ -194,6 +198,7 @@ export function EditBookModal({
     setCoverFile(null);
     setCoverPreviewUrl(book?.coverImage || null);
     coverIsObjectUrlRef.current = false;
+    setFieldValue('cover_image', null);
   };
 
   const closeModal = () => {
@@ -238,7 +243,7 @@ export function EditBookModal({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-book-desc">Description</Label>
+              <Label htmlFor="edit-book-desc">Description<span className="text-red-500">*</span></Label>
               <Textarea
                 id="edit-book-desc"
                 name="description"
@@ -248,7 +253,11 @@ export function EditBookModal({
                 onBlur={handleBlur}
                 disabled={isSubmitting}
                 rows={3}
+                className={errors.description && touched.description ? 'border-red-500' : ''}
               />
+              {errors.description && touched.description && (
+                <p className="text-sm text-red-600">{errors.description}</p>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -359,7 +368,7 @@ export function EditBookModal({
             </div>
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
-                <Label htmlFor="edit-book-cover">Cover Image</Label>
+                <Label htmlFor="edit-book-cover">Cover Image <span className="text-xs text-muted-foreground font-normal">(leave unchanged to keep current)</span></Label>
                 <label
                   htmlFor="edit-book-cover"
                   className="border-input bg-input-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full cursor-pointer items-center rounded-full border px-4 py-1 text-sm text-muted-foreground transition-[color,box-shadow] outline-none focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50"
@@ -422,7 +431,7 @@ export function EditBookModal({
               </div>
               {values.pricingModel === 'book' && (
                 <div className="space-y-2">
-                  <Label htmlFor="edit-book-price">Price ($) <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="edit-book-price">Price (KSH) <span className="text-red-500">*</span></Label>
                   <Input
                     id="edit-book-price"
                     name="price"

@@ -58,7 +58,7 @@ export const initiateRazorpayPayment = async (
   const res = await fetch('/api/razorpay/create-order', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount: options.amount, currency: 'KES' }),
+    body: JSON.stringify({ amount: options.amount, currency: 'INR' }),
   });
 
   if (!res.ok) throw new Error('Failed to create Razorpay order');
@@ -68,7 +68,7 @@ export const initiateRazorpayPayment = async (
     const rzp = new window.Razorpay({
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
       amount,
-      currency: 'KES',
+      currency: 'INR',
       name: options.name ?? 'Taaluma World',
       description: options.description,
       order_id: orderId,

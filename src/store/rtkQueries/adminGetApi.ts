@@ -8,6 +8,7 @@ import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
 import { IAllUsersAPIResponse } from '@/types/allUsers';
 import { IAllFaqsAPIResponse } from '@/types/faqs';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
+import { IAllTransactionsAPIResponse } from '@/types/transaction';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -90,6 +91,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
             providesTags: ['AdminProfile'],
+        }),
+        /** Transactions */
+        getAllTransactions: builder.query<IAllTransactionsAPIResponse, void>({
+            query: () => ({
+                url: `/admin/transactions`,
+                method: 'GET',
+            }),
+            // providesTags: ['AdminTransactions'],
         }),
     }),
 });

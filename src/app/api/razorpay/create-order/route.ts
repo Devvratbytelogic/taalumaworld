@@ -17,9 +17,9 @@ export async function POST(request: NextRequest) {
     const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret })
     try {
         const body = await request.json()
-        const { amount, currency = 'KES', receipt = 'credits_purchase' } = body
+        const { amount, currency = 'INR', receipt = 'credits_purchase' } = body
 
-        // Amount in smallest unit (cents for KES)
+        // Amount in smallest unit (paise for INR)
         const amountInSmallestUnit = Math.round(Number(amount) * 100)
 
         const order = await razorpay.orders.create({

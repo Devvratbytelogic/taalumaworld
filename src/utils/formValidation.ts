@@ -126,17 +126,37 @@ export const addBookSchema = Yup.object({
   title: Yup.string()
     .trim()
     .required('Please enter a book title'),
-  description: Yup.string(),
+  description: Yup.string()
+    .trim()
+    .required('Please enter a description'),
   thoughtLeader: Yup.string().required('Please select a thought leader'),
-  // category: Yup.string().required('Please select a category'),
-  // subcategory: Yup.string(),
-  // pricingModel: Yup.string().oneOf(['book', 'chapter']).required(),
+  category: Yup.string().required('Please select a category'),
+  cover_image: Yup.mixed<File>()
+    .required('Please select a cover image')
+    .test('is-file', 'Please select a cover image', (v) => v instanceof File),
   price: Yup.number()
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
     .min(1, 'Price must be greater than 1')
     .required('Price is required'),
-  tags: Yup.array().of(Yup.string().required()),
-  tagsInput: Yup.string(),
+});
+// Edit Book Modal Validation Schema — cover_image is optional (null = keep existing)
+export const editBookSchema = Yup.object({
+  title: Yup.string()
+    .trim()
+    .required('Please enter a book title'),
+  description: Yup.string()
+    .trim()
+    .required('Please enter a description'),
+  thoughtLeader: Yup.string().required('Please select a thought leader'),
+  category: Yup.string().required('Please select a category'),
+  cover_image: Yup.mixed<File>()
+    .nullable()
+    .optional()
+    .test('is-file-or-null', 'Please select a valid image file', (v) => v == null || v instanceof File),
+  price: Yup.number()
+    .transform((v) => (v === '' || v == null ? undefined : Number(v)))
+    .min(1, 'Price must be greater than 1')
+    .required('Price is required'),
 });
 
 // Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, status, cover_image, page)

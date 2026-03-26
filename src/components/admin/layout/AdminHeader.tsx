@@ -1,13 +1,17 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X, UserCircle, } from 'lucide-react';
-import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Select, SelectItem, } from '@heroui/react';
+import {
+    BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X,
+    UserCircle, Book, FileText, Users, FolderTree, LayoutDashboard,
+    MessageSquare, FileEdit, Receipt, Plus,
+} from 'lucide-react';
+import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 import { getRoleName } from '@/utils/adminPermissions';
-import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getCreateChapterRoutePath } from '@/routes/routes';
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
@@ -15,12 +19,62 @@ import { useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '@/store
 import type { AdminRole } from '@/types/admin';
 import ImageComponent from '@/components/ui/ImageComponent';
 
+// ── All navigable admin routes for the search palette ────────────────────────
+const ADMIN_ROUTES = [
+    { label: 'Dashboard',        description: 'Overview & stats',            path: getAdminSectionRoutePath('dashboard'),    icon: LayoutDashboard, keywords: ['home', 'overview', 'stats'] },
+    { label: 'Books',            description: 'Manage all books',            path: getAdminSectionRoutePath('books'),        icon: Book,            keywords: ['book', 'publish'] },
+    { label: 'Chapters',         description: 'Manage all chapters',         path: getAdminSectionRoutePath('chapters'),     icon: FileText,        keywords: ['chapter', 'content'] },
+    { label: 'Create Chapter',   description: 'Add a new chapter',          path: getCreateChapterRoutePath(),              icon: Plus,            keywords: ['new chapter', 'add chapter'] },
+    { label: 'Categories',       description: 'Manage categories',          path: getAdminSectionRoutePath('categories'),   icon: FolderTree,      keywords: ['category', 'tag'] },
+    { label: 'Thought Leaders',  description: 'Manage authors & leaders',   path: getAdminSectionRoutePath('authors'),      icon: Users,           keywords: ['author', 'leader', 'thought'] },
+    { label: 'Users',            description: 'Manage registered users',    path: getAdminSectionRoutePath('users'),        icon: UserCircle,      keywords: ['user', 'member', 'account'] },
+    { label: 'Transactions',     description: 'View payment transactions',  path: getAdminSectionRoutePath('transactions'), icon: Receipt,         keywords: ['payment', 'transaction', 'money'] },
+    { label: 'Testimonials',     description: 'Manage testimonials',        path: getAdminSectionRoutePath('testimonials'), icon: MessageSquare,   keywords: ['testimonial', 'review', 'feedback'] },
+    { label: 'FAQs',             description: 'Manage FAQ entries',         path: getAdminSectionRoutePath('faqs'),         icon: FileEdit,        keywords: ['faq', 'question', 'answer'] },
+    { label: 'Settings',         description: 'Platform settings',          path: getAdminSectionRoutePath('settings'),     icon: Settings,        keywords: ['setting', 'config', 'logo'] },
+    { label: 'My Profile',       description: 'Edit your admin profile',    path: getAdminProfileRoutePath(),               icon: UserCircle,      keywords: ['profile', 'me', 'account'] },
+];
+
 export function AdminHeader() {
     const router = useRouter();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
     const { data: globalSettings, isFetching: isSettingsLoading } = useGetAdminGlobalSettingsQuery();
     const { data: profileData } = useGetAdminProfileQuery();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // ── Navigation search ─────────────────────────────────────────────────────
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showResults, setShowResults] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
+    const mobileSearchRef = useRef<HTMLDivElement>(null);
+
+    const isSearchActive = searchQuery.trim().length >= 1;
+
+    const searchResults = useMemo(() => {
+        if (!isSearchActive) return ADMIN_ROUTES;
+        const q = searchQuery.toLowerCase().trim();
+        return ADMIN_ROUTES.filter(route =>
+            route.label.toLowerCase().includes(q) ||
+            route.description.toLowerCase().includes(q) ||
+            route.keywords.some(k => k.includes(q))
+        );
+    }, [isSearchActive, searchQuery]);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            const inside = searchRef.current?.contains(e.target as Node)
+                        || mobileSearchRef.current?.contains(e.target as Node);
+            if (!inside) setShowResults(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const handleResultClick = (path: string) => {
+        setShowResults(false);
+        setSearchQuery('');
+        router.push(path);
+    };
 
     const visible = globalSettings?.data?.visible ?? 'chapter';
     const logo = globalSettings?.data?.logo as string | null | undefined;
@@ -119,13 +173,21 @@ export function AdminHeader() {
                     </div>
 
                     {/* Search (desktop) */}
-                    <div className="hidden lg:flex flex-1 max-w-xl">
+                    <div className="hidden lg:flex flex-1 max-w-xl relative" ref={searchRef}>
                         <Input
-                            startContent={<Search className="h-5 w-5 text-muted-foreground" />}
+                            startContent={<Search className="h-4 w-4 text-muted-foreground" />}
                             type="search"
-                            placeholder="Search users, books, chapters..."
+                            placeholder="Navigate to..."
                             radius="full"
                             className="w-full"
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setShowResults(true); }}
+                            onFocus={() => setShowResults(true)}
+                        />
+                        <SearchDropdown
+                            show={showResults}
+                            results={searchResults}
+                            onSelect={handleResultClick}
                         />
                     </div>
 
@@ -182,14 +244,66 @@ export function AdminHeader() {
             </div>
 
             {/* ── Mobile Search ────────────────────────────────────── */}
-            <div className="lg:hidden border-t px-4 py-3">
+            <div className="lg:hidden border-t px-4 py-3 relative" ref={mobileSearchRef}>
                 <Input
-                    startContent={<Search className="h-5 w-5 text-muted-foreground" />}
+                    startContent={<Search className="h-4 w-4 text-muted-foreground" />}
                     type="search"
-                    placeholder="Search..."
+                    placeholder="Navigate to..."
                     className="w-full rounded-full"
+                    value={searchQuery}
+                    onChange={(e) => { setSearchQuery(e.target.value); setShowResults(true); }}
+                    onFocus={() => setShowResults(true)}
+                />
+                <SearchDropdown
+                    show={showResults}
+                    results={searchResults}
+                    onSelect={handleResultClick}
                 />
             </div>
         </header>
+    );
+}
+
+// ── Navigation Search Dropdown ────────────────────────────────────────────────
+
+type RouteItem = typeof ADMIN_ROUTES[number];
+
+function SearchDropdown({
+    show,
+    results,
+    onSelect,
+}: {
+    show: boolean;
+    results: RouteItem[];
+    onSelect: (path: string) => void;
+}) {
+    if (!show) return null;
+
+    return (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-border z-50 overflow-hidden max-h-80 overflow-y-auto">
+            {results.length === 0 ? (
+                <p className="px-4 py-5 text-center text-sm text-muted-foreground">No pages found</p>
+            ) : (
+                results.map((route) => {
+                    const Icon = route.icon;
+                    return (
+                        <button
+                            key={route.path}
+                            type="button"
+                            onClick={() => onSelect(route.path)}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 transition-colors text-left group"
+                        >
+                            <div className="h-8 w-8 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                                <Icon className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-sm font-medium">{route.label}</p>
+                                <p className="text-xs text-muted-foreground">{route.description}</p>
+                            </div>
+                        </button>
+                    );
+                })
+            )}
+        </div>
     );
 }

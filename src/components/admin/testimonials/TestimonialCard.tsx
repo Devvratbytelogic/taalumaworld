@@ -53,9 +53,13 @@ export function TestimonialCard({
         </div>
         <Chip
           size="sm"
-          color={t.status === 'active' ? 'success' : 'default'}
+          color={
+            t.status === 'Approved' ? 'success'
+            : t.status === 'Rejected' ? 'danger'
+            : 'warning'
+          }
           variant="flat"
-          className="shrink-0"
+          className="shrink-0 capitalize"
         >
           {t.status}
         </Chip>

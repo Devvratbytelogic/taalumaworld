@@ -254,6 +254,22 @@ export const globalSettingsSchema = Yup.object({
   alertFlaggedContent: Yup.boolean(),
 });
 
+// Testimonial Form Validation Schema
+export const testimonialSchema = Yup.object({
+  name: Yup.string().trim().required('Name is required'),
+  title: Yup.string().trim().required('Title / role is required'),
+  message: Yup.string().trim().required('Message is required'),
+  rating: Yup.number()
+    .typeError('Rating must be a number')
+    .min(1, 'Rating must be at least 1')
+    .max(5, 'Rating cannot exceed 5')
+    .required('Rating is required'),
+  status: Yup.string()
+    .oneOf(['Pending', 'Approved', 'Rejected'], 'Select a valid status')
+    .required('Status is required'),
+  photo: Yup.mixed().nullable().optional(),
+});
+
 // Add / Edit Author (Thought Leader) Modal Validation Schema
 export const authorSchema = Yup.object({
   fullName: Yup.string()

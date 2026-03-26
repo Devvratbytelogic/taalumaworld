@@ -19,6 +19,19 @@ export function AdminChaptersTab() {
   const [deleteChapter] = useDeleteChapterMutation();
   const chapters = chaptersResponse?.data ?? [];
 
+  const filteredChapters = chapters.filter((chapter) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      chapter.title?.toLowerCase().includes(q) ||
+      chapter.book?.title?.toLowerCase().includes(q) ||
+      chapter.book?.thoughtLeader?.fullName?.toLowerCase().includes(q) ||
+      chapter.status?.toLowerCase().includes(q) ||
+      String(chapter.price).includes(q) ||
+      String(chapter.number).includes(q)
+    );
+  });
+
   const confirmDeleteChapter = async () => {
     if (!deleteConfirmChapter) return;
     try {
@@ -44,7 +57,8 @@ export function AdminChaptersTab() {
           <AdminChaptersSkeleton />
         ) : (
           <ChapterListing
-            data={chapters}
+            data={filteredChapters}
+            searchQuery={searchQuery}
             setPreviewChapter={setPreviewChapter}
             setDeleteConfirmChapter={setDeleteConfirmChapter}
           />

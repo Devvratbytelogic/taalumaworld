@@ -359,7 +359,7 @@ export function CreateChapterForm() {
               </div>
               {!values.isFree && (
                 <div className="space-y-2 max-w-xs">
-                  <Label htmlFor="chapter-price">Price ($)<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="chapter-price">Price (KSH)<span className="text-red-500">*</span></Label>
                   <Input
                     id="chapter-price"
                     name="price"

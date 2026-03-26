@@ -1,7 +1,7 @@
 import { Plus, Users, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Badge } from '../../ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import ImageComponent from '@/components/ui/ImageComponent';
 import {
   Table,
   TableBody,
@@ -33,6 +33,7 @@ export function AuthorListing({
   onEdit,
   onDelete,
 }: AuthorListingProps) {
+  
   return (
     <>
       <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
@@ -50,10 +51,19 @@ export function AuthorListing({
               <TableRow key={author.id}>
                 <TableCell className="max-w-44">
                   <div className="flex items-center gap-3 min-w-0">
-                    <Avatar className="h-10 w-10 shrink-0">
-                      <AvatarImage src={author.avatar} alt={author.name} />
-                      <AvatarFallback>{author?.fullName?.substring(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
+                    <div className="h-10 w-10 rounded-full shrink-0 overflow-hidden bg-muted">
+                      {author.avatar ? (
+                        <ImageComponent
+                          src={author.avatar}
+                          alt={author.name ?? ''}
+                          object_cover={true}
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-sm font-medium text-muted-foreground">
+                          {author?.name?.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
                     <p className="font-medium truncate">{author.name}</p>
                   </div>
                 </TableCell>
@@ -63,7 +73,7 @@ export function AuthorListing({
                   </p>
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
-                  <span className="font-medium">{author.booksCount}</span>
+                  <span className={`font-medium`}>{author.followersCount}</span>
                   <span className="text-muted-foreground text-sm"> books</span>
                 </TableCell>
                 <TableCell className="text-right">

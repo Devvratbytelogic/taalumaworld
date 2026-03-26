@@ -29,10 +29,15 @@ export function AdminTestimonialsTab() {
   const testimonials = data?.data ?? [];
 
   const filtered = testimonials.filter(
-    (t) =>
-      t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.message.toLowerCase().includes(searchQuery.toLowerCase())
+    (t) => {
+      const q = searchQuery.toLowerCase();
+      return (
+        t.name.toLowerCase().includes(q) ||
+        t.title.toLowerCase().includes(q) ||
+        t.message.toLowerCase().includes(q) ||
+        t.status?.toLowerCase().includes(q)
+      );
+    }
   );
 
   const handleAdd = async (formData: FormData) => {

@@ -23,7 +23,7 @@ function mapLeaderToAuthor(leader: LeadersEntity): Author {
     name: leader.fullName,
     bio: leader.professionalBio ?? '',
     avatar: leader.avatar ?? '',
-    booksCount: 0,
+    followersCount: leader.followersCount ?? 0,
   };
 }
 
@@ -45,7 +45,7 @@ export function AdminAuthorsTab() {
 
   const filteredAuthors = authors.filter(
     (author) =>
-      author?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      author?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (author.bio && author.bio.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 

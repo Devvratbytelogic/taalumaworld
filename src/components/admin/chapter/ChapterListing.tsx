@@ -29,6 +29,7 @@ import toast from '@/utils/toast';
 
 interface ChapterListingProps {
   data: IAllChaptersAPIResponseData[];
+  searchQuery?: string;
   setPreviewChapter: (chapter: IAllChaptersAPIResponseData | null) => void;
   setDeleteConfirmChapter: (chapter: IAllChaptersAPIResponseData | null) => void;
 }
@@ -48,7 +49,7 @@ const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string 
 
 const STATUSES = ['Published', 'Draft'] as const;
 
-export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapter }: ChapterListingProps) {
+export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setDeleteConfirmChapter }: ChapterListingProps) {
   const router = useRouter();
   const [updateChapter] = useUpdateChapterMutation();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -159,7 +160,7 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button className="global_btn rounded_full bg_transparent">
+                        <Button isIconOnly className="global_btn rounded_full bg_transparent icon_btn fit_btn">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -197,7 +198,9 @@ export function ChapterListing({ data, setPreviewChapter, setDeleteConfirmChapte
               <div>
                 <h3 className="font-bold">No chapters found</h3>
                 <p className="text-muted-foreground">
-                  Create your first chapter to get started
+                  {searchQuery.trim()
+                    ? `No chapters match "${searchQuery}"`
+                    : 'Create your first chapter to get started'}
                 </p>
               </div>
             </div>

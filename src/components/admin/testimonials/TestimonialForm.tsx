@@ -1,18 +1,21 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { Upload, UserCircle } from 'lucide-react';
-import { Button } from '@heroui/react';
+import { useRef, useState, useEffect } from 'react';
+import { useFormik } from 'formik';
+import { Upload, UserCircle, Save, X } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { ITestimonialsDataEntity } from '@/types/testimonial';
+import { testimonialSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
-
-interface FormValues {
-  name: string;
-  title: string;
-  message: string;
-  rating: number;
-  status: string;
-  photo: File | null;
-}
 
 interface TestimonialFormProps {
   initial?: Partial<ITestimonialsDataEntity>;
@@ -21,32 +24,54 @@ interface TestimonialFormProps {
   isLoading: boolean;
 }
 
-const inputCls =
-  'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
+const STATUSES = ['Pending', 'Approved', 'Rejected'] as const;
 
 export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }: TestimonialFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [values, setValues] = useState<FormValues>({
-    name: initial.name ?? '',
-    title: initial.title ?? '',
-    message: initial.message ?? '',
-    rating: initial.rating ?? 5,
-    status: initial.status ?? 'active',
-    photo: null,
-  });
-
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initial.photo ?? null);
 
   useEffect(() => {
-    if (values.photo instanceof File) {
-      const url = URL.createObjectURL(values.photo);
+    if (photoFile) {
+      const url = URL.createObjectURL(photoFile);
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
     }
-  }, [values.photo]);
+  }, [photoFile]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+    setFieldTouched,
+  } = useFormik({
+    initialValues: {
+      name: initial.name ?? '',
+      title: initial.title ?? '',
+      message: initial.message ?? '',
+      rating: initial.rating ?? 5,
+      status: initial.status ?? 'Pending',
+      photo: null as File | null,
+    },
+    validationSchema: testimonialSchema,
+    onSubmit: async (vals) => {
+      const fd = new FormData();
+      fd.append('name', vals.name);
+      fd.append('title', vals.title);
+      fd.append('message', vals.message);
+      fd.append('rating', String(vals.rating));
+      fd.append('status', vals.status);
+      if (photoFile) fd.append('photo', photoFile);
+      await onSubmit(fd);
+    },
+  });
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -57,134 +82,200 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
       toast.error('Image must be less than 2MB');
       return;
     }
-    setValues((prev) => ({ ...prev, photo: file }));
+    setPhotoFile(file);
+    setFieldValue('photo', file);
+    e.target.value = '';
   };
 
-  const handleSubmit = async () => {
-    const fd = new FormData();
-    fd.append('name', values.name);
-    fd.append('title', values.title);
-    fd.append('message', values.message);
-    fd.append('rating', String(values.rating));
-    fd.append('status', values.status);
-    if (values.photo) {
-      fd.append('photo', values.photo);
-    }
-    await onSubmit(fd);
+  const clearPhoto = () => {
+    setPhotoFile(null);
+    setPreviewUrl(initial.photo ?? null);
+    setFieldValue('photo', null);
   };
+
+  const isSubmittingState = isSubmitting || isLoading;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
+    <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
 
       {/* Photo upload */}
       <div className="flex items-center gap-5">
-        <div className="shrink-0 w-20 h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Photo preview"
-              className="w-full h-full object-cover"
-              onError={() => setPreviewUrl(null)}
-            />
-          ) : (
-            <UserCircle className="h-10 w-10 text-gray-300" />
+        <div className="relative shrink-0">
+          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Photo preview"
+                className="w-full h-full object-cover"
+                onError={() => setPreviewUrl(null)}
+              />
+            ) : (
+              <UserCircle className="h-10 w-10 text-gray-300" />
+            )}
+          </div>
+          {previewUrl && (
+            <button
+              type="button"
+              onClick={clearPhoto}
+              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-white flex items-center justify-center"
+            >
+              <X className="h-3 w-3" />
+            </button>
           )}
         </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-700 mb-1">
-            Photo <span className="text-gray-400 font-normal">(optional)</span>
-          </p>
+        <div>
+          <Label className="mb-1 block">
+            Photo <span className="text-muted-foreground font-normal">(optional)</span>
+          </Label>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={handleFileChange}
+            onChange={handlePhotoChange}
           />
           <Button
             type="button"
-            variant="bordered"
-            size="sm"
+            className="global_btn rounded_full outline_primary"
             startContent={<Upload className="h-4 w-4" />}
             onPress={() => fileInputRef.current?.click()}
+            isDisabled={isSubmittingState}
           >
-            {values.photo ? values.photo.name : 'Choose image'}
+            {photoFile ? photoFile.name : 'Choose image'}
           </Button>
-          <p className="text-sm text-gray-400 mt-1">JPG, PNG, WEBP — max 5 MB</p>
+          <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP — max 2 MB</p>
         </div>
       </div>
 
-      {/* Fields */}
+      {/* Name + Title */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            className={inputCls}
-            value={values.name}
-            onChange={(e) => setValues((p) => ({ ...p, name: e.target.value }))}
+        <div className="space-y-2">
+          <Label htmlFor="t-name">Name <span className="text-red-500">*</span></Label>
+          <Input
+            id="t-name"
+            name="name"
             placeholder="Reviewer name"
+            value={values.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmittingState}
+            className={errors.name && touched.name ? 'border-red-500' : ''}
           />
+          {errors.name && touched.name && (
+            <p className="text-sm text-red-600">{errors.name}</p>
+          )}
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            className={inputCls}
-            value={values.title}
-            onChange={(e) => setValues((p) => ({ ...p, title: e.target.value }))}
+
+        <div className="space-y-2">
+          <Label htmlFor="t-title">Title / Role <span className="text-red-500">*</span></Label>
+          <Input
+            id="t-title"
+            name="title"
             placeholder="e.g. CEO at Acme"
+            value={values.title}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmittingState}
+            className={errors.title && touched.title ? 'border-red-500' : ''}
           />
+          {errors.title && touched.title && (
+            <p className="text-sm text-red-600">{errors.title}</p>
+          )}
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rating (1–5)</label>
-          <input
+
+        {/* Rating */}
+        <div className="space-y-2">
+          <Label htmlFor="t-rating">Rating (1–5) <span className="text-red-500">*</span></Label>
+          <Input
+            id="t-rating"
+            name="rating"
             type="number"
             min={1}
             max={5}
-            className={inputCls}
             value={values.rating}
-            onChange={(e) =>
-              setValues((p) => ({ ...p, rating: Math.min(5, Math.max(1, Number(e.target.value))) }))
-            }
+            onChange={(e) => {
+              if (e.target.value === '') { setFieldValue('rating', ''); return; }
+              setFieldValue('rating', Number(e.target.value));
+            }}
+            onBlur={(e) => {
+              const n = parseInt(e.target.value, 10);
+              setFieldValue('rating', Number.isNaN(n) || n < 1 ? 1 : Math.min(5, n));
+              handleBlur(e);
+            }}
+            disabled={isSubmittingState}
+            className={errors.rating && touched.rating ? 'border-red-500' : ''}
           />
+          {errors.rating && touched.rating && (
+            <p className="text-sm text-red-600">{errors.rating as string}</p>
+          )}
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select
-            className={inputCls}
+
+        {/* Status */}
+        <div className="space-y-2">
+          <Label htmlFor="t-status">Status <span className="text-red-500">*</span></Label>
+          <Select
             value={values.status}
-            onChange={(e) => setValues((p) => ({ ...p, status: e.target.value }))}
+            onValueChange={(v) => { setFieldValue('status', v); setFieldTouched('status', true); }}
+            disabled={isSubmittingState}
           >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+            <SelectTrigger
+              id="t-status"
+              className={errors.status && touched.status ? 'border-red-500' : ''}
+            >
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>{s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.status && touched.status && (
+            <p className="text-sm text-red-600">{errors.status}</p>
+          )}
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Message <span className="text-red-500">*</span>
-        </label>
-        <textarea
+      {/* Message */}
+      <div className="space-y-2">
+        <Label htmlFor="t-message">Message <span className="text-red-500">*</span></Label>
+        <Textarea
+          id="t-message"
+          name="message"
           rows={4}
-          className={`${inputCls} resize-none`}
-          value={values.message}
-          onChange={(e) => setValues((p) => ({ ...p, message: e.target.value }))}
           placeholder="Testimonial message…"
+          value={values.message}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={isSubmittingState}
+          className={`resize-none rounded-2xl ${errors.message && touched.message ? 'border-red-500' : ''}`}
         />
+        {errors.message && touched.message && (
+          <p className="text-sm text-red-600">{errors.message}</p>
+        )}
       </div>
 
-      <div className="flex gap-3 justify-end">
-        <Button variant="bordered" onPress={onCancel} size="sm" isDisabled={isLoading}>
+      {/* Actions */}
+      <div className="flex gap-3 justify-end pt-2 border-t border-border">
+        <Button
+          type="button"
+          className="global_btn rounded_full outline_primary"
+          startContent={<X className="h-4 w-4" />}
+          onPress={onCancel}
+          isDisabled={isSubmittingState}
+        >
           Cancel
         </Button>
-        <Button color="primary" isLoading={isLoading} onPress={handleSubmit} size="sm">
+        <Button
+          type="submit"
+          className="global_btn rounded_full bg_primary"
+          startContent={<Save className="h-4 w-4" />}
+          isLoading={isSubmittingState}
+          isDisabled={isSubmittingState}
+        >
           Save
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

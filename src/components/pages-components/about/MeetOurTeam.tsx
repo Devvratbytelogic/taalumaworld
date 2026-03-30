@@ -8,9 +8,9 @@ export default function MeetOurTeam() {
                 <div className="container mx-auto px-4">
                     <div className="max-w-6xl mx-auto">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-3">Meet the Visionary</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-3">The Visionary Bio                            </h2>
                             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                                The architect behind Taaluma.world
+                                The Architect of Irreplaceable Careers
                             </p>
                         </div>
 
@@ -36,14 +36,10 @@ export default function MeetOurTeam() {
                             <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
                                 <div>
                                     <h3 className="text-2xl font-bold text-foreground mb-1">Daniel Muchika</h3>
-                                    <p className="text-primary font-medium mb-4">Founder & Visionary · Taaluma.world</p>
+                                    <p className="text-primary font-medium mb-4">Founder & Principal Strategist · Taaluma.world                                    </p>
                                 </div>
                                 <p className="text-muted-foreground leading-relaxed">
-                                    Daniel Muchika is the architect behind Taaluma.world. A high-impact Fintech Executive and Digital Finance Strategist, Daniel has spent nearly two decades at the intersection of global finance and human potential.
-                                </p>
-                                <p className="text-muted-foreground leading-relaxed">
-                                    His journey is a blend of academic excellence and &quot;real-world&quot; scars. As a mentor to hundreds and a strategic advisor to founders, Daniel&apos;s mission is clear: to equip you with the internal resilience and strategic tools needed to own your destiny in the Gen AI era.
-                                </p>
+                                    Daniel Muchika is the strategist behind Taaluma.world, engineered from twenty years of experience at the intersection of global finance and human potential. His journey is a rare blend of elite academic credentials and 'real-world' scars. Daniel's mission is to equip the next generation of professionals with the <b>internal muscle</b> and <b>strategic blueprints</b> required to out-pace the noise of the AI revolution and own their professional destiny.</p>
                             </div>
                         </div>
 
@@ -54,10 +50,9 @@ export default function MeetOurTeam() {
                                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                                     <span className="text-2xl">🎓</span>
                                 </div>
-                                <h4 className="font-semibold text-foreground mb-2">Academic Foundation</h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Alumnus of Friends School Kamusinga, University of Nairobi, Strathmore University, IESE Barcelona, and Stockholm School of Economics.
-                                </p>
+                                <h4 className="font-semibold text-foreground mb-2">Global Academic Blueprint</h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">Alumnus of Friends School Kamusinga, University of Nairobi, Strathmore, IESE Barcelona, and Stockholm School of Economics.
+</p>
                             </div>
 
                             {/* Global Leadership */}
@@ -65,10 +60,8 @@ export default function MeetOurTeam() {
                                 <div className="w-12 h-12 rounded-2xl bg-secondary-accent/10 flex items-center justify-center mb-4">
                                     <span className="text-2xl">🌍</span>
                                 </div>
-                                <h4 className="font-semibold text-foreground mb-2">Global Leadership</h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Leadership experience at some of the world&apos;s most influential financial institutions across global finance and digital strategy.
-                                </p>
+                                <h4 className="font-semibold text-foreground mb-2">Executive Perspective Moat</h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">Extensive leadership at global financial institutions, specializing in digital finance strategy and the future of cross-border payments.</p>
                             </div>
 
                             {/* Entrepreneurial Grit */}
@@ -76,10 +69,8 @@ export default function MeetOurTeam() {
                                 <div className="w-12 h-12 rounded-2xl bg-success/10 flex items-center justify-center mb-4">
                                     <span className="text-2xl">🔥</span>
                                 </div>
-                                <h4 className="font-semibold text-foreground mb-2">Entrepreneurial Grit</h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    A seasoned founder of over a dozen businesses who has lived the &quot;System Architect&quot; journey—experiencing the highs of innovation and the necessity of pivoting through failure.
-                                </p>
+                                <h4 className="font-semibold text-foreground mb-2">The Entrepreneur’s Resiliency</h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">A veteran founder who has navigated the 'Auctioneer’s Edge,' turning high-stakes failure into a masterclass on market survival and creation.</p>
                             </div>
                         </div>
                     </div>

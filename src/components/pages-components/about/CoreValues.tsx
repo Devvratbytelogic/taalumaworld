@@ -19,10 +19,9 @@ export default function CoreValues() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                                 <BookOpen className="w-6 h-6 text-primary" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Accessibility First</h3>
+                            <h3 className="font-semibold text-lg mb-2">Strategic Subsistence</h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                Reading should be accessible to everyone. Our chapter-by-chapter model ensures
-                                cost is never a barrier to discovering great stories.
+                            We prioritize high-velocity skills that secure your financial foundation, allowing you the stability to engineer your long-term masterpiece.
                             </p>
                         </div>
 
@@ -31,11 +30,9 @@ export default function CoreValues() {
                             <div className="w-12 h-12 rounded-full bg-secondary-accent/10 flex items-center justify-center mb-4">
                                 <Users className="w-6 h-6 text-secondary-accent" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Community Driven</h3>
+                            <h3 className="font-semibold text-lg mb-2">Irreducible Capacity                            </h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                We're building a vibrant community where readers and authors connect, share,
-                                and grow together through their love of storytelling.
-                            </p>
+                            We focus on building the depth of character, critical thinking, and empathy that no algorithm or competitor can replicate.</p>
                         </div>
 
                         {/* Value 3 */}
@@ -43,11 +40,9 @@ export default function CoreValues() {
                             <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mb-4">
                                 <Heart className="w-6 h-6 text-success" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Author Support</h3>
+                            <h3 className="font-semibold text-lg mb-2">Learning Velocity</h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                We believe in fair compensation for creators. Authors earn directly from every
-                                chapter sold, supporting their craft and encouraging more great content.
-                            </p>
+                            We empower you to out-pace the noise of the AI revolution by mastering the art of rapid tool deployment and first-principles thinking.</p>
                         </div>
 
                         {/* Value 4 */}
@@ -55,10 +50,9 @@ export default function CoreValues() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                                 <Award className="w-6 h-6 text-primary" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Quality Content</h3>
+                            <h3 className="font-semibold text-lg mb-2">Validatable Proof                            </h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                Every book on our platform is carefully curated to ensure high-quality,
-                                age-appropriate content that resonates with teen readers.
+                            We reject "Paper Profiles" in favor of a portfolio of capacity that provides undisputable evidence of the value you offer the world.
                             </p>
                         </div>
 
@@ -67,10 +61,9 @@ export default function CoreValues() {
                             <div className="w-12 h-12 rounded-full bg-secondary-accent/10 flex items-center justify-center mb-4">
                                 <Sparkles className="w-6 h-6 text-secondary-accent" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Innovation</h3>
+                            <h3 className="font-semibold text-lg mb-2">Strategic Exposure                            </h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                We're constantly evolving our platform with new features and improvements
-                                based on feedback from our amazing community of readers.
+                            We leverage global mentorship and digital tools to bypass local limitations and architect your career on a global stage.
                             </p>
                         </div>
 
@@ -79,11 +72,9 @@ export default function CoreValues() {
                             <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mb-4">
                                 <Target className="w-6 h-6 text-success" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Reader Empowerment</h3>
+                            <h3 className="font-semibold text-lg mb-2">Market Creation                            </h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                You're in control. Read at your pace, choose what you buy, and discover
-                                stories that truly speak to you without commitment or pressure.
-                            </p>
+                            We shift your mindset from being a spectator in an existing system to being the creator who engineers new markets and solves critical pain points.</p>
                         </div>
                     </div>
                 </div>
@@ -97,25 +88,25 @@ export default function CoreValues() {
                             {/* Stat 1 */}
                             <div className="text-center">
                                 <div className="text-4xl md:text-5xl font-bold text-primary mb-2">500+</div>
-                                <p className="text-muted-foreground font-medium">Active Readers</p>
+                                <p className="text-muted-foreground font-medium">Career Architects.                                </p>
                             </div>
 
                             {/* Stat 2 */}
                             <div className="text-center">
                                 <div className="text-4xl md:text-5xl font-bold text-secondary-accent mb-2">150+</div>
-                                <p className="text-muted-foreground font-medium">Authors</p>
+                                <p className="text-muted-foreground font-medium">Strategic Mentors.                                </p>
                             </div>
 
                             {/* Stat 3 */}
                             <div className="text-center">
                                 <div className="text-4xl md:text-5xl font-bold text-success mb-2">1,200+</div>
-                                <p className="text-muted-foreground font-medium">Chapters Available</p>
+                                <p className="text-muted-foreground font-medium">Strategic Blueprints.                             </p>
                             </div>
 
                             {/* Stat 4 */}
                             <div className="text-center">
                                 <div className="text-4xl md:text-5xl font-bold text-primary mb-2">50+</div>
-                                <p className="text-muted-foreground font-medium">Genres</p>
+                                <p className="text-muted-foreground font-medium">Industry Roadmaps.                                </p>
                             </div>
                         </div>
                     </div>

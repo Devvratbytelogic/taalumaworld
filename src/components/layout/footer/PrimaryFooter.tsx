@@ -200,7 +200,7 @@ export default function PrimaryFooter() {
                                 )}
                             </ul>
                             <div className="space-y-2">
-                                <p className="text-sm font-medium text-white">Subscribe to our newsletter</p>
+                                <p className="text-sm font-medium text-white">Subscribe to The Taaluma Signal                                 </p>
                                 <div className="flex gap-2">
                                     <Input
                                         placeholder="Your email"

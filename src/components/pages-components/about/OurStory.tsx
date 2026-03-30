@@ -19,14 +19,14 @@ export default function OurStory() {
                             {/* Story Image */}
                             <div className="relative">
                                 <div className="relative z-10 rounded-3xl overflow-hidden shadow-lg h-full max-h-75">
-                                   <div className='w-[80%] ml-auto'>
+                                    <div className='w-[80%] ml-auto'>
                                         <ImageComponent
                                             src="/images/common/about-img2.png"
                                             alt="Colorful stack of books"
                                             object_cover={true}
                                             priority={true}
                                         />
-                                   </div>
+                                    </div>
                                 </div>
                                 <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-secondary-accent/20 rounded-full blur-2xl"></div>
                                 <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl"></div>
@@ -34,12 +34,14 @@ export default function OurStory() {
 
                             {/* Story Text */}
                             <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
-                                <h3 className="text-xl font-bold text-foreground">The Disconnect: Why the Old Rules No Longer Apply</h3>
+                                <h3 className="text-xl font-bold text-foreground">Born in the Trenches. Engineered for the Future.</h3>
                                 <p className="text-base text-muted-foreground leading-relaxed">
-                                    There is a massive gap between what we are taught in school and what the world actually requires. Add the pressure of survival, the noise of modern life, and the complexities of personal struggles, and it&apos;s easy to see why so many feel stuck.
+                                    Taaluma.World was born from a 10-page "monster" CV and a 4,000-mile wake-up call in London. Our founder, Daniel Muchika, learned the hard way that in the real world, <b>what matters is what you have IN you, not what you have WITH you.</b> After surviving the "Auctioneer’s Block" and navigating the "Ghost of the Holy Trinity," he realized that traditional career advice is a "4-Year Illusion" that leaves graduates unprepared for the brutal financial realities of the modern marketplace.
                                 </p>
                                 <p className="text-base text-muted-foreground leading-relaxed">
-                                    Traditional career stories are often told as one-off &quot;TED-style&quot; moments. Taaluma is different. This is a living community where stories aren&apos;t just told—they are discussed, mentored, and coached. It is an ecosystem built for those who want to offer value and those ready to gain it.
+                                    We are a living ecosystem built to replace passive "reading" with <b>Active Execution.</b> At Taaluma, we don't just tell stories; we provide the <b>Strategic Blueprints</b>—from the <b>3S Framework to First Principles Thinking</b>—that allow you to upgrade your Career Operating System in real-time. We are here to help you move beyond "laying bricks" for subsistence and start architecting a <b>Portfolio of Capacity</b> that no AI can replicate. Whether you are a student searching for your <b>True North</b> or a professional seeking your unique <b>Ikigai</b>, Taaluma.World is your laboratory for becoming an <b>Irreplaceable Career Architect.</b>
+
+
                                 </p>
                             </div>
                         </div>

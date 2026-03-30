@@ -61,7 +61,7 @@ export default function ContactUsPageForm() {
                             id="name"
                             name="name"
                             type="text"
-                            placeholder="Enter your name"
+                            placeholder="E.g., Architect John Doe"
                             value={formik.values.name}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
@@ -81,7 +81,7 @@ export default function ContactUsPageForm() {
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="your.email@example.com"
+                            placeholder="Your secure digital channel..."
                             value={formik.values.email}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
@@ -101,7 +101,7 @@ export default function ContactUsPageForm() {
                             id="subject"
                             name="subject"
                             type="text"
-                            placeholder="What's this about?"
+                            placeholder="Which blueprint or pain point is this about?"
                             value={formik.values.subject}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
@@ -121,7 +121,7 @@ export default function ContactUsPageForm() {
                             id="message"
                             name="message"
                             rows={6}
-                            placeholder="Tell us more about your inquiry..."
+                            placeholder="Detail the specific gap you are looking to close..."
                             value={formik.values.message}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}

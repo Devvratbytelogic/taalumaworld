@@ -54,9 +54,9 @@ export default function ContactUsPage() {
                             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                                 <Mail className="w-7 h-7 text-primary" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Email Us</h3>
+                            <h3 className="font-semibold text-lg mb-2">Direct Signal</h3>
                             <p className="text-sm text-muted-foreground mb-3">
-                                Send us an email anytime
+                                Initiate a Value Exchange
                             </p>
                             {supportEmail && (
                                 <a
@@ -73,9 +73,9 @@ export default function ContactUsPage() {
                             <div className="w-14 h-14 rounded-full bg-secondary-accent/10 flex items-center justify-center mx-auto mb-4">
                                 <Clock className="w-7 h-7 text-secondary-accent" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Response Time</h3>
+                            <h3 className="font-semibold text-lg mb-2">Strategic Velocity</h3>
                             <p className="text-sm text-muted-foreground mb-3">
-                                We typically respond within
+                                We have a 48-Hour Feedback Loop
                             </p>
                             <p className="text-primary font-semibold text-sm">24-48 hours</p>
                         </div>
@@ -85,7 +85,7 @@ export default function ContactUsPage() {
                             <div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
                                 <HelpCircle className="w-7 h-7 text-success" />
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">Help Center</h3>
+                            <h3 className="font-semibold text-lg mb-2">Blueprint Support</h3>
                             <p className="text-sm text-muted-foreground mb-3">
                                 Find quick answers
                             </p>
@@ -102,9 +102,9 @@ export default function ContactUsPage() {
                     <div className="max-w-3xl mx-auto">
                         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm">
                             <div className="text-center mb-8">
-                                <h2 className="text-2xl md:text-3xl font-bold mb-3">Send Us a Message</h2>
+                                <h2 className="text-2xl md:text-3xl font-bold mb-3">Initiate a Strategic Inquiry</h2>
                                 <p className="text-muted-foreground">
-                                    Fill out the form below and we&apos;ll get back to you as soon as possible
+                                Provide your data points, and our team will respond with high-velocity clarity
                                 </p>
                             </div>
                             <ContactUsPageForm />
@@ -218,7 +218,7 @@ export default function ContactUsPage() {
             <section className="py-16 bg-background">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-3">Looking for Quick Answers?</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-3">Looking Consult the Blueprint FAQs.</h2>
                         <p className="text-lg text-muted-foreground mb-8">
                             Check out our FAQ section for commonly asked questions
                         </p>

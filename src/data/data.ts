@@ -114,11 +114,11 @@ export const contactUsBannerData: normalBannerData = {
         icon: MessageSquare,
     },
     heading: {
-        prefix: "We'd love to",
-        highlight: "hear from you",
+        prefix: "Architecting the ",
+        highlight: "1% Together.",
     },
     description:
-        "Have a question, suggestion, or just want to say hi? Our team is here to help and would be happy to hear from you.",
+        `Have a question about a blueprint, or ready to share your own "System Architect" journey? Our strategic team is here to help you navigate your path.`,
 }
 export const faqBannerData: normalBannerData = {
     badge: {

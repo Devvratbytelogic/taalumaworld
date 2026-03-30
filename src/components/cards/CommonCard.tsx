@@ -23,8 +23,8 @@ export default function CommonCard({ data }: CommonCardProps) {
             onClick={() => dispatch(openModal({ componentName: 'CommonCardDetailsModal', data: { chapter: data } }))}
         >
             {/* Cover Image */}
-            <div className="aspect-2/1 overflow-hidden bg-muted relative shrink-0">
-                <div className="transition-transform hover:scale-105">
+            <div className="aspect-3/4 overflow-hidden bg-muted relative shrink-0">
+                <div className="w-full h-full transition-transform hover:scale-105">
                     <ImageComponent src={data.coverImage} alt={data.title} object_cover={true} />
                 </div>
 

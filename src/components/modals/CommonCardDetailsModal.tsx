@@ -60,11 +60,13 @@ export default function CommonCardDetailsModal() {
     >
       <ModalContent>
         {/* Cover Image */}
-        <div className="relative shrink-0">
-          <div className="aspect-3/1 overflow-hidden bg-muted">
-            <ImageComponent src={chapter.coverImage} alt={chapter.title} object_cover={true} />
+        {chapter.coverImage && (
+          <div className="relative shrink-0 bg-muted flex justify-center py-6">
+            <div className="w-40 aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
+              <ImageComponent src={chapter.coverImage} alt={chapter.title} object_cover={false} />
+            </div>
           </div>
-        </div>
+        )}
 
         {isBook ? (
           <BookModalContent

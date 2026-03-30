@@ -67,7 +67,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                             </Badge>
                         )}
                         <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-sm font-medium">
-                            Chapter {data.chapterNumber}
+                        Blueprint {data.chapterNumber}
                         </Badge>
                     </div>
                 )}

@@ -34,13 +34,13 @@ export interface bannerProps {
 export const homeBannerData: bannerProps = {
     badgeText: '📚 Now live and ready to explore!',
     heading: {
-        prefix: 'Discover the joy of',
-        highlight: 'reading',
+        prefix: 'Build Undisputable Career Capacity for the AI',
+        highlight: 'Economy',
         suffix: '.',
     },
-    description: 'Read chapter by chapter or get the full book. Your learning journey, your way.',
+    description: 'A University degree is just hardware. Install the strategic software used by the top 1% to stay ahead of technological shifts.',
     primaryCta: {
-        title: 'Explore Chapters',
+        title: 'Engineer My Path',
         button_status: true,
     },
     secondaryCta: {
@@ -66,12 +66,12 @@ export const homeBannerData: bannerProps = {
 export const aboutBannerData: bannerProps = {
     badgeText: 'About Taaluma.World',
     heading: {
-        prefix: 'Empowering young readers,',
-        highlight: 'one chapter',
-        suffix: ' at a time',
+        prefix: 'Build Undisputable Capacity for the AI',
+        highlight: 'Economy',
+        suffix: '.',
     },
     description:
-        "We're on a mission to make reading more accessible, affordable, and exciting for teens everywhere. With Taaluma, you're not just buying books—you're discovering stories that shape who you are.",
+        "We are on a mission to bridge the gap between academic theory and real-world execution. At Taaluma, you aren't just consuming content—you are upgrading your Career Operating System with validatable proof and strategic blueprints.",
     primaryCta: {
         title: 'Explore Chapters',
         button_status: false,
@@ -91,7 +91,7 @@ export const aboutBannerData: bannerProps = {
         description: '500+ active readers',
     },
     image: {
-        src: '/images/banner/about-banner1.webp',
+        src: '/images/common/about-img1.jpg',
         alt: 'About Us Banner',
     },
 

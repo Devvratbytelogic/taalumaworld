@@ -47,7 +47,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
 
                             {/* Heading */}
                             <div className="space-y-3">
-                                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+                                <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-foreground leading-tight">
                                     {data?.heading?.prefix}{' '}
                                     <span className="relative inline-block">
                                         <span className="relative z-10">{data?.heading?.highlight}</span>
@@ -115,7 +115,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                                 )}
                                             </div>
                                             <span className="text-sm font-medium text-foreground">
-                                                {total.toLocaleString()}+ active readers
+                                                {total.toLocaleString()}+ Strategic Career Architects
                                             </span>
                                         </div>
                                     </div>

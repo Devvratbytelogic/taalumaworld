@@ -21,9 +21,9 @@ export default function MeetOurTeam() {
                                 <div className="relative z-10 rounded-3xl overflow-hidden shadow-lg">
                                     <div className="h-80 md:h-96">
                                         <ImageComponent
-                                            src="https://images.unsplash.com/photo-1624555130296-e551faf8969b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaXZlcnNlJTIwdGVhbSUyMHdvcmtpbmd8ZW58MXx8fHwxNzY3OTM4Mjg1fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                                            src="/images/common/about-img3.png"
                                             alt="Daniel Muchika"
-                                            object_cover={true}
+                                            object_cover={false}
                                             priority={true}
                                         />
                                     </div>

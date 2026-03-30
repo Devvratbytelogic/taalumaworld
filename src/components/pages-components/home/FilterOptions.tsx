@@ -28,7 +28,7 @@ export default function FilterOptions({ total = 0, viewMode }: FilterOptionsProp
     const readingProgress = parseArrayParam(searchParams.get('readingProgress'));
     const activeFilterCount = categoryId.length + thoughtLeaderId.length + tags.length + readingProgress.length;
 
-    const contentLabel = viewMode === VISIBLE.BOOK ? 'books' : 'chapters';
+    const contentLabel = viewMode === VISIBLE.BOOK ? 'books' : 'blueprints';
 
     return (
         <>

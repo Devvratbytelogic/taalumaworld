@@ -12,9 +12,9 @@ export default function ReaderTestimonials() {
             <section className="py-16 bg-accent/30">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-3">What Our Readers Say</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-3">Insights from the Career Architects</h2>
                         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            Join thousands of young readers discovering amazing stories, one chapter at a time.
+                            See how thousands of young professionals are upgrading their Career Operating Systems to stay ahead of the AI shift.
                         </p>
                     </div>
 

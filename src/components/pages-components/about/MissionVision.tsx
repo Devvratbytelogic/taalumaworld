@@ -14,9 +14,7 @@ export default function MissionVision() {
                             </div>
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Mission</h2>
                             <p className="text-muted-foreground leading-relaxed text-lg">
-                                To revolutionize how young people experience literature by offering flexible,
-                                chapter-by-chapter purchasing that fits every budget and reading style. We believe
-                                every teen deserves access to incredible stories without barriers.
+                                To bridge the gap between academic theory and real-world execution by providing a high-velocity Career Operating System. We empower the next generation to upgrade their internal muscle through strategic blueprints that build Undisputable Capacity for the AI economy.
                             </p>
                         </div>
 
@@ -27,10 +25,7 @@ export default function MissionVision() {
                             </div>
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Vision</h2>
                             <p className="text-muted-foreground leading-relaxed text-lg">
-                                A world where reading is the most engaging and accessible form of entertainment for
-                                teens. We envision a global community of young readers connecting through stories,
-                                supporting authors directly, and building a lifelong love of literature.
-                            </p>
+                                A global ecosystem where every professional is an Architect of their own path. We envision a future where the top 1% possess the Perspective Moat and Strategic Resilience required to lead markets and solve humanity's most critical pain points.</p>
                         </div>
                     </div>
                 </div>

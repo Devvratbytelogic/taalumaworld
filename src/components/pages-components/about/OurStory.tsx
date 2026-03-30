@@ -19,12 +19,14 @@ export default function OurStory() {
                             {/* Story Image */}
                             <div className="relative">
                                 <div className="relative z-10 rounded-3xl overflow-hidden shadow-lg h-full max-h-75">
-                                    <ImageComponent
-                                        src="/images/common/img1.jpeg"
-                                        alt="Colorful stack of books"
-                                        object_cover={true}
-                                        priority={true}
-                                    />
+                                   <div className='w-[80%] ml-auto'>
+                                        <ImageComponent
+                                            src="/images/common/about-img2.png"
+                                            alt="Colorful stack of books"
+                                            object_cover={true}
+                                            priority={true}
+                                        />
+                                   </div>
                                 </div>
                                 <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-secondary-accent/20 rounded-full blur-2xl"></div>
                                 <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl"></div>

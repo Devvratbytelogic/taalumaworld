@@ -1,4 +1,4 @@
-import { Users, MoreVertical, Eye, Mail, Ban } from 'lucide-react';
+import { Users, MoreVertical, Eye, Mail, Ban, CircleCheck } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
@@ -90,7 +90,13 @@ export function UserListing({
               <TableCell className="whitespace-nowrap">{user.joinDate}</TableCell>
               <TableCell>{user.purchases}</TableCell>
               <TableCell>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <Badge
+                  variant="outline"
+                  className={user.status === 'suspended'
+                    ? 'bg-red-50 text-red-700 border-red-200'
+                    : 'bg-green-50 text-green-700 border-green-200'
+                  }
+                >
                   {user.status || 'active'}
                 </Badge>
               </TableCell>
@@ -111,11 +117,20 @@ export function UserListing({
                       Send Email
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="text-destructive"
+                      className={user.status === 'suspended' ? 'text-green-600' : 'text-destructive'}
                       onSelect={() => onSuspend?.(user)}
                     >
-                      <Ban className="h-4 w-4 mr-2" />
-                      Suspend User
+                      {user.status === 'suspended' ? (
+                        <>
+                          <CircleCheck className="h-4 w-4 mr-2" />
+                          Activate User
+                        </>
+                      ) : (
+                        <>
+                          <Ban className="h-4 w-4 mr-2" />
+                          Suspend User
+                        </>
+                      )}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

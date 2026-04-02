@@ -24,14 +24,18 @@ export function SuspendUserDialog({
   onConfirm,
   isLoading,
 }: SuspendUserDialogProps) {
+  const isSuspended = user?.status === 'suspended';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Suspend User</DialogTitle>
+          <DialogTitle>{isSuspended ? 'Activate User' : 'Suspend User'}</DialogTitle>
           <DialogDescription>
             {user
-              ? `Are you sure you want to suspend "${user.name}"? They will not be able to sign in until reinstated.`
+              ? isSuspended
+                ? `Are you sure you want to activate "${user.name}"? They will be able to sign in again.`
+                : `Are you sure you want to suspend "${user.name}"? They will not be able to sign in until reinstated.`
               : ''}
           </DialogDescription>
         </DialogHeader>
@@ -46,9 +50,11 @@ export function SuspendUserDialog({
           <Button
             onPress={onConfirm}
             isDisabled={isLoading}
-            className="global_btn rounded_full bg-destructive text-destructive-foreground"
+            className={`global_btn rounded_full ${isSuspended ? 'bg_primary' : 'bg-destructive text-destructive-foreground'}`}
           >
-            {isLoading ? 'Suspending...' : 'Suspend'}
+            {isLoading
+              ? isSuspended ? 'Activating...' : 'Suspending...'
+              : isSuspended ? 'Activate' : 'Suspend'}
           </Button>
         </DialogFooter>
       </DialogContent>

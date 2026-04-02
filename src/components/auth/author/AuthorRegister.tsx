@@ -75,7 +75,8 @@ export default function AuthorRegister() {
                 toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
                 dispatch(openModal({ componentName: 'AuthorOtpVerification', data: { email: formValues.email, type: 'account' } }))
             } catch {
-                toast.error('Registration failed. Please try again.')
+                // toast.error('Registration failed. Please try again.')
+                console.error('Registration failed. Please try again.');
             }
         },
     })

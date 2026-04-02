@@ -85,14 +85,6 @@ export function getCartCheckoutRoutePath(): string {
   return '/cart/checkout';
 }
 
-export function getBooksRoutePath(params?: { id?: string }): string {
-  const base = '/books';
-  if (params?.id) {
-    return `${base}?id=${encodeURIComponent(params.id)}`;
-  }
-  return base;
-}
-
 export function getCategoriesRoutePath(): string {
   return '/categories';
 }

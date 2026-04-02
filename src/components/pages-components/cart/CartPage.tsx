@@ -13,15 +13,15 @@ import { openModal } from '@/store/slices/allModalSlice';
 import CartPageSkeleton from '@/components/skeleton-loader/CartPageSkeleton';
 import CartNoData from './CartNoData';
 import CartSummary from './CartSummary';
-import { getUserDashboardRoutePath } from '@/routes/routes';
 import { initiateRazorpayPayment, RazorpayPaymentResponse } from '@/components/pages-components/chapter/Razorpay';
 import PaymentLoader from './PaymentLoader';
 import PaymentConfirmed from './PaymentConfirmed';
 import { VISIBLE } from '@/constants/contentMode';
+import Link from 'next/link';
+import { getReadBookRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 
 export default function CartDetailsComponent() {
   const dispatch = useDispatch();
-  const router = useRouter();
   const { data: cartResponse, isLoading } = useGetCartQuery();
   const [checkOutCart] = useCheckOutCartMutation();
   const [isOrderComplete, setIsOrderComplete] = useState(false);
@@ -115,13 +115,20 @@ export default function CartDetailsComponent() {
                   <div className="flex gap-4">
                     {/* Cover Image */}
                     <div className="shrink-0">
-                      <div className="w-24 h-32 rounded-2xl overflow-hidden">
+                      <Link
+                        href={
+                          isBookItem
+                            ? getReadBookRoutePath(item.book?._id ?? '')
+                            : getReadChapterRoutePath(item.chapter?._id ?? '')
+                        }
+                        className="block w-24 h-32 rounded-2xl overflow-hidden"
+                      >
                         <ImageComponent
                           src={coverImage ?? ''}
                           alt={title ?? ''}
                           object_cover={true}
                         />
-                      </div>
+                      </Link>
                     </div>
 
                     {/* Item Info */}

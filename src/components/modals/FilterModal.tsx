@@ -234,15 +234,13 @@ export default function FilterModal() {
                       onClick={() => handleCategoryToggle(category.id)}
                     >
                       <Checkbox
-                        id={`cat-${category.id}`}
                         checked={tempCategories.includes(category.id)}
-                        onCheckedChange={() => handleCategoryToggle(category.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="rounded-md"
+                        className="rounded-md pointer-events-none"
                       />
-                      <label htmlFor={`cat-${category.id}`} className="text-sm cursor-pointer tracking-tight flex-1">
+                      <span className="text-sm cursor-pointer tracking-tight flex-1">
                         {category.name}
-                      </label>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -262,15 +260,13 @@ export default function FilterModal() {
                       onClick={() => handleAuthorToggle(author.id)}
                     >
                       <Checkbox
-                        id={`author-${author.id}`}
                         checked={tempAuthors.includes(author.id)}
-                        onCheckedChange={() => handleAuthorToggle(author.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="rounded-md"
+                        className="rounded-md pointer-events-none"
                       />
-                      <label htmlFor={`author-${author.id}`} className="text-sm cursor-pointer tracking-tight flex-1">
+                      <span className="text-sm cursor-pointer tracking-tight flex-1">
                         {author.fullName}
-                      </label>
+                      </span>
                     </div>
                   ))}
                 </div>

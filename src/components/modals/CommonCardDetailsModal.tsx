@@ -3,7 +3,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
-import { BookOpen, User, FileText, DollarSign, ShoppingCart, Layers, Lock } from 'lucide-react'
+import { BookOpen, User, FileText, ShoppingCart, Layers, Lock } from 'lucide-react'
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react'
 import { Badge } from '@/components/ui/badge'
 import Button from '@/components/ui/Button'
@@ -62,7 +62,7 @@ export default function CommonCardDetailsModal() {
         {/* Cover Image */}
         {chapter.coverImage && (
           <div className="relative shrink-0 bg-muted flex justify-center py-6">
-            <div className="w-40 aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
+            <div className="w-40 aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
               <ImageComponent src={chapter.coverImage} alt={chapter.title} object_cover={false} />
             </div>
           </div>
@@ -511,7 +511,7 @@ function ChapterModalContent({
             </div>
           </div>
           <div className="flex items-start gap-2">
-            <DollarSign className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+            <span className="text-xs font-bold text-primary mt-0.5 shrink-0">KSh</span>
             <div>
               <div className="text-sm text-muted-foreground tracking-tight">Price</div>
               <div className="font-semibold text-sm tracking-tight">

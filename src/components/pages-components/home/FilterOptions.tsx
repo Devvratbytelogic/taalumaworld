@@ -29,6 +29,7 @@ export default function FilterOptions({ total = 0, viewMode }: FilterOptionsProp
     const activeFilterCount = categoryId.length + thoughtLeaderId.length + tags.length + readingProgress.length;
 
     const contentLabel = viewMode === VISIBLE.BOOK ? 'books' : 'blueprints';
+    console.log('contentLabel', contentLabel);
 
     return (
         <>

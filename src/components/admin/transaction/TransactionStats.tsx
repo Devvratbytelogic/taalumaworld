@@ -1,5 +1,5 @@
 import { Card } from '../../ui/card';
-import { DollarSign, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 
 interface TransactionStatsProps {
   totalRevenue: number;
@@ -17,8 +17,8 @@ export function TransactionStats({
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card className="p-4 bg-white rounded-3xl shadow-sm border">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-green-50 rounded-lg">
-            <DollarSign className="h-5 w-5 text-green-600" />
+          <div className="p-2 bg-green-50 rounded-lg flex items-center justify-center">
+            <span className="text-xs font-bold text-green-600">KSh</span>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Total Revenue</p>
@@ -39,8 +39,8 @@ export function TransactionStats({
       </Card>
       <Card className="p-4 bg-white rounded-3xl shadow-sm border">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-50 rounded-lg">
-            <DollarSign className="h-5 w-5 text-purple-600" />
+          <div className="p-2 bg-purple-50 rounded-lg flex items-center justify-center">
+            <span className="text-xs font-bold text-purple-600">KSh</span>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Avg. Transaction</p>

@@ -2,18 +2,17 @@
 import React from 'react'
 import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent';
-import { useContentMode } from '@/hooks/useContentMode';
 import { bannerProps } from '@/data/data';
-import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetActiveReadersQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
+// import { VISIBLE } from '@/constants/contentMode';
 
 interface CommonBannerProps {
     data: bannerProps;
 }
 export default function CommonBanner({ data }: CommonBannerProps) {
     const { data: activeReadersData } = useGetActiveReadersQuery();
-    // Use content mode hook to get current mode
-    const { contentMode } = useContentMode();
-    const displayMode = contentMode; // Use contentMode from the hook
+    // const { data: globalSettings } = useGetGlobalSettingsQuery();
+    // const displayMode = globalSettings?.data?.visible === VISIBLE.BOOK ? 'books' : 'chapters';
 
 
     // Function to scroll to content section
@@ -31,6 +30,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
             categoriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
+    
     return (
         <>
             <section className="relative py-12 md:py-16 overflow-hidden">
@@ -68,14 +68,14 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                 >
                                     {data?.primaryCta?.title}
                                 </Button>}
-                                {displayMode === 'books' && data?.secondaryCta?.button_status && (
+                                {/* {displayMode === 'books' && data?.secondaryCta?.button_status && (
                                     <Button
                                         className="global_btn rounded_full bg_primary"
                                         onPress={scrollToCategories}
                                     >
                                         {data?.secondaryCta?.title}
                                     </Button>
-                                )}
+                                )} */}
                             </div>
 
                             {/* Active Readers Stats */}

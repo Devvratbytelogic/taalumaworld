@@ -65,7 +65,7 @@ export function DashboardTopContent({ items, contentMode, isLoading }: Dashboard
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{item.title}</p>
                         <p className="text-sm text-muted-foreground">
-                          Price: ${item.revenue.toLocaleString()}
+                          Price: KSh {item.revenue.toLocaleString()}
                         </p>
                       </div>
                     </div>

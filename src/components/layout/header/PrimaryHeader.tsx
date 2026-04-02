@@ -13,7 +13,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import MobileSearchBar from './MobileSearchBar';
-import { getAboutUsRoutePath, getAdminRoutePath, getAuthorsRoutePath, getBooksRoutePath, getCartRoutePath, getCategoriesRoutePath, getContactUsRoutePath, getHomeRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { useAuth } from '@/hooks/useAuth';
 import ImageComponent from '@/components/ui/ImageComponent';

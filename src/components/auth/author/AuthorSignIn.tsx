@@ -65,7 +65,7 @@ export default function AuthorSignIn() {
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
-                        Author Sign In
+                        Admin/Author Sign In
                     </p>
                     <p className="text-sm text-muted-foreground font-normal">
                         Sign in to your author account

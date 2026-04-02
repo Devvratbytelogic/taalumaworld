@@ -61,7 +61,7 @@ export default function OtpVerification() {
     };
 
     const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const sanitizedValue = event.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+        const sanitizedValue = event.target.value.replace(/[^0-9]/g, '').slice(0, 4);
         setFieldValue('code', sanitizedValue);
     };
 

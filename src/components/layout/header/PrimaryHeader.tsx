@@ -67,9 +67,6 @@ export default function PrimaryHeader() {
     return null;
   }
 
-  console.log('isAuthenticated', isAuthenticated);
-  console.log('isLoading', isLoading);
-
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       {/* Top Announcement Bar */}

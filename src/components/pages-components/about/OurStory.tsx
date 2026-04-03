@@ -5,7 +5,7 @@ export default function OurStory() {
     return (
         <>
             {/* About Taaluma.World */}
-            <section className="py-16 bg-accent/30">
+            <section className="pt-8 sm:pt-16 bg-accent/30">
                 <div className="container mx-auto sm:px-4">
                     <div className="max-w-6xl mx-auto">
                         <div className="text-center mb-12">
@@ -50,7 +50,7 @@ export default function OurStory() {
             </section>
 
             {/* AI Revolution & Internal Compass */}
-            <section className="py-16 bg-background">
+            <section className="pt-16 bg-background">
                 <div className="container mx-auto sm:px-4">
                     <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8">
                         {/* AI Revolution */}

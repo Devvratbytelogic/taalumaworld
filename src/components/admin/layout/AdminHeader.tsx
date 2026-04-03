@@ -211,7 +211,7 @@ export function AdminHeader() {
                         {/* User menu */}
                         <Dropdown>
                             <DropdownTrigger>
-                                <Button className="global_btn rounded_full bg_transparent" isIconOnly={false}>
+                                <Button className="global_btn rounded_full bg_transparent px-0! w-fit! min-w-fit! max-h-10! min-h-10!" isIconOnly={false}>
                                     <Avatar src={adminUser.avatar} name={adminUser.name} size="sm" className="h-8 w-8" />
                                     <span className="hidden md:inline">{adminUser.name}</span>
                                     <ChevronDown className="h-4 w-4 hidden md:inline" />

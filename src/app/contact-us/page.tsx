@@ -41,12 +41,12 @@ export default function ContactUsPage() {
     return (
         <>
             {/* Contact Us Banner */}
-            <section className="relative py-16 md:pt-24 overflow-hidden bg-accent/30">
+            <section className="relative pt-16 sm:py-16 overflow-hidden bg-accent/30">
                 <NormalBanner data={contactUsBannerData} />
             </section>
 
             {/* Contact Cards Section */}
-            <section className="py-16 bg-background">
+            <section className="pt-8 sm:pt-16 bg-background">
                 <div className="container mx-auto sm:px-4">
                     <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
                         {/* Email Card */}
@@ -114,7 +114,7 @@ export default function ContactUsPage() {
             </section>
 
             {/* Additional Contact Methods */}
-            <section className="py-16 bg-accent/30">
+            <section className="pt-8 sm:pt-16 bg-accent/30">
                 <div className="container mx-auto sm:px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">Other Ways to Reach Us</h2>
@@ -215,7 +215,7 @@ export default function ContactUsPage() {
             </section>
 
             {/* FAQ Preview Section */}
-            <section className="py-16 bg-background">
+            <section className="py-8 sm:py-16 bg-background">
                 <div className="container mx-auto sm:px-4">
                     <div className="max-w-3xl mx-auto text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">Looking Consult the Blueprint FAQs.</h2>

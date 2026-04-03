@@ -30,10 +30,10 @@ export default function CommonBanner({ data }: CommonBannerProps) {
             categoriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
-    
+
     return (
         <>
-            <section className="relative py-12 md:py-16 overflow-hidden">
+            <section className="relative pt-12 sm:pt-12 md:pt-16 overflow-hidden">
                 <div className="container mx-auto sm:px-4">
                     <div className="grid lg:grid-cols-2 gap-10 items-center" style={{ maxHeight: '900px' }}>
                         {/* Left Column - Text Content */}
@@ -61,13 +61,13 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                             </div>
 
                             {/* CTA Buttons */}
-                            <div className="flex flex-col sm:flex-row items-start gap-4 pt-2">
-                                {data?.primaryCta?.button_status && <Button
+                            {data?.primaryCta?.button_status && (<div className="flex flex-col sm:flex-row items-start gap-4 pt-2">
+                                <Button
                                     className="global_btn rounded_full bg_primary"
                                     onPress={scrollToContent}
                                 >
                                     {data?.primaryCta?.title}
-                                </Button>}
+                                </Button>
                                 {/* {displayMode === 'books' && data?.secondaryCta?.button_status && (
                                     <Button
                                         className="global_btn rounded_full bg_primary"
@@ -76,7 +76,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                         {data?.secondaryCta?.title}
                                     </Button>
                                 )} */}
-                            </div>
+                            </div>)}
 
                             {/* Active Readers Stats */}
                             {activeReadersData?.data && activeReadersData.data.totalReaders > 0 && (() => {

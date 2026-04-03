@@ -4,7 +4,7 @@ import { Sparkles, Target } from 'lucide-react'
 export default function MissionVision() {
     return (
         <>
-            <section className="py-16 bg-background">
+            <section className="pt-8 sm:pt-16 bg-background">
                 <div className="container mx-auto sm:px-4">
                     <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                         {/* Mission Card */}

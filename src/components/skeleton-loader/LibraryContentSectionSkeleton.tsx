@@ -1,6 +1,6 @@
 export default function LibraryContentSectionSkeleton() {
   return (
-    <section className="container mx-auto px-4 animate-pulse">
+    <section className="container mx-auto sm:px-4 animate-pulse">
       {/* Filter row */}
       <div className="flex items-center justify-between mb-6">
         <div className="h-10 bg-gray-200 rounded-full w-44" />

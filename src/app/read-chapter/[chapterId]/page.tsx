@@ -222,7 +222,7 @@ export default function ReadChapterPage() {
         onClick={() => setShowControls(!showControls)}
         onScroll={handleScroll}
       >
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-12">
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 pt-12 sm:py-12">
           {/* Chapter Title */}
           <div className="mb-10 text-center">
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm mb-3">
@@ -246,7 +246,7 @@ export default function ReadChapterPage() {
 
           {/* End of Chapter */}
           {canGoNext && (
-            <div className="mt-16 mb-8 text-center">
+            <div className="my-4 sm:mt-16 sm:mb-8 text-center">
               <div className="inline-block border-t border-border w-32 mb-6" />
               <p className="text-sm text-muted-foreground mb-4">
                 End of Chapter {currentChapter.chapterNumber}
@@ -258,7 +258,7 @@ export default function ReadChapterPage() {
           )}
 
           {!canGoNext && (
-            <div className="mt-16 mb-8 text-center">
+            <div className="my-4 sm:mt-16 sm:mb-8 text-center">
               <div className="inline-block border-t border-border w-32 mb-6" />
               <p className="text-sm text-muted-foreground">
                 You&apos;ve reached the end of available chapters
@@ -273,17 +273,8 @@ export default function ReadChapterPage() {
         className={`bg-white border-t transition-transform duration-300 ${showControls ? 'translate-y-0' : 'translate-y-full'
           }`}
       >
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button
-            onPress={handlePreviousChapter}
-            isDisabled={!canGoPrevious}
-            className='global_btn rounded_full outline_primary'
-            startContent={<ChevronLeft className="h-4 w-4" />}
-          >
-            Previous Chapter
-          </Button>
-
-          <div className="flex items-center gap-2 text-sm">
+        <div className="max-w-4xl mx-auto px-3 py-3 sm:px-4 sm:py-4 grid grid-cols-2 gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="col-span-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm tabular-nums sm:order-2 sm:flex-none">
             <span className="text-muted-foreground">Chapter</span>
             <span className="font-semibold">{currentChapter.chapterNumber}</span>
             {bookChapters.length > 0 && (
@@ -295,12 +286,23 @@ export default function ReadChapterPage() {
           </div>
 
           <Button
+            onPress={handlePreviousChapter}
+            isDisabled={!canGoPrevious}
+            className="global_btn rounded_full outline_primary min-w-0 sm:order-1 sm:w-auto"
+            startContent={<ChevronLeft className="h-4 w-4 shrink-0" />}
+          >
+            <span className="hidden sm:inline">Previous Chapter</span>
+            <span className="sm:hidden truncate">Previous</span>
+          </Button>
+
+          <Button
             onPress={handleNextChapter}
             isDisabled={!canGoNext}
-            className="global_btn rounded_full bg_primary"
-            endContent={<ChevronRight className="h-4 w-4" />}
+            className="global_btn rounded_full bg_primary min-w-0 sm:order-3 sm:w-auto"
+            endContent={<ChevronRight className="h-4 w-4 shrink-0" />}
           >
-            Next Chapter
+            <span className="hidden sm:inline">Next Chapter</span>
+            <span className="sm:hidden truncate">Next</span>
           </Button>
         </div>
       </div>

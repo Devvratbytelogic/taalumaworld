@@ -87,20 +87,20 @@ export default function CartDetailsComponent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
       {isPaymentProcessing && (
         <PaymentLoader />
       )}
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Shopping Cart</h1>
-          <p className="text-muted-foreground">{cartSummaryText}</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold mb-2 sm:text-3xl">Shopping Cart</h1>
+          <p className="text-sm text-muted-foreground sm:text-base">{cartSummaryText}</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="space-y-3 sm:space-y-4 lg:col-span-2">
             {cartItems.map(item => {
               const isBookItem = item.type === VISIBLE.BOOK
               const coverImage = isBookItem ? item.book?.coverImage : item.chapter?.coverImage
@@ -111,17 +111,20 @@ export default function CartDetailsComponent() {
               const bookTitle = !isBookItem ? item.chapter?.book?.title : null
 
               return (
-                <div key={item._id} className="bg-white rounded-3xl p-6 shadow-sm border border-border">
-                  <div className="flex gap-4">
+                <div
+                  key={item._id}
+                  className="bg-white rounded-2xl border border-border p-4 shadow-sm sm:rounded-3xl sm:p-6"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                     {/* Cover Image */}
-                    <div className="shrink-0">
+                    <div className="mx-auto shrink-0 sm:mx-0">
                       <Link
                         href={
                           isBookItem
                             ? getReadBookRoutePath(item.book?._id ?? '')
                             : getReadChapterRoutePath(item.chapter?._id ?? '')
                         }
-                        className="block w-24 h-32 rounded-2xl overflow-hidden"
+                        className="block w-full overflow-hidden rounded-sm sm:h-32 sm:w-24 sm:rounded-2xl"
                       >
                         <ImageComponent
                           src={coverImage ?? ''}
@@ -132,15 +135,15 @@ export default function CartDetailsComponent() {
                     </div>
 
                     {/* Item Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="outline" className="text-sm rounded-full">
+                    <div className="min-w-0 w-full flex-1">
+                      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="rounded-full text-xs sm:text-sm">
                               {isBookItem ? 'Full Book' : `Chapter ${item.chapter?.number}`}
                             </Badge>
                           </div>
-                          <h3 className="font-bold text-lg mb-1 line-clamp-2">{title}</h3>
+                          <h3 className="mb-1 line-clamp-2 text-base font-bold sm:text-lg">{title}</h3>
                           {bookTitle && (
                             <p className="text-sm text-muted-foreground mb-1 line-clamp-1">
                               <BookOpen className="h-3.5 w-3.5 inline mr-1" />
@@ -155,13 +158,13 @@ export default function CartDetailsComponent() {
                         </div>
 
                         {/* Price */}
-                        <div className="text-right shrink-0">
+                        <div className="flex shrink-0 flex-col items-start sm:items-end sm:text-right">
                           {item.chapter?.isFree ? (
-                            <Badge className="bg-success/10 text-success border-success/20 rounded-full">
+                            <Badge className="w-fit rounded-full border-success/20 bg-success/10 text-success">
                               Free
                             </Badge>
                           ) : (
-                            <p className="text-xl font-bold text-primary">
+                            <p className="text-lg font-bold text-primary sm:text-xl">
                               KSH {item.selling_price?.toFixed(2)}
                             </p>
                           )}
@@ -171,7 +174,7 @@ export default function CartDetailsComponent() {
                       {/* Remove Button */}
                       <Button
                         onPress={() => onRemoveFromCart(item._id, title ?? '')}
-                        className="global_btn danger_outline"
+                        className="global_btn danger_outline w-full sm:w-auto"
                         startContent={<Trash2 className="h-4 w-4 mr-2" />}
                       >
                         Remove
@@ -184,7 +187,7 @@ export default function CartDetailsComponent() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:min-w-0">
             <CartSummary
               subtotal={subtotal}
               total={total}

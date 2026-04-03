@@ -7,7 +7,7 @@ export default function HeaderToolbar() {
     return (
         <>
             <div className="bg-primary text-white">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto sm:px-4">
                     <div className="flex items-center justify-between h-10 text-sm">
                         <div className="flex items-center gap-2">
                             <p>Welcome to Taaluma - Empowering College Graduates & Young Professionals!</p>

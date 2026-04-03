@@ -14,7 +14,7 @@ export default function CommonCTA() {
     return (
         <>
             <section className="py-16 bg-linear-to-br from-primary/10 to-secondary-accent/10">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto sm:px-4">
                     <div className="max-w-3xl mx-auto text-center space-y-6">
                         <h2 className="text-3xl md:text-4xl font-bold">Join the Global Ecosystem of Career Architects</h2>
                         <p className="text-lg text-muted-foreground">

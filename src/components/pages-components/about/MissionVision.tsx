@@ -5,7 +5,7 @@ export default function MissionVision() {
     return (
         <>
             <section className="py-16 bg-background">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto sm:px-4">
                     <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                         {/* Mission Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow">

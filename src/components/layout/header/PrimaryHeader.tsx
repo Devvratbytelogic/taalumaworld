@@ -34,7 +34,7 @@ export default function PrimaryHeader() {
   const { isAuthenticated, user } = useAuth();
   const isAdmin = ['admin', 'author'].includes(user?.role?.toLowerCase() ?? '');
 
-  const { data: cartData } = useGetCartQuery(undefined, { skip: !isAuthenticated });
+  const { data: cartData, isLoading } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const cartCount = cartData?.data?.[0]?.item_count ?? 0;
 
 
@@ -67,13 +67,16 @@ export default function PrimaryHeader() {
     return null;
   }
 
+  console.log('isAuthenticated', isAuthenticated);
+  console.log('isLoading', isLoading);
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       {/* Top Announcement Bar */}
       <HeaderToolbar />
 
       {/* Main Header */}
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto sm:px-4">
         <div className="flex items-center justify-between py-4 gap-4">
           {/* Logo */}
           <Link href={getHomeRoutePath()} className="flex items-center gap-2 shrink-0">
@@ -94,7 +97,7 @@ export default function PrimaryHeader() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-6 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
               <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 hover:text-primary transition-colors">
@@ -105,21 +108,23 @@ export default function PrimaryHeader() {
 
             {/* Cart */}
             {isAuthenticated && (
-              <Link href={getCartRoutePath()} className="relative hidden lg:block">
-                <button className="relative hover:text-primary transition-colors">
-                  <ShoppingCart className="h-6 w-6" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary text-white text-sm rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                </button>
+              <Link
+                href={getCartRoutePath()}
+                className="relative inline-flex p-1.5 sm:p-0 rounded-lg sm:rounded-none text-foreground hover:text-primary transition-colors"
+                aria-label="Shopping cart"
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {cartCount > 0 && (
+                  <span className="absolute top-0 right-0 sm:-top-2 sm:-right-2 min-w-5 h-5 px-1 bg-primary text-white text-xs rounded-full flex items-center justify-center font-bold leading-none">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </Link>
             )}
 
             {/* User Avatar */}
             {isAuthenticated ? (
-              <div ref={userMenuRef} className="relative hidden lg:block">
+              <div ref={userMenuRef} className="relative">
                 <div
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm hover:bg-primary/90 transition-colors cursor-pointer"
@@ -156,10 +161,23 @@ export default function PrimaryHeader() {
                 )}
               </div>
             ) : (
-              <Button className='hidden lg:flex global_btn rounded_full bg_primary' onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}>
-                <LogIn className="h-4 w-4" />
-                Sign In
-              </Button>
+              <>
+                <Button
+                  className="lg:hidden min-w-10! w-10 max-w-10! h-10! max-h-10! p-0! global_btn rounded_full bg_primary"
+                  isIconOnly
+                  aria-label="Sign in"
+                  onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                >
+                  <LogIn className="h-5 w-5" />
+                </Button>
+                <Button
+                  className="hidden lg:flex global_btn rounded_full bg_primary"
+                  onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                >
+                  <LogIn className="h-4 w-4" />
+                  Sign In
+                </Button>
+              </>
             )}
 
             {/* Mobile Menu Toggle */}
@@ -176,7 +194,7 @@ export default function PrimaryHeader() {
         <MobileSearchBar />
 
         {/* Navigation Bar */}
-        <nav className="hidden md:flex items-center gap-8 border-t py-3">
+        <nav className="hidden lg:flex items-center gap-8 border-t py-3">
           <Link
             href={getHomeRoutePath()}
             className={`transition-colors ${isActive(getHomeRoutePath()) ? 'text-primary' : 'hover:text-primary'

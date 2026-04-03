@@ -48,7 +48,7 @@ function AuthorsList() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto sm:px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Thought Leaders</h1>
           <p className="text-muted-foreground">Discover the authors behind our content</p>
@@ -124,7 +124,7 @@ function AuthorDetail({ id }: { id: string }) {
   if (!isLoadingAuthor && !author) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto sm:px-4 py-8">
           <Link
             href={getAuthorsRoutePath()}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
@@ -148,7 +148,7 @@ function AuthorDetail({ id }: { id: string }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto sm:px-4 py-8">
         <Link
           href={getAuthorsRoutePath()}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"

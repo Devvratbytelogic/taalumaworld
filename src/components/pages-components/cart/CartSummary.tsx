@@ -23,8 +23,8 @@ export default function CartSummary({
   isLoading = false,
 }: CartSummaryProps) {
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-border sticky top-24">
-      <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+    <div className="rounded-2xl border border-border bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 lg:sticky lg:top-24">
+      <h2 className="mb-4 text-lg font-bold sm:mb-6 sm:text-xl">Order Summary</h2>
 
       <div className="space-y-3 mb-6 pb-6 border-b">
         <div className="flex justify-between text-sm">
@@ -51,9 +51,9 @@ export default function CartSummary({
         )}
       </div>
 
-      <div className="flex justify-between mb-6 pb-6 border-b">
-        <span className="font-bold text-lg">Total</span>
-        <span className="font-bold text-2xl text-primary">
+      <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b pb-6">
+        <span className="text-base font-bold sm:text-lg">Total</span>
+        <span className="text-xl font-bold text-primary sm:text-2xl">
           KSH {total.toFixed(2)}
         </span>
       </div>

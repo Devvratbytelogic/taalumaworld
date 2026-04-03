@@ -129,7 +129,7 @@ function BookModalContent({
 
   return (
     <>
-      <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[45vh] custom_scrollbar min-w-0">
+      <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
         {/* Category tags + Title + Author */}
         <div className="space-y-2 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -459,7 +459,7 @@ function ChapterModalContent({
 
   return (
     <>
-      <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[55vh] custom_scrollbar min-w-0">
+      <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
         {/* Chapter Header */}
         <div className="space-y-2 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">

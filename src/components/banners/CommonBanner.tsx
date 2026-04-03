@@ -34,7 +34,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
     return (
         <>
             <section className="relative py-12 md:py-16 overflow-hidden">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto sm:px-4">
                     <div className="grid lg:grid-cols-2 gap-10 items-center" style={{ maxHeight: '900px' }}>
                         {/* Left Column - Text Content */}
                         <div className="space-y-6 animate-fade-in">
@@ -90,9 +90,11 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                             <div className="flex -space-x-2">
                                                 {users && users.length > 0 && users?.map((user, index) => (
                                                     user.profilePic ? (
-                                                        <div className='w-8 h-8 rounded-full border-2 overflow-hidden border-background'>
+                                                        <div
+                                                            key={user.id}
+                                                            className="w-8 h-8 rounded-full border-2 overflow-hidden border-background"
+                                                        >
                                                             <ImageComponent
-                                                                key={user.id}
                                                                 src={user.profilePic}
                                                                 alt={user.name}
                                                                 object_cover={true}

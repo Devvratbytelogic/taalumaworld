@@ -50,7 +50,7 @@ export default function PrimaryFooter() {
         <>
             <footer className="bg-gray-900 text-gray-300">
                 {/* Main Footer */}
-                <div className="container mx-auto px-4 py-12">
+                <div className="container mx-auto sm:px-4 py-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {/* About Section */}
                         <div>
@@ -232,7 +232,7 @@ export default function PrimaryFooter() {
 
                 {/* Bottom Bar */}
                 <div className="border-t border-gray-800">
-                    <div className="container mx-auto px-4 py-6">
+                    <div className="container mx-auto sm:px-4 py-6">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
                             <div className="text-center md:text-left">
                                 {copyRight ? (

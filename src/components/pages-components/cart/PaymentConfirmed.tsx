@@ -9,7 +9,7 @@ export default function PaymentConfirmed() {
     return (
         <>
             <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
-                <div className="container mx-auto px-4 max-w-lg">
+                <div className="container mx-auto sm:px-4 max-w-lg">
                     <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm text-center">
                         <div className="bg-success/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
                             <CheckCircle className="h-12 w-12 text-success" />

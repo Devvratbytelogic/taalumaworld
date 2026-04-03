@@ -26,7 +26,7 @@ export default function LibraryContentSection() {
 
     return (
         <>
-            <section className="container mx-auto px-4">
+            <section className="container mx-auto sm:px-4 pb-4">
                 <div className="flex items-center justify-between mb-6">
                     <FilterOptions total={total} viewMode={viewMode} />
                 </div>

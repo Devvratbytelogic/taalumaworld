@@ -51,7 +51,7 @@ export default function FaqSearch() {
             </section>
 
             <section className="py-12 bg-background">
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto sm:px-4">
                     <div className="max-w-5xl mx-auto">
 
                         {/* Category Tabs */}

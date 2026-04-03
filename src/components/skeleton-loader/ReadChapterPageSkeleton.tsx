@@ -18,8 +18,8 @@ export default function ReadChapterPageSkeleton() {
 
       {/* Reading Content */}
       <div className="flex-1 overflow-hidden">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-12 space-y-6">
-          {/* Chapter badge + title */}
+      <div className="max-w-3xl mx-auto px-6 sm:px-8 pt-12 sm:py-12">
+      {/* Chapter badge + title */}
           <div className="text-center space-y-3 mb-10">
             <div className="h-6 bg-gray-200 rounded-full w-24 mx-auto" />
             <div className="h-10 bg-gray-200 rounded-xl w-3/4 mx-auto" />

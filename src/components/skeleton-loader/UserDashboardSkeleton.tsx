@@ -1,7 +1,7 @@
 export default function UserDashboardSkeleton() {
   return (
     <div className="min-h-screen bg-gray-50 animate-pulse">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto sm:px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <aside className="lg:w-64 shrink-0">

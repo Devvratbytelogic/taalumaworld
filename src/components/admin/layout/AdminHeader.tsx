@@ -114,7 +114,7 @@ export function AdminHeader() {
 
             {/* ── Top Bar ─────────────────────────────────────────── */}
             <div className="bg-primary text-white">
-                <div className="container mx-auto px-4 h-10 flex items-center justify-between text-sm">
+                <div className="container mx-auto sm:px-4 h-10 flex items-center justify-between text-sm">
                     <span className="font-medium hidden sm:block">Admin Panel - {brandName}</span>
                     <span className="font-medium sm:hidden">Admin</span>
 
@@ -145,7 +145,7 @@ export function AdminHeader() {
             </div>
 
             {/* ── Main Header ─────────────────────────────────────── */}
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto sm:px-4">
                 <div className="flex items-center justify-between py-4 gap-4">
 
                     {/* Logo + mobile toggle */}

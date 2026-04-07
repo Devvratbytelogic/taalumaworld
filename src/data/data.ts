@@ -58,7 +58,7 @@ export const homeBannerData: bannerProps = {
         description: '500+ active readers',
     },
     image: {
-        src: '/images/banner/home-banner1.png',
+        src: '/images/banner/home-banner2.jpg',
         alt: 'Teen reading on laptop',
     },
 };

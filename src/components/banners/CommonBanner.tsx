@@ -33,7 +33,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
 
     return (
         <>
-            <section className="relative pt-12 sm:pt-12 md:pt-16 overflow-hidden">
+            <section className="relative py-12 sm:py-12 md:py-16 overflow-hidden">
                 <div className="container mx-auto sm:px-4">
                     <div className="grid lg:grid-cols-2 gap-10 items-center" style={{ maxHeight: '900px' }}>
                         {/* Left Column - Text Content */}

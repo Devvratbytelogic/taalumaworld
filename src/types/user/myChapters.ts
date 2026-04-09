@@ -20,6 +20,7 @@ export interface IMyChaptersAPIResponseSummary {
 export interface ItemsEntity {
     chapterId: string;
     chapterNumber: number;
+    order_id: string;
     title: string;
     description: string;
     bookId: string;

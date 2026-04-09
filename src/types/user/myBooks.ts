@@ -25,6 +25,7 @@ export interface IMyBookItem {
     id: string;
     title: string;
     description: string;
+    order_id: string;
     coverImage: string;
     chapterCount: number;
     pricingModel: string;

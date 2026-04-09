@@ -2,7 +2,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
-import { Input } from '@/components/ui/input';
+import OtpInput from '@/components/auth/OtpInput';
 import Button from '@/components/ui/Button';
 import { useFormik } from 'formik';
 import { otpVerificationSchema } from '@/utils/formValidation';
@@ -20,7 +20,7 @@ export default function OtpVerification() {
     const [userVerifyOtp, { isLoading: isVerifying }] = useUserVerifyOtpMutation();
     const [userResendOtp, { isLoading: isResending }] = useUserResendOtpMutation();
 
-    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, setFieldValue } = useFormik({
+    const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue } = useFormik({
         initialValues: {
             code: '',
         },
@@ -60,11 +60,6 @@ export default function OtpVerification() {
         }
     };
 
-    const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const sanitizedValue = event.target.value.replace(/[^0-9]/g, '').slice(0, 4);
-        setFieldValue('code', sanitizedValue);
-    };
-
     return (
         <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
@@ -77,30 +72,29 @@ export default function OtpVerification() {
                     </p>
                 </ModalHeader>
                 <ModalBody>
-                    <form className="space-y-3" onSubmit={handleSubmit}>
-                        <div className="space-y-2">
-                            <label htmlFor="code" className="text-sm font-medium text-foreground">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <div className="space-y-4">
+                            <label className="text-sm font-medium text-foreground block text-center">
                                 Verification Code
                             </label>
-                            <Input
-                                id="code"
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="••••"
-                                className={`h-12 text-center text-lg tracking-[0.7rem] rounded-2xl ${errors.code && touched.code ? 'border-red-500' : ''}`}
-                                disabled={isSubmitting}
+                            <OtpInput
                                 value={values.code}
-                                onChange={handleCodeChange}
-                                onBlur={handleBlur}
+                                onChange={(val) => setFieldValue('code', val)}
+                                length={4}
+                                isDisabled={isSubmitting}
+                                classNames={{
+                                    wrapper: 'flex gap-3 justify-center',
+                                    inputWrapper: `w-12 h-12 shrink-0 flex items-center justify-center border rounded-[10px] bg-white transition-colors ${errors.code && touched.code ? 'border-red-500' : 'border-muted-color focus-within:border-body-color/40'}`,
+                                }}
                             />
                             {errors.code && touched.code && (
-                                <p className="text-sm text-red-600">{errors.code}</p>
+                                <p className="text-sm text-red-600 text-center">{errors.code}</p>
                             )}
                         </div>
 
                         <Button
                             type="submit"
-                            className="global_btn bg_primary w-full"
+                            className="global_btn bg_primary w-fit mx-auto flex"
                             disabled={isSubmitting || isVerifying}
                             isLoading={isSubmitting || isVerifying}
                         >

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import toast from '@/utils/toast';
-import { Menu, X, ShoppingCart, LogIn, BookMarked, LogOut, User } from 'lucide-react';
+import { Menu, X, ShoppingCart, BookMarked, LogOut, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { useGetCartQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
@@ -165,13 +165,13 @@ export default function PrimaryHeader() {
                   aria-label="Sign in"
                   onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                 >
-                  <LogIn className="h-5 w-5" />
+                  <User className="h-5 w-5" />
                 </Button>
                 <Button
                   className="hidden lg:flex global_btn rounded_full bg_primary"
                   onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                 >
-                  <LogIn className="h-4 w-4" />
+                  <User className="h-4 w-4" />
                   Sign In
                 </Button>
               </>

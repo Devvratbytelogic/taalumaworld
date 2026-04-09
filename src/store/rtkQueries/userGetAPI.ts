@@ -149,6 +149,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 params: { query },
             }),
         }),
+        getTransactionInvoice: builder.query<Blob, { orderId: string }>({
+            query: ({ orderId }) => ({
+                url: `/user/invoice/${orderId}`,
+                method: 'GET',
+                responseHandler: (response) => response.blob(),
+            }),
+        }),
     }),
 });
 
@@ -169,4 +176,5 @@ export const {
     useGetTestimonialsQuery,
     useGetFAQQuery,
     useGetSearchResultsQuery,
+    useLazyGetTransactionInvoiceQuery,
 } = clientSideGetApis;

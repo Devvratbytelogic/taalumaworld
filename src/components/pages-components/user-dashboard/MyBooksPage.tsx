@@ -1,9 +1,9 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Book, BookOpen, TrendingUp, CheckCircle, Play, User } from 'lucide-react';
+import { Book, BookOpen, TrendingUp, CheckCircle, Play, User, FileDown } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetMyBooksQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetMyBooksQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
 import { cn } from '@/components/ui/utils';
 import type { IMyBookItem } from '@/types/user/myBooks';
 import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
@@ -15,8 +15,10 @@ type FilterType = 'all' | 'reading' | 'completed' | 'unread';
 export function MyBooksPage() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [invoiceDownloadingOrderId, setInvoiceDownloadingOrderId] = useState<string | null>(null);
 
   const { data: myBooksData, isLoading } = useGetMyBooksQuery();
+  const [fetchTransactionInvoice] = useLazyGetTransactionInvoiceQuery();
   const books: IMyBookItem[] = myBooksData?.data?.items ?? [];
 
   const stats = useMemo(
@@ -46,6 +48,24 @@ export function MyBooksPage() {
     if (completed || progressPercent === 100) return { label: 'Completed', color: 'text-green-600' };
     if (progressPercent > 0) return { label: 'In Progress', color: 'text-primary' };
     return { label: 'Not Started', color: 'text-gray-500' };
+  };
+
+  const handleDownloadInvoice = async (orderId: string) => {
+    setInvoiceDownloadingOrderId(orderId);
+    try {
+      const blob = await fetchTransactionInvoice({ orderId }).unwrap();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${orderId}.pdf`;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setInvoiceDownloadingOrderId(null);
+    }
   };
 
   if (isLoading) {
@@ -203,6 +223,17 @@ export function MyBooksPage() {
                         </>
                       )}
                     </Button>
+
+                    {book.order_id && (
+                      <Button
+                        className="global_btn rounded_full outline_primary w-full"
+                        isDisabled={invoiceDownloadingOrderId === book.order_id}
+                        onPress={() => handleDownloadInvoice(book.order_id)}
+                      >
+                        <FileDown className="h-4 w-4" />
+                        {invoiceDownloadingOrderId === book.order_id ? 'Downloading…' : 'Download invoice'}
+                      </Button>
+                    )}
 
                     {/* Book Details */}
                     <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">

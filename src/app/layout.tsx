@@ -3,6 +3,7 @@ import { Roboto, Ubuntu } from "next/font/google";
 import "../styles/globals.css";
 import { AppProviders } from "../components/providers/AppProviders";
 import ConditionalSiteLayout from "@/components/layout/ConditionalSiteLayout";
+import { ContentProtection } from "@/components/ContentProtection";
 import { API_BASE_URL } from "@/utils/config";
 
 const roboto = Roboto({
@@ -48,6 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${roboto.variable} ${ubuntu.variable}`}>
       <body className="antialiased">
+        <ContentProtection />
         <AppProviders>
           <ConditionalSiteLayout>
             {children}

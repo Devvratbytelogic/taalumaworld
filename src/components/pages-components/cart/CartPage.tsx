@@ -76,7 +76,7 @@ export default function CartDetailsComponent() {
     return <CartPageSkeleton />;
   }
 
-  if (cartItems.length === 0 && !isOrderComplete) {
+  if (cartItems?.length === 0 && !isLoading && !isOrderComplete) {
     return <CartNoData />;
   }
 

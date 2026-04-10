@@ -164,6 +164,7 @@ export const {
     useGetActiveReadersQuery,
     useGetAllChaptersQuery,
     useGetSingleChapterQuery,
+    useLazyGetSingleChapterQuery,
     useGetSingleBookQuery,
     useGetUserAllCategoriesQuery,
     useGetUserAllAuthorsQuery,

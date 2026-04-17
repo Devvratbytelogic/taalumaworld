@@ -134,10 +134,14 @@ export const addBookSchema = Yup.object({
   cover_image: Yup.mixed<File>()
     .required('Please select a cover image')
     .test('is-file', 'Please select a cover image', (v) => v instanceof File),
+  pricingModel: Yup.string().oneOf(['book', 'chapter']),
   price: Yup.number()
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-    .min(1, 'Price must be greater than 1')
-    .required('Price is required'),
+    .when('pricingModel', {
+      is: 'book',
+      then: (schema) => schema.min(1, 'Price must be greater than 1').required('Price is required'),
+      otherwise: (schema) => schema.optional(),
+    }),
 });
 // Edit Book Modal Validation Schema — cover_image is optional (null = keep existing)
 export const editBookSchema = Yup.object({

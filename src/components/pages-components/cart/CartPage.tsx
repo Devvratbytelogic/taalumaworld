@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { getReadBookRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
 import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
+import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
 
 export default function CartDetailsComponent() {
   const dispatch = useDispatch();
@@ -67,7 +68,7 @@ export default function CartDetailsComponent() {
     setIsOrderComplete(true);
   }, []);
 
-  const { startPayment, isInitiating, waitModalProps } = useMpesaPaymentFlow({
+  const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
     getAmount,
     attemptComplete,
     onSuccess: onMpesaSuccess,
@@ -91,6 +92,7 @@ export default function CartDetailsComponent() {
 
   return (
     <>
+      <MpesaPhoneModal {...phoneModalProps} />
       <MpesaWaitModal {...waitModalProps} />
       <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
         <div className="container mx-auto max-w-6xl px-4 sm:px-6">

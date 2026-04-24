@@ -18,6 +18,7 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import { getCartRoutePath } from '@/routes/routes';
 import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
 import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
+import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
 
 // const MPESA_STATIC_AMOUNT = 200;
 
@@ -61,7 +62,7 @@ export function ChapterPurchaseModal() {
     dispatch(closeModal());
   }, [dispatch]);
 
-  const { startPayment, isInitiating, waitModalProps } = useMpesaPaymentFlow({
+  const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
     getAmount,
     attemptComplete,
     onSuccess: onMpesaSuccess,
@@ -169,6 +170,7 @@ export function ChapterPurchaseModal() {
         </ModalContent>
       </Modal>
 
+      <MpesaPhoneModal {...phoneModalProps} />
       <MpesaWaitModal {...waitModalProps} />
     </>
   );

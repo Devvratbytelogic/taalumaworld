@@ -1,5 +1,12 @@
 import { ICartAPIResponse } from '@/types/user/cart';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
+
+export type MpesaPaymentStatusResponse = {
+  success?: boolean;
+  data?: {
+    status?: 'pending' | 'completed' | 'cancel' | 'failed';
+  };
+};
 import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
@@ -156,6 +163,12 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 responseHandler: (response) => response.blob(),
             }),
         }),
+        getMpesaPaymentStatus: builder.query<MpesaPaymentStatusResponse, string>({
+            query: (checkoutRequestId) => ({
+                url: `/user/payment-status/${checkoutRequestId}`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -178,4 +191,5 @@ export const {
     useGetFAQQuery,
     useGetSearchResultsQuery,
     useLazyGetTransactionInvoiceQuery,
+    useLazyGetMpesaPaymentStatusQuery,
 } = clientSideGetApis;

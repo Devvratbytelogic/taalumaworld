@@ -63,13 +63,13 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
         }),
-        mpesaPaymentCallback: builder.mutation({
-            query: (body) => ({
-                url: `/user/mpaisa/callback`,
-                method: 'POST',
-                body,
-            }),
-        }),
+        // mpesaPaymentCallback: builder.mutation({
+        //     query: (body) => ({
+        //         url: `/user/mpaisa/callback`,
+        //         method: 'POST',
+        //         body,
+        //     }),
+        // }),
     }),
 });
 
@@ -82,5 +82,5 @@ export const {
     usePostContactUsMutation,
     useSubscribeToNewsletterMutation,
     useMpesaPaymentMutation,
-    useMpesaPaymentCallbackMutation,
+    // useMpesaPaymentCallbackMutation,
 } = clientSidePostApis;

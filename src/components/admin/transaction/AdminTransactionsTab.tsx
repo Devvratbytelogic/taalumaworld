@@ -25,9 +25,9 @@ export function AdminTransactionsTab() {
 
   const filteredTransactions = transactions.filter(
     (txn) =>
-      txn.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      txn.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      txn.item.toLowerCase().includes(searchQuery.toLowerCase())
+      txn.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      txn.user?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      txn.item?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalRevenue = data?.data?.totalRevenue ?? 0;

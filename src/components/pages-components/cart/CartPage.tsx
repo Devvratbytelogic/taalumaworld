@@ -54,6 +54,7 @@ export default function CartDetailsComponent() {
           payment_method: 'M-Pesa',
           amount: total,
           transaction_id: checkoutRequestId,
+          invoice: checkoutRequestId,
           payment_status: 'Paid',
         }).unwrap();
         return true;

@@ -46,6 +46,7 @@ export function ChapterPurchaseModal() {
           type: 'chapter',
           payment_method: 'M-Pesa',
           transaction_id: checkoutRequestId,
+          invoice: checkoutRequestId,
           payment_status: 'Paid',
           chapter_id: chapter.id,
         }).unwrap();

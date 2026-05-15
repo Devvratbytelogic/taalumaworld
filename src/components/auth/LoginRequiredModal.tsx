@@ -19,25 +19,25 @@ export default function LoginRequiredModal() {
     switch (action) {
       case 'cart':
         return {
-          icon: <ShoppingCart className="h-12 w-12 text-primary" />,
+          icon: <ShoppingCart className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In to Add to Cart',
           description: 'Create an account or sign in to start building your library and unlock amazing stories.',
         };
       case 'read':
         return {
-          icon: <BookOpen className="h-12 w-12 text-primary" />,
+          icon: <BookOpen className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In to Read',
           description: `Sign in to start reading this ${itemType}. All our content requires authentication to ensure the best experience.`,
         };
       case 'view':
         return {
-          icon: <Lock className="h-12 w-12 text-primary" />,
+          icon: <Lock className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In to View Details',
           description: `Create an account or sign in to view ${itemType} details and explore our full collection.`,
         };
       default:
         return {
-          icon: <LogIn className="h-12 w-12 text-primary" />,
+          icon: <LogIn className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In Required',
           description: 'Please sign in to continue.',
         };
@@ -51,14 +51,14 @@ export default function LoginRequiredModal() {
       <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} hideCloseButton>
         <ModalContent>
           <ModalBody>
-            <div className="flex justify-center my-6">
-              <div className="bg-primary/10 rounded-full p-6">
+            <div className="flex justify-center my-4 md:my-6">
+              <div className="bg-primary/10 rounded-full p-4 md:p-6">
                 {content.icon}
               </div>
             </div>
 
             {/* Content */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-4 md:mb-8">
               <h2 className="text-2xl font-bold mb-3">{content.title}</h2>
               <p className="text-muted-foreground">
                 {content.description}
@@ -66,7 +66,7 @@ export default function LoginRequiredModal() {
             </div>
 
             {/* Benefits */}
-            <div className="bg-linear-to-br from-primary/5 to-primary/10 rounded-2xl p-4 mb-6">
+            <div className="bg-linear-to-br from-primary/5 to-primary/10 rounded-2xl p-4 md:p-6 mb-6">
               <p className="text-sm font-semibold text-foreground mb-2">With a TaalumaWorld account:</p>
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">

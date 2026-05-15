@@ -17,37 +17,9 @@ export interface AuthResponseData {
 }
 
 /**
- * Store auth token, user id and role in cookies after successful login/verify.
- * Uses session cookies so the user is logged out when the browser is closed.
- * Handles common API shapes: token or access_token; user._id or user.id; role.id, role.name.
+ * Store auth token, user id and role in cookies after successful login.
+ * Dispatches auth-changed so hooks (e.g. useAuth + profile query) refresh.
  */
-export interface UserDisplayData {
-    fullName: string;
-    email: string;
-    photo?: string | null;
-}
-
-const USER_DISPLAY_KEY = 'auth_user_display'
-
-export function setUserDisplayData(data: UserDisplayData): void {
-    if (typeof window === 'undefined') return
-    localStorage.setItem(USER_DISPLAY_KEY, JSON.stringify(data))
-}
-
-export function getUserDisplayData(): UserDisplayData | null {
-    if (typeof window === 'undefined') return null
-    try {
-        const raw = localStorage.getItem(USER_DISPLAY_KEY)
-        return raw ? (JSON.parse(raw) as UserDisplayData) : null
-    } catch {
-        return null
-    }
-}
-
-function clearUserDisplayData(): void {
-    if (typeof window === 'undefined') return
-    localStorage.removeItem(USER_DISPLAY_KEY)
-}
 
 function dispatchAuthChanged(): void {
     if (typeof window !== 'undefined') {
@@ -116,7 +88,6 @@ export function clearAuthCookies(): void {
     Cookies.remove('auth_token', { path: '/' })
     Cookies.remove('userID', { path: '/' })
     Cookies.remove('user_role', { path: '/' })
-    clearUserDisplayData()
     dispatchAuthChanged()
 }
 

@@ -4,7 +4,7 @@ import React from 'react'
 export default function CoreValues() {
     return (
         <>
-            <section className="pt-8 sm:pt-16 bg-background">
+            <section className="pt-8 sm:pt-16 bg-background overflow-hidden">
                 <div className="container mx-auto sm:px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">What We Stand For</h2>

@@ -9,7 +9,6 @@ import { useGetCartQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/u
 import { openModal } from '@/store/slices/allModalSlice';
 import { VISIBLE } from '@/constants/contentMode';
 import Button from '@/components/ui/Button';
-import { UserAvatar } from '@/components/ui/UserAvatar';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import MobileSearchBar from './MobileSearchBar';
@@ -37,6 +36,8 @@ export default function PrimaryHeader() {
   const { data: cartData, isLoading } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const cartCount = cartData?.data?.[0]?.item_count ?? 0;
 
+  const headerUserPhoto = user?.photo?.trim() || undefined;
+  const avatarInitial = (user?.fullName || user?.email || 'U').charAt(0).toUpperCase();
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -124,12 +125,25 @@ export default function PrimaryHeader() {
               <div ref={userMenuRef} className="relative">
                 <div
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm hover:bg-primary/90 transition-colors cursor-pointer"
+                  className={
+                    headerUserPhoto
+                      ? 'h-10 w-10 shrink-0 cursor-pointer rounded-full overflow-hidden ring-2 ring-transparent hover:opacity-95 hover:ring-primary/25 transition-all'
+                      : 'h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm hover:bg-primary/90 transition-colors cursor-pointer shrink-0'
+                  }
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') setIsUserMenuOpen((o) => !o);
+                  }}
                 >
-                  {user?.photo ? (
-                    <img src={user.photo} alt={user.fullName || 'User'} className="h-full w-full rounded-full object-cover" />
+                  {headerUserPhoto ? (
+                    <img
+                      src={headerUserPhoto}
+                      alt={user?.fullName ? `${user.fullName} avatar` : 'Your profile'}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
                   ) : (
-                    <span>{(user?.fullName || user?.email || 'U').charAt(0).toUpperCase()}</span>
+                    <span aria-hidden>{avatarInitial}</span>
                   )}
                 </div>
                 {isUserMenuOpen && (
@@ -280,11 +294,17 @@ export default function PrimaryHeader() {
                   <>
                     <Link href={isAdmin ? getAdminRoutePath() : getUserDashboardRoutePath()} onClick={() => setIsMenuOpen(false)}>
                       <button className="w-full flex items-center gap-3 bg-linear-to-r from-primary/10 to-primary/5 rounded-2xl p-3 mb-3">
-                        <UserAvatar
-                          userName={user?.fullName || user?.email || ''}
-                          userPhoto={user?.photo ?? undefined}
-                          size="sm"
-                        />
+                        <div className="h-8 w-8 rounded-full shrink-0 overflow-hidden bg-primary flex items-center justify-center">
+                          {headerUserPhoto ? (
+                            <img
+                              src={headerUserPhoto}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs font-semibold text-white">{avatarInitial}</span>
+                          )}
+                        </div>
                         <span className="text-base">{isAdmin ? 'Admin Panel' : (user?.fullName || 'My Account')}</span>
                       </button>
                     </Link>

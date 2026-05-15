@@ -5,7 +5,7 @@ export default function OurStory() {
     return (
         <>
             {/* About Taaluma.World */}
-            <section className="pt-8 sm:pt-16 bg-accent/30">
+            <section className="pt-8 sm:pt-16 bg-accent/30 overflow-hidden">
                 <div className="container mx-auto sm:px-4">
                     <div className="max-w-6xl mx-auto">
                         <div className="text-center mb-12">

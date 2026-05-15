@@ -143,8 +143,8 @@ export default function FilterModal() {
 
   return (
     <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container" size="2xl">
-      <ModalContent>
-        <ModalHeader className="flex flex-row items-center justify-between gap-3 p-6 border-b">
+      <ModalContent className="max-h-[min(90dvh,900px)] w-[min(100vw-1.5rem,42rem)] max-w-full mx-auto overflow-hidden flex flex-col">
+        <ModalHeader className="flex flex-row items-center justify-between gap-3 p-4 sm:p-6 border-b shrink-0">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 p-2 rounded-full">
               <SlidersHorizontal className="h-5 w-5 text-primary" />
@@ -162,7 +162,7 @@ export default function FilterModal() {
           </div>
         </ModalHeader>
 
-        <ModalBody className="overflow-y-auto max-h-[calc(90vh-220px)] p-6">
+        <ModalBody className="overflow-y-auto flex-1 min-h-0 p-4 sm:p-6 max-h-[calc(90dvh-11rem)] sm:max-h-[calc(90dvh-12rem)]">
           {isLoadingFilters ? (
             <FilterModalSkeleton displayMode={displayMode === 'chapters' ? 'chapters' : 'books'} />
           ) : displayMode === 'chapters' ? (
@@ -293,26 +293,31 @@ export default function FilterModal() {
             </div>
           )}
         </ModalBody>
-        <ModalFooter className="flex items-center justify-between gap-3 p-6 border-t bg-gray-50">
+        <ModalFooter className="flex flex-col gap-3 p-4 sm:p-6 border-t bg-gray-50 w-full min-w-0 shrink-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <Button
             onPress={handleReset}
             disabled={activeFilterCount === 0}
-            className="global_btn outline_primary rounded_full w_fit"
+            className="global_btn outline_primary rounded_full w-full sm:w-auto shrink-0 order-2 sm:order-1"
           >
             Reset All
           </Button>
-          <div className="flex gap-2">
-            <Button onPress={() => dispatch(closeModal())} className="global_btn outline_primary rounded_full w_fit">
+          <div className="flex gap-2 w-full min-w-0 sm:w-auto sm:justify-end order-1 sm:order-2">
+            <Button
+              onPress={() => dispatch(closeModal())}
+              className="global_btn outline_primary rounded_full flex-1 sm:flex-initial min-w-0"
+            >
               Cancel
             </Button>
             <Button
               onPress={handleApply}
-              className="global_btn bg_primary rounded_full w_fit"
+              className="global_btn bg_primary rounded_full flex-1 sm:flex-initial min-w-0 [&>span]:min-w-0"
             >
-              Apply Filters
-              {activeFilterCount > 0 && (
-                <Badge className="ml-2 bg-white text-primary rounded-full">{activeFilterCount}</Badge>
-              )}
+              <span className="inline-flex items-center justify-center gap-2 min-w-0">
+                <span className="truncate">Apply Filters</span>
+                {activeFilterCount > 0 && (
+                  <Badge className="shrink-0 bg-white text-primary rounded-full">{activeFilterCount}</Badge>
+                )}
+              </span>
             </Button>
           </div>
         </ModalFooter>

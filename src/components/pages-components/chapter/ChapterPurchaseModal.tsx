@@ -12,7 +12,6 @@ import { toast } from 'sonner';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { useDirectPurchaseChapterMutation } from '@/store/rtkQueries/userPostAPI';
-import { useLazyGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
 import { IChapterItem } from '@/types/user/HomeAllChapters';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import { getCartRoutePath } from '@/routes/routes';
@@ -86,9 +85,9 @@ export function ChapterPurchaseModal() {
         className="modal_container"
         size="lg"
         classNames={{
-          base: 'max-w-lg rounded-3xl overflow-hidden',
-          wrapper: 'px-6 py-12',
-          body: 'p-0',
+          base: 'max-w-lg rounded-3xl overflow-scroll',
+          wrapper: 'px-6 py-12 overflow-scroll',
+          body: 'p-0 overflow-scroll',
         }}
       >
         <ModalContent>
@@ -127,7 +126,7 @@ export function ChapterPurchaseModal() {
               <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium text-foreground">Chapter Price:</span>
-                  <span className="text-2xl font-bold text-primary">
+                  <span className="text-xl sm:text-2xl font-bold text-primary">
                     KSH {chapter.price?.toFixed(2) || '0.00'}
                   </span>
                 </div>

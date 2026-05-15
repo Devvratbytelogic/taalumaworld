@@ -1,45 +1,49 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { getAuthToken, getUserRole, getUserDisplayData } from '@/utils/authCookies';
+import { useState, useEffect } from 'react'
+import { getAuthToken, getUserRole } from '@/utils/authCookies'
+import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI'
 
 export interface AuthUser {
-    fullName: string;
-    email: string;
-    photo?: string | null;
-    role?: string;
+    fullName: string
+    email: string
+    photo?: string | null
+    role?: string
 }
 
 export interface AuthState {
-    isAuthenticated: boolean;
-    user: AuthUser | null;
+    isAuthenticated: boolean
+    user: AuthUser | null
 }
 
-function readAuthState(): AuthState {
-    const isAuthenticated = !!getAuthToken();
-    if (!isAuthenticated) return { isAuthenticated: false, user: null };
+/** Marketplace reader session: identity (name, email, avatar) comes from GET /user/get-user-profile only. Role still comes from the auth cookie. */
+export function useAuth(): AuthState {
+    const [, setTick] = useState(0)
 
-    const display = getUserDisplayData();
-    const role = getUserRole();
+    useEffect(() => {
+        const sync = () => setTick((t) => t + 1)
+        window.addEventListener('auth-changed', sync)
+        return () => window.removeEventListener('auth-changed', sync)
+    }, [])
+
+    const isAuthenticated = !!getAuthToken()
+
+    const { data: profileRes } = useGetUserProfileQuery(undefined, { skip: !isAuthenticated })
+
+    if (!isAuthenticated) {
+        return { isAuthenticated: false, user: null }
+    }
+
+    const d = profileRes?.data
+    const role = getUserRole()
+
     return {
         isAuthenticated: true,
         user: {
-            fullName: display?.fullName ?? '',
-            email: display?.email ?? '',
-            photo: display?.photo ?? null,
+            fullName: d?.name ?? '',
+            email: d?.email ?? '',
+            photo: d?.profile_pic?.trim() ? d.profile_pic : null,
             role,
         },
-    };
-}
-
-export function useAuth(): AuthState {
-    const [auth, setAuth] = useState<AuthState>(readAuthState);
-
-    useEffect(() => {
-        const sync = () => setAuth(readAuthState());
-        window.addEventListener('auth-changed', sync);
-        return () => window.removeEventListener('auth-changed', sync);
-    }, []);
-
-    return auth;
+    }
 }

@@ -84,7 +84,7 @@ export default function AuthorOtpVerification() {
                                 isDisabled={isSubmitting}
                                 classNames={{
                                     wrapper: 'flex gap-3 justify-center',
-                                    inputWrapper: `w-12 h-12 shrink-0 flex items-center justify-center border rounded-[10px] bg-white transition-colors ${errors.code && touched.code ? 'border-red-500' : 'border-muted-color focus-within:border-body-color/40'}`,
+                                    inputWrapper: `w-12 h-12 shrink-0 flex items-center justify-center border-1 rounded-[10px] bg-white transition-colors ${errors.code && touched.code ? 'border-red-500' : 'border-primary'}`,
                                 }}
                             />
                             {errors.code && touched.code && (

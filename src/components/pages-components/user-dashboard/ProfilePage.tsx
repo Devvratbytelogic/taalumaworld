@@ -173,7 +173,7 @@ export function ProfilePage() {
                           <span className="text-sm font-medium">Change</span>
                         </div>
                       </label>
-                      <button
+                      {/* <button
                         type="button"
                         onClick={handleRemovePhoto}
                         className="flex items-center justify-center gap-2 h-10 px-4 rounded-2xl border border-red-200 hover:bg-red-50 text-red-600 transition-colors"
@@ -181,7 +181,7 @@ export function ProfilePage() {
                       >
                         <X className="h-4 w-4" />
                         <span className="text-sm font-medium">Remove</span>
-                      </button>
+                      </button> */}
                     </>
                   )}
                 </div>

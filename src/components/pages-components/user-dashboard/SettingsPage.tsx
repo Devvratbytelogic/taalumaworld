@@ -4,12 +4,16 @@ import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import toast from '@/utils/toast';
 import { useUserChangePasswordMutation } from '@/store/rtkQueries/userAuthApi';
+import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
+import moment from 'moment';
 
 interface SettingsPageProps {
   onLogout: () => void;
 }
 
 export function SettingsPage({ onLogout }: SettingsPageProps) {
+  const { data: profileRes, isLoading: isLoadingProfile } = useGetUserProfileQuery()
+  const lastChangedDate = profileRes?.data?.updatedAt;
   const [changePassword, { isLoading: isSaving }] = useUserChangePasswordMutation();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -118,9 +122,9 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
 
           {!isChangingPassword ? (
             <div>
-              {/* <p className="text-sm text-muted-foreground mb-4">
-                Last changed: Never
-              </p> */}
+              <p className="text-sm text-muted-foreground mb-4">
+                Last changed: {isLoadingProfile ? 'Loading...' : moment(lastChangedDate).format('DD/MM/YYYY hh:mm A')}
+              </p>
               <Button className='global_btn rounded_full bg_primary' onPress={() => setIsChangingPassword(true)}>
                 Change Password
               </Button>

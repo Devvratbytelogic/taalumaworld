@@ -30,6 +30,7 @@ function mapBookToContentItem(book: BooksEntity): IBookItem {
     subcategory: book.subcategory ?? null,
     isPurchased: false,
     canRead: false,
+    isCart: false,
     chapters: [],
   };
 }
@@ -51,6 +52,8 @@ function mapChapterToContentItem(chapter: ChaptersEntity): IChapterItem {
     authorAvatar: chapter.authorAvatar ?? null,
     category: chapter.category,
     subcategory: chapter.subcategory ?? null,
+    canRead: false,
+    isCart: false,
   };
 }
 

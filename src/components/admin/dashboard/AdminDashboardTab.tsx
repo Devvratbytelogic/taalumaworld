@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { Users, Book, FileText, DollarSign, ShoppingCart } from 'lucide-react';
+import { Users, Book, FileText, ShoppingCart } from 'lucide-react';
 import type { ContentMode } from '../../../types/admin';
 import type { StatCard } from './DashboardStatsGrid';
 import type { ActivityItem } from './DashboardRecentActivity';
@@ -40,6 +40,14 @@ function calcUserGrowth(dates: string[]): number {
   }).length;
   if (prev === 0) return recent > 0 ? 100 : 0;
   return Math.round(((recent - prev) / prev) * 100 * 10) / 10;
+}
+
+function KshIcon({ className }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-center justify-center border-[1.5px] border-current rounded font-bold text-[8px] leading-none tracking-tight shrink-0 ${className ?? ''}`}>
+      KSH
+    </span>
+  );
 }
 
 export function AdminDashboardTab() {
@@ -109,7 +117,7 @@ export function AdminDashboardTab() {
       title: 'Total Purchases',
       value: totalPurchases.toLocaleString(),
       change: 0,
-      icon: DollarSign,
+      icon: KshIcon,
       color: 'green',
       href: getAdminSectionRoutePath('transactions'),
     },

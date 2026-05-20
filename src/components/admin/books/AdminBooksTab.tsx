@@ -14,6 +14,8 @@ import AdminBooksSkeleton from '@/components/skeleton-loader/AdminBooksSkeleton'
 
 export function AdminBooksTab() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedLeader, setSelectedLeader] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [previewBook, setPreviewBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
   const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
@@ -30,11 +32,18 @@ export function AdminBooksTab() {
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
   const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
 
-  const filteredBooks = books.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (book.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const categoryOptions = categories.map((c) => ({ id: c._id, name: c.name }));
+  const leaderOptions = thoughtLeaders.map((l) => ({ id: l._id ?? l.id, name: l.fullName }));
+
+  const filteredBooks = books.filter((book) => {
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q ||
+      book.title.toLowerCase().includes(q) ||
+      (book.description ?? '').toLowerCase().includes(q);
+    const matchCategory = !selectedCategory || book.category?._id === selectedCategory;
+    const matchLeader = !selectedLeader || book.thoughtLeader?._id === selectedLeader;
+    return matchSearch && matchCategory && matchLeader;
+  });
 
   const handleEditBook = (book: IAllBooksAPIResponseDataEntity) => {
     setEditingBook(book);
@@ -66,6 +75,12 @@ export function AdminBooksTab() {
       <AdminBooksSearch
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        categories={categoryOptions}
+        leaders={leaderOptions}
+        selectedCategory={selectedCategory}
+        selectedLeader={selectedLeader}
+        onCategoryChange={setSelectedCategory}
+        onLeaderChange={setSelectedLeader}
       />
 
       {isBooksLoading || isBooksFetching ? (

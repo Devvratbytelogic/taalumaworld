@@ -55,7 +55,11 @@ function mapChapterToContentItem(chapter: ChaptersEntity): IChapterItem {
 
 const RECENT_SEARCHES_KEY = 'taaluma_recent_searches';
 
-export default function GlobalSearchBar() {
+interface GlobalSearchBarProps {
+  onSelect?: () => void;
+}
+
+export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -109,6 +113,7 @@ export default function GlobalSearchBar() {
     setQuery('');
     setDebouncedQuery('');
     setIsOpen(false);
+    onSelect?.();
   };
 
   const handleSubmit = (e: React.FormEvent) => {

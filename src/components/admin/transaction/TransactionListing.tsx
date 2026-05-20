@@ -1,5 +1,22 @@
 import { Receipt } from 'lucide-react';
-import { Badge } from '../../ui/badge';
+
+function StatusBadge({ status }: { status: string }) {
+  const s = (status || 'pending').toLowerCase();
+  const styles: Record<string, string> = {
+    completed: 'bg-green-100 text-green-700 border-green-200',
+    paid:      'bg-blue-100 text-blue-700 border-blue-200',
+    failed:    'bg-red-100 text-red-700 border-red-200',
+    pending:   'bg-yellow-100 text-yellow-700 border-yellow-200',
+    refunded:  'bg-purple-100 text-purple-700 border-purple-200',
+    cancelled: 'bg-gray-100 text-gray-600 border-gray-200',
+  };
+  const cls = styles[s] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${cls}`}>
+      {status || 'pending'}
+    </span>
+  );
+}
 import {
   Table,
   TableBody,
@@ -43,8 +60,8 @@ export function TransactionListing({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {transactions.map((txn) => (
-            <TableRow key={txn.id}>
+          {transactions.map((txn, idx) => (
+            <TableRow key={`${txn.id ?? 'no-id'}-${idx}`}>
               <TableCell className="font-mono text-sm max-w-36 truncate">{txn.id}</TableCell>
               <TableCell className="max-w-32 truncate">{txn.user}</TableCell>
               <TableCell className="max-w-40 truncate">{txn.item}</TableCell>
@@ -53,9 +70,7 @@ export function TransactionListing({
                 KSH {txn.amount.toFixed(2)}
               </TableCell>
               <TableCell>
-                <Badge variant={txn.status === 'completed' ? 'default' : 'secondary'}>
-                  {txn.status || 'pending'}
-                </Badge>
+                <StatusBadge status={txn.status} />
               </TableCell>
               <TableCell className="whitespace-nowrap">{txn.date}</TableCell>
             </TableRow>

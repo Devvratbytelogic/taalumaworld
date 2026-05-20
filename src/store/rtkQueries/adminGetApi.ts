@@ -10,6 +10,7 @@ import { IAllFaqsAPIResponse } from '@/types/faqs';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 import { IAllTransactionsAPIResponse } from '@/types/transaction';
 import { IAllContactusDataAPIResponse } from '@/types/contactData';
+import { IAllSubscribersAPIResponse } from '@/types/subscribers';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -109,6 +110,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        /** Subscribers */
+        getAllSubscribers: builder.query<IAllSubscribersAPIResponse, void>({
+            query: () => ({
+                url: `/admin/all-subscriber`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminSubscribers'],
+        }),
     }),
 });
 
@@ -124,4 +134,5 @@ export const {
     useGetAdminProfileQuery,
     useGetAllTransactionsQuery,
     useGetAllContactusDataQuery,
+    useGetAllSubscribersQuery,
 } = clientSideGetApis;

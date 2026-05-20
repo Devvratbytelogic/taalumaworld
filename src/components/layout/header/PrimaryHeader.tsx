@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import toast from '@/utils/toast';
-import { Menu, X, ShoppingCart, BookMarked, LogOut, User } from 'lucide-react';
+import { Menu, X, ShoppingCart, BookMarked, LogOut, User, Home, Info, Phone, HelpCircle, Shield, FileText } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { useGetCartQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
@@ -12,13 +12,14 @@ import Button from '@/components/ui/Button';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import MobileSearchBar from './MobileSearchBar';
-import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { useAuth } from '@/hooks/useAuth';
 import ImageComponent from '@/components/ui/ImageComponent';
 
 export default function PrimaryHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuMounted, setIsMenuMounted] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +56,30 @@ export default function PrimaryHeader() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isUserMenuOpen]);
+
+  // Mount/unmount offcanvas with animation
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsMenuMounted(true);
+    }
+  }, [isMenuOpen]);
+
+  // Lock body scroll when offcanvas is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
+  const closeMenu = () => setIsMenuOpen(false);
+  const handleTransitionEnd = () => {
+    if (!isMenuOpen) setIsMenuMounted(false);
+  };
 
   const handleSignOut = () => {
     clearAuthCookies();
@@ -192,148 +217,180 @@ export default function PrimaryHeader() {
             )}
 
             {/* Mobile Menu Toggle */}
-            <div
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2"
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+              aria-label="Open menu"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </div>
+              <Menu className="h-6 w-6" />
+            </button>
           </div>
         </div>
 
         {/* Mobile Search Bar */}
         <MobileSearchBar />
 
-        {/* Navigation Bar */}
+        {/* Desktop Navigation Bar */}
         <nav className="hidden lg:flex items-center gap-8 border-t py-3">
           <Link
             href={getHomeRoutePath()}
-            className={`transition-colors ${isActive(getHomeRoutePath()) ? 'text-primary' : 'hover:text-primary'
-              }`}
+            className={`transition-colors ${isActive(getHomeRoutePath()) ? 'text-primary' : 'hover:text-primary'}`}
           >
             Home
           </Link>
           <Link
             href={getAboutUsRoutePath()}
-            className={`transition-colors ${isActive(getAboutUsRoutePath()) ? 'text-primary' : 'hover:text-primary'
-              }`}
+            className={`transition-colors ${isActive(getAboutUsRoutePath()) ? 'text-primary' : 'hover:text-primary'}`}
           >
             About Us
           </Link>
           <Link
             href={getContactUsRoutePath()}
-            className={`transition-colors ${isActive(getContactUsRoutePath()) ? 'text-primary' : 'hover:text-primary'
-              }`}
+            className={`transition-colors ${isActive(getContactUsRoutePath()) ? 'text-primary' : 'hover:text-primary'}`}
           >
             Contact
           </Link>
-
-          {/* {contentMode === VISIBLE.BOOK && (
-            <>
-              <Link
-                href={getBooksRoutePath()}
-                className={`transition-colors ${isActive(getBooksRoutePath()) ? 'text-primary' : 'hover:text-primary'
-                  }`}
-              >
-                Books
-              </Link>
-              <Link
-                href={getCategoriesRoutePath()}
-                className={`transition-colors ${isActive(getCategoriesRoutePath()) ? 'text-primary' : 'hover:text-primary'
-                  }`}
-              >
-                Categories
-              </Link>
-              <Link
-                href={getAuthorsRoutePath()}
-                className={`transition-colors ${isActive(getAuthorsRoutePath()) ? 'text-primary' : 'hover:text-primary'
-                  }`}
-              >
-                Thought Leaders
-              </Link>
-            </>
-          )} */}
         </nav>
+      </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t">
-            <nav className="flex flex-col gap-4">
-              <Link href={getHomeRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                Home
-              </Link>
-              <Link href={getAboutUsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                About Us
-              </Link>
-              <Link href={getContactUsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                Contact
-              </Link>
+      {/* Offcanvas Backdrop */}
+      {isMenuMounted && (
+        <div
+          className={`fixed inset-0 z-60 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
+      )}
 
-              {/* {contentMode === VISIBLE.BOOK && (
-                <>
-                  <Link href={getBooksRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                    Books
-                  </Link>
-                  <Link href={getCategoriesRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                    Categories
-                  </Link>
-                  <Link href={getAuthorsRoutePath()} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
-                    Thought Leaders
-                  </Link>
-                </> 
-              )} */}
+      {/* Offcanvas Panel */}
+      {isMenuMounted && (
+        <div
+          onTransitionEnd={handleTransitionEnd}
+          className={`fixed top-0 right-0 z-70 h-full w-[300px] max-w-[85vw] bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          {/* Offcanvas Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b bg-white shrink-0">
+            <Link href={getHomeRoutePath()} onClick={closeMenu}>
+              <div className="h-9 w-[140px]">
+                <ImageComponent
+                  src={logo || '/images/logo.png'}
+                  alt={brandName}
+                  object_cover={false}
+                />
+              </div>
+            </Link>
+            <button
+              onClick={closeMenu}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Offcanvas Body */}
+          <div className="flex-1 overflow-y-auto px-5 py-4">
+            {/* Nav Links */}
+            <nav className="flex flex-col">
+              {[
+                { label: 'Home', href: getHomeRoutePath(), icon: Home },
+                { label: 'About Us', href: getAboutUsRoutePath(), icon: Info },
+                { label: 'Contact', href: getContactUsRoutePath(), icon: Phone },
+              ].map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={closeMenu}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${
+                    isActive(href) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
+                  }`}
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                  {label}
+                </Link>
+              ))}
 
               {isAuthenticated && (
-                <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} onClick={() => setIsMenuOpen(false)} className="py-2 font-medium">
+                <Link
+                  href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`}
+                  onClick={closeMenu}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${
+                    isActive(getUserDashboardRoutePath()) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
+                  }`}
+                >
+                  <BookMarked className="h-5 w-5 shrink-0" />
                   {contentMode === VISIBLE.CHAPTER ? 'My Chapters' : 'My Books'}
                 </Link>
               )}
 
-              <div className="pt-4 border-t">
-                {isAuthenticated ? (
-                  <>
-                    <Link href={isAdmin ? getAdminRoutePath() : getUserDashboardRoutePath()} onClick={() => setIsMenuOpen(false)}>
-                      <button className="w-full flex items-center gap-3 bg-linear-to-r from-primary/10 to-primary/5 rounded-2xl p-3 mb-3">
-                        <div className="h-8 w-8 rounded-full shrink-0 overflow-hidden bg-primary flex items-center justify-center">
-                          {headerUserPhoto ? (
-                            <img
-                              src={headerUserPhoto}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-xs font-semibold text-white">{avatarInitial}</span>
-                          )}
-                        </div>
-                        <span className="text-base">{isAdmin ? 'Admin Panel' : (user?.fullName || 'My Account')}</span>
-                      </button>
-                    </Link>
-                    <Button
-                      className='global_btn rounded_full outline_primary'
-                      onPress={() => {
-                        handleSignOut();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      Sign Out
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    className="w-full"
-                    onPress={() => {
-                      dispatch(openModal({ componentName: 'SignIn', data: '' }));
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    Sign In
-                  </Button>
-                )}
-              </div>
+              <div className="my-3 border-t" />
+
+              {[
+                { label: 'FAQ', href: getFAQRoutePath(), icon: HelpCircle },
+                { label: 'Privacy Policy', href: getPrivacyPolicyRoutePath(), icon: Shield },
+                { label: 'Terms of Service', href: getTermsOfServiceRoutePath(), icon: FileText },
+              ].map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={closeMenu}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${
+                    isActive(href) ? 'text-primary bg-primary/8 font-medium' : 'text-gray-500 hover:bg-gray-50 hover:text-primary'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {label}
+                </Link>
+              ))}
             </nav>
           </div>
-        )}
-      </div>
+
+          {/* Offcanvas Footer */}
+          <div className="shrink-0 px-5 py-4 border-t bg-gray-50">
+            {isAuthenticated ? (
+              <div className="flex flex-col gap-3">
+                <Link
+                  href={isAdmin ? getAdminRoutePath() : getUserDashboardRoutePath()}
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 bg-white rounded-2xl p-3 shadow-xs border border-gray-100 hover:border-primary/30 transition-colors"
+                >
+                  <div className="h-9 w-9 rounded-full shrink-0 overflow-hidden bg-primary flex items-center justify-center">
+                    {headerUserPhoto ? (
+                      <img src={headerUserPhoto} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-semibold text-white">{avatarInitial}</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{isAdmin ? 'Admin Panel' : (user?.fullName || 'My Account')}</p>
+                    {!isAdmin && user?.email && (
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    )}
+                  </div>
+                </Link>
+                <Button
+                  className="global_btn rounded_full outline_primary w-full"
+                  onPress={() => { handleSignOut(); closeMenu(); }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button
+                className="global_btn rounded_full bg_primary w-full"
+                onPress={() => {
+                  dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                  closeMenu();
+                }}
+              >
+                <User className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

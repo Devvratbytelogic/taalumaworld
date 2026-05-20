@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X,
     UserCircle, Book, FileText, Users, FolderTree, LayoutDashboard,
-    MessageSquare, FileEdit, Receipt, Plus,
+    MessageSquare, FileEdit, Receipt, Plus, Mail,
 } from 'lucide-react';
 import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
@@ -31,16 +31,20 @@ const ADMIN_ROUTES = [
     { label: 'Transactions',     description: 'View payment transactions',  path: getAdminSectionRoutePath('transactions'), icon: Receipt,         keywords: ['payment', 'transaction', 'money'] },
     { label: 'Testimonials',     description: 'Manage testimonials',        path: getAdminSectionRoutePath('testimonials'), icon: MessageSquare,   keywords: ['testimonial', 'review', 'feedback'] },
     { label: 'FAQs',             description: 'Manage FAQ entries',         path: getAdminSectionRoutePath('faqs'),         icon: FileEdit,        keywords: ['faq', 'question', 'answer'] },
+    { label: 'Subscribers',      description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'),  icon: Mail,            keywords: ['subscriber', 'newsletter', 'email'] },
     { label: 'Settings',         description: 'Platform settings',          path: getAdminSectionRoutePath('settings'),     icon: Settings,        keywords: ['setting', 'config', 'logo'] },
     { label: 'My Profile',       description: 'Edit your admin profile',    path: getAdminProfileRoutePath(),               icon: UserCircle,      keywords: ['profile', 'me', 'account'] },
 ];
 
-export function AdminHeader() {
+interface AdminHeaderProps {
+    onMobileMenuToggle: () => void;
+}
+
+export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
     const router = useRouter();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
     const { data: globalSettings, isFetching: isSettingsLoading } = useGetAdminGlobalSettingsQuery();
     const { data: profileData } = useGetAdminProfileQuery();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     // ── Navigation search ─────────────────────────────────────────────────────
     const [searchQuery, setSearchQuery] = useState('');
@@ -88,8 +92,6 @@ export function AdminHeader() {
     };
 
     const isAuthor = adminUser.role === 'author' || getUserRole()?.toLowerCase() === 'author';
-
-    const onMobileMenuToggle = () => setMobileMenuOpen(prev => !prev);
 
     const onContentModeToggle = async (isBooks: boolean) => {
         const newMode = isBooks ? 'book' : 'chapter';
@@ -151,7 +153,7 @@ export function AdminHeader() {
                     {/* Logo + mobile toggle */}
                     <div className="flex items-center gap-3">
                         <Button variant="light" size="sm" isIconOnly className="lg:hidden" onPress={onMobileMenuToggle}>
-                            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                            <Menu className="h-5 w-5" />
                         </Button>
                         <Link href="/admin/dashboard" className="flex items-center gap-2 shrink-0">
                             {logo ? (

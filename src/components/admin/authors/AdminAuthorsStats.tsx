@@ -6,12 +6,10 @@ interface AdminAuthorsStatsProps {
   authors: Author[];
 }
 
-export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {
+export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {  
   const totalAuthors = authors.length;
-  const publishedBooks = authors.reduce((sum, a) => sum + (a.booksCount ?? 0), 0);
-  // Avg. Rating and Total Followers can be wired when API supports them
-  const avgRating = '—';
-  const totalFollowers = '—';
+  const publishedBooks = authors.reduce((sum, a) => sum + (a.followersCount ?? 0), 0);
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -37,7 +35,7 @@ export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {
           </div>
         </div>
       </Card>
-      <Card className="p-4 bg-white rounded-3xl shadow-sm border">
+      {/* <Card className="p-4 bg-white rounded-3xl shadow-sm border">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-purple-50 rounded-lg">
             <Star className="h-5 w-5 text-purple-600" />
@@ -58,7 +56,7 @@ export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {
             <p className="text-2xl font-bold">{totalFollowers}</p>
           </div>
         </div>
-      </Card>
+      </Card> */}
     </div>
   );
 }

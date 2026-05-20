@@ -23,12 +23,17 @@ export function AdminTransactionsTab() {
     date: p.date,
   }));
 
-  const filteredTransactions = transactions.filter(
-    (txn) =>
-      txn.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      txn.user?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      txn.item?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTransactions = transactions.filter((txn) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (txn.id ?? '').toLowerCase().includes(q) ||
+      (txn.user ?? '').toLowerCase().includes(q) ||
+      (txn.item ?? '').toLowerCase().includes(q) ||
+      (txn.type ?? '').toLowerCase().includes(q) ||
+      (txn.status ?? '').toLowerCase().includes(q)
+    );
+  });
 
   const totalRevenue = data?.data?.totalRevenue ?? 0;
 

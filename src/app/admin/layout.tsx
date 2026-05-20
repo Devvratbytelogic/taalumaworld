@@ -6,9 +6,16 @@ import { BookOpen, AlertCircle } from 'lucide-react';
 import { Button } from '@heroui/react';
 import {
     LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree,
-    MessageSquare, FileEdit, BarChart3, DollarSign, Shield, Activity,
-    Receipt, FileSpreadsheet, UserCircle, Mail,
+    MessageSquare, FileEdit, UserCircle, Mail, Bell,
 } from 'lucide-react';
+
+function KshIcon({ className }: { className?: string }) {
+    return (
+        <span className={`inline-flex items-center justify-center border-[1.5px] border-current rounded font-bold text-[8px] leading-none tracking-tight shrink-0 ${className ?? ''}`}>
+            KSH
+        </span>
+    );
+}
 
 import { useAdminUser } from '@/hooks/useAdminUser';
 import { canAccessSection } from '@/utils/adminPermissions';
@@ -30,11 +37,12 @@ const NAV_ITEMS = [
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
     // { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
     // { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
-    { id: 'transactions' as AdminSection, label: 'Transactions', icon: Receipt, category: 'commerce' },
+    { id: 'transactions' as AdminSection, label: 'Transactions', icon: KshIcon, category: 'commerce' },
     // { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
     { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
     { id: 'faqs' as AdminSection, label: 'FAQs', icon: FileEdit, category: 'community' },
     { id: 'contact_us' as AdminSection, label: 'Contact Us', icon: Mail, category: 'community' },
+    { id: 'subscribers' as AdminSection, label: 'Subscribers', icon: Bell, category: 'community' },
     // { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
     // { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
     // { id: 'reports' as AdminSection, label: 'Reports', icon: FileSpreadsheet, category: 'analytics' },
@@ -57,6 +65,7 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/testimonials': 'testimonials',
     '/admin/faqs': 'faqs',
     '/admin/all-contact-us': 'contact_us',
+    '/admin/subscribers': 'subscribers',
     // '/admin/moderation': 'moderation',
     '/admin/analytics': 'analytics',
     '/admin/reports': 'reports',
@@ -131,7 +140,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     return (
         <div className="min-h-screen bg-gray-50 admin_panel">
 
-            <AdminHeader />
+            <AdminHeader onMobileMenuToggle={() => setMobileMenuOpen(prev => !prev)} />
 
             <div className="container mx-auto sm:px-4 py-8">
                 <div className="flex flex-col lg:flex-row gap-8">

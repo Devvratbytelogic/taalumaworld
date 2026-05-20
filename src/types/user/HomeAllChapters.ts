@@ -39,6 +39,7 @@ export interface IBookItem {
   subcategory: ICategory | null;
   isPurchased: boolean;
   canRead: boolean;
+  isCart: boolean;
   chapters: IBookChapterItem[];
 }
 
@@ -58,6 +59,8 @@ export interface IChapterItem {
   authorAvatar: string | null;
   category: ICategory;
   subcategory: ICategory | null;
+  canRead: boolean;
+  isCart: boolean;
 }
 
 /** A chapter embedded inside an IBookItem */
@@ -71,6 +74,7 @@ export interface IBookChapterItem {
   content: string;
   isFree: boolean;
   canRead: boolean;
+  isCart?: boolean;
   coverImage: string;
   pdf: string | null;
   price: number;

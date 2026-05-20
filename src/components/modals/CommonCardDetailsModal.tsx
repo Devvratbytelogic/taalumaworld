@@ -216,6 +216,10 @@ function BookModalContent({
                   onAddToCart={() => {
                     if (!isAuthenticated) onLoginRequired('cart', 'chapter')
                   }}
+                  onGoToCart={() => {
+                    dispatch(closeModal())
+                    router.push(getCartRoutePath())
+                  }}
                   bookId={chapter.id}
                 />
               ))}
@@ -262,6 +266,14 @@ function BookModalContent({
             >
               Buy Complete Book - KSH {chapter.price.toFixed(2)}
             </Button>
+          ) : chapter.isCart ? (
+            <Button
+              className="global_btn rounded_full bg_primary w-full"
+              onPress={() => { dispatch(closeModal()); router.push(getCartRoutePath()) }}
+              startContent={<ShoppingCart className="h-4 w-4" />}
+            >
+              Go to Cart
+            </Button>
           ) : (
             <AddToCartButton
               chapterId={chapter.id}
@@ -294,6 +306,7 @@ function BookChapterRow({
   onLoginRequired,
   onRead,
   onAddToCart,
+  onGoToCart,
   bookId,
 }: {
   chapter: IBookChapterItem
@@ -302,6 +315,7 @@ function BookChapterRow({
   onLoginRequired: () => void
   onRead: () => void
   onAddToCart: () => void
+  onGoToCart: () => void
   bookId: string
 }) {
   const renderAction = () => {
@@ -338,6 +352,18 @@ function BookChapterRow({
       )
     }
 
+    if (chapter.isCart) {
+      return (
+        <Button
+          className="global_btn rounded_full outline_primary text-sm px-3 py-1 h-auto min-h-0"
+          onPress={onGoToCart}
+          startContent={<ShoppingCart className="h-3.5 w-3.5" />}
+        >
+          Go to Cart
+        </Button>
+      )
+    }
+
     return (
       <AddToCartButton
         chapterId={chapter._id}
@@ -346,6 +372,7 @@ function BookChapterRow({
         price={chapter.price}
         className="global_btn rounded_full outline_primary text-sm px-3 py-1 h-auto min-h-0"
         label={`KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
+        onSuccess={onGoToCart}
       />
     )
   }
@@ -398,6 +425,12 @@ function ChapterModalContent({
   const isBookPricing = bookData?.pricingModel === 'book'
   const bookPrice: number = bookData?.price ?? 0
   const bookDbId: string = bookData?._id ?? ''
+  const isCart = chapter?.isCart
+
+  const handleGoToCart = () => {
+    dispatch(closeModal())
+    router.push(getCartRoutePath())
+  }
 
   const renderFooter = () => {
     if (chapter.isFree || chapter.canRead) {
@@ -417,6 +450,13 @@ function ChapterModalContent({
           </Button>
         )
       }
+      if (isCart) {
+        return (
+          <Button className="global_btn rounded_full bg_primary w-full" onPress={handleGoToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+            Go to Cart
+          </Button>
+        )
+      }
       return (
         <AddToCartButton
           chapterId={bookDbId}
@@ -425,10 +465,7 @@ function ChapterModalContent({
           price={bookPrice}
           className="global_btn rounded_full bg_primary w-full"
           label={`Buy Complete Book - KSH ${bookPrice.toFixed(2)}`}
-          onSuccess={() => {
-            dispatch(closeModal())
-            router.push(getCartRoutePath())
-          }}
+          onSuccess={handleGoToCart}
         />
       )
     }
@@ -441,6 +478,13 @@ function ChapterModalContent({
         </Button>
       )
     }
+    if (isCart) {
+      return (
+        <Button className="global_btn rounded_full bg_primary w-full" onPress={handleGoToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+          Go to Cart
+        </Button>
+      )
+    }
     return (
       <AddToCartButton
         chapterId={chapter.id}
@@ -449,10 +493,7 @@ function ChapterModalContent({
         price={chapter.price}
         className="global_btn rounded_full bg_primary w-full"
         label={`Add to Cart - KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
-        onSuccess={() => {
-          dispatch(closeModal())
-          router.push(getCartRoutePath())
-        }}
+        onSuccess={handleGoToCart}
       />
     )
   }

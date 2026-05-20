@@ -5,9 +5,9 @@ const ADMIN_ROLES = ['admin', 'author'];
 const USER_ROLES = ['user'];
 const ADMIN_PATH_PREFIX = '/admin';
 /** Paths accessible only by the "user" role (not admin/author) */
-const USER_ROLE_ONLY_PATHS = ['/user-dashboard'];
+const USER_ROLE_ONLY_PATHS: string[] = [];
 /** Paths that require any authenticated user, regardless of role */
-const AUTH_REQUIRED_PATHS = ['/read-book', '/read-chapter'];
+const AUTH_REQUIRED_PATHS = ['/user-dashboard', '/read-book', '/read-chapter'];
 
 function isAdminPath(pathname: string): boolean {
     return pathname === ADMIN_PATH_PREFIX || pathname.startsWith(ADMIN_PATH_PREFIX + '/');
@@ -37,8 +37,7 @@ function isUserRole(role: string | undefined): boolean {
  * Route protection by role (used by middleware):
  * - Not logged in         → block /admin/*, /user-dashboard, /read-book/*, /read-chapter/* → redirect to /
  * - Logged in as "user"   → block /admin/*                    → redirect to /
- * - Logged in as admin    → block /user-dashboard             → redirect to /
- * - Any logged-in role    → allow /read-book/*, /read-chapter/*
+ * - Any logged-in role    → allow /user-dashboard, /read-book/*, /read-chapter/*
  */
 export async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
@@ -72,7 +71,6 @@ export async function proxy(request: NextRequest) {
         if (isUserRoleOnlyPath(pathname) && !isUserRole(userRole)) {
             return redirectToHome();
         }
-        // /read-book and /read-chapter are open to any authenticated role
     }
 
     return NextResponse.next();

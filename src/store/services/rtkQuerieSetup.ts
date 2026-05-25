@@ -17,9 +17,23 @@ interface IAPIResponse<T = unknown> {
 
 interface IAPIError {
     data: {
-        message?: string;
+        message?: unknown;
     };
     error?: string;
+}
+
+/** HeroUI toast descriptions must be strings — API errors may return nested objects. */
+function toToastMessage(value: unknown, fallback = 'Unknown error'): string {
+    if (typeof value === 'string' && value.trim()) return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (value && typeof value === 'object') {
+        const obj = value as Record<string, unknown>;
+        for (const key of ['message', 'response', 'error', 'description']) {
+            const extracted = toToastMessage(obj[key], '');
+            if (extracted) return extracted;
+        }
+    }
+    return fallback;
 }
 
 const baseQuery = fetchBaseQuery({
@@ -54,12 +68,12 @@ const baseQueryWithAuth: BaseQueryFn<
             const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string } };
             const status = errorData?.status;
             const responseData = errorData?.data;
-            const message = (responseData as { message?: string })?.message || "Unknown API error";
+            const message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
             // Suppress silent background errors (401, 403, 404) but show all other errors to the user
             // const SILENT_STATUSES = [401, 403, 404];
             // const shouldShowToast = !status || !SILENT_STATUSES.includes(status);
             // if (shouldShowToast) {
-                addToast({ title: "Error", description: responseData?.message ?? "Unknown error", color: "danger", timeout: 2000 });
+                addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
             // }
             return {
                 error: {
@@ -81,7 +95,12 @@ const baseQueryWithAuth: BaseQueryFn<
                 error: error.message,
             };
 
-            addToast({ title: "Error", description: errorResponse?.error ?? "An unexpected error occurred", color: "danger", timeout: 2000 })
+            addToast({
+                title: 'Error',
+                description: toToastMessage(errorResponse?.error, 'An unexpected error occurred'),
+                color: 'danger',
+                timeout: 2000,
+            });
         } else {
             errorResponse = {
                 status: "CUSTOM_ERROR",

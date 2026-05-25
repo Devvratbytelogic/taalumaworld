@@ -50,6 +50,7 @@ const defaultValues = {
   linkdin_link: '',
   pinterest_link: '',
   whatsapp_link: '',
+  tiktok_link: '',
   emailNotificationsNewUsers: false,
   emailNotificationsPurchases: false,
   dailySummaryReports: false,
@@ -131,6 +132,7 @@ export function GeneralSettingsCard() {
     linkdin_link: data?.linkdin_link ?? '',
     pinterest_link: data?.pinterest_link ?? '',
     whatsapp_link: data?.whatsapp_link ?? '',
+    tiktok_link: data?.tiktok_link ?? '',
     emailNotificationsNewUsers: data?.emailNotificationsNewUsers ?? false,
     emailNotificationsPurchases: data?.emailNotificationsPurchases ?? false,
     dailySummaryReports: data?.dailySummaryReports ?? false,
@@ -424,6 +426,7 @@ export function GeneralSettingsCard() {
                   ['linkdin_link', 'LinkedIn', 'https://linkedin.com/...'],
                   ['pinterest_link', 'Pinterest', 'https://pinterest.com/...'],
                   ['whatsapp_link', 'WhatsApp', 'https://wa.me/...'],
+                  ['tiktok_link', 'TikTok', 'https://tiktok.com/@...'],
                 ] as [string, string, string][]
               ).map(([name, label, placeholder]) => {
                 const key = name as keyof FormValues;

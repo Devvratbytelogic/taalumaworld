@@ -31,6 +31,7 @@ export interface IGlobalSettingsAPIResponse {
     linkdin_link: string;
     pinterest_link: string;
     whatsapp_link: string;
+    tiktok_link: string;
     microsoft_clarity: string;
     bing_tracking_code: string;
     created_by: number;

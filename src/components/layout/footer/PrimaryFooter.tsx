@@ -6,7 +6,7 @@ import { openModal } from '@/store/slices/allModalSlice';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react';
-import { FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon, PinterestIcon, WhatsAppIcon } from '@/components/ui/AllSVG';
+import { FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon, PinterestIcon, WhatsAppIcon, TikTokIcon } from '@/components/ui/AllSVG';
 import { Input } from '@/components/ui/input';
 import { Button } from '@heroui/react';
 import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
@@ -43,6 +43,7 @@ export default function PrimaryFooter() {
         { href: settings?.linkdin_link, icon: LinkedinIcon, label: 'LinkedIn' },
         { href: settings?.pinterest_link, icon: PinterestIcon, label: 'Pinterest' },
         { href: settings?.whatsapp_link, icon: WhatsAppIcon, label: 'WhatsApp' },
+        { href: settings?.tiktok_link, icon: TikTokIcon, label: 'TikTok' },
     ].filter((s) => !!s.href);
 
 

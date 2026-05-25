@@ -251,6 +251,7 @@ export const globalSettingsSchema = Yup.object({
   linkdin_link: urlSchema,
   pinterest_link: urlSchema,
   whatsapp_link: urlSchema,
+  tiktok_link: urlSchema,
   // Notifications
   emailNotificationsNewUsers: Yup.boolean(),
   emailNotificationsPurchases: Yup.boolean(),

@@ -15,6 +15,7 @@ import {
     LinkedinIcon,
     PinterestIcon,
     WhatsAppIcon,
+    TikTokIcon,
 } from '@/components/ui/AllSVG'
 import Link from 'next/link'
 
@@ -36,6 +37,7 @@ export default function ContactUsPage() {
         { href: gs?.linkdin_link, label: 'LinkedIn', Icon: LinkedinIcon, colorClass: 'text-blue-600', bgClass: 'bg-blue-600/10' },
         { href: gs?.pinterest_link, label: 'Pinterest', Icon: PinterestIcon, colorClass: 'text-red-600', bgClass: 'bg-red-600/10' },
         { href: gs?.whatsapp_link, label: 'WhatsApp', Icon: WhatsAppIcon, colorClass: 'text-success', bgClass: 'bg-success/10' },
+        { href: gs?.tiktok_link, label: 'TikTok', Icon: TikTokIcon, colorClass: 'text-foreground', bgClass: 'bg-foreground/10' },
     ].filter(({ href }) => !!href);
 
     return (

@@ -237,7 +237,7 @@ export function MyBooksPage() {
 
                     {/* Book Details */}
                     <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">
-                      <span>{book.chapterCount} chapters</span>
+                      <span>{book.chapterCount} blueprints</span>
                       <span className={status.color}>{status.label}</span>
                     </div>
                   </div>

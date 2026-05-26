@@ -62,7 +62,7 @@ function fileToDataUrl(file: File): Promise<string> {
 export function RichTextEditor({
   value,
   onChange,
-  placeholder = 'Write your chapter content here...',
+  placeholder = 'Write your blueprint content here...',
   disabled = false,
   minHeight = '280px',
   className,

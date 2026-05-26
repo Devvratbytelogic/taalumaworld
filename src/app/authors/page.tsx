@@ -180,7 +180,7 @@ function AuthorDetail({ id }: { id: string }) {
         {/* Content section */}
         <div className="mb-6">
           <h2 className="text-xl font-bold">
-            {contentMode === VISIBLE.BOOK ? 'Books' : 'Chapters'}
+            {contentMode === VISIBLE.BOOK ? 'Books' : 'Blueprints'}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">Content by {author?.fullName}</p>
         </div>
@@ -227,7 +227,7 @@ function AuthorDetail({ id }: { id: string }) {
                     <h3 className="font-bold line-clamp-1">{contentItem.title}</h3>
                     {!isBook && (
                       <p className="text-sm text-muted-foreground">
-                        Ch. {(contentItem as IChapterItem).chapterNumber} · {(contentItem as IChapterItem).bookTitle}
+                        Bp. {(contentItem as IChapterItem).chapterNumber} · {(contentItem as IChapterItem).bookTitle}
                       </p>
                     )}
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-1">

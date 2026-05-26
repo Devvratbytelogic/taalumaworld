@@ -168,7 +168,7 @@ export const addChapterSchema = Yup.object({
   bookId: Yup.string().required('Please select a book'),
   title: Yup.string()
     .trim()
-    .required('Please enter a chapter title'),
+    .required('Please enter a blueprint title'),
   description: Yup.string(),
   content: Yup.string(),
   sequence: Yup.number()
@@ -186,8 +186,8 @@ export const addChapterSchema = Yup.object({
       then: (schema) => schema.min(0).optional(),
       otherwise: (schema) =>
         schema
-          .min(1, 'Price must be greater than 0 for paid chapters')
-          .required('Price is required when chapter is not free'),
+          .min(1, 'Price must be greater than 0 for paid blueprints')
+          .required('Price is required when blueprint is not free'),
     }),
   status: Yup.string().required('Status is required'),
   cover_image: Yup.mixed().required('Cover image is required'),

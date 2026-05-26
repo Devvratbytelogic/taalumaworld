@@ -125,7 +125,7 @@ export default function PrimaryHeader() {
             {isAuthenticated && (
               <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 hover:text-primary transition-colors">
                 <BookMarked className="h-5 w-5" />
-                <span className="font-medium text-sm">{contentMode === VISIBLE.BOOK ? 'My Books' : 'My Chapters'}</span>
+                <span className="font-medium text-sm">{contentMode === VISIBLE.BOOK ? 'My Books' : 'My Blueprints'}</span>
               </Link>
             )}
 
@@ -319,7 +319,7 @@ export default function PrimaryHeader() {
                   }`}
                 >
                   <BookMarked className="h-5 w-5 shrink-0" />
-                  {contentMode === VISIBLE.CHAPTER ? 'My Chapters' : 'My Books'}
+                  {contentMode === VISIBLE.CHAPTER ? 'My Blueprints' : 'My Books'}
                 </Link>
               )}
 

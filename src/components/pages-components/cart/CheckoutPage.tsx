@@ -114,11 +114,11 @@ export function CheckoutPage() {
 
             <h1 className="text-3xl font-bold mb-3">Purchase Complete! 🎉</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Your chapters are now unlocked and ready to read
+              Your blueprints are now unlocked and ready to read
             </p>
 
             <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left">
-              <h2 className="font-bold mb-4">Your New Chapters</h2>
+              <h2 className="font-bold mb-4">Your New Blueprints</h2>
               <div className="space-y-3">
                 {purchasedChapters.map((chapter) => {
                   const book = books.find((b) => b.id === chapter.bookId);

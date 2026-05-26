@@ -48,7 +48,7 @@ export function DashboardHome() {
         </h1>
         <p className="text-muted-foreground">
           {displayMode === 'chapters'
-            ? "Continue your reading journey or explore new chapters"
+            ? "Continue your reading journey or explore new blueprints"
             : "Continue your reading journey or explore new books"}
         </p>
       </div>
@@ -69,12 +69,12 @@ export function DashboardHome() {
               </div>
               <ArrowRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <h3 className="text-xl font-bold mb-2">My Chapters</h3>
+            <h3 className="text-xl font-bold mb-2">My Blueprints</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              {ownedChapters.length} {ownedChapters.length === 1 ? 'chapter' : 'chapters'} owned
+              {ownedChapters.length} {ownedChapters.length === 1 ? 'blueprint' : 'blueprints'} owned
             </p>
             <p className="text-sm text-muted-foreground">
-              Access all your purchased chapters
+              Access all your purchased blueprints
             </p>
           </button>
         ) : (
@@ -130,7 +130,7 @@ export function DashboardHome() {
             <ArrowRight className="h-5 w-5 text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <h3 className="text-xl font-bold mb-2">
-            {displayMode === 'chapters' ? 'Explore Chapters' : 'Explore Books'}
+            {displayMode === 'chapters' ? 'Explore Blueprints' : 'Explore Books'}
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
             Discover new stories

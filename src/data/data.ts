@@ -73,7 +73,7 @@ export const aboutBannerData: bannerProps = {
     description:
         "We are on a mission to bridge the gap between academic theory and real-world execution. At Taaluma, you aren't just consuming content—you are upgrading your Career Operating System with validatable proof and strategic blueprints.",
     primaryCta: {
-        title: 'Explore Chapters',
+        title: 'Explore Blueprints',
         button_status: false,
     },
     secondaryCta: {

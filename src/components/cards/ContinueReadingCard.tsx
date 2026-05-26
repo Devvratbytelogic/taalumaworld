@@ -44,7 +44,7 @@ export function ContinueReadingCard({
         <div className="flex-1 pt-4 px-4 pb-4 flex flex-col gap-2.5">
           {/* Chapter Number Badge */}
           <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2.5 py-0.5 text-sm font-medium w-fit">
-            Chapter {chapter.sequence}
+            Blueprint {chapter.sequence}
           </Badge>
 
           {/* Chapter Title */}

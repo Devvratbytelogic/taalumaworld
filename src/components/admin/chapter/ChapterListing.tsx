@@ -61,7 +61,7 @@ export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setD
     setUpdatingId(chapter.id);
     try {
       await updateChapter({ id: chapter.id, values: formData }).unwrap();
-      toast.success(`Chapter marked as ${status}`);
+      toast.success(`Blueprint marked as ${status}`);
     } catch {
       toast.error('Failed to update status');
     } finally {
@@ -75,7 +75,7 @@ export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setD
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Chapter Title</TableHead>
+              <TableHead>Blueprint Title</TableHead>
               <TableHead>Book</TableHead>
               <TableHead>Thought Leader</TableHead>
               <TableHead>Price</TableHead>
@@ -101,7 +101,7 @@ export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setD
                       <div className="min-w-0">
                         <div className="font-medium line-clamp-1 truncate max-w-40">{chapter.title}</div>
                         <div className="text-sm text-muted-foreground line-clamp-1">
-                          Chapter {chapter.number}
+                          Blueprint {chapter.number}
                         </div>
                       </div>
                     </div>
@@ -196,11 +196,11 @@ export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setD
                 <FileText className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold">No chapters found</h3>
+                <h3 className="font-bold">No blueprints found</h3>
                 <p className="text-muted-foreground">
                   {searchQuery.trim()
-                    ? `No chapters match "${searchQuery}"`
-                    : 'Create your first chapter to get started'}
+                    ? `No blueprints match "${searchQuery}"`
+                    : 'Create your first blueprint to get started'}
                 </p>
               </div>
             </div>

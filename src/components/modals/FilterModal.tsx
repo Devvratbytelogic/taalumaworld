@@ -81,10 +81,10 @@ export default function FilterModal() {
   const allTags = tagsResponse?.data?.tags ?? [];
 
   const progressFilters = [
-    { id: 'continueReading', label: 'Continue Reading', icon: BookOpen, description: 'Chapters you started' },
-    { id: 'unread', label: 'Unread Chapters', icon: BookMarked, description: 'New chapters to explore' },
-    { id: 'freeToRead', label: 'Free to Read', icon: Gift, description: 'Free chapters available' },
-    { id: 'purchased', label: 'Purchased', icon: CheckCircle, description: 'Chapters you own' },
+    { id: 'continueReading', label: 'Continue Reading', icon: BookOpen, description: 'Blueprints you started' },
+    { id: 'unread', label: 'Unread Blueprints', icon: BookMarked, description: 'New blueprints to explore' },
+    { id: 'freeToRead', label: 'Free to Read', icon: Gift, description: 'Free blueprints available' },
+    { id: 'purchased', label: 'Purchased', icon: CheckCircle, description: 'Blueprints you own' },
   ];
 
   const handleProgressFilterToggle = (filterId: string) => {
@@ -151,7 +151,7 @@ export default function FilterModal() {
             </div>
             <div>
               <h2 className="text-xl font-bold tracking-tight">
-                Filter {displayMode === 'chapters' ? 'Chapters' : 'Books'}
+                Filter {displayMode === 'chapters' ? 'Blueprints' : 'Books'}
               </h2>
               <div className="text-sm font-normal text-muted-foreground">
                 {activeFilterCount > 0 && (
@@ -173,7 +173,7 @@ export default function FilterModal() {
                   <span className="font-semibold text-sm text-primary tracking-tight">Reading Progress</span>
                 </div>
                 <p className="text-sm text-muted-foreground tracking-tight">
-                  Filter chapters based on your reading journey
+                  Filter blueprints based on your reading journey
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

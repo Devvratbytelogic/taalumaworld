@@ -32,7 +32,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                 <div className="absolute top-3.5 right-3.5">
                     {isBook ? (
                         <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium ${data.pricingModel === VISIBLE.BOOK ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
-                            {data.pricingModel === VISIBLE.BOOK ? 'Full Book' : 'By Chapter'}
+                            {data.pricingModel === VISIBLE.BOOK ? 'Full Book' : 'By Blueprint'}
                         </Badge>
                     ) : data.isFree ? (
                         <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium">
@@ -98,7 +98,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                         {isBook &&
                             <>
                                 <BookOpen className="h-4 w-4" />
-                                <span>{data.chapterCount} chapters</span>
+                                <span>{data.chapterCount} blueprints</span>
                             </>
                         }
                     </div>
@@ -107,7 +107,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                         data.price > 0 ? (
                             <span className="font-semibold text-lg text-primary">KSH {data.price.toFixed(2)}</span>
                         ) : (
-                            <span className="text-primary text-sm tracking-tight">View Chapters</span>
+                            <span className="text-primary text-sm tracking-tight">View Blueprints</span>
                         )
                     ) : (
                         data.isFree ? (

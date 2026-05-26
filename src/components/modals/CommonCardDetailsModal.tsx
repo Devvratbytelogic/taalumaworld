@@ -177,7 +177,7 @@ function BookModalContent({
           <div className="flex items-center justify-between p-4 bg-accent/40 rounded-2xl border border-border">
             <div>
               <p className="font-semibold text-sm tracking-tight">Complete Book</p>
-              <p className="text-sm text-muted-foreground">Access all {chapter.chapterCount} chapters</p>
+              <p className="text-sm text-muted-foreground">Access all {chapter.chapterCount} blueprints</p>
             </div>
             <span className="font-bold text-2xl text-primary">KSH {chapter.price.toFixed(2)}</span>
           </div>
@@ -187,7 +187,7 @@ function BookModalContent({
         {!isFullBook && (
           <div className="p-4 bg-accent/40 rounded-2xl border border-border">
             <p className="font-semibold text-sm tracking-tight mb-0.5">Purchase Options</p>
-            <p className="text-sm text-muted-foreground">Purchase individual chapters below</p>
+            <p className="text-sm text-muted-foreground">Purchase individual blueprints below</p>
           </div>
         )}
 
@@ -196,7 +196,7 @@ function BookModalContent({
           <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-primary" />
             <h3 className="font-semibold text-sm tracking-tight">
-              Chapters {chapter.chapterCount > 0 ? `(${chapter.chapterCount})` : bookChapters.length > 0 ? `(${bookChapters.length})` : ''}
+              Blueprints {chapter.chapterCount > 0 ? `(${chapter.chapterCount})` : bookChapters.length > 0 ? `(${bookChapters.length})` : ''}
             </h3>
           </div>
 
@@ -225,7 +225,7 @@ function BookModalContent({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground py-2">No chapters available yet.</p>
+            <p className="text-sm text-muted-foreground py-2">No blueprints available yet.</p>
           )}
         </div>
 
@@ -387,7 +387,7 @@ function BookChapterRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
           <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2 py-0 text-sm">
-            Chapter {chapter.number}
+            Blueprint {chapter.number}
           </Badge>
         </div>
         <p className="font-medium text-sm line-clamp-1 tracking-tight">{chapter.title}</p>
@@ -436,7 +436,7 @@ function ChapterModalContent({
     if (chapter.isFree || chapter.canRead) {
       return (
         <Button className="global_btn rounded_full bg_primary w-full" onPress={onReadClick} startContent={<BookOpen className="h-4 w-4" />}>
-          {chapter.isFree ? 'Read Free Chapter' : 'Read Chapter'}
+          {chapter.isFree ? 'Read Free Blueprint' : 'Read Blueprint'}
         </Button>
       )
     }
@@ -505,7 +505,7 @@ function ChapterModalContent({
         <div className="space-y-2 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-sm font-medium">
-              Chapter {chapter.chapterNumber}
+              Blueprint {chapter.chapterNumber}
             </Badge>
             {chapter.isFree && (
               <Badge className="bg-success/10 text-success border-success/20 rounded-full px-3 py-1 text-sm font-medium">
@@ -535,7 +535,7 @@ function ChapterModalContent({
         {/* Description */}
         {chapter.description && (
           <div className="min-w-0">
-            <h3 className="font-semibold text-sm mb-1.5 tracking-tight">About this Chapter</h3>
+            <h3 className="font-semibold text-sm mb-1.5 tracking-tight">About this Blueprint</h3>
             <p className="text-sm text-muted-foreground leading-relaxed tracking-tight wrap-break-word">
               {chapter.description}
             </p>

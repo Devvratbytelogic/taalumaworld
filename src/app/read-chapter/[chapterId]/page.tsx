@@ -165,7 +165,7 @@ export default function ReadChapterPage() {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
         <div className="bg-white rounded-3xl p-8 max-w-md text-center">
-          <p className="text-lg font-semibold mb-4">Chapter not found</p>
+          <p className="text-lg font-semibold mb-4">Blueprint not found</p>
           <Button onPress={onClose} className="global_btn rounded_full outline_primary">
             Go Back
           </Button>
@@ -200,7 +200,7 @@ export default function ReadChapterPage() {
               </h1>
               {book && (
                 <p className="text-sm text-muted-foreground truncate">
-                  {book.title} • Chapter {currentChapter.chapterNumber}
+                  {book.title} • Blueprint {currentChapter.chapterNumber}
                 </p>
               )}
             </div>
@@ -226,7 +226,7 @@ export default function ReadChapterPage() {
           {/* Chapter Title */}
           <div className="mb-10 text-center">
             <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm mb-3">
-              Chapter {currentChapter.chapterNumber}
+              Blueprint {currentChapter.chapterNumber}
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">{currentChapter.title}</h1>
             {currentChapter.description && (
@@ -240,7 +240,7 @@ export default function ReadChapterPage() {
           ) : (
             <MarkdownContent
               content={currentChapter.content}
-              emptyMessage="No content available for this chapter."
+              emptyMessage="No content available for this blueprint."
             />
           )}
 
@@ -249,10 +249,10 @@ export default function ReadChapterPage() {
             <div className="my-4 sm:mt-16 sm:mb-8 text-center">
               <div className="inline-block border-t border-border w-32 mb-6" />
               <p className="text-sm text-muted-foreground mb-4">
-                End of Chapter {currentChapter.chapterNumber}
+                End of Blueprint {currentChapter.chapterNumber}
               </p>
               <Button onPress={handleNextChapter} className="global_btn rounded_full bg_primary">
-                Continue to Next Chapter
+                Continue to Next Blueprint
               </Button>
             </div>
           )}
@@ -261,7 +261,7 @@ export default function ReadChapterPage() {
             <div className="my-4 sm:mt-16 sm:mb-8 text-center">
               <div className="inline-block border-t border-border w-32 mb-6" />
               <p className="text-sm text-muted-foreground">
-                You&apos;ve reached the end of available chapters
+                You&apos;ve reached the end of available blueprints
               </p>
             </div>
           )}
@@ -275,7 +275,7 @@ export default function ReadChapterPage() {
       >
         <div className="max-w-4xl mx-auto px-3 py-3 sm:px-4 sm:py-4 grid grid-cols-2 gap-x-2 gap-y-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="col-span-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm tabular-nums sm:order-2 sm:flex-none">
-            <span className="text-muted-foreground">Chapter</span>
+            <span className="text-muted-foreground">Blueprint</span>
             <span className="font-semibold">{currentChapter.chapterNumber}</span>
             {bookChapters.length > 0 && (
               <>
@@ -291,7 +291,7 @@ export default function ReadChapterPage() {
             className="global_btn rounded_full outline_primary min-w-0 sm:order-1 sm:w-auto"
             startContent={<ChevronLeft className="h-4 w-4 shrink-0" />}
           >
-            <span className="hidden sm:inline">Previous Chapter</span>
+            <span className="hidden sm:inline">Previous Blueprint</span>
             <span className="sm:hidden truncate">Previous</span>
           </Button>
 
@@ -301,7 +301,7 @@ export default function ReadChapterPage() {
             className="global_btn rounded_full bg_primary min-w-0 sm:order-3 sm:w-auto"
             endContent={<ChevronRight className="h-4 w-4 shrink-0" />}
           >
-            <span className="hidden sm:inline">Next Chapter</span>
+            <span className="hidden sm:inline">Next Blueprint</span>
             <span className="sm:hidden truncate">Next</span>
           </Button>
         </div>

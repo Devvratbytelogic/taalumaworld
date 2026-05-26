@@ -130,13 +130,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         setFeaturedImageFile(null);
         setFeaturedImagePreviewUrl(null);
         setPdfFile(null);
-        toast.success('Chapter updated successfully');
+        toast.success('Blueprint updated successfully');
         router.push(`/admin/chapters`);
       } catch (err: unknown) {
         const message =
           (err as { data?: { message?: string }; message?: string })?.data?.message ||
           (err as { message?: string })?.message ||
-          'Failed to update chapter';
+          'Failed to update blueprint';
         toast.error(message);
       }
     },
@@ -263,7 +263,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           <Textarea
             id="chapter-desc"
             name="description"
-            placeholder="Brief description of the chapter..."
+            placeholder="Brief description of the blueprint..."
             value={values.description}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -274,11 +274,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label>Chapter content</Label>
+          <Label>Blueprint content</Label>
           <RichTextEditor
             value={values.content}
             onChange={(html) => setFieldValue('content', html)}
-            placeholder="Write your chapter content here. Use the toolbar for headings, bold, lists, etc."
+            placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
             disabled={isSubmittingState}
             minHeight="320px"
           />
@@ -290,7 +290,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             <span className="font-medium">Upload PDF (optional)</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Attach a PDF file for this chapter. The file can be stored and linked for readers.
+            Attach a PDF file for this blueprint. The file can be stored and linked for readers.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <label className="border-input bg-input-background focus-visible:border-ring flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50">
@@ -317,7 +317,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="chapter-sequence">Chapter Number<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-sequence">Blueprint Number<span className="text-red-500">*</span></Label>
             <Input
               id="chapter-sequence"
               name="sequence"
@@ -386,7 +386,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                     disabled={isSubmittingState}
                   />
                   <Label htmlFor="chapter-free" className="cursor-pointer">
-                    Free chapter
+                    Free blueprint
                   </Label>
                 </div>
               </div>
@@ -422,7 +422,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             </>
           ) : (
             <div className="space-y-2 flex flex-col justify-end text-sm text-muted-foreground">
-              <span>Pricing is set at book level; this chapter has no separate price.</span>
+              <span>Pricing is set at book level; this blueprint has no separate price.</span>
             </div>
           )}
           <div className="space-y-2 max-w-xs">
@@ -476,7 +476,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-square max-w-32">
                 <img
                   src={showCoverPreview}
-                  alt="Chapter preview"
+                  alt="Blueprint preview"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -510,7 +510,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           isDisabled={isSubmittingState || books.length === 0 || !chapter}
           isLoading={isSubmittingState}
         >
-          Update Chapter
+          Update Blueprint
         </Button>
         <Link href={getAdminSectionRoutePath('chapters')}>
           <Button

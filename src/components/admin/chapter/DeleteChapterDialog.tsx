@@ -26,7 +26,7 @@ export function DeleteChapterDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Delete Chapter</DialogTitle>
+          <DialogTitle>Delete Blueprint</DialogTitle>
           <DialogDescription>
             {chapter
               ? `Are you sure you want to delete "${chapter.title}"? This cannot be undone.`

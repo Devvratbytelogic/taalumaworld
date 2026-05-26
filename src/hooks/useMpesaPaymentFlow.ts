@@ -202,7 +202,7 @@ export function useMpesaPaymentFlow({
               setErrorState({
                 title: 'Could not finalise purchase',
                 description:
-                  'Your payment was received but we could not unlock the chapter. Please contact support.',
+                  'Your payment was received but we could not unlock the blueprint. Please contact support.',
               });
               setIsWaiting(true);
             }

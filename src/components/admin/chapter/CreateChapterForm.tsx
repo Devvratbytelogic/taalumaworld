@@ -100,13 +100,13 @@ export function CreateChapterForm() {
         setFeaturedImagePreviewUrl(null);
         setPdfFile(null);
         resetForm({ values: initialFormValues });
-        toast.success('Chapter created successfully');
+        toast.success('Blueprint created successfully');
         router.push(`/admin/chapters`);
       } catch (err: unknown) {
         const message =
           (err as { data?: { message?: string }; message?: string })?.data?.message ||
           (err as { message?: string })?.message ||
-          'Failed to create chapter';
+          'Failed to create blueprint';
         toast.error(message);
       }
     },
@@ -230,7 +230,7 @@ export function CreateChapterForm() {
           <Textarea
             id="chapter-desc"
             name="description"
-            placeholder="Brief description of the chapter..."
+            placeholder="Brief description of the blueprint..."
             value={values.description}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -241,11 +241,11 @@ export function CreateChapterForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Chapter content</Label>
+          <Label>Blueprint content</Label>
           <RichTextEditor
             value={values.content}
             onChange={(html) => setFieldValue('content', html)}
-            placeholder="Write your chapter content here. Use the toolbar for headings, bold, lists, etc."
+            placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
             disabled={isSubmittingState}
             minHeight="320px"
           />
@@ -257,7 +257,7 @@ export function CreateChapterForm() {
             <span className="font-medium">Upload PDF (optional)</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Attach a PDF file for this chapter. The file can be stored and linked for readers.
+            Attach a PDF file for this blueprint. The file can be stored and linked for readers.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <label className="border-input bg-input-background focus-visible:border-ring flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50">
@@ -284,7 +284,7 @@ export function CreateChapterForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="chapter-sequence">Chapter Number<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-sequence">Blueprint Number<span className="text-red-500">*</span></Label>
             <Input
               id="chapter-sequence"
               name="sequence"
@@ -353,7 +353,7 @@ export function CreateChapterForm() {
                     disabled={isSubmittingState}
                   />
                   <Label htmlFor="chapter-free" className="cursor-pointer">
-                    Free chapter
+                    Free blueprint
                   </Label>
                 </div>
               </div>
@@ -389,7 +389,7 @@ export function CreateChapterForm() {
             </>
           ) : (
             <div className="space-y-2 flex flex-col justify-end text-sm text-muted-foreground">
-              <span>Pricing is set at book level; this chapter has no separate price.</span>
+              <span>Pricing is set at book level; this blueprint has no separate price.</span>
             </div>
           )}
           <div className="space-y-2 max-w-xs">
@@ -443,7 +443,7 @@ export function CreateChapterForm() {
               <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-square max-w-32">
                 <img
                   src={featuredImagePreviewUrl}
-                  alt="Chapter preview"
+                  alt="Blueprint preview"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -478,7 +478,7 @@ export function CreateChapterForm() {
           isDisabled={isSubmittingState || books.length === 0}
           isLoading={isSubmittingState}
         >
-          Create Chapter
+          Create Blueprint
         </Button>
         <Link href={getAdminSectionRoutePath('chapters')}>
           <Button

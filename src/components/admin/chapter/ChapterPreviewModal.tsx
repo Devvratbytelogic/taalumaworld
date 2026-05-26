@@ -29,9 +29,9 @@ export function ChapterPreviewModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="xl" className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Chapter Preview</DialogTitle>
+          <DialogTitle>Blueprint Preview</DialogTitle>
           <DialogDescription>
-            Read-only view of chapter details.
+            Read-only view of blueprint details.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4 max-h-[70vh] custom_scrollbar overflow-y-auto">
@@ -52,7 +52,7 @@ export function ChapterPreviewModal({
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-xl font-semibold text-foreground">{chapter.title}</h3>
               <p className="text-sm text-muted-foreground">
-                Chapter {chapter.number}
+                Blueprint {chapter.number}
                 {chapter?.book?.title && ` · ${chapter?.book?.title}`}
               </p>
               {chapter?.book?.thoughtLeader?.fullName && (
@@ -63,7 +63,7 @@ export function ChapterPreviewModal({
                   {chapter.isFree ? 'Free' : `KSH ${chapter.price.toFixed(2)}`}
                 </span>
                 {chapter.isFree && (
-                  <span className="text-sm text-muted-foreground">(Free chapter)</span>
+                  <span className="text-sm text-muted-foreground">(Free blueprint)</span>
                 )}
               </div>
             </div>
@@ -88,7 +88,7 @@ export function ChapterPreviewModal({
               <dd className="font-medium">{chapter?.book?.thoughtLeader?.fullName ?? 'Unknown'}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Chapter Number</dt>
+              <dt className="text-muted-foreground">Blueprint Number</dt>
               <dd className="font-medium">{chapter.number}</dd>
             </div>
             <div>

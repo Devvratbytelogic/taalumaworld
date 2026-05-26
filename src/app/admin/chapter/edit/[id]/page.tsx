@@ -14,7 +14,7 @@ export default async function EditChapterPage({ params }: Props) {
                     href={getAdminSectionRoutePath('chapters')}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
                 >
-                    ← Back to Chapters
+                    ← Back to Blueprints
                 </Link>
                 <div className="flex items-center gap-3">
                     <div className="rounded-2xl bg-primary/10 p-3">
@@ -22,7 +22,7 @@ export default async function EditChapterPage({ params }: Props) {
                     </div>
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                            Edit Chapter
+                            Edit Blueprint
                         </h1>
                         {/* <p className="text-muted-foreground mt-0.5">
                             Edit a chapter with rich content and optional PDF attachment

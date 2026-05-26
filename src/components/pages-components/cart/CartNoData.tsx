@@ -14,13 +14,13 @@ export default function CartNoData() {
                             <ShoppingCart className="mx-auto mb-6 h-16 w-16 text-muted-foreground/30 sm:h-24 sm:w-24" />
                             <h2 className="mb-3 text-xl font-bold sm:text-2xl">Your cart is empty</h2>
                             <p className="mb-6 text-sm text-muted-foreground sm:text-base">
-                                Start adding chapters to your cart to begin your reading journey!
+                                Start adding blueprints to your cart to begin your reading journey!
                             </p>
                             <Button
                                 className="global_btn rounded_full"
                                 onPress={() => router.push(getHomeRoutePath())}
                             >
-                                Browse Chapters
+                                Browse Blueprints
                             </Button>
                         </div>
                     </div>

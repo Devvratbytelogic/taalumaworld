@@ -15,6 +15,8 @@ export default function LoginRequiredModal() {
   const action = data?.action;
   const itemType = data?.itemType;
 
+  const itemLabel = itemType === 'chapter' ? 'blueprint' : itemType === 'book' ? 'book' : itemType;
+
   const getContent = () => {
     switch (action) {
       case 'cart':
@@ -27,13 +29,13 @@ export default function LoginRequiredModal() {
         return {
           icon: <BookOpen className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In to Read',
-          description: `Sign in to start reading this ${itemType}. All our content requires authentication to ensure the best experience.`,
+          description: `Sign in to start reading this ${itemLabel}. All our content requires authentication to ensure the best experience.`,
         };
       case 'view':
         return {
           icon: <Lock className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In to View Details',
-          description: `Create an account or sign in to view ${itemType} details and explore our full collection.`,
+          description: `Create an account or sign in to view ${itemLabel} details and explore our full collection.`,
         };
       default:
         return {
@@ -71,7 +73,7 @@ export default function LoginRequiredModal() {
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">✓</span>
-                  <span>Access your purchased chapters and books anytime</span>
+                  <span>Access your purchased blueprints and books anytime</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">✓</span>

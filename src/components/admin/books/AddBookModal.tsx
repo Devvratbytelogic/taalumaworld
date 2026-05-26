@@ -385,7 +385,7 @@ export function AddBookModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="chapter">chapter</SelectItem>
+                    <SelectItem value="chapter">blueprint</SelectItem>
                     <SelectItem value="book">book</SelectItem>
                   </SelectContent>
                 </Select>

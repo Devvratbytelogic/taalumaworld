@@ -158,7 +158,7 @@ export default function MobileSearchBar() {
         />
         <Input
           type="text"
-          placeholder="Search books, chapters, authors..."
+          placeholder="Search books, blueprints, authors..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
@@ -258,7 +258,7 @@ export default function MobileSearchBar() {
                     <div className="flex items-center gap-2 px-3 py-1.5">
                       <FileText className="h-4 w-4 text-primary" />
                       <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Chapters
+                        Blueprints
                       </span>
                     </div>
                     {chapters.slice(0, 4).map((chapter) => (
@@ -273,7 +273,7 @@ export default function MobileSearchBar() {
                       >
                         <div className="text-sm font-medium line-clamp-1">{chapter.title}</div>
                         <div className="text-sm text-gray-500">
-                          Ch. {chapter.chapterNumber} · {chapter.bookTitle}
+                          Bp. {chapter.chapterNumber} · {chapter.bookTitle}
                         </div>
                       </button>
                     ))}

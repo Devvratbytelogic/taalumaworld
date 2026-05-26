@@ -16,7 +16,7 @@ export default function PaymentConfirmed() {
                         </div>
                         <h1 className="text-3xl font-bold mb-3">Order Confirmed!</h1>
                         <p className="text-muted-foreground mb-8">
-                            Your chapters are now unlocked and ready to read. Head to your
+                            Your blueprints are now unlocked and ready to read. Head to your
                             dashboard to start exploring.
                         </p>
                         <Button

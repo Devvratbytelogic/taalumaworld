@@ -42,8 +42,8 @@ export function getRoleDescription(role: AdminRole | string): string {
   const descriptions: Record<string, string> = {
     admin: 'Full access to all admin features and settings.',
     Admin: 'Full access to all admin features and settings.',
-    author: 'Manage books, chapters, and categories.',
-    Author: 'Manage books, chapters, and categories.',
+    author: 'Manage books, blueprints, and categories.',
+    Author: 'Manage books, blueprints, and categories.',
   };
   return descriptions[role] ?? '';
 }

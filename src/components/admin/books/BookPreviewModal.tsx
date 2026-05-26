@@ -65,7 +65,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground pt-1 capitalize">
-                  Pricing: <span className="font-medium text-foreground">{book.pricingModel ?? 'per chapter'}</span>
+                  Pricing: <span className="font-medium text-foreground">{book.pricingModel ?? 'per blueprint'}</span>
                 </p>
               )}
             </div>

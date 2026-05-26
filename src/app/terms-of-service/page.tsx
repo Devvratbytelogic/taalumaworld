@@ -98,7 +98,7 @@ export default function TermsOfServicePage() {
                                             Taaluma offers two primary purchasing models:
                                         </p>
                                         <ul className="list-disc list-inside space-y-2 ml-4">
-                                            <li><strong>Chapter-by-Chapter:</strong> Purchase individual chapters of books at listed prices</li>
+                                            <li><strong>Blueprint-by-Blueprint:</strong> Purchase individual blueprints of books at listed prices</li>
                                             <li><strong>Full Book:</strong> Purchase complete books when available</li>
                                         </ul>
                                         <p>

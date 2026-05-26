@@ -322,12 +322,12 @@ export function GeneralSettingsCard() {
                 <div>
                   <p className="font-medium text-sm">Content Visibility Mode</p>
                   <p className="text-sm text-muted-foreground mt-0.5">
-                    Platform is currently in <span className="font-semibold">{values.visible === 'book' ? 'Book' : 'Chapter'}</span> mode
+                    Platform is currently in <span className="font-semibold">{values.visible === 'book' ? 'Book' : 'Blueprint'}</span> mode
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={cn('text-sm font-medium transition-colors', values.visible === 'chapter' ? 'text-primary' : 'text-muted-foreground')}>
-                    Chapter
+                    Blueprint
                   </span>
                   <Switch
                     checked={values.visible === 'book'}
@@ -365,7 +365,7 @@ export function GeneralSettingsCard() {
               </div>
               <div>
                 <Label htmlFor="meta_keywords">Meta Keywords</Label>
-                <Input {...field('meta_keywords')} placeholder="books, reading, chapters" />
+                <Input {...field('meta_keywords')} placeholder="books, reading, blueprints" />
                 <FieldError msg={touched.meta_keywords ? errors.meta_keywords : ''} />
               </div>
               <div>

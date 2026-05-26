@@ -8,7 +8,7 @@ import { useGetFAQQuery } from '@/store/rtkQueries/userGetAPI';
 
 const categories = [
     { id: 'all', label: 'All Questions', icon: HelpCircle },
-    { id: 'reading', label: 'Reading & Chapters', icon: BookOpen },
+    { id: 'reading', label: 'Reading & Blueprints', icon: BookOpen },
     { id: 'payment', label: 'Payments & Pricing', icon: CreditCard },
     { id: 'account', label: 'Account & Settings', icon: Users },
 ];

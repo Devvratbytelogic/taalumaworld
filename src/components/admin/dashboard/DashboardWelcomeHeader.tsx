@@ -18,7 +18,7 @@ export function DashboardWelcomeHeader({ adminUser, contentMode }: DashboardWelc
       </p>
       <div className="mt-4 flex items-center gap-2">
         <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-          {contentMode === 'chapters' ? 'Chapter Mode' : 'Book Mode'}
+          {contentMode === 'chapters' ? 'Blueprint Mode' : 'Book Mode'}
         </Badge>
         <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
           {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}

@@ -137,7 +137,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
         />
         <Input
           type="text"
-          placeholder="Search books, chapters, authors..."
+          placeholder="Search blueprints, authors..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
@@ -245,7 +245,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                   <div className="flex items-center gap-2 px-3 py-2">
                     <FileText className="h-4 w-4 text-primary" />
                     <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                      Chapters
+                      Blueprints
                     </span>
                   </div>
                   {chapters.slice(0, 4).map((chapter) => (
@@ -260,7 +260,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                     >
                       <div className="font-medium line-clamp-1">{chapter.title}</div>
                       <div className="text-sm text-gray-500">
-                        Ch. {chapter.chapterNumber} · {chapter.bookTitle}
+                        Bp. {chapter.chapterNumber} · {chapter.bookTitle}
                       </div>
                     </button>
                   ))}

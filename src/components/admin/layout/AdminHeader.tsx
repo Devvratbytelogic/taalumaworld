@@ -23,8 +23,8 @@ import ImageComponent from '@/components/ui/ImageComponent';
 const ADMIN_ROUTES = [
     { label: 'Dashboard',        description: 'Overview & stats',            path: getAdminSectionRoutePath('dashboard'),    icon: LayoutDashboard, keywords: ['home', 'overview', 'stats'] },
     { label: 'Books',            description: 'Manage all books',            path: getAdminSectionRoutePath('books'),        icon: Book,            keywords: ['book', 'publish'] },
-    { label: 'Chapters',         description: 'Manage all chapters',         path: getAdminSectionRoutePath('chapters'),     icon: FileText,        keywords: ['chapter', 'content'] },
-    { label: 'Create Chapter',   description: 'Add a new chapter',          path: getCreateChapterRoutePath(),              icon: Plus,            keywords: ['new chapter', 'add chapter'] },
+    { label: 'Blueprints',         description: 'Manage all blueprints',         path: getAdminSectionRoutePath('chapters'),     icon: FileText,        keywords: ['blueprint', 'content'] },
+    { label: 'Create Blueprint',   description: 'Add a new blueprint',          path: getCreateChapterRoutePath(),              icon: Plus,            keywords: ['new blueprint', 'add blueprint'] },
     { label: 'Categories',       description: 'Manage categories',          path: getAdminSectionRoutePath('categories'),   icon: FolderTree,      keywords: ['category', 'tag'] },
     { label: 'Thought Leaders',  description: 'Manage authors & leaders',   path: getAdminSectionRoutePath('authors'),      icon: Users,           keywords: ['author', 'leader', 'thought'] },
     { label: 'Users',            description: 'Manage registered users',    path: getAdminSectionRoutePath('users'),        icon: UserCircle,      keywords: ['user', 'member', 'account'] },
@@ -132,7 +132,7 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
                                 ) : (
                                     <>
                                         <span className={cn("text-sm", visible === 'chapter' ? 'font-semibold' : 'opacity-70')}>
-                                            Chapters
+                                            Blueprints
                                         </span>
                                         <Switch isSelected={visible === 'book'} onValueChange={onContentModeToggle} size="sm" />
                                         <span className={cn("text-sm", visible === 'book' ? 'font-semibold' : 'opacity-70')}>

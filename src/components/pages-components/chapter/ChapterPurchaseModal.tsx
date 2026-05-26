@@ -58,7 +58,7 @@ export function ChapterPurchaseModal() {
   );
 
   const onMpesaSuccess = useCallback(() => {
-    toast.success('Chapter purchased successfully!');
+    toast.success('Blueprint purchased successfully!');
     dispatch(closeModal());
   }, [dispatch]);
 
@@ -97,7 +97,7 @@ export function ChapterPurchaseModal() {
               <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
                 <Lock className="h-5 w-5 text-warning" />
               </div>
-              <h2 className="text-xl font-bold">Chapter Locked</h2>
+              <h2 className="text-xl font-bold">Blueprint Locked</h2>
             </div>
           </div>
 
@@ -106,7 +106,7 @@ export function ChapterPurchaseModal() {
             <div className="bg-primary/5 rounded-2xl space-y-3 p-3">
               <div className="flex items-start gap-3">
                 <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full">
-                  Chapter {chapter.chapterNumber}
+                  Blueprint {chapter.chapterNumber}
                 </Badge>
               </div>
               <h3 className="font-bold text-lg">{chapter.title}</h3>
@@ -122,10 +122,10 @@ export function ChapterPurchaseModal() {
 
             {/* Message */}
             <div className="space-y-2">
-              <p className="text-foreground">You need to purchase this chapter to continue reading.</p>
+              <p className="text-foreground">You need to purchase this blueprint to continue reading.</p>
               <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium text-foreground">Chapter Price:</span>
+                  <span className="text-sm font-medium text-foreground">Blueprint Price:</span>
                   <span className="text-xl sm:text-2xl font-bold text-primary">
                     KSH {chapter.price?.toFixed(2) || '0.00'}
                   </span>
@@ -163,7 +163,7 @@ export function ChapterPurchaseModal() {
           <ModalFooter>
             {/* Info Note */}
             <div className="text-sm text-muted-foreground text-center bg-accent/20 rounded-2xl p-3">
-              💡 Once purchased, you&apos;ll have unlimited access to this chapter and can read it
+              💡 Once purchased, you&apos;ll have unlimited access to this blueprint and can read it
               anytime.
             </div>
           </ModalFooter>

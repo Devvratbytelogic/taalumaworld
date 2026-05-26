@@ -28,14 +28,14 @@ export default function FilterOptions({ total = 0, viewMode }: FilterOptionsProp
     const readingProgress = parseArrayParam(searchParams.get('readingProgress'));
     const activeFilterCount = categoryId.length + thoughtLeaderId.length + tags.length + readingProgress.length;
 
+    const displayMode = viewMode === VISIBLE.BOOK ? 'books' : 'chapters';
     const contentLabel = viewMode === VISIBLE.BOOK ? 'books' : 'blueprints';
-    console.log('contentLabel', contentLabel);
 
     return (
         <>
             <div className="flex items-center gap-4">
                 <Button
-                    onPress={() => dispatch(openModal({ componentName: 'FilterModal', data: { displayMode: contentLabel } }))}
+                    onPress={() => dispatch(openModal({ componentName: 'FilterModal', data: { displayMode } }))}
                     className="global_btn rounded_full outline_primary"
                     startContent={<SlidersHorizontal className="h-5 w-5" />}
                 >

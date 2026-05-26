@@ -111,7 +111,7 @@ export function ReadingHistory() {
                   <p className="text-sm text-muted-foreground mb-1">{item.bookTitle}</p>
                   <h3 className="font-bold text-base mb-1 line-clamp-1">{item.chapterTitle}</h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Chapter {item.chapterNumber}
+                    Blueprint {item.chapterNumber}
                   </p>
 
                   {/* Progress Info */}
@@ -156,13 +156,13 @@ export function ReadingHistory() {
             </div>
             <h3 className="text-xl font-bold mb-2">No Reading History</h3>
             <p className="text-muted-foreground mb-6">
-              Start reading to build your history. Your recently read {displayMode === 'chapters' ? 'chapters' : 'books'} will appear here.
+              Start reading to build your history. Your recently read {displayMode === 'chapters' ? 'blueprints' : 'books'} will appear here.
             </p>
             <Button
               onPress={() => router.push('/')}
               className='global_btn rounded_full bg_primary'
             >
-              {displayMode === 'chapters' ? 'Browse Chapters' : 'Browse Books'}
+              {displayMode === 'chapters' ? 'Browse Blueprints' : 'Browse Books'}
             </Button>
           </div>
         </div>

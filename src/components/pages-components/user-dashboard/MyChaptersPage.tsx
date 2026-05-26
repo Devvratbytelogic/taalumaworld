@@ -104,8 +104,8 @@ export function MyChaptersPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="mb-2">
-        <h1 className="text-3xl font-bold mb-1">My Chapters</h1>
-        <p className="text-muted-foreground">Your personal collection of purchased chapters</p>
+        <h1 className="text-3xl font-bold mb-1">My Blueprints</h1>
+        <p className="text-muted-foreground">Your personal collection of purchased blueprints</p>
       </div>
 
       {/* Stats Cards */}
@@ -117,7 +117,7 @@ export function MyChaptersPage() {
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">Total Chapters</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Total Blueprints</div>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ export function MyChaptersPage() {
           ))}
         </div>
         <p className="text-muted-foreground text-sm">
-          {filteredChapters.length} chapter{filteredChapters.length !== 1 ? 's' : ''}
+          {filteredChapters.length} blueprint{filteredChapters.length !== 1 ? 's' : ''}
         </p>
       </div>
 
@@ -267,7 +267,7 @@ export function MyChaptersPage() {
 
                     {/* Chapter Number & Status */}
                     <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-sm text-muted-foreground">
-                      <span>Chapter {chapter.chapterNumber}</span>
+                      <span>Blueprint {chapter.chapterNumber}</span>
                       <span className={status.color}>{status.label}</span>
                     </div>
                   </div>
@@ -284,19 +284,19 @@ export function MyChaptersPage() {
               <BookOpen className="h-8 w-8 text-primary" />
             </div>
             <h3 className="text-xl font-bold mb-2">
-              {activeFilter === 'all' ? 'No Chapters Yet' : `No ${activeFilter === 'reading' ? 'In Progress' : activeFilter === 'completed' ? 'Completed' : 'Unread'} Chapters`}
+              {activeFilter === 'all' ? 'No Blueprints Yet' : `No ${activeFilter === 'reading' ? 'In Progress' : activeFilter === 'completed' ? 'Completed' : 'Unread'} Blueprints`}
             </h3>
             <p className="text-muted-foreground mb-6">
               {activeFilter === 'all'
-                ? "You haven't purchased any chapters yet. Start exploring and build your collection!"
-                : 'No chapters match this filter.'}
+                ? "You haven't purchased any blueprints yet. Start exploring and build your collection!"
+                : 'No blueprints match this filter.'}
             </p>
             {activeFilter === 'all' && (
               <Button
                 onPress={() => router.push('/')}
                 className='global_btn rounded_full bg_primary'
               >
-                Browse Chapters
+                Browse Blueprints
               </Button>
             )}
             {activeFilter !== 'all' && (
@@ -304,7 +304,7 @@ export function MyChaptersPage() {
                 onPress={() => setActiveFilter('all')}
                 className='global_btn rounded_full outline_primary'
               >
-                Show All Chapters
+                Show All Blueprints
               </Button>
             )}
           </div>

@@ -79,7 +79,7 @@ export default function BookReadPage() {
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-sm truncate">{book.title}</h1>
             <p className="text-sm text-muted-foreground truncate">
-              {book.author} • {chapters.length} chapter{chapters.length !== 1 ? 's' : ''}
+              {book.author} • {chapters.length} blueprint{chapters.length !== 1 ? 's' : ''}
             </p>
           </div>
         </div>
@@ -108,14 +108,14 @@ export default function BookReadPage() {
           {/* Section heading */}
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="h-4 w-4 text-primary" />
-            <h3 className="font-semibold text-sm">All Chapters</h3>
+            <h3 className="font-semibold text-sm">All Blueprints</h3>
             <span className="ml-auto text-sm text-muted-foreground">{chapters.length} total</span>
           </div>
 
           {/* Chapter cards */}
           {chapters.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground text-sm">
-              No chapters available yet.
+              No blueprints available yet.
             </div>
           ) : (
             <div className="space-y-3">
@@ -175,7 +175,7 @@ export default function BookReadPage() {
       {needsBookPurchase && (
         <div className="absolute bottom-0 left-0 right-0 bg-white border-t px-4 py-3 flex items-center gap-4">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm tracking-tight">Unlock all {chapters.length} chapters</p>
+            <p className="font-semibold text-sm tracking-tight">Unlock all {chapters.length} blueprints</p>
             <p className="text-sm text-muted-foreground">One-time purchase · KSH {book!.price.toFixed(2)}</p>
           </div>
           {!isAuthenticated ? (

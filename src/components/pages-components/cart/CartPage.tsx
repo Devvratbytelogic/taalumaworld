@@ -35,7 +35,7 @@ export default function CartDetailsComponent() {
   const cartSummaryText = (() => {
     const parts: string[] = [];
     if (bookCount > 0) parts.push(`${bookCount} ${bookCount === 1 ? 'book' : 'books'}`);
-    if (chapterCount > 0) parts.push(`${chapterCount} ${chapterCount === 1 ? 'chapter' : 'chapters'}`);
+    if (chapterCount > 0) parts.push(`${chapterCount} ${chapterCount === 1 ? 'blueprint' : 'blueprints'}`);
     return `${parts.join(' and ')} ready for checkout`;
   })();
 
@@ -145,7 +145,7 @@ export default function CartDetailsComponent() {
                           <div className="min-w-0 flex-1">
                             <div className="mb-1 flex flex-wrap items-center gap-2">
                               <Badge variant="outline" className="rounded-full text-xs sm:text-sm">
-                                {isBookItem ? 'Full Book' : `Chapter ${item.chapter?.number}`}
+                                {isBookItem ? 'Full Book' : `Blueprint ${item.chapter?.number}`}
                               </Badge>
                             </div>
                             <h3 className="mb-1 line-clamp-2 text-base font-bold sm:text-lg">{title}</h3>

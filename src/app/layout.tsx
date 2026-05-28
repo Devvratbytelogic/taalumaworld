@@ -21,7 +21,9 @@ const ubuntu = Ubuntu({
 
 async function fetchGlobalSettings() {
   try {
-    const res = await fetch(`${API_BASE_URL}user/get-global`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${API_BASE_URL}user/get-global`, {
+      cache: "no-store",
+    });
     const json = await res.json();
     return json?.data ?? null;
   } catch {

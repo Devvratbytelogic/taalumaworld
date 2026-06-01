@@ -102,12 +102,8 @@ export function CreateChapterForm() {
         resetForm({ values: initialFormValues });
         toast.success('Blueprint created successfully');
         router.push(`/admin/chapters`);
-      } catch (err: unknown) {
-        const message =
-          (err as { data?: { message?: string }; message?: string })?.data?.message ||
-          (err as { message?: string })?.message ||
-          'Failed to create blueprint';
-        toast.error(message);
+      } catch (err) {
+        console.error('error during create chapter', err);  
       }
     },
   });

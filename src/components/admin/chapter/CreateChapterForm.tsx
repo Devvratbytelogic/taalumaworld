@@ -145,6 +145,10 @@ export function CreateChapterForm() {
         toast.error('Please select a PDF file');
         return;
       }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('PDF must be less than 5MB');
+        return;
+      }
       setPdfFile(file);
     }
     e.target.value = '';
@@ -253,7 +257,7 @@ export function CreateChapterForm() {
             <span className="font-medium">Upload PDF (optional)</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Attach a PDF file for this blueprint. The file can be stored and linked for readers.
+            Attach a PDF file for this blueprint (max 5MB). The file can be stored and linked for readers.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <label className="border-input bg-input-background focus-visible:border-ring flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50">

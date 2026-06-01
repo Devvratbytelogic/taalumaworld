@@ -80,19 +80,16 @@ const baseQueryWithAuth: BaseQueryFn<
         const result = await baseQuery(args, api, extraOptions);
         const res = result.data as IAPIResponse;
         if (result.error) {
-            const errorData = result.error as IAPIError & { status?: number | string; data?: { data?: { flow?: string }; message?: string } };
+            const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string } };
             const status = errorData?.status;
             const responseData = errorData?.data;
-
-            let message: string;
-            if (isFetchNetworkError(result.error)) {
-                message = NETWORK_MESSAGES.requestFailedOnline;
-                addToast({ title: 'Connection problem', description: message, color: 'warning', timeout: 3000 });
-            } else {
-                message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
-                addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
-            }
-
+            const message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
+            // Suppress silent background errors (401, 403, 404) but show all other errors to the user
+            // const SILENT_STATUSES = [401, 403, 404];
+            // const shouldShowToast = !status || !SILENT_STATUSES.includes(status);
+            // if (shouldShowToast) {
+            addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
+            // }
             return {
                 error: {
                     status: "CUSTOM_ERROR",

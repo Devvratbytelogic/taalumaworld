@@ -4,6 +4,7 @@ import { Mutex } from 'async-mutex';
 import Cookies from "js-cookie";
 import { addToast } from '@heroui/react';
 import { API_BASE_URL } from '@/utils/config';
+import { isBrowserOnline, isFetchNetworkError, NETWORK_MESSAGES } from '@/utils/network';
 
 const mutex = new Mutex();
 
@@ -36,8 +37,11 @@ function toToastMessage(value: unknown, fallback = 'Unknown error'): string {
     return fallback;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
 const baseQuery = fetchBaseQuery({
     baseUrl: API_BASE_URL,
+    timeout: REQUEST_TIMEOUT_MS,
     prepareHeaders: async (headers) => {
         const token = Cookies.get("auth_token") || null
         const deviceId = Cookies.get("device") || ''
@@ -61,20 +65,34 @@ const baseQueryWithAuth: BaseQueryFn<
     FetchBaseQueryError
 > = async (args, api, extraOptions) => {
     await mutex.waitForUnlock();
+
+    if (!isBrowserOnline()) {
+        const message = NETWORK_MESSAGES.requestFailedOffline;
+        return {
+            error: {
+                status: 'FETCH_ERROR',
+                error: message,
+            },
+        };
+    }
+
     try {
         const result = await baseQuery(args, api, extraOptions);
         const res = result.data as IAPIResponse;
         if (result.error) {
-            const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string } };
+            const errorData = result.error as IAPIError & { status?: number | string; data?: { data?: { flow?: string }; message?: string } };
             const status = errorData?.status;
             const responseData = errorData?.data;
-            const message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
-            // Suppress silent background errors (401, 403, 404) but show all other errors to the user
-            // const SILENT_STATUSES = [401, 403, 404];
-            // const shouldShowToast = !status || !SILENT_STATUSES.includes(status);
-            // if (shouldShowToast) {
+
+            let message: string;
+            if (isFetchNetworkError(result.error)) {
+                message = NETWORK_MESSAGES.requestFailedOnline;
+                addToast({ title: 'Connection problem', description: message, color: 'warning', timeout: 3000 });
+            } else {
+                message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
                 addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
-            // }
+            }
+
             return {
                 error: {
                     status: "CUSTOM_ERROR",

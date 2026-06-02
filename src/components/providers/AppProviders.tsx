@@ -6,7 +6,7 @@ import { store } from '@/store/store';
 import { Provider } from 'react-redux';
 import { Toaster } from 'sonner';
 import AllModal from '../modals/AllModal';
-import { NetworkStatusBanner } from '../network/NetworkStatusBanner';
+// import { NetworkStatusBanner } from '../network/NetworkStatusBanner';
 
 interface ProvidersProps {
     children: React.ReactNode;
@@ -24,7 +24,7 @@ export function AppProviders({ children }: ProvidersProps) {
                         showSpinner={false}
                     />
                     <AllModal />
-                    <NetworkStatusBanner />
+                    {/* <NetworkStatusBanner /> */}
                     {children}
                 </HeroUIProvider>
             </Provider>

@@ -211,7 +211,7 @@ export default function PrimaryHeader() {
                   onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                 >
                   <User className="h-4 w-4" />
-                  Sign In
+                  Sign In/Sign Up
                 </Button>
               </>
             )}

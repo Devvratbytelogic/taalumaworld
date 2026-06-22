@@ -4,7 +4,11 @@ import Button from '@/components/ui/Button'
 import { useRouter } from 'next/navigation'
 import { getUserDashboardRoutePath } from '@/routes/routes'
 
-export default function PaymentConfirmed() {
+interface PaymentConfirmedProps {
+  orderId?: string | number | null;
+}
+
+export default function PaymentConfirmed({ orderId }: PaymentConfirmedProps) {
     const router = useRouter();
     return (
         <>
@@ -15,6 +19,11 @@ export default function PaymentConfirmed() {
                             <CheckCircle className="h-12 w-12 text-success" />
                         </div>
                         <h1 className="text-3xl font-bold mb-3">Order Confirmed!</h1>
+                        {orderId && (
+                            <p className="text-sm font-medium text-muted-foreground mb-3">
+                                Order <span className="text-foreground font-semibold">#{orderId}</span>
+                            </p>
+                        )}
                         <p className="text-muted-foreground mb-8">
                             Your blueprints are now unlocked and ready to read. Head to your
                             dashboard to start exploring.

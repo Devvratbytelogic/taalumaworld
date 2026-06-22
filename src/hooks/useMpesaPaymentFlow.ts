@@ -38,6 +38,8 @@ export type UseMpesaPaymentFlowOptions = {
   onSuccess: () => void | Promise<void>;
 };
 
+const SKIP_MPESA = process.env.NEXT_PUBLIC_SKIP_MPESA === 'true';
+
 export function useMpesaPaymentFlow({
   getAmount,
   waitSeconds = DEFAULT_WAIT_SECONDS,
@@ -97,8 +99,29 @@ export function useMpesaPaymentFlow({
     setIsPhoneModalOpen(true);
   }, [stopPolling]);
 
-  /** Step 1: open the phone-number modal. */
-  const startPayment = useCallback(() => {
+  /** Step 1: open the phone-number modal (or skip M-Pesa entirely in test mode). */
+  const startPayment = useCallback(async () => {
+    if (SKIP_MPESA) {
+      setIsInitiating(true);
+      try {
+        const fakeCheckoutId = `TEST-${Date.now()}`;
+        const done = await attemptCompleteRef.current(fakeCheckoutId);
+        if (done) {
+          await Promise.resolve(onSuccessRef.current());
+        } else {
+          toast.error('Test purchase failed', {
+            description: 'attemptComplete returned false in skip-mpesa mode.',
+          });
+        }
+      } catch {
+        toast.error('Test purchase error', {
+          description: 'An error occurred in skip-mpesa mode.',
+        });
+      } finally {
+        setIsInitiating(false);
+      }
+      return;
+    }
     setIsPhoneModalOpen(true);
   }, []);
 

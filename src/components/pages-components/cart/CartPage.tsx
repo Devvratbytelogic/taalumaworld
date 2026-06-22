@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Trash2, BookOpen, CheckCircle } from 'lucide-react';
+import { Trash2, BookOpen } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
@@ -26,6 +26,7 @@ export default function CartDetailsComponent() {
   const { data: cartResponse, isLoading } = useGetCartQuery();
   const [checkOutCart] = useCheckOutCartMutation();
   const [isOrderComplete, setIsOrderComplete] = useState(false);
+  const [orderId, setOrderId] = useState<string | number | null>(null);
 
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
@@ -50,13 +51,16 @@ export default function CartDetailsComponent() {
   const attemptComplete = useCallback(
     async (checkoutRequestId: string) => {
       try {
-        await checkOutCart({
+        const res = await checkOutCart({
           payment_method: 'M-Pesa',
           amount: total,
           transaction_id: checkoutRequestId,
           invoice: checkoutRequestId,
           payment_status: 'Paid',
         }).unwrap();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const id = (res as any)?.data?.order_id;
+        if (id) setOrderId(id);
         return true;
       } catch {
         return false;
@@ -88,7 +92,7 @@ export default function CartDetailsComponent() {
   }
 
   if (isOrderComplete) {
-    return <PaymentConfirmed />;
+    return <PaymentConfirmed orderId={orderId} />;
   }
 
   return (

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@heroui/react';
 import type { IAllFaqsDataEntity, FAQType } from '@/types/faqs';
+import { RichTextEditor } from '@/components/editor/RichTextEditor';
 
 export interface FAQFormValues {
   question: string;
@@ -74,12 +75,11 @@ export function FAQForm({ initial = {}, onSubmit, onCancel, isLoading }: FAQForm
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Answer <span className="text-red-500">*</span>
         </label>
-        <textarea
-          rows={5}
-          className={`${inputCls} resize-none`}
+        <RichTextEditor
           value={values.answer}
-          onChange={(e) => setValues((p) => ({ ...p, answer: e.target.value }))}
+          onChange={(md) => setValues((p) => ({ ...p, answer: md }))}
           placeholder="Enter the answer…"
+          minHeight="150px"
         />
       </div>
       <div className="flex gap-3 justify-end">

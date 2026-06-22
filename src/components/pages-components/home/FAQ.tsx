@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useGetFAQQuery } from '@/store/rtkQueries/userGetAPI'
 import FAQSkeleton from '@/components/skeleton-loader/FAQSkeleton'
 
@@ -59,7 +61,9 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             </button>
             {isOpen && (
                 <div className="px-5 pb-5 pt-0">
-                    <p className="text-muted-foreground leading-relaxed">{answer}</p>
+                    <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:border-primary prose-blockquote:text-muted-foreground">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+                    </div>
                 </div>
             )}
         </div>

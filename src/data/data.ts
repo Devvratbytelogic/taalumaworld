@@ -116,11 +116,11 @@ export const contactUsBannerData: normalBannerData = {
         icon: MessageSquare,
     },
     heading: {
-        prefix: "Architecting the ",
-        highlight: "1% Together.",
+        prefix: "Connect With the Taaluma",
+        highlight: "Community.",
     },
     description:
-        `Have a question about a blueprint, or ready to share your own "System Architect" journey? Our strategic team is here to help you navigate your path.`,
+        `Whether you're looking for guidance, interested in becoming a mentor, exploring partnerships, or simply have a question, we'd love to hear from you.`,
 }
 export const faqBannerData: normalBannerData = {
     badge: {

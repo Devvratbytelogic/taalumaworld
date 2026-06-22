@@ -8,6 +8,16 @@ import { Input } from '../ui/input';
 import Button from '../ui/Button';
 import { usePostContactUsMutation } from '@/store/rtkQueries/userPostAPI';
 
+const INQUIRY_OPTIONS = [
+    'I want to become a Mentor',
+    'I want to start learning',
+    'Partnership enquiry',
+    'School / University enquiry',
+    'Corporate enquiry',
+    'Technical support',
+    'General enquiry',
+]
+
 export default function ContactUsPageForm() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [postContactUs, { isLoading }] = usePostContactUsMutation();
@@ -15,6 +25,7 @@ export default function ContactUsPageForm() {
         initialValues: {
             name: '',
             email: '',
+            inquiryType: '',
             subject: '',
             message: ''
         },
@@ -90,6 +101,26 @@ export default function ContactUsPageForm() {
                         {formik.touched.email && formik.errors.email && (
                             <p className="text-sm text-red-500">{formik.errors.email}</p>
                         )}
+                    </div>
+
+                    {/* Inquiry Type */}
+                    <div className="space-y-2">
+                        <label htmlFor="inquiryType" className="text-sm font-medium">
+                            How Can We Help?
+                        </label>
+                        <select
+                            id="inquiryType"
+                            name="inquiryType"
+                            value={formik.values.inquiryType}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className="w-full rounded-full h-12 px-6 border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-input-focus transition-all"
+                        >
+                            <option value="">Select an option…</option>
+                            {INQUIRY_OPTIONS.map((opt) => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
                     </div>
 
                     {/* Subject Field */}

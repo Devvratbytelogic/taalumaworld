@@ -5,6 +5,8 @@ import WhyTaalumaExists from '@/components/pages-components/about/WhyTaalumaExis
 import MissionVision from '@/components/pages-components/about/MissionVision';
 import OurStory from '@/components/pages-components/about/OurStory';
 import CoreValues from '@/components/pages-components/about/CoreValues';
+import MentorMarketplace from '@/components/pages-components/about/MentorMarketplace';
+import BlueprintShowcase from '@/components/pages-components/about/BlueprintShowcase';
 import CommonCTA from '@/components/cta/CommonCTA';
 
 export default function AboutUsPage() {
@@ -13,20 +15,26 @@ export default function AboutUsPage() {
             {/* About Us Banner */}
             <CommonBanner data={aboutBannerData} />
 
-            {/* Why Taaluma.World Exists */}
             <div className='space-y-10'>
+                {/* Why Taaluma.World Exists */}
                 <WhyTaalumaExists />
-    
-                {/* Mission Vision */}
+
+                {/* Mission & Vision */}
                 <MissionVision />
-    
-                {/* Our Story */}
+
+                {/* How Taaluma Works */}
                 <OurStory />
-    
-                {/* Core Values */}
+
+                {/* Core Values + Today on Taaluma */}
                 <CoreValues />
-    
-                {/* Common CTA */}
+
+                {/* Meet Some of Our Mentors */}
+                <MentorMarketplace />
+
+                {/* Featured Blueprints */}
+                <BlueprintShowcase />
+
+                {/* CTA */}
                 <CommonCTA />
             </div>
         </>

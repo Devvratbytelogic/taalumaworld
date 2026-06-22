@@ -83,7 +83,7 @@ function AuthorsList() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-lg leading-tight">{author.fullName}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{author.followersCount} followers</p>
+                  {/* <p className="text-sm text-muted-foreground mt-1">{author.followersCount} followers</p> */}
                   {author.professionalBio && (
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{author.professionalBio}</p>
                   )}
@@ -170,7 +170,7 @@ function AuthorDetail({ id }: { id: string }) {
           </div>
           <div className="flex-1 text-center sm:text-left">
             <h1 className="text-3xl font-bold">{author?.fullName}</h1>
-            <p className="text-sm text-muted-foreground mt-1">{author?.followersCount} followers</p>
+            {/* <p className="text-sm text-muted-foreground mt-1">{author?.followersCount} followers</p> */}
             {author?.professionalBio && (
               <p className="text-muted-foreground mt-3 max-w-2xl">{author.professionalBio}</p>
             )}

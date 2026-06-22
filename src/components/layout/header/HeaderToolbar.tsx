@@ -10,7 +10,7 @@ export default function HeaderToolbar() {
                 <div className="container mx-auto sm:px-4">
                     <div className="flex items-center justify-between h-10 text-sm">
                         <div className="flex items-center gap-2">
-                            <p>Welcome to Taaluma - Empowering College Graduates & Young Professionals!</p>
+                            <p>Welcome to Taaluma.World — The Global Marketplace for Mentorship, Learning & Career Architecture.</p>
                         </div>
                         <div className="hidden md:flex items-center gap-4">
                             <Link href={getContactUsRoutePath()} className="hover:text-white/80 transition-colors flex items-center gap-1">

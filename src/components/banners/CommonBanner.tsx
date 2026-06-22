@@ -47,7 +47,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
 
                             {/* Heading */}
                             <div className="space-y-3">
-                                <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-foreground leading-tight">
+                                <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-tight">
                                     {data?.heading?.prefix}{' '}
                                     <span className="relative inline-block">
                                         <span className="relative z-10">{data?.heading?.highlight}</span>
@@ -55,27 +55,27 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                     </span>
                                     {data?.heading?.suffix}
                                 </h1>
-                                <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-xl">
+                                <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
                                     {data?.description}
                                 </p>
                             </div>
 
                             {/* CTA Buttons */}
-                            {data?.primaryCta?.button_status && (<div className="flex flex-col sm:flex-row items-start gap-4 pt-2">
+                            {data?.primaryCta?.button_status && (<div className="flex flex-col sm:flex-row items-start gap-2 pt-2">
                                 <Button
                                     className="global_btn rounded_full bg_primary"
                                     onPress={scrollToContent}
                                 >
                                     {data?.primaryCta?.title}
                                 </Button>
-                                {/* {displayMode === 'books' && data?.secondaryCta?.button_status && (
+                                {data?.secondaryCta?.button_status && (
                                     <Button
-                                        className="global_btn rounded_full bg_primary"
+                                        className="global_btn rounded_full outline_primary"
                                         onPress={scrollToCategories}
                                     >
                                         {data?.secondaryCta?.title}
                                     </Button>
-                                )} */}
+                                )}
                             </div>)}
 
                             {/* Active Readers Stats */}

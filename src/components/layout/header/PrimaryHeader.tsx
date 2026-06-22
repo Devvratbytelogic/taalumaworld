@@ -120,7 +120,7 @@ export default function PrimaryHeader() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
               <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 hover:text-primary transition-colors">
@@ -207,11 +207,16 @@ export default function PrimaryHeader() {
                   <User className="h-5 w-5" />
                 </Button>
                 <Button
+                  className="hidden lg:flex global_btn rounded_full outline_primary"
+                  onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                >
+                  Sign In
+                </Button>
+                <Button
                   className="hidden lg:flex global_btn rounded_full bg_primary"
                   onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                 >
-                  <User className="h-4 w-4" />
-                  Sign In/Sign Up
+                  Join Taaluma
                 </Button>
               </>
             )}
@@ -377,16 +382,26 @@ export default function PrimaryHeader() {
                 </Button>
               </div>
             ) : (
-              <Button
-                className="global_btn rounded_full bg_primary w-full"
-                onPress={() => {
-                  dispatch(openModal({ componentName: 'SignIn', data: '' }));
-                  closeMenu();
-                }}
-              >
-                <User className="h-4 w-4" />
-                Sign In
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="global_btn rounded_full outline_primary w-full"
+                  onPress={() => {
+                    dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                    closeMenu();
+                  }}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  className="global_btn rounded_full bg_primary w-full"
+                  onPress={() => {
+                    dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                    closeMenu();
+                  }}
+                >
+                  Join Taaluma
+                </Button>
+              </div>
             )}
           </div>
         </div>

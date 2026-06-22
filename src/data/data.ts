@@ -32,19 +32,19 @@ export interface bannerProps {
 
 
 export const homeBannerData: bannerProps = {
-    badgeText: '📚 Now live and ready to explore!',
+    badgeText: 'Learn. Mentor. Grow.',
     heading: {
-        prefix: 'Build Undisputable Career Capacity for the AI',
-        highlight: 'Economy',
+        prefix: 'Learn From Someone Ahead. Mentor Someone ',
+        highlight: 'Behind',
         suffix: '.',
     },
-    description: 'A University degree is just hardware. Install the strategic software used by the top 1% to stay ahead of technological shifts.',
+    description: 'Connect with mentors, discover practical blueprints, and build the skills needed to thrive in a rapidly changing world.',
     primaryCta: {
-        title: 'Engineer My Path',
+        title: 'Start Learning',
         button_status: true,
     },
     secondaryCta: {
-        title: 'Browse Categories',
+        title: 'Become a Mentor',
         button_status: true,
     },
     stats: {

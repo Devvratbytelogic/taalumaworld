@@ -158,7 +158,7 @@ export default function MobileSearchBar() {
         />
         <Input
           type="text"
-          placeholder="Search books, blueprints, authors..."
+          placeholder="Search mentors, blueprints, topics..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}

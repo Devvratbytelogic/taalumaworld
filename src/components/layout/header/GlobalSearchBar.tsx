@@ -137,7 +137,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
         />
         <Input
           type="text"
-          placeholder="Search blueprints, authors..."
+          placeholder="Search mentors, blueprints, topics..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}

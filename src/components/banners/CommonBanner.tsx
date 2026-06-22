@@ -58,6 +58,11 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
                                     {data?.description}
                                 </p>
+                                {data?.tagline && (
+                                    <p className="text-lg font-medium text-primary mt-2">
+                                        {data.tagline}
+                                    </p>
+                                )}
                             </div>
 
                             {/* CTA Buttons */}

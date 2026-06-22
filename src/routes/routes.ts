@@ -5,7 +5,7 @@ export function getHomeRoutePath(): string {
 }
 
 export function getAboutUsRoutePath(): string {
-  return '/about-us';
+  return '/why-taaluma-exists';
 }
 
 export function getContactUsRoutePath(): string {

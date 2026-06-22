@@ -1,95 +1,101 @@
-import ImageComponent from '@/components/ui/ImageComponent'
+import { BookOpen, MessageCircle, LayoutDashboard } from 'lucide-react'
 import React from 'react'
+
+const phases = [
+    {
+        number: '01',
+        phase: 'Phase 1',
+        title: 'Learn',
+        description: 'Access mentor-created Blueprints.',
+        status: 'Current',
+        statusStyle: 'bg-success/10 text-success border border-success/20',
+        icon: BookOpen,
+        iconBg: 'bg-primary/10',
+        iconColor: 'text-primary',
+        numberColor: 'text-primary',
+        cardBorder: 'border-primary/20',
+    },
+    {
+        number: '02',
+        phase: 'Phase 2',
+        title: 'Interact',
+        description: 'Join live mentoring sessions and learning experiences.',
+        status: 'Coming Soon',
+        statusStyle: 'bg-secondary-accent/10 text-secondary-accent border border-secondary-accent/20',
+        icon: MessageCircle,
+        iconBg: 'bg-secondary-accent/10',
+        iconColor: 'text-secondary-accent',
+        numberColor: 'text-secondary-accent',
+        cardBorder: 'border-secondary-accent/20',
+    },
+    {
+        number: '03',
+        phase: 'Phase 3',
+        title: 'Build',
+        description: 'Create and track your personal Vision Board.',
+        status: 'Coming Soon',
+        statusStyle: 'bg-muted text-muted-foreground border border-border',
+        icon: LayoutDashboard,
+        iconBg: 'bg-success/10',
+        iconColor: 'text-success',
+        numberColor: 'text-success',
+        cardBorder: 'border-success/20',
+    },
+]
 
 export default function OurStory() {
     return (
-        <>
-            {/* About Taaluma.World */}
-            <section className="pt-8 sm:pt-16 bg-accent/30 overflow-hidden">
-                <div className="container mx-auto sm:px-4">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-3">About Taaluma.World</h2>
-                            <p className="text-lg text-muted-foreground">
-                                A living community built for value and growth
-                            </p>
-                        </div>
+        <section className="bg-background overflow-hidden">
+            <div className="container mx-auto sm:px-4">
+                <div className="max-w-6xl mx-auto">
 
-                        <div className="grid lg:grid-cols-2 gap-8">
-                            {/* Story Image */}
-                            <div className="relative">
-                                <div className="relative z-10 rounded-3xl overflow-hidden shadow-lg h-full max-h-75">
-                                    <div className='w-[80%] ml-auto'>
-                                        <ImageComponent
-                                            src="/images/common/about-img2.png"
-                                            alt="Colorful stack of books"
-                                            object_cover={true}
-                                            priority={true}
-                                        />
-                                    </div>
+                    {/* Section Header */}
+                    <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full mb-4">
+                            <span className="text-sm font-medium text-primary">The Journey</span>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-3">How Taaluma Works</h2>
+                        <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+                            A three-phase roadmap — from learning to mentoring to building your future.
+                        </p>
+                    </div>
+
+                    {/* Phase Cards */}
+                    <div className="grid md:grid-cols-3 gap-6 relative">
+
+                        {/* Connector line (desktop) */}
+                        <div className="hidden md:block absolute top-10 left-[calc(33.33%+12px)] right-[calc(33.33%+12px)] h-0.5 bg-border z-0" />
+
+                        {phases.map(({ number, phase, title, description, status, statusStyle, icon: Icon, iconBg, iconColor, numberColor, cardBorder }) => (
+                            <div
+                                key={phase}
+                                className={`relative bg-white rounded-3xl p-7 shadow-sm hover:shadow-md transition-shadow border ${cardBorder} flex flex-col gap-5 z-10`}
+                            >
+                                {/* Phase number + status */}
+                                <div className="flex items-center justify-between">
+                                    <span className={`text-4xl font-black ${numberColor} opacity-20 leading-none`}>{number}</span>
+                                    <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusStyle}`}>
+                                        {status}
+                                    </span>
                                 </div>
-                                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-secondary-accent/20 rounded-full blur-2xl"></div>
-                                <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl"></div>
+
+                                {/* Icon */}
+                                <div className={`w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center`}>
+                                    <Icon className={`w-6 h-6 ${iconColor}`} />
+                                </div>
+
+                                {/* Text */}
+                                <div className="space-y-1">
+                                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{phase}</p>
+                                    <h3 className="text-2xl font-bold text-foreground">{title}</h3>
+                                    <p className="text-base text-muted-foreground leading-relaxed pt-1">{description}</p>
+                                </div>
                             </div>
-
-                            {/* Story Text */}
-                            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
-                                <h3 className="text-xl font-bold text-foreground">Born in the Trenches. Engineered for the Future.</h3>
-                                <p className="text-base text-muted-foreground leading-relaxed">
-                                    Taaluma.World was born from a 10-page "monster" CV and a 4,000-mile wake-up call in London. Our founder, Daniel Muchika, learned the hard way that in the real world, <b>what matters is what you have IN you, not what you have WITH you.</b> After surviving the "Auctioneer’s Block" and navigating the "Ghost of the Holy Trinity," he realized that traditional career advice is a "4-Year Illusion" that leaves graduates unprepared for the brutal financial realities of the modern marketplace.
-                                </p>
-                                <p className="text-base text-muted-foreground leading-relaxed">
-                                    We are a living ecosystem built to replace passive "reading" with <b>Active Execution.</b> At Taaluma, we don't just tell stories; we provide the <b>Strategic Blueprints</b>—from the <b>3S Framework to First Principles Thinking</b>—that allow you to upgrade your Career Operating System in real-time. We are here to help you move beyond "laying bricks" for subsistence and start architecting a <b>Portfolio of Capacity</b> that no AI can replicate. Whether you are a student searching for your <b>True North</b> or a professional seeking your unique <b>Ikigai</b>, Taaluma.World is your laboratory for becoming an <b>Irreplaceable Career Architect.</b>
-
-
-                                </p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
-                </div>
-            </section>
 
-            {/* AI Revolution & Internal Compass */}
-            <section className="pt-16 bg-background">
-                <div className="container mx-auto sm:px-4">
-                    <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8">
-                        {/* AI Revolution */}
-                        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
-                            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-2">
-                                <span className="text-2xl">🤖</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-foreground">The AI Revolution: From CVs to Skill Badges</h3>
-                            <p className="text-base text-muted-foreground leading-relaxed">
-                                On November 30, 2022, the launch of ChatGPT changed the game forever. The career landscape shifted overnight from manual searches to a high-speed, AI-driven marketplace.
-                            </p>
-                            <ul className="space-y-3 text-muted-foreground">
-                                <li className="flex items-start gap-3">
-                                    <span className="text-primary font-bold mt-0.5">*</span>
-                                    <p>The <strong className="text-foreground">&quot;Standard Resume&quot;</strong> is a relic. Hiring bots scan your digital footprint before you even hit &quot;submit.&quot;</p>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="text-primary font-bold mt-0.5">*</span>
-                                    <p><strong className="text-foreground">Learning Velocity</strong>—the speed at which you master and deploy new tools—is the new currency of success.</p>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {/* Internal Compass */}
-                        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
-                            <div className="w-12 h-12 rounded-2xl bg-secondary-accent/10 flex items-center justify-center mb-2">
-                                <span className="text-2xl">🧭</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-foreground">Your Superpower: The Internal Compass</h3>
-                            <p className="text-base text-muted-foreground leading-relaxed">
-                                In the age of Gen AI, success begins with self-knowledge. AI can generate data, but it cannot replicate your indispensable skills—the things you were born with that feel like play but look like work to others.
-                            </p>
-                            <p className="text-base text-muted-foreground leading-relaxed">
-                                Taaluma doesn&apos;t just point you toward a specific job; it points you inward. We help you sharpen your &quot;internal compass&quot;—that essential gut feeling that tells you when a direction is truly yours. Whether you are launching your first career or looking for a &quot;mid-flight&quot; upgrade to your current business or job, we provide the strategic roadmap to make you irreplaceable.
-                            </p>
-                        </div>
-                    </div>
                 </div>
-            </section>
-        </>
+            </div>
+        </section>
     )
 }

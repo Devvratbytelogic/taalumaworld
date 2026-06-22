@@ -14,7 +14,8 @@ export default function MissionVision() {
                             </div>
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Mission</h2>
                             <p className="text-muted-foreground leading-relaxed text-lg">
-                                To bridge the gap between academic theory and real-world execution by providing a high-velocity Career Operating System. We empower the next generation to upgrade their internal muscle through strategic blueprints that build Undisputable Capacity for the AI economy.
+                                To democratize access to mentorship, practical knowledge, and career guidance by
+                                connecting learners and mentors across generations.
                             </p>
                         </div>
 
@@ -25,7 +26,8 @@ export default function MissionVision() {
                             </div>
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Vision</h2>
                             <p className="text-muted-foreground leading-relaxed text-lg">
-                                A global ecosystem where every professional is an Architect of their own path. We envision a future where the top 1% possess the Perspective Moat and Strategic Resilience required to lead markets and solve humanity's most critical pain points.</p>
+                                A world where every person can access the wisdom, experience, and networks needed to
+                                reach their full potential.</p>
                         </div>
                     </div>
                 </div>

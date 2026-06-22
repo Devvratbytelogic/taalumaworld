@@ -8,6 +8,7 @@ export interface bannerProps {
         suffix: string;
     };
     description: string;
+    tagline?: string;
     primaryCta: {
         title: string;
         button_status: boolean;
@@ -66,12 +67,13 @@ export const homeBannerData: bannerProps = {
 export const aboutBannerData: bannerProps = {
     badgeText: 'About Taaluma.World',
     heading: {
-        prefix: 'Build Undisputable Capacity for the AI',
-        highlight: 'Economy',
+        prefix: 'The Global Marketplace for Mentorship, Learning & Career',
+        highlight: 'Architecture',
         suffix: '.',
     },
     description:
-        "We are on a mission to bridge the gap between academic theory and real-world execution. At Taaluma, you aren't just consuming content—you are upgrading your Career Operating System with validatable proof and strategic blueprints.",
+        'We help people learn from those ahead of them, mentor those behind them, and build the capacity needed to thrive in the AI Economy.',
+    tagline: 'Learn From Someone Ahead. Mentor Someone Behind.',
     primaryCta: {
         title: 'Explore Blueprints',
         button_status: false,

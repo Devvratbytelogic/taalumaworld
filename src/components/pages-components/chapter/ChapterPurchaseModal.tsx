@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import { useDirectPurchaseChapterMutation } from '@/store/rtkQueries/userPostAPI';
 import { IChapterItem } from '@/types/user/HomeAllChapters';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import { getCartRoutePath } from '@/routes/routes';
@@ -32,30 +31,8 @@ export function ChapterPurchaseModal() {
   const router = useRouter();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const { chapter, book, closeBehavior = 'dismiss' } = data;
-  const [directPurchaseChapter] = useDirectPurchaseChapterMutation();
-
   const getAmount = useCallback(() => chapter?.price ?? 0, [chapter?.price]);
-
-  const attemptComplete = useCallback(
-    async (checkoutRequestId: string) => {
-      if (!chapter) return false;
-      try {
-
-        await directPurchaseChapter({
-          type: 'chapter',
-          payment_method: 'M-Pesa',
-          transaction_id: checkoutRequestId,
-          invoice: checkoutRequestId,
-          payment_status: 'Paid',
-          chapter_id: chapter.id,
-        }).unwrap();
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    [chapter, directPurchaseChapter]
-  );
+  const chapterID = chapter?._id ?? '';
 
   const onMpesaSuccess = useCallback(() => {
     toast.success('Blueprint purchased successfully!');
@@ -64,7 +41,8 @@ export function ChapterPurchaseModal() {
 
   const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
     getAmount,
-    attemptComplete,
+    chapterID,
+    type: chapter?.type,
     onSuccess: onMpesaSuccess,
   });
 

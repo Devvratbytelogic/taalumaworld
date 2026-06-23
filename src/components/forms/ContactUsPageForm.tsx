@@ -36,6 +36,7 @@ export default function ContactUsPageForm() {
                     name: values.name,
                     email: values.email,
                     subject: values.subject,
+                    inquiryType: values.inquiryType,
                     message: values.message,
                 }).unwrap();
                 setIsSubmitted(true);

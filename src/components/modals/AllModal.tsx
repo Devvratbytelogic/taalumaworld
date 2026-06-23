@@ -13,7 +13,6 @@ import CommonCardDetailsModal from './CommonCardDetailsModal';
 import LoginRequiredModal from '../auth/LoginRequiredModal';
 import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
-import AuthorRegister from '../auth/author/AuthorRegister';
 import AuthorForgotPassword from '../auth/author/AuthorForgotPassword';
 import AuthorOtpVerification from '../auth/author/AuthorOtpVerification';
 import AuthorResetPassword from '../auth/author/AuthorResetPassword';
@@ -34,6 +33,7 @@ export default function AllModal() {
             case "AuthorSignIn":
                 return <SignIn />;
             case "SignUp":
+            case "AuthorRegister":
                 return <SignUp />;
             case "ForgotPassword":
                 return <ForgotPassword />;
@@ -51,8 +51,6 @@ export default function AllModal() {
                 return <ChapterPurchaseModal />;
             case "ConfirmRemoveCartModal":
                 return <ConfirmRemoveCartModal />;
-            case "AuthorRegister":
-                return <AuthorRegister />;
             case "AuthorForgotPassword":
                 return <AuthorForgotPassword />;
             case "AuthorOtpVerification":

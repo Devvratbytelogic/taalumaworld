@@ -214,7 +214,7 @@ export default function PrimaryHeader() {
                 </Button>
                 <Button
                   className="hidden lg:flex global_btn rounded_full bg_primary"
-                  onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                  onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                 >
                   Join Taaluma
                 </Button>
@@ -395,7 +395,7 @@ export default function PrimaryHeader() {
                 <Button
                   className="global_btn rounded_full bg_primary w-full"
                   onPress={() => {
-                    dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                    dispatch(openModal({ componentName: 'SignUp', data: '' }));
                     closeMenu();
                   }}
                 >

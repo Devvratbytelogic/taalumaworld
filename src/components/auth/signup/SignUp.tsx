@@ -1,101 +1,141 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
-import { Input } from '@/components/ui/input';
-import Button from '@/components/ui/Button';
-import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
-import { useFormik } from 'formik';
-import { signUpSchema } from '@/utils/formValidation';
-import { RootState } from '@/store/store';
-import { closeModal, openModal } from '@/store/slices/allModalSlice';
-import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi';
-import toast from '@/utils/toast';
-import Link from 'next/link';
-import { getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
+import { Input } from '@/components/ui/input'
+import Button from '@/components/ui/Button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
+import { useFormik } from 'formik'
+import { signUpSchema } from '@/utils/formValidation'
+import { RootState } from '@/store/store'
+import { closeModal, openModal } from '@/store/slices/allModalSlice'
+import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
+import { useAuthorRegisterMutation } from '@/store/rtkQueries/adminAuth'
+import toast from '@/utils/toast'
+import Link from 'next/link'
+import { getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes'
 
-const AVATAR_BORDER_COLOR = '#C8D7EE';
+type SignRole = 'user' | 'author'
+
+const AVATAR_BORDER_COLOR = '#C8D7EE'
 
 export default function SignUp() {
-    const dispatch = useDispatch();
-    const { isOpen } = useSelector((state: RootState) => state.allModal);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [profileImage, setProfileImage] = useState<File | null>(null);
-    const [profilePreview, setProfilePreview] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation();
+    const dispatch = useDispatch()
+    const { isOpen, componentName } = useSelector((state: RootState) => state.allModal)
+    const [signRole, setSignRole] = useState<SignRole>('user')
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [profileImage, setProfileImage] = useState<File | null>(null)
+    const [profilePreview, setProfilePreview] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const handleAvatarClick = () => fileInputRef.current?.click();
+    const [userRegister, { isLoading: userRegistering }] = useUserRegisterMutation()
+    const [authorRegister, { isLoading: authorRegistering }] = useAuthorRegisterMutation()
+    const isRegistering = signRole === 'user' ? userRegistering : authorRegistering
+
+    useEffect(() => {
+        if (!isOpen) return
+        setSignRole(componentName === 'AuthorRegister' ? 'author' : 'user')
+    }, [isOpen, componentName])
+
+    const handleAvatarClick = () => fileInputRef.current?.click()
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const file = e.target.files?.[0]
+        if (!file) return
         if (!file.type.startsWith('image/')) {
-            toast.error('Please select an image file (e.g. JPG, PNG)');
-            return;
+            toast.error('Please select an image file (e.g. JPG, PNG)')
+            return
         }
         if (file.size > 2 * 1024 * 1024) {
-            toast.error('Image must be less than 2MB');
-            return;
+            toast.error('Image must be less than 2MB')
+            return
         }
-        setProfileImage(file);
-        const url = URL.createObjectURL(file);
-        setProfilePreview(url);
-    };
+        setProfileImage(file)
+        setProfilePreview(URL.createObjectURL(file))
+    }
     const clearProfileImage = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setProfileImage(null);
-        if (profilePreview) URL.revokeObjectURL(profilePreview);
-        setProfilePreview(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-    };
+        e.stopPropagation()
+        setProfileImage(null)
+        if (profilePreview) URL.revokeObjectURL(profilePreview)
+        setProfilePreview(null)
+        if (fileInputRef.current) fileInputRef.current.value = ''
+    }
 
-    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
-        initialValues: {
-            name: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-        },
+    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
+        initialValues: { name: '', email: '', password: '', confirmPassword: '' },
         validationSchema: signUpSchema,
-        onSubmit: async (formValues, { resetForm }) => {
+        onSubmit: async (formValues, { resetForm: rf }) => {
             try {
-                const formData = new FormData();
-                formData.append('name', formValues.name);
-                formData.append('email', formValues.email);
-                formData.append('password', formValues.password);
-                formData.append('password_confirmation', formValues.confirmPassword);
-                if (profileImage) formData.append('profile_pic', profileImage);
+                const formData = new FormData()
+                formData.append('name', formValues.name)
+                formData.append('email', formValues.email)
+                formData.append('password', formValues.password)
+                formData.append('password_confirmation', formValues.confirmPassword)
+                if (profileImage) formData.append('profile_pic', profileImage)
 
-                const res = await userRegister(formData).unwrap();
-
-                if (profilePreview) URL.revokeObjectURL(profilePreview);
-                setProfileImage(null);
-                setProfilePreview(null);
-                resetForm();
-
-                toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.');
-                dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }));
+                if (signRole === 'user') {
+                    const res = await userRegister(formData).unwrap()
+                    if (profilePreview) URL.revokeObjectURL(profilePreview)
+                    setProfileImage(null)
+                    setProfilePreview(null)
+                    rf()
+                    toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
+                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }))
+                } else {
+                    const res = await authorRegister(formData).unwrap()
+                    if (profilePreview) URL.revokeObjectURL(profilePreview)
+                    setProfileImage(null)
+                    setProfilePreview(null)
+                    rf()
+                    toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
+                    dispatch(openModal({ componentName: 'AuthorOtpVerification', data: { email: formValues.email, type: 'account' } }))
+                }
             } catch {
-                console.error('Registration failed. Please try again.');
+                console.error('Registration failed. Please try again.')
             }
         },
-    });
+    })
+
+    const onRoleChange = (next: SignRole) => {
+        setSignRole(next)
+        resetForm()
+        setShowPassword(false)
+        setShowConfirmPassword(false)
+    }
+
+    const headerSubtitle =
+        signRole === 'user'
+            ? 'Join TaalumaWorld and start your reading journey!'
+            : 'Create your author account on TaalumaWorld'
+
+    const signInModal = signRole === 'user' ? 'SignIn' : 'AuthorSignIn'
 
     return (
-        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
+        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container" scrollBehavior="outside">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
-                    <p className="text-2xl font-semibold text-foreground">
-                        Create Account
-                    </p>
-                    <p className="text-sm text-muted-foreground font-normal">
-                        Join <span className="text-foreground font-bold">Taaluma</span><span className="text-primary font-bold">World</span> and start your reading journey!
-                    </p>
+                    <p className="text-2xl font-semibold text-foreground">Create Account</p>
+                    <p className="text-sm text-muted-foreground font-normal">{headerSubtitle}</p>
+                    <div className="w-full mt-3">
+                        <Tabs
+                            value={signRole}
+                            onValueChange={(v) => onRoleChange(v === 'author' ? 'author' : 'user')}
+                            className="w-full"
+                        >
+                            <TabsList className="grid w-full grid-cols-2 rounded-2xl p-1 h-11 gap-1">
+                                <TabsTrigger value="user" className="rounded-xl text-sm">
+                                    User account
+                                </TabsTrigger>
+                                <TabsTrigger value="author" className="rounded-xl text-sm">
+                                    Author account
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    </div>
                 </ModalHeader>
                 <ModalBody>
                     <form className="space-y-3" onSubmit={handleSubmit}>
-                        {/* Profile Picture Upload */}
                         <div className="flex flex-col items-center gap-2">
                             <input
                                 ref={fileInputRef}
@@ -135,15 +175,15 @@ export default function SignUp() {
                             <span className="text-sm text-muted-foreground">Profile picture (optional)</span>
                         </div>
 
-                        {/* Name Field */}
                         <div className="space-y-2">
-                            <label htmlFor="name" className="text-sm font-medium text-foreground">
+                            <label htmlFor="signup-name" className="text-sm font-medium text-foreground">
                                 Full Name
                             </label>
                             <div className="relative">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input
-                                    id="name"
+                                    id="signup-name"
+                                    name="name"
                                     type="text"
                                     placeholder="John Doe"
                                     className={`pl-12 h-12 rounded-2xl ${errors.name && touched.name ? 'border-red-500' : ''}`}
@@ -158,15 +198,15 @@ export default function SignUp() {
                             )}
                         </div>
 
-                        {/* Email Field */}
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-foreground">
+                            <label htmlFor="signup-email" className="text-sm font-medium text-foreground">
                                 Email Address
                             </label>
                             <div className="relative">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input
-                                    id="email"
+                                    id="signup-email"
+                                    name="email"
                                     type="email"
                                     placeholder="you@example.com"
                                     className={`pl-12 h-12 rounded-2xl ${errors.email && touched.email ? 'border-red-500' : ''}`}
@@ -181,15 +221,15 @@ export default function SignUp() {
                             )}
                         </div>
 
-                        {/* Password Field */}
                         <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-foreground">
+                            <label htmlFor="signup-password" className="text-sm font-medium text-foreground">
                                 Password
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input
-                                    id="password"
+                                    id="signup-password"
+                                    name="password"
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="Create a password"
                                     className={`pl-12 pr-12 h-12 rounded-2xl ${errors.password && touched.password ? 'border-red-500' : ''}`}
@@ -212,15 +252,15 @@ export default function SignUp() {
                             )}
                         </div>
 
-                        {/* Confirm Password Field */}
                         <div className="space-y-2">
-                            <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+                            <label htmlFor="signup-confirmPassword" className="text-sm font-medium text-foreground">
                                 Confirm Password
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input
-                                    id="confirmPassword"
+                                    id="signup-confirmPassword"
+                                    name="confirmPassword"
                                     type={showConfirmPassword ? 'text' : 'password'}
                                     placeholder="Re-enter your password"
                                     className={`pl-12 pr-12 h-12 rounded-2xl ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : ''}`}
@@ -249,32 +289,41 @@ export default function SignUp() {
                             disabled={isSubmitting || isRegistering}
                             isLoading={isSubmitting || isRegistering}
                         >
-                            Sign Up
+                            {signRole === 'user' ? 'Sign Up' : 'Register'}
                         </Button>
-
-                        
                     </form>
-                    <ModalFooter className='px-0!'>
-                        <div className="w-full text-center text-sm text-muted-foreground">
-                            <span>Already have an account? </span>
-                            <button
-                                type="button"
-                                className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
-                                disabled={isSubmitting}
-                            >
-                                Sign In
-                            </button>
-                            <p className="text-center text-sm text-muted-foreground">
-                            By creating an account, you agree to our{' '}
-                            <Link href={getTermsOfServiceRoutePath()} target='_blank' className="font-semibold text-primary hover:text-primary/80 transition-colors">
-                                Terms &amp; Conditions
-                            </Link>
-                            {' '}and{' '}
-                            <Link href={getPrivacyPolicyRoutePath()} target='_blank' className="font-semibold text-primary hover:text-primary/80 transition-colors">
-                                Privacy Policy
-                            </Link>
-                        </p>
+
+                    <ModalFooter className="px-0!">
+                        <div className="w-full space-y-2 text-center text-sm text-muted-foreground">
+                            <div>
+                                <span>Already have an account? </span>
+                                <button
+                                    type="button"
+                                    className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                    onClick={() => dispatch(openModal({ componentName: signInModal, data: '' }))}
+                                    disabled={isSubmitting}
+                                >
+                                    Sign In
+                                </button>
+                            </div>
+                            <p>
+                                By creating an account, you agree to our{' '}
+                                <Link
+                                    href={getTermsOfServiceRoutePath()}
+                                    target="_blank"
+                                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                >
+                                    Terms &amp; Conditions
+                                </Link>
+                                {' '}and{' '}
+                                <Link
+                                    href={getPrivacyPolicyRoutePath()}
+                                    target="_blank"
+                                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                >
+                                    Privacy Policy
+                                </Link>
+                            </p>
                         </div>
                     </ModalFooter>
                 </ModalBody>

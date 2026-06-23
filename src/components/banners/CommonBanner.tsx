@@ -4,13 +4,16 @@ import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent';
 import { bannerProps } from '@/data/data';
 import { useGetActiveReadersQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
+import { openModal } from '@/store/slices/allModalSlice';
 // import { VISIBLE } from '@/constants/contentMode';
+import { useDispatch } from 'react-redux';
 
 interface CommonBannerProps {
     data: bannerProps;
 }
 export default function CommonBanner({ data }: CommonBannerProps) {
     const { data: activeReadersData } = useGetActiveReadersQuery();
+    const dispatch = useDispatch();
     // const { data: globalSettings } = useGetGlobalSettingsQuery();
     // const displayMode = globalSettings?.data?.visible === VISIBLE.BOOK ? 'books' : 'chapters';
 
@@ -76,7 +79,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                 {data?.secondaryCta?.button_status && (
                                     <Button
                                         className="global_btn rounded_full outline_primary"
-                                        onPress={scrollToCategories}
+                                        onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                                     >
                                         {data?.secondaryCta?.title}
                                     </Button>

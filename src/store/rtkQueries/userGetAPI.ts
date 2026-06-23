@@ -53,7 +53,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
                 params,
             }),
-            providesTags: ['AllChapters'],
+            providesTags: ['AllChapters', 'Cart'],
         }),
         /** single chapter */
         getSingleChapter: builder.query<ISingleChapterAPIResponse, string>({

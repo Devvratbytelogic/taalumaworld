@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { IChapterItem } from '@/types/user/HomeAllChapters';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import { getCartRoutePath } from '@/routes/routes';
 import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
@@ -35,9 +36,14 @@ export function ChapterPurchaseModal() {
   const chapterID = chapter?._id ?? '';
 
   const onMpesaSuccess = useCallback(() => {
+    dispatch(rtkQuerieSetup.util.invalidateTags([
+      { type: 'SingleChapter', id: chapterID },
+      'AllChapters',
+      'MyChapters',
+    ]));
     toast.success('Blueprint purchased successfully!');
     dispatch(closeModal());
-  }, [dispatch]);
+  }, [dispatch, chapterID]);
 
   const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
     getAmount,

@@ -5,6 +5,7 @@ import { Trash2, BookOpen } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
@@ -48,8 +49,9 @@ export default function CartDetailsComponent() {
   const cartID = cartData?._id ?? '';
 
   const onMpesaSuccess = useCallback(() => {
+    dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
     setIsOrderComplete(true);
-  }, []);
+  }, [dispatch]);
 
   const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
     getAmount,

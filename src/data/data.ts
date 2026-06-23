@@ -94,7 +94,7 @@ export const aboutBannerData: bannerProps = {
     },
     image: {
         src: '/images/common/about-img1.jpg',
-        alt: 'About Us Banner',
+        alt: 'Why Taaluma Exists Banner',
     },
 
 };

@@ -124,12 +124,12 @@ export default function PrimaryFooter() {
                                 )} */}
                                 <li>
                                     <Link href={getAboutUsRoutePath()} className="hover:text-primary transition-colors">
-                                        About Us
+                                        Why Taaluma Exists
                                     </Link>
                                 </li>
                                 <li>
                                     <Link href={getContactUsRoutePath()} className="hover:text-primary transition-colors">
-                                        Contact Us
+                                        Help & Trust Center
                                     </Link>
                                 </li>
                             </ul>
@@ -259,7 +259,7 @@ export default function PrimaryFooter() {
                                 </Link>
                                 <span className="text-gray-600">•</span>
                                 <Link href={getContactUsRoutePath()} className="hover:text-primary transition-colors">
-                                    Contact
+                                    Help & Trust Center
                                 </Link>
                             </div>
                         </div>

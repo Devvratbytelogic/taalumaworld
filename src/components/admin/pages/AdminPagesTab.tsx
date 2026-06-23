@@ -190,8 +190,8 @@ export function AdminPagesTab() {
     },
     {
       id: 1,
-      title: 'About Us',
-      slug: 'about-us',
+      title: 'Why Taaluma Exists',
+      slug: 'why-taaluma-exists',
       content: 'Learn about Taaluma.world and our mission to empower young professionals...',
       status: 'published',
       lastModified: '2024-01-20',
@@ -1051,7 +1051,7 @@ export function AdminPagesTab() {
               <Label htmlFor="title">Page Title</Label>
               <Input
                 id="title"
-                placeholder="e.g., About Us"
+                placeholder="e.g., Why Taaluma Exists"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
@@ -1141,7 +1141,7 @@ export function AdminPagesTab() {
               <Label htmlFor="edit-title">Page Title</Label>
               <Input
                 id="edit-title"
-                placeholder="e.g., About Us"
+                placeholder="e.g., Why Taaluma Exists"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />

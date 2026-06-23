@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useMpesaPaymentMutation } from '@/store/rtkQueries/userPostAPI';
 import { useLazyGetMpesaPaymentStatusQuery } from '@/store/rtkQueries/userGetAPI';
+import { mpesaLog } from '@/utils/mpesaLogger';
 
-const DEFAULT_WAIT_SECONDS = 90;
+const DEFAULT_WAIT_SECONDS = 300;
 const STATUS_POLL_MS = 2_000;
 
 export type MpesaPayResult = {
@@ -76,6 +77,7 @@ export function useMpesaPaymentFlow({
 
   /** Fully resets everything and closes the wait modal. */
   const cancelWaiting = useCallback(() => {
+    mpesaLog('PAYMENT_CANCELLED_BY_USER', 'warn', { checkoutId: checkoutIdRef.current });
     finalizedRef.current = true;
     stopPolling();
     checkoutIdRef.current = null;
@@ -102,18 +104,23 @@ export function useMpesaPaymentFlow({
   /** Step 1: open the phone-number modal (or skip M-Pesa entirely in test mode). */
   const startPayment = useCallback(async () => {
     if (SKIP_MPESA) {
+      mpesaLog('TEST_MODE_SKIP', 'warn', { amount: getAmount() });
       setIsInitiating(true);
       try {
         const fakeCheckoutId = `TEST-${Date.now()}`;
+        mpesaLog('CHECKOUT_ATTEMPT', 'info', { checkoutId: fakeCheckoutId, amount: getAmount() });
         const done = await attemptCompleteRef.current(fakeCheckoutId);
         if (done) {
+          mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId: fakeCheckoutId });
           await Promise.resolve(onSuccessRef.current());
         } else {
+          mpesaLog('CHECKOUT_FAILED', 'error', { checkoutId: fakeCheckoutId, error: 'attemptComplete returned false in skip-mpesa mode' });
           toast.error('Test purchase failed', {
             description: 'attemptComplete returned false in skip-mpesa mode.',
           });
         }
       } catch {
+        mpesaLog('CHECKOUT_FAILED', 'error', { error: 'Exception thrown in skip-mpesa mode' });
         toast.error('Test purchase error', {
           description: 'An error occurred in skip-mpesa mode.',
         });
@@ -122,13 +129,15 @@ export function useMpesaPaymentFlow({
       }
       return;
     }
+    mpesaLog('PAYMENT_INITIATED', 'info', { amount: getAmount() });
     setIsPhoneModalOpen(true);
-  }, []);
+  }, [getAmount]);
 
   /** Step 2: called by MpesaPhoneModal with the collected phone number. */
   const confirmPayment = useCallback(
     async (phone: number) => {
       setIsInitiating(true);
+      mpesaLog('PAYMENT_INITIATED', 'info', { amount: getAmount(), phone });
       try {
         const res = (await mpesaPayment({
           amount: getAmount(),
@@ -139,6 +148,13 @@ export function useMpesaPaymentFlow({
         const checkoutId = res?.data?.response?.MerchantRequestID;
 
         if (res?.success && responseCode === '0' && checkoutId) {
+          mpesaLog('STK_PUSH_SUCCESS', 'info', {
+            checkoutId,
+            responseCode,
+            amount: getAmount(),
+            phone,
+            meta: { merchantRequestId: res?.data?.response?.MerchantRequestID, checkoutRequestId: res?.data?.response?.CheckoutRequestID },
+          });
           checkoutIdRef.current = checkoutId;
           finalizedRef.current = false;
           pollInFlightRef.current = false;
@@ -149,11 +165,22 @@ export function useMpesaPaymentFlow({
           return;
         }
 
+        mpesaLog('STK_PUSH_FAILED', 'error', {
+          responseCode: responseCode ?? 'none',
+          amount: getAmount(),
+          phone,
+          error: `success=${res?.success}, responseCode=${responseCode}, checkoutId=${checkoutId}`,
+        });
         toast.error('Could not start M-Pesa payment', {
           description: 'Please try again or contact support.',
         });
         setIsInitiating(false);
-      } catch {
+      } catch (err) {
+        mpesaLog('STK_PUSH_FAILED', 'error', {
+          amount: getAmount(),
+          phone,
+          error: err instanceof Error ? err.message : 'Unknown exception during STK push',
+        });
         toast.error('Payment Failed', {
           description: 'Please try again or contact support.',
         });
@@ -176,6 +203,10 @@ export function useMpesaPaymentFlow({
         clearInterval(timer);
         if (!finalizedRef.current) {
           stopPolling();
+          mpesaLog('POLL_TIMEOUT', 'warn', {
+            checkoutId: checkoutIdRef.current,
+            meta: { waitSeconds },
+          });
           setShowPaymentSuccessMessage(false);
           setErrorState({
             title: 'Payment timed out',
@@ -210,18 +241,27 @@ export function useMpesaPaymentFlow({
 
         const status = result?.data?.data?.status as MpesaPaymentStatus | undefined;
 
+        mpesaLog('POLL_TICK', 'info', { checkoutId, status: status ?? 'undefined' });
+
         if (status === 'completed') {
           finalizedRef.current = true;
           stopPolling();
+          mpesaLog('POLL_COMPLETED', 'info', { checkoutId });
           setShowPaymentSuccessMessage(true);
           try {
+            mpesaLog('CHECKOUT_ATTEMPT', 'info', { checkoutId });
             const done = await attemptCompleteRef.current(checkoutId);
             checkoutIdRef.current = null;
             setShowPaymentSuccessMessage(false);
             setIsWaiting(false);
             if (done) {
+              mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId });
               await Promise.resolve(onSuccessRef.current());
             } else {
+              mpesaLog('CHECKOUT_FAILED', 'error', {
+                checkoutId,
+                error: 'attemptComplete returned false — payment received but checkout not finalised',
+              });
               setErrorState({
                 title: 'Could not finalise purchase',
                 description:
@@ -229,7 +269,11 @@ export function useMpesaPaymentFlow({
               });
               setIsWaiting(true);
             }
-          } catch {
+          } catch (err) {
+            mpesaLog('CHECKOUT_FAILED', 'error', {
+              checkoutId,
+              error: err instanceof Error ? err.message : 'Exception in attemptComplete',
+            });
             setShowPaymentSuccessMessage(false);
             setErrorState({
               title: 'Could not finalise purchase',
@@ -241,6 +285,7 @@ export function useMpesaPaymentFlow({
           finalizedRef.current = true;
           stopPolling();
           checkoutIdRef.current = null;
+          mpesaLog('POLL_CANCELLED', 'warn', { checkoutId });
           setErrorState({
             title: 'Payment was cancelled',
             description:
@@ -250,6 +295,7 @@ export function useMpesaPaymentFlow({
           finalizedRef.current = true;
           stopPolling();
           checkoutIdRef.current = null;
+          mpesaLog('POLL_FAILED', 'error', { checkoutId, status });
           setErrorState({
             title: 'Payment failed',
             description:
@@ -259,14 +305,19 @@ export function useMpesaPaymentFlow({
           finalizedRef.current = true;
           stopPolling();
           checkoutIdRef.current = null;
+          mpesaLog('POLL_UNKNOWN_STATUS', 'error', { checkoutId, status });
           setErrorState({
             title: 'Payment was not successful',
             description: 'An unexpected error occurred. Please try again or contact support.',
           });
         }
         // 'pending' → do nothing; next interval will poll again
-      } catch {
+      } catch (err) {
         // Network/parse error — silently retry on next interval
+        mpesaLog('POLL_NETWORK_ERROR', 'error', {
+          checkoutId,
+          error: err instanceof Error ? err.message : 'Unknown network error during poll',
+        });
       } finally {
         pollInFlightRef.current = false;
       }

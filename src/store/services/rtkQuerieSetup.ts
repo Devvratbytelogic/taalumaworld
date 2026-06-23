@@ -150,6 +150,8 @@ export const rtkQuerieSetup = createApi({
         'AdminFAQs',
         'GlobalSettings',
         'AdminSubscribers',
+        'AdminBookOrders',
+        'AdminBlueprintOrders',
     ],
     endpoints: () => ({}),
 });

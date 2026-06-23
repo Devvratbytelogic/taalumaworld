@@ -13,6 +13,7 @@ const sectionToPermission: Record<AdminSection, keyof AdminUser['permissions']> 
   activity_logs: 'canViewActivityLogs',
   payments: 'canManagePayments',
   transactions: 'canViewTransactions',
+  orders: 'canManageOrders',
   reviews: 'canManageReviews',
   moderation: 'canModerateContent',
   analytics: 'canViewAnalytics',

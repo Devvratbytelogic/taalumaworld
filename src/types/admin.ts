@@ -15,6 +15,7 @@ export type AdminSection =
   | 'activity_logs'
   | 'payments'
   | 'transactions'
+  | 'orders'
   | 'reviews'
   | 'moderation'
   | 'analytics'
@@ -37,6 +38,7 @@ export type AdminPermissions = {
   canViewActivityLogs: boolean;
   canManagePayments: boolean;
   canViewTransactions: boolean;
+  canManageOrders: boolean;
   canManageReviews: boolean;
   canModerateContent: boolean;
   canViewAnalytics: boolean;
@@ -73,6 +75,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewActivityLogs: true,
     canManagePayments: true,
     canViewTransactions: true,
+    canManageOrders: true,
     canManageReviews: true,
     canModerateContent: true,
     canViewAnalytics: true,
@@ -96,6 +99,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canViewActivityLogs: false,
     canManagePayments: false,
     canViewTransactions: false,
+    canManageOrders: false,
     canManageReviews: false,
     canModerateContent: false,
     canViewAnalytics: false,

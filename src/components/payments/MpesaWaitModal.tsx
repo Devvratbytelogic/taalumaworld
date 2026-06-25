@@ -62,7 +62,7 @@ export function MpesaWaitModal({
             <>
               <p className="text-lg font-semibold">Payment successful</p>
               <p className="text-sm font-normal text-muted-foreground">
-                Confirming your purchase. Please wait a moment.
+                Your payment was received. Redirecting you now…
               </p>
             </>
           ) : (
@@ -89,7 +89,7 @@ export function MpesaWaitModal({
             <div className="flex flex-col items-center gap-4 py-2 text-center">
               <CheckCircle2 className="h-16 w-16 text-success" strokeWidth={1.75} aria-hidden />
               <p className="text-base font-medium text-foreground">M-Pesa payment received</p>
-              <p className="text-sm text-muted-foreground">Finalizing your order…</p>
+              <p className="text-sm text-muted-foreground">Your order is confirmed!</p>
             </div>
           ) : (
             <>

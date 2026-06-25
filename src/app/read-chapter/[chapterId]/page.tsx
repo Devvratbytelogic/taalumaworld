@@ -8,25 +8,37 @@ import { useGetSingleBookQuery, useGetSingleChapterQuery } from '@/store/rtkQuer
 import type { IBookChapterItem } from '@/types/user/singleBook';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import dynamic from 'next/dynamic';
-
-const PdfViewer = dynamic(() => import('@/components/ui/PdfViewer'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center py-16">
-      <p className="text-muted-foreground text-sm animate-pulse">Loading PDF…</p>
-    </div>
-  ),
-});
 import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPageSkeleton';
+import PdfViewerSkeleton from '@/components/skeleton-loader/PdfViewerSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { useUpdateReadingProgressMutation } from '@/store/rtkQueries/userPostAPI';
+const PdfViewer = dynamic(() => import('@/components/ui/PdfViewer'), {
+  ssr: false,
+  loading: () => <PdfViewerSkeleton />,
+});
 
 export default function ReadChapterPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
-  const chapterId = params?.chapterId as string | undefined;
+
+  // Manage chapterId in state so chapter navigation doesn't unmount/remount
+  // the page (and PdfViewer). URL is kept in sync via window.history.pushState.
+  const [chapterId, setChapterId] = useState<string | undefined>(
+    params?.chapterId as string | undefined,
+  );
+
+  // Sync state when user navigates via browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const parts = window.location.pathname.split('/');
+      const id = parts[parts.length - 1];
+      if (id) setChapterId(id);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const { data: chapterResponse, isLoading } = useGetSingleChapterQuery(chapterId!, { skip: !chapterId });
 
@@ -73,7 +85,7 @@ export default function ReadChapterPage() {
   const currentIndex = bookChapters.findIndex((c) => c._id === chapterId);
 
   const hasPdf = !!currentChapter?.pdf;
-
+  // console.log('hasPdf', currentChapter?.pdf);
   const [showControls, setShowControls] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -105,20 +117,20 @@ export default function ReadChapterPage() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
   };
 
+  const navigateToChapter = (id: string) => {
+    resetProgressRefs();
+    setChapterId(id);
+    window.history.pushState({}, '', getReadChapterRoutePath(id));
+  };
+
   const handlePreviousChapter = () => {
     const prev = bookChapters[currentIndex - 1];
-    if (prev) {
-      resetProgressRefs();
-      router.push(getReadChapterRoutePath(prev._id));
-    }
+    if (prev) navigateToChapter(prev._id);
   };
 
   const handleNextChapter = () => {
     const next = bookChapters[currentIndex + 1];
-    if (next) {
-      resetProgressRefs();
-      router.push(getReadChapterRoutePath(next._id));
-    }
+    if (next) navigateToChapter(next._id);
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {

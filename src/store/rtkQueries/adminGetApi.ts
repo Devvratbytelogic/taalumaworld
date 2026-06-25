@@ -11,6 +11,7 @@ import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 import { IAllTransactionsAPIResponse } from '@/types/transaction';
 import { IAllContactusDataAPIResponse } from '@/types/contactData';
 import { IAllSubscribersAPIResponse } from '@/types/subscribers';
+import { IAllOrdersAPIResponse } from '@/types/order';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -96,10 +97,11 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Transactions */
-        getAllTransactions: builder.query<IAllTransactionsAPIResponse, void>({
-            query: () => ({
+        getAllTransactions: builder.query<IAllTransactionsAPIResponse, { search?: string, fromDate?: string, toDate?: string, status?: string, page?: number, limit?: number }>({
+            query: (params) => ({
                 url: `/admin/payment-report`,
                 method: 'GET',
+                params: params,
             }),
             // providesTags: ['AdminTransactions'],
         }),
@@ -119,6 +121,26 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminSubscribers'],
         }),
+
+        /** Book Orders */
+        getAllBookOrders: builder.query<IAllOrdersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
+                url: `/admin/orders`,
+                method: 'GET',
+                params: { type: 'books', ...(params || {}) },
+            }),
+            providesTags: ['AdminBookOrders'],
+        }),
+
+        /** Blueprint Orders */
+        getAllBlueprintOrders: builder.query<IAllOrdersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
+                url: `/admin/orders`,
+                method: 'GET',
+                params: { type: 'chapters', ...(params || {}) },
+            }),
+            providesTags: ['AdminBlueprintOrders'],
+        }),
     }),
 });
 
@@ -135,4 +157,6 @@ export const {
     useGetAllTransactionsQuery,
     useGetAllContactusDataQuery,
     useGetAllSubscribersQuery,
+    useGetAllBookOrdersQuery,
+    useGetAllBlueprintOrdersQuery,
 } = clientSideGetApis;

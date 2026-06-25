@@ -6,11 +6,7 @@ import { BookOpen, AlertCircle } from 'lucide-react';
 import { Button } from '@heroui/react';
 import {
     LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree,
-<<<<<<< Updated upstream
-    MessageSquare, FileEdit, UserCircle, Mail, Bell,
-=======
     MessageSquare, FileEdit, UserCircle, Mail, Bell, ShoppingBag, GraduationCap,
->>>>>>> Stashed changes
 } from 'lucide-react';
 
 function KshIcon({ className }: { className?: string }) {
@@ -43,10 +39,11 @@ const NAV_ITEMS = [
     // { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
     // { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: KshIcon, category: 'commerce' },
+    { id: 'orders' as AdminSection, label: 'Orders', icon: ShoppingBag, category: 'commerce' },
     // { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
     { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
     { id: 'faqs' as AdminSection, label: 'FAQs', icon: FileEdit, category: 'community' },
-    { id: 'contact_us' as AdminSection, label: 'Contact Us', icon: Mail, category: 'community' },
+    { id: 'contact_us' as AdminSection, label: 'Help & Trust Center', icon: Mail, category: 'community' },
     { id: 'subscribers' as AdminSection, label: 'Subscribers', icon: Bell, category: 'community' },
     // { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
     // { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
@@ -67,6 +64,7 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/activity-logs': 'activity_logs',
     // '/admin/payments': 'payments',
     '/admin/transactions': 'transactions',
+    '/admin/orders': 'orders',
     '/admin/reviews': 'reviews',
     '/admin/testimonials': 'testimonials',
     '/admin/faqs': 'faqs',

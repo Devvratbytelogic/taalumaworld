@@ -35,15 +35,16 @@ export default function PrimaryFooter() {
     const logo = settings?.logo as string | null | undefined;
 
 
+    // Ordered: LinkedIn → YouTube → Instagram → TikTok (priority channels for a knowledge platform)
     const socialLinks = [
+        { href: settings?.linkdin_link, icon: LinkedinIcon, label: 'LinkedIn' },
+        { href: settings?.youtube_link, icon: YoutubeIcon, label: 'YouTube' },
+        { href: settings?.instagram_link, icon: InstagramIcon, label: 'Instagram' },
+        { href: settings?.tiktok_link, icon: TikTokIcon, label: 'TikTok' },
         { href: settings?.facebook_link, icon: FacebookIcon, label: 'Facebook' },
         { href: settings?.x_link, icon: TwitterIcon, label: 'X / Twitter' },
-        { href: settings?.instagram_link, icon: InstagramIcon, label: 'Instagram' },
-        { href: settings?.youtube_link, icon: YoutubeIcon, label: 'YouTube' },
-        { href: settings?.linkdin_link, icon: LinkedinIcon, label: 'LinkedIn' },
         { href: settings?.pinterest_link, icon: PinterestIcon, label: 'Pinterest' },
         { href: settings?.whatsapp_link, icon: WhatsAppIcon, label: 'WhatsApp' },
-        { href: settings?.tiktok_link, icon: TikTokIcon, label: 'TikTok' },
     ].filter((s) => !!s.href);
 
 
@@ -64,9 +65,11 @@ export default function PrimaryFooter() {
                                     <h3 className="text-white font-bold text-lg">{brandName}</h3>
                                 )}
                             </div>
-                            {description && (
-                                <p className="text-sm text-white mb-4">{description}</p>
-                            )}
+                            <div className="mb-4 space-y-1">
+                                <p className="text-sm text-gray-300">The Global Marketplace for Mentorship, Learning &amp; Career Architecture.</p>
+                                <p className="text-sm text-gray-400">Learn from someone ahead. Mentor someone behind.</p>
+                                <p className="text-sm text-gray-400">Build human capacity for the AI Economy.</p>
+                            </div>
                             {socialLinks.length > 0 && (
                                 <div className="flex gap-3 flex-wrap">
                                     {socialLinks.map(({ href, icon: Icon, label }) => (
@@ -121,12 +124,12 @@ export default function PrimaryFooter() {
                                 )} */}
                                 <li>
                                     <Link href={getAboutUsRoutePath()} className="hover:text-primary transition-colors">
-                                        About Us
+                                        Why Taaluma Exists
                                     </Link>
                                 </li>
                                 <li>
                                     <Link href={getContactUsRoutePath()} className="hover:text-primary transition-colors">
-                                        Contact Us
+                                        Help & Trust Center
                                     </Link>
                                 </li>
                             </ul>
@@ -256,7 +259,7 @@ export default function PrimaryFooter() {
                                 </Link>
                                 <span className="text-gray-600">•</span>
                                 <Link href={getContactUsRoutePath()} className="hover:text-primary transition-colors">
-                                    Contact
+                                    Help & Trust Center
                                 </Link>
                             </div>
                         </div>

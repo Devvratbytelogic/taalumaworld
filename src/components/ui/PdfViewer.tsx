@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import PdfViewerSkeleton from '@/components/skeleton-loader/PdfViewerSkeleton';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -37,11 +38,7 @@ export default function PdfViewer({ url }: PdfViewerProps) {
       <Document
         file={url}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-        loading={
-          <div className="flex items-center justify-center py-16">
-            <p className="text-muted-foreground text-sm animate-pulse">Loading PDF…</p>
-          </div>
-        }
+        loading={<PdfViewerSkeleton />}
         error={
           <div className="flex items-center justify-center py-16">
             <p className="text-destructive text-sm">Failed to load PDF.</p>

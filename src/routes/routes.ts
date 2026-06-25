@@ -50,6 +50,7 @@ export function getAdminSectionRoutePath(section: string): string {
     activity_logs: '/admin/activity-logs',
     payments: '/admin/payments',
     transactions: '/admin/transactions',
+    orders: '/admin/orders',
     reviews: '/admin/reviews',
     testimonials: '/admin/testimonials',
     faqs: '/admin/faqs',

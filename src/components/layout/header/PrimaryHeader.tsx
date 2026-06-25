@@ -214,7 +214,7 @@ export default function PrimaryHeader() {
                 </Button>
                 <Button
                   className="hidden lg:flex global_btn rounded_full bg_primary"
-                  onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                  onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                 >
                   Join Taaluma
                 </Button>
@@ -247,13 +247,13 @@ export default function PrimaryHeader() {
             href={getAboutUsRoutePath()}
             className={`transition-colors ${isActive(getAboutUsRoutePath()) ? 'text-primary' : 'hover:text-primary'}`}
           >
-            About Us
+            Why Taaluma Exists
           </Link>
           <Link
             href={getContactUsRoutePath()}
             className={`transition-colors ${isActive(getContactUsRoutePath()) ? 'text-primary' : 'hover:text-primary'}`}
           >
-            Contact
+            Help & Trust Center
           </Link>
         </nav>
       </div>
@@ -299,16 +299,15 @@ export default function PrimaryHeader() {
             <nav className="flex flex-col">
               {[
                 { label: 'Home', href: getHomeRoutePath(), icon: Home },
-                { label: 'About Us', href: getAboutUsRoutePath(), icon: Info },
-                { label: 'Contact', href: getContactUsRoutePath(), icon: Phone },
+                { label: 'Why Taaluma Exists', href: getAboutUsRoutePath(), icon: Info },
+                { label: 'Help & Trust Center', href: getContactUsRoutePath(), icon: Phone },
               ].map(({ label, href, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={closeMenu}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${
-                    isActive(href) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${isActive(href) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
+                    }`}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   {label}
@@ -319,9 +318,8 @@ export default function PrimaryHeader() {
                 <Link
                   href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`}
                   onClick={closeMenu}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${
-                    isActive(getUserDashboardRoutePath()) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${isActive(getUserDashboardRoutePath()) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
+                    }`}
                 >
                   <BookMarked className="h-5 w-5 shrink-0" />
                   {contentMode === VISIBLE.CHAPTER ? 'My Blueprints' : 'My Books'}
@@ -339,9 +337,8 @@ export default function PrimaryHeader() {
                   key={href}
                   href={href}
                   onClick={closeMenu}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${
-                    isActive(href) ? 'text-primary bg-primary/8 font-medium' : 'text-gray-500 hover:bg-gray-50 hover:text-primary'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${isActive(href) ? 'text-primary bg-primary/8 font-medium' : 'text-gray-500 hover:bg-gray-50 hover:text-primary'
+                    }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
                   {label}
@@ -395,7 +392,7 @@ export default function PrimaryHeader() {
                 <Button
                   className="global_btn rounded_full bg_primary w-full"
                   onPress={() => {
-                    dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                    dispatch(openModal({ componentName: 'SignUp', data: '' }));
                     closeMenu();
                   }}
                 >

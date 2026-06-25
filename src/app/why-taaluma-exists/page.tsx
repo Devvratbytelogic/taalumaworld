@@ -12,7 +12,7 @@ import CommonCTA from '@/components/cta/CommonCTA';
 export default function AboutUsPage() {
     return (
         <>
-            {/* About Us Banner */}
+            {/* Why Taaluma Exists Banner */}
             <CommonBanner data={aboutBannerData} />
 
             <div className='space-y-10'>

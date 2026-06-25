@@ -9,6 +9,14 @@ export interface IAllTransactionsAPIResponse {
   export interface IAllTransactionsAPIResponseData {
     totalRevenue: number;
     payments?: (IPaymentsEntity)[] | null;
+    pagination?: ITransactionPagination;
+  }
+
+  export interface ITransactionPagination {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
   }
   export interface IPaymentsEntity {
     transactionId: string;

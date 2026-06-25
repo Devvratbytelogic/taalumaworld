@@ -5,7 +5,7 @@ import { Trash2, BookOpen } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
-import { useCheckOutCartMutation } from '@/store/rtkQueries/userPostAPI';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
@@ -24,9 +24,8 @@ import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
 export default function CartDetailsComponent() {
   const dispatch = useDispatch();
   const { data: cartResponse, isLoading } = useGetCartQuery();
-  const [checkOutCart] = useCheckOutCartMutation();
   const [isOrderComplete, setIsOrderComplete] = useState(false);
-  const [orderId, setOrderId] = useState<string | number | null>(null);
+  const [orderId] = useState<string | number | null>(null);
 
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
@@ -47,35 +46,16 @@ export default function CartDetailsComponent() {
   const total = cartData?.total_amount ?? subtotal;
 
   const getAmount = useCallback(() => total, [total]);
-
-  const attemptComplete = useCallback(
-    async (checkoutRequestId: string) => {
-      try {
-        const res = await checkOutCart({
-          payment_method: 'M-Pesa',
-          amount: total,
-          transaction_id: checkoutRequestId,
-          invoice: checkoutRequestId,
-          payment_status: 'Paid',
-        }).unwrap();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const id = (res as any)?.data?.order_id;
-        if (id) setOrderId(id);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    [checkOutCart, total]
-  );
+  const cartID = cartData?._id ?? '';
 
   const onMpesaSuccess = useCallback(() => {
+    dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
     setIsOrderComplete(true);
-  }, []);
+  }, [dispatch]);
 
   const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
     getAmount,
-    attemptComplete,
+    cartID,
     onSuccess: onMpesaSuccess,
   });
 

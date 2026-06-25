@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     BookOpen, Search, Home, Bell, LogOut, Settings, ChevronDown, Menu, X,
     UserCircle, Book, FileText, Users, FolderTree, LayoutDashboard,
-    MessageSquare, FileEdit, Receipt, Plus, Mail,
+    MessageSquare, FileEdit, Receipt, Plus, Mail, ShoppingBag,
 } from 'lucide-react';
 import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +29,7 @@ const ADMIN_ROUTES = [
     { label: 'Thought Leaders',  description: 'Manage authors & leaders',   path: getAdminSectionRoutePath('authors'),      icon: Users,           keywords: ['author', 'leader', 'thought'] },
     { label: 'Users',            description: 'Manage registered users',    path: getAdminSectionRoutePath('users'),        icon: UserCircle,      keywords: ['user', 'member', 'account'] },
     { label: 'Transactions',     description: 'View payment transactions',  path: getAdminSectionRoutePath('transactions'), icon: Receipt,         keywords: ['payment', 'transaction', 'money'] },
+    { label: 'Orders',           description: 'View book & blueprint orders', path: getAdminSectionRoutePath('orders'),      icon: ShoppingBag,     keywords: ['order', 'book order', 'blueprint order', 'purchase'] },
     { label: 'Testimonials',     description: 'Manage testimonials',        path: getAdminSectionRoutePath('testimonials'), icon: MessageSquare,   keywords: ['testimonial', 'review', 'feedback'] },
     { label: 'FAQs',             description: 'Manage FAQ entries',         path: getAdminSectionRoutePath('faqs'),         icon: FileEdit,        keywords: ['faq', 'question', 'answer'] },
     { label: 'Subscribers',      description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'),  icon: Mail,            keywords: ['subscriber', 'newsletter', 'email'] },
@@ -203,12 +204,12 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
                             <span className="hidden lg:inline">Website</span>
                         </Button>
 
-                        <div className="relative">
+                        {/* <div className="relative">
                             <Bell className="h-5 w-5" />
                             <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-sm">
                                 3
                             </Badge>
-                        </div>
+                        </div> */}
 
                         {/* User menu */}
                         <Dropdown>

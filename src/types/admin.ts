@@ -22,7 +22,8 @@ export type AdminSection =
   | 'testimonials'
   | 'faqs'
   | 'contact_us'
-  | 'subscribers';
+  | 'subscribers'
+  | 'institutions';
 
 export type AdminPermissions = {
   canViewDashboard: boolean;
@@ -45,6 +46,7 @@ export type AdminPermissions = {
   canManageFAQs: boolean;
   canManageContactUs: boolean;
   canManageSubscribers: boolean;
+  canManageInstitutions: boolean;
 };
 
 export interface AdminUser {
@@ -80,6 +82,7 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canManageFAQs: true,
     canManageContactUs: true,
     canManageSubscribers: true,
+    canManageInstitutions: true,
   },
   author: {
     canViewDashboard: false,
@@ -102,5 +105,6 @@ export const rolePermissions: Record<AdminRole, AdminPermissions> = {
     canManageFAQs: false,
     canManageContactUs: false,
     canManageSubscribers: false,
+    canManageInstitutions: false,
   },
 };

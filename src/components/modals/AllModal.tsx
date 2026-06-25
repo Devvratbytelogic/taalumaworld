@@ -18,6 +18,8 @@ import AuthorForgotPassword from '../auth/author/AuthorForgotPassword';
 import AuthorOtpVerification from '../auth/author/AuthorOtpVerification';
 import AuthorResetPassword from '../auth/author/AuthorResetPassword';
 import AuthorChangePassword from '../auth/author/AuthorChangePassword';
+import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
+import { ExtendPromotionModal } from '../admin/institutions/ExtendPromotionModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -61,6 +63,10 @@ export default function AllModal() {
                 return <AuthorResetPassword />;
             case "AuthorChangePassword":
                 return <AuthorChangePassword />;
+            case "AddEditInstitutionModal":
+                return <AddEditInstitutionModal />;
+            case "ExtendPromotionModal":
+                return <ExtendPromotionModal />;
 
             default:
                 return null;

@@ -6,7 +6,11 @@ import { BookOpen, AlertCircle } from 'lucide-react';
 import { Button } from '@heroui/react';
 import {
     LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree,
+<<<<<<< Updated upstream
     MessageSquare, FileEdit, UserCircle, Mail, Bell,
+=======
+    MessageSquare, FileEdit, UserCircle, Mail, Bell, ShoppingBag, GraduationCap,
+>>>>>>> Stashed changes
 } from 'lucide-react';
 
 function KshIcon({ className }: { className?: string }) {
@@ -35,6 +39,7 @@ const NAV_ITEMS = [
     { id: 'categories' as AdminSection, label: 'Categories', icon: FolderTree, category: 'content' },
     { id: 'authors' as AdminSection, label: 'Thought Leaders', icon: Users, category: 'content' },
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
+    { id: 'institutions' as AdminSection, label: 'University Partners', icon: GraduationCap, category: 'users' },
     // { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
     // { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: KshIcon, category: 'commerce' },
@@ -58,6 +63,7 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     '/admin/categories': 'categories',
     '/admin/authors': 'authors',
     '/admin/users': 'users',
+    '/admin/institutions': 'institutions',
     '/admin/activity-logs': 'activity_logs',
     // '/admin/payments': 'payments',
     '/admin/transactions': 'transactions',

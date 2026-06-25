@@ -150,6 +150,14 @@ export const rtkQuerieSetup = createApi({
         'AdminFAQs',
         'GlobalSettings',
         'AdminSubscribers',
+<<<<<<< Updated upstream
+=======
+        'AdminBookOrders',
+        'AdminBlueprintOrders',
+        'AdminInstitutions',
+        'AdminInstitutionUsage',
+        'AdminRegistrationPrompt',
+>>>>>>> Stashed changes
     ],
     endpoints: () => ({}),
 });

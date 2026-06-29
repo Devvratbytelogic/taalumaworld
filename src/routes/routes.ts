@@ -44,6 +44,10 @@ export function getInstitutionalAccessTermsRoutePath(): string {
   return '/policies/institutional-access-terms';
 }
 
+export function getRefundPolicyRoutePath(): string {
+  return '/policies/refund-policy';
+}
+
 export function getAdminRoutePath(): string {
   return '/admin';
 }

@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { getRefundPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 
 interface CartSummaryProps {
   subtotal: number;
@@ -22,6 +26,22 @@ export default function CartSummary({
   onCheckout,
   isLoading = false,
 }: CartSummaryProps) {
+  const [agreeDigitalPurchase, setAgreeDigitalPurchase] = useState(false);
+  const [agreementTouched, setAgreementTouched] = useState(false);
+
+  const agreementError =
+    agreementTouched && !agreeDigitalPurchase
+      ? 'You must acknowledge the digital purchase terms before checkout'
+      : undefined;
+
+  const handleCheckout = () => {
+    if (!agreeDigitalPurchase) {
+      setAgreementTouched(true);
+      return;
+    }
+    onCheckout();
+  };
+
   return (
     <div className="rounded-2xl border border-border bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 lg:sticky lg:top-24">
       <h2 className="mb-4 text-lg font-bold sm:mb-6 sm:text-xl">Order Summary</h2>
@@ -58,10 +78,53 @@ export default function CartSummary({
         </span>
       </div>
 
+      <div className="mb-4">
+        <AgreementCheckbox
+          id="agreeDigitalPurchase"
+          checked={agreeDigitalPurchase}
+          error={agreementError}
+          touched={agreementTouched}
+          onCheckedChange={(checked) => {
+            setAgreeDigitalPurchase(checked);
+            setAgreementTouched(true);
+          }}
+          onBlur={() => setAgreementTouched(true)}
+          disabled={isLoading}
+        >
+          I understand this is a digital purchase and refund restrictions may apply. See the{' '}
+          <Link
+            href={getRefundPolicyRoutePath()}
+            target="_blank"
+            className={`font-semibold transition-colors ${
+              agreementError
+                ? 'text-red-600 hover:text-red-700'
+                : 'text-primary hover:text-primary/80'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            Refund Policy
+          </Link>{' '}
+          and{' '}
+          <Link
+            href={getTermsOfServiceRoutePath()}
+            target="_blank"
+            className={`font-semibold transition-colors ${
+              agreementError
+                ? 'text-red-600 hover:text-red-700'
+                : 'text-primary hover:text-primary/80'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            Terms of Service
+          </Link>
+          .
+        </AgreementCheckbox>
+      </div>
+
       <Button
         size="lg"
         className="global_btn rounded_full bg_primary w-full mb-3"
-        onPress={onCheckout}
+        onPress={handleCheckout}
         disabled={itemCount === 0 || isLoading}
         startContent={isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : undefined}
         endContent={!isLoading ? <ArrowRight className="h-5 w-5 ml-2" /> : undefined}

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree, MessageSquare, FileEdit, UserCircle, Mail, Bell, ShoppingBag, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree, MessageSquare, FileEdit, UserCircle, Mail, Bell, ShoppingBag, GraduationCap, Shield } from 'lucide-react';
 import { getAdminSectionRoutePath, getAdminDashboardRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -24,6 +24,7 @@ const NAV_ITEMS = [
     { id: 'authors' as AdminSection, label: 'Thought Leaders', icon: Users, category: 'content' },
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
     { id: 'institutions' as AdminSection, label: 'University Partners', icon: GraduationCap, category: 'users' },
+    { id: 'roles_permissions' as AdminSection, label: 'Roles & Permissions', icon: Shield, category: 'system' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: KshIcon, category: 'commerce' },
     { id: 'orders' as AdminSection, label: 'Orders', icon: ShoppingBag, category: 'commerce' },
     { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
@@ -41,6 +42,7 @@ const PATH_TO_SECTION: Record<string, AdminSection> = {
     [getAdminSectionRoutePath('authors')]: 'authors',
     [getAdminSectionRoutePath('users')]: 'users',
     [getAdminSectionRoutePath('institutions')]: 'institutions',
+    [getAdminSectionRoutePath('roles_permissions')]: 'roles_permissions',
     [getAdminSectionRoutePath('activity_logs')]: 'activity_logs',
     [getAdminSectionRoutePath('transactions')]: 'transactions',
     [getAdminSectionRoutePath('orders')]: 'orders',

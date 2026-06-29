@@ -19,6 +19,9 @@ import AuthorResetPassword from '../auth/author/AuthorResetPassword';
 import AuthorChangePassword from '../auth/author/AuthorChangePassword';
 import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
 import { ExtendPromotionModal } from '../admin/institutions/ExtendPromotionModal';
+import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModal';
+import { AssignStaffRoleModal } from '../admin/roles-and-permissions/AssignStaffRoleModal';
+import { AddStaffModal } from '../admin/roles-and-permissions/AddStaffModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -65,6 +68,12 @@ export default function AllModal() {
                 return <AddEditInstitutionModal />;
             case "ExtendPromotionModal":
                 return <ExtendPromotionModal />;
+            case "AddEditRoleModal":
+                return <AddEditRoleModal />;
+            case "AssignStaffRoleModal":
+                return <AssignStaffRoleModal />;
+            case "AddStaffModal":
+                return <AddStaffModal />;
 
             default:
                 return null;

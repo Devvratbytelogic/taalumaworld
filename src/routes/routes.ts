@@ -46,7 +46,6 @@ export function getAdminSectionRoutePath(section: string): string {
     categories: '/admin/categories',
     authors: '/admin/authors',
     users: '/admin/users',
-    roles: '/admin/roles',
     activity_logs: '/admin/activity-logs',
     payments: '/admin/payments',
     transactions: '/admin/transactions',

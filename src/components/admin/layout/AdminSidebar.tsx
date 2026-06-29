@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { Shield, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
-import { getRoleName, getRoleDescription } from '@/utils/adminPermissions';
 import { getAdminSectionRoutePath } from '@/routes/routes';
-import type { AdminUser, AdminSection } from '@/types/admin';
+import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
+import type { AdminSection } from '@/types/admin';
 
 interface NavItem {
     id: AdminSection;
@@ -17,7 +17,6 @@ interface NavItem {
 }
 
 interface AdminSidebarProps {
-    adminUser: AdminUser;
     navItemsByCategory: Record<string, NavItem[]>;
     activeSection: AdminSection;
     mobileMenuOpen: boolean;
@@ -34,13 +33,15 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export function AdminSidebar({
-    adminUser,
     navItemsByCategory,
     activeSection,
     mobileMenuOpen,
     onCloseMobileMenu,
 }: AdminSidebarProps) {
     const [isMounted, setIsMounted] = useState(false);
+    const { data: profileData } = useGetAdminProfileQuery();
+
+    const roleLabel = profileData?.data?.role?.name ?? 'Admin';
 
     useEffect(() => {
         if (mobileMenuOpen) setIsMounted(true);
@@ -57,16 +58,13 @@ export function AdminSidebar({
 
     const sidebarContent = (
         <>
-            {/* Role info */}
             <div className="mb-6 p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold">{getRoleName(adminUser.role)}</span>
+                    <span className="text-sm font-semibold">{roleLabel}</span>
                 </div>
-                <p className="text-sm text-muted-foreground">{getRoleDescription(adminUser.role)}</p>
             </div>
 
-            {/* Nav groups */}
             <nav className="space-y-6">
                 {Object.entries(navItemsByCategory).map(([category, items]) => (
                     <div key={category}>
@@ -91,17 +89,14 @@ export function AdminSidebar({
 
     return (
         <>
-            {/* ── Desktop sidebar (always visible on lg+) ── */}
             <aside className="hidden lg:block lg:w-64 shrink-0">
                 <div className="bg-white rounded-3xl p-6 shadow-sm sticky top-24">
                     {sidebarContent}
                 </div>
             </aside>
 
-            {/* ── Mobile offcanvas ── */}
             {isMounted && (
                 <>
-                    {/* Backdrop */}
                     <div
                         className={cn(
                             'fixed inset-0 z-60 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
@@ -111,7 +106,6 @@ export function AdminSidebar({
                         aria-hidden="true"
                     />
 
-                    {/* Panel */}
                     <div
                         onTransitionEnd={handleTransitionEnd}
                         className={cn(
@@ -119,11 +113,10 @@ export function AdminSidebar({
                             mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                         )}
                     >
-                        {/* Panel header */}
                         <div className="flex items-center justify-between px-5 py-4 border-b shrink-0">
                             <div className="flex items-center gap-2">
                                 <Shield className="h-4 w-4 text-primary" />
-                                <span className="font-semibold text-sm">{getRoleName(adminUser.role)}</span>
+                                <span className="font-semibold text-sm">{roleLabel}</span>
                             </div>
                             <button
                                 onClick={onCloseMobileMenu}
@@ -134,7 +127,6 @@ export function AdminSidebar({
                             </button>
                         </div>
 
-                        {/* Scrollable nav */}
                         <div className="flex-1 overflow-y-auto px-4 py-4">
                             <nav className="space-y-6">
                                 {Object.entries(navItemsByCategory).map(([category, items]) => (
@@ -162,8 +154,6 @@ export function AdminSidebar({
         </>
     );
 }
-
-// ── Single nav link ──────────────────────────────────────────────────────────
 
 interface NavLinkProps {
     item: NavItem;

@@ -155,9 +155,6 @@ export const rtkQuerieSetup = createApi({
         'AdminInstitutions',
         'AdminInstitutionUsage',
         'AdminRegistrationPrompt',
-        'AdminRoles',
-        'AdminPermissions',
-        'AdminStaff',
     ],
     endpoints: () => ({}),
 });

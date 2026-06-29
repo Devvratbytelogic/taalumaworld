@@ -10,7 +10,6 @@ import {
 import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
-import { getRoleName } from '@/utils/adminPermissions';
 import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getCreateChapterRoutePath } from '@/routes/routes';
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
@@ -84,6 +83,8 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
     const visible = globalSettings?.data?.visible ?? 'chapter';
     const logo = globalSettings?.data?.logo as string | null | undefined;
     const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
+
+    const roleLabel = profileData?.data?.role?.name ?? 'Admin';
 
     const adminUser = {
         name: profileData?.data?.name ?? 'Admin User',
@@ -228,7 +229,7 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
                                     <div className="px-2 py-2">
                                         <p className="text-sm font-medium">{adminUser.name}</p>
                                         <p className="text-sm text-muted-foreground">{adminUser.email}</p>
-                                        <Badge variant="secondary" className="w-fit mt-1">{getRoleName(adminUser.role)}</Badge>
+                                        <Badge variant="secondary" className="w-fit mt-1">{roleLabel}</Badge>
                                     </div>
                                 }
                             >

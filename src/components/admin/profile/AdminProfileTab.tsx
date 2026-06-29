@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import toast from '@/utils/toast';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation } from '@/store/rtkQueries/adminPostApi';
-import { getRoleName } from '@/utils/adminPermissions';
 import type { AdminRole } from '@/types/admin';
 
 const updateAdminProfileSchema = Yup.object({
@@ -94,7 +93,7 @@ export function AdminProfileTab() {
 
     const displayPhoto = tempPhoto || profile?.profile_pic || '';
     const displayName = values.name || profile?.name || 'Admin';
-    const roleName = getRoleName(profile?.role?.name ?? 'admin');
+    const roleName = profile?.role?.name ?? 'Admin';
 
     const formatDate = (iso?: string) => {
         if (!iso) return '—';

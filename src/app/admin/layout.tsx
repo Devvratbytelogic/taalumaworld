@@ -1,13 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
-import { BookOpen, AlertCircle } from 'lucide-react';
-import { Button } from '@heroui/react';
-import {
-    LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree,
-    MessageSquare, FileEdit, UserCircle, Mail, Bell, ShoppingBag, GraduationCap,
-} from 'lucide-react';
+import { LayoutDashboard, Settings, BookOpen as Book, FileText, Users, FolderTree, MessageSquare, FileEdit, UserCircle, Mail, Bell, ShoppingBag, GraduationCap } from 'lucide-react';
+import { getAdminSectionRoutePath, getAdminDashboardRoutePath } from '@/routes/routes';
+import { AdminHeader } from '@/components/admin/layout/AdminHeader';
+import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
+import type { AdminSection } from '@/types/admin';
 
 function KshIcon({ className }: { className?: string }) {
     return (
@@ -16,16 +14,6 @@ function KshIcon({ className }: { className?: string }) {
         </span>
     );
 }
-
-import { useAdminUser } from '@/hooks/useAdminUser';
-import { canAccessSection } from '@/utils/adminPermissions';
-import { getHomeRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
-
-import { AdminHeader } from '@/components/admin/layout/AdminHeader';
-import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
-import type { AdminSection } from '@/types/admin';
-
-// ── Nav items definition ─────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
     { id: 'dashboard' as AdminSection, label: 'Dashboard', icon: LayoutDashboard, category: 'system' },
@@ -36,121 +24,57 @@ const NAV_ITEMS = [
     { id: 'authors' as AdminSection, label: 'Thought Leaders', icon: Users, category: 'content' },
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
     { id: 'institutions' as AdminSection, label: 'University Partners', icon: GraduationCap, category: 'users' },
-    // { id: 'activity_logs' as AdminSection, label: 'Activity Logs', icon: Activity, category: 'users' },
-    // { id: 'payments' as AdminSection, label: 'Payments', icon: DollarSign, category: 'commerce' },
     { id: 'transactions' as AdminSection, label: 'Transactions', icon: KshIcon, category: 'commerce' },
     { id: 'orders' as AdminSection, label: 'Orders', icon: ShoppingBag, category: 'commerce' },
-    // { id: 'reviews' as AdminSection, label: 'Reviews', icon: MessageSquare, category: 'community' },
     { id: 'testimonials' as AdminSection, label: 'Testimonials', icon: MessageSquare, category: 'community' },
     { id: 'faqs' as AdminSection, label: 'FAQs', icon: FileEdit, category: 'community' },
     { id: 'contact_us' as AdminSection, label: 'Help & Trust Center', icon: Mail, category: 'community' },
     { id: 'subscribers' as AdminSection, label: 'Subscribers', icon: Bell, category: 'community' },
-    // { id: 'moderation' as AdminSection, label: 'Moderation', icon: Moderation, category: 'community', badge: 5 },
-    // { id: 'analytics' as AdminSection, label: 'Analytics', icon: BarChart3, category: 'analytics' },
-    // { id: 'reports' as AdminSection, label: 'Reports', icon: FileSpreadsheet, category: 'analytics' },
 ];
 
-// Maps URL path → section id (to highlight active nav item)
 const PATH_TO_SECTION: Record<string, AdminSection> = {
-    '/admin/dashboard': 'dashboard',
-    '/admin/settings': 'settings',
-    '/admin/books': 'books',
-    '/admin/chapters': 'chapters',
-    '/admin/chapter': 'chapters',   // create & edit sub-routes (/admin/chapter/create, /admin/chapter/edit/[id])
-    '/admin/categories': 'categories',
-    '/admin/authors': 'authors',
-    '/admin/users': 'users',
-    '/admin/institutions': 'institutions',
-    '/admin/activity-logs': 'activity_logs',
-    // '/admin/payments': 'payments',
-    '/admin/transactions': 'transactions',
-    '/admin/orders': 'orders',
-    '/admin/reviews': 'reviews',
-    '/admin/testimonials': 'testimonials',
-    '/admin/faqs': 'faqs',
-    '/admin/all-contact-us': 'contact_us',
-    '/admin/subscribers': 'subscribers',
-    // '/admin/moderation': 'moderation',
-    '/admin/analytics': 'analytics',
-    '/admin/reports': 'reports',
+    [getAdminDashboardRoutePath()]: 'dashboard',
+    [getAdminSectionRoutePath('settings')]: 'settings',
+    [getAdminSectionRoutePath('books')]: 'books',
+    [getAdminSectionRoutePath('chapters')]: 'chapters',
+    [getAdminSectionRoutePath('categories')]: 'categories',
+    [getAdminSectionRoutePath('authors')]: 'authors',
+    [getAdminSectionRoutePath('users')]: 'users',
+    [getAdminSectionRoutePath('institutions')]: 'institutions',
+    [getAdminSectionRoutePath('activity_logs')]: 'activity_logs',
+    [getAdminSectionRoutePath('transactions')]: 'transactions',
+    [getAdminSectionRoutePath('orders')]: 'orders',
+    [getAdminSectionRoutePath('reviews')]: 'reviews',
+    [getAdminSectionRoutePath('testimonials')]: 'testimonials',
+    [getAdminSectionRoutePath('faqs')]: 'faqs',
+    [getAdminSectionRoutePath('contact_us')]: 'contact_us',
+    [getAdminSectionRoutePath('subscribers')]: 'subscribers',
+    [getAdminSectionRoutePath('analytics')]: 'analytics',
+    [getAdminSectionRoutePath('reports')]: 'reports',
 };
 
-// ── Layout ───────────────────────────────────────────────────────────────────
-
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
-    const router = useRouter();
     const pathname = usePathname();
-
-    const { adminUser, isLoading } = useAdminUser();
-
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    // Exact match first, then prefix match (segment-boundary safe) so that
-    // sub-routes like /admin/chapter/create or /admin/chapter/edit/[id]
-    // correctly highlight their parent section instead of falling back to Dashboard.
     const activeSection: AdminSection =
         PATH_TO_SECTION[pathname] ??
         Object.entries(PATH_TO_SECTION).find(([path]) => pathname.startsWith(path + '/'))?.[1] ??
         'dashboard';
 
-    // Redirect author to books if they land on a section they cannot access
-    useEffect(() => {
-        if (!adminUser || isLoading) return;
-        const section = PATH_TO_SECTION[pathname];
-        if (section && !canAccessSection(adminUser, section)) {
-            router.replace(getAdminSectionRoutePath('books'));
-        }
-    }, [adminUser, isLoading, pathname, router]);
-
-    // Only show nav items the current admin role has access to
-    const accessibleNavItems = adminUser
-        ? NAV_ITEMS.filter(item => canAccessSection(adminUser, item.id))
-        : [];
-
-    // Group accessible items by category for sidebar rendering
-    const navItemsByCategory = accessibleNavItems.reduce((acc, item) => {
+    const navItemsByCategory = NAV_ITEMS.reduce((acc, item) => {
         if (!acc[item.category]) acc[item.category] = [];
         acc[item.category].push(item);
         return acc;
     }, {} as Record<string, typeof NAV_ITEMS>);
 
-    // ── Loading state ──
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <BookOpen className="h-12 w-12 text-primary animate-pulse mx-auto mb-4" />
-                    <p className="text-muted-foreground">Loading Admin Panel...</p>
-                </div>
-            </div>
-        );
-    }
-
-    // ── Access denied state ──
-    if (!adminUser) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-                    <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-                    <p className="text-muted-foreground mb-4">You don't have permission to access the admin panel.</p>
-                    <Button onPress={() => router.push(getHomeRoutePath())}>Go to Website</Button>
-                </div>
-            </div>
-        );
-    }
-
-    // ── Main layout ──
     return (
         <div className="min-h-screen bg-gray-50 admin_panel">
-
             <AdminHeader onMobileMenuToggle={() => setMobileMenuOpen(prev => !prev)} />
 
             <div className="container mx-auto sm:px-4 py-8">
                 <div className="flex flex-col lg:flex-row gap-8">
-
                     <AdminSidebar
-                        adminUser={adminUser}
                         navItemsByCategory={navItemsByCategory}
                         activeSection={activeSection}
                         mobileMenuOpen={mobileMenuOpen}
@@ -160,7 +84,6 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
                     <main className="flex-1 min-w-0">
                         {children}
                     </main>
-
                 </div>
             </div>
         </div>

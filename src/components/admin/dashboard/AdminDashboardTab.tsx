@@ -14,8 +14,7 @@ import { DashboardStatsGrid } from './DashboardStatsGrid';
 import { DashboardRecentActivity } from './DashboardRecentActivity';
 import { DashboardTopContent } from './DashboardTopContent';
 import { DashboardQuickActions } from './DashboardQuickActions';
-import { useAdminUser } from '../../../hooks/useAdminUser';
-import { useGetAllUsersQuery, useGetAllBooksQuery, useGetAllAdminChaptersQuery, useGetAllTestimonialsQuery, useGetAdminGlobalSettingsQuery } from '../../../store/rtkQueries/adminGetApi';
+import { useGetAllUsersQuery, useGetAllBooksQuery, useGetAllAdminChaptersQuery, useGetAllTestimonialsQuery, useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '../../../store/rtkQueries/adminGetApi';
 import { getAdminSectionRoutePath } from '../../../routes/routes';
 
 function timeAgo(dateStr: string): string {
@@ -51,7 +50,8 @@ function KshIcon({ className }: { className?: string }) {
 }
 
 export function AdminDashboardTab() {
-  const { adminUser } = useAdminUser();
+  const { data: profileData } = useGetAdminProfileQuery();
+  const userName = profileData?.data?.name ?? 'Admin';
 
   const { data: usersData, isLoading: usersLoading } = useGetAllUsersQuery();
   const { data: booksData, isLoading: booksLoading } = useGetAllBooksQuery();
@@ -167,11 +167,9 @@ export function AdminDashboardTab() {
             trend: 0,
           }));
 
-  if (!adminUser) return null;
-
   return (
     <div className="space-y-8 animate-fade-in">
-      <DashboardWelcomeHeader adminUser={adminUser} contentMode={contentMode} />
+      <DashboardWelcomeHeader userName={userName} contentMode={contentMode} />
       <DashboardStatsGrid stats={stats} isLoading={isLoading} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DashboardRecentActivity items={recentActivity} isLoading={usersLoading} />

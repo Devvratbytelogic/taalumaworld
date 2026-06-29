@@ -1,17 +1,16 @@
 import { Badge } from '../../ui/badge';
-import type { AdminUser } from '../../../types/admin';
 import type { ContentMode } from '../../../types/admin';
 
 interface DashboardWelcomeHeaderProps {
-  adminUser: AdminUser;
+  userName: string;
   contentMode: ContentMode;
 }
 
-export function DashboardWelcomeHeader({ adminUser, contentMode }: DashboardWelcomeHeaderProps) {
+export function DashboardWelcomeHeader({ userName, contentMode }: DashboardWelcomeHeaderProps) {
   return (
     <div className="bg-linear-to-r from-primary to-primary-light rounded-3xl p-8 text-white shadow-lg">
       <h1 className="text-3xl font-bold mb-2">
-        Welcome back, {adminUser.name}!
+        Welcome back, {userName}!
       </h1>
       <p className="text-white/90">
         Here&apos;s what&apos;s happening with your platform today.

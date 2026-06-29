@@ -7,14 +7,22 @@ import Button from '@/components/ui/Button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
 import { useFormik } from 'formik'
-import { signUpSchema } from '@/utils/formValidation'
+import { careerArchitectSignUpSchema, mentorSignUpSchema } from '@/utils/formValidation'
 import { RootState } from '@/store/store'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
 import { useAuthorRegisterMutation } from '@/store/rtkQueries/adminAuth'
 import toast from '@/utils/toast'
 import Link from 'next/link'
-import { getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes'
+import {
+    getCommunityStandardsRoutePath,
+    getContentOwnershipLicensingRoutePath,
+    getMentorAgreementRoutePath,
+    getPrivacyPolicyRoutePath,
+    getRevenueShareAgreementRoutePath,
+    getTermsOfServiceRoutePath,
+} from '@/routes/routes'
+import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
 
 type SignRole = 'user' | 'author'
 
@@ -62,9 +70,20 @@ export default function SignUp() {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
-    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
-        initialValues: { name: '', email: '', password: '', confirmPassword: '' },
-        validationSchema: signUpSchema,
+    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm, setFieldValue, setFieldTouched } = useFormik({
+        initialValues: {
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            agreeTerms: false,
+            agreePrivacy: false,
+            sendUpdates: false,
+            agreeMentorAgreement: false,
+            agreeRevenueShare: false,
+            agreeContentAndCommunity: false,
+        },
+        validationSchema: signRole === 'user' ? careerArchitectSignUpSchema : mentorSignUpSchema,
         onSubmit: async (formValues, { resetForm: rf }) => {
             try {
                 const formData = new FormData()
@@ -73,6 +92,16 @@ export default function SignUp() {
                 formData.append('password', formValues.password)
                 formData.append('password_confirmation', formValues.confirmPassword)
                 if (profileImage) formData.append('profile_pic', profileImage)
+
+                if (signRole === 'user') {
+                    formData.append('terms_accepted', String(formValues.agreeTerms))
+                    formData.append('privacy_accepted', String(formValues.agreePrivacy))
+                    formData.append('send_updates', String(formValues.sendUpdates))
+                } else {
+                    formData.append('mentor_agreement_accepted', String(formValues.agreeMentorAgreement))
+                    formData.append('revenue_share_accepted', String(formValues.agreeRevenueShare))
+                    formData.append('content_policy_accepted', String(formValues.agreeContentAndCommunity))
+                }
 
                 if (signRole === 'user') {
                     const res = await userRegister(formData).unwrap()
@@ -283,6 +312,128 @@ export default function SignUp() {
                             )}
                         </div>
 
+                        <div className="space-y-3 pt-1">
+                            {signRole === 'user' ? (
+                                <>
+                                    <AgreementCheckbox
+                                        id="agreeTerms"
+                                        checked={values.agreeTerms}
+                                        error={errors.agreeTerms}
+                                        touched={touched.agreeTerms}
+                                        onCheckedChange={(checked) => setFieldValue('agreeTerms', checked)}
+                                        onBlur={() => setFieldTouched('agreeTerms', true)}
+                                        disabled={isSubmitting}
+                                    >
+                                        I agree to the{' '}
+                                        <Link
+                                            href={getTermsOfServiceRoutePath()}
+                                            target="_blank"
+                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Terms of Service
+                                        </Link>
+                                    </AgreementCheckbox>
+                                    <AgreementCheckbox
+                                        id="agreePrivacy"
+                                        checked={values.agreePrivacy}
+                                        error={errors.agreePrivacy}
+                                        touched={touched.agreePrivacy}
+                                        onCheckedChange={(checked) => setFieldValue('agreePrivacy', checked)}
+                                        onBlur={() => setFieldTouched('agreePrivacy', true)}
+                                        disabled={isSubmitting}
+                                    >
+                                        I have read the{' '}
+                                        <Link
+                                            href={getPrivacyPolicyRoutePath()}
+                                            target="_blank"
+                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Privacy Policy
+                                        </Link>
+                                    </AgreementCheckbox>
+                                    <AgreementCheckbox
+                                        id="sendUpdates"
+                                        checked={values.sendUpdates}
+                                        onCheckedChange={(checked) => setFieldValue('sendUpdates', checked)}
+                                        disabled={isSubmitting}
+                                    >
+                                        Send me updates <span className="text-muted-foreground">(optional)</span>
+                                    </AgreementCheckbox>
+                                </>
+                            ) : (
+                                <>
+                                    <AgreementCheckbox
+                                        id="agreeMentorAgreement"
+                                        checked={values.agreeMentorAgreement}
+                                        error={errors.agreeMentorAgreement}
+                                        touched={touched.agreeMentorAgreement}
+                                        onCheckedChange={(checked) => setFieldValue('agreeMentorAgreement', checked)}
+                                        onBlur={() => setFieldTouched('agreeMentorAgreement', true)}
+                                        disabled={isSubmitting}
+                                    >
+                                        I agree to the{' '}
+                                        <Link
+                                            href={getMentorAgreementRoutePath()}
+                                            target="_blank"
+                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Mentor Agreement
+                                        </Link>
+                                    </AgreementCheckbox>
+                                    <AgreementCheckbox
+                                        id="agreeRevenueShare"
+                                        checked={values.agreeRevenueShare}
+                                        error={errors.agreeRevenueShare}
+                                        touched={touched.agreeRevenueShare}
+                                        onCheckedChange={(checked) => setFieldValue('agreeRevenueShare', checked)}
+                                        onBlur={() => setFieldTouched('agreeRevenueShare', true)}
+                                        disabled={isSubmitting}
+                                    >
+                                        I agree to the{' '}
+                                        <Link
+                                            href={getRevenueShareAgreementRoutePath()}
+                                            target="_blank"
+                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Revenue Share Agreement
+                                        </Link>
+                                    </AgreementCheckbox>
+                                    <AgreementCheckbox
+                                        id="agreeContentAndCommunity"
+                                        checked={values.agreeContentAndCommunity}
+                                        error={errors.agreeContentAndCommunity}
+                                        touched={touched.agreeContentAndCommunity}
+                                        onCheckedChange={(checked) => setFieldValue('agreeContentAndCommunity', checked)}
+                                        onBlur={() => setFieldTouched('agreeContentAndCommunity', true)}
+                                        disabled={isSubmitting}
+                                    >
+                                        I agree to the{' '}
+                                        <Link
+                                            href={getContentOwnershipLicensingRoutePath()}
+                                            target="_blank"
+                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Content Ownership &amp; Licensing Policy
+                                        </Link>
+                                        {' '}and{' '}
+                                        <Link
+                                            href={getCommunityStandardsRoutePath()}
+                                            target="_blank"
+                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Community Standards Policy
+                                        </Link>
+                                    </AgreementCheckbox>
+                                </>
+                            )}
+                        </div>
+
                         <Button
                             type="submit"
                             className="global_btn bg_primary w-full"
@@ -306,24 +457,6 @@ export default function SignUp() {
                                     Sign In
                                 </button>
                             </div>
-                            <p>
-                                By creating an account, you agree to our{' '}
-                                <Link
-                                    href={getTermsOfServiceRoutePath()}
-                                    target="_blank"
-                                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                >
-                                    Terms &amp; Conditions
-                                </Link>
-                                {' '}and{' '}
-                                <Link
-                                    href={getPrivacyPolicyRoutePath()}
-                                    target="_blank"
-                                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                >
-                                    Privacy Policy
-                                </Link>
-                            </p>
                         </div>
                     </ModalFooter>
                 </ModalBody>

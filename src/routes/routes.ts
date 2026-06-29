@@ -17,11 +17,27 @@ export function getFAQRoutePath(): string {
 }
 
 export function getPrivacyPolicyRoutePath(): string {
-  return '/privacy-policy';
+  return '/policies/privacy-policy';
 }
 
 export function getTermsOfServiceRoutePath(): string {
-  return '/terms-of-service';
+  return '/policies/terms-of-service';
+}
+
+export function getMentorAgreementRoutePath(): string {
+  return '/policies/mentor-agreement';
+}
+
+export function getRevenueShareAgreementRoutePath(): string {
+  return '/policies/revenue-share-agreement';
+}
+
+export function getContentOwnershipLicensingRoutePath(): string {
+  return '/policies/content-ownership-licensing';
+}
+
+export function getCommunityStandardsRoutePath(): string {
+  return '/policies/community-standards';
 }
 
 export function getAdminRoutePath(): string {

@@ -57,7 +57,7 @@ export const signInSchema = Yup.object({
     .required('Password is required'),
 });
 
-export const signUpSchema = Yup.object({
+const signUpBaseSchema = {
   name: Yup.string()
     .min(2, 'Name must be at least 2 characters')
     .required('Name is required'),
@@ -66,6 +66,25 @@ export const signUpSchema = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords must match')
     .required('Please confirm your password'),
+};
+
+export const signUpSchema = Yup.object(signUpBaseSchema);
+
+export const careerArchitectSignUpSchema = Yup.object({
+  ...signUpBaseSchema,
+  agreeTerms: Yup.boolean().oneOf([true], 'You must agree to the Terms of Service'),
+  agreePrivacy: Yup.boolean().oneOf([true], 'You must read the Privacy Policy'),
+  sendUpdates: Yup.boolean(),
+});
+
+export const mentorSignUpSchema = Yup.object({
+  ...signUpBaseSchema,
+  agreeMentorAgreement: Yup.boolean().oneOf([true], 'You must agree to the Mentor Agreement'),
+  agreeRevenueShare: Yup.boolean().oneOf([true], 'You must agree to the Revenue Share Agreement'),
+  agreeContentAndCommunity: Yup.boolean().oneOf(
+    [true],
+    'You must agree to the Content Ownership & Licensing Policy and Community Standards Policy',
+  ),
 });
 
 export const forgotPasswordSchema = Yup.object({

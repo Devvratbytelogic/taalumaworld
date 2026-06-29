@@ -27,8 +27,9 @@ import {
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
 import type { Book, Author } from '@/types/content';
-import { getAdminSectionRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath } from '@/routes/routes';
 import Link from 'next/link';
+import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 
 const initialFormValues = {
   bookId: '',
@@ -41,6 +42,7 @@ const initialFormValues = {
   price: 0 as number | undefined,
   status: 'Published',
   cover_image: null as File | null,
+  agreeContentOwnership: false,
 };
 
 export function CreateChapterForm() {
@@ -469,6 +471,27 @@ export function CreateChapterForm() {
 
 
       </div>
+
+      <AgreementCheckbox
+        id="agreeContentOwnership"
+        checked={values.agreeContentOwnership}
+        error={errors.agreeContentOwnership}
+        touched={touched.agreeContentOwnership}
+        onCheckedChange={(checked) => setFieldValue('agreeContentOwnership', checked)}
+        onBlur={() => setFieldTouched('agreeContentOwnership', true)}
+        disabled={isSubmittingState}
+      >
+        I own or have rights to this content · No third-party infringement · I understand Taaluma may remove
+        non-compliant content. See the{' '}
+        <Link
+          href={getContentOwnershipLicensingRoutePath()}
+          target="_blank"
+          className="font-semibold text-primary hover:text-primary/80 transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Content Ownership Policy
+        </Link>
+      </AgreementCheckbox>
 
       <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
         <Button

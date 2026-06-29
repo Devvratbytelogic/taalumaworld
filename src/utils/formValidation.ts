@@ -210,6 +210,10 @@ export const addChapterSchema = Yup.object({
     }),
   status: Yup.string().required('Status is required'),
   cover_image: Yup.mixed().required('Cover image is required'),
+  agreeContentOwnership: Yup.boolean().oneOf(
+    [true],
+    'You must confirm content ownership and rights',
+  ),
 });
 
 // Add / Edit Category Modal Validation Schema

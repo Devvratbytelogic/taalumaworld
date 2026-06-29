@@ -208,7 +208,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="chapter-book">Book<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-book">Series<span className="text-red-500">*</span></Label>
             <Select
               value={values.bookId || undefined}
               onValueChange={(value) => {
@@ -226,7 +226,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <SelectTrigger
                 className={errors.bookId && touched.bookId ? 'border-red-500' : ''}
               >
-                <SelectValue placeholder={books.length === 0 ? 'No books available' : 'Select book'} />
+                <SelectValue placeholder={books.length === 0 ? 'No series available' : 'Select series'} />
               </SelectTrigger>
               <SelectContent>
                 {books.map((book) => (
@@ -237,7 +237,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               </SelectContent>
             </Select>
             {books.length === 0 && (
-              <p className="text-sm text-muted-foreground">Create a book first from the Admin Books section.</p>
+              <p className="text-sm text-muted-foreground">Create a series first from the Admin Series section.</p>
             )}
             {errors.bookId && touched.bookId && (
               <p className="text-sm text-red-600">{errors.bookId}</p>
@@ -426,7 +426,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             </>
           ) : (
             <div className="space-y-2 flex flex-col justify-end text-sm text-muted-foreground">
-              <span>Pricing is set at book level; this blueprint has no separate price.</span>
+              <span>Pricing is set at series level; this blueprint has no separate price.</span>
             </div>
           )}
           <div className="space-y-2 max-w-xs">

@@ -127,9 +127,9 @@ export function EditBookModal({
         setCoverPreviewUrl(null);
         coverIsObjectUrlRef.current = false;
         onOpenChange(false);
-        toast.success('Book updated successfully');
+        toast.success('Series updated successfully');
       } catch {
-        toast.error('Failed to update book');
+        toast.error('Failed to update series');
       }
     },
   });
@@ -223,7 +223,7 @@ export function EditBookModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="xl" className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit Book</DialogTitle>
+          <DialogTitle>Edit Series</DialogTitle>
           <DialogDescription>
             Update the details for &quot;{book.title}&quot;.
           </DialogDescription>
@@ -251,7 +251,7 @@ export function EditBookModal({
               <Textarea
                 id="edit-book-desc"
                 name="description"
-                placeholder="Brief description of the book..."
+                placeholder="Brief description of the series..."
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -429,7 +429,7 @@ export function EditBookModal({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="chapter">blueprint</SelectItem>
-                    <SelectItem value="book">book</SelectItem>
+                    <SelectItem value="book">series</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -478,7 +478,7 @@ export function EditBookModal({
               isDisabled={isSubmitting}
               isLoading={isSubmitting}
             >
-              Update Book
+              Update Series
             </Button>
           </DialogFooter>
         </form>

@@ -322,7 +322,7 @@ export function GeneralSettingsCard() {
                 <div>
                   <p className="font-medium text-sm">Content Visibility Mode</p>
                   <p className="text-sm text-muted-foreground mt-0.5">
-                    Platform is currently in <span className="font-semibold">{values.visible === 'book' ? 'Book' : 'Blueprint'}</span> mode
+                    Platform is currently in <span className="font-semibold">{values.visible === 'book' ? 'Series' : 'Blueprint'}</span> mode
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -334,7 +334,7 @@ export function GeneralSettingsCard() {
                     onCheckedChange={(checked) => formik.setFieldValue('visible', checked ? 'book' : 'chapter')}
                   />
                   <span className={cn('text-sm font-medium transition-colors', values.visible === 'book' ? 'text-primary' : 'text-muted-foreground')}>
-                    Book
+                    Series
                   </span>
                 </div>
               </div>
@@ -365,7 +365,7 @@ export function GeneralSettingsCard() {
               </div>
               <div>
                 <Label htmlFor="meta_keywords">Meta Keywords</Label>
-                <Input {...field('meta_keywords')} placeholder="books, reading, blueprints" />
+                <Input {...field('meta_keywords')} placeholder="series, reading, blueprints" />
                 <FieldError msg={touched.meta_keywords ? errors.meta_keywords : ''} />
               </div>
               <div>

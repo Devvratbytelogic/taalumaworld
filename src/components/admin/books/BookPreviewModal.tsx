@@ -26,8 +26,8 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="xl" className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Book Preview</DialogTitle>
-          <DialogDescription>Read-only view of book details.</DialogDescription>
+          <DialogTitle>Series Preview</DialogTitle>
+          <DialogDescription>Read-only view of series details.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 py-4 max-h-[70vh] custom_scrollbar overflow-y-auto">
@@ -61,7 +61,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
               {book.pricingModel === 'book' && book.price != null ? (
                 <p className="text-lg font-bold text-primary pt-1">
                   KSH {Number(book.price).toFixed(2)}
-                  <span className="text-sm font-normal text-muted-foreground ml-1">/ full book</span>
+                  <span className="text-sm font-normal text-muted-foreground ml-1">/ full series</span>
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground pt-1 capitalize">
@@ -87,7 +87,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
             </div>
             <div>
               <dt className="text-muted-foreground">Pricing Model</dt>
-              <dd className="font-medium capitalize">{book.pricingModel ?? 'N/A'}</dd>
+              <dd className="font-medium capitalize">{book.pricingModel === 'book' ? 'series' : (book.pricingModel ?? 'N/A')}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Category</dt>

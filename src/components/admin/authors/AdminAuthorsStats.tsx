@@ -30,7 +30,7 @@ export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {
             <Book className="h-5 w-5 text-green-600" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Published Books</p>
+            <p className="text-sm text-muted-foreground">Published Series</p>
             <p className="text-2xl font-bold">{publishedBooks}</p>
           </div>
         </div>

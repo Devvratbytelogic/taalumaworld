@@ -37,7 +37,7 @@ export function AdminBooksSearch({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search books by title or description..."
+            placeholder="Search series by title or description..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10"

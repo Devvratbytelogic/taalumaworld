@@ -106,7 +106,7 @@ export function AdminDashboardTab() {
       href: getAdminSectionRoutePath('users'),
     },
     {
-      title: contentMode === 'chapters' ? 'Total Blueprints' : 'Total Books',
+      title: contentMode === 'chapters' ? 'Total Blueprints' : 'Total Series',
       value: contentMode === 'chapters' ? totalChapters : totalBooks,
       change: contentMode === 'chapters' ? recentChapters : recentBooks,
       icon: contentMode === 'chapters' ? FileText : Book,
@@ -122,7 +122,7 @@ export function AdminDashboardTab() {
       href: getAdminSectionRoutePath('transactions'),
     },
     {
-      title: contentMode === 'chapters' ? 'Total Books' : 'Total Blueprints',
+      title: contentMode === 'chapters' ? 'Total Series' : 'Total Blueprints',
       value: contentMode === 'chapters' ? totalBooks : totalChapters,
       change: contentMode === 'chapters' ? recentBooks : recentChapters,
       icon: contentMode === 'chapters' ? Book : ShoppingCart,

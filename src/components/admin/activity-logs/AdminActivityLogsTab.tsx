@@ -32,7 +32,7 @@ const mockLogs: ActivityLogEntry[] = [
   {
     id: 3,
     user: 'Content Manager',
-    action: 'Created new book',
+    action: 'Created new series',
     resource: 'Career Mastery',
     time: '1 hour ago',
     type: 'content',

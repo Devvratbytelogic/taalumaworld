@@ -62,7 +62,7 @@ export function ReviewListing({
                 </div>
               </div>
               <Badge variant="outline">
-                {review.itemType === 'chapter' ? 'Focus Area' : 'Book'}
+                {review.itemType === 'chapter' ? 'Focus Area' : 'Series'}
               </Badge>
             </div>
           </CardHeader>

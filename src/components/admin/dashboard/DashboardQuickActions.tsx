@@ -59,7 +59,7 @@ export function DashboardQuickActions({
           </div>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Blueprints/books not yet published
+          Blueprints/series not yet published
         </p>
         <Link href="/admin/chapters">
           <Button className="global_btn rounded_full outline_primary">

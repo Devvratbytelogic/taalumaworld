@@ -12,7 +12,7 @@ export function AdminChaptersHeader() {
             Blueprints Management
           </h1>
           <p className="text-muted-foreground">
-            Manage all blueprints across all books
+            Manage all blueprints across all series
           </p>
         </div>
         <Link href={getCreateChapterRoutePath()}>

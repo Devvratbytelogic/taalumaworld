@@ -220,7 +220,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                   <div className="flex items-center gap-2 px-3 py-2">
                     <BookOpen className="h-4 w-4 text-primary" />
                     <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                      Books
+                      Series
                     </span>
                   </div>
                   {books.slice(0, 4).map((book) => (

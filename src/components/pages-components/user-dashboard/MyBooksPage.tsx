@@ -76,8 +76,8 @@ export function MyBooksPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="mb-2">
-        <h1 className="text-3xl font-bold mb-1">My Books</h1>
-        <p className="text-muted-foreground">Your personal collection of purchased books</p>
+        <h1 className="text-3xl font-bold mb-1">My Series</h1>
+        <p className="text-muted-foreground">Your personal collection of purchased series</p>
       </div>
 
       {/* Stats Cards */}
@@ -89,7 +89,7 @@ export function MyBooksPage() {
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">Total Books</div>
+              <div className="text-sm text-muted-foreground tracking-tight">Total Series</div>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function MyBooksPage() {
           ))}
         </div>
         <p className="text-muted-foreground text-sm">
-          {filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''}
+          {filteredBooks.length} series
         </p>
       </div>
 
@@ -255,27 +255,27 @@ export function MyBooksPage() {
             </div>
             <h3 className="text-xl font-bold mb-2">
               {activeFilter === 'all'
-                ? 'No Books Yet'
-                : `No ${activeFilter === 'reading' ? 'In Progress' : activeFilter === 'completed' ? 'Completed' : 'Unread'} Books`}
+                ? 'No Series Yet'
+                : `No ${activeFilter === 'reading' ? 'In Progress' : activeFilter === 'completed' ? 'Completed' : 'Unread'} Series`}
             </h3>
             <p className="text-muted-foreground mb-6">
               {activeFilter === 'all'
-                ? "You haven't purchased any books yet. Start exploring and build your collection!"
-                : 'No books match this filter.'}
+                ? "You haven't purchased any series yet. Start exploring and build your collection!"
+                : 'No series match this filter.'}
             </p>
             {activeFilter === 'all' ? (
               <Button
                 onPress={() => router.push(getHomeRoutePath())}
                 className="global_btn rounded_full bg_primary"
               >
-                Browse Books
+                Browse Series
               </Button>
             ) : (
               <Button
                 onPress={() => setActiveFilter('all')}
                 className="global_btn rounded_full outline_primary"
               >
-                Show All Books
+                Show All Series
               </Button>
             )}
           </div>

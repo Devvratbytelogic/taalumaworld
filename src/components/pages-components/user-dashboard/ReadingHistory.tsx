@@ -156,13 +156,13 @@ export function ReadingHistory() {
             </div>
             <h3 className="text-xl font-bold mb-2">No Reading History</h3>
             <p className="text-muted-foreground mb-6">
-              Start reading to build your history. Your recently read {displayMode === 'chapters' ? 'blueprints' : 'books'} will appear here.
+              Start reading to build your history. Your recently read {displayMode === 'chapters' ? 'blueprints' : 'series'} will appear here.
             </p>
             <Button
               onPress={() => router.push('/')}
               className='global_btn rounded_full bg_primary'
             >
-              {displayMode === 'chapters' ? 'Browse Blueprints' : 'Browse Books'}
+              {displayMode === 'chapters' ? 'Browse Blueprints' : 'Browse Series'}
             </Button>
           </div>
         </div>

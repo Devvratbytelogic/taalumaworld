@@ -144,7 +144,7 @@ function BookModalContent({
               </Badge>
             )} */}
             {/* <Badge className={`rounded-full px-3 py-1 text-sm font-medium backdrop-blur-sm bg-white border ${isFullBook ? 'text-blue-600 border-blue-200' : 'text-gray-700 border-gray-200'}`}>
-              {isFullBook ? 'Full Book' : 'By Chapter'}
+              {isFullBook ? 'Full Series' : 'By Chapter'}
             </Badge> */}
           </div>
 
@@ -176,7 +176,7 @@ function BookModalContent({
         {isFullBook && hasPrice && (
           <div className="flex items-center justify-between p-4 bg-accent/40 rounded-2xl border border-border">
             <div>
-              <p className="font-semibold text-sm tracking-tight">Complete Book</p>
+              <p className="font-semibold text-sm tracking-tight">Complete Series</p>
               <p className="text-sm text-muted-foreground">Access all {chapter.chapterCount} blueprints</p>
             </div>
             <span className="font-bold text-2xl text-primary">KSH {chapter.price.toFixed(2)}</span>
@@ -256,7 +256,7 @@ function BookModalContent({
         {isFullBook && hasPrice ? (
           chapter.isPurchased ? (
             <Button className="global_btn rounded_full bg_primary w-full" onPress={handleReadBook} startContent={<BookOpen className="h-4 w-4" />}>
-              Read Book
+              Read Series
             </Button>
           ) : !isAuthenticated ? (
             <Button
@@ -264,7 +264,7 @@ function BookModalContent({
               onPress={handleBuyBook}
               startContent={<ShoppingCart className="h-4 w-4" />}
             >
-              Buy Complete Book - KSH {chapter.price.toFixed(2)}
+              Buy Complete Series - KSH {chapter.price.toFixed(2)}
             </Button>
           ) : chapter.isCart ? (
             <Button
@@ -281,7 +281,7 @@ function BookModalContent({
               type="book"
               price={chapter.price}
               className="global_btn rounded_full bg_primary w-full"
-              label={`Buy Complete Book - KSH ${chapter.price.toFixed(2)}`}
+              label={`Buy Complete Series - KSH ${chapter.price.toFixed(2)}`}
               onSuccess={() => {
                 dispatch(closeModal())
                 router.push(getCartRoutePath())
@@ -290,7 +290,7 @@ function BookModalContent({
           )
         ) : (
           <Button className="global_btn rounded_full bg_primary w-full" onPress={handleReadBook} startContent={<BookOpen className="h-4 w-4" />}>
-            Read Book
+            Read Series
           </Button>
         )}
       </ModalFooter>
@@ -446,7 +446,7 @@ function ChapterModalContent({
       if (!isAuthenticated) {
         return (
           <Button className="global_btn rounded_full bg_primary w-full" onPress={onAddToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-            Buy Complete Book - KSH {bookPrice.toFixed(2)}
+            Buy Complete Series - KSH {bookPrice.toFixed(2)}
           </Button>
         )
       }
@@ -464,7 +464,7 @@ function ChapterModalContent({
           type="book"
           price={bookPrice}
           className="global_btn rounded_full bg_primary w-full"
-          label={`Buy Complete Book - KSH ${bookPrice.toFixed(2)}`}
+          label={`Buy Complete Series - KSH ${bookPrice.toFixed(2)}`}
           onSuccess={handleGoToCart}
         />
       )
@@ -559,7 +559,7 @@ function ChapterModalContent({
                 {chapter.isFree
                   ? 'Free'
                   : isBookPricing
-                    ? `KSH ${bookPrice.toFixed(2)} (book)`
+                    ? `KSH ${bookPrice.toFixed(2)} (series)`
                     : `KSH ${chapter.price?.toFixed(2) ?? '0.00'}`}
               </div>
             </div>
@@ -580,7 +580,7 @@ function ChapterModalContent({
           <div className="flex items-center gap-3 p-3 bg-accent/40 rounded-2xl border border-border">
             <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
             <p className="text-sm text-muted-foreground leading-relaxed">
-              This chapter is only available as part of the complete book purchase.
+              This chapter is only available as part of the complete series purchase.
             </p>
           </div>
         )}
@@ -588,7 +588,7 @@ function ChapterModalContent({
         {/* Book context */}
         {bookData && (
           <div className="border-t pt-3">
-            <h3 className="font-semibold text-sm mb-2 tracking-tight">About the Book</h3>
+            <h3 className="font-semibold text-sm mb-2 tracking-tight">About the Series</h3>
             <div className="flex gap-3">
               {bookData.coverImage && (
                 <div className="w-16 h-20 object-cover rounded-2xl shrink-0 overflow-hidden">

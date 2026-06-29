@@ -27,7 +27,7 @@ export function DashboardTopContent({ items, contentMode, isLoading }: Dashboard
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold">
-          Top {contentMode === 'chapters' ? 'Blueprints' : 'Books'}
+          Top {contentMode === 'chapters' ? 'Blueprints' : 'Series'}
         </h3>
         <Link href={contentMode === 'chapters' ? '/admin/chapters' : '/admin/books'}>
           <Button className="global_btn rounded_full outline_primary">

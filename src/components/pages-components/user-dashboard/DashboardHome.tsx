@@ -49,7 +49,7 @@ export function DashboardHome() {
         <p className="text-muted-foreground">
           {displayMode === 'chapters'
             ? "Continue your reading journey or explore new blueprints"
-            : "Continue your reading journey or explore new books"}
+            : "Continue your reading journey or explore new series"}
         </p>
       </div>
 
@@ -88,12 +88,12 @@ export function DashboardHome() {
               </div>
               <ArrowRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <h3 className="text-xl font-bold mb-2">My Books</h3>
+            <h3 className="text-xl font-bold mb-2">My Series</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              {ownedBooks.length} {ownedBooks.length === 1 ? 'book' : 'books'} owned
+              {ownedBooks.length} series owned
             </p>
             <p className="text-sm text-muted-foreground">
-              Access all your purchased books
+              Access all your purchased series
             </p>
           </button>
         )}
@@ -130,7 +130,7 @@ export function DashboardHome() {
             <ArrowRight className="h-5 w-5 text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <h3 className="text-xl font-bold mb-2">
-            {displayMode === 'chapters' ? 'Explore Blueprints' : 'Explore Books'}
+            {displayMode === 'chapters' ? 'Explore Blueprints' : 'Explore Series'}
           </h3>
           <p className="text-sm text-muted-foreground mb-3">
             Discover new stories

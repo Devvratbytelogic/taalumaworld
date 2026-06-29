@@ -80,7 +80,7 @@ export function ChapterPreviewModal({
 
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div>
-              <dt className="text-muted-foreground">Book</dt>
+              <dt className="text-muted-foreground">Series</dt>
               <dd className="font-medium">{chapter?.book?.title ?? 'N/A'}</dd>
             </div>
             <div>

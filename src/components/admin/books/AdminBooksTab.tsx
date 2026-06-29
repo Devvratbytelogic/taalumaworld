@@ -60,7 +60,7 @@ export function AdminBooksTab() {
       toast.success(`"${deleteConfirmBook.title}" deleted`);
       setDeleteConfirmBook(null);
     } catch {
-      toast.error('Failed to delete book');
+      toast.error('Failed to delete series');
     }
   };
 

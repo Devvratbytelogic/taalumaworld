@@ -106,7 +106,7 @@ export function AdminOrdersTab() {
                     )}
                 >
                     <BookOpen className="h-4 w-4" />
-                    Book Orders
+                    Series Orders
                     {(bookData?.data?.pagination?.total ?? 0) > 0 && (
                         <span className={cn(
                             'ml-1 px-2 py-0.5 rounded-full text-xs font-semibold',
@@ -123,7 +123,7 @@ export function AdminOrdersTab() {
                 <Input
                     startContent={<Search className="h-4 w-4 text-muted-foreground" />}
                     type="search"
-                    placeholder={`Search ${activeTab === 'books' ? 'book' : 'blueprint'} orders by name, email, item or status...`}
+                    placeholder={`Search ${activeTab === 'books' ? 'series' : 'blueprint'} orders by name, email, item or status...`}
                     radius="full"
                     className="w-full max-w-xl"
                     value={searchQuery}

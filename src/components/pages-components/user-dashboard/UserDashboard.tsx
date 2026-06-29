@@ -41,7 +41,7 @@ function UserDashboardInner() {
     { id: 'dashboard' as DashboardPage, label: 'Dashboard', icon: Home, show: true },
     { id: 'profile' as DashboardPage, label: 'Profile', icon: User, show: true },
     { id: 'my-chapters' as DashboardPage, label: 'My Blueprints', icon: BookOpen, show: true },
-    { id: 'my-books' as DashboardPage, label: 'My Books', icon: Book, show: true },
+    { id: 'my-books' as DashboardPage, label: 'My Series', icon: Book, show: true },
     { id: 'history' as DashboardPage, label: 'Reading History', icon: Clock, show: true },
     { id: 'settings' as DashboardPage, label: 'Settings', icon: Settings, show: true },
   ].filter(item => item.show);

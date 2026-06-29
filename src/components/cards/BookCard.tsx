@@ -27,7 +27,7 @@ export function BookCard({ book, author, chaptersCount, onClick }: BookCardProps
           {/* Pricing Type Badge on Image */}
           <div className="absolute top-3.5 right-3.5">
             <Badge className="text-primary border-primary/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium">
-              {book?.type === 'full-book' ? 'Full Book' : 'By Blueprint'}
+              {book?.type === 'full-book' ? 'Full Series' : 'By Blueprint'}
             </Badge>
           </div>
         </div>

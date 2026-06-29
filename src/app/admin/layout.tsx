@@ -18,7 +18,7 @@ function KshIcon({ className }: { className?: string }) {
 const NAV_ITEMS = [
     { id: 'dashboard' as AdminSection, label: 'Dashboard', icon: LayoutDashboard, category: 'system' },
     { id: 'settings' as AdminSection, label: 'Settings', icon: Settings, category: 'system' },
-    { id: 'books' as AdminSection, label: 'Books', icon: Book, category: 'content' },
+    { id: 'books' as AdminSection, label: 'Series', icon: Book, category: 'content' },
     { id: 'chapters' as AdminSection, label: 'Blueprints', icon: FileText, category: 'content' },
     { id: 'categories' as AdminSection, label: 'Categories', icon: FolderTree, category: 'content' },
     { id: 'authors' as AdminSection, label: 'Mentors', icon: Users, category: 'content' },

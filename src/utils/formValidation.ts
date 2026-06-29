@@ -125,7 +125,7 @@ export const contactFormSchema = Yup.object({
 export const addBookSchema = Yup.object({
   title: Yup.string()
     .trim()
-    .required('Please enter a book title'),
+    .required('Please enter a series title'),
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
@@ -147,7 +147,7 @@ export const addBookSchema = Yup.object({
 export const editBookSchema = Yup.object({
   title: Yup.string()
     .trim()
-    .required('Please enter a book title'),
+    .required('Please enter a series title'),
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
@@ -165,7 +165,7 @@ export const editBookSchema = Yup.object({
 
 // Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, status, cover_image, page)
 export const addChapterSchema = Yup.object({
-  bookId: Yup.string().required('Please select a book'),
+  bookId: Yup.string().required('Please select a series'),
   title: Yup.string()
     .trim()
     .required('Please enter a blueprint title'),

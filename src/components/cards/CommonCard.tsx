@@ -32,7 +32,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                 <div className="absolute top-3.5 right-3.5">
                     {isBook ? (
                         <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium ${data.pricingModel === VISIBLE.BOOK ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
-                            {data.pricingModel === VISIBLE.BOOK ? 'Full Book' : 'By Blueprint'}
+                            {data.pricingModel === VISIBLE.BOOK ? 'Full Series' : 'By Blueprint'}
                         </Badge>
                     ) : data.isFree ? (
                         <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium">

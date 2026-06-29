@@ -101,7 +101,7 @@ export default function PrimaryFooter() {
                                     <>
                                         <li>
                                             <Link href={getBooksRoutePath()} className="hover:text-primary transition-colors">
-                                                Browse Books
+                                                Browse Series
                                             </Link>
                                         </li>
                                         <li>

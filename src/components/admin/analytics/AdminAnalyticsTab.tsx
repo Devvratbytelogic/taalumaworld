@@ -18,7 +18,7 @@ export function AdminAnalyticsTab({ contentMode }: AdminAnalyticsTabProps) {
   const stats: AnalyticsStat[] = [
     { title: 'Total Users', value: '2,543', change: '+12.5%', changeType: 'positive', icon: Users },
     {
-      title: `Total ${contentMode === 'chapters' ? 'Focus Areas' : 'Books'}`,
+      title: `Total ${contentMode === 'chapters' ? 'Focus Areas' : 'Series'}`,
       value: contentMode === 'chapters' ? '156' : '42',
       change: '+8.2%',
       changeType: 'positive',

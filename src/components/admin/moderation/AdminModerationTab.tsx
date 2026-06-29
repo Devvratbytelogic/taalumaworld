@@ -11,7 +11,7 @@ import { ModerationPendingBanner } from './ModerationPendingBanner';
 import { ModerationListing } from './ModerationListing';
 
 const flaggedItemsData: FlaggedItem[] = [
-  { id: 1, type: 'review', content: 'Inappropriate language in review', user: 'John Doe', item: 'Leadership Book', flagged: '2 hours ago', severity: 'high' },
+  { id: 1, type: 'review', content: 'Inappropriate language in review', user: 'John Doe', item: 'Leadership Series', flagged: '2 hours ago', severity: 'high' },
   { id: 2, type: 'comment', content: 'Spam comment detected', user: 'Jane Smith', item: 'Career Blueprint', flagged: '5 hours ago', severity: 'medium' },
   { id: 3, type: 'review', content: 'Potential fake review', user: 'Bob Johnson', item: 'Communication Skills', flagged: '1 day ago', severity: 'low' },
 ];

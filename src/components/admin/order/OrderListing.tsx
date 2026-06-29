@@ -86,7 +86,7 @@ interface OrderListingProps {
 }
 
 export function OrderListing({ orders, searchQuery = '', orderType }: OrderListingProps) {
-    const emptyLabel = orderType === 'books' ? 'book orders' : 'blueprint orders';
+    const emptyLabel = orderType === 'books' ? 'series orders' : 'blueprint orders';
 
     return (
         <div className="bg-white rounded-3xl shadow-sm overflow-hidden">

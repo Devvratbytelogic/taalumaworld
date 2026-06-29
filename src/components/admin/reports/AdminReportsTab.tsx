@@ -16,7 +16,7 @@ interface AdminReportsTabProps {
 const reportTypes: ReportType[] = [
   { id: 'sales', title: 'Sales Report', description: 'Detailed breakdown of all sales and revenue', lastGenerated: '2024-01-20', frequency: 'Weekly' },
   { id: 'users', title: 'User Activity Report', description: 'User engagement and activity metrics', lastGenerated: '2024-01-20', frequency: 'Daily' },
-  { id: 'content', title: 'Content Performance', description: 'Most popular books and focus areas', lastGenerated: '2024-01-19', frequency: 'Monthly' },
+  { id: 'content', title: 'Content Performance', description: 'Most popular series and focus areas', lastGenerated: '2024-01-19', frequency: 'Monthly' },
   { id: 'revenue', title: 'Revenue Analysis', description: 'Financial performance and trends', lastGenerated: '2024-01-15', frequency: 'Monthly' },
 ];
 

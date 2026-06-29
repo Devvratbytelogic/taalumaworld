@@ -41,11 +41,11 @@ export function BookListing({
               <Book className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h3 className="font-bold">No books found</h3>
+              <h3 className="font-bold">No series found</h3>
               <p className="text-muted-foreground">
                 {searchQuery
                   ? 'Try adjusting your search query'
-                  : 'Create your first book to get started'}
+                  : 'Create your first series to get started'}
               </p>
             </div>
             {!searchQuery && (
@@ -55,7 +55,7 @@ export function BookListing({
                 className="global_btn rounded_full bg_primary"
                 startContent={<Plus className="h-4 w-4" />}
               >
-                Create Your First Book
+                Create Your First Series
               </Button>
             )}
           </div>

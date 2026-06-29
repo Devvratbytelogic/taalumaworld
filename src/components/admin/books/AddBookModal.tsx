@@ -91,7 +91,7 @@ export function AddBookModal({
         setCoverPreviewUrl(null);
         resetForm({ values: initialFormValues });
         onOpenChange(false);
-        toast.success('Book created successfully');
+        toast.success('Series created successfully');
       } catch {
         // toast.error('Failed to create book');
         console.error('Failed to create book');
@@ -177,9 +177,9 @@ export function AddBookModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="xl" className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Create New Book</DialogTitle>
+          <DialogTitle>Create New Series</DialogTitle>
           <DialogDescription>
-            Add a new book to the platform. Fill in the details below.
+            Add a new series to the platform. Fill in the details below.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col min-h-0">
@@ -205,7 +205,7 @@ export function AddBookModal({
               <Textarea
                 id="book-desc"
                 name="description"
-                placeholder="Brief description of the book..."
+                placeholder="Brief description of the series..."
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -386,7 +386,7 @@ export function AddBookModal({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="chapter">blueprint</SelectItem>
-                    <SelectItem value="book">book</SelectItem>
+                    <SelectItem value="book">series</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -435,7 +435,7 @@ export function AddBookModal({
               isDisabled={isSubmitting}
               isLoading={isSubmitting}
             >
-              Create Book
+              Create Series
             </Button>
           </DialogFooter>
         </form>

@@ -42,7 +42,7 @@ export function AuthorListing({
             <TableRow>
               <TableHead>Mentor</TableHead>
               <TableHead>Bio</TableHead>
-              <TableHead>Books</TableHead>
+              <TableHead>Series</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -74,7 +74,7 @@ export function AuthorListing({
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   <span className={`font-medium`}>{author.followersCount}</span>
-                  <span className="text-muted-foreground text-sm"> books</span>
+                  <span className="text-muted-foreground text-sm"> series</span>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>

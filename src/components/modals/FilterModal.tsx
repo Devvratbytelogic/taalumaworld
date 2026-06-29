@@ -151,7 +151,7 @@ export default function FilterModal() {
             </div>
             <div>
               <h2 className="text-xl font-bold tracking-tight">
-                Filter {displayMode === 'chapters' ? 'Blueprints' : 'Books'}
+                Filter {displayMode === 'chapters' ? 'Blueprints' : 'Series'}
               </h2>
               <div className="text-sm font-normal text-muted-foreground">
                 {activeFilterCount > 0 && (
@@ -217,7 +217,7 @@ export default function FilterModal() {
                   <span className="font-semibold text-sm text-primary tracking-tight">Discover & Explore</span>
                 </div>
                 <p className="text-sm text-muted-foreground tracking-tight">
-                  Find books by category, mentor, or genre
+                  Find series by category, mentor, or genre
                 </p>
               </div>
               <div className="space-y-3">

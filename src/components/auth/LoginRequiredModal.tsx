@@ -15,7 +15,7 @@ export default function LoginRequiredModal() {
   const action = data?.action;
   const itemType = data?.itemType;
 
-  const itemLabel = itemType === 'chapter' ? 'blueprint' : itemType === 'book' ? 'book' : itemType;
+  const itemLabel = itemType === 'chapter' ? 'blueprint' : itemType === 'book' ? 'series' : itemType;
 
   const getContent = () => {
     switch (action) {
@@ -73,7 +73,7 @@ export default function LoginRequiredModal() {
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">✓</span>
-                  <span>Access your purchased blueprints and books anytime</span>
+                  <span>Access your purchased blueprints and series anytime</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">✓</span>

@@ -18,7 +18,7 @@ export function AdminAnalyticsHeader({ contentMode }: AdminAnalyticsHeaderProps)
           </p>
         </div>
         <Badge variant="outline" className="h-fit">
-          {contentMode === 'chapters' ? 'Blueprint Mode' : 'Book Mode'}
+          {contentMode === 'chapters' ? 'Blueprint Mode' : 'Series Mode'}
         </Badge>
       </div>
     </div>

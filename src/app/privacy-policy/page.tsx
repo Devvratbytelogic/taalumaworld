@@ -67,7 +67,7 @@ export default function PrivacyPolicyPage() {
                                             <h3 className="font-semibold text-foreground mb-2">1.2 Services Offered</h3>
                                             <p>Taaluma World provides:</p>
                                             <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
-                                                <li><strong>Phase 1 (Current):</strong> Taaluma Digital Mini-books (available globally)</li>
+                                                <li><strong>Phase 1 (Current):</strong> Taaluma Digital Series (available globally)</li>
                                                 <li><strong>Phase 2 (Future):</strong> Taaluma Hub (mentorship platform) and Taaluma Digital Vision Board (restricted to Kenya and select African countries)</li>
                                             </ul>
                                         </div>
@@ -104,7 +104,7 @@ export default function PrivacyPolicyPage() {
                                         </div>
 
                                         <div>
-                                            <h3 className="font-semibold text-foreground mb-2">1.6 Payment Terms (Phase 1 – Digital Mini-Books)</h3>
+                                            <h3 className="font-semibold text-foreground mb-2">1.6 Payment Terms (Phase 1 – Digital Series)</h3>
                                             <ul className="list-disc list-inside space-y-1 ml-4">
                                                 <li>All prices are displayed in applicable currency</li>
                                                 <li>Payment is required before access to digital products</li>

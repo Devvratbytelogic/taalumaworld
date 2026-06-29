@@ -41,14 +41,14 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onEdit(book)}>
                 <Edit className="h-4 w-4 mr-2" />
-                Edit Book
+                Edit Series
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive"
                 onSelect={() => onDelete(book)}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete Book
+                Delete Series
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -81,7 +81,7 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
 
         <div className="text-sm">
           <span className="text-muted-foreground">Type:</span>
-          <span className="ml-1 font-medium capitalize">{book.pricingModel ?? 'book'}</span>
+          <span className="ml-1 font-medium capitalize">{book.pricingModel === 'book' ? 'series' : (book.pricingModel ?? 'series')}</span>
         </div>
 
         {book.pricingModel === 'book' && book.price != null && (
@@ -90,7 +90,7 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
               KSH {Number(book.price).toFixed(2)}
             </span>
             <span className="text-sm text-muted-foreground ml-1">
-              full book
+              full series
             </span>
           </div>
         )}

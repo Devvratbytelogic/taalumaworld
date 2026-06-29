@@ -47,7 +47,7 @@ export function PaymentListing({ payments, searchQuery = '' }: PaymentListingPro
               <TableCell className="max-w-40 truncate">{payment.item}</TableCell>
               <TableCell>
                 <Badge variant="outline">
-                  {payment.type === 'chapter' ? 'Focus Area' : 'Book'}
+                  {payment.type === 'chapter' ? 'Focus Area' : 'Series'}
                 </Badge>
               </TableCell>
               <TableCell className="font-semibold text-primary whitespace-nowrap">

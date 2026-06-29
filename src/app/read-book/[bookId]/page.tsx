@@ -55,7 +55,7 @@ export default function BookReadPage() {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
         <div className="bg-white rounded-3xl p-8 max-w-md text-center">
-          <p className="text-lg font-semibold mb-4">Book not found</p>
+          <p className="text-lg font-semibold mb-4">Series not found</p>
           <Button onPress={onClose} className="global_btn rounded_full outline_primary">
             Go Back
           </Button>
@@ -184,7 +184,7 @@ export default function BookReadPage() {
               onPress={handleLoginRequired}
               startContent={<ShoppingCart className="h-4 w-4" />}
             >
-              Buy Book · KSH {book!.price.toFixed(2)}
+              Buy Series · KSH {book!.price.toFixed(2)}
             </Button>
           ) : (
             <AddToCartButton
@@ -193,7 +193,7 @@ export default function BookReadPage() {
               type="book"
               price={book!.price}
               className="global_btn rounded_full bg_primary shrink-0"
-              label={`Buy Book · KSH ${book!.price.toFixed(2)}`}
+              label={`Buy Series · KSH ${book!.price.toFixed(2)}`}
             />
           )}
         </div>

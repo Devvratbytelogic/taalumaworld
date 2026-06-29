@@ -101,7 +101,7 @@ export function AdminPagesTab() {
     hero: {
       title: 'Accelerate Your Career with Expert Knowledge',
       subtitle: 'For College Graduates & Young Professionals',
-      description: 'Access curated insights from industry mentors. Learn at your own pace with focused areas or complete books.',
+      description: 'Access curated insights from industry mentors. Learn at your own pace with focused areas or complete series.',
       ctaText: 'Explore Content',
       ctaLink: '/browse',
       backgroundImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200',
@@ -119,7 +119,7 @@ export function AdminPagesTab() {
         },
         {
           title: 'Flexible Learning',
-          description: 'Choose focus areas or complete books based on your needs',
+          description: 'Choose focus areas or complete series based on your needs',
           icon: 'BookOpen',
         },
         {
@@ -134,7 +134,7 @@ export function AdminPagesTab() {
       items: [
         { label: 'Active Users', value: '2,847', icon: 'Users' },
         { label: 'Expert Mentors', value: '42', icon: 'Users' },
-        { label: 'Books Available', value: '156', icon: 'BookOpen' },
+        { label: 'Series Available', value: '156', icon: 'BookOpen' },
         { label: 'Satisfaction Rate', value: '98%', icon: 'TrendingUp' },
       ],
     },
@@ -156,7 +156,7 @@ export function AdminPagesTab() {
         {
           name: 'Michael Chen',
           role: 'Software Engineer',
-          content: 'The flexibility to learn from individual areas or full books is perfect for my busy schedule.',
+          content: 'The flexibility to learn from individual areas or full series is perfect for my busy schedule.',
           avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
         },
         {
@@ -648,7 +648,7 @@ export function AdminPagesTab() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">Featured Content</h3>
-                  <p className="text-sm text-muted-foreground">Showcase highlighted books or focus areas</p>
+                  <p className="text-sm text-muted-foreground">Showcase highlighted series or focus areas</p>
                 </div>
                 <Switch
                   checked={homeContent.featuredContent.enabled}

@@ -180,7 +180,7 @@ function AuthorDetail({ id }: { id: string }) {
         {/* Content section */}
         <div className="mb-6">
           <h2 className="text-xl font-bold">
-            {contentMode === VISIBLE.BOOK ? 'Books' : 'Blueprints'}
+            {contentMode === VISIBLE.BOOK ? 'Series' : 'Blueprints'}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">Content by {author?.fullName}</p>
         </div>

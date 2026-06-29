@@ -11,10 +11,10 @@ export function AdminBooksHeader({ onCreateBook }: AdminBooksHeaderProps) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Books Management
+            Series Management
           </h1>
           <p className="text-muted-foreground">
-            Manage all books on the platform
+            Manage all series on the platform
           </p>
         </div>
         <Button
@@ -23,7 +23,7 @@ export function AdminBooksHeader({ onCreateBook }: AdminBooksHeaderProps) {
           className="global_btn rounded_full bg_primary"
         >
           <Plus className="h-4 w-4" />
-          Create New Book
+          Create New Series
         </Button>
       </div>
     </div>

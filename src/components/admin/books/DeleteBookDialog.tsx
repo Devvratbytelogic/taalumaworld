@@ -28,7 +28,7 @@ export function DeleteBookDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Delete Book</DialogTitle>
+          <DialogTitle>Delete Series</DialogTitle>
           <DialogDescription>
             {book
               ? `Are you sure you want to delete "${book.title}"? This cannot be undone.`

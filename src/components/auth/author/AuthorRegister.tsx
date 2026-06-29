@@ -86,10 +86,10 @@ export default function AuthorRegister() {
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
-                        Author Registration
+                        Mentor Registration
                     </p>
                     <p className="text-sm text-muted-foreground font-normal">
-                        Create your author account on <span className="text-foreground font-bold">Taaluma</span><span className="text-primary font-bold">World</span>
+                        Create your mentor account on <span className="text-foreground font-bold">Taaluma</span><span className="text-primary font-bold">World</span>
                     </p>
                 </ModalHeader>
                 <ModalBody>

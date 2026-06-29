@@ -50,14 +50,14 @@ function AuthorsList() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto sm:px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Thought Leaders</h1>
-          <p className="text-muted-foreground">Discover the authors behind our content</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Mentors</h1>
+          <p className="text-muted-foreground">Discover the mentors behind our content</p>
         </div>
 
         {authors.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No thought leaders available yet.</p>
+            <p>No mentors available yet.</p>
             <Link href={getHomeRoutePath()}>
               <Button className="global_btn rounded_full outline_primary mt-4">
                 Back to Home
@@ -130,14 +130,14 @@ function AuthorDetail({ id }: { id: string }) {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Thought Leaders
+            Back to Mentors
           </Link>
           <div className="text-center py-16">
             <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-muted-foreground">Thought leader not found.</p>
+            <p className="text-muted-foreground">Mentor not found.</p>
             <Link href={getAuthorsRoutePath()}>
               <Button className="global_btn rounded_full outline_primary mt-4">
-                Browse all Thought Leaders
+                Browse all Mentors
               </Button>
             </Link>
           </div>
@@ -154,7 +154,7 @@ function AuthorDetail({ id }: { id: string }) {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Thought Leaders
+          Back to Mentors
         </Link>
 
         {/* Author profile card */}
@@ -194,7 +194,7 @@ function AuthorDetail({ id }: { id: string }) {
         ) : items.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No content available from this author yet.</p>
+            <p>No content available from this mentor yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

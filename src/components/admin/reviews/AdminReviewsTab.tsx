@@ -18,7 +18,7 @@ const mockReviews: ReviewEntry[] = [
     userAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     rating: 5,
     comment:
-      'This focus area was incredibly insightful! The thought leader really knows their stuff.',
+      'This focus area was incredibly insightful! The mentor really knows their stuff.',
     itemTitle: 'Introduction to Career Growth',
     itemType: 'chapter',
     date: '2024-01-20',

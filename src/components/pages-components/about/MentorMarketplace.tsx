@@ -82,7 +82,7 @@ export default function MentorMarketplace() {
                     ) : (
                         /* Placeholder cards when no data */
                         <div className="grid md:grid-cols-3 gap-6">
-                            {['Thought Leader', 'Career Strategist', 'Industry Expert'].map((role, index) => (
+                            {['Mentor', 'Career Strategist', 'Industry Expert'].map((role, index) => (
                                 <div key={role} className="bg-white rounded-3xl p-6 shadow-sm flex flex-col gap-4 border border-dashed border-border">
                                     <div className="flex items-center gap-4">
                                         <div

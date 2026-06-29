@@ -103,7 +103,7 @@ export default function TermsOfServicePage() {
                                         </ul>
                                         <p>
                                             All prices are displayed in USD and include applicable taxes. Prices may vary by content
-                                            and are subject to change at the author's or platform's discretion. Any price changes
+                                            and are subject to change at the mentor's or platform's discretion. Any price changes
                                             will not affect purchases already completed.
                                         </p>
                                         <p>

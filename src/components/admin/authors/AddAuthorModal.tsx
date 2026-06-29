@@ -68,7 +68,7 @@ export function AddAuthorModal({
       resetForm({ values: initialFormValues });
       setAvatarPreviewUrl(null);
       onOpenChange(false);
-      toast.success('Thought leader added successfully');
+      toast.success('Mentor added successfully');
       onSuccess?.();
     },
   });
@@ -118,9 +118,9 @@ export function AddAuthorModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Thought Leader</DialogTitle>
+          <DialogTitle>Add Mentor</DialogTitle>
           <DialogDescription>
-            Add a new author or thought leader. Fill in the details below.
+            Add a new mentor. Fill in the details below.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col min-h-0 admin_panel">
@@ -240,7 +240,7 @@ export function AddAuthorModal({
               isDisabled={isSubmitting}
               isLoading={isSubmitting}
             >
-              Add Thought Leader
+              Add Mentor
             </Button>
           </DialogFooter>
         </form>

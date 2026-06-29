@@ -56,7 +56,7 @@ export function ChapterPreviewModal({
                 {chapter?.book?.title && ` · ${chapter?.book?.title}`}
               </p>
               {chapter?.book?.thoughtLeader?.fullName && (
-                <p className="text-sm text-muted-foreground">Thought Leader: {chapter?.book?.thoughtLeader?.fullName}</p>
+                <p className="text-sm text-muted-foreground">Mentor: {chapter?.book?.thoughtLeader?.fullName}</p>
               )}
               <div className="flex items-center gap-2 pt-1">
                 <span className="font-semibold text-primary">
@@ -84,7 +84,7 @@ export function ChapterPreviewModal({
               <dd className="font-medium">{chapter?.book?.title ?? 'N/A'}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Thought Leader</dt>
+              <dt className="text-muted-foreground">Mentor</dt>
               <dd className="font-medium">{chapter?.book?.thoughtLeader?.fullName ?? 'Unknown'}</dd>
             </div>
             <div>

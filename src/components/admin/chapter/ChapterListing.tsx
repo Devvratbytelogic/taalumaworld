@@ -77,7 +77,7 @@ export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setD
             <TableRow>
               <TableHead>Blueprint Title</TableHead>
               <TableHead>Book</TableHead>
-              <TableHead>Thought Leader</TableHead>
+              <TableHead>Mentor</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>

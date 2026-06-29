@@ -101,7 +101,7 @@ export function AdminPagesTab() {
     hero: {
       title: 'Accelerate Your Career with Expert Knowledge',
       subtitle: 'For College Graduates & Young Professionals',
-      description: 'Access curated insights from industry thought leaders. Learn at your own pace with focused areas or complete books.',
+      description: 'Access curated insights from industry mentors. Learn at your own pace with focused areas or complete books.',
       ctaText: 'Explore Content',
       ctaLink: '/browse',
       backgroundImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200',
@@ -113,7 +113,7 @@ export function AdminPagesTab() {
       subtitle: 'Everything you need to advance your professional journey',
       items: [
         {
-          title: 'Expert Thought Leaders',
+          title: 'Expert Mentors',
           description: 'Learn from industry professionals and career experts',
           icon: 'Users',
         },
@@ -133,7 +133,7 @@ export function AdminPagesTab() {
       enabled: true,
       items: [
         { label: 'Active Users', value: '2,847', icon: 'Users' },
-        { label: 'Expert Thought Leaders', value: '42', icon: 'Users' },
+        { label: 'Expert Mentors', value: '42', icon: 'Users' },
         { label: 'Books Available', value: '156', icon: 'BookOpen' },
         { label: 'Satisfaction Rate', value: '98%', icon: 'TrendingUp' },
       ],
@@ -162,7 +162,7 @@ export function AdminPagesTab() {
         {
           name: 'Emily Rodriguez',
           role: 'Business Analyst',
-          content: 'Expert insights from real thought leaders. This platform is a game-changer!',
+          content: 'Expert insights from real mentors. This platform is a game-changer!',
           avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emily',
         },
       ],

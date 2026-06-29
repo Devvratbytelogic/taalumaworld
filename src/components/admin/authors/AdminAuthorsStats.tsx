@@ -19,7 +19,7 @@ export function AdminAuthorsStats({ authors }: AdminAuthorsStatsProps) {
             <Users className="h-5 w-5 text-blue-600" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Total Authors</p>
+            <p className="text-sm text-muted-foreground">Total Mentors</p>
             <p className="text-2xl font-bold">{totalAuthors}</p>
           </div>
         </div>

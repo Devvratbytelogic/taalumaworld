@@ -21,7 +21,7 @@ const NAV_ITEMS = [
     { id: 'books' as AdminSection, label: 'Books', icon: Book, category: 'content' },
     { id: 'chapters' as AdminSection, label: 'Blueprints', icon: FileText, category: 'content' },
     { id: 'categories' as AdminSection, label: 'Categories', icon: FolderTree, category: 'content' },
-    { id: 'authors' as AdminSection, label: 'Thought Leaders', icon: Users, category: 'content' },
+    { id: 'authors' as AdminSection, label: 'Mentors', icon: Users, category: 'content' },
     { id: 'users' as AdminSection, label: 'Users', icon: UserCircle, category: 'users' },
     { id: 'institutions' as AdminSection, label: 'University Partners', icon: GraduationCap, category: 'users' },
     { id: 'roles_permissions' as AdminSection, label: 'Roles & Permissions', icon: Shield, category: 'system' },

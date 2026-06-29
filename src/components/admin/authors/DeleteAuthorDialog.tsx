@@ -26,7 +26,7 @@ export function DeleteAuthorDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Delete Thought Leader</DialogTitle>
+          <DialogTitle>Delete Mentor</DialogTitle>
           <DialogDescription>
             {author
               ? `Are you sure you want to delete "${author.name}"? This cannot be undone.`

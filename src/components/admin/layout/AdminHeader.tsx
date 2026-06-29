@@ -20,20 +20,20 @@ import ImageComponent from '@/components/ui/ImageComponent';
 
 // ── All navigable admin routes for the search palette ────────────────────────
 const ADMIN_ROUTES = [
-    { label: 'Dashboard',        description: 'Overview & stats',            path: getAdminSectionRoutePath('dashboard'),    icon: LayoutDashboard, keywords: ['home', 'overview', 'stats'] },
-    { label: 'Books',            description: 'Manage all books',            path: getAdminSectionRoutePath('books'),        icon: Book,            keywords: ['book', 'publish'] },
-    { label: 'Blueprints',         description: 'Manage all blueprints',         path: getAdminSectionRoutePath('chapters'),     icon: FileText,        keywords: ['blueprint', 'content'] },
-    { label: 'Create Blueprint',   description: 'Add a new blueprint',          path: getCreateChapterRoutePath(),              icon: Plus,            keywords: ['new blueprint', 'add blueprint'] },
-    { label: 'Categories',       description: 'Manage categories',          path: getAdminSectionRoutePath('categories'),   icon: FolderTree,      keywords: ['category', 'tag'] },
-    { label: 'Thought Leaders',  description: 'Manage authors & leaders',   path: getAdminSectionRoutePath('authors'),      icon: Users,           keywords: ['author', 'leader', 'thought'] },
-    { label: 'Users',            description: 'Manage registered users',    path: getAdminSectionRoutePath('users'),        icon: UserCircle,      keywords: ['user', 'member', 'account'] },
-    { label: 'Transactions',     description: 'View payment transactions',  path: getAdminSectionRoutePath('transactions'), icon: Receipt,         keywords: ['payment', 'transaction', 'money'] },
-    { label: 'Orders',           description: 'View book & blueprint orders', path: getAdminSectionRoutePath('orders'),      icon: ShoppingBag,     keywords: ['order', 'book order', 'blueprint order', 'purchase'] },
-    { label: 'Testimonials',     description: 'Manage testimonials',        path: getAdminSectionRoutePath('testimonials'), icon: MessageSquare,   keywords: ['testimonial', 'review', 'feedback'] },
-    { label: 'FAQs',             description: 'Manage FAQ entries',         path: getAdminSectionRoutePath('faqs'),         icon: FileEdit,        keywords: ['faq', 'question', 'answer'] },
-    { label: 'Subscribers',      description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'),  icon: Mail,            keywords: ['subscriber', 'newsletter', 'email'] },
-    { label: 'Settings',         description: 'Platform settings',          path: getAdminSectionRoutePath('settings'),     icon: Settings,        keywords: ['setting', 'config', 'logo'] },
-    { label: 'My Profile',       description: 'Edit your admin profile',    path: getAdminProfileRoutePath(),               icon: UserCircle,      keywords: ['profile', 'me', 'account'] },
+    { label: 'Dashboard', description: 'Overview & stats', path: getAdminSectionRoutePath('dashboard'), icon: LayoutDashboard, keywords: ['home', 'overview', 'stats'] },
+    { label: 'Books', description: 'Manage all books', path: getAdminSectionRoutePath('books'), icon: Book, keywords: ['book', 'publish'] },
+    { label: 'Blueprints', description: 'Manage all blueprints', path: getAdminSectionRoutePath('chapters'), icon: FileText, keywords: ['blueprint', 'content'] },
+    { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
+    { label: 'Categories', description: 'Manage categories', path: getAdminSectionRoutePath('categories'), icon: FolderTree, keywords: ['category', 'tag'] },
+    { label: 'Mentors', description: 'Manage mentors', path: getAdminSectionRoutePath('authors'), icon: Users, keywords: ['author', 'leader', 'thought', 'mentor'] },
+    { label: 'Users', description: 'Manage registered users', path: getAdminSectionRoutePath('users'), icon: UserCircle, keywords: ['user', 'member', 'account'] },
+    { label: 'Transactions', description: 'View payment transactions', path: getAdminSectionRoutePath('transactions'), icon: Receipt, keywords: ['payment', 'transaction', 'money'] },
+    { label: 'Orders', description: 'View book & blueprint orders', path: getAdminSectionRoutePath('orders'), icon: ShoppingBag, keywords: ['order', 'book order', 'blueprint order', 'purchase'] },
+    { label: 'Testimonials', description: 'Manage testimonials', path: getAdminSectionRoutePath('testimonials'), icon: MessageSquare, keywords: ['testimonial', 'review', 'feedback'] },
+    { label: 'FAQs', description: 'Manage FAQ entries', path: getAdminSectionRoutePath('faqs'), icon: FileEdit, keywords: ['faq', 'question', 'answer'] },
+    { label: 'Subscribers', description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'), icon: Mail, keywords: ['subscriber', 'newsletter', 'email'] },
+    { label: 'Settings', description: 'Platform settings', path: getAdminSectionRoutePath('settings'), icon: Settings, keywords: ['setting', 'config', 'logo'] },
+    { label: 'My Profile', description: 'Edit your admin profile', path: getAdminProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];
 
 interface AdminHeaderProps {
@@ -67,7 +67,7 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             const inside = searchRef.current?.contains(e.target as Node)
-                        || mobileSearchRef.current?.contains(e.target as Node);
+                || mobileSearchRef.current?.contains(e.target as Node);
             if (!inside) setShowResults(false);
         };
         document.addEventListener('mousedown', handler);

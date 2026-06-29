@@ -62,7 +62,7 @@ export function AdminBooksSearch({
           onChange={(e) => onLeaderChange(e.target.value)}
           className="h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-48"
         >
-          <option value="">All Thought Leaders</option>
+          <option value="">All Mentors</option>
           {leaders.map((l) => (
             <option key={l.id} value={l.id}>{l.name}</option>
           ))}

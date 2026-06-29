@@ -67,7 +67,7 @@ export function AdminAuthorsTab() {
       toast.success(`"${deleteConfirmAuthor.name}" deleted`);
       setDeleteConfirmAuthor(null);
     } catch {
-      toast.error('Failed to delete thought leader');
+      toast.error('Failed to delete mentor');
     }
   };
 

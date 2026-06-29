@@ -129,7 +129,7 @@ export const addBookSchema = Yup.object({
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
-  thoughtLeader: Yup.string().required('Please select a thought leader'),
+  thoughtLeader: Yup.string().required('Please select a mentor'),
   category: Yup.string().required('Please select a category'),
   cover_image: Yup.mixed<File>()
     .required('Please select a cover image')
@@ -151,7 +151,7 @@ export const editBookSchema = Yup.object({
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
-  thoughtLeader: Yup.string().required('Please select a thought leader'),
+  thoughtLeader: Yup.string().required('Please select a mentor'),
   category: Yup.string().required('Please select a category'),
   cover_image: Yup.mixed<File>()
     .nullable()

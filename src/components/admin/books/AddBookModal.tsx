@@ -219,7 +219,7 @@ export function AddBookModal({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Thought Leader<span className="text-red-500">*</span></Label>
+                <Label>Mentor<span className="text-red-500">*</span></Label>
                 <Select
                   value={values.thoughtLeader}
                   onValueChange={(value) => {
@@ -230,7 +230,7 @@ export function AddBookModal({
                   <SelectTrigger
                     className={errors.thoughtLeader && touched.thoughtLeader ? 'border-red-500' : ''}
                   >
-                    <SelectValue placeholder="Select thought leader" />
+                    <SelectValue placeholder="Select mentor" />
                   </SelectTrigger>
                   <SelectContent>
                     {thoughtLeaders.map((l) => (

@@ -217,7 +217,7 @@ export default function FilterModal() {
                   <span className="font-semibold text-sm text-primary tracking-tight">Discover & Explore</span>
                 </div>
                 <p className="text-sm text-muted-foreground tracking-tight">
-                  Find books by category, author, or genre
+                  Find books by category, mentor, or genre
                 </p>
               </div>
               <div className="space-y-3">
@@ -249,7 +249,7 @@ export default function FilterModal() {
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
                   <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempAuthors.length}</span>
-                  Authors
+                  Mentors
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
                   {authors.map((author) => (

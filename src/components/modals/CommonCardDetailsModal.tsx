@@ -232,7 +232,7 @@ function BookModalContent({
         {/* About the Author */}
         {chapter.author && (
           <div className="border-t pt-3">
-            <h3 className="font-semibold text-sm mb-2 tracking-tight">About the Author</h3>
+            <h3 className="font-semibold text-sm mb-2 tracking-tight">About the Mentor</h3>
             <div className="flex items-start gap-3">
               {chapter.authorAvatar ? (
                 <img src={chapter.authorAvatar} alt={chapter.author} className="h-10 w-10 rounded-full object-cover shrink-0" />

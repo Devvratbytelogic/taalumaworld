@@ -40,7 +40,7 @@ export function AuthorListing({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Thought Leader</TableHead>
+              <TableHead>Mentor</TableHead>
               <TableHead>Bio</TableHead>
               <TableHead>Books</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -110,11 +110,11 @@ export function AuthorListing({
                 <Users className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="font-bold">No thought leaders found</h3>
+                <h3 className="font-bold">No mentors found</h3>
                 <p className="text-muted-foreground">
                   {searchQuery
                     ? 'Try adjusting your search query'
-                    : 'Add your first thought leader to get started'}
+                    : 'Add your first mentor to get started'}
                 </p>
               </div>
               {!searchQuery && (
@@ -123,7 +123,7 @@ export function AuthorListing({
                   className="global_btn rounded_full bg_primary"
                   startContent={<Plus className="h-4 w-4" />}
                 >
-                  Add Your First Thought Leader
+                  Add Your First Mentor
                 </Button>
               )}
             </div>

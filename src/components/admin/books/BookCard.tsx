@@ -58,7 +58,7 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
       <CardHeader className="pb-3">
         <h3 className="line-clamp-1 font-bold">{book.title}</h3>
         <p className="text-sm text-muted-foreground line-clamp-1">
-          by {book.thoughtLeader?.fullName ?? 'Unknown Thought Leader'}
+          by {book.thoughtLeader?.fullName ?? 'Unknown Mentor'}
         </p>
         <div className="flex items-center gap-2 flex-wrap pt-2">
           {category && category.name !== 'N/A' && (

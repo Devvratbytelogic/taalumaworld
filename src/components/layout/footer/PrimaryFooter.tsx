@@ -111,14 +111,14 @@ export default function PrimaryFooter() {
                                         </li>
                                         <li>
                                             <Link href={getAuthorsRoutePath()} className="hover:text-primary transition-colors">
-                                                Thought Leaders
+                                                Mentors
                                             </Link>
                                         </li>
                                     </>
                                 ) : (
                                     <li>
                                         <Link href={getAuthorsRoutePath()} className="hover:text-primary transition-colors">
-                                            Thought Leaders
+                                            Mentors
                                         </Link>
                                     </li>
                                 )} */}
@@ -173,7 +173,7 @@ export default function PrimaryFooter() {
                                             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                             </svg>
-                                            Admin/Author Login
+                                            Admin/Mentor Login
                                         </button>
                                     )}
                                 </li>

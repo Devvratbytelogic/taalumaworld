@@ -84,7 +84,7 @@ export function EditAuthorModal({
         await onSubmitForm(id, values);
       }
       onOpenChange(false);
-      toast.success('Thought leader updated successfully');
+      toast.success('Mentor updated successfully');
       onSuccess?.();
     },
   });
@@ -141,7 +141,7 @@ export function EditAuthorModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Thought Leader</DialogTitle>
+          <DialogTitle>Edit Mentor</DialogTitle>
           <DialogDescription>
             Update the details for &quot;{leader.fullName}&quot;.
           </DialogDescription>

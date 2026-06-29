@@ -46,7 +46,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-xl font-semibold">{book.title}</h3>
               <p className="text-sm text-muted-foreground">
-                by {book.thoughtLeader?.fullName ?? 'Unknown Thought Leader'}
+                by {book.thoughtLeader?.fullName ?? 'Unknown Mentor'}
               </p>
 
               <div className="flex flex-wrap gap-1.5 pt-1">
@@ -82,7 +82,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
           {/* Detail grid */}
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div>
-              <dt className="text-muted-foreground">Thought Leader</dt>
+              <dt className="text-muted-foreground">Mentor</dt>
               <dd className="font-medium">{book.thoughtLeader?.fullName ?? 'N/A'}</dd>
             </div>
             <div>

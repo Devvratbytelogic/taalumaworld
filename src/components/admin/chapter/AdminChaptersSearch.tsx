@@ -14,7 +14,7 @@ export function AdminChaptersSearch({ searchQuery, onSearchChange }: AdminChapte
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search by title, book, thought leader, status, price, or blueprint number..."
+            placeholder="Search by title, book, mentor, status, price, or blueprint number..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10"

@@ -40,6 +40,10 @@ export function getCommunityStandardsRoutePath(): string {
   return '/policies/community-standards';
 }
 
+export function getInstitutionalAccessTermsRoutePath(): string {
+  return '/policies/institutional-access-terms';
+}
+
 export function getAdminRoutePath(): string {
   return '/admin';
 }

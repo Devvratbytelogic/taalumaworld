@@ -131,7 +131,7 @@ export default function SignIn() {
         resetForm()
     }
 
-    const headerTitle = signRole === 'user' ? 'Sign In' : 'Author Sign In'
+    const headerTitle = signRole === 'user' ? 'Sign In' : 'Mentor Sign In'
     const headerSubtitle =
         signRole === 'user'
             ? 'Continue your learning journey with TaalumaWorld'
@@ -151,10 +151,10 @@ export default function SignIn() {
                         >
                             <TabsList className="grid w-full grid-cols-2 rounded-2xl p-1 h-11 gap-1">
                                 <TabsTrigger value="user" className="rounded-xl text-sm">
-                                    User account
+                                    Career Architect
                                 </TabsTrigger>
                                 <TabsTrigger value="author" className="rounded-xl text-sm">
-                                    Author account
+                                    Mentor
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
@@ -245,7 +245,7 @@ export default function SignIn() {
                                 onClick={() => dispatch(openModal({ componentName: signupModal, data: '' }))}
                                 disabled={isSubmitting}
                             >
-                                {signRole === 'user' ? 'Sign Up' : 'Register as author'}
+                                {signRole === 'user' ? 'Sign Up' : 'Register as Mentor'}
                             </button>
                         </div>
                     </ModalFooter>

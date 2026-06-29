@@ -106,8 +106,8 @@ export default function SignUp() {
 
     const headerSubtitle =
         signRole === 'user'
-            ? 'Join TaalumaWorld and start your reading journey!'
-            : 'Create your author account on TaalumaWorld'
+            ? 'Join TaalumaWorld and start your learning journey!'
+            : 'Create your Mentor account on TaalumaWorld'
 
     const signInModal = signRole === 'user' ? 'SignIn' : 'AuthorSignIn'
 
@@ -125,10 +125,10 @@ export default function SignUp() {
                         >
                             <TabsList className="grid w-full grid-cols-2 rounded-2xl p-1 h-11 gap-1">
                                 <TabsTrigger value="user" className="rounded-xl text-sm">
-                                    User account
+                                    Career Architect
                                 </TabsTrigger>
                                 <TabsTrigger value="author" className="rounded-xl text-sm">
-                                    Author account
+                                    Mentor
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
@@ -289,7 +289,7 @@ export default function SignUp() {
                             disabled={isSubmitting || isRegistering}
                             isLoading={isSubmitting || isRegistering}
                         >
-                            {signRole === 'user' ? 'Sign Up' : 'Register'}
+                            {signRole === 'user' ? 'Sign Up' : 'Register as Mentor'}
                         </Button>
                     </form>
 

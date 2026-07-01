@@ -91,7 +91,9 @@ export default async function RootLayout({
         )}
       </head>
       <body className="antialiased">
-        <ContentProtection />
+        {process.env.NEXT_PUBLIC_ENABLE_CONTENT_PROTECTION !== "false" && (
+          <ContentProtection />
+        )}
         <AppProviders>
           <ConditionalSiteLayout>
             {children}

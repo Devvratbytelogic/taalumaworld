@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const }
+const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const, expires: 7 } // 7 days
 /** Session cookies: no expires = removed when browser/tab is closed */
 const SESSION_COOKIE_OPTIONS = { ...COOKIE_OPTIONS }
 

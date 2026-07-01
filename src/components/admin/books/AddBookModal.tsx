@@ -428,26 +428,6 @@ export function AddBookModal({
                 </div>
               )}
             </div>
-            <OpenGraphFieldsSection
-              idPrefix="book"
-              values={{
-                meta_title: values.meta_title,
-                meta_description: values.meta_description,
-                og_title: values.og_title,
-                og_description: values.og_description,
-                og_image: values.og_image,
-                json_ld: values.json_ld,
-              }}
-              errors={errors}
-              touched={touched}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-              disabled={isSubmitting}
-              ogImagePreviewUrl={ogImagePreviewUrl}
-              ogImageFileName={ogImageFile?.name ?? null}
-              onOgImageChange={handleOgImageChange}
-              onOgImageClear={clearOgImage}
-            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Pricing model</Label>
@@ -493,6 +473,26 @@ export function AddBookModal({
               </div>
               )}
             </div>
+            <OpenGraphFieldsSection
+              idPrefix="book"
+              values={{
+                meta_title: values.meta_title,
+                meta_description: values.meta_description,
+                og_title: values.og_title,
+                og_description: values.og_description,
+                og_image: values.og_image,
+                json_ld: values.json_ld,
+              }}
+              errors={errors}
+              touched={touched}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              disabled={isSubmitting}
+              ogImagePreviewUrl={ogImagePreviewUrl}
+              ogImageFileName={ogImageFile?.name ?? null}
+              onOgImageChange={handleOgImageChange}
+              onOgImageClear={clearOgImage}
+            />
           </div>
           <DialogFooter>
             <Button

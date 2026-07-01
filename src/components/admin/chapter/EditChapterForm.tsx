@@ -19,6 +19,8 @@ import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
 import { addChapterSchema } from '@/utils/formValidation';
+import { APP_SITE_URL } from '@/utils/config';
+import { getUserId, getUserRole } from '@/utils/authCookies';
 import { useUpdateChapterMutation } from '@/store/rtkQueries/adminPostApi';
 import {
   useGetAllBooksQuery,
@@ -35,6 +37,7 @@ import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphField
 const initialFormValues = {
   bookId: '',
   title: '',
+  slug: '',
   description: '',
   content: '',
   sequence: 1,
@@ -73,9 +76,12 @@ function getOpenGraphValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
 
 function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
   const bookId = (chapter.book as { id?: string; _id?: string })?.id ?? (chapter.book as { id?: string; _id?: string })?._id ?? '';
+  const title = chapter.title ?? '';
+  const slug = chapter.slug ?? title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   return {
     bookId,
-    title: chapter.title ?? '',
+    title,
+    slug,
     description: chapter.description ?? '',
     content: chapter.content ?? '',
     sequence: chapter.number ?? 1,
@@ -162,6 +168,9 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (vals.og_description) formData.append('og_description', vals.og_description);
       if (ogImageFile) formData.append('og_image', ogImageFile);
       if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      formData.append('slug', vals.slug);
+      const baseUrl = APP_SITE_URL.replace(/\/$/, '');
+      formData.append('shareable_link', `${baseUrl}/${getUserId() ?? ''}/${getUserRole() ?? ''}/${vals.slug}`);
       try {
         await updateChapter({ id: chapterId, values: formData }).unwrap();
         if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
@@ -331,7 +340,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               name="title"
               placeholder="e.g., Introduction to Leadership"
               value={values.title}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                const slug = e.target.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                setFieldValue('slug', slug);
+              }}
               onBlur={handleBlur}
               disabled={isSubmittingState}
               className={errors.title && touched.title ? 'border-red-500' : ''}
@@ -340,6 +353,19 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <p className="text-sm text-red-600">{errors.title}</p>
             )}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="chapter-slug">Slug</Label>
+          <Input
+            id="chapter-slug"
+            name="slug"
+            value={values.slug}
+            readOnly
+            disabled
+            placeholder="Auto-generated from title"
+            className="bg-muted/50"
+          />
         </div>
 
         <div className="space-y-2">

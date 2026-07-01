@@ -24,6 +24,8 @@ export interface IAllChaptersAPIResponseData {
   jsonLd?: string;
   price: number;
   status: string;
+  slug?: string;
+  shareable_link?: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

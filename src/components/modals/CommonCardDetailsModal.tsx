@@ -15,6 +15,7 @@ import ImageComponent from '../ui/ImageComponent'
 import { useAuth } from '@/hooks/useAuth'
 import { IBookChapterItem } from '@/types/user/HomeAllChapters'
 import { VISIBLE } from '@/constants/contentMode'
+import BlueprintShareButtons from '../blueprint/BlueprintShareButtons'
 
 export default function CommonCardDetailsModal() {
   const dispatch = useDispatch()
@@ -613,6 +614,17 @@ function ChapterModalContent({
             </div>
           </div>
         )}
+
+        <div className="border-t pt-3">
+          <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Blueprint</h3>
+          <BlueprintShareButtons
+            shareableLink={chapter.shareable_link}
+            title={chapter.title}
+            description={chapter.description}
+            size="sm"
+            showCopyLink={true}
+          />
+        </div>
       </ModalBody>
 
       <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">

@@ -20,6 +20,8 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
 import { addChapterSchema } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
+import { APP_SITE_URL } from '@/utils/config';
+import { getUserId, getUserRole } from '@/utils/authCookies';
 import {
   useAddChapterMutation,
 } from '@/store/rtkQueries/adminPostApi';
@@ -28,7 +30,7 @@ import {
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
 import type { Book, Author } from '@/types/content';
-import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
@@ -36,6 +38,7 @@ import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphField
 const initialFormValues = {
   bookId: '',
   title: '',
+  slug: '',
   description: '',
   content: '',
   sequence: 1,
@@ -111,6 +114,9 @@ export function CreateChapterForm() {
       if (vals.og_description) formData.append('og_description', vals.og_description);
       if (ogImageFile) formData.append('og_image', ogImageFile);
       if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      formData.append('slug', vals.slug);
+      const baseUrl = APP_SITE_URL.replace(/\/$/, '');
+      formData.append('shareable_link', `${baseUrl}${getReadChapterRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
       await appendUserIpToFormData(formData);
       try {
         const res = await addChapter(formData).unwrap();
@@ -265,7 +271,11 @@ export function CreateChapterForm() {
               name="title"
               placeholder="e.g., Introduction to Leadership"
               value={values.title}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                const slug = e.target.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                setFieldValue('slug', slug);
+              }}
               onBlur={handleBlur}
               disabled={isSubmittingState}
               className={errors.title && touched.title ? 'border-red-500' : ''}
@@ -274,6 +284,19 @@ export function CreateChapterForm() {
               <p className="text-sm text-red-600">{errors.title}</p>
             )}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="chapter-slug">Slug</Label>
+          <Input
+            id="chapter-slug"
+            name="slug"
+            value={values.slug}
+            readOnly
+            disabled
+            placeholder="Auto-generated from title"
+            className="bg-muted/50"
+          />
         </div>
 
         <div className="space-y-2">

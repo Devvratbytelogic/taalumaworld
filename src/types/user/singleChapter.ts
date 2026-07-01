@@ -12,6 +12,7 @@ export interface ISingleChapterAPIResponse {
     type: string;
     chapterNumber: number;
     title: string;
+    shareable_link: string;
     description: string;
     pageCount: number;
     content: string;
@@ -22,10 +23,16 @@ export interface ISingleChapterAPIResponse {
     bookId: string;
     bookTitle: string;
     author: string;
-    authorAvatar?: null;
+    authorAvatar?: string | null;
     category: Category;
     subcategory?: null;
     canRead: boolean;
+    metaTitle?: string;
+    metaDescription?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    jsonLd?: string;
   }
   export interface Category {
     _id: string;

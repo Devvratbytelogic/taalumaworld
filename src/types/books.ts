@@ -14,6 +14,12 @@ export interface IAllBooksAPIResponseDataEntity {
   subcategory?: SubcategoryOrCategory | null;
   description: string;
   coverImage: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  jsonLd?: string;
   pricingModel: string;
   price: number;
   tags?: (string | null)[] | null;

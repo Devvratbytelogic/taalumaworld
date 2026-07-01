@@ -16,6 +16,12 @@ export interface IAllChaptersAPIResponseData {
   content: string;
   isFree: boolean;
   coverImage: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  jsonLd?: string;
   price: number;
   status: string;
   createdBy: string;

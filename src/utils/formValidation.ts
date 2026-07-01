@@ -140,6 +140,30 @@ export const contactFormSchema = Yup.object({
     .required('Message is required'),
 });
 
+const openGraphFieldsSchema = {
+  meta_title: Yup.string().trim(),
+  meta_description: Yup.string().trim(),
+  og_title: Yup.string().trim(),
+  og_description: Yup.string().trim(),
+  og_image: Yup.mixed()
+    .nullable()
+    .optional()
+    .test('is-file-or-string-or-null', 'Please select a valid image file', (v) =>
+      v == null || v instanceof File || typeof v === 'string'
+    ),
+  json_ld: Yup.string()
+    .trim()
+    .test('valid-json', 'Enter valid JSON-LD', (v) => {
+      if (!v) return true;
+      try {
+        JSON.parse(v);
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+};
+
 // Add Book Modal Validation Schema (matches API: title, thoughtLeader, category, subcategory, description, pricingModel, price, cover_image, tags)
 export const addBookSchema = Yup.object({
   title: Yup.string()
@@ -161,6 +185,7 @@ export const addBookSchema = Yup.object({
       then: (schema) => schema.min(1, 'Price must be greater than 1').required('Price is required'),
       otherwise: (schema) => schema.optional(),
     }),
+  ...openGraphFieldsSchema,
 });
 // Edit Book Modal Validation Schema — cover_image is optional (null = keep existing)
 export const editBookSchema = Yup.object({
@@ -180,6 +205,7 @@ export const editBookSchema = Yup.object({
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
     .min(1, 'Price must be greater than 1')
     .required('Price is required'),
+  ...openGraphFieldsSchema,
 });
 
 // Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, status, cover_image, page)
@@ -214,6 +240,7 @@ export const addChapterSchema = Yup.object({
     [true],
     'You must confirm content ownership and rights',
   ),
+  ...openGraphFieldsSchema,
 });
 
 // Add / Edit Category Modal Validation Schema

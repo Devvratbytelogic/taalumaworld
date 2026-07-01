@@ -30,6 +30,7 @@ import type { IAllChaptersAPIResponseData } from '@/types/chapter';
 import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 
 const initialFormValues = {
   bookId: '',
@@ -43,7 +44,32 @@ const initialFormValues = {
   status: 'Published',
   cover_image: null as File | string | null,
   agreeContentOwnership: false,
+  meta_title: '',
+  meta_description: '',
+  og_title: '',
+  og_description: '',
+  og_image: null as File | string | null,
+  json_ld: '',
 };
+
+function getOpenGraphValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
+  const record = chapter as IAllChaptersAPIResponseData & {
+    meta_title?: string;
+    meta_description?: string;
+    og_title?: string;
+    og_description?: string;
+    og_image?: string;
+    json_ld?: string;
+  };
+  return {
+    meta_title: chapter.metaTitle ?? record.meta_title ?? '',
+    meta_description: chapter.metaDescription ?? record.meta_description ?? '',
+    og_title: chapter.ogTitle ?? record.og_title ?? '',
+    og_description: chapter.ogDescription ?? record.og_description ?? '',
+    og_image: (chapter.ogImage ?? record.og_image ?? null) as File | string | null,
+    json_ld: chapter.jsonLd ?? record.json_ld ?? '',
+  };
+}
 
 function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
   const bookId = (chapter.book as { id?: string; _id?: string })?.id ?? (chapter.book as { id?: string; _id?: string })?._id ?? '';
@@ -59,6 +85,7 @@ function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
     status: chapter.status ?? 'Published',
     cover_image: (chapter.coverImage ?? null) as File | string | null,
     agreeContentOwnership: false,
+    ...getOpenGraphValuesFromChapter(chapter),
   };
 }
 
@@ -68,6 +95,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const router = useRouter();
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [featuredImagePreviewUrl, setFeaturedImagePreviewUrl] = useState<string | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const { data: booksResponse } = useGetAllBooksQuery();
@@ -127,11 +156,20 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (pdfFile) {
         formData.append('pdf_file', pdfFile);
       }
+      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
+      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
+      if (vals.og_title) formData.append('og_title', vals.og_title);
+      if (vals.og_description) formData.append('og_description', vals.og_description);
+      if (ogImageFile) formData.append('og_image', ogImageFile);
+      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
       try {
         await updateChapter({ id: chapterId, values: formData }).unwrap();
         if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+        if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
         setFeaturedImageFile(null);
         setFeaturedImagePreviewUrl(null);
+        setOgImageFile(null);
+        setOgImagePreviewUrl(null);
         setPdfFile(null);
         toast.success('Blueprint updated successfully');
         router.push(`/admin/chapters`);
@@ -150,10 +188,20 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const chapterPricingEnabled = pricingModel === 'chapter';
 
   useEffect(() => {
+    if (chapter) {
+      const existingOgImage = chapter.ogImage ?? (chapter as { og_image?: string }).og_image ?? null;
+      if (!ogImageFile) {
+        setOgImagePreviewUrl(existingOgImage);
+      }
+    }
+  }, [chapter, ogImageFile]);
+
+  useEffect(() => {
     return () => {
       if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+      if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
     };
-  }, [featuredImagePreviewUrl]);
+  }, [featuredImagePreviewUrl, ogImagePreviewUrl, ogImageFile]);
 
   const handleFeaturedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -198,6 +246,35 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     // Revert to the existing server URL if available so validation stays satisfied
     setFieldValue('cover_image', existingCoverUrl ?? null);
     setFieldTouched('cover_image', true);
+  };
+
+  const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file (e.g. JPG, PNG)');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image must be less than 2MB');
+        return;
+      }
+      if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
+      setOgImageFile(file);
+      setOgImagePreviewUrl(URL.createObjectURL(file));
+      setFieldValue('og_image', file);
+      setFieldTouched('og_image', true);
+    }
+    e.target.value = '';
+  };
+
+  const clearOgImage = () => {
+    if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
+    setOgImageFile(null);
+    const existingOgImage = chapter?.ogImage ?? (chapter as { og_image?: string } | undefined)?.og_image ?? null;
+    setOgImagePreviewUrl(existingOgImage);
+    setFieldValue('og_image', existingOgImage);
+    setFieldTouched('og_image', true);
   };
 
   const clearPdf = () => setPdfFile(null);
@@ -505,7 +582,26 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           )}
         </div>
 
-
+        <OpenGraphFieldsSection
+          idPrefix="edit-chapter"
+          values={{
+            meta_title: values.meta_title,
+            meta_description: values.meta_description,
+            og_title: values.og_title,
+            og_description: values.og_description,
+            og_image: values.og_image,
+            json_ld: values.json_ld,
+          }}
+          errors={errors}
+          touched={touched}
+          handleChange={handleChange}
+          handleBlur={handleBlur}
+          disabled={isSubmittingState}
+          ogImagePreviewUrl={ogImagePreviewUrl}
+          ogImageFileName={ogImageFile?.name ?? null}
+          onOgImageChange={handleOgImageChange}
+          onOgImageClear={clearOgImage}
+        />
 
       </div>
 

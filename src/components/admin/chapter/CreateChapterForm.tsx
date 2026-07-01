@@ -19,6 +19,7 @@ import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
 import { addChapterSchema } from '@/utils/formValidation';
+import { appendUserIpToFormData } from '@/utils/clientIp';
 import {
   useAddChapterMutation,
 } from '@/store/rtkQueries/adminPostApi';
@@ -30,6 +31,7 @@ import type { Book, Author } from '@/types/content';
 import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 
 const initialFormValues = {
   bookId: '',
@@ -43,12 +45,20 @@ const initialFormValues = {
   status: 'Published',
   cover_image: null as File | null,
   agreeContentOwnership: false,
+  meta_title: '',
+  meta_description: '',
+  og_title: '',
+  og_description: '',
+  og_image: null as File | null,
+  json_ld: '',
 };
 
 export function CreateChapterForm() {
   const router = useRouter();
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [featuredImagePreviewUrl, setFeaturedImagePreviewUrl] = useState<string | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const { data: booksResponse } = useGetAllBooksQuery();
@@ -95,11 +105,21 @@ export function CreateChapterForm() {
       if (pdfFile) {
         formData.append('pdf_file', pdfFile);
       }
+      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
+      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
+      if (vals.og_title) formData.append('og_title', vals.og_title);
+      if (vals.og_description) formData.append('og_description', vals.og_description);
+      if (ogImageFile) formData.append('og_image', ogImageFile);
+      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      await appendUserIpToFormData(formData);
       try {
         const res = await addChapter(formData).unwrap();
         if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+        if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
         setFeaturedImageFile(null);
         setFeaturedImagePreviewUrl(null);
+        setOgImageFile(null);
+        setOgImagePreviewUrl(null);
         setPdfFile(null);
         resetForm({ values: initialFormValues });
         toast.success('Blueprint created successfully');
@@ -117,8 +137,9 @@ export function CreateChapterForm() {
   useEffect(() => {
     return () => {
       if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+      if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     };
-  }, [featuredImagePreviewUrl]);
+  }, [featuredImagePreviewUrl, ogImagePreviewUrl]);
 
   const handleFeaturedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -162,6 +183,34 @@ export function CreateChapterForm() {
     setFeaturedImagePreviewUrl(null);
     setFieldValue('cover_image', null);
     setFieldTouched('cover_image', true);
+  };
+
+  const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file (e.g. JPG, PNG)');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image must be less than 2MB');
+        return;
+      }
+      if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      setOgImageFile(file);
+      setOgImagePreviewUrl(URL.createObjectURL(file));
+      setFieldValue('og_image', file);
+      setFieldTouched('og_image', true);
+    }
+    e.target.value = '';
+  };
+
+  const clearOgImage = () => {
+    if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+    setOgImageFile(null);
+    setOgImagePreviewUrl(null);
+    setFieldValue('og_image', null);
+    setFieldTouched('og_image', true);
   };
 
   const clearPdf = () => setPdfFile(null);
@@ -468,7 +517,26 @@ export function CreateChapterForm() {
         
         </div>
 
-
+        <OpenGraphFieldsSection
+          idPrefix="chapter"
+          values={{
+            meta_title: values.meta_title,
+            meta_description: values.meta_description,
+            og_title: values.og_title,
+            og_description: values.og_description,
+            og_image: values.og_image,
+            json_ld: values.json_ld,
+          }}
+          errors={errors}
+          touched={touched}
+          handleChange={handleChange}
+          handleBlur={handleBlur}
+          disabled={isSubmittingState}
+          ogImagePreviewUrl={ogImagePreviewUrl}
+          ogImageFileName={ogImageFile?.name ?? null}
+          onOgImageChange={handleOgImageChange}
+          onOgImageClear={clearOgImage}
+        />
 
       </div>
 

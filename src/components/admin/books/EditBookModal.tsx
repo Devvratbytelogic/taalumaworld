@@ -22,6 +22,7 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { editBookSchema } from '@/utils/formValidation';
+import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
 import type { LeadersEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
@@ -38,7 +39,32 @@ const emptyFormValues = {
   pricingModel: 'book',
   price: '' as number | '',
   cover_image: null as File | null,
+  meta_title: '',
+  meta_description: '',
+  og_title: '',
+  og_description: '',
+  og_image: null as File | string | null,
+  json_ld: '',
 };
+
+function getOpenGraphValuesFromBook(book: IAllBooksAPIResponseDataEntity) {
+  const record = book as IAllBooksAPIResponseDataEntity & {
+    meta_title?: string;
+    meta_description?: string;
+    og_title?: string;
+    og_description?: string;
+    og_image?: string;
+    json_ld?: string;
+  };
+  return {
+    meta_title: book.metaTitle ?? record.meta_title ?? '',
+    meta_description: book.metaDescription ?? record.meta_description ?? '',
+    og_title: book.ogTitle ?? record.og_title ?? '',
+    og_description: book.ogDescription ?? record.og_description ?? '',
+    og_image: (book.ogImage ?? record.og_image ?? null) as File | string | null,
+    json_ld: book.jsonLd ?? record.json_ld ?? '',
+  };
+}
 
 function getInitialValuesFromBook(book: IAllBooksAPIResponseDataEntity | null): typeof emptyFormValues {
   if (!book) return emptyFormValues;
@@ -65,6 +91,7 @@ function getInitialValuesFromBook(book: IAllBooksAPIResponseDataEntity | null): 
     pricingModel: book.pricingModel === 'chapter' ? 'chapter' : 'book',
     price: book.price != null ? book.price : '',
     cover_image: null as File | null,
+    ...getOpenGraphValuesFromBook(book),
   };
 }
 
@@ -89,7 +116,10 @@ export function EditBookModal({
 }: EditBookModalProps) {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const coverIsObjectUrlRef = useRef(false);
+  const ogImageIsObjectUrlRef = useRef(false);
 
   const initialValues = getInitialValuesFromBook(book);
 
@@ -119,13 +149,23 @@ export function EditBookModal({
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
       formData.append('tags', values.tags.join(','));
+      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
+      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
+      if (vals.og_title) formData.append('og_title', vals.og_title);
+      if (vals.og_description) formData.append('og_description', vals.og_description);
+      if (ogImageFile) formData.append('og_image', ogImageFile);
+      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
 
       try {
         await onSubmit({ id: book._id, values: formData }).unwrap();
         if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+        if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
         setCoverFile(null);
         setCoverPreviewUrl(null);
+        setOgImageFile(null);
+        setOgImagePreviewUrl(null);
         coverIsObjectUrlRef.current = false;
+        ogImageIsObjectUrlRef.current = false;
         onOpenChange(false);
         toast.success('Series updated successfully');
       } catch {
@@ -145,15 +185,23 @@ export function EditBookModal({
       setCoverPreviewUrl(book.coverImage || null);
       coverIsObjectUrlRef.current = false;
       setCoverFile(null);
+      const existingOgImage = book.ogImage ?? (book as { og_image?: string }).og_image ?? null;
+      setOgImagePreviewUrl(existingOgImage);
+      ogImageIsObjectUrlRef.current = false;
+      setOgImageFile(null);
     }
   }, [open, book]);
 
   useEffect(() => {
     if (!open) {
       if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+      if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       setCoverFile(null);
       setCoverPreviewUrl(null);
+      setOgImageFile(null);
+      setOgImagePreviewUrl(null);
       coverIsObjectUrlRef.current = false;
+      ogImageIsObjectUrlRef.current = false;
       resetForm({ values: emptyFormValues });
     }
   }, [open, resetForm]);
@@ -205,11 +253,46 @@ export function EditBookModal({
     setFieldValue('cover_image', null);
   };
 
+  const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file (e.g. JPG, PNG)');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image must be less than 2MB');
+        return;
+      }
+      if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      setOgImageFile(file);
+      setOgImagePreviewUrl(URL.createObjectURL(file));
+      ogImageIsObjectUrlRef.current = true;
+      setFieldValue('og_image', file);
+      setFieldTouched('og_image', true);
+    }
+    e.target.value = '';
+  };
+
+  const clearOgImage = () => {
+    if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+    setOgImageFile(null);
+    const existingOgImage = book?.ogImage ?? (book as { og_image?: string } | null)?.og_image ?? null;
+    setOgImagePreviewUrl(existingOgImage);
+    ogImageIsObjectUrlRef.current = false;
+    setFieldValue('og_image', existingOgImage);
+    setFieldTouched('og_image', true);
+  };
+
   const closeModal = () => {
     if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setCoverFile(null);
     setCoverPreviewUrl(null);
+    setOgImageFile(null);
+    setOgImagePreviewUrl(null);
     coverIsObjectUrlRef.current = false;
+    ogImageIsObjectUrlRef.current = false;
     resetForm({ values: emptyFormValues });
     onOpenChange(false);
   };
@@ -415,6 +498,26 @@ export function EditBookModal({
                 </div>
               )}
             </div>
+            <OpenGraphFieldsSection
+              idPrefix="edit-book"
+              values={{
+                meta_title: values.meta_title,
+                meta_description: values.meta_description,
+                og_title: values.og_title,
+                og_description: values.og_description,
+                og_image: values.og_image,
+                json_ld: values.json_ld,
+              }}
+              errors={errors}
+              touched={touched}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              disabled={isSubmitting}
+              ogImagePreviewUrl={ogImagePreviewUrl}
+              ogImageFileName={ogImageFile?.name ?? null}
+              onOgImageChange={handleOgImageChange}
+              onOgImageClear={clearOgImage}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Pricing model</Label>

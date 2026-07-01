@@ -22,6 +22,8 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
+import { appendUserIpToFormData } from '@/utils/clientIp';
+import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import type { LeadersEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
 import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
@@ -37,6 +39,12 @@ const initialFormValues = {
   pricingModel: 'book',
   price: '' as number | '',
   cover_image: null as File | null,
+  meta_title: '',
+  meta_description: '',
+  og_title: '',
+  og_description: '',
+  og_image: null as File | null,
+  json_ld: '',
 };
 
 interface AddBookModalProps {
@@ -58,6 +66,8 @@ export function AddBookModal({
 }: AddBookModalProps) {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
 
   const {
     values,
@@ -83,12 +93,22 @@ export function AddBookModal({
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
       formData.append('tags', vals.tags.join(','));
+      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
+      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
+      if (vals.og_title) formData.append('og_title', vals.og_title);
+      if (vals.og_description) formData.append('og_description', vals.og_description);
+      if (ogImageFile) formData.append('og_image', ogImageFile);
+      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      await appendUserIpToFormData(formData);
 
       try {
         await onSubmit(formData).unwrap();
         if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+        if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
         setCoverFile(null);
         setCoverPreviewUrl(null);
+        setOgImageFile(null);
+        setOgImagePreviewUrl(null);
         resetForm({ values: initialFormValues });
         onOpenChange(false);
         toast.success('Series created successfully');
@@ -111,6 +131,11 @@ export function AddBookModal({
       resetForm({ values: initialFormValues });
       setCoverFile(null);
       setCoverPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setOgImageFile(null);
+      setOgImagePreviewUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);
         return null;
       });
@@ -162,10 +187,41 @@ export function AddBookModal({
     setFieldValue('cover_image', null);
   };
 
+  const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file (e.g. JPG, PNG)');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image must be less than 2MB');
+        return;
+      }
+      if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      setOgImageFile(file);
+      setOgImagePreviewUrl(URL.createObjectURL(file));
+      setFieldValue('og_image', file);
+      setFieldTouched('og_image', true);
+    }
+    e.target.value = '';
+  };
+
+  const clearOgImage = () => {
+    if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+    setOgImageFile(null);
+    setOgImagePreviewUrl(null);
+    setFieldValue('og_image', null);
+    setFieldTouched('og_image', true);
+  };
+
   const closeModal = () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setCoverFile(null);
     setCoverPreviewUrl(null);
+    setOgImageFile(null);
+    setOgImagePreviewUrl(null);
     resetForm({ values: initialFormValues });
     onOpenChange(false);
   };
@@ -372,6 +428,26 @@ export function AddBookModal({
                 </div>
               )}
             </div>
+            <OpenGraphFieldsSection
+              idPrefix="book"
+              values={{
+                meta_title: values.meta_title,
+                meta_description: values.meta_description,
+                og_title: values.og_title,
+                og_description: values.og_description,
+                og_image: values.og_image,
+                json_ld: values.json_ld,
+              }}
+              errors={errors}
+              touched={touched}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              disabled={isSubmitting}
+              ogImagePreviewUrl={ogImagePreviewUrl}
+              ogImageFileName={ogImageFile?.name ?? null}
+              onOgImageChange={handleOgImageChange}
+              onOgImageClear={clearOgImage}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Pricing model</Label>

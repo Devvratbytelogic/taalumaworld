@@ -5,8 +5,19 @@ import Cookies from "js-cookie";
 import { addToast } from '@heroui/react';
 import { API_BASE_URL } from '@/utils/config';
 import { isBrowserOnline, isFetchNetworkError, NETWORK_MESSAGES } from '@/utils/network';
+import { hasAuthCookie, isUnauthorizedError, logoutAndRedirectToHome } from '@/utils/authCookies';
 
 const mutex = new Mutex();
+let isLoggingOut = false;
+
+/** Clear session and redirect when an authenticated request returns 401 / invalid token. */
+function handleUnauthorizedSession(message: string, status?: number): boolean {
+    if (!hasAuthCookie() || !isUnauthorizedError(message, status)) return false;
+    if (isLoggingOut) return true;
+    isLoggingOut = true;
+    logoutAndRedirectToHome();
+    return true;
+}
 
 interface IAPIResponse<T = unknown> {
     http_status_code: number;
@@ -80,16 +91,23 @@ const baseQueryWithAuth: BaseQueryFn<
         const result = await baseQuery(args, api, extraOptions);
         const res = result.data as IAPIResponse;
         if (result.error) {
-            const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string } };
-            const status = errorData?.status;
+            const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string; http_status_code?: number } };
+            const status = errorData?.status ?? errorData?.data?.http_status_code;
             const responseData = errorData?.data;
             const message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
-            // Suppress silent background errors (401, 403, 404) but show all other errors to the user
-            // const SILENT_STATUSES = [401, 403, 404];
-            // const shouldShowToast = !status || !SILENT_STATUSES.includes(status);
-            // if (shouldShowToast) {
+            const httpStatus = typeof status === 'number' ? status : undefined;
+
+            if (handleUnauthorizedSession(message, httpStatus)) {
+                return {
+                    error: {
+                        status: 'CUSTOM_ERROR',
+                        data: { message, httpStatus },
+                        error: message,
+                    },
+                };
+            }
+
             addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
-            // }
             return {
                 error: {
                     status: "CUSTOM_ERROR",
@@ -97,9 +115,20 @@ const baseQueryWithAuth: BaseQueryFn<
                     error: message,
                 },
             };
-        } else {
-            return { data: res };
         }
+
+        if (res && hasAuthCookie() && isUnauthorizedError(res.message, res.http_status_code)) {
+            handleUnauthorizedSession(res.message, res.http_status_code);
+            return {
+                error: {
+                    status: 'CUSTOM_ERROR',
+                    data: { message: res.message, httpStatus: res.http_status_code },
+                    error: res.message,
+                },
+            };
+        }
+
+        return { data: res };
 
     } catch (error: unknown) {
         let errorResponse: FetchBaseQueryError;

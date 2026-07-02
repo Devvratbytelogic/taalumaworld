@@ -4,27 +4,23 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Camera, Eye, EyeOff, GraduationCap, Lock, Mail, User } from 'lucide-react'
 import { useFormik } from 'formik'
-import { careerArchitectSignUpSchema, mentorSignUpSchema } from '@/utils/formValidation'
+import { careerArchitectSignUpSchema } from '@/utils/formValidation'
 import { RootState } from '@/store/store'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
-import { useAuthorRegisterMutation } from '@/store/rtkQueries/adminAuth'
 import toast from '@/utils/toast'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
-    getCommunityStandardsRoutePath,
-    getContentOwnershipLicensingRoutePath,
-    getMentorAgreementRoutePath,
+    getMentorSignupRoutePath,
     getPrivacyPolicyRoutePath,
-    getRevenueShareAgreementRoutePath,
     getTermsOfServiceRoutePath,
 } from '@/routes/routes'
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
 
-type SignRole = 'user' | 'author'
+type SignModalData = { redirectTo?: string }
 
 const AVATAR_BORDER_COLOR = '#C8D7EE'
 
@@ -35,22 +31,23 @@ const PARTNER_UNIVERSITIES = [
 
 export default function SignUp() {
     const dispatch = useDispatch()
-    const { isOpen, componentName } = useSelector((state: RootState) => state.allModal)
-    const [signRole, setSignRole] = useState<SignRole>('user')
+    const router = useRouter()
+    const { isOpen, componentName, data } = useSelector((state: RootState) => state.allModal)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [profileImage, setProfileImage] = useState<File | null>(null)
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const [userRegister, { isLoading: userRegistering }] = useUserRegisterMutation()
-    const [authorRegister, { isLoading: authorRegistering }] = useAuthorRegisterMutation()
-    const isRegistering = signRole === 'user' ? userRegistering : authorRegistering
+    const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation()
 
     useEffect(() => {
         if (!isOpen) return
-        setSignRole(componentName === 'AuthorRegister' ? 'author' : 'user')
-    }, [isOpen, componentName])
+        if (componentName === 'AuthorRegister') {
+            dispatch(closeModal())
+            router.push(getMentorSignupRoutePath())
+        }
+    }, [isOpen, componentName, dispatch, router])
 
     const handleAvatarClick = () => fileInputRef.current?.click()
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,7 +88,7 @@ export default function SignUp() {
             agreeRevenueShare: false,
             agreeContentAndCommunity: false,
         },
-        validationSchema: signRole === 'user' ? careerArchitectSignUpSchema : mentorSignUpSchema,
+        validationSchema: careerArchitectSignUpSchema,
         onSubmit: async (formValues, { resetForm: rf }) => {
             try {
                 const formData = new FormData()
@@ -100,82 +97,36 @@ export default function SignUp() {
                 formData.append('password', formValues.password)
                 formData.append('password_confirmation', formValues.confirmPassword)
                 if (profileImage) formData.append('profile_pic', profileImage)
+                formData.append('terms_accepted', String(formValues.agreeTerms))
+                formData.append('privacy_accepted', String(formValues.agreePrivacy))
+                formData.append('send_updates', String(formValues.sendUpdates))
 
-                if (signRole === 'user') {
-                    formData.append('terms_accepted', String(formValues.agreeTerms))
-                    formData.append('privacy_accepted', String(formValues.agreePrivacy))
-                    formData.append('send_updates', String(formValues.sendUpdates))
-                } else {
-                    formData.append('mentor_agreement_accepted', String(formValues.agreeMentorAgreement))
-                    formData.append('revenue_share_accepted', String(formValues.agreeRevenueShare))
-                    formData.append('content_policy_accepted', String(formValues.agreeContentAndCommunity))
-                }
-
-                if (signRole === 'user') {
-                    const res = await userRegister(formData).unwrap()
-                    if (profilePreview) URL.revokeObjectURL(profilePreview)
-                    setProfileImage(null)
-                    setProfilePreview(null)
-                    rf()
-                    toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
-                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }))
-                } else {
-                    const res = await authorRegister(formData).unwrap()
-                    if (profilePreview) URL.revokeObjectURL(profilePreview)
-                    setProfileImage(null)
-                    setProfilePreview(null)
-                    rf()
-                    toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
-                    dispatch(openModal({ componentName: 'AuthorOtpVerification', data: { email: formValues.email, type: 'account' } }))
-                }
+                const res = await userRegister(formData).unwrap()
+                if (profilePreview) URL.revokeObjectURL(profilePreview)
+                setProfileImage(null)
+                setProfilePreview(null)
+                rf()
+                toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
+                dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }))
             } catch {
                 console.error('Registration failed. Please try again.')
             }
         },
     })
 
-    const onRoleChange = (next: SignRole) => {
-        setSignRole(next)
-        resetForm()
-        setShowPassword(false)
-        setShowConfirmPassword(false)
-    }
-
     const selectedUniversity = PARTNER_UNIVERSITIES.find((u) => u.id === values.university)
-
-    const headerSubtitle =
-        signRole === 'user'
-            ? 'Join TaalumaWorld and start your learning journey!'
-            : 'Create your Mentor account on TaalumaWorld'
-
-    const signInModal = signRole === 'user' ? 'SignIn' : 'AuthorSignIn'
 
     return (
         <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container" scrollBehavior="outside">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">Create Account</p>
-                    <p className="text-sm text-muted-foreground font-normal">{headerSubtitle}</p>
-                    <div className="w-full mt-3">
-                        <Tabs
-                            value={signRole}
-                            onValueChange={(v) => onRoleChange(v === 'author' ? 'author' : 'user')}
-                            className="w-full"
-                        >
-                            <TabsList className="grid w-full grid-cols-2 rounded-2xl p-1 h-11 gap-1">
-                                <TabsTrigger value="user" className="rounded-xl text-sm">
-                                    Career Architect
-                                </TabsTrigger>
-                                <TabsTrigger value="author" className="rounded-xl text-sm">
-                                    Mentor
-                                </TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </div>
+                    <p className="text-sm text-muted-foreground font-normal">
+                        Join TaalumaWorld and start your learning journey!
+                    </p>
                 </ModalHeader>
                 <ModalBody>
-                    {signRole === 'user' && (
-                        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 mb-3">
+                    <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 mb-3">
                             <div className="flex gap-3">
                                 <GraduationCap className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                                 <div className="space-y-1 text-sm text-left">
@@ -195,7 +146,6 @@ export default function SignUp() {
                                 </div>
                             </div>
                         </div>
-                    )}
 
                     <form className="space-y-3" onSubmit={handleSubmit}>
                         <div className="flex flex-col items-center gap-2">
@@ -237,8 +187,7 @@ export default function SignUp() {
                             <span className="text-sm text-muted-foreground">Profile picture (optional)</span>
                         </div>
 
-                        {signRole === 'user' && (
-                            <div className="space-y-3 rounded-2xl border border-gray-200 p-4">
+                        <div className="space-y-3 rounded-2xl border border-gray-200 p-4">
                                 <label className="flex items-start gap-3 cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -305,8 +254,7 @@ export default function SignUp() {
                                         </div>
                                     </>
                                 )}
-                            </div>
-                        )}
+                        </div>
 
                         <div className="space-y-2">
                             <label htmlFor="signup-name" className="text-sm font-medium text-foreground">
@@ -333,7 +281,7 @@ export default function SignUp() {
 
                         <div className="space-y-2">
                             <label htmlFor="signup-email" className="text-sm font-medium text-foreground">
-                                {values.isPartnerStudent && signRole === 'user' ? 'Personal Email Address' : 'Email Address'}
+                                {values.isPartnerStudent ? 'Personal Email Address' : 'Email Address'}
                             </label>
                             <div className="relative">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -417,9 +365,7 @@ export default function SignUp() {
                         </div>
 
                         <div className="space-y-3 pt-1">
-                            {signRole === 'user' ? (
-                                <>
-                                    <AgreementCheckbox
+                            <AgreementCheckbox
                                         id="agreeTerms"
                                         checked={values.agreeTerms}
                                         error={errors.agreeTerms}
@@ -464,78 +410,7 @@ export default function SignUp() {
                                         disabled={isSubmitting}
                                     >
                                         Send me updates <span className="text-muted-foreground">(optional)</span>
-                                    </AgreementCheckbox>
-                                </>
-                            ) : (
-                                <>
-                                    <AgreementCheckbox
-                                        id="agreeMentorAgreement"
-                                        checked={values.agreeMentorAgreement}
-                                        error={errors.agreeMentorAgreement}
-                                        touched={touched.agreeMentorAgreement}
-                                        onCheckedChange={(checked) => setFieldValue('agreeMentorAgreement', checked)}
-                                        onBlur={() => setFieldTouched('agreeMentorAgreement', true)}
-                                        disabled={isSubmitting}
-                                    >
-                                        I agree to the{' '}
-                                        <Link
-                                            href={getMentorAgreementRoutePath()}
-                                            target="_blank"
-                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Mentor Agreement
-                                        </Link>
-                                    </AgreementCheckbox>
-                                    <AgreementCheckbox
-                                        id="agreeRevenueShare"
-                                        checked={values.agreeRevenueShare}
-                                        error={errors.agreeRevenueShare}
-                                        touched={touched.agreeRevenueShare}
-                                        onCheckedChange={(checked) => setFieldValue('agreeRevenueShare', checked)}
-                                        onBlur={() => setFieldTouched('agreeRevenueShare', true)}
-                                        disabled={isSubmitting}
-                                    >
-                                        I agree to the{' '}
-                                        <Link
-                                            href={getRevenueShareAgreementRoutePath()}
-                                            target="_blank"
-                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Revenue Share Agreement
-                                        </Link>
-                                    </AgreementCheckbox>
-                                    <AgreementCheckbox
-                                        id="agreeContentAndCommunity"
-                                        checked={values.agreeContentAndCommunity}
-                                        error={errors.agreeContentAndCommunity}
-                                        touched={touched.agreeContentAndCommunity}
-                                        onCheckedChange={(checked) => setFieldValue('agreeContentAndCommunity', checked)}
-                                        onBlur={() => setFieldTouched('agreeContentAndCommunity', true)}
-                                        disabled={isSubmitting}
-                                    >
-                                        I agree to the{' '}
-                                        <Link
-                                            href={getContentOwnershipLicensingRoutePath()}
-                                            target="_blank"
-                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Content Ownership &amp; Licensing Policy
-                                        </Link>
-                                        {' '}and{' '}
-                                        <Link
-                                            href={getCommunityStandardsRoutePath()}
-                                            target="_blank"
-                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Community Standards Policy
-                                        </Link>
-                                    </AgreementCheckbox>
-                                </>
-                            )}
+                                </AgreementCheckbox>
                         </div>
 
                         <Button
@@ -544,7 +419,7 @@ export default function SignUp() {
                             disabled={isSubmitting || isRegistering}
                             isLoading={isSubmitting || isRegistering}
                         >
-                            {signRole === 'user' ? 'Sign Up' : 'Register as Mentor'}
+                            Sign Up
                         </Button>
                     </form>
 
@@ -555,11 +430,20 @@ export default function SignUp() {
                                 <button
                                     type="button"
                                     className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                    onClick={() => dispatch(openModal({ componentName: signInModal, data: '' }))}
+                                    onClick={() => dispatch(openModal({ componentName: 'SignIn', data: data ?? '' }))}
                                     disabled={isSubmitting}
                                 >
                                     Sign In
                                 </button>
+                            </div>
+                            <div>
+                                <Link
+                                    href={getMentorSignupRoutePath()}
+                                    className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                    onClick={() => dispatch(closeModal())}
+                                >
+                                    Register as Mentor
+                                </Link>
                             </div>
                         </div>
                     </ModalFooter>

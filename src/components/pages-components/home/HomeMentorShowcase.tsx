@@ -4,15 +4,13 @@ import { useRouter } from 'next/navigation'
 import { Users } from 'lucide-react'
 import ImageComponent from '@/components/ui/ImageComponent'
 import Button from '@/components/ui/Button'
-import { useDispatch } from 'react-redux'
-import { openModal } from '@/store/slices/allModalSlice'
+import { getMentorSignupRoutePath } from '@/routes/routes'
 import React from 'react'
 
 const avatarColors = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626']
 
 export default function HomeMentorShowcase() {
     const router = useRouter()
-    const dispatch = useDispatch()
     const { data, isLoading } = useGetUserAllAuthorsQuery()
     const mentors = data?.data?.items?.slice(0, 4) ?? []
 
@@ -89,7 +87,7 @@ export default function HomeMentorShowcase() {
                         </Button>
                         <Button
                             className="global_btn rounded_full bg_primary"
-                            onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                            onPress={() => router.push(getMentorSignupRoutePath())}
                         >
                             Become a Mentor
                         </Button>

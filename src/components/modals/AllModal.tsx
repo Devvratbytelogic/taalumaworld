@@ -8,15 +8,11 @@ import SignUp from '../auth/signup/SignUp';
 import ForgotPassword from '../auth/forgot/ForgotPassword';
 import ResetPassword from '../auth/forgot/ResetPassword';
 import OtpVerification from '../auth/otp/OtpVerification';
+import LoginRequiredModal from '../auth/LoginRequiredModal';
 import FilterModal from './FilterModal';
 import CommonCardDetailsModal from './CommonCardDetailsModal';
-import LoginRequiredModal from '../auth/LoginRequiredModal';
 import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
-import AuthorForgotPassword from '../auth/author/AuthorForgotPassword';
-import AuthorOtpVerification from '../auth/author/AuthorOtpVerification';
-import AuthorResetPassword from '../auth/author/AuthorResetPassword';
-import AuthorChangePassword from '../auth/author/AuthorChangePassword';
 import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
 import { ExtendPromotionModal } from '../admin/institutions/ExtendPromotionModal';
 import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModal';
@@ -30,7 +26,7 @@ export default function AllModal() {
 
     useEffect(() => {
         dispatch(closeModal())
-    }, [pathName])
+    }, [pathName, dispatch])
 
     const renderComponent = () => {
         switch (componentName) {
@@ -46,24 +42,16 @@ export default function AllModal() {
                 return <ResetPassword />;
             case "OtpVerification":
                 return <OtpVerification />;
+            case "LoginRequiredModal":
+                return <LoginRequiredModal />;
             case "FilterModal":
                 return <FilterModal />;
             case "CommonCardDetailsModal":
                 return <CommonCardDetailsModal />;
-            case "LoginRequiredModal":
-                return <LoginRequiredModal />;
             case "ChapterPurchaseModal":
                 return <ChapterPurchaseModal />;
             case "ConfirmRemoveCartModal":
                 return <ConfirmRemoveCartModal />;
-            case "AuthorForgotPassword":
-                return <AuthorForgotPassword />;
-            case "AuthorOtpVerification":
-                return <AuthorOtpVerification />;
-            case "AuthorResetPassword":
-                return <AuthorResetPassword />;
-            case "AuthorChangePassword":
-                return <AuthorChangePassword />;
             case "AddEditInstitutionModal":
                 return <AddEditInstitutionModal />;
             case "ExtendPromotionModal":

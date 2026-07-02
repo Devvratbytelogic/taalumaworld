@@ -1,8 +1,5 @@
 'use client';
 import React, { useState } from 'react'
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { selectContentMode } from '@/store/slices/contentModeSlice';
-import { openModal } from '@/store/slices/allModalSlice';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react';
@@ -17,8 +14,6 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import toast from '@/utils/toast';
 
 export default function PrimaryFooter() {
-    const contentMode = useAppSelector(selectContentMode);
-    const dispatch = useAppDispatch();
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
     const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -156,8 +151,8 @@ export default function PrimaryFooter() {
                                         Terms of Service
                                     </Link>
                                 </li>
-                                <li className="pt-2">
-                                    {isAuthenticated && isAdmin ? (
+                                {isAuthenticated && isAdmin && (
+                                    <li className="pt-2">
                                         <Link
                                             href={getAdminRoutePath()}
                                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-primary hover:bg-primary hover:text-white transition-colors text-sm font-medium"
@@ -167,18 +162,8 @@ export default function PrimaryFooter() {
                                             </svg>
                                             Admin Panel
                                         </Link>
-                                    ) : (
-                                        <button
-                                            onClick={() => dispatch(openModal({ componentName: 'AuthorSignIn', data: '' }))}
-                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 border border-gray-700 text-gray-400 hover:border-primary/50 hover:text-primary transition-colors text-sm font-medium"
-                                        >
-                                            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                            Admin/Mentor Login
-                                        </button>
-                                    )}
-                                </li>
+                                    </li>
+                                )}
                             </ul>
                         </div>
 

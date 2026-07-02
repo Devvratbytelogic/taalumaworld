@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { RootState } from '@/store/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Button from '@/components/ui/Button'
 import toast from '@/utils/toast'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
@@ -14,99 +13,58 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { useFormik } from 'formik'
 import { signInSchema } from '@/utils/formValidation'
 import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
-import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth'
 import { setAuthCookies } from '@/utils/authCookies'
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup'
+import { RootState } from '@/store/store'
+import { getMentorLoginRoutePath } from '@/routes/routes'
 
-type SignModalData = { redirectTo?: string; signInAs?: 'author' | 'user' }
-
-type SignRole = 'user' | 'author'
+type SignModalData = { redirectTo?: string }
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false)
-    const [signRole, setSignRole] = useState<SignRole>('user')
     const dispatch = useDispatch()
     const router = useRouter()
     const { isOpen, data, componentName } = useSelector((state: RootState) => state.allModal)
-
     const [userLogin, { isLoading: userLoginLoading }] = useUserLoginMutation()
-    const [adminLogin, { isLoading: adminLoginLoading }] = useAdminLoginMutation()
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
-        initialValues: {
-            email: '',
-            password: '',
-        },
+        initialValues: { email: '', password: '' },
         validationSchema: signInSchema,
-        onSubmit: async (vals, formikHelpers) => {
-            const { resetForm: rf } = formikHelpers
+        onSubmit: async (vals, { resetForm: rf }) => {
             const modalPayload = data as SignModalData | null | undefined
 
             try {
-                if (signRole === 'user') {
-                    const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
-                    if (res.success && res.data) {
-                        const { token, user } = res.data as {
-                            token: string
-                            user: { name: string; id?: string | number; _id?: string; profile_pic?: string | null }
-                        }
-                        setAuthCookies({
-                            token,
-                            user: { id: String(user.id ?? user._id), _id: user._id },
-                            role: 'user',
-                        })
-                        dispatch(rtkQuerieSetup.util.invalidateTags([
-                            'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
-                        ]))
-                        const redirectTo = modalPayload?.redirectTo
-                        dispatch(closeModal())
-                        rf()
-                        toast.success(res.message ?? 'Sign in successful!')
-                        if (redirectTo) router.push(redirectTo)
-                    }
-                } else {
-                    const res = await adminLogin({ email: vals.email, password: vals.password }).unwrap()
-                    if (res.success && res.data) {
-                        const { token, userRole } = res.data as {
-                            token: string
-                            userRole: {
-                                name: string
-                                id?: number
-                                _id?: string
-                                user_id?: string | number
-                                profile_pic?: string | null
-                            }
-                        }
-                        setAuthCookies({
-                            token,
-                            user: { id: String(userRole.user_id), _id: userRole._id },
-                            role: {
-                                name: userRole.name,
-                                id: userRole.id !== undefined ? String(userRole.id) : undefined,
-                                _id: userRole._id,
-                            },
-                        })
-                        dispatch(rtkQuerieSetup.util.invalidateTags([
-                            'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
-                        ]))
-                        dispatch(closeModal())
-                        rf()
-                        toast.success(res.message ?? 'Sign in successful!')
-                        router.push('/admin/dashboard')
-                    }
+                const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
+                if (!res.success || !res.data) return
+
+                const { token, user } = res.data as {
+                    token: string
+                    user: { id?: string | number; _id?: string }
                 }
+
+                setAuthCookies({
+                    token,
+                    user: { id: String(user.id ?? user._id), _id: user._id },
+                    role: 'user',
+                })
+
+                dispatch(rtkQuerieSetup.util.invalidateTags([
+                    'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
+                ]))
+
+                const redirectTo = modalPayload?.redirectTo
+                dispatch(closeModal())
+                rf()
+                toast.success(res.message ?? 'Sign in successful!')
+                if (redirectTo) router.push(redirectTo)
             } catch (error) {
                 const errMsg = (error as { data?: { message?: string } })?.data?.message ?? ''
                 if (errMsg.toLowerCase().includes('verify your account')) {
                     toast.info(errMsg)
-                    dispatch(
-                        openModal({
-                            componentName: signRole === 'user' ? 'OtpVerification' : 'AuthorOtpVerification',
-                            data: { email: vals.email, type: 'account' },
-                        }),
-                    )
-                } else {
-                    console.log(errMsg || 'Invalid email or password. Please try again.')
+                    dispatch(openModal({
+                        componentName: 'OtpVerification',
+                        data: { email: vals.email, type: 'account' },
+                    }))
                 }
             }
         },
@@ -114,51 +72,22 @@ export default function SignIn() {
 
     useEffect(() => {
         if (!isOpen) return
-
-        const payload = data as SignModalData | null | undefined
-        const wantsAuthor =
-            componentName === 'AuthorSignIn' || payload?.signInAs === 'author'
-        setSignRole(wantsAuthor ? 'author' : 'user')
+        if (componentName === 'AuthorSignIn') {
+            dispatch(closeModal())
+            router.push(getMentorLoginRoutePath())
+            return
+        }
         resetForm()
-    }, [isOpen, componentName, data, resetForm])
-
-    const forgotPasswordModal = signRole === 'user' ? 'ForgotPassword' : 'AuthorForgotPassword'
-    const signupModal = signRole === 'user' ? 'SignUp' : 'AuthorRegister'
-    const loginLoading = signRole === 'user' ? userLoginLoading : adminLoginLoading
-
-    const onRoleChange = (next: SignRole) => {
-        setSignRole(next)
-        resetForm()
-    }
-
-    const headerTitle = signRole === 'user' ? 'Sign In' : 'Mentor Sign In'
-    const headerSubtitle =
-        signRole === 'user'
-            ? 'Continue your learning journey with TaalumaWorld'
-            : 'Sign in to publish and manage your content'
+    }, [isOpen, componentName, dispatch, router, resetForm])
 
     return (
         <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
-                    <p className="text-2xl font-semibold text-foreground">{headerTitle}</p>
-                    <p className="text-sm text-muted-foreground font-normal">{headerSubtitle}</p>
-                    <div className="w-full mt-3">
-                        <Tabs
-                            value={signRole === 'author' ? 'author' : 'user'}
-                            onValueChange={(v) => onRoleChange(v === 'author' ? 'author' : 'user')}
-                            className="w-full"
-                        >
-                            <TabsList className="grid w-full grid-cols-2 rounded-2xl p-1 h-11 gap-1">
-                                <TabsTrigger value="user" className="rounded-xl text-sm">
-                                    Career Architect
-                                </TabsTrigger>
-                                <TabsTrigger value="author" className="rounded-xl text-sm">
-                                    Mentor
-                                </TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </div>
+                    <p className="text-2xl font-semibold text-foreground">Sign In</p>
+                    <p className="text-sm text-muted-foreground font-normal">
+                        Continue your learning journey with TaalumaWorld
+                    </p>
                 </ModalHeader>
                 <ModalBody>
                     <form className="space-y-3" onSubmit={handleSubmit}>
@@ -219,7 +148,7 @@ export default function SignIn() {
                         <div className="text-right">
                             <button
                                 type="button"
-                                onClick={() => dispatch(openModal({ componentName: forgotPasswordModal, data: '' }))}
+                                onClick={() => dispatch(openModal({ componentName: 'ForgotPassword', data: '' }))}
                                 className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
                                 disabled={isSubmitting}
                             >
@@ -230,23 +159,32 @@ export default function SignIn() {
                         <Button
                             type="submit"
                             className="global_btn bg_primary w-full"
-                            disabled={isSubmitting || loginLoading}
-                            isLoading={isSubmitting || loginLoading}
+                            disabled={isSubmitting || userLoginLoading}
+                            isLoading={isSubmitting || userLoginLoading}
                         >
                             Sign In
                         </Button>
                     </form>
-                    <ModalFooter>
+                    <ModalFooter className="flex flex-col gap-2">
                         <div className="w-full text-center text-sm text-muted-foreground">
                             <span>Don&apos;t have an account? </span>
                             <button
                                 type="button"
                                 className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: signupModal, data: '' }))}
+                                onClick={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                                 disabled={isSubmitting}
                             >
-                                {signRole === 'user' ? 'Sign Up' : 'Register as Mentor'}
+                                Sign Up
                             </button>
+                        </div>
+                        <div className="w-full text-center text-sm text-muted-foreground">
+                            <Link
+                                href={getMentorLoginRoutePath()}
+                                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                                onClick={() => dispatch(closeModal())}
+                            >
+                                Sign in as Mentor
+                            </Link>
                         </div>
                     </ModalFooter>
                 </ModalBody>

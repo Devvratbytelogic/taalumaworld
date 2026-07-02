@@ -3,10 +3,9 @@ import React from 'react'
 import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent';
 import { bannerProps } from '@/data/data';
-import { useGetActiveReadersQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
-import { openModal } from '@/store/slices/allModalSlice';
-// import { VISIBLE } from '@/constants/contentMode';
+import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI';
 import { useDispatch } from 'react-redux';
+import { openModal } from '@/store/slices/allModalSlice';
 
 interface CommonBannerProps {
     data: bannerProps;

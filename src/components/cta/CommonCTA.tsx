@@ -4,12 +4,10 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import Button from '../ui/Button'
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI'
-import { useDispatch } from 'react-redux'
-import { openModal } from '@/store/slices/allModalSlice'
+import { getMentorSignupRoutePath } from '@/routes/routes'
 
 export default function CommonCTA() {
     const router = useRouter()
-    const dispatch = useDispatch();
     useGetGlobalSettingsQuery()
 
     return (
@@ -29,7 +27,7 @@ export default function CommonCTA() {
                                 Start Learning
                             </Button>
                             <Button
-                                onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                                onPress={() => router.push(getMentorSignupRoutePath())}
                                 className='global_btn rounded_full outline_primary hover-lift'
                             >
                                 Become a Mentor

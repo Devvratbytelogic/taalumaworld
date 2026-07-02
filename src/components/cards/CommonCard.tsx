@@ -40,7 +40,6 @@ export default function CommonCard({ data }: CommonCardProps) {
 
                 {/* Top-right badge */}
                 <div className="absolute top-3.5 right-3.5 z-2">
-                    dfd
                     {isBook ? (
                         <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium ${data.pricingModel === VISIBLE.BOOK ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
                             {data.pricingModel === VISIBLE.BOOK ? 'Full Series' : 'By Blueprint'}

@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button'
 import NormalBanner from '@/components/banners/NormalBanner'
 import { contactUsBannerData } from '@/data/data'
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI'
-import { getFAQRoutePath, getAuthorsRoutePath } from '@/routes/routes'
+import { getFAQRoutePath, getAuthorsRoutePath, getMentorSignupRoutePath } from '@/routes/routes'
 import {
     InstagramIcon,
     YoutubeIcon,
@@ -15,8 +15,6 @@ import {
 } from '@/components/ui/AllSVG'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { openModal } from '@/store/slices/allModalSlice'
-import { useDispatch } from 'react-redux'
 
 const CONTACT_EMAILS = [
     { label: 'Partnerships', email: 'teamtaaluma@taaluma.world', color: 'text-primary', bg: 'bg-primary/10' },
@@ -26,7 +24,6 @@ const CONTACT_EMAILS = [
 
 export default function ContactUsPage() {
     const router = useRouter()
-    const dispatch = useDispatch();
     const { data: globalSettings } = useGetGlobalSettingsQuery();
     const gs = globalSettings?.data;
 
@@ -110,7 +107,7 @@ export default function ContactUsPage() {
                             </div>
                             <Button
                                 className="global_btn rounded_full bg_primary shrink-0"
-                                onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                                onPress={() => router.push(getMentorSignupRoutePath())}
                             >
                                 Become a Mentor
                             </Button>

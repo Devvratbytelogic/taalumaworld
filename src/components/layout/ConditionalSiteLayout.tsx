@@ -6,12 +6,14 @@ import PrimaryFooter from '@/components/layout/footer/PrimaryFooter';
 export default function ConditionalSiteLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isAdminRoute = pathname.startsWith('/admin');
+    const isPortalRoute = pathname.startsWith('/portal');
+    const hideSiteChrome = isAdminRoute || isPortalRoute;
 
     return (
         <>
-            {!isAdminRoute && <PrimaryHeader />}
+            {!hideSiteChrome && <PrimaryHeader />}
             {children}
-            {!isAdminRoute && <PrimaryFooter />}
+            {!hideSiteChrome && <PrimaryFooter />}
         </>
     );
 }

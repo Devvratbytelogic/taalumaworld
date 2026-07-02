@@ -13,10 +13,10 @@ export function AdminAuthorsHeader({ onCreateAuthor }: AdminAuthorsHeaderProps) 
           <h1 className="text-3xl font-bold text-foreground mb-2">Mentors</h1>
           <p className="text-muted-foreground">Manage mentors and content creators</p>
         </div>
-        <Button onPress={onCreateAuthor} className="global_btn rounded_full bg_primary">
+        {/* <Button onPress={onCreateAuthor} className="global_btn rounded_full bg_primary">
           <Plus className="h-4 w-4" />
           Add Mentor
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

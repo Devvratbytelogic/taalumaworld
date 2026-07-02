@@ -1,4 +1,4 @@
-import { Plus, Users, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Plus, Users, MoreVertical, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Badge } from '../../ui/badge';
 import ImageComponent from '@/components/ui/ImageComponent';
@@ -18,11 +18,21 @@ import {
 } from '../../ui/dropdown-menu';
 import type { Author } from '@/types/content';
 
+const MENTOR_STATUSES = ['active', 'inactive', 'suspended', 'pending', 'rejected'];
+
+const STATUS_COLORS: Record<string, string> = {
+  active: 'bg-green-100 text-green-700 border-green-200',
+  inactive: 'bg-gray-100 text-gray-700 border-gray-200',
+  suspended: 'bg-amber-100 text-amber-700 border-amber-200',
+  pending: 'bg-blue-100 text-blue-700 border-blue-200',
+  rejected: 'bg-red-100 text-red-700 border-red-200',
+};
+
 interface AuthorListingProps {
   authors: Author[];
   searchQuery: string;
   onCreateAuthor: () => void;
-  onEdit: (author: Author) => void;
+  onUpdateStatus: (author: Author, status: string) => void;
   onDelete: (author: Author) => void;
 }
 
@@ -30,7 +40,7 @@ export function AuthorListing({
   authors,
   searchQuery,
   onCreateAuthor,
-  onEdit,
+  onUpdateStatus,
   onDelete,
 }: AuthorListingProps) {
   
@@ -42,12 +52,15 @@ export function AuthorListing({
             <TableRow>
               <TableHead>Mentor</TableHead>
               <TableHead>Bio</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Series</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {authors.map((author) => (
+            {authors.map((author) => {
+              const status = author.status || 'pending';
+              return (
               <TableRow key={author.id}>
                 <TableCell className="max-w-44">
                   <div className="flex items-center gap-3 min-w-0">
@@ -72,6 +85,11 @@ export function AuthorListing({
                     {author.bio || '—'}
                   </p>
                 </TableCell>
+                <TableCell>
+                  <Badge className={`capitalize ${STATUS_COLORS[status] ?? STATUS_COLORS.pending}`}>
+                    {status}
+                  </Badge>
+                </TableCell>
                 <TableCell className="whitespace-nowrap">
                   <span className={`font-medium`}>{author.followersCount}</span>
                   <span className="text-muted-foreground text-sm"> series</span>
@@ -84,10 +102,15 @@ export function AuthorListing({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => onEdit(author)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
+                      {MENTOR_STATUSES.map((item) => (
+                        <DropdownMenuItem
+                          key={item}
+                          disabled={status === item}
+                          onSelect={() => onUpdateStatus(author, item)}
+                        >
+                          {item}
+                        </DropdownMenuItem>
+                      ))}
                       <DropdownMenuItem
                         className="text-destructive"
                         onSelect={() => onDelete(author)}
@@ -99,7 +122,8 @@ export function AuthorListing({
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
-            ))}
+            );
+            })}
           </TableBody>
         </Table>
 
@@ -117,7 +141,7 @@ export function AuthorListing({
                     : 'Add your first mentor to get started'}
                 </p>
               </div>
-              {!searchQuery && (
+              {/* {!searchQuery && (
                 <Button
                   onPress={onCreateAuthor}
                   className="global_btn rounded_full bg_primary"
@@ -125,7 +149,7 @@ export function AuthorListing({
                 >
                   Add Your First Mentor
                 </Button>
-              )}
+              )} */}
             </div>
           </div>
         )}

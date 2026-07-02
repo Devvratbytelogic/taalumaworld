@@ -14,7 +14,6 @@ import { AdminAuthorsStats } from './AdminAuthorsStats';
 import { AdminAuthorsSearch } from './AdminAuthorsSearch';
 import { AuthorListing } from './AuthorListing';
 import { AddAuthorModal, type AddAuthorFormValues } from './AddAuthorModal';
-import { EditAuthorModal, type EditAuthorFormValues } from './EditAuthorModal';
 import { DeleteAuthorDialog } from './DeleteAuthorDialog';
 
 function mapLeaderToAuthor(leader: LeadersEntity): Author {
@@ -24,13 +23,13 @@ function mapLeaderToAuthor(leader: LeadersEntity): Author {
     bio: leader.professionalBio ?? '',
     avatar: leader.avatar ?? '',
     followersCount: leader.followersCount ?? 0,
+    status: leader.status?.toLowerCase() ?? 'pending',
   };
 }
 
 export function AdminAuthorsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingLeader, setEditingLeader] = useState<LeadersEntity | null>(null);
   const [deleteConfirmAuthor, setDeleteConfirmAuthor] = useState<Author | null>(null);
 
   const { data: leadersResponse, isLoading } = useGetAllAuthorLeadersQuery();
@@ -49,11 +48,16 @@ export function AdminAuthorsTab() {
       (author.bio && author.bio.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const handleEditAuthor = (author: Author) => {
-    const leader = leadersResponse?.data?.leaders?.find(
-      (l) => (l.id ?? l._id) === author.id
-    );
-    setEditingLeader(leader ?? null);
+  const handleUpdateStatus = async (author: Author, status: string) => {
+    if (!author.id) return;
+    try {
+      const formData = new FormData();
+      formData.append('status', status);
+      await updateAuthorLeader({ id: author.id, values: formData }).unwrap();
+      toast.success(`Status updated to ${status}`);
+    } catch {
+      toast.error('Failed to update status');
+    }
   };
 
   const handleDeleteAuthor = (author: Author) => {
@@ -83,21 +87,6 @@ export function AdminAuthorsTab() {
     await addAuthorLeader(formData).unwrap();
   };
 
-  const handleUpdateAuthor = async (
-    id: string,
-    values: EditAuthorFormValues
-  ) => {
-    const formData = new FormData();
-    formData.append('fullName', values.fullName);
-    formData.append('email', values.email);
-    formData.append('professionalBio', values.professionalBio);
-    formData.append('status', values.status);
-    if (values.avatar) {
-      formData.append('avatar', values.avatar);
-    }
-    await updateAuthorLeader({ id, values: formData }).unwrap();
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -122,7 +111,7 @@ export function AdminAuthorsTab() {
         authors={filteredAuthors}
         searchQuery={searchQuery}
         onCreateAuthor={() => setIsCreateModalOpen(true)}
-        onEdit={handleEditAuthor}
+        onUpdateStatus={handleUpdateStatus}
         onDelete={handleDeleteAuthor}
       />
 
@@ -130,13 +119,6 @@ export function AdminAuthorsTab() {
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
         onSubmitForm={handleAddAuthor}
-      />
-
-      <EditAuthorModal
-        leader={editingLeader}
-        open={!!editingLeader}
-        onOpenChange={(open) => !open && setEditingLeader(null)}
-        onSubmitForm={handleUpdateAuthor}
       />
 
       <DeleteAuthorDialog

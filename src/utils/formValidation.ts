@@ -77,8 +77,28 @@ export const careerArchitectSignUpSchema = Yup.object({
   sendUpdates: Yup.boolean(),
 });
 
-export const mentorSignUpSchema = Yup.object({
-  ...signUpBaseSchema,
+export const mentorSignUpAccountSchema = Yup.object({
+  name: signUpBaseSchema.name,
+  email: signUpBaseSchema.email,
+  password: signUpBaseSchema.password,
+  confirmPassword: signUpBaseSchema.confirmPassword,
+});
+
+const optionalUrl = Yup.string()
+  .transform((value) => (value?.trim() ? value.trim() : undefined))
+  .url('Enter a valid URL')
+  .optional();
+
+export const mentorSignUpProfileSchema = Yup.object({
+  professionalBio: Yup.string()
+    .min(20, 'Bio must be at least 20 characters')
+    .max(500, 'Bio must be 500 characters or less')
+    .required('Professional bio is required'),
+  linkedInUrl: optionalUrl,
+  websiteUrl: optionalUrl,
+});
+
+export const mentorSignUpAgreementsSchema = Yup.object({
   agreeMentorAgreement: Yup.boolean().oneOf([true], 'You must agree to the Mentor Agreement'),
   agreeRevenueShare: Yup.boolean().oneOf([true], 'You must agree to the Revenue Share Agreement'),
   agreeContentAndCommunity: Yup.boolean().oneOf(
@@ -86,6 +106,28 @@ export const mentorSignUpSchema = Yup.object({
     'You must agree to the Content Ownership & Licensing Policy and Community Standards Policy',
   ),
 });
+
+export const mentorSignUpPaymentSchema = Yup.object({
+  bankName: Yup.string().required('Bank name is required'),
+  bankAccountName: Yup.string().required('Account holder name is required'),
+  bankAccountNumber: Yup.string()
+    .min(6, 'Enter a valid account number')
+    .required('Bank account number is required'),
+  bankBranch: Yup.string().optional(),
+  mpesaNumber: Yup.string()
+    .transform((value) => value?.replace(/\s/g, ''))
+    .matches(/^(254|0)[17]\d{8}$/, 'Format: 0724409796 or 254724409796')
+    .required('M-Pesa number is required'),
+  taxId: Yup.string().optional(),
+  paymentFrequency: Yup.string()
+    .oneOf(['monthly', 'quarterly', 'annually'], 'Select a payment frequency')
+    .required('Payment frequency is required'),
+});
+
+export const mentorSignUpSchema = mentorSignUpAccountSchema
+  .concat(mentorSignUpProfileSchema)
+  .concat(mentorSignUpAgreementsSchema)
+  .concat(mentorSignUpPaymentSchema);
 
 export const forgotPasswordSchema = Yup.object({
   email: emailRules,

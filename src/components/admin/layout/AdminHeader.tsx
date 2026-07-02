@@ -10,7 +10,7 @@ import {
 import { Button, Input, Switch, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
-import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getCreateChapterRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getCreateChapterRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
@@ -119,8 +119,8 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
             {/* ── Top Bar ─────────────────────────────────────────── */}
             <div className="bg-primary text-white">
                 <div className="container mx-auto sm:px-4 h-10 flex items-center justify-between text-sm">
-                    <span className="font-medium hidden sm:block">Admin Panel - {brandName}</span>
-                    <span className="font-medium sm:hidden">Admin</span>
+                    <span className="font-medium hidden sm:block">{isAuthor ? 'Mentor Panel' : 'Admin Panel'} - {brandName}</span>
+                    <span className="font-medium sm:hidden">{isAuthor ? 'Mentor' : 'Admin'}</span>
 
                     {!isAuthor && (
                         <div className="flex items-center gap-2">
@@ -157,7 +157,7 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
                         <Button variant="light" size="sm" isIconOnly className="lg:hidden" onPress={onMobileMenuToggle}>
                             <Menu className="h-5 w-5" />
                         </Button>
-                        <Link href="/admin/dashboard" className="flex items-center gap-2 shrink-0">
+                        <Link href={isAuthor ? getMentorDashboardRoutePath() : '/admin/dashboard'} className="flex items-center gap-2 shrink-0">
                             {logo ? (
                                 <div className="h-10 w-[160px]">
                                     <ImageComponent src={logo} alt={brandName} object_cover={false} />

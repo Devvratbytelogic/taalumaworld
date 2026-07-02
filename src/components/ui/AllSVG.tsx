@@ -61,3 +61,12 @@ export function WhatsAppIcon({ className = 'h-5 w-5' }: { className?: string }) 
         </svg>
     );
 }
+
+
+export function KshIcon({ className }: { className?: string }) {
+    return (
+        <span className={`inline-flex items-center justify-center border-[1.5px] border-current rounded font-bold text-[8px] leading-none tracking-tight shrink-0 ${className ?? ''}`}>
+            KSH
+        </span>
+    );
+}

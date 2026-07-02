@@ -17,6 +17,7 @@ import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import {
     getAdminDashboardRoutePath,
     getHomeRoutePath,
+    getMentorDashboardRoutePath,
     getMentorForgotPasswordRoutePath,
     getMentorSignupRoutePath,
     getMentorVerifyRoutePath,
@@ -73,7 +74,9 @@ export function SignInForm({ variant }: SignInFormProps) {
 
                 resetForm();
                 toast.success(res.message ?? 'Sign in successful!');
-                router.push(redirectTo ?? getAdminDashboardRoutePath());
+                router.push(
+                    redirectTo ?? (isMentor ? getMentorDashboardRoutePath() : getAdminDashboardRoutePath()),
+                );
             } catch (error) {
                 const errMsg = (error as { data?: { message?: string } })?.data?.message ?? '';
                 if (errMsg.toLowerCase().includes('verify your account')) {

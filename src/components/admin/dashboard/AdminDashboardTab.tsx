@@ -16,6 +16,7 @@ import { DashboardTopContent } from './DashboardTopContent';
 import { DashboardQuickActions } from './DashboardQuickActions';
 import { useGetAllUsersQuery, useGetAllBooksQuery, useGetAllAdminChaptersQuery, useGetAllTestimonialsQuery, useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '../../../store/rtkQueries/adminGetApi';
 import { getAdminSectionRoutePath } from '../../../routes/routes';
+import { KshIcon } from '@/components/ui/AllSVG';
 
 function timeAgo(dateStr: string): string {
   const diffMs = Date.now() - new Date(dateStr).getTime();
@@ -41,13 +42,13 @@ function calcUserGrowth(dates: string[]): number {
   return Math.round(((recent - prev) / prev) * 100 * 10) / 10;
 }
 
-function KshIcon({ className }: { className?: string }) {
-  return (
-    <span className={`inline-flex items-center justify-center border-[1.5px] border-current rounded font-bold text-[8px] leading-none tracking-tight shrink-0 ${className ?? ''}`}>
-      KSH
-    </span>
-  );
-}
+// function KshIcon({ className }: { className?: string }) {
+//   return (
+//     <span className={`inline-flex items-center justify-center border-[1.5px] border-current rounded font-bold text-[8px] leading-none tracking-tight shrink-0 ${className ?? ''}`}>
+//       KSH
+//     </span>
+//   );
+// }
 
 export function AdminDashboardTab() {
   const { data: profileData } = useGetAdminProfileQuery();

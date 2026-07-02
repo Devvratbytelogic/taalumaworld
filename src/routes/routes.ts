@@ -55,6 +55,56 @@ export function getAdminRoutePath(): string {
 export function getAdminDashboardRoutePath(): string {
   return '/admin/dashboard';
 }
+export function getMentorRoutePath(): string {
+  return '/admin/mentor';
+}
+export function getMentorDashboardRoutePath(): string {
+  return '/admin/mentor/dashboard';
+}
+
+export function getMentorBlueprintPerformanceRoutePath(): string {
+  return '/admin/mentor/blueprint-performance';
+}
+
+export function getMentorSalesVolumeRoutePath(): string {
+  return '/admin/mentor/sales-volume';
+}
+
+export function getMentorRevenueEarnedRoutePath(): string {
+  return '/admin/mentor/revenue-earned';
+}
+
+export function getMentorRevenuePendingRoutePath(): string {
+  return '/admin/mentor/revenue-pending';
+}
+
+export function getMentorPaymentHistoryRoutePath(): string {
+  return '/admin/mentor/payment-history';
+}
+
+export function getMentorStatementsRoutePath(): string {
+  return '/admin/mentor/statements';
+}
+
+export function getMentorRevenueByBlueprintRoutePath(): string {
+  return '/admin/mentor/revenue-by-blueprint';
+}
+
+export function getMentorBooksRoutePath(): string {
+  return '/admin/mentor/books';
+}
+
+export function getMentorChaptersRoutePath(): string {
+  return '/admin/mentor/chapters';
+}
+
+export function getMentorCategoriesRoutePath(): string {
+  return '/admin/mentor/categories';
+}
+
+export function getMentorUsersRoutePath(): string {
+  return '/admin/mentor/users';
+}
 
 export function getMentorLoginRoutePath(): string {
   return '/mentor/login';

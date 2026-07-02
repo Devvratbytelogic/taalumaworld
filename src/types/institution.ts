@@ -1,6 +1,6 @@
 // ─── Institution Module Types ─────────────────────────────────────────────────
 
-export type InstitutionStatus = 'active' | 'suspended' | 'terminated';
+export type InstitutionStatus = 'pending' | 'active' | 'suspended' | 'terminated';
 export type ReAccessPricingType = 'discounted' | 'market';
 
 export interface IInstitutionEmailDomain {

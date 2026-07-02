@@ -104,7 +104,7 @@ export const DUMMY_INSTITUTIONS: IAllInstitutionsAPIResponse = {
                 { domain: 'kca.ac.ke', is_primary: true },
                 { domain: 'students.kca.ac.ke', is_primary: false },
             ],
-            status: 'suspended',
+            status: 'pending',
             promotional_access: {
                 start_date: '2026-02-01T00:00:00.000Z',
                 end_date: '2026-07-15T00:00:00.000Z',
@@ -250,3 +250,18 @@ export const DUMMY_MUTATION_SUCCESS = {
     message: 'Operation completed successfully',
     data: null,
 };
+/** Check if email belongs to an active partner university (dummy data). */
+export function matchInstitutionByEmail(email: string) {
+    const domain = email.split('@')[1]?.toLowerCase().trim();
+    if (!domain) return null;
+
+    return (
+        DUMMY_INSTITUTIONS.data.find(
+            (inst) =>
+                inst.status === 'active' &&
+                inst.promotional_access.is_active &&
+                inst.email_domains.some((d) => domain === d.domain.toLowerCase()),
+        ) ?? null
+    );
+}
+

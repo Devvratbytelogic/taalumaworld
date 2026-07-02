@@ -5,7 +5,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@herou
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
+import { Camera, Eye, EyeOff, GraduationCap, Lock, Mail, User } from 'lucide-react'
 import { useFormik } from 'formik'
 import { careerArchitectSignUpSchema, mentorSignUpSchema } from '@/utils/formValidation'
 import { RootState } from '@/store/store'
@@ -27,6 +27,11 @@ import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
 type SignRole = 'user' | 'author'
 
 const AVATAR_BORDER_COLOR = '#C8D7EE'
+
+const PARTNER_UNIVERSITIES = [
+    { id: 'uon', name: 'University of Nairobi', emailHint: 'you@students.uonbi.ac.ke' },
+    { id: 'strathmore', name: 'Strathmore University', emailHint: 'you@strathmore.edu' },
+]
 
 export default function SignUp() {
     const dispatch = useDispatch()
@@ -76,6 +81,9 @@ export default function SignUp() {
             email: '',
             password: '',
             confirmPassword: '',
+            isPartnerStudent: false,
+            university: '',
+            universityEmail: '',
             agreeTerms: false,
             agreePrivacy: false,
             sendUpdates: false,
@@ -133,6 +141,8 @@ export default function SignUp() {
         setShowConfirmPassword(false)
     }
 
+    const selectedUniversity = PARTNER_UNIVERSITIES.find((u) => u.id === values.university)
+
     const headerSubtitle =
         signRole === 'user'
             ? 'Join TaalumaWorld and start your learning journey!'
@@ -164,6 +174,29 @@ export default function SignUp() {
                     </div>
                 </ModalHeader>
                 <ModalBody>
+                    {signRole === 'user' && (
+                        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 mb-3">
+                            <div className="flex gap-3">
+                                <GraduationCap className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                                <div className="space-y-1 text-sm text-left">
+                                    <p className="font-semibold text-foreground">
+                                        Are you a student from a partner university?
+                                    </p>
+                                    <p className="text-muted-foreground">
+                                        Register using your university email address to access selected Taaluma.World
+                                        content free of charge for a promotional period.
+                                    </p>
+                                    <p className="text-xs text-muted-foreground pt-1">
+                                        Not listed? Contact{' '}
+                                        <Link href="mailto:teamtaaluma@taaluma.world" className="text-primary">
+                                            teamtaaluma@taaluma.world
+                                        </Link>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <form className="space-y-3" onSubmit={handleSubmit}>
                         <div className="flex flex-col items-center gap-2">
                             <input
@@ -204,6 +237,77 @@ export default function SignUp() {
                             <span className="text-sm text-muted-foreground">Profile picture (optional)</span>
                         </div>
 
+                        {signRole === 'user' && (
+                            <div className="space-y-3 rounded-2xl border border-gray-200 p-4">
+                                <label className="flex items-start gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        name="isPartnerStudent"
+                                        checked={values.isPartnerStudent}
+                                        onChange={(e) => {
+                                            handleChange(e)
+                                            if (!e.target.checked) {
+                                                setFieldValue('university', '')
+                                                setFieldValue('universityEmail', '')
+                                            }
+                                        }}
+                                        onBlur={handleBlur}
+                                        className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                    />
+                                    <span className="text-sm font-medium text-foreground">
+                                        I am a student from a partner university
+                                    </span>
+                                </label>
+
+                                {values.isPartnerStudent && (
+                                    <>
+                                        <div className="space-y-2">
+                                            <label htmlFor="signup-university" className="text-sm font-medium text-foreground">
+                                                Select University
+                                            </label>
+                                            <select
+                                                id="signup-university"
+                                                name="university"
+                                                value={values.university}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className="w-full h-12 rounded-2xl border border-input bg-white px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                            >
+                                                <option value="">Choose your university</option>
+                                                {PARTNER_UNIVERSITIES.map((u) => (
+                                                    <option key={u.id} value={u.id}>
+                                                        {u.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label htmlFor="signup-university-email" className="text-sm font-medium text-foreground">
+                                                University Email Address
+                                            </label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                                <Input
+                                                    id="signup-university-email"
+                                                    name="universityEmail"
+                                                    type="email"
+                                                    placeholder={selectedUniversity?.emailHint ?? 'you@university.ac.ke'}
+                                                    className="pl-12 h-12 rounded-2xl"
+                                                    value={values.universityEmail}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">
+                                                Use your official university email for promotional access.
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <label htmlFor="signup-name" className="text-sm font-medium text-foreground">
                                 Full Name
@@ -229,7 +333,7 @@ export default function SignUp() {
 
                         <div className="space-y-2">
                             <label htmlFor="signup-email" className="text-sm font-medium text-foreground">
-                                Email Address
+                                {values.isPartnerStudent && signRole === 'user' ? 'Personal Email Address' : 'Email Address'}
                             </label>
                             <div className="relative">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />

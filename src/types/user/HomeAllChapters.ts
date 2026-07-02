@@ -19,6 +19,11 @@ export interface IHomeAllChaptersAPIResponseData {
 /** Discriminated union — narrows automatically via `type` field */
 export type IContentItem = IBookItem | IChapterItem;
 
+export interface IAuthorSocialLinks {
+  linkedin?: string | null;
+  facebook?: string | null;
+}
+
 export interface IBookItem {
   type: 'book';
   id: string;
@@ -35,6 +40,7 @@ export interface IBookItem {
   author: string;
   authorAvatar: string | null;
   authorBio?: string | null;
+  authorSocial?: IAuthorSocialLinks | null;
   category: ICategory;
   subcategory: ICategory | null;
   isPurchased: boolean;
@@ -57,6 +63,8 @@ export interface IChapterItem {
   bookTitle: string;
   author: string;
   authorAvatar: string | null;
+  authorBio?: string | null;
+  authorSocial?: IAuthorSocialLinks | null;
   category: ICategory;
   subcategory: ICategory | null;
   canRead: boolean;

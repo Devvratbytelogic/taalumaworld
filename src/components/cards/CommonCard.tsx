@@ -4,10 +4,11 @@ import { useDispatch } from 'react-redux'
 import { Card, CardContent } from '../ui/card'
 import ImageComponent from '../ui/ImageComponent'
 import { Badge } from '../ui/badge'
-import { BookOpen, FileText, User } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { openModal } from '@/store/slices/allModalSlice'
 import { IContentItem } from '@/types/user/HomeAllChapters'
 import { VISIBLE } from '@/constants/contentMode'
+import MentorCardReveal from './MentorCardReveal'
 
 interface CommonCardProps {
     data: IContentItem;
@@ -19,17 +20,27 @@ export default function CommonCard({ data }: CommonCardProps) {
 
     return (
         <Card
-            className="overflow-hidden cursor-pointer hover-lift transition-all hover:border-primary/50 rounded-3xl flex flex-col h-full"
+            className="group/card overflow-hidden cursor-pointer hover-lift transition-all hover:border-primary/50 rounded-3xl flex flex-col h-full"
             onClick={() => dispatch(openModal({ componentName: 'CommonCardDetailsModal', data: { chapter: data } }))}
         >
             {/* Cover Image */}
             <div className="overflow-hidden bg-muted relative shrink-0">
-                <div className="w-full h-full transition-transform hover:scale-105">
+                <div className="w-full h-full transition-transform group-hover/card:scale-105">
                     <ImageComponent src={data.coverImage} alt={data.title} object_cover={true} />
                 </div>
 
+                {data?.author && (
+                    <MentorCardReveal
+                        name={data.author ?? 'Mentor'}
+                        avatar={data.authorAvatar ?? undefined}
+                        bio={data.authorBio ?? 'Mentor bio'}
+                        social={data.authorSocial ?? { linkedin: 'https://www.linkedin.com/in/mentor', facebook: 'https://www.facebook.com/mentor' }}
+                    />
+                )}
+
                 {/* Top-right badge */}
-                <div className="absolute top-3.5 right-3.5">
+                <div className="absolute top-3.5 right-3.5 z-2">
+                    dfd
                     {isBook ? (
                         <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium ${data.pricingModel === VISIBLE.BOOK ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
                             {data.pricingModel === VISIBLE.BOOK ? 'Full Series' : 'By Blueprint'}
@@ -80,14 +91,6 @@ export default function CommonCard({ data }: CommonCardProps) {
                     <p className="text-sm text-muted-foreground line-clamp-2 tracking-tight h-10">
                         {data.description}
                     </p>
-                )}
-
-                {/* Author */}
-                {data.author && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground tracking-tight">
-                        <User className="h-4 w-4" />
-                        <span>{data.author}</span>
-                    </div>
                 )}
 
                 <div className="flex-1" />

@@ -62,7 +62,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
 
     return (
         <div
-            className="min-h-screen bg-white admin_panel [--admin-header-height:7rem]"
+            className="min-h-screen bg-slate-50/80 admin_panel [--admin-header-height:6rem]"
             style={{ '--admin-sidebar-width': ADMIN_SIDEBAR_WIDTH } as React.CSSProperties}
         >
             <AdminHeader onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />

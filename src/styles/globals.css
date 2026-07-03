@@ -320,14 +320,13 @@
 
   body {
     @apply bg-background text-foreground font-roboto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   /* Smooth scrolling */
-  html {
+  /* html {
     scroll-behavior: smooth;
-  }
+  } */
 
   /* Selection color */
   ::selection {

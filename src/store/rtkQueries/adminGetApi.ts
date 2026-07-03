@@ -16,19 +16,21 @@ import { IAllOrdersAPIResponse } from '@/types/order';
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         /** categories */
-        getAllCategories: builder.query<IAllCategoriesAPIResponse, void>({
-            query: () => ({
+        getAllCategories: builder.query<IAllCategoriesAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/categories`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminCategories'],
         }),
 
         /** Author Leaders */
-        getAllAuthorLeaders: builder.query<IAllAuthorLeadersAPIResponse, void>({
-            query: () => ({
+        getAllAuthorLeaders: builder.query<IAllAuthorLeadersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/leaders`,
-                method: 'GET',
+                method: 'GET',  
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminAuthorLeaders'],
         }),
@@ -44,10 +46,11 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Chapters */
-        getAllAdminChapters: builder.query<IAllChaptersAPIResponse, void>({
-            query: () => ({
+        getAllAdminChapters: builder.query<IAllChaptersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/chapters`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminChapters'],
         }),
@@ -62,19 +65,21 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** users */
-        getAllUsers: builder.query<IAllUsersAPIResponse, void>({
-            query: () => ({
+        getAllUsers: builder.query<IAllUsersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/get-all-users`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminUsers'],
         }),
 
         /** testimonials */
-        getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, void>({
-            query: () => ({
+        getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/testimonial`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminTestimonials'],
         }),
@@ -107,18 +112,20 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             // providesTags: ['AdminTransactions'],
         }),
         
-        getAllContactusData: builder.query<IAllContactusDataAPIResponse, void>({
-            query: () => ({
+        getAllContactusData: builder.query<IAllContactusDataAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/all-contact-us`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
         }),
 
         /** Subscribers */
-        getAllSubscribers: builder.query<IAllSubscribersAPIResponse, void>({
-            query: () => ({
+        getAllSubscribers: builder.query<IAllSubscribersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/all-subscriber`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminSubscribers'],
         }),

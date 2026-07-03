@@ -14,6 +14,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useDebounce } from '@/hooks/useDebounce';
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('en-US', {
@@ -25,31 +26,29 @@ function formatDate(iso: string) {
 
 export function AdminSubscribersTab() {
     const [searchQuery, setSearchQuery] = useState('');
-    const { data, isLoading, isFetching } = useGetAllSubscribersQuery();
+    const [page, setPage] = useState(1);
+    const [pageLimit, setPageLimit] = useState(10);
+    const debouncedSearch = useDebounce(searchQuery, 500);
+    const queryParams = {
+        page,
+        limit: pageLimit,
+        ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+    };
+    const { data, isLoading, isFetching } = useGetAllSubscribersQuery(queryParams);
 
     const subscribers = data?.data ?? [];
-
-    const filtered = subscribers.filter((s: SubscriberEntry) => {
-        const q = searchQuery.toLowerCase();
-        return (
-            s.email.toLowerCase().includes(q) ||
-            (s.name ?? '').toLowerCase().includes(q) ||
-            s.date_of_subscription.includes(q)
-        );
-    });
-
     const activeCount = subscribers.filter((s: SubscriberEntry) => s.status).length;
     const loading = isLoading || isFetching;
 
     const handleExportCSV = () => {
         const rows = [
             ['#', 'Email', 'Status', 'Subscribed On'],
-            ...filtered.map((s: SubscriberEntry, i: number) => [
+            ...(subscribers && subscribers?.length > 0 ? subscribers?.map((s: SubscriberEntry, i: number) => [
                 String(i + 1),
                 s.email,
                 s.status ? 'Active' : 'Inactive',
                 s.date_of_subscription,
-            ]),
+            ]) : []),
         ];
         const csv = rows.map((r: string[]) => r.map((v: string) => `"${v}"`).join(',')).join('\n');
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -98,7 +97,7 @@ export function AdminSubscribersTab() {
                     </div>
                     <button
                         onClick={handleExportCSV}
-                        disabled={loading || filtered.length === 0}
+                        disabled={loading || subscribers && subscribers?.length === 0}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                     >
                         <Download className="h-4 w-4" />
@@ -130,7 +129,7 @@ export function AdminSubscribersTab() {
                                     ))}
                                 </TableRow>
                             ))
-                            : filtered.map((sub: SubscriberEntry, idx: number) => (
+                            : subscribers && subscribers?.length > 0 && subscribers?.map((sub: SubscriberEntry, idx: number) => (
                                 <TableRow key={sub._id}>
                                     <TableCell className="text-muted-foreground text-sm">
                                         {idx + 1}
@@ -167,7 +166,7 @@ export function AdminSubscribersTab() {
                     </TableBody>
                 </Table>
 
-                {!loading && filtered.length === 0 && (
+                {!loading && subscribers && subscribers?.length === 0 && (
                     <div className="p-12">
                         <div className="text-center space-y-4">
                             <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">

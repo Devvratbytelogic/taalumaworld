@@ -17,7 +17,9 @@ import {
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu';
 import { AdminEmptyState, AdminTableShell } from '@/components/admin/layout/AdminContent';
+import { AdminPagination } from '@/components/admin/shared/AdminPagination';
 import type { Author } from '@/types/content';
+import { IAuthorLeaderEntity } from '@/types/authleaders';
 
 const MENTOR_STATUSES = ['active', 'inactive', 'suspended', 'pending', 'rejected'];
 
@@ -30,8 +32,15 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 interface AuthorListingProps {
-  authors: Author[];
+  authors: IAuthorLeaderEntity[];
   searchQuery: string;
+  page: number;
+  pageLimit: number;
+  totalAuthors: number;
+  totalPages: number;
+  isFetching?: boolean;
+  onPageChange: (page: number) => void;
+  onPageLimitChange: (limit: number) => void;
   onCreateAuthor: () => void;
   onUpdateStatus: (author: Author, status: string) => void;
   onDelete: (author: Author) => void;
@@ -40,11 +49,19 @@ interface AuthorListingProps {
 export function AuthorListing({
   authors,
   searchQuery,
+  page,
+  pageLimit,
+  totalAuthors,
+  totalPages,
+  isFetching = false,
+  onPageChange,
+  onPageLimitChange,
   onCreateAuthor,
   onUpdateStatus,
   onDelete,
 }: AuthorListingProps) {
   return (
+    <>
     <AdminTableShell>
       <Table>
         <TableHeader>
@@ -67,20 +84,23 @@ export function AuthorListing({
                       {author.avatar ? (
                         <ImageComponent
                           src={author.avatar}
-                          alt={author.name ?? ''}
+                          alt={author.fullName ?? ''}
                           object_cover={true}
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-sm font-medium text-slate-500">
-                          {author?.name?.substring(0, 2).toUpperCase()}
+                          {author?.fullName?.substring(0, 2).toUpperCase()}
                         </div>
                       )}
                     </div>
-                    <p className="truncate font-medium text-slate-900">{author.name}</p>
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-slate-900">{author.fullName}</p>
+                      <p className="truncate text-xs text-slate-500">{author.email}</p>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell className="max-w-sm">
-                  <p className="line-clamp-2 text-sm text-slate-500">{author.bio || '—'}</p>
+                  <p className="line-clamp-2 text-sm text-slate-500">{author.professionalBio || '—'}</p>
                 </TableCell>
                 <TableCell>
                   <Badge className={`capitalize ${STATUS_COLORS[status] ?? STATUS_COLORS.pending}`}>
@@ -144,5 +164,19 @@ export function AuthorListing({
         />
       ) : null}
     </AdminTableShell>
+
+    {totalAuthors > 0 && (
+      <AdminPagination
+        page={page}
+        limit={pageLimit}
+        total={totalAuthors}
+        totalPages={totalPages}
+        itemLabel="mentors"
+        disabled={isFetching}
+        onPageChange={onPageChange}
+        onLimitChange={onPageLimitChange}
+      />
+    )}
+    </>
   );
 }

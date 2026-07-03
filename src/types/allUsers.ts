@@ -3,6 +3,13 @@ export interface IAllUsersAPIResponse {
     http_status_msg: string;
     success: boolean;
     data?: (IAllUsersDataEntity)[] | null;
+    pagination?: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+    totalUsers: number;
     message: string;
     timestamp: string;
   }

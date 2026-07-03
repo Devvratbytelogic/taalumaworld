@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FolderTree, Layers, Tags } from 'lucide-react';
 import toast from '@/utils/toast';
 import type { IAllCategoriesAPIResponseData } from '@/types/categories';
 import { useGetAllCategoriesQuery } from '@/store/rtkQueries/adminGetApi';
@@ -14,9 +15,12 @@ import { AddCategoryModal } from './AddCategoryModal';
 import { EditCategoryModal } from './EditCategoryModal';
 import { DeleteCategoryDialog } from './DeleteCategoryDialog';
 import AdminCategoriesSkeleton from '@/components/skeleton-loader/AdminCategoriesSkeleton';
+import { useDebounce } from '@/hooks/useDebounce';
+import { AdminPage, AdminStatCard } from '@/components/admin/layout/AdminContent';
 
 export function AdminCategoriesTab() {
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 400);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<IAllCategoriesAPIResponseData | null>(null);
   const [deleteConfirmCategory, setDeleteConfirmCategory] = useState<IAllCategoriesAPIResponseData | null>(null);
@@ -28,12 +32,21 @@ export function AdminCategoriesTab() {
 
   const categories = categoriesResponse?.data ?? [];
 
-  const filteredCategories = categories.filter(
-    (category) =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (category.subcategories ?? []).some((sub) =>
-        sub?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const searchText = debouncedSearch.trim().toLowerCase();
+  const filteredCategories = searchText
+    ? categories.filter(
+        (category) =>
+          category.name.toLowerCase().includes(searchText) ||
+          category.slug.toLowerCase().includes(searchText) ||
+          (category.subcategories ?? []).some((sub) =>
+            sub?.name?.toLowerCase().includes(searchText)
+          )
       )
+    : categories;
+
+  const subcategoryCount = categories.reduce(
+    (count, category) => count + (category.subcategories ?? []).filter(Boolean).length,
+    0
   );
 
   const handleEditCategory = (category: IAllCategoriesAPIResponseData) => {
@@ -79,8 +92,19 @@ export function AdminCategoriesTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <AdminPage>
       <AdminCategoriesHeader onCreateCategory={() => setIsCreateModalOpen(true)} />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <AdminStatCard label="Categories" value={categories.length} icon={FolderTree} tone="blue" />
+        <AdminStatCard label="Subcategories" value={subcategoryCount} icon={Layers} tone="green" />
+        <AdminStatCard
+          label="Empty categories"
+          value={categories.filter((c) => !(c.subcategories ?? []).length).length}
+          icon={Tags}
+          tone="slate"
+        />
+      </div>
 
       <AdminCategoriesSearch
         searchQuery={searchQuery}
@@ -90,13 +114,14 @@ export function AdminCategoriesTab() {
       {isLoading || isFetching ? (
         <AdminCategoriesSkeleton />
       ) : (
-      <CategoryListing
-        categories={filteredCategories}
-        searchQuery={searchQuery}
-        onCreateCategory={() => setIsCreateModalOpen(true)}
-        onEdit={handleEditCategory}
-        onDelete={handleDeleteCategory}
-      />
+        <CategoryListing
+          categories={filteredCategories}
+          totalCount={categories.length}
+          searchQuery={debouncedSearch}
+          onCreateCategory={() => setIsCreateModalOpen(true)}
+          onEdit={handleEditCategory}
+          onDelete={handleDeleteCategory}
+        />
       )}
 
       <AddCategoryModal
@@ -121,6 +146,6 @@ export function AdminCategoriesTab() {
         onConfirm={confirmDeleteCategory}
         isDeleting={isDeleting}
       />
-    </div>
+    </AdminPage>
   );
 }

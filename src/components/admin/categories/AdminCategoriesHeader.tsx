@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import Button from '../../ui/Button';
+import { Button } from '@heroui/react';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 
 interface AdminCategoriesHeaderProps {
@@ -9,11 +9,15 @@ interface AdminCategoriesHeaderProps {
 export function AdminCategoriesHeader({ onCreateCategory }: AdminCategoriesHeaderProps) {
   return (
     <AdminPageHeader
-      title="Categories management"
+      title="Categories"
       description="Organize content with categories and subcategories"
     >
-      <Button onPress={onCreateCategory} className="global_btn rounded_full bg_primary">
-        <Plus className="h-4 w-4" />
+      <Button
+        color="primary"
+        className="rounded-xl"
+        onPress={onCreateCategory}
+        startContent={<Plus className="h-4 w-4" />}
+      >
         Add category
       </Button>
     </AdminPageHeader>

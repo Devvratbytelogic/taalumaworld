@@ -12,6 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useDebounce } from '@/hooks/useDebounce';
 
 function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -25,18 +26,17 @@ function formatDate(dateStr: string) {
 
 export function AdminContactUsTab() {
     const [searchQuery, setSearchQuery] = useState('');
-    const { data, isLoading, isFetching } = useGetAllContactusDataQuery();
+    const [page, setPage] = useState(1);
+    const [pageLimit, setPageLimit] = useState(10);
+    const debouncedSearch = useDebounce(searchQuery, 500);
+    const queryParams = {
+        page,
+        limit: pageLimit,
+        ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+    };
+    const { data, isLoading, isFetching } = useGetAllContactusDataQuery(queryParams);
 
     const entries = data?.data ?? [];
-
-    const filtered = entries.filter(
-        (e) =>
-            e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            e.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            e.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            e.message.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     const loading = isLoading || isFetching;
 
     return (
@@ -95,7 +95,7 @@ export function AdminContactUsTab() {
                                     ))}
                                 </TableRow>
                             ))
-                            : filtered.map((entry, idx) => (
+                            : entries && entries?.length > 0 && entries?.map((entry, idx) => (
                                 <TableRow key={entry._id}>
                                     <TableCell className="text-muted-foreground text-sm w-10">
                                         {idx + 1}
@@ -127,7 +127,7 @@ export function AdminContactUsTab() {
                     </TableBody>
                 </Table>
 
-                {!loading && filtered.length === 0 && (
+                {!loading && entries && entries?.length === 0 && (
                     <div className="p-12">
                         <div className="text-center space-y-4">
                             <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">

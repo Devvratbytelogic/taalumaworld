@@ -19,6 +19,13 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         ],
     },
     {
+        title: 'Commerce',
+        items: [
+            { id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
+            { id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
+        ],
+    },
+    {
         title: 'Content Management',
         items: [
             { id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
@@ -32,13 +39,6 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
             { id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
-        ],
-    },
-    {
-        title: 'Commerce',
-        items: [
-            { id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
-            { id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
         ],
     },
     {

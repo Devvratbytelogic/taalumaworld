@@ -12,12 +12,12 @@ import AdminTransactionsSkeleton from '@/components/skeleton-loader/AdminTransac
 
 export function AdminTransactionsTab() {
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearch = useDebounce(searchQuery);
-  const [fromDate, setFromDate] = useState<string>('');
-  const [toDate, setToDate] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
-  const [limit, setLimit] = useState<number>(10);
-  const [page, setPage] = useState<number>(1);
+  const debouncedSearch = useDebounce(searchQuery, 400);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [status, setStatus] = useState('');
+  const [pageLimit, setPageLimit] = useState(10);
+  const [page, setPage] = useState(1);
 
   const handleFilterChange = <T,>(setter: (v: T) => void) => (value: T) => {
     setter(value);
@@ -29,12 +29,12 @@ export function AdminTransactionsTab() {
   }, [debouncedSearch]);
 
   const { data, isLoading, isFetching } = useGetAllTransactionsQuery({
-    search: debouncedSearch,
-    fromDate,
-    toDate,
-    status,
+    search: debouncedSearch.trim() || undefined,
+    fromDate: fromDate || undefined,
+    toDate: toDate || undefined,
+    status: status || undefined,
     page,
-    limit,
+    limit: pageLimit,
   });
 
   const transactions: TransactionEntry[] = (data?.data?.payments ?? []).map((p) => ({
@@ -49,7 +49,7 @@ export function AdminTransactionsTab() {
 
   const totalRevenue = data?.data?.totalRevenue ?? 0;
   const pagination = data?.data?.pagination;
-  const totalCount = pagination?.total ?? 0;
+  const totalTransactions = pagination?.total ?? 0;
   const totalPages = pagination?.totalPages ?? 1;
 
   return (
@@ -65,46 +65,30 @@ export function AdminTransactionsTab() {
         onToDateChange={handleFilterChange(setToDate)}
         status={status}
         onStatusChange={handleFilterChange(setStatus)}
-        limit={limit}
-        onLimitChange={handleFilterChange(setLimit)}
       />
 
       <TransactionStats
         totalRevenue={totalRevenue}
-        transactionCount={totalCount}
+        transactionCount={totalTransactions}
       />
 
-      {isLoading || isFetching ? (
+      {isLoading ? (
         <AdminTransactionsSkeleton />
       ) : (
         <TransactionListing
           transactions={transactions}
           searchQuery={debouncedSearch}
+          page={page}
+          pageLimit={pageLimit}
+          totalTransactions={totalTransactions}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPageChange={setPage}
+          onPageLimitChange={(limit) => {
+            setPageLimit(limit);
+            setPage(1);
+          }}
         />
-      )}
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Page {page} of {totalPages} &middot; {totalCount} total transactions
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || isFetching}
-              className="px-4 py-2 text-sm rounded-lg border bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages || isFetching}
-              className="px-4 py-2 text-sm rounded-lg border bg-white disabled:opacity-40 hover:bg-gray-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );

@@ -7,11 +7,17 @@ export interface IAllAuthorLeadersAPIResponse {
     timestamp: string;
   }
   export interface IAllAuthorLeadersAPIResponseData {
-    leaders?: (LeadersEntity)[] | null;
+    leaders?: ( IAuthorLeaderEntity)[] | null;
     totalAuthors: number;
     totalFollowers: number;
+    pagination?: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   }
-  export interface LeadersEntity {
+  export interface IAuthorLeaderEntity {
     _id: string;
     fullName: string;
     email: string;

@@ -10,8 +10,6 @@ interface AdminTransactionsSearchProps {
   onToDateChange: (value: string) => void;
   status: string;
   onStatusChange: (value: string) => void;
-  limit: number;
-  onLimitChange: (value: number) => void;
 }
 
 const STATUS_OPTIONS = [
@@ -20,8 +18,6 @@ const STATUS_OPTIONS = [
   { label: 'Pending', value: 'pending' },
   { label: 'Failed', value: 'failed' },
 ];
-
-const LIMIT_OPTIONS = [10, 25, 50, 100];
 
 export function AdminTransactionsSearch({
   searchQuery,
@@ -32,13 +28,10 @@ export function AdminTransactionsSearch({
   onToDateChange,
   status,
   onStatusChange,
-  limit,
-  onLimitChange,
 }: AdminTransactionsSearchProps) {
   return (
     <div className="admin-surface p-5">
       <div className="flex flex-col gap-4">
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
@@ -50,9 +43,7 @@ export function AdminTransactionsSearch({
           />
         </div>
 
-        {/* Filters row */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:items-end">
-          {/* From date */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-muted-foreground font-medium">From</label>
             <Input
@@ -64,7 +55,6 @@ export function AdminTransactionsSearch({
             />
           </div>
 
-          {/* To date */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-muted-foreground font-medium">To</label>
             <Input
@@ -76,7 +66,6 @@ export function AdminTransactionsSearch({
             />
           </div>
 
-          {/* Status */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-muted-foreground font-medium">Status</label>
             <select
@@ -92,32 +81,15 @@ export function AdminTransactionsSearch({
             </select>
           </div>
 
-          {/* Per page */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-muted-foreground font-medium">Per page</label>
-            <select
-              value={limit}
-              onChange={(e) => onLimitChange(Number(e.target.value))}
-              className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              {LIMIT_OPTIONS.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Clear filters */}
-          {(fromDate || toDate || status || limit !== 10) && (
+          {(fromDate || toDate || status) && (
             <div className="col-span-2 sm:col-span-1 flex flex-col gap-1">
               <span className="text-xs text-transparent select-none sm:block hidden">Clear</span>
               <button
+                type="button"
                 onClick={() => {
                   onFromDateChange('');
                   onToDateChange('');
                   onStatusChange('');
-                  onLimitChange(10);
                 }}
                 className="w-full sm:w-auto h-10 px-4 text-sm rounded-md border border-input hover:bg-gray-50 transition-colors text-muted-foreground"
               >

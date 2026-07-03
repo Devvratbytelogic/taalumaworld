@@ -1,52 +1,45 @@
-import { useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGetAllAuthorLeadersQuery } from '@/store/rtkQueries/adminGetApi';
 import AdminAuthorsSkeleton from '@/components/skeleton-loader/AdminAuthorsSkeleton';
-import {
-  useAddAuthorLeaderMutation,
-  useUpdateAuthorLeaderMutation,
-  useDeleteAuthorLeaderMutation,
-} from '@/store/rtkQueries/adminPostApi';
+import { useAddAuthorLeaderMutation, useUpdateAuthorLeaderMutation, useDeleteAuthorLeaderMutation } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import type { Author } from '@/types/content';
-import type { LeadersEntity } from '@/types/authleaders';
 import { AdminAuthorsHeader } from './AdminAuthorsHeader';
 import { AdminAuthorsStats } from './AdminAuthorsStats';
 import { AdminAuthorsSearch } from './AdminAuthorsSearch';
 import { AuthorListing } from './AuthorListing';
 import { AddAuthorModal, type AddAuthorFormValues } from './AddAuthorModal';
 import { DeleteAuthorDialog } from './DeleteAuthorDialog';
+import { useDebounce } from '@/hooks/useDebounce';
 
-function mapLeaderToAuthor(leader: LeadersEntity): Author {
-  return {
-    id: leader.id ?? leader._id,
-    name: leader.fullName,
-    bio: leader.professionalBio ?? '',
-    avatar: leader.avatar ?? '',
-    followersCount: leader.followersCount ?? 0,
-    status: leader.status?.toLowerCase() ?? 'pending',
-  };
-}
 
 export function AdminAuthorsTab() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(10);
+  const debouncedSearch = useDebounce(searchQuery, 400);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteConfirmAuthor, setDeleteConfirmAuthor] = useState<Author | null>(null);
 
-  const { data: leadersResponse, isLoading } = useGetAllAuthorLeadersQuery();
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  const queryParams = {
+    page,
+    limit: pageLimit,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  };
+
+  const { data: leadersResponse, isLoading, isFetching } = useGetAllAuthorLeadersQuery(queryParams);
   const [addAuthorLeader] = useAddAuthorLeaderMutation();
   const [updateAuthorLeader] = useUpdateAuthorLeaderMutation();
   const [deleteAuthorLeader] = useDeleteAuthorLeaderMutation();
 
-  const authors: Author[] = useMemo(() => {
-    const leaders = leadersResponse?.data?.leaders ?? [];
-    return leaders.map(mapLeaderToAuthor);
-  }, [leadersResponse?.data?.leaders]);
-
-  const filteredAuthors = authors.filter(
-    (author) =>
-      author?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (author.bio && author.bio.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const authors = leadersResponse?.data?.leaders ?? [];
+  const pagination = leadersResponse?.data?.pagination;
+  const totalAuthors = pagination?.total ?? leadersResponse?.data?.totalAuthors ?? 0;
+  const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalAuthors / pageLimit));
 
   const handleUpdateStatus = async (author: Author, status: string) => {
     if (!author.id) return;
@@ -108,8 +101,18 @@ export function AdminAuthorsTab() {
       />
 
       <AuthorListing
-        authors={filteredAuthors}
-        searchQuery={searchQuery}
+        authors={authors}
+        searchQuery={debouncedSearch}
+        page={page}
+        pageLimit={pageLimit}
+        totalAuthors={totalAuthors}
+        totalPages={totalPages}
+        isFetching={isFetching}
+        onPageChange={setPage}
+        onPageLimitChange={(limit) => {
+          setPageLimit(limit);
+          setPage(1);
+        }}
         onCreateAuthor={() => setIsCreateModalOpen(true)}
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDeleteAuthor}

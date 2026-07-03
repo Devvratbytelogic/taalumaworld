@@ -16,37 +16,44 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu';
-
-export interface AdminListUser {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  role: string;
-  joinDate: string;
-  purchases: number;
-  status: string;
-}
+import { AdminEmptyState, AdminTableShell } from '@/components/admin/layout/AdminContent';
+import { AdminPagination } from '@/components/admin/shared/AdminPagination';
+import { IAllUsersDataEntity } from '@/types/allUsers';
 
 interface UserListingProps {
-  users: AdminListUser[];
+  users: IAllUsersDataEntity[];
   searchQuery: string;
+  page: number;
+  pageLimit: number;
+  totalUsers: number;
+  totalPages: number;
   isLoading?: boolean;
-  onViewProfile?: (user: AdminListUser) => void;
-  onSendEmail?: (user: AdminListUser) => void;
-  onSuspend?: (user: AdminListUser) => void;
+  isFetching?: boolean;
+  onPageChange: (page: number) => void;
+  onPageLimitChange: (limit: number) => void;
+  onViewProfile?: (user: IAllUsersDataEntity) => void;
+  onSendEmail?: (user: IAllUsersDataEntity) => void;
+  onSuspend?: (user: IAllUsersDataEntity) => void;
 }
 
 export function UserListing({
   users,
   searchQuery,
+  page,
+  pageLimit,
+  totalUsers,
+  totalPages,
   isLoading,
+  isFetching = false,
+  onPageChange,
+  onPageLimitChange,
   onViewProfile,
   onSendEmail,
   onSuspend,
 }: UserListingProps) {
   return (
-    <div className="admin-surface overflow-hidden">
+    <>
+    <AdminTableShell>
       <Table>
         <TableHeader>
           <TableRow>
@@ -75,16 +82,16 @@ export function UserListing({
               <TableCell className="max-w-40">
                 <div className="flex items-center gap-3 min-w-0">
                   <Avatar className="shrink-0">
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback>{user.name[0]}</AvatarFallback>
+                    <AvatarImage src={user.profile_pic ?? ''} />
+                    <AvatarFallback>{user.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className="font-medium truncate">{user.name}</span>
                 </div>
               </TableCell>
               <TableCell className="max-w-48 truncate">{user.email}</TableCell>
               <TableCell>
-                <Badge variant={user.role === 'Premium User' ? 'default' : 'outline'}>
-                  {user.role}
+                <Badge>
+                  {user.role?.name ?? '-'}
                 </Badge>
               </TableCell>
               <TableCell className="whitespace-nowrap">{user.joinDate}</TableCell>
@@ -140,23 +147,31 @@ export function UserListing({
         </TableBody>
       </Table>
 
-      {users.length === 0 && (
-        <div className="p-12">
-          <div className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-bold">No users found</h3>
-              <p className="text-muted-foreground">
-                {searchQuery
-                  ? 'Try adjusting your search query'
-                  : 'There are no users to display'}
-              </p>
-            </div>
-          </div>
-        </div>
+      {!isLoading && users.length === 0 && (
+        <AdminEmptyState
+          icon={Users}
+          title="No users found"
+          description={
+            searchQuery.trim()
+              ? 'Try adjusting your search query.'
+              : 'There are no users to display.'
+          }
+        />
       )}
-    </div>
+    </AdminTableShell>
+
+    {!isLoading && totalUsers > 0 && (
+      <AdminPagination
+        page={page}
+        limit={pageLimit}
+        total={totalUsers}
+        totalPages={totalPages}
+        itemLabel="users"
+        disabled={isFetching}
+        onPageChange={onPageChange}
+        onLimitChange={onPageLimitChange}
+      />
+    )}
+    </>
   );
 }

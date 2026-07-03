@@ -3,9 +3,8 @@
  * View and manage platform users
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from '@/utils/toast';
-import type { AdminListUser } from './UserListing';
 import { AdminUsersHeader } from './AdminUsersHeader';
 import { AdminUsersSearch } from './AdminUsersSearch';
 import { UserListing } from './UserListing';
@@ -13,46 +12,44 @@ import { ViewProfileModal } from './ViewProfileModal';
 import { SuspendUserDialog } from './SuspendUserDialog';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/adminGetApi';
 import { useSuspendUserMutation } from '@/store/rtkQueries/adminPostApi';
-import type { IAllUsersDataEntity } from '@/types/allUsers';
+import { useDebounce } from '@/hooks/useDebounce';
+import { IAllUsersDataEntity } from '@/types/allUsers';
 
-function mapUserToAdminListUser(user: IAllUsersDataEntity): AdminListUser {
-  return {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    avatar: user.profile_pic ?? '',
-    role: user.role?.name ?? 'User',
-    joinDate: user.joinDate ?? user.createdAt,
-    purchases: user.purchases ?? 0,
-    status: user.status,
-  };
-}
 
 export function AdminUsersTab() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [profileUser, setProfileUser] = useState<AdminListUser | null>(null);
-  const [suspendUser, setSuspendUser] = useState<AdminListUser | null>(null);
-
-  const { data, isLoading } = useGetAllUsersQuery();
+  const [profileUser, setProfileUser] = useState<IAllUsersDataEntity | null>(null);
+  const [suspendUser, setSuspendUser] = useState<IAllUsersDataEntity | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(10);
+  const debouncedSearch = useDebounce(searchQuery, 400);
+  const queryParams = {
+    page,
+    limit: pageLimit,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  };
+  const { data, isLoading, isFetching } = useGetAllUsersQuery(queryParams);
   const [suspendUserMutation, { isLoading: isSuspending }] = useSuspendUserMutation();
 
-  const users: AdminListUser[] = (data?.data ?? []).map(mapUserToAdminListUser);
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const users = data?.data ?? [];
+  const pagination = data?.pagination;
+  const totalUsers = pagination?.total ?? data?.totalUsers ?? 0;
+  const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalUsers / pageLimit));
 
-  const handleViewProfile = (user: AdminListUser) => {
+
+  const handleViewProfile = (user: IAllUsersDataEntity) => {
     setProfileUser(user);
   };
 
-  const handleSendEmail = (user: AdminListUser) => {
+  const handleSendEmail = (user: IAllUsersDataEntity) => {
     window.location.href = `mailto:${user.email}`;
   };
 
-  const handleSuspend = (user: AdminListUser) => {
+  const handleSuspend = (user: IAllUsersDataEntity) => {
     setSuspendUser(user);
   };
 
@@ -70,21 +67,31 @@ export function AdminUsersTab() {
     }
   };
 
-  const handleSuspendFromProfile = (user: AdminListUser) => {
+  const handleSuspendFromProfile = (user: IAllUsersDataEntity) => {
     setProfileUser(null);
     setSuspendUser(user);
   };
 
   return (
     <div className="space-y-6">
-      <AdminUsersHeader totalCount={users.length} />
+      <AdminUsersHeader totalCount={totalUsers} />
 
       <AdminUsersSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       <UserListing
-        users={filteredUsers}
-        searchQuery={searchQuery}
+        users={users}
+        searchQuery={debouncedSearch}
+        page={page}
+        pageLimit={pageLimit}
+        totalUsers={totalUsers}
+        totalPages={totalPages}
         isLoading={isLoading}
+        isFetching={isFetching}
+        onPageChange={setPage}
+        onPageLimitChange={(limit) => {
+          setPageLimit(limit);
+          setPage(1);
+        }}
         onViewProfile={handleViewProfile}
         onSendEmail={handleSendEmail}
         onSuspend={handleSuspend}

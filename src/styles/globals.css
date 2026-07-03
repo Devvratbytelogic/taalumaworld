@@ -692,6 +692,11 @@
   gap: 0.5rem;
   cursor: pointer;
   text-align: left;
+  border: 1px solid rgb(226 232 240) !important;
+  background-color: #fff !important;
+  color: rgb(51 65 85);
+  font-weight: 400;
+  appearance: none;
 }
 
 .admin_panel [data-slot='input'],
@@ -722,8 +727,9 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
   border-radius: 0.5rem !important;
+  border: 1px solid rgb(226 232 240) !important;
   border-color: rgb(226 232 240);
-  background-color: #fff;
+  background-color: #fff !important;
   box-shadow: none;
   box-sizing: border-box;
 }

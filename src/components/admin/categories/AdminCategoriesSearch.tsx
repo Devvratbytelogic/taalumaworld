@@ -1,5 +1,4 @@
-import { Search } from 'lucide-react';
-import { Input } from '../../ui/input';
+import { AdminSearchInput, AdminSearchPanel } from '@/components/admin/layout/AdminContent';
 
 interface AdminCategoriesSearchProps {
   searchQuery: string;
@@ -8,19 +7,12 @@ interface AdminCategoriesSearchProps {
 
 export function AdminCategoriesSearch({ searchQuery, onSearchChange }: AdminCategoriesSearchProps) {
   return (
-    <div className="admin-surface p-5">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search categories and subcategories..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-    </div>
+    <AdminSearchPanel>
+      <AdminSearchInput
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder="Search categories and subcategories..."
+      />
+    </AdminSearchPanel>
   );
 }

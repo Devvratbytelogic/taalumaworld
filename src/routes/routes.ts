@@ -150,6 +150,10 @@ export function getAdminProfileRoutePath(): string {
   return '/admin/profile';
 }
 
+export function getMentorProfileRoutePath(): string {
+  return '/admin/mentor/profile';
+}
+
 export function getAdminSectionRoutePath(section: string): string {
   const map: Record<string, string> = {
     dashboard: '/admin/dashboard',

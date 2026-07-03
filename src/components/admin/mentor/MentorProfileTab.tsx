@@ -14,6 +14,7 @@ import {
   AdminPanel,
   adminPanelClass,
 } from '@/components/admin/layout/AdminContent';
+import { MENTOR_OVERVIEW } from '@/components/admin/mentor/data/mentorPerformanceData';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
@@ -38,7 +39,7 @@ function ProfileSkeleton() {
   );
 }
 
-export function AdminProfileTab() {
+export function MentorProfileTab() {
   const [isEditing, setIsEditing] = useState(false);
   const [tempPhoto, setTempPhoto] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -100,15 +101,14 @@ export function AdminProfileTab() {
   if (isLoading) return <ProfileSkeleton />;
 
   const displayPhoto = tempPhoto || profile?.profile_pic || '';
-  const displayName = values.name || profile?.name || 'Admin';
-  const roleName = profile?.role?.name ?? 'Admin';
+  const displayName = values.name || profile?.name || 'Mentor';
 
   return (
     <AdminPage>
       <AdminPageHeader
-        eyebrow="System"
+        eyebrow="Account"
         title="My Profile"
-        description="Manage your administrator account information."
+        description="Manage your mentor profile, bio, and public information."
       >
         {!isEditing ? (
           <Button
@@ -134,7 +134,7 @@ export function AdminProfileTab() {
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                   <Shield className="h-3.5 w-3.5" />
-                  {roleName}
+                  Mentor
                 </span>
                 {profile?.createdAt ? (
                   <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
@@ -143,6 +143,24 @@ export function AdminProfileTab() {
                   </span>
                 ) : null}
               </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-lg border border-slate-200/80 bg-white/80 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Profile completion</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900">{MENTOR_OVERVIEW.profileCompletion}%</p>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${MENTOR_OVERVIEW.profileCompletion}%` }} />
+              </div>
+            </div>
+            <div className="rounded-lg border border-slate-200/80 bg-white/80 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Verification</p>
+              <p className="mt-1 text-sm font-semibold text-amber-700">{MENTOR_OVERVIEW.verificationStatus}</p>
+            </div>
+            <div className="rounded-lg border border-slate-200/80 bg-white/80 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Mentor type</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">{MENTOR_OVERVIEW.mentorType}</p>
             </div>
           </div>
         </div>
@@ -161,7 +179,7 @@ export function AdminProfileTab() {
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Role</dt>
-                <dd className="mt-1 text-sm font-medium text-slate-900">{roleName}</dd>
+                <dd className="mt-1 text-sm font-medium text-slate-900">Mentor</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Member since</dt>

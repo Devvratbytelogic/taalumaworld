@@ -6,11 +6,17 @@ import {
     BookOpen, Home, LogOut, Settings, ChevronDown, Menu,
     UserCircle,
 } from 'lucide-react';
-import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@heroui/react';
-import { Badge } from '@/components/ui/badge';
+import { Avatar } from '@heroui/react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/components/ui/utils';
 import { AdminHeaderSearch, AdminHeaderSearchProvider } from '@/components/admin/layout/AdminHeaderSearch';
-import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorProfileRoutePath } from '@/routes/routes';
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
@@ -122,8 +128,6 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
     const logo = globalSettings?.data?.logo as string | null | undefined;
     const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
 
-    const roleLabel = profileData?.data?.role?.name ?? 'Admin';
-
     const adminUser = {
         name: profileData?.data?.name ?? 'Admin User',
         email: profileData?.data?.email ?? '',
@@ -132,6 +136,7 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
     };
 
     const isAuthor = adminUser.role === 'author' || getUserRole()?.toLowerCase() === 'author';
+    const roleLabel = isAuthor ? 'Mentor' : (profileData?.data?.role?.name ?? 'Admin');
 
     const onContentModeToggle = async (isBooks: boolean) => {
         const newMode = isBooks ? 'book' : 'chapter';
@@ -144,12 +149,7 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
         window.location.href = getHomeRoutePath();
     };
 
-    const handleDropdownAction = (key: React.Key) => {
-        if (key === 'profile') router.push(getAdminProfileRoutePath());
-        if (key === 'settings') router.push(getAdminSectionRoutePath('settings'));
-        if (key === 'website') router.push(getHomeRoutePath());
-        if (key === 'logout') handleLogout();
-    };
+    const goToProfile = () => router.push(isAuthor ? getMentorProfileRoutePath() : getAdminProfileRoutePath());
 
     return (
         <AdminHeaderSearchProvider>
@@ -232,40 +232,82 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
                                 <span className="hidden lg:inline">Website</span>
                             </button>
 
-                            <Dropdown>
-                                <DropdownTrigger>
-                                    <button type="button" className={cn(headerButtonClass, 'max-w-48 pl-1.5')}>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className={cn(
+                                            headerButtonClass,
+                                            'group max-w-52 gap-2.5 pl-1 pr-2.5 data-[state=open]:border-primary/30 data-[state=open]:bg-primary/5',
+                                        )}
+                                    >
                                         <Avatar
                                             src={adminUser.avatar}
                                             name={adminUser.name}
                                             className="h-7 w-7 shrink-0"
                                         />
                                         <span className="hidden truncate md:inline">{adminUser.name}</span>
-                                        <ChevronDown className="hidden h-4 w-4 shrink-0 text-slate-400 md:inline" />
+                                        <ChevronDown className="hidden h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 group-data-[state=open]:rotate-180 md:inline" />
                                     </button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label="User menu"
-                                    className="w-72"
-                                    onAction={handleDropdownAction}
-                                    topContent={
-                                        <div className="px-2 py-2">
-                                            <p className="text-sm font-medium text-slate-900">{adminUser.name}</p>
-                                            <p className="text-sm text-slate-500">{adminUser.email}</p>
-                                            <Badge variant="secondary" className="mt-1 w-fit">{roleLabel}</Badge>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-72 overflow-hidden rounded-md border-slate-200 p-0 shadow-lg">
+                                    <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-4 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <Avatar
+                                                src={adminUser.avatar}
+                                                name={adminUser.name}
+                                                className="h-11 w-11 shrink-0 ring-2 ring-white shadow-sm"
+                                            />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="truncate text-sm font-semibold text-slate-900">{adminUser.name}</p>
+                                                <p className="truncate text-xs text-slate-500">{adminUser.email}</p>
+                                            </div>
                                         </div>
-                                    }
-                                >
-                                    <DropdownItem key="profile" startContent={<UserCircle className="h-4 w-4" />}>My Profile</DropdownItem>
-                                    {isAuthor ? null : <DropdownItem key="settings" startContent={<Settings className="h-4 w-4" />}>Settings</DropdownItem>}
-                                    <DropdownItem key="website" startContent={<Home className="h-4 w-4" />}>Back to Website</DropdownItem>
-                                    <DropdownSection>
-                                        <DropdownItem key="logout" startContent={<LogOut className="h-4 w-4" />} className="text-danger" color="danger">
+                                        <span className="mt-3 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                                            {roleLabel}
+                                        </span>
+                                    </div>
+
+                                    <div className="p-1.5">
+                                        <DropdownMenuItem
+                                            className="cursor-pointer rounded-md px-3 py-2.5"
+                                            onSelect={goToProfile}
+                                        >
+                                            <UserCircle className="h-4 w-4 text-slate-500" />
+                                            My Profile
+                                        </DropdownMenuItem>
+                                        {!isAuthor ? (
+                                            <DropdownMenuItem
+                                                className="cursor-pointer rounded-md px-3 py-2.5"
+                                                onSelect={() => router.push(getAdminSectionRoutePath('settings'))}
+                                            >
+                                                <Settings className="h-4 w-4 text-slate-500" />
+                                                Settings
+                                            </DropdownMenuItem>
+                                        ) : null}
+                                        <DropdownMenuItem
+                                            className="cursor-pointer rounded-md px-3 py-2.5"
+                                            onSelect={() => router.push(getHomeRoutePath())}
+                                        >
+                                            <Home className="h-4 w-4 text-slate-500" />
+                                            Back to Website
+                                        </DropdownMenuItem>
+                                    </div>
+
+                                    <DropdownMenuSeparator className="mx-0 bg-slate-100" />
+
+                                    <div className="p-1.5">
+                                        <DropdownMenuItem
+                                            variant="destructive"
+                                            className="cursor-pointer rounded-md px-3 py-2.5"
+                                            onSelect={handleLogout}
+                                        >
+                                            <LogOut className="h-4 w-4" />
                                             Sign Out
-                                        </DropdownItem>
-                                    </DropdownSection>
-                                </DropdownMenu>
-                            </Dropdown>
+                                        </DropdownMenuItem>
+                                    </div>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                 </div>

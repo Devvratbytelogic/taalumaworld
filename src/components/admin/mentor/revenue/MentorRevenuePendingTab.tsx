@@ -42,7 +42,8 @@ export function MentorRevenuePendingTab() {
               <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
                 <th className="px-5 py-3 font-medium">Period</th>
                 <th className="px-5 py-3 font-medium">Amount</th>
-                <th className="px-5 py-3 font-medium text-right">Expected payout</th>
+                <th className="px-5 py-3 font-medium">Expected payout</th>
+                <th className="px-5 py-3 font-medium text-right">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -50,7 +51,8 @@ export function MentorRevenuePendingTab() {
                 <tr key={row.period} className="border-b border-slate-50 last:border-0">
                   <td className="px-5 py-4 font-medium text-slate-900">{row.period}</td>
                   <td className="px-5 py-4 text-slate-600">{formatKes(row.amount)}</td>
-                  <td className="px-5 py-4 text-right text-slate-900">{row.payoutDate}</td>
+                  <td className="px-5 py-4 text-slate-600">{row.payoutDate}</td>
+                  <td className="px-5 py-4 text-right text-slate-600">{row.status}</td>
                 </tr>
               ))}
             </tbody>

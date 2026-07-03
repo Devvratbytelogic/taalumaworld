@@ -15,6 +15,7 @@ import {
 
 const thisMonth = REVENUE_BY_MONTH[0];
 const totalPlatformShare = REVENUE_BY_MONTH.reduce((sum, row) => sum + row.platformShare, 0);
+const totalRefunds = REVENUE_BY_MONTH.reduce((sum, row) => sum + row.refunds, 0);
 
 export function MentorRevenueEarnedTab() {
   return (
@@ -22,28 +23,14 @@ export function MentorRevenueEarnedTab() {
       <AdminPageHeader
         eyebrow="Performance & Revenue"
         title="Revenue Earned"
-        description="Total earnings from blueprint sales after platform share."
+        description="Total earnings after platform share, discounts, and refunds."
       />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AdminStatCard
-          label="Total earned"
-          value={formatKes(MENTOR_OVERVIEW.revenueEarned)}
-          icon={TrendingUp}
-          tone="green"
-        />
-        <AdminStatCard
-          label="This month"
-          value={formatKes(thisMonth.earned)}
-          icon={CalendarDays}
-          tone="blue"
-        />
-        <AdminStatCard
-          label="Platform share (total)"
-          value={formatKes(totalPlatformShare)}
-          icon={Wallet}
-          tone="slate"
-        />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <AdminStatCard label="Total earned" value={formatKes(MENTOR_OVERVIEW.revenueEarned)} icon={TrendingUp} tone="green" />
+        <AdminStatCard label="This month" value={formatKes(thisMonth.earned)} icon={CalendarDays} tone="blue" />
+        <AdminStatCard label="Platform share" value={formatKes(totalPlatformShare)} icon={Wallet} tone="slate" />
+        <AdminStatCard label="Refunds (total)" value={formatKes(totalRefunds)} icon={Wallet} tone="orange" />
       </div>
 
       <AdminTableShell>
@@ -53,6 +40,8 @@ export function MentorRevenueEarnedTab() {
               <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
                 <th className="px-5 py-3 font-medium">Month</th>
                 <th className="px-5 py-3 font-medium">Gross</th>
+                <th className="px-5 py-3 font-medium">Discounts</th>
+                <th className="px-5 py-3 font-medium">Refunds</th>
                 <th className="px-5 py-3 font-medium">Platform share</th>
                 <th className="px-5 py-3 font-medium text-right">Your share</th>
               </tr>
@@ -62,6 +51,8 @@ export function MentorRevenueEarnedTab() {
                 <tr key={row.month} className="border-b border-slate-50 last:border-0">
                   <td className="px-5 py-4 font-medium text-slate-900">{row.month}</td>
                   <td className="px-5 py-4 text-slate-600">{formatKes(row.gross)}</td>
+                  <td className="px-5 py-4 text-slate-600">{formatKes(row.discounts)}</td>
+                  <td className="px-5 py-4 text-slate-600">{formatKes(row.refunds)}</td>
                   <td className="px-5 py-4 text-slate-600">{formatKes(row.platformShare)}</td>
                   <td className="px-5 py-4 text-right font-medium text-slate-900">{formatKes(row.earned)}</td>
                 </tr>

@@ -90,6 +90,18 @@ export function getMentorRevenueByBlueprintRoutePath(): string {
   return '/admin/mentor/revenue-by-blueprint';
 }
 
+export function getMentorWalletRoutePath(): string {
+  return '/admin/mentor/wallet';
+}
+
+export function getMentorReferralsRoutePath(): string {
+  return '/admin/mentor/referrals';
+}
+
+export function getMentorCouponsRoutePath(): string {
+  return '/admin/mentor/coupons';
+}
+
 export function getMentorBooksRoutePath(): string {
   return '/admin/mentor/books';
 }

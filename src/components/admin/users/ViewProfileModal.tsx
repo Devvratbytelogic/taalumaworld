@@ -8,14 +8,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { AdminListUser } from './UserListing';
+import type { IAllUsersDataEntity } from '@/types/allUsers';
 
 interface ViewProfileModalProps {
-  user: AdminListUser | null;
+  user: IAllUsersDataEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSendEmail?: (user: AdminListUser) => void;
-  onSuspend?: (user: AdminListUser) => void;
+  onSendEmail?: (user: IAllUsersDataEntity) => void;
+  onSuspend?: (user: IAllUsersDataEntity) => void;
 }
 
 export function ViewProfileModal({
@@ -37,7 +37,7 @@ export function ViewProfileModal({
         <div className="space-y-6 pt-2">
           <div className="flex flex-col items-center gap-4">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarImage src={user.profile_pic ?? ''} alt={user.name} />
               <AvatarFallback className="text-2xl">{user.name[0]}</AvatarFallback>
             </Avatar>
             <div className="text-center">
@@ -49,8 +49,8 @@ export function ViewProfileModal({
           <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Role</span>
-              <Badge variant={user.role === 'Premium User' ? 'default' : 'outline'}>
-                {user.role}
+              <Badge variant={user.role?.name === 'Premium User' ? 'default' : 'outline'}>
+                {user.role?.name ?? '-'}
               </Badge>
             </div>
             <div className="flex justify-between text-sm">

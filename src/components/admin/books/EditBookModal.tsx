@@ -25,7 +25,7 @@ import toast from '@/utils/toast';
 import { editBookSchema } from '@/utils/formValidation';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
-import type { LeadersEntity } from '@/types/authleaders';
+import type { IAuthorLeaderEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
 import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
 
@@ -100,7 +100,7 @@ interface EditBookModalProps {
   book: IAllBooksAPIResponseDataEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  thoughtLeaders: LeadersEntity[];
+  thoughtLeaders: IAuthorLeaderEntity[];
   categories: CategoryEntity[];
   onSubmit: (args: { id: string; values: FormData }) => { unwrap: () => Promise<unknown> };
   isSubmitting?: boolean;
@@ -299,7 +299,7 @@ export function EditBookModal({
   };
 
   const getCategoryId = (c: CategoryEntity) => (c as IAllCategoriesAPIResponseData).id ?? (c as IAllCategoriesAPIResponseData)._id;
-  const getLeaderId = (l: LeadersEntity) => l.id ?? l._id;
+  const getLeaderId = (l: IAuthorLeaderEntity) => l.id ?? l._id;
 
   if (!book) return null;
 

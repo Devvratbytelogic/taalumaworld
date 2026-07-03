@@ -15,7 +15,7 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { authorSchema } from '@/utils/formValidation';
-import type { LeadersEntity } from '@/types/authleaders';
+import type { IAuthorLeaderEntity } from '@/types/authleaders';
 
 export type EditAuthorFormValues = {
   fullName: string;
@@ -25,7 +25,7 @@ export type EditAuthorFormValues = {
   avatar: File | null;
 };
 
-function getInitialValuesFromLeader(leader: LeadersEntity | null): EditAuthorFormValues {
+function getInitialValuesFromLeader(leader: IAuthorLeaderEntity | null): EditAuthorFormValues {
   if (!leader) {
     return {
       fullName: '',
@@ -45,7 +45,7 @@ function getInitialValuesFromLeader(leader: LeadersEntity | null): EditAuthorFor
 }
 
 interface EditAuthorModalProps {
-  leader: LeadersEntity | null;
+  leader: IAuthorLeaderEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;

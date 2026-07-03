@@ -24,7 +24,7 @@ import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
-import type { LeadersEntity } from '@/types/authleaders';
+import type { IAuthorLeaderEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
 import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
 import { cn } from '@/components/ui/utils';
@@ -51,7 +51,7 @@ const initialFormValues = {
 interface AddBookModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  thoughtLeaders: LeadersEntity[];
+  thoughtLeaders: IAuthorLeaderEntity[];
   categories: CategoryEntity[];
   onSubmit: (payload: FormData) => { unwrap: () => Promise<unknown> };
   isSubmitting?: boolean;
@@ -228,7 +228,7 @@ export function AddBookModal({
   };
 
   const getCategoryId = (c: CategoryEntity) => (c as IAllCategoriesAPIResponseData).id ?? (c as IAllCategoriesAPIResponseData)._id;
-  const getLeaderId = (l: LeadersEntity) => l.id ?? l._id;
+  const getLeaderId = (l: IAuthorLeaderEntity) => l.id ?? l._id;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

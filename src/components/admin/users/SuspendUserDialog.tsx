@@ -7,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import type { AdminListUser } from './UserListing';
+import type { IAllUsersDataEntity } from '@/types/allUsers';
 
 interface SuspendUserDialogProps {
-  user: AdminListUser | null;
+  user: IAllUsersDataEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;

@@ -96,10 +96,8 @@ export function RichTextEditor({
 
   return (
     <div
-      className={cn(
-        'border border-input rounded-2xl bg-input-background overflow-hidden transition-[color,box-shadow] focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50',
-        className
-      )}
+      data-slot="rich-text-editor"
+      className={cn('overflow-hidden border border-slate-200 bg-white', className)}
       style={{ minHeight }}
     >
       <MDXEditor

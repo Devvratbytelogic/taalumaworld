@@ -40,9 +40,9 @@ export function AdminContactUsTab() {
     const loading = isLoading || isFetching;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <div className="admin-surface p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-foreground mb-2">Contact Us</h1>
@@ -58,7 +58,7 @@ export function AdminContactUsTab() {
             </div>
 
             {/* Search */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm">
+            <div className="admin-surface p-5">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
@@ -72,7 +72,7 @@ export function AdminContactUsTab() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+            <div className="admin-surface overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>

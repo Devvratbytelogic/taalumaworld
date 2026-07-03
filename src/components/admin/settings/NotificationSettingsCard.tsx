@@ -11,7 +11,7 @@ const notificationItems = [
 
 export function NotificationSettingsCard() {
   return (
-    <Card className="p-6 rounded-3xl">
+    <Card className="admin-surface p-6">
       <div className="flex items-start gap-4 mb-6">
         <div className="p-3 bg-purple-50 rounded-xl">
           <Bell className="h-6 w-6 text-purple-600" />

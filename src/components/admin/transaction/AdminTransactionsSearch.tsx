@@ -36,7 +36,7 @@ export function AdminTransactionsSearch({
   onLimitChange,
 }: AdminTransactionsSearchProps) {
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm">
+    <div className="admin-surface p-5">
       <div className="flex flex-col gap-4">
         {/* Search */}
         <div className="relative">

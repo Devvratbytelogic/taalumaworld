@@ -1,4 +1,5 @@
 import { Badge } from '../../ui/badge';
+import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import type { ContentMode } from '../../../types/admin';
 
 interface AdminReportsHeaderProps {
@@ -7,20 +8,13 @@ interface AdminReportsHeaderProps {
 
 export function AdminReportsHeader({ contentMode }: AdminReportsHeaderProps) {
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-sm">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Reports & Analytics
-          </h1>
-          <p className="text-muted-foreground">
-            Generate and download detailed reports
-          </p>
-        </div>
-        <Badge variant="outline" className="h-fit">
-          {contentMode === 'chapters' ? 'Blueprint Mode' : 'Series Mode'}
-        </Badge>
-      </div>
-    </div>
+    <AdminPageHeader
+      title="Reports & analytics"
+      description="Generate and download detailed reports"
+    >
+      <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
+        {contentMode === 'chapters' ? 'Blueprint mode' : 'Series mode'}
+      </Badge>
+    </AdminPageHeader>
   );
 }

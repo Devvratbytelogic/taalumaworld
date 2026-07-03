@@ -65,7 +65,7 @@ export function AdminReviewsTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminReviewsHeader totalCount={mockReviews.length} />
 
       <AdminReviewsSearch

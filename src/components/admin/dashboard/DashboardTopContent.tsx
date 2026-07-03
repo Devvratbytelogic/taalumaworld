@@ -1,9 +1,9 @@
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
 import { Progress } from '@heroui/react';
-import Button from '../../ui/Button';
-import { Card } from '../../ui/card';
-import { Badge } from '../../ui/badge';
+import {
+  AdminPanel,
+  AdminSectionHeader,
+  AdminTextLink,
+} from '@/components/admin/layout/AdminContent';
 import type { ContentMode } from '../../../types/admin';
 
 export interface TopContentItem {
@@ -22,61 +22,53 @@ interface DashboardTopContentProps {
 
 export function DashboardTopContent({ items, contentMode, isLoading }: DashboardTopContentProps) {
   const maxRevenue = items.length > 0 ? Math.max(...items.map((i) => i.revenue), 1) : 1;
+  const listHref = contentMode === 'chapters' ? '/admin/chapters' : '/admin/books';
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">
-          Top {contentMode === 'chapters' ? 'Blueprints' : 'Series'}
-        </h3>
-        <Link href={contentMode === 'chapters' ? '/admin/chapters' : '/admin/books'}>
-          <Button className="global_btn rounded_full outline_primary">
-            View All
-            <ArrowUpRight className="h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
+    <AdminPanel>
+      <AdminSectionHeader
+        title={`Top ${contentMode === 'chapters' ? 'blueprints' : 'series'}`}
+        action={<AdminTextLink href={listHref}>View all</AdminTextLink>}
+      />
+
       <div className="space-y-4">
         {isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="space-y-2 animate-pulse">
+              <div key={i} className="animate-pulse space-y-2 rounded-lg px-2 py-1">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted shrink-0" />
+                  <div className="h-8 w-8 shrink-0 rounded-lg bg-slate-100" />
                   <div className="flex-1 space-y-1">
-                    <div className="w-2/3 h-4 rounded bg-muted" />
-                    <div className="w-1/3 h-3 rounded bg-muted" />
+                    <div className="h-4 w-2/3 rounded bg-slate-100" />
+                    <div className="h-3 w-1/3 rounded bg-slate-100" />
                   </div>
-                  <div className="w-12 h-5 rounded bg-muted" />
                 </div>
-                <div className="h-2 rounded bg-muted" />
+                <div className="h-1.5 rounded bg-slate-100" />
               </div>
             ))
           : items.length === 0
-            ? (
-                <p className="text-sm text-muted-foreground text-center py-6">No content available</p>
-              )
+            ? <p className="py-8 text-center text-sm text-slate-500">No content available</p>
             : items.map((item, index) => (
-                <div key={item.id} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm shrink-0">
+                <div key={item.id} className="space-y-2 rounded-lg px-2 py-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold text-slate-600">
                         {index + 1}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{item.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Price: KSh {item.revenue.toLocaleString()}
-                        </p>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-slate-900">{item.title}</p>
+                        <p className="text-xs text-slate-500">KSh {item.revenue.toLocaleString()}</p>
                       </div>
                     </div>
-                    <Badge variant={item.trend >= 0 ? 'default' : 'destructive'} className="ml-2">
+                    <span
+                      className={`shrink-0 text-xs font-medium ${item.trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+                    >
                       {item.trend >= 0 ? '+' : ''}{item.trend}%
-                    </Badge>
+                    </span>
                   </div>
-                  <Progress value={(item.revenue / maxRevenue) * 100} className="h-2" />
+                  <Progress value={(item.revenue / maxRevenue) * 100} className="h-1.5" />
                 </div>
               ))}
       </div>
-    </Card>
+    </AdminPanel>
   );
 }

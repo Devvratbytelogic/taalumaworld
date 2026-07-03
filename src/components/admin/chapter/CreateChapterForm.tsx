@@ -3,10 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
-import { Save, X, FileText, Upload } from 'lucide-react';
+import { Save, X, Upload } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -33,7 +32,9 @@ import type { Book, Author } from '@/types/content';
 import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { Label } from '@/components/ui/label';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+import { cn } from '@/components/ui/utils';
 
 const initialFormValues = {
   bookId: '',
@@ -224,11 +225,11 @@ export function CreateChapterForm() {
   const isSubmittingState = isSubmitting || isAdding;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="space-y-6">
+    <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
+      <div className="space-y-2">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="chapter-book">Series<span className="text-red-500">*</span></Label>
+            <Label>Series <span className="text-red-500">*</span></Label>
             <Select
               value={values.bookId || undefined}
               onValueChange={(value) => {
@@ -243,9 +244,7 @@ export function CreateChapterForm() {
               }}
               disabled={books.length === 0}
             >
-              <SelectTrigger
-                className={errors.bookId && touched.bookId ? 'border-red-500' : ''}
-              >
+              <SelectTrigger className={errors.bookId && touched.bookId ? 'border-red-500' : undefined}>
                 <SelectValue placeholder={books.length === 0 ? 'No series available' : 'Select series'} />
               </SelectTrigger>
               <SelectContent>
@@ -265,7 +264,7 @@ export function CreateChapterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="chapter-title">Title<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-title">Title <span className="text-red-500">*</span></Label>
             <Input
               id="chapter-title"
               name="title"
@@ -278,7 +277,7 @@ export function CreateChapterForm() {
               }}
               onBlur={handleBlur}
               disabled={isSubmittingState}
-              className={errors.title && touched.title ? 'border-red-500' : ''}
+              className={errors.title && touched.title ? 'border-red-500' : undefined}
             />
             {errors.title && touched.title && (
               <p className="text-sm text-red-600">{errors.title}</p>
@@ -295,7 +294,7 @@ export function CreateChapterForm() {
             readOnly
             disabled
             placeholder="Auto-generated from title"
-            className="bg-muted/50"
+            
           />
         </div>
 
@@ -310,7 +309,7 @@ export function CreateChapterForm() {
             onBlur={handleBlur}
             disabled={isSubmittingState}
             rows={3}
-            className="rounded-2xl"
+           
           />
         </div>
 
@@ -325,26 +324,18 @@ export function CreateChapterForm() {
           />
         </div>
 
-        <div className="border border-dashed border-border rounded-2xl p-6 bg-muted/20 space-y-3">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <FileText className="h-5 w-5" />
-            <span className="font-medium">Upload PDF (optional)</span>
+        <div className="blueprint-form-section">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Upload PDF (optional)</h3>
+            <p className="mt-1 text-sm text-slate-500">Attach a PDF file for this blueprint (max 5MB).</p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Attach a PDF file for this blueprint (max 5MB). The file can be stored and linked for readers.
-          </p>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="border-input bg-input-background focus-visible:border-ring flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50">
-              <Upload className="h-4 w-4" />
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={handlePdfChange}
-                className="sr-only"
-              />
+            <label className="blueprint-file-picker w-fit">
+              <Upload className="h-4 w-4 shrink-0" />
+              <input type="file" accept="application/pdf" onChange={handlePdfChange} className="sr-only" />
               {pdfFile ? pdfFile.name : 'Choose PDF...'}
             </label>
-            {pdfFile && (
+            {pdfFile ? (
               <Button
                 type="button"
                 className="global_btn rounded_full outline_primary text-destructive hover:bg-destructive/10"
@@ -352,13 +343,13 @@ export function CreateChapterForm() {
               >
                 Remove PDF
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="chapter-sequence">Blueprint Number<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-sequence">Blueprint number <span className="text-red-500">*</span></Label>
             <Input
               id="chapter-sequence"
               name="sequence"
@@ -379,7 +370,7 @@ export function CreateChapterForm() {
                 handleBlur(e);
               }}
               disabled={isSubmittingState}
-              className={errors.sequence && touched.sequence ? 'border-red-500' : ''}
+              className={errors.sequence && touched.sequence ? 'border-red-500' : undefined}
             />
             {errors.sequence && touched.sequence && (
               <p className="text-sm text-red-600">{errors.sequence}</p>
@@ -433,7 +424,7 @@ export function CreateChapterForm() {
               </div>
               {!values.isFree && (
                 <div className="space-y-2 max-w-xs">
-                  <Label htmlFor="chapter-price">Price (KSH)<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="chapter-price">Price (KSH) <span className="text-red-500">*</span></Label>
                   <Input
                     id="chapter-price"
                     name="price"
@@ -453,7 +444,7 @@ export function CreateChapterForm() {
                     }}
                     onBlur={handleBlur}
                     disabled={isSubmittingState}
-                    className={errors.price && touched.price ? 'border-red-500' : ''}
+                    className={errors.price && touched.price ? 'border-red-500' : undefined}
                   />
                   {errors.price && touched.price && (
                     <p className="text-sm text-red-600">{errors.price}</p>
@@ -467,7 +458,7 @@ export function CreateChapterForm() {
             </div>
           )}
           <div className="space-y-2 max-w-xs">
-            <Label htmlFor="chapter-status">Status<span className="text-red-500">*</span></Label>
+            <Label>Status <span className="text-red-500">*</span></Label>
             <Select
               value={values.status}
               onValueChange={(value) => {
@@ -475,9 +466,7 @@ export function CreateChapterForm() {
                 setFieldTouched('status', true);
               }}
             >
-              <SelectTrigger
-                className={errors.status && touched.status ? 'border-red-500' : ''}
-              >
+              <SelectTrigger className={errors.status && touched.status ? 'border-red-500' : undefined}>
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
@@ -492,10 +481,10 @@ export function CreateChapterForm() {
         </div>
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="space-y-2 flex-1 ">
-            <Label htmlFor="chapter-image">Featured Image<span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-image">Featured image <span className="text-red-500">*</span></Label>
             <label
               htmlFor="chapter-image"
-              className={`border-input bg-input-background focus-visible:border-ring flex h-10 w-full cursor-pointer items-center rounded-full border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 ${errors.cover_image && touched.cover_image ? 'border-red-500' : ''}`}
+              className={cn('blueprint-file-picker', errors.cover_image && touched.cover_image && 'border-red-500')}
             >
               <input
                 id="chapter-image"
@@ -514,7 +503,7 @@ export function CreateChapterForm() {
           </div>
           {featuredImagePreviewUrl ? (
             <div className="relative inline-block">
-              <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-square max-w-32">
+              <div className="image-preview">
                 <img
                   src={featuredImagePreviewUrl}
                   alt="Blueprint preview"
@@ -531,10 +520,8 @@ export function CreateChapterForm() {
               </Button>
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-muted-foreground/30 aspect-square max-w-32 flex items-center justify-center bg-muted/30">
-              <span className="text-sm text-muted-foreground px-3 text-center">
-                Preview
-              </span>
+            <div className="image-preview-placeholder">
+              <span className="px-3 text-center text-sm text-slate-400">Preview</span>
             </div>
           )}
         
@@ -584,7 +571,7 @@ export function CreateChapterForm() {
         </Link>
       </AgreementCheckbox>
 
-      <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
+      <div className="form-footer">
         <Button
           type="submit"
           className="global_btn rounded_full bg_primary"

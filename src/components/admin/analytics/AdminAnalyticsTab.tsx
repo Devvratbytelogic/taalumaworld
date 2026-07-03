@@ -29,7 +29,7 @@ export function AdminAnalyticsTab({ contentMode }: AdminAnalyticsTabProps) {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminAnalyticsHeader contentMode={contentMode} />
       <AnalyticsStatsGrid stats={stats} />
       <AnalyticsChartsSection />

@@ -139,7 +139,7 @@ export function AddCategoryModal({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="border-input flex h-9 w-full items-center justify-between gap-2 rounded-full border bg-input-background px-4 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4"
+                    className="admin-form-trigger w-full"
                   >
                     <span className={values.subcategories.length === 0 ? 'text-muted-foreground' : ''}>
                       {values.subcategories.length === 0

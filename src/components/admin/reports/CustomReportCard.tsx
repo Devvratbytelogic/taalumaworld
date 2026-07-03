@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 
 export function CustomReportCard() {
   return (
-    <Card className="rounded-3xl shadow-sm">
+    <Card className="admin-surface">
       <CardHeader>
         <CardTitle>Custom Report Generator</CardTitle>
         <CardDescription>

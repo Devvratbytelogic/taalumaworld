@@ -2,26 +2,18 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import Button from '../../ui/Button';
 import { getCreateChapterRoutePath } from '@/routes/routes';
+import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 
 export function AdminChaptersHeader() {
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-sm">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Blueprints Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage all blueprints across all series
-          </p>
-        </div>
-        <Link href={getCreateChapterRoutePath()}>
-          <Button className="global_btn rounded_full bg_primary">
-            <Plus className="h-4 w-4" />
-            Create New Blueprint
-          </Button>
-        </Link>
-      </div>
-    </div>
+    <AdminPageHeader
+      title="Blueprints management"
+      description="Manage all blueprints across all series"
+    >
+      <Button as={Link} href={getCreateChapterRoutePath()} className="global_btn rounded_full bg_primary">
+        <Plus className="h-4 w-4" />
+        Create new blueprint
+      </Button>
+    </AdminPageHeader>
   );
 }

@@ -38,7 +38,7 @@ export function AddEditRoleModal() {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="lg" scrollBehavior="inside">
-            <ModalContent>
+            <ModalContent className="admin_panel">
                 <ModalHeader className="flex flex-col gap-1">
                     <p className="text-xl font-bold">{isEdit ? 'Edit Role' : 'Create Role'}</p>
                     <p className="text-sm font-normal text-muted-foreground">

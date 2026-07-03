@@ -1,16 +1,10 @@
+import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
+
 export function AdminActivityLogsHeader() {
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-sm">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Activity Logs
-          </h1>
-          <p className="text-muted-foreground">
-            Monitor platform activity and user actions
-          </p>
-        </div>
-      </div>
-    </div>
+    <AdminPageHeader
+      title="Activity logs"
+      description="Monitor platform activity and user actions"
+    />
   );
 }

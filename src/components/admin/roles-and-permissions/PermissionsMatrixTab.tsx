@@ -6,6 +6,9 @@ import { RotateCcw, Save, Search, Shield, Lock } from 'lucide-react';
 import { useGetPermissionsMatrixQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import type { IPermission } from '@/types/rolesPermissions';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { adminPanelClass } from '@/components/admin/layout/AdminContent';
+import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 
 export function PermissionsMatrixTab() {
@@ -110,7 +113,7 @@ export function PermissionsMatrixTab() {
 
     if (loading) {
         return (
-            <div className="bg-white rounded-3xl shadow-sm p-8 space-y-4">
+            <div className="admin-surface p-8 space-y-4">
                 {Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />
                 ))}
@@ -153,13 +156,12 @@ export function PermissionsMatrixTab() {
 
             <div className="flex flex-col lg:flex-row gap-4 min-h-[520px]">
                 {/* Role list */}
-                <div className="lg:w-72 shrink-0 bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
-                    <div className="p-4 border-b border-gray-100 space-y-3">
-                        <p className="text-sm font-semibold text-gray-800">Roles</p>
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <input
-                                className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
+                <div className={cn(adminPanelClass, 'lg:w-72 shrink-0 flex flex-col overflow-hidden')}>
+                    <div className="border-b border-slate-200 p-4 space-y-3">
+                        <p className="text-sm font-semibold text-slate-900">Roles</p>
+                        <div className="admin-search-input relative">
+                            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Input
                                 placeholder="Search roles..."
                                 value={roleSearch}
                                 onChange={(e) => setRoleSearch(e.target.value)}
@@ -207,27 +209,26 @@ export function PermissionsMatrixTab() {
                 </div>
 
                 {/* Permission editor */}
-                <div className="flex-1 min-w-0 bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+                <div className={cn(adminPanelClass, 'flex-1 min-w-0 flex flex-col overflow-hidden')}>
                     {!selectedRole ? (
-                        <div className="flex-1 flex items-center justify-center p-8 text-muted-foreground text-sm">
+                        <div className="flex flex-1 items-center justify-center p-8 text-sm text-slate-500">
                             Select a role to manage its permissions
                         </div>
                     ) : (
                         <>
-                            <div className="p-4 sm:p-5 border-b border-gray-100 space-y-3">
+                            <div className="space-y-3 border-b border-slate-200 p-4 sm:p-5">
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <h3 className="text-lg font-semibold text-gray-900">{selectedRole.name}</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900">{selectedRole.name}</h3>
                                     {selectedRole.is_system && (
                                         <Badge variant="secondary" className="text-xs">System</Badge>
                                     )}
-                                    <Badge variant="outline" className="text-xs ml-auto">
+                                    <Badge variant="outline" className="ml-auto text-xs">
                                         {rolePermissions.length} / {permissions.length} permissions
                                     </Badge>
                                 </div>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <input
-                                        className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                <div className="admin-search-input relative">
+                                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                    <Input
                                         placeholder="Filter permissions..."
                                         value={permSearch}
                                         onChange={(e) => setPermSearch(e.target.value)}

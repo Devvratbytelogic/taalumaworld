@@ -19,7 +19,7 @@ export function ReportsGrid({ reports }: ReportsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {reports.map((report) => (
-        <Card key={report.id} className="rounded-3xl shadow-sm">
+        <Card key={report.id} className="admin-surface">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">

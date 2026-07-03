@@ -1,36 +1,28 @@
-import { CreateChapterForm } from '@/components/admin/chapter/CreateChapterForm';
-import { FileText } from 'lucide-react';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { CreateChapterForm } from '@/components/admin/chapter/CreateChapterForm';
+import { AdminPage, AdminPageHeader, AdminPanel } from '@/components/admin/layout/AdminContent';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 
 export default function CreateChapterPage() {
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col gap-3">
-                <Link
-                    href={getAdminSectionRoutePath('chapters')}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
-                >
-                    ← Back to Blueprints
-                </Link>
-                <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-primary/10 p-3">
-                        <FileText className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                            Create New Blueprint
-                        </h1>
-                        {/* <p className="text-muted-foreground mt-0.5">
-                            Add a new chapter with rich content and optional PDF attachment
-                        </p> */}
-                    </div>
-                </div>
-            </div>
+  return (
+    <AdminPage>
+      <Link
+        href={getAdminSectionRoutePath('chapters')}
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to blueprints
+      </Link>
 
-            <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
-                <CreateChapterForm />
-            </div>
-        </div>
-    );
+      <AdminPageHeader
+        title="Create new blueprint"
+        description="Add blueprint content, metadata, and an optional PDF attachment."
+      />
+
+      <AdminPanel className="p-6 md:p-7" padding={false}>
+        <CreateChapterForm />
+      </AdminPanel>
+    </AdminPage>
+  );
 }

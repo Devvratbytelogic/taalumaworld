@@ -20,7 +20,7 @@ export function AnalyticsStatsGrid({ stats }: AnalyticsStatsGridProps) {
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.title} className="rounded-3xl shadow-sm">
+          <Card key={stat.title} className="admin-surface">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}

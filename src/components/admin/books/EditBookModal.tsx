@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
+import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import { editBookSchema } from '@/utils/formValidation';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
@@ -458,7 +459,7 @@ export function EditBookModal({
                 <Label htmlFor="edit-book-cover">Cover Image <span className="text-xs text-muted-foreground font-normal">(leave unchanged to keep current)</span></Label>
                 <label
                   htmlFor="edit-book-cover"
-                  className="border-input bg-input-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full cursor-pointer items-center rounded-full border px-4 py-1 text-sm text-muted-foreground transition-[color,box-shadow] outline-none focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50"
+                  className="blueprint-file-picker"
                 >
                   <input
                     id="edit-book-cover"
@@ -474,7 +475,7 @@ export function EditBookModal({
               </div>
               {coverPreviewUrl ? (
                 <div className="mt-3 relative inline-block">
-                  <div className="rounded-2xl overflow-hidden bg-muted border border-border aspect-4/4 max-w-24">
+                  <div className="image-preview max-w-24">
                     <img
                       src={coverPreviewUrl}
                       alt="Cover preview"
@@ -491,10 +492,8 @@ export function EditBookModal({
                   </Button>
                 </div>
               ) : (
-                <div className="mt-3 rounded-2xl border border-dashed border-muted-foreground/30 aspect-4/4 max-w-24 flex items-center justify-center bg-muted/30">
-                  <span className="text-sm text-muted-foreground px-3 text-center">
-                    Select an image to preview
-                  </span>
+                <div className="image-preview-placeholder max-w-24 text-xs">
+                  <span className="px-2">Select an image to preview</span>
                 </div>
               )}
             </div>

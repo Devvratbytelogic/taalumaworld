@@ -28,7 +28,7 @@ export function AdminModerationTab() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminModerationHeader />
       <AdminModerationSearch
         searchQuery={searchQuery}

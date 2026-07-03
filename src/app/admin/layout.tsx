@@ -7,7 +7,7 @@ import { getAdminDashboardRoutePath, getAdminSectionRoutePath, getMentorRoutePat
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
-import type { SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
+import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
 
 const NAV_GROUPS: SidebarNavGroup[] = [
     {
@@ -61,20 +61,20 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     }
 
     return (
-        <div className="min-h-screen bg-[#f4f7fb] admin_panel">
+        <div
+            className="min-h-screen bg-white admin_panel [--admin-header-height:7rem]"
+            style={{ '--admin-sidebar-width': ADMIN_SIDEBAR_WIDTH } as React.CSSProperties}
+        >
             <AdminHeader onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
+            <AdminSidebar
+                groups={NAV_GROUPS}
+                mobileMenuOpen={mobileMenuOpen}
+                onCloseMobileMenu={() => setMobileMenuOpen(false)}
+            />
 
-            <div className="container mx-auto sm:px-4 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <AdminSidebar
-                        groups={NAV_GROUPS}
-                        mobileMenuOpen={mobileMenuOpen}
-                        onCloseMobileMenu={() => setMobileMenuOpen(false)}
-                    />
-
-                    <main className="flex-1 min-w-0">{children}</main>
-                </div>
-            </div>
+            <main className="min-w-0 lg:ml-(--admin-sidebar-width)">
+                <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:py-7">{children}</div>
+            </main>
         </div>
     );
 }

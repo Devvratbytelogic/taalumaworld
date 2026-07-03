@@ -38,7 +38,7 @@ export function AddStaffModal() {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="md">
-            <ModalContent>
+            <ModalContent className="admin_panel">
                 <ModalHeader className="flex flex-col gap-1">
                     <p className="text-xl font-bold">Add Staff Member</p>
                     <p className="text-sm font-normal text-muted-foreground">

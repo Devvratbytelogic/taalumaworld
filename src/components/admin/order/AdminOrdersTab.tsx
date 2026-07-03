@@ -2,23 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Input } from '@heroui/react';
-import { Search, ShoppingBag, BookOpen, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ShoppingBag, BookOpen, FileText } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import { OrderListing } from './OrderListing';
-import { OrderStats } from './OrderStats';
+import { AdminPagination } from '@/components/admin/shared/AdminPagination';
 import { useGetAllBookOrdersQuery, useGetAllBlueprintOrdersQuery } from '@/store/rtkQueries/adminGetApi';
 import AdminOrdersSkeleton from '@/components/skeleton-loader/AdminOrdersSkeleton';
 import { useDebounce } from '@/hooks/useDebounce';
 
 type OrderTab = 'books' | 'blueprints';
 
-const PAGE_LIMIT = 10;
-
 export function AdminOrdersTab() {
     const [activeTab, setActiveTab] = useState<OrderTab>('blueprints');
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
-
+    const [pageLimit, setPageLimit] = useState(10);
     const debouncedSearch = useDebounce(searchQuery, 400);
 
     useEffect(() => {
@@ -27,40 +25,28 @@ export function AdminOrdersTab() {
 
     const queryParams = {
         page,
-        limit: PAGE_LIMIT,
+        limit: pageLimit,
         ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
     };
 
-    const {
-        data: bookData,
-        isLoading: bookLoading,
-        isFetching: bookFetching,
-    } = useGetAllBookOrdersQuery(queryParams, { skip: activeTab !== 'books' });
-
-    const {
-        data: blueprintData,
-        isLoading: blueprintLoading,
-        isFetching: blueprintFetching,
-    } = useGetAllBlueprintOrdersQuery(queryParams, { skip: activeTab !== 'blueprints' });
+    const { data: bookData, isLoading: bookLoading, isFetching: bookFetching } = useGetAllBookOrdersQuery(queryParams, { skip: activeTab !== 'books' });
+    const { data: blueprintData, isLoading: blueprintLoading, isFetching: blueprintFetching } = useGetAllBlueprintOrdersQuery(queryParams, { skip: activeTab !== 'blueprints' });
 
     const activeData = activeTab === 'books' ? bookData : blueprintData;
     const orders = activeData?.data?.orders ?? [];
     const pagination = activeData?.data?.pagination;
 
-    const isLoading =
-        activeTab === 'books' ? bookLoading || bookFetching : blueprintLoading || blueprintFetching;
+    const isLoading = activeTab === 'books' ? bookLoading || bookFetching : blueprintLoading || blueprintFetching;
+    const isFetching = activeTab === 'books' ? bookFetching : blueprintFetching;
 
-    function handleTabSwitch(tab: OrderTab) {
-        setActiveTab(tab);
-        setSearchQuery('');
-        setPage(1);
-    }
+    const totalPages = pagination?.totalPages ?? 1;
+    const totalOrders = pagination?.total ?? 0;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
 
             {/* Header */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <div className="admin-surface p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
@@ -73,10 +59,14 @@ export function AdminOrdersTab() {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-3xl p-2 shadow-sm flex gap-2 w-fit">
+            <div className="admin-surface p-2 flex gap-2 w-fit">
                 <button
                     type="button"
-                    onClick={() => handleTabSwitch('blueprints')}
+                    onClick={() => {
+                        setActiveTab('blueprints');
+                        setSearchQuery('');
+                        setPage(1);
+                    }}
                     className={cn(
                         'flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-medium transition-all',
                         activeTab === 'blueprints'
@@ -97,7 +87,11 @@ export function AdminOrdersTab() {
                 </button>
                 <button
                     type="button"
-                    onClick={() => handleTabSwitch('books')}
+                    onClick={() => {
+                        setActiveTab('books');
+                        setSearchQuery('');
+                        setPage(1);
+                    }}
                     className={cn(
                         'flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-medium transition-all',
                         activeTab === 'books'
@@ -119,7 +113,7 @@ export function AdminOrdersTab() {
             </div>
 
             {/* Search */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm">
+            <div className="admin-surface p-5">
                 <Input
                     startContent={<Search className="h-4 w-4 text-muted-foreground" />}
                     type="search"
@@ -130,12 +124,6 @@ export function AdminOrdersTab() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
             </div>
-
-            {/* Stats */}
-            {/* <OrderStats
-                totalOrders={pagination?.total ?? 0}
-                pageOrders={orders}
-            /> */}
 
             {/* Table */}
             {isLoading ? (
@@ -149,31 +137,20 @@ export function AdminOrdersTab() {
             )}
 
             {/* Pagination */}
-            {!isLoading && pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between bg-white rounded-3xl px-6 py-4 shadow-sm">
-                    <p className="text-sm text-muted-foreground">
-                        Page {pagination.page} of {pagination.totalPages}&nbsp;&middot;&nbsp;{pagination.total} total orders
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            disabled={page <= 1}
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            className="p-2 rounded-xl hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </button>
-                        <span className="text-sm font-medium px-2">{page}</span>
-                        <button
-                            type="button"
-                            disabled={page >= (pagination.totalPages ?? 1)}
-                            onClick={() => setPage((p) => Math.min(pagination.totalPages ?? 1, p + 1))}
-                            className="p-2 rounded-xl hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </button>
-                    </div>
-                </div>
+            {!isLoading && pagination && totalOrders > 0 && (
+                <AdminPagination
+                    page={page}
+                    limit={pageLimit}
+                    total={totalOrders}
+                    totalPages={totalPages}
+                    itemLabel="orders"
+                    disabled={isFetching}
+                    onPageChange={setPage}
+                    onLimitChange={(limit) => {
+                        setPageLimit(limit);
+                        setPage(1);
+                    }}
+                />
             )}
         </div>
     );

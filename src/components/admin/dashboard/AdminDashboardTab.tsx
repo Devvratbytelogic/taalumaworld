@@ -14,6 +14,7 @@ import { DashboardStatsGrid } from './DashboardStatsGrid';
 import { DashboardRecentActivity } from './DashboardRecentActivity';
 import { DashboardTopContent } from './DashboardTopContent';
 import { DashboardQuickActions } from './DashboardQuickActions';
+import { AdminPage } from '@/components/admin/layout/AdminContent';
 import { useGetAllUsersQuery, useGetAllBooksQuery, useGetAllAdminChaptersQuery, useGetAllTestimonialsQuery, useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '../../../store/rtkQueries/adminGetApi';
 import { getAdminSectionRoutePath } from '../../../routes/routes';
 import { KshIcon } from '@/components/ui/AllSVG';
@@ -120,7 +121,7 @@ export function AdminDashboardTab() {
       change: 0,
       icon: KshIcon,
       color: 'green',
-      href: getAdminSectionRoutePath('transactions'),
+      href: getAdminSectionRoutePath('orders'),
     },
     {
       title: contentMode === 'chapters' ? 'Total Series' : 'Total Blueprints',
@@ -169,10 +170,10 @@ export function AdminDashboardTab() {
           }));
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <AdminPage>
       <DashboardWelcomeHeader userName={userName} contentMode={contentMode} />
       <DashboardStatsGrid stats={stats} isLoading={isLoading} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <DashboardRecentActivity items={recentActivity} isLoading={usersLoading} />
         <DashboardTopContent
           items={topContent}
@@ -185,6 +186,6 @@ export function AdminDashboardTab() {
         inactiveContent={inactiveContent}
         isLoading={isLoading}
       />
-    </div>
+    </AdminPage>
   );
 }

@@ -79,7 +79,7 @@ export function AdminCategoriesTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminCategoriesHeader onCreateCategory={() => setIsCreateModalOpen(true)} />
 
       <AdminCategoriesSearch

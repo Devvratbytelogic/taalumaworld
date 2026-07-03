@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import { Avatar } from '@heroui/react';
-import { Shield } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 
 export interface SidebarNavItem {
@@ -19,6 +17,9 @@ export interface SidebarNavGroup {
   items: SidebarNavItem[];
 }
 
+/** Shared width for fixed admin/mentor sidebar */
+export const ADMIN_SIDEBAR_WIDTH = '17rem';
+
 export function SidebarRoleCard({
   name,
   role,
@@ -29,15 +30,17 @@ export function SidebarRoleCard({
   avatar?: string;
 }) {
   return (
-    <div className="mb-5 rounded-2xl border border-primary/10 bg-linear-to-br from-primary/8 via-white to-primary/5 p-4">
+    <div className="border-b border-slate-200/90 px-1 pb-4">
       <div className="flex items-center gap-3">
-        <Avatar src={avatar} name={name} size="sm" className="h-10 w-10 ring-2 ring-white shadow-sm" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-foreground">{name}</p>
-          <Badge variant="secondary" className="mt-1 gap-1 bg-primary/10 text-primary border-0">
-            <Shield className="h-3 w-3" />
-            {role}
-          </Badge>
+        <Avatar
+          src={avatar}
+          name={name}
+          size="sm"
+          className="h-9 w-9 shrink-0 ring-1 ring-slate-200/80"
+        />
+        <div className="min-w-0">
+          <p className="truncate text-base font-semibold tracking-tight text-slate-900">{name}</p>
+          <p className="truncate text-sm text-slate-500">{role}</p>
         </div>
       </div>
     </div>
@@ -60,35 +63,29 @@ export function SidebarNavLink({
       href={item.href}
       onClick={onClick}
       className={cn(
-        'group relative flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+        'group flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm leading-snug transition-colors duration-150',
         isActive
-          ? 'bg-primary text-white shadow-[0_8px_20px_-6px_rgba(10,102,194,0.55)]'
-          : 'text-foreground/75 hover:bg-muted/70 hover:text-foreground',
+          ? 'bg-primary/10 font-medium text-primary'
+          : 'font-normal text-slate-600 hover:bg-slate-50 hover:text-slate-900',
       )}
     >
-      {isActive && (
-        <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white/90" />
-      )}
-      <div className="flex min-w-0 items-center gap-3 pl-0.5">
+      <Icon
+        className={cn(
+          'h-[18px] w-[18px] shrink-0 transition-colors',
+          isActive ? 'text-primary' : 'text-slate-400 group-hover:text-slate-600',
+        )}
+        strokeWidth={isActive ? 2.25 : 2}
+      />
+      <span className="truncate">{item.label}</span>
+      {item.badge ? (
         <span
           className={cn(
-            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
-            isActive
-              ? 'bg-white/20 text-white'
-              : 'bg-muted/60 text-primary group-hover:bg-primary/10',
+            'ml-auto rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums',
+            isActive ? 'bg-primary/15 text-primary' : 'bg-slate-100 text-slate-600',
           )}
         >
-          <Icon className="h-[18px] w-[18px]" />
-        </span>
-        <span className="truncate leading-snug">{item.label}</span>
-      </div>
-      {item.badge ? (
-        <Badge
-          variant={isActive ? 'secondary' : 'default'}
-          className={cn('h-5 shrink-0 px-2', isActive && 'bg-white/20 text-white')}
-        >
           {item.badge}
-        </Badge>
+        </span>
       ) : null}
     </Link>
   );
@@ -104,10 +101,10 @@ export function SidebarNavGroups({
   onNavigate?: () => void;
 }) {
   return (
-    <nav className="space-y-1">
+    <nav className="space-y-5 pt-4">
       {groups.map((group) => (
-        <div key={group.title} className="pt-4 first:pt-0">
-          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
+        <div key={group.title}>
+          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
             {group.title}
           </p>
           <div className="space-y-0.5">
@@ -126,9 +123,20 @@ export function SidebarNavGroups({
   );
 }
 
-export function SidebarPanel({ children }: { children: React.ReactNode }) {
+export function SidebarPanel({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="rounded-2xl border border-border/50 bg-white/90 p-3 shadow-[0_8px_30px_-12px_rgba(10,102,194,0.15)] backdrop-blur-sm">
+    <div
+      className={cn(
+        'flex flex-col overflow-hidden rounded-lg border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_4px_16px_rgba(15,23,42,0.04)]',
+        className,
+      )}
+    >
       {children}
     </div>
   );

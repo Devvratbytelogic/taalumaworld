@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 export function AnalyticsChartsSection() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="rounded-3xl shadow-sm">
+      <Card className="admin-surface">
         <CardHeader>
           <CardTitle>Sales Over Time</CardTitle>
           <CardDescription>Revenue trends for the last 6 months</CardDescription>
@@ -18,7 +18,7 @@ export function AnalyticsChartsSection() {
           </div>
         </CardContent>
       </Card>
-      <Card className="rounded-3xl shadow-sm">
+      <Card className="admin-surface">
         <CardHeader>
           <CardTitle>User Growth</CardTitle>
           <CardDescription>New users registered over time</CardDescription>

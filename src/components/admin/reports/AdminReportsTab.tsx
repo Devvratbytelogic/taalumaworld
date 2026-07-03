@@ -22,7 +22,7 @@ const reportTypes: ReportType[] = [
 
 export function AdminReportsTab({ contentMode }: AdminReportsTabProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminReportsHeader contentMode={contentMode} />
       <ReportsGrid reports={reportTypes} />
       <CustomReportCard />

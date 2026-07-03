@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { MessageSquare, AlertCircle, TrendingUp } from 'lucide-react';
-import Button from '../../ui/Button';
-import { Card } from '../../ui/card';
+import { AlertCircle, ArrowUpRight, MessageSquare, TrendingUp } from 'lucide-react';
+import { cn } from '@/components/ui/utils';
+import { adminPanelClass } from '@/components/admin/layout/AdminContent';
 
 interface DashboardQuickActionsProps {
   pendingTestimonials?: number;
@@ -9,86 +9,78 @@ interface DashboardQuickActionsProps {
   isLoading?: boolean;
 }
 
+const actions = [
+  {
+    key: 'testimonials',
+    title: 'Pending testimonials',
+    description: 'Waiting for moderation',
+    href: '/admin/testimonials',
+    cta: 'Review now',
+    icon: MessageSquare,
+    tone: 'bg-amber-50 text-amber-600',
+    countKey: 'pendingTestimonials' as const,
+  },
+  {
+    key: 'inactive',
+    title: 'Inactive content',
+    description: 'Not yet published',
+    href: '/admin/chapters',
+    cta: 'View queue',
+    icon: AlertCircle,
+    tone: 'bg-red-50 text-red-600',
+    countKey: 'inactiveContent' as const,
+  },
+  {
+    key: 'health',
+    title: 'System health',
+    description: 'All systems operational',
+    href: '/admin/analytics',
+    cta: 'View details',
+    icon: TrendingUp,
+    tone: 'bg-emerald-50 text-emerald-600',
+    staticValue: '98%',
+  },
+];
+
 export function DashboardQuickActions({
   pendingTestimonials = 0,
   inactiveContent = 0,
   isLoading = false,
 }: DashboardQuickActionsProps) {
+  const counts = { pendingTestimonials, inactiveContent };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <Card className="p-6 border-l-4 border-l-orange-500">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-50 rounded-full">
-              <MessageSquare className="h-5 w-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="font-semibold">Pending Testimonials</p>
-              {isLoading ? (
-                <div className="w-10 h-7 rounded bg-muted animate-pulse mt-1" />
-              ) : (
-                <p className="text-2xl font-bold">{pendingTestimonials}</p>
-              )}
-            </div>
-          </div>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Testimonials waiting for moderation
-        </p>
-        <Link href="/admin/testimonials">
-          <Button className="global_btn rounded_full outline_primary">
-            Review Now
-          </Button>
-        </Link>
-      </Card>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {actions.map((action) => {
+        const Icon = action.icon;
+        const value = action.staticValue ?? counts[action.countKey!];
 
-      <Card className="p-6 border-l-4 border-l-red-500">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-50 rounded-full">
-              <AlertCircle className="h-5 w-5 text-red-600" />
+        return (
+          <div key={action.key} className={cn(adminPanelClass, 'flex flex-col p-5')}>
+            <div className="mb-4 flex items-start gap-3">
+              <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg', action.tone)}>
+                <Icon className="h-[18px] w-[18px]" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900">{action.title}</p>
+                {isLoading && !action.staticValue ? (
+                  <div className="mt-1 h-7 w-10 animate-pulse rounded bg-slate-100" />
+                ) : (
+                  <p className="mt-0.5 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <p className="font-semibold">Inactive Content</p>
-              {isLoading ? (
-                <div className="w-10 h-7 rounded bg-muted animate-pulse mt-1" />
-              ) : (
-                <p className="text-2xl font-bold">{inactiveContent}</p>
-              )}
-            </div>
+            <p className="mb-4 text-sm text-slate-500">{action.description}</p>
+            <Link
+              href={action.href}
+              className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              {action.cta}
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </div>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Blueprints/series not yet published
-        </p>
-        <Link href="/admin/chapters">
-          <Button className="global_btn rounded_full outline_primary">
-            View Queue
-          </Button>
-        </Link>
-      </Card>
-
-      <Card className="p-6 border-l-4 border-l-green-500">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-50 rounded-full">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="font-semibold">System Health</p>
-              <p className="text-2xl font-bold">98%</p>
-            </div>
-          </div>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          All systems operational
-        </p>
-        <Link href="/admin/analytics">
-          <Button className="global_btn rounded_full outline_primary">
-            View Details
-          </Button>
-        </Link>
-      </Card>
+        );
+      })}
     </div>
   );
 }

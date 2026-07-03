@@ -11,7 +11,7 @@ export function AdminPaymentsSearch({
   onSearchChange,
 }: AdminPaymentsSearchProps) {
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm">
+    <div className="admin-surface p-5">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input

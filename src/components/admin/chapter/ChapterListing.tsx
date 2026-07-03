@@ -71,7 +71,7 @@ export function ChapterListing({ data, searchQuery = '', setPreviewChapter, setD
 
   return (
     <>
-      <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+      <div className="admin-surface overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>

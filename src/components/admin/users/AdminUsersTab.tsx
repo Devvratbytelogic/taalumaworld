@@ -76,7 +76,7 @@ export function AdminUsersTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminUsersHeader totalCount={users.length} />
 
       <AdminUsersSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />

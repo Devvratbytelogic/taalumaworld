@@ -69,7 +69,7 @@ export function AdminBooksTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminBooksHeader onCreateBook={() => setIsCreateModalOpen(true)} />
 
       <AdminBooksSearch

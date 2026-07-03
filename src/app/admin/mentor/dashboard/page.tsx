@@ -1,8 +1,13 @@
+import { AdminPage, AdminPageHeader } from '@/components/admin/layout/AdminContent';
+
 export default function MentorDashboardPage() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Mentor Dashboard</h1>
-      <p className="text-muted-foreground">Overview of sales, revenue, and blueprint performance.</p>
-    </div>
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="Overview"
+        title="Mentor dashboard"
+        description="Overview of sales, revenue, and blueprint performance."
+      />
+    </AdminPage>
   );
 }

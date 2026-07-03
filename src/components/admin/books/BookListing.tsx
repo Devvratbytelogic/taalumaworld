@@ -35,7 +35,7 @@ export function BookListing({
       </div>
 
       {books.length === 0 && (
-        <div className="bg-white rounded-3xl p-12 shadow-sm">
+        <div className="admin-surface">
           <div className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
               <Book className="h-8 w-8 text-primary" />

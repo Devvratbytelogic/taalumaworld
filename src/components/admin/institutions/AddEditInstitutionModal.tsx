@@ -118,7 +118,7 @@ export function AddEditInstitutionModal() {
             size="2xl"
             scrollBehavior="inside"
         >
-            <ModalContent>
+            <ModalContent className="admin_panel">
                 <ModalHeader className="flex flex-col gap-1">
                     <p className="text-xl font-bold">
                         {isEdit ? 'Edit Institution' : 'Add Partner Institution'}

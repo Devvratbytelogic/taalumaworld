@@ -174,7 +174,7 @@ export function GeneralSettingsCard() {
   }
 
   return (
-    <Card className="p-6 rounded-3xl">
+    <Card className="admin-surface p-6">
       <div className="flex items-start gap-4 mb-6">
         <div className="p-3 bg-blue-50 rounded-xl">
           <Settings className="h-6 w-6 text-blue-600" />
@@ -190,7 +190,7 @@ export function GeneralSettingsCard() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* ── Platform Info ── */}
           <section>

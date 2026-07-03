@@ -49,7 +49,7 @@ export function ExtendPromotionModal() {
             className="modal_container"
             size="md"
         >
-            <ModalContent>
+            <ModalContent className="admin_panel">
                 <ModalHeader className="flex flex-col gap-1">
                     <p className="text-lg font-bold">Extend Promotional Period</p>
                     {institution && (

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
-import { Plus, Search, MoreVertical, Edit2, Trash2, Shield, Lock } from 'lucide-react';
+import { Plus, MoreVertical, Edit2, Trash2, Shield, Lock } from 'lucide-react';
 import {
     useGetAllRolesQuery,
 } from '@/store/rtkQueries/rolesPermissionsApi';
@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
+import { AdminSearchInput, AdminStatCard, AdminTableShell } from '@/components/admin/layout/AdminContent';
 
 function ActionMenu({ role, onEdit, onDelete }: { role: IRole; onEdit: () => void; onDelete: () => void }) {
     const [open, setOpen] = useState(false);
@@ -61,31 +61,18 @@ export function RolesRegistryTab() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-wrap gap-4">
-                <div className="bg-accent rounded-2xl px-5 py-3 text-center">
-                    <p className="text-2xl font-bold text-primary">{roles.length}</p>
-                    <p className="text-xs text-muted-foreground">Total Roles</p>
-                </div>
-                <div className="bg-blue-50 rounded-2xl px-5 py-3 text-center">
-                    <p className="text-2xl font-bold text-blue-600">{systemCount}</p>
-                    <p className="text-xs text-muted-foreground">System Roles</p>
-                </div>
-                <div className="bg-green-50 rounded-2xl px-5 py-3 text-center">
-                    <p className="text-2xl font-bold text-green-600">{roles.length - systemCount}</p>
-                    <p className="text-xs text-muted-foreground">Custom Roles</p>
-                </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <AdminStatCard label="Total Roles" value={roles.length} icon={Shield} tone="blue" />
+                <AdminStatCard label="System Roles" value={systemCount} icon={Lock} tone="slate" />
+                <AdminStatCard label="Custom Roles" value={roles.length - systemCount} icon={Shield} tone="green" />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search roles..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-10"
-                    />
-                </div>
+                <AdminSearchInput
+                    placeholder="Search roles..."
+                    value={search}
+                    onChange={setSearch}
+                />
                 <Button
                     color="primary"
                     className="rounded-xl"
@@ -96,7 +83,7 @@ export function RolesRegistryTab() {
                 </Button>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+            <AdminTableShell>
                 <Table className="table-fixed">
                     <TableHeader>
                         <TableRow>
@@ -175,7 +162,7 @@ export function RolesRegistryTab() {
                         </p>
                     </div>
                 )}
-            </div>
+            </AdminTableShell>
         </div>
     );
 }

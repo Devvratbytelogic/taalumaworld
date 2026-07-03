@@ -1,39 +1,32 @@
-import { FileText } from 'lucide-react';
 import Link from 'next/link';
-import { getAdminSectionRoutePath } from '@/routes/routes';
+import { ArrowLeft } from 'lucide-react';
 import { EditChapterForm } from '@/components/admin/chapter/EditChapterForm';
+import { AdminPage, AdminPageHeader, AdminPanel } from '@/components/admin/layout/AdminContent';
+import { getAdminSectionRoutePath } from '@/routes/routes';
 
 type Props = { params: Promise<{ id: string }> };
 
 export default async function EditChapterPage({ params }: Props) {
-    const { id } = await params;
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col gap-3">
-                <Link
-                    href={getAdminSectionRoutePath('chapters')}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
-                >
-                    ← Back to Blueprints
-                </Link>
-                <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-primary/10 p-3">
-                        <FileText className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                            Edit Blueprint
-                        </h1>
-                        {/* <p className="text-muted-foreground mt-0.5">
-                            Edit a chapter with rich content and optional PDF attachment
-                        </p> */}
-                    </div>
-                </div>
-            </div>
+  const { id } = await params;
 
-            <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
-                <EditChapterForm chapterId={id} />
-            </div>
-        </div>
-    );
+  return (
+    <AdminPage>
+      <Link
+        href={getAdminSectionRoutePath('chapters')}
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to blueprints
+      </Link>
+
+      <AdminPageHeader
+        title="Edit blueprint"
+        description="Update blueprint content, metadata, and attachments."
+      />
+
+      <AdminPanel className="p-6 md:p-7" padding={false}>
+        <EditChapterForm chapterId={id} />
+      </AdminPanel>
+    </AdminPage>
+  );
 }

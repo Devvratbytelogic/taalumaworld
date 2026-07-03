@@ -51,9 +51,9 @@ export function AdminInstitutionsTab() {
     const activeCount = institutions.filter((i) => i.status === 'active').length;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Page header */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <div className="admin-surface p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">

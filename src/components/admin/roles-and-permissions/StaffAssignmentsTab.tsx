@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
-import { Plus, Search, MoreVertical, UserCog, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, MoreVertical, UserCog, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import {
     useGetAllStaffQuery,
     useGetAllRolesQuery,
@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
+import { AdminSearchInput, AdminTableShell } from '@/components/admin/layout/AdminContent';
 
 function formatDate(iso?: string) {
     if (!iso) return '—';
@@ -93,15 +93,11 @@ export function StaffAssignmentsTab() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search by name, email, or role..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-10"
-                    />
-                </div>
+                <AdminSearchInput
+                    placeholder="Search by name, email, or role..."
+                    value={search}
+                    onChange={setSearch}
+                />
                 <Button
                     color="primary"
                     className="rounded-xl"
@@ -112,7 +108,7 @@ export function StaffAssignmentsTab() {
                 </Button>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+            <AdminTableShell>
                 <Table className="table-fixed w-full">
                     <TableHeader>
                         <TableRow>
@@ -173,7 +169,7 @@ export function StaffAssignmentsTab() {
                         </p>
                     </div>
                 )}
-            </div>
+            </AdminTableShell>
         </div>
     );
 }

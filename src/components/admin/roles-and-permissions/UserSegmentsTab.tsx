@@ -3,7 +3,9 @@
 import { Users, GraduationCap, BookOpen, ShieldCheck, FileText } from 'lucide-react';
 import { useGetUserSegmentsQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import type { IUserSegment, UserSegmentType } from '@/types/rolesPermissions';
+import { cn } from '@/components/ui/utils';
 import { Badge } from '@/components/ui/badge';
+import { adminPanelClass } from '@/components/admin/layout/AdminContent';
 
 const SEGMENT_ICONS: Record<UserSegmentType, React.ElementType> = {
     career_architect: Users,
@@ -20,7 +22,7 @@ export function UserSegmentsTab() {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="rounded-3xl shadow-sm p-6 h-48 animate-pulse bg-gray-100" />
+                    <div key={i} className="admin-surface p-6 h-48 animate-pulse bg-gray-100" />
                 ))}
             </div>
         );
@@ -37,9 +39,9 @@ export function UserSegmentsTab() {
                 {segments.map((segment) => {
                     const Icon = SEGMENT_ICONS[segment.id];
                     return (
-                        <div key={segment.id} className="bg-white rounded-3xl shadow-sm p-6 space-y-4">
+                        <div key={segment.id} className={cn(adminPanelClass, 'space-y-4 p-6')}>
                             <div className="flex items-start gap-4">
-                                <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                                     <Icon className="h-5 w-5 text-primary" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -51,7 +53,7 @@ export function UserSegmentsTab() {
                                 </div>
                             </div>
 
-                            <div className="space-y-2 pt-2 border-t border-gray-100">
+                            <div className="space-y-2 border-t border-slate-200 pt-2">
                                 <div className="flex items-center gap-2 text-sm">
                                     <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                                     <span className="text-muted-foreground">Terms:</span>

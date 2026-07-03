@@ -17,83 +17,71 @@ export function BookCard({ book, onPreview, onEdit, onDelete }: BookCardProps) {
   const subcategory = book.subcategory;
 
   return (
-    <Card className="overflow-hidden rounded-3xl shadow-sm hover:shadow-lg transition-all">
-      <div className="aspect-3/4 overflow-hidden bg-muted relative">
+    <Card className="admin-surface overflow-hidden transition-all">
+      <div className="relative aspect-3/4 overflow-hidden bg-slate-100">
         <img
           src={book.coverImage ?? ''}
           alt={book.title}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
         <div className="absolute top-3 right-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                className="global_btn rounded_full bg_primary fit_btn"
-                isIconOnly={true}
-              >
+              <Button className="global_btn bg_transparent icon_btn" isIconOnly>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => onPreview(book)}>
-                <Eye className="h-4 w-4 mr-2" />
+                <Eye className="mr-2 h-4 w-4" />
                 Preview
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onEdit(book)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Series
+                <Edit className="mr-2 h-4 w-4" />
+                Edit series
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive"
-                onSelect={() => onDelete(book)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Series
+              <DropdownMenuItem className="text-destructive" onSelect={() => onDelete(book)}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete series
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      <CardHeader className="pb-3">
-        <h3 className="line-clamp-1 font-bold">{book.title}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-1">
-          by {book.thoughtLeader?.fullName ?? 'Unknown Mentor'}
+      <CardHeader className="gap-1 px-5 pt-4 pb-2">
+        <h3 className="line-clamp-1 text-base font-semibold text-slate-900">{book.title}</h3>
+        <p className="line-clamp-1 text-sm text-slate-500">
+          by {book.thoughtLeader?.fullName ?? 'Unknown mentor'}
         </p>
-        <div className="flex items-center gap-2 flex-wrap pt-2">
-          {category && category.name !== 'N/A' && (
-            <Badge variant="outline" className="text-sm">
+        <div className="flex flex-wrap items-center gap-2 pt-2">
+          {category && category.name !== 'N/A' ? (
+            <Badge variant="outline" className="border-slate-200 text-xs text-slate-600">
               {category.name}
             </Badge>
-          )}
-          {subcategory?.name && subcategory?.name !== 'N/A' && (
-            <Badge variant="outline" className="text-sm">
+          ) : null}
+          {subcategory?.name && subcategory?.name !== 'N/A' ? (
+            <Badge variant="outline" className="border-slate-200 text-xs text-slate-600">
               {subcategory.name}
             </Badge>
-          )}
+          ) : null}
         </div>
       </CardHeader>
 
-      <CardContent className="pb-3 space-y-2">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {book.description ?? ''}
-        </p>
-
-        <div className="text-sm">
-          <span className="text-muted-foreground">Type:</span>
-          <span className="ml-1 font-medium capitalize">{book.pricingModel === 'book' ? 'series' : (book.pricingModel ?? 'series')}</span>
+      <CardContent className="space-y-2 px-5 pb-5">
+        <p className="line-clamp-2 text-sm text-slate-500">{book.description ?? ''}</p>
+        <div className="text-sm text-slate-600">
+          <span className="text-slate-400">Type:</span>
+          <span className="ml-1 font-medium capitalize">
+            {book.pricingModel === 'book' ? 'series' : (book.pricingModel ?? 'series')}
+          </span>
         </div>
-
-        {book.pricingModel === 'book' && book.price != null && (
-          <div className="pt-2">
-            <span className="text-lg font-bold text-primary">
-              KSH {Number(book.price).toFixed(2)}
-            </span>
-            <span className="text-sm text-muted-foreground ml-1">
-              full series
-            </span>
+        {book.pricingModel === 'book' && book.price != null ? (
+          <div className="pt-1">
+            <span className="text-lg font-semibold text-primary">KSH {Number(book.price).toFixed(2)}</span>
+            <span className="ml-1 text-sm text-slate-400">full series</span>
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

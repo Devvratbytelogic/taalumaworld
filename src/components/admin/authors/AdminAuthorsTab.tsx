@@ -89,7 +89,7 @@ export function AdminAuthorsTab() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         <AdminAuthorsHeader onCreateAuthor={() => setIsCreateModalOpen(true)} />
         <AdminAuthorsSkeleton />
       </div>
@@ -97,7 +97,7 @@ export function AdminAuthorsTab() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminAuthorsHeader onCreateAuthor={() => setIsCreateModalOpen(true)} />
 
       <AdminAuthorsStats authors={authors} />

@@ -4,7 +4,7 @@ import { Switch } from '../../ui/switch';
 
 export function SecuritySettingsCard() {
   return (
-    <Card className="p-6 rounded-3xl">
+    <Card className="admin-surface p-6">
       <div className="flex items-start gap-4 mb-6">
         <div className="p-3 bg-red-50 rounded-xl">
           <Shield className="h-6 w-6 text-red-600" />

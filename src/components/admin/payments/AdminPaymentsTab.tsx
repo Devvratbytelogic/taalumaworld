@@ -62,7 +62,7 @@ export function AdminPaymentsTab(props?: AdminPaymentsTabProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPaymentsHeader
         totalRevenue={totalRevenue}
         onExport={handleExport}

@@ -11,7 +11,7 @@ interface ContentModeSettingsCardProps {
 
 export function ContentModeSettingsCard({ contentMode, onContentModeChange }: ContentModeSettingsCardProps) {
   return (
-    <Card className="p-6 rounded-3xl">
+    <Card className="admin-surface p-6">
       <div className="flex items-start gap-4 mb-6">
         <div className="p-3 bg-primary/10 rounded-xl">
           <Globe className="h-6 w-6 text-primary" />

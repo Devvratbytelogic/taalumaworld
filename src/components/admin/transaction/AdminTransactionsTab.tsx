@@ -53,7 +53,7 @@ export function AdminTransactionsTab() {
   const totalPages = pagination?.totalPages ?? 1;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminTransactionsHeader />
 
       <AdminTransactionsSearch

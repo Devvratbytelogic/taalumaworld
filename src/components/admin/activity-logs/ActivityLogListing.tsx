@@ -27,7 +27,7 @@ interface ActivityLogListingProps {
 
 export function ActivityLogListing({ logs, searchQuery = '' }: ActivityLogListingProps) {
   return (
-    <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+    <div className="admin-surface overflow-hidden">
       <div className="p-6 space-y-4">
         {logs.map((log) => {
           const Icon = log.icon;

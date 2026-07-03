@@ -23,7 +23,7 @@ export function CategoryListing({
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((category) => (
-          <Card key={category.id} className="rounded-3xl shadow-sm">
+          <Card key={category.id} className="admin-surface">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -71,7 +71,7 @@ export function CategoryListing({
       </div>
 
       {categories.length === 0 && (
-        <div className="bg-white rounded-3xl p-12 shadow-sm">
+        <div className="admin-surface">
           <div className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
               <FolderTree className="h-8 w-8 text-primary" />

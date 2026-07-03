@@ -36,45 +36,47 @@ export function AdminBooksSearch({
 
   return (
     <AdminSearchPanel>
-      <div className="flex flex-col gap-3 md:flex-row">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <AdminSearchInput
           value={searchQuery}
           onChange={onSearchChange}
           placeholder="Search series by title or description..."
         />
 
-        <select
-          value={selectedCategory}
-          onChange={(e) => onCategoryChange(e.target.value)}
-          className={adminSelectClass}
-        >
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-
-        <select
-          value={selectedLeader}
-          onChange={(e) => onLeaderChange(e.target.value)}
-          className={adminSelectClass}
-        >
-          <option value="">All mentors</option>
-          {leaders.map((l) => (
-            <option key={l.id} value={l.id}>{l.name}</option>
-          ))}
-        </select>
-
-        {hasActiveFilters ? (
-          <button
-            type="button"
-            onClick={() => { onCategoryChange(''); onLeaderChange(''); }}
-            className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+        <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+          <select
+            value={selectedCategory}
+            onChange={(e) => onCategoryChange(e.target.value)}
+            className={adminSelectClass}
           >
-            <X className="h-3.5 w-3.5" />
-            Clear filters
-          </button>
-        ) : null}
+            <option value="">All categories</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+
+          <select
+            value={selectedLeader}
+            onChange={(e) => onLeaderChange(e.target.value)}
+            className={adminSelectClass}
+          >
+            <option value="">All mentors</option>
+            {leaders.map((l) => (
+              <option key={l.id} value={l.id}>{l.name}</option>
+            ))}
+          </select>
+
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={() => { onCategoryChange(''); onLeaderChange(''); }}
+              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear
+            </button>
+          ) : null}
+        </div>
       </div>
 
       {hasActiveFilters ? (

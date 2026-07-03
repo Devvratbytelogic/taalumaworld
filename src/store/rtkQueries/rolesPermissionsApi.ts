@@ -21,7 +21,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
 
         // ── GET endpoints ──────────────────────────────────────────────────────
 
-        getAllRoles: builder.query<IAllRolesAPIResponse, void>({
+        getAllRoles: builder.query<IAllRolesAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             // query: () => ({ url: `/admin/roles`, method: 'GET' }),
             queryFn: () => ({ data: DUMMY_ROLES }),
             providesTags: ['AdminRoles'],

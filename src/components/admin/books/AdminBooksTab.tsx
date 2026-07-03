@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BookOpen, Layers, Users } from 'lucide-react';
 import { useGetAllBooksQuery, useGetAllAuthorLeadersQuery, useGetAllCategoriesQuery, } from '@/store/rtkQueries/adminGetApi';
 import { useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
@@ -11,17 +12,30 @@ import { DeleteBookDialog } from './DeleteBookDialog';
 import { BookPreviewModal } from './BookPreviewModal';
 import { IAllBooksAPIResponseDataEntity } from '@/types/books';
 import AdminBooksSkeleton from '@/components/skeleton-loader/AdminBooksSkeleton';
+import { AdminPage, AdminStatCard } from '@/components/admin/layout/AdminContent';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export function AdminBooksTab() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedLeader, setSelectedLeader] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [previewBook, setPreviewBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
   const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
   const [deleteConfirmBook, setDeleteConfirmBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
 
-  const { data: booksResponse, isLoading: isBooksLoading, isFetching: isBooksFetching } = useGetAllBooksQuery();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(10);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedLeader, setSelectedLeader] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
+  const queryParams = {
+    page,
+    limit: pageLimit,
+    ...(selectedCategory ? { category: selectedCategory } : {}),
+    ...(selectedLeader ? { leader: selectedLeader } : {}),
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  };
+  const { data: booksResponse, isLoading: isBooksLoading, isFetching: isBooksFetching } = useGetAllBooksQuery(queryParams);
   const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
   const { data: categoriesResponse } = useGetAllCategoriesQuery();
   const books = booksResponse?.data ?? [];
@@ -32,18 +46,11 @@ export function AdminBooksTab() {
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
   const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
 
-  const categoryOptions = categories.map((c) => ({ id: c._id, name: c.name }));
-  const leaderOptions = thoughtLeaders.map((l) => ({ id: l._id ?? l.id, name: l.fullName }));
+  const categoryOptions = categories.length > 0 ? categories.map((c) => ({ id: c._id, name: c.name })) : [];
+  const leaderOptions = thoughtLeaders.length > 0 ? thoughtLeaders.map((l) => ({ id: l._id ?? l.id, name: l.fullName })) : [];
 
-  const filteredBooks = books.filter((book) => {
-    const q = searchQuery.toLowerCase();
-    const matchSearch = !q ||
-      book.title.toLowerCase().includes(q) ||
-      (book.description ?? '').toLowerCase().includes(q);
-    const matchCategory = !selectedCategory || book.category?._id === selectedCategory;
-    const matchLeader = !selectedLeader || book.thoughtLeader?._id === selectedLeader;
-    return matchSearch && matchCategory && matchLeader;
-  });
+
+  const hasActiveFilters = !!(selectedCategory || selectedLeader);
 
   const handleEditBook = (book: IAllBooksAPIResponseDataEntity) => {
     setEditingBook(book);
@@ -69,8 +76,14 @@ export function AdminBooksTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <AdminPage>
       <AdminBooksHeader onCreateBook={() => setIsCreateModalOpen(true)} />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <AdminStatCard label="Total Series" value={books?.length ?? 0} icon={BookOpen} tone="blue" />
+        <AdminStatCard label="Mentors" value={thoughtLeaders.length} icon={Users} tone="green" />
+        <AdminStatCard label="Categories" value={categories.length} icon={Layers} tone="purple" />
+      </div>
 
       <AdminBooksSearch
         searchQuery={searchQuery}
@@ -87,8 +100,10 @@ export function AdminBooksTab() {
         <AdminBooksSkeleton />
       ) : (
         <BookListing
-          books={filteredBooks}
+          books={books}
+          totalCount={books?.length ?? 0}
           searchQuery={searchQuery}
+          hasActiveFilters={hasActiveFilters}
           onCreateBook={() => setIsCreateModalOpen(true)}
           onPreview={openPreview}
           onEdit={handleEditBook}
@@ -128,6 +143,6 @@ export function AdminBooksTab() {
         onConfirm={confirmDeleteBook}
         isDeleting={isDeleting}
       />
-    </div>
+    </AdminPage>
   );
 }

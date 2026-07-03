@@ -6,6 +6,16 @@ export interface IAllBooksAPIResponse {
   message: string;
   timestamp: string;
 }
+
+// export interface IAllBooksAPIResponseData {
+//   books: IAllBooksAPIResponseDataEntity[];
+//   pagination: {
+//     total: number;
+//     page: number;
+//     limit: number;
+//     totalPages: number;
+//   };
+// }
 export interface IAllBooksAPIResponseDataEntity {
   _id: string;
   title: string;

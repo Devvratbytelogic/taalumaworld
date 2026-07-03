@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import Button from '../../ui/Button';
+import { Button } from '@heroui/react';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 
 interface AdminBooksHeaderProps {
@@ -9,16 +9,16 @@ interface AdminBooksHeaderProps {
 export function AdminBooksHeader({ onCreateBook }: AdminBooksHeaderProps) {
   return (
     <AdminPageHeader
-      title="Series management"
+      title="Series"
       description="Manage all series on the platform"
     >
       <Button
+        color="primary"
+        className="rounded-xl"
         onPress={onCreateBook}
-        onClick={(e) => { e.preventDefault(); onCreateBook(); }}
-        className="global_btn rounded_full bg_primary"
+        startContent={<Plus className="h-4 w-4" />}
       >
-        <Plus className="h-4 w-4" />
-        Create new series
+        Create series
       </Button>
     </AdminPageHeader>
   );

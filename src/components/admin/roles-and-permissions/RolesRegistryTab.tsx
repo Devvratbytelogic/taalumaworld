@@ -14,6 +14,7 @@ import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { AdminSearchInput, AdminStatCard, AdminTableShell } from '@/components/admin/layout/AdminContent';
+import { useDebounce } from '@/hooks/useDebounce';
 
 function ActionMenu({ role, onEdit, onDelete }: { role: IRole; onEdit: () => void; onDelete: () => void }) {
     const [open, setOpen] = useState(false);
@@ -52,7 +53,8 @@ function ActionMenu({ role, onEdit, onDelete }: { role: IRole; onEdit: () => voi
 export function RolesRegistryTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
-    const { data, isLoading, isFetching } = useGetAllRolesQuery();
+    const debouncedSearch = useDebounce(search, 500);
+    const { data, isLoading, isFetching } = useGetAllRolesQuery({ search: debouncedSearch, page: 1, limit: 10 });
 
     const roles: IRole[] = data?.data ?? [];
 

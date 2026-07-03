@@ -34,10 +34,11 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Books */
-        getAllBooks: builder.query<IAllBooksAPIResponse, void>({
-            query: () => ({
+        getAllBooks: builder.query<IAllBooksAPIResponse, { page?: number; limit?: number; search?: string; category?: string; leader?: string } | void>({
+            query: (params) => ({
                 url: `/admin/books`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminBooks'],
         }),

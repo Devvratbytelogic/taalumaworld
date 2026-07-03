@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useGetAllAuthorLeadersQuery } from '@/store/rtkQueries/adminGetApi';
 import AdminAuthorsSkeleton from '@/components/skeleton-loader/AdminAuthorsSkeleton';
-import { useAddAuthorLeaderMutation, useUpdateAuthorLeaderMutation, useDeleteAuthorLeaderMutation } from '@/store/rtkQueries/adminPostApi';
+import { useUpdateAuthorLeaderMutation, useDeleteAuthorLeaderMutation } from '@/store/rtkQueries/adminPostApi';
 import toast from '@/utils/toast';
 import type { Author } from '@/types/content';
 import { AdminAuthorsHeader } from './AdminAuthorsHeader';
 import { AdminAuthorsStats } from './AdminAuthorsStats';
 import { AdminAuthorsSearch } from './AdminAuthorsSearch';
 import { AuthorListing } from './AuthorListing';
-import { AddAuthorModal, type AddAuthorFormValues } from './AddAuthorModal';
 import { DeleteAuthorDialog } from './DeleteAuthorDialog';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -18,7 +17,6 @@ export function AdminAuthorsTab() {
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(10);
   const debouncedSearch = useDebounce(searchQuery, 400);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteConfirmAuthor, setDeleteConfirmAuthor] = useState<Author | null>(null);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ export function AdminAuthorsTab() {
   };
 
   const { data: leadersResponse, isLoading, isFetching } = useGetAllAuthorLeadersQuery(queryParams);
-  const [addAuthorLeader] = useAddAuthorLeaderMutation();
   const [updateAuthorLeader] = useUpdateAuthorLeaderMutation();
   const [deleteAuthorLeader] = useDeleteAuthorLeaderMutation();
 
@@ -68,22 +65,10 @@ export function AdminAuthorsTab() {
     }
   };
 
-  const handleAddAuthor = async (values: AddAuthorFormValues) => {
-    const formData = new FormData();
-    formData.append('fullName', values.fullName);
-    formData.append('email', values.email);
-    formData.append('professionalBio', values.professionalBio);
-    formData.append('status', values.status);
-    if (values.avatar) {
-      formData.append('avatar', values.avatar);
-    }
-    await addAuthorLeader(formData).unwrap();
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <AdminAuthorsHeader onCreateAuthor={() => setIsCreateModalOpen(true)} />
+        <AdminAuthorsHeader />
         <AdminAuthorsSkeleton />
       </div>
     );
@@ -91,7 +76,7 @@ export function AdminAuthorsTab() {
 
   return (
     <div className="space-y-6">
-      <AdminAuthorsHeader onCreateAuthor={() => setIsCreateModalOpen(true)} />
+      <AdminAuthorsHeader />
 
       <AdminAuthorsStats authors={authors} />
 
@@ -113,15 +98,8 @@ export function AdminAuthorsTab() {
           setPageLimit(limit);
           setPage(1);
         }}
-        onCreateAuthor={() => setIsCreateModalOpen(true)}
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDeleteAuthor}
-      />
-
-      <AddAuthorModal
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        onSubmitForm={handleAddAuthor}
       />
 
       <DeleteAuthorDialog

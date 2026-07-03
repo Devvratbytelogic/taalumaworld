@@ -326,6 +326,11 @@ export const testimonialSchema = Yup.object({
   photo: Yup.mixed().nullable().optional(),
 });
 
+export const inviteMentorSchema = Yup.object({
+  fullName: Yup.string().trim(),
+  email: emailRules,
+});
+
 // Add / Edit Author (Thought Leader) Modal Validation Schema
 export const authorSchema = Yup.object({
   fullName: Yup.string()

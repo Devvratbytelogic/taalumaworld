@@ -1,4 +1,4 @@
-import { Plus, Users, MoreVertical, Trash2 } from 'lucide-react';
+import { Users, MoreVertical, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
 import { Badge } from '../../ui/badge';
 import ImageComponent from '@/components/ui/ImageComponent';
@@ -41,7 +41,6 @@ interface AuthorListingProps {
   isFetching?: boolean;
   onPageChange: (page: number) => void;
   onPageLimitChange: (limit: number) => void;
-  onCreateAuthor: () => void;
   onUpdateStatus: (author: Author, status: string) => void;
   onDelete: (author: Author) => void;
 }
@@ -56,7 +55,6 @@ export function AuthorListing({
   isFetching = false,
   onPageChange,
   onPageLimitChange,
-  onCreateAuthor,
   onUpdateStatus,
   onDelete,
 }: AuthorListingProps) {
@@ -148,18 +146,7 @@ export function AuthorListing({
           description={
             searchQuery
               ? 'Try adjusting your search query'
-              : 'Add your first mentor to get started'
-          }
-          action={
-            !searchQuery ? (
-              <Button
-                onPress={onCreateAuthor}
-                className="global_btn rounded_full bg_primary"
-                startContent={<Plus className="h-4 w-4" />}
-              >
-                Add mentor
-              </Button>
-            ) : undefined
+              : 'No mentors yet. Use Invite mentor above to get started.'
           }
         />
       ) : null}

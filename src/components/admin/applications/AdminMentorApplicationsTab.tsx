@@ -64,20 +64,20 @@ export function AdminMentorApplicationsTab() {
 
   const conversionList = search
     ? conversionApps.filter(
-        (app) =>
-          app.applicantName.toLowerCase().includes(search) ||
-          app.applicantEmail.toLowerCase().includes(search) ||
-          app.status.toLowerCase().includes(search),
-      )
+      (app) =>
+        app.applicantName.toLowerCase().includes(search) ||
+        app.applicantEmail.toLowerCase().includes(search) ||
+        app.status.toLowerCase().includes(search),
+    )
     : conversionApps;
 
   const verificationList = search
     ? verificationApps.filter(
-        (app) =>
-          app.mentorName.toLowerCase().includes(search) ||
-          app.mentorEmail.toLowerCase().includes(search) ||
-          app.status.toLowerCase().includes(search),
-      )
+      (app) =>
+        app.mentorName.toLowerCase().includes(search) ||
+        app.mentorEmail.toLowerCase().includes(search) ||
+        app.status.toLowerCase().includes(search),
+    )
     : verificationApps;
 
   const openConversionReview = (app: MentorConversionApplication) => {
@@ -215,7 +215,7 @@ export function AdminMentorApplicationsTab() {
                 <DialogDescription>{reviewConversion.applicantName} · {reviewConversion.applicantEmail}</DialogDescription>
               </DialogHeader>
 
-              <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto px-8 py-4 text-sm">
+              <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto p-6! text-sm">
                 <p><span className="text-slate-500">Experience:</span> {reviewConversion.yearsOfExperience} years</p>
                 {reviewConversion.linkedinUrl ? <p><span className="text-slate-500">LinkedIn:</span> {reviewConversion.linkedinUrl}</p> : null}
                 {reviewConversion.facebookUrl ? <p><span className="text-slate-500">Facebook:</span> {reviewConversion.facebookUrl}</p> : null}

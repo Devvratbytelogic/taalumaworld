@@ -12,7 +12,7 @@ import Button from '@/components/ui/Button';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderToolbar from './HeaderToolbar';
 import MobileSearchBar from './MobileSearchBar';
-import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { useAuth } from '@/hooks/useAuth';
 import ImageComponent from '@/components/ui/ImageComponent';
@@ -123,7 +123,7 @@ export default function PrimaryHeader() {
           <div className="flex items-center gap-2 shrink-0">
             {/* My Chapters / My Books */}
             {isAuthenticated && (
-              <Link href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`} className="hidden lg:flex items-center gap-2 hover:text-primary transition-colors">
+              <Link href={contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath()} className="hidden lg:flex items-center gap-2 hover:text-primary transition-colors">
                 <BookMarked className="h-5 w-5" />
                 <span className="font-medium text-sm">{contentMode === VISIBLE.BOOK ? 'My Series' : 'My Blueprints'}</span>
               </Link>
@@ -316,9 +316,9 @@ export default function PrimaryHeader() {
 
               {isAuthenticated && (
                 <Link
-                  href={contentMode === VISIBLE.CHAPTER ? `${getUserDashboardRoutePath()}?tab=my-chapters` : `${getUserDashboardRoutePath()}?tab=my-books`}
+                  href={contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath()}
                   onClick={closeMenu}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${isActive(getUserDashboardRoutePath()) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-colors ${isActive(contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath()) ? 'text-primary bg-primary/8' : 'hover:bg-gray-50 hover:text-primary'
                     }`}
                 >
                   <BookMarked className="h-5 w-5 shrink-0" />

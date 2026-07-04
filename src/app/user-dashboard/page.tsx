@@ -1,5 +1,6 @@
-import { UserDashboard } from '@/components/pages-components/user-dashboard/UserDashboard';
+import { redirect } from 'next/navigation';
+import { getUserDashboardProfileRoutePath } from '@/routes/routes';
 
 export default function UserDashboardPage() {
-  return <UserDashboard />;
+  redirect(getUserDashboardProfileRoutePath());
 }

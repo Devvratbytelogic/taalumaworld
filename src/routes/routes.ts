@@ -208,6 +208,30 @@ export function getUserDashboardRoutePath(): string {
   return '/user-dashboard';
 }
 
+export function getUserDashboardProfileRoutePath(): string {
+  return '/user-dashboard/profile';
+}
+
+export function getUserDashboardMyChaptersRoutePath(): string {
+  return '/user-dashboard/my-chapters';
+}
+
+export function getUserDashboardMyBooksRoutePath(): string {
+  return '/user-dashboard/my-books';
+}
+
+export function getUserDashboardHistoryRoutePath(): string {
+  return '/user-dashboard/history';
+}
+
+export function getUserDashboardBecomeMentorRoutePath(): string {
+  return '/user-dashboard/become-mentor';
+}
+
+export function getUserDashboardSettingsRoutePath(): string {
+  return '/user-dashboard/settings';
+}
+
 export function getCartRoutePath(): string {
   return '/cart';
 }

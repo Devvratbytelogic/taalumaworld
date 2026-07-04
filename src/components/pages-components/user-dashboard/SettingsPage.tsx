@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Settings, Lock, LogOut, Eye, EyeOff, Check } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -6,12 +8,10 @@ import toast from '@/utils/toast';
 import { useUserChangePasswordMutation } from '@/store/rtkQueries/userAuthApi';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import moment from 'moment';
+import { clearAuthCookies } from '@/utils/authCookies';
+import { getHomeRoutePath } from '@/routes/routes';
 
-interface SettingsPageProps {
-  onLogout: () => void;
-}
-
-export function SettingsPage({ onLogout }: SettingsPageProps) {
+export function SettingsPage() {
   const { data: profileRes, isLoading: isLoadingProfile } = useGetUserProfileQuery()
   const lastChangedDate = profileRes?.data?.updatedAt;
   const [changePassword, { isLoading: isSaving }] = useUserChangePasswordMutation();
@@ -79,7 +79,8 @@ export function SettingsPage({ onLogout }: SettingsPageProps) {
   const handleLogout = () => {
     toast.success('Logged out successfully');
     setShowLogoutModal(false);
-    onLogout();
+    clearAuthCookies();
+    window.location.href = getHomeRoutePath();
   };
 
   const handleCancel = () => {

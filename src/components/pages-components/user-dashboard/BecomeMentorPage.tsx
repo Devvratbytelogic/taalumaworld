@@ -75,7 +75,7 @@ export function BecomeMentorPage() {
       />
 
       <form noValidate onSubmit={handleSubmit} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <section className="border-b border-gray-100 px-6 py-5 sm:px-8 sm:py-6">
+        <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={Share2}
             title="Social profiles"
@@ -155,7 +155,7 @@ export function BecomeMentorPage() {
           </div>
         </section>
 
-        <section className="border-b border-gray-100 px-6 py-5 sm:px-8 sm:py-6">
+        <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={Briefcase}
             title="Experience"
@@ -211,7 +211,7 @@ export function BecomeMentorPage() {
           </div>
         </section>
 
-        <section className="border-b border-gray-100 px-6 py-5 sm:px-8 sm:py-6">
+        <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={CreditCard}
             title="Payment information"
@@ -331,7 +331,7 @@ export function BecomeMentorPage() {
           </div>
         </section>
 
-        <section className="px-6 py-5 sm:px-8 sm:py-6">
+        <section className="px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={FileCheck}
             title="Agreements"

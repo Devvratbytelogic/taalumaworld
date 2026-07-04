@@ -119,8 +119,8 @@ export function MyBooksPage() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             {(
               [
                 { key: 'all', label: `All (${stats.total})` },
@@ -132,7 +132,7 @@ export function MyBooksPage() {
               <Button
                 key={key}
                 type="button"
-                className={cn('global_btn rounded_full', activeFilter === key ? 'bg_primary' : 'outline_primary')}
+                className={cn('global_btn shrink-0 rounded_full', activeFilter === key ? 'bg_primary' : 'outline_primary')}
                 onPress={() => setActiveFilter(key)}
               >
                 {label}
@@ -142,7 +142,7 @@ export function MyBooksPage() {
           <p className="text-sm text-gray-500">{filteredBooks.length} series</p>
         </div>
 
-        <div className="p-5 sm:p-6">
+        <div className="p-4 sm:p-6">
           {filteredBooks.length > 0 ? (
             <div className="flex flex-col gap-4">
               {filteredBooks.map((book, index) => {

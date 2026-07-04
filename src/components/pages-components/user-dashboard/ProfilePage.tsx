@@ -208,7 +208,60 @@ export function ProfilePage() {
       </UserDashboardPageHeader>
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="relative h-24 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90">
+        {/* Mobile profile banner — stacked, no overlap */}
+        <div className="sm:hidden">
+          <div className="h-16 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90" />
+          <div className="relative px-4 pb-1 pt-0">
+            <div className="-mt-8 rounded-lg border border-primary/20 bg-white p-4 shadow-none">
+              <div className="flex items-start gap-3">
+                <label className={isEditing ? 'relative shrink-0 cursor-pointer' : 'relative shrink-0'}>
+                  <div className="rounded-full border ring-2 ring-white">
+                    <UserAvatar
+                      userName={values.fullName || profile?.name || ''}
+                      userPhoto={displayPhoto}
+                      size="lg"
+                    />
+                  </div>
+                  {isEditing && (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                        disabled={isSubmitting}
+                      />
+                      <span className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/45 text-white">
+                        <Camera className="h-4 w-4" aria-hidden />
+                        <span className="mt-0.5 text-[10px] font-medium leading-none">Change</span>
+                      </span>
+                    </>
+                  )}
+                </label>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-base font-medium text-gray-900">{profile?.name ?? '—'}</h2>
+                  <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+                    <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+                    <span className="break-all">{profile?.email ?? '—'}</span>
+                  </p>
+                  {isEditing ? (
+                    <p className="mt-2 text-xs text-primary">Tap your photo to upload a new image</p>
+                  ) : null}
+                </div>
+              </div>
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Career Architect
+              </span>
+              {isEditing ? (
+                <p className="mt-2 text-[11px] text-gray-500">Max photo size: 2MB</p>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop profile banner — original placement */}
+        <div className="relative hidden h-24 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90 sm:block">
           <span className="absolute right-6 bottom-0 inline-flex translate-y-1/2 items-center gap-1.5 rounded-full border border-primary/20 bg-white/95 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-primary backdrop-blur-sm sm:right-8">
             <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
             Career Architect
@@ -260,8 +313,8 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <div className="relative px-6 pb-8 pt-12 sm:px-8">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 mt-6">
+        <div className="relative px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-12">
+          <div className="mt-2 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:mt-6 lg:grid-cols-4">
             {kpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
               <Link
                 key={label}
@@ -272,7 +325,7 @@ export function ProfilePage() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                     <Icon className={cn('h-4 w-4', iconClass)} aria-hidden />
                   </span>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     {isKpisLoading ? (
                       <div className="space-y-1.5 animate-pulse">
                         <div className="h-5 w-8 rounded bg-gray-200" />
@@ -281,7 +334,7 @@ export function ProfilePage() {
                     ) : (
                       <>
                         <p className="text-xl font-semibold tracking-tight text-gray-900">{value}</p>
-                        <p className="truncate text-sm text-gray-500">{label}</p>
+                        <p className="text-sm text-gray-500">{label}</p>
                       </>
                     )}
                   </div>
@@ -290,18 +343,18 @@ export function ProfilePage() {
             ))}
           </div>
 
-          <div className="mt-8 border-t border-gray-100 pt-8">
+          <div className="mt-6 border-t border-gray-100 pt-6 sm:mt-8 sm:pt-8">
             {!isEditing ? (
               <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50/60">
                 <dl className="divide-y divide-gray-200/70">
-                  <div className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+                  <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
                     <dt className="flex items-center gap-3 text-sm font-normal text-gray-600">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <UserRound className="h-4 w-4 text-primary" aria-hidden />
                       </span>
                       Full name
                     </dt>
-                    <dd className="pl-12 text-base font-medium text-gray-900 sm:pl-0 sm:text-right">
+                    <dd className="text-base font-medium text-gray-900 sm:text-right">
                       {profile?.name ?? '—'}
                     </dd>
                   </div>
@@ -313,20 +366,20 @@ export function ProfilePage() {
                       </span>
                       Email address
                     </dt>
-                    <dd className="pl-12 sm:pl-0 sm:text-right">
+                    <dd className="sm:text-right">
                       <p className="text-base font-medium text-gray-900">{profile?.email ?? '—'}</p>
                       <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
                     </dd>
                   </div>
 
-                  <div className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+                  <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
                     <dt className="flex items-center gap-3 text-sm font-normal text-gray-600">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <Calendar className="h-4 w-4 text-primary" aria-hidden />
                       </span>
                       Member since
                     </dt>
-                    <dd className="pl-12 text-base font-medium text-gray-900 sm:pl-0 sm:text-right">
+                    <dd className="text-base font-medium text-gray-900 sm:text-right">
                       {profile?.createdAt && moment(profile.createdAt).isValid()
                         ? moment(profile.createdAt).format('MMMM D, YYYY')
                         : '—'}
@@ -347,7 +400,7 @@ export function ProfilePage() {
                       </span>
                       Full name
                     </label>
-                    <div className="pl-12 sm:max-w-md">
+                    <div className="sm:max-w-md">
                       <Input
                         id="fullName"
                         name="fullName"
@@ -371,20 +424,20 @@ export function ProfilePage() {
                       </span>
                       Email address
                     </p>
-                    <div className="pl-12 sm:pl-0 sm:text-right">
+                    <div className="sm:text-right">
                       <p className="text-base font-normal text-gray-900">{profile?.email ?? '—'}</p>
                       <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+                  <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
                     <p className="flex items-center gap-3 text-sm font-normal text-gray-600">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <Calendar className="h-4 w-4 text-primary" aria-hidden />
                       </span>
                       Member since
                     </p>
-                    <p className="pl-12 text-base font-normal text-gray-900 sm:pl-0 sm:text-right">
+                    <p className="text-base font-normal text-gray-900 sm:text-right">
                       {profile?.createdAt && moment(profile.createdAt).isValid()
                         ? moment(profile.createdAt).format('MMMM D, YYYY')
                         : '—'}

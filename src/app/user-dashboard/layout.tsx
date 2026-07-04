@@ -49,9 +49,9 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:py-10">
-        <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
-          <aside className="lg:w-64 shrink-0 xl:w-72">
+      <div className="container mx-auto px-3 py-5 sm:px-6 sm:py-8 lg:py-10">
+        <div className="flex flex-col gap-4 lg:flex-row lg:gap-10">
+          <aside className="hidden shrink-0 lg:block lg:w-64 xl:w-72">
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white lg:sticky lg:top-24">
               <div className="border-b border-gray-100 bg-linear-to-br from-primary/8 via-primary/4 to-white px-5 py-5">
                 <div className="flex items-center gap-3">

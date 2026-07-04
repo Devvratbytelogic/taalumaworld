@@ -137,13 +137,13 @@ export function ReadingHistory() {
           ))}
         </div>
 
-        <div className="border-b border-gray-100 px-5 py-4 sm:px-6">
+        <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
           <p className="text-sm text-gray-500">
             {historyItems.length} recent {historyItems.length === 1 ? 'item' : 'items'}
           </p>
         </div>
 
-        <div className="p-5 sm:p-6">
+        <div className="p-4 sm:p-6">
           {historyItems.length > 0 ? (
             <div className="flex flex-col gap-4">
               {historyItems.map((item) => {

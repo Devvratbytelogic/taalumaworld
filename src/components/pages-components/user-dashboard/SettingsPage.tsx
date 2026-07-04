@@ -106,7 +106,7 @@ export function SettingsPage() {
       <UserDashboardPageHeader title="Settings" description="Manage your account settings and preferences" />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <section className="px-6 py-5 sm:px-8 sm:py-6">
+        <section className="px-4 py-5 sm:px-8 sm:py-6">
           <div className="flex items-start gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-gray-50/60">
               <Lock className="h-4 w-4 text-primary" aria-hidden />
@@ -271,7 +271,7 @@ export function SettingsPage() {
           </div>
         </section>
 
-        <section className="border-t border-gray-100 px-6 py-5 sm:px-8 sm:py-6">
+        <section className="border-t border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
             <div className="flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-red-100 bg-red-50">

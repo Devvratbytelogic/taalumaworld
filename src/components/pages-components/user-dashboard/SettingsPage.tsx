@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Settings, Lock, LogOut, Eye, EyeOff, Check } from 'lucide-react';
+import { Lock, LogOut, Eye, EyeOff, Check } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import toast from '@/utils/toast';
@@ -93,24 +93,15 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-purple-500/10 rounded-2xl">
-            <Settings className="h-6 w-6 text-purple-500" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        </div>
-        <p className="text-muted-foreground">
-          Manage your account settings and preferences
-        </p>
+      <div>
+        <h1 className="text-2xl font-bold">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your account settings and preferences</p>
       </div>
 
-      {/* Password Section */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
+      <div className="rounded-lg border border-gray-200/80 bg-white p-6 sm:p-8">
         <div className="max-w-2xl">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-blue-500/10 rounded-xl">
+            <div className="rounded-lg bg-blue-500/10 p-2">
               <Lock className="h-5 w-5 text-blue-500" />
             </div>
             <div>
@@ -275,11 +266,10 @@ export function SettingsPage() {
         </div>
       </div>
 
-      {/* Logout Section */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border-2 border-red-100">
+      <div className="rounded-lg border border-red-100 bg-white p-6 sm:p-8">
         <div className="max-w-2xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-red-500/10 rounded-xl">
+            <div className="rounded-lg bg-red-500/10 p-2">
               <LogOut className="h-5 w-5 text-red-500" />
             </div>
             <div>
@@ -307,8 +297,8 @@ export function SettingsPage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowLogoutModal(false)}
           />
-          <div className="relative bg-white rounded-3xl shadow-xl p-8 w-full max-w-sm flex flex-col items-center gap-4">
-            <div className="p-3 bg-red-100 rounded-2xl">
+          <div className="relative flex w-full max-w-sm flex-col items-center gap-4 rounded-lg border border-gray-200/80 bg-white p-8">
+            <div className="rounded-lg bg-red-100 p-3">
               <LogOut className="h-7 w-7 text-red-500" />
             </div>
             <div className="text-center">

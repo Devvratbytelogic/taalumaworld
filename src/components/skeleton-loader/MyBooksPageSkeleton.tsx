@@ -1,28 +1,28 @@
 export default function MyBooksPageSkeleton() {
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="animate-pulse space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white rounded-3xl p-5 shadow-sm animate-pulse">
+          <div key={i} className="rounded-lg border border-gray-200/80 bg-white p-5">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-gray-200 rounded-full" />
+              <div className="h-11 w-11 shrink-0 rounded-lg bg-gray-200" />
               <div className="space-y-2">
-                <div className="h-6 bg-gray-200 rounded w-10" />
-                <div className="h-3 bg-gray-100 rounded w-24" />
+                <div className="h-6 w-10 rounded bg-gray-200" />
+                <div className="h-3 w-24 rounded bg-gray-100" />
               </div>
             </div>
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-3xl overflow-hidden animate-pulse">
-            <div className="aspect-3/4 bg-gray-200" />
-            <div className="p-5 space-y-3">
-              <div className="h-3 bg-gray-100 rounded w-24" />
-              <div className="h-5 bg-gray-200 rounded w-full" />
-              <div className="h-4 bg-gray-100 rounded w-3/4" />
-              <div className="h-10 bg-gray-200 rounded-full" />
+          <div key={i} className="overflow-hidden rounded-lg border border-gray-200/80 bg-white">
+            <div className="aspect-video bg-gray-200" />
+            <div className="space-y-3 p-5">
+              <div className="h-3 w-24 rounded bg-gray-100" />
+              <div className="h-5 w-full rounded bg-gray-200" />
+              <div className="h-4 w-3/4 rounded bg-gray-100" />
+              <div className="h-10 rounded-lg bg-gray-200" />
             </div>
           </div>
         ))}

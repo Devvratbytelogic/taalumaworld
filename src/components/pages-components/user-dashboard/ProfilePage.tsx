@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useFormik } from 'formik';
-import { User, Mail, Camera, X, Check } from 'lucide-react';
+import { Mail, Camera, Check } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -87,22 +87,22 @@ export function ProfilePage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-3xl p-8 shadow-sm animate-pulse">
-          <div className="h-8 w-40 bg-gray-200 rounded-xl mb-2" />
-          <div className="h-4 w-64 bg-gray-100 rounded-xl" />
+        <div className="rounded-lg border border-gray-200/80 bg-white p-8 animate-pulse">
+          <div className="mb-2 h-8 w-40 rounded-lg bg-gray-200" />
+          <div className="h-4 w-64 rounded-lg bg-gray-100" />
         </div>
-        <div className="bg-white rounded-3xl p-8 shadow-sm animate-pulse space-y-6">
+        <div className="space-y-6 rounded-lg border border-gray-200/80 bg-white p-8 animate-pulse">
           <div className="flex items-center gap-6 pb-8 border-b border-gray-200">
             <div className="w-24 h-24 rounded-full bg-gray-200 shrink-0" />
             <div className="space-y-3 flex-1">
-              <div className="h-5 w-32 bg-gray-200 rounded-xl" />
-              <div className="h-4 w-56 bg-gray-100 rounded-xl" />
+              <div className="h-5 w-32 rounded-md bg-gray-200" />
+              <div className="h-4 w-56 rounded-md bg-gray-100" />
             </div>
           </div>
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-2">
-              <div className="h-4 w-24 bg-gray-200 rounded-xl" />
-              <div className="h-6 w-56 bg-gray-100 rounded-xl" />
+              <div className="h-4 w-24 rounded-md bg-gray-200" />
+              <div className="h-6 w-56 rounded-md bg-gray-100" />
             </div>
           ))}
         </div>
@@ -112,19 +112,12 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-2xl">
-            <User className="h-6 w-6 text-primary" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Profile</h1>
-        </div>
-        <p className="text-muted-foreground">Manage your personal information</p>
+      <div>
+        <h1 className="text-2xl font-bold">Profile</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your personal information</p>
       </div>
 
-      {/* Profile Content */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
+      <div className="rounded-lg border border-gray-200/80 bg-white p-6 sm:p-8">
         <div className="max-w-2xl">
           {/* Profile Photo Section */}
           <div className="flex items-start gap-6 mb-8 pb-8 border-b border-gray-200">
@@ -153,7 +146,7 @@ export function ProfilePage() {
                         className="hidden"
                         disabled={isSubmitting}
                       />
-                      <div className="cursor-pointer flex items-center justify-center gap-2 h-10 px-4 rounded-2xl border border-border hover:bg-accent transition-colors">
+                      <div className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-border px-4 transition-colors hover:bg-accent">
                         <Camera className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Upload Photo</span>
                       </div>
@@ -168,7 +161,7 @@ export function ProfilePage() {
                           className="hidden"
                           disabled={isSubmitting}
                         />
-                        <div className="cursor-pointer flex items-center justify-center gap-2 h-10 px-4 rounded-2xl border border-border hover:bg-accent transition-colors">
+                        <div className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-border px-4 transition-colors hover:bg-accent">
                           <Camera className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Change</span>
                         </div>
@@ -176,7 +169,7 @@ export function ProfilePage() {
                       {/* <button
                         type="button"
                         onClick={handleRemovePhoto}
-                        className="flex items-center justify-center gap-2 h-10 px-4 rounded-2xl border border-red-200 hover:bg-red-50 text-red-600 transition-colors"
+                        className="flex h-10 items-center justify-center gap-2 rounded-md border border-red-200 px-4 text-red-600 transition-colors hover:bg-red-50"
                         disabled={isSubmitting}
                       >
                         <X className="h-4 w-4" />

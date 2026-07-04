@@ -72,9 +72,9 @@ export function MyChaptersPage() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-3xl p-5 shadow-sm animate-pulse">
+            <div key={i} className="rounded-lg border border-gray-200/80 bg-white p-5 animate-pulse">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 bg-gray-200 rounded-full" />
+                <div className="h-11 w-11 rounded-lg bg-gray-200" />
                 <div className="space-y-2">
                   <div className="h-6 bg-gray-200 rounded w-10" />
                   <div className="h-3 bg-gray-100 rounded w-24" />
@@ -85,7 +85,7 @@ export function MyChaptersPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-3xl overflow-hidden animate-pulse">
+            <div key={i} className="overflow-hidden rounded-lg border border-gray-200/80 bg-white animate-pulse">
               <div className="aspect-video bg-gray-200" />
               <div className="p-5 space-y-3">
                 <div className="h-3 bg-gray-100 rounded w-24" />
@@ -110,36 +110,36 @@ export function MyChaptersPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-3xl p-5">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-primary/20 rounded-full">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <BookOpen className="h-5 w-5 text-primary" />
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">Total Blueprints</div>
+              <div className="text-sm text-muted-foreground">Total Blueprints</div>
             </div>
           </div>
         </div>
-        <div className="bg-linear-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-3xl p-5">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-200 rounded-full">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-50">
               <TrendingUp className="h-5 w-5 text-blue-600" />
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.reading}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">In Progress</div>
+              <div className="text-sm text-muted-foreground">In Progress</div>
             </div>
           </div>
         </div>
-        <div className="bg-linear-to-br from-green-50 to-green-100/50 border border-green-200 rounded-3xl p-5">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-200 rounded-full">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-green-50">
               <CheckCircle className="h-5 w-5 text-green-600" />
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.completed}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">Completed</div>
+              <div className="text-sm text-muted-foreground">Completed</div>
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@ export function MyChaptersPage() {
             return (
               <div
                 key={chapter.chapterId}
-                className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all group flex flex-col"
+                className="group flex flex-col overflow-hidden rounded-lg border border-gray-200/80 bg-white transition-colors hover:border-gray-300"
               >
                 {/* Chapter Image */}
                 <div className="aspect-video relative overflow-hidden bg-gray-100 shrink-0">
@@ -278,7 +278,7 @@ export function MyChaptersPage() {
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-white rounded-3xl p-12 text-center shadow-sm">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-12 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <BookOpen className="h-8 w-8 text-primary" />

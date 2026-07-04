@@ -82,36 +82,36 @@ export function MyBooksPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-3xl p-5">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-primary/20 rounded-full">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <Book className="h-5 w-5 text-primary" />
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.total}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">Total Series</div>
+              <div className="text-sm text-muted-foreground">Total Series</div>
             </div>
           </div>
         </div>
-        <div className="bg-linear-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-3xl p-5">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-200 rounded-full">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-50">
               <TrendingUp className="h-5 w-5 text-blue-600" />
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.reading}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">In Progress</div>
+              <div className="text-sm text-muted-foreground">In Progress</div>
             </div>
           </div>
         </div>
-        <div className="bg-linear-to-br from-green-50 to-green-100/50 border border-green-200 rounded-3xl p-5">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-5">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-200 rounded-full">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-green-50">
               <CheckCircle className="h-5 w-5 text-green-600" />
             </div>
             <div>
               <div className="text-2xl font-bold tracking-tight">{stats.completed}</div>
-              <div className="text-sm text-muted-foreground tracking-tight">Completed</div>
+              <div className="text-sm text-muted-foreground">Completed</div>
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@ export function MyBooksPage() {
             return (
               <div
                 key={book.bookId ?? index}
-                className="bg-white border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-all group flex flex-col"
+                className="group flex flex-col overflow-hidden rounded-lg border border-gray-200/80 bg-white transition-colors hover:border-gray-300"
               >
                 {/* Book Cover */}
                 <div className="aspect-video relative overflow-hidden bg-gray-100 shrink-0">
@@ -248,7 +248,7 @@ export function MyBooksPage() {
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-white rounded-3xl p-12 text-center shadow-sm">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-12 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Book className="h-8 w-8 text-primary" />

@@ -41,14 +41,14 @@ export function BecomeMentorPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl bg-white p-8 shadow-sm">
+      <div className="rounded-lg border border-gray-200/80 bg-white p-6 sm:p-8">
         <h1 className="text-2xl font-bold">Apply to Become a Mentor</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Share your experience with Career Architects. An administrator will review your application.
         </p>
       </div>
 
-      <form noValidate onSubmit={handleSubmit} className="rounded-3xl bg-white p-8 shadow-sm space-y-6">
+      <form noValidate onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-gray-200/80 bg-white p-6 sm:p-8">
         <div className="space-y-4">
           <h2 className="font-semibold">Social profiles</h2>
           <p className="text-sm text-muted-foreground">At least one of LinkedIn, Facebook, or X is required.</p>

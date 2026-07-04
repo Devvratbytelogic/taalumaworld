@@ -53,14 +53,14 @@ export function ReadingHistory() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-3xl p-8 shadow-sm animate-pulse">
-          <div className="h-8 bg-gray-200 rounded-xl w-48 mb-2" />
-          <div className="h-4 bg-gray-100 rounded-xl w-64" />
+        <div className="rounded-lg border border-gray-200/80 bg-white p-8 animate-pulse">
+          <div className="mb-2 h-8 w-48 rounded-lg bg-gray-200" />
+          <div className="h-4 w-64 rounded-lg bg-gray-100" />
         </div>
-        <div className="bg-white rounded-3xl p-6 shadow-sm space-y-4">
+        <div className="space-y-4 rounded-lg border border-gray-200/80 bg-white p-6 animate-pulse">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex gap-4 p-4 rounded-2xl border border-gray-100 animate-pulse">
-              <div className="shrink-0 w-32 aspect-video rounded-xl bg-gray-200" />
+            <div key={i} className="flex animate-pulse gap-4 rounded-lg border border-gray-100 p-4">
+              <div className="aspect-video w-32 shrink-0 rounded-md bg-gray-200" />
               <div className="flex-1 space-y-2">
                 <div className="h-3 bg-gray-100 rounded w-24" />
                 <div className="h-5 bg-gray-200 rounded w-3/4" />
@@ -75,30 +75,20 @@ export function ReadingHistory() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-blue-500/10 rounded-2xl">
-            <Clock className="h-6 w-6 text-blue-500" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Reading History</h1>
-        </div>
-        <p className="text-muted-foreground">
-          Track your reading journey and progress
-        </p>
+      <div>
+        <h1 className="text-2xl font-bold">Reading History</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Track your reading journey and progress</p>
       </div>
 
-      {/* History List */}
       {historyItems.length > 0 ? (
-        <div className="bg-white rounded-3xl p-6 shadow-sm">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-4 sm:p-6">
           <div className="space-y-4">
             {historyItems.map((item) => (
               <div
                 key={item.chapterId}
-                className="flex gap-4 p-4 rounded-2xl border border-gray-200 hover:shadow-md transition-all group"
+                className="group flex gap-4 rounded-lg border border-gray-100 p-4 transition-colors hover:border-gray-200"
               >
-                {/* Chapter Image */}
-                <div className="shrink-0 w-32 aspect-video rounded-xl overflow-hidden bg-gray-100">
+                <div className="aspect-video w-32 shrink-0 overflow-hidden rounded-md bg-gray-100">
                   <img
                     src={item.chapterCoverImage}
                     alt={item.chapterTitle}
@@ -149,7 +139,7 @@ export function ReadingHistory() {
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-white rounded-3xl p-12 text-center shadow-sm">
+        <div className="rounded-lg border border-gray-200/80 bg-white p-12 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="h-8 w-8 text-blue-500" />

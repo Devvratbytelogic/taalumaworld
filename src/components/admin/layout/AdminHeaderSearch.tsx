@@ -28,6 +28,7 @@ import {
     Mail,
     ShoppingBag,
     Settings,
+    Award,
     UserCircle,
 } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
@@ -35,6 +36,7 @@ import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
 import {
     getAdminSectionRoutePath,
     getAdminProfileRoutePath,
+    getAdminMentorTypesRoutePath,
     getCreateChapterRoutePath,
 } from '@/routes/routes';
 
@@ -53,6 +55,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
     { label: 'Categories', description: 'Manage categories', path: getAdminSectionRoutePath('categories'), icon: FolderTree, keywords: ['category', 'tag'] },
     { label: 'Mentors', description: 'Manage mentors', path: getAdminSectionRoutePath('authors'), icon: Users, keywords: ['author', 'leader', 'thought', 'mentor'] },
+    { label: 'Mentor Types', description: 'Configure mentor categories and revenue share', path: getAdminMentorTypesRoutePath(), icon: Award, keywords: ['mentor type', 'mentor category', 'founding', 'revenue share', 'badge'] },
     { label: 'Users', description: 'Manage registered users', path: getAdminSectionRoutePath('users'), icon: UserCircle, keywords: ['user', 'member', 'account'] },
     { label: 'Transactions', description: 'View payment transactions', path: getAdminSectionRoutePath('transactions'), icon: Receipt, keywords: ['payment', 'transaction', 'money'] },
     { label: 'Orders', description: 'View series & blueprint orders', path: getAdminSectionRoutePath('orders'), icon: ShoppingBag, keywords: ['order', 'book order', 'series order', 'blueprint order', 'purchase'] },

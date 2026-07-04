@@ -20,6 +20,10 @@ import { AdminEmptyState, AdminTableShell } from '@/components/admin/layout/Admi
 import { AdminPagination } from '@/components/admin/shared/AdminPagination';
 import type { Author } from '@/types/content';
 import { IAuthorLeaderEntity } from '@/types/authleaders';
+import {
+  INITIAL_MENTOR_TYPES,
+  MENTOR_TYPE_BADGE_COLORS,
+} from '@/components/admin/mentor-types/data/mentorTypesData';
 
 const MENTOR_STATUSES = ['active', 'inactive', 'suspended', 'pending', 'rejected'];
 
@@ -65,6 +69,7 @@ export function AuthorListing({
         <TableHeader>
           <TableRow>
             <TableHead>Mentor</TableHead>
+            <TableHead>Mentor type</TableHead>
             <TableHead>Bio</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Series</TableHead>
@@ -72,10 +77,12 @@ export function AuthorListing({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {authors.map((author) => {
+          {authors.map((author, index) => {
             const status = author.status || 'pending';
+            const authorId = author.id ?? author._id;
+            const mentorType = INITIAL_MENTOR_TYPES[index % INITIAL_MENTOR_TYPES.length];
             return (
-              <TableRow key={author.id}>
+              <TableRow key={authorId ?? index}>
                 <TableCell className="max-w-44">
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-100">
@@ -96,6 +103,17 @@ export function AuthorListing({
                       <p className="truncate text-xs text-slate-500">{author.email}</p>
                     </div>
                   </div>
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  <Badge
+                    variant="outline"
+                    className={MENTOR_TYPE_BADGE_COLORS[mentorType.slug] ?? 'border-slate-200 text-slate-600'}
+                  >
+                    {mentorType.badgeLabel}
+                  </Badge>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {mentorType.mentorSharePercent}% share
+                  </p>
                 </TableCell>
                 <TableCell className="max-w-sm">
                   <p className="line-clamp-2 text-sm text-slate-500">{author.professionalBio || '—'}</p>

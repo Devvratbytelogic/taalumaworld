@@ -10,6 +10,7 @@ export type AdminSection =
   | 'chapters'
   | 'categories'
   | 'authors'
+  | 'mentor_types'
   | 'users'
   | 'activity_logs'
   | 'payments'

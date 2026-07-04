@@ -146,6 +146,10 @@ export function getAdminPortalLoginRoutePath(): string {
   return '/portal/login';
 }
 
+export function getAdminMentorTypesRoutePath(): string {
+  return '/admin/types/mentor-types';
+}
+
 export function getAdminProfileRoutePath(): string {
   return '/admin/profile';
 }
@@ -163,6 +167,7 @@ export function getAdminSectionRoutePath(section: string): string {
     chapters: '/admin/chapters',
     categories: '/admin/categories',
     authors: '/admin/authors',
+    mentor_types: '/admin/types/mentor-types',
     users: '/admin/users',
     activity_logs: '/admin/activity-logs',
     payments: '/admin/payments',

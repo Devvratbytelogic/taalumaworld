@@ -10,7 +10,6 @@ import ResetPassword from '../auth/forgot/ResetPassword';
 import OtpVerification from '../auth/otp/OtpVerification';
 import LoginRequiredModal from '../auth/LoginRequiredModal';
 import FilterModal from './FilterModal';
-import CommonCardDetailsModal from './CommonCardDetailsModal';
 import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
 import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
@@ -18,6 +17,8 @@ import { ExtendPromotionModal } from '../admin/institutions/ExtendPromotionModal
 import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModal';
 import { AssignStaffRoleModal } from '../admin/roles-and-permissions/AssignStaffRoleModal';
 import { AddStaffModal } from '../admin/roles-and-permissions/AddStaffModal';
+import BookDetailsModal from './common-card-details/BookDetailsModal';
+import ChapterDetailsModal from './common-card-details/ChapterDetailsModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -46,8 +47,6 @@ export default function AllModal() {
                 return <LoginRequiredModal />;
             case "FilterModal":
                 return <FilterModal />;
-            case "CommonCardDetailsModal":
-                return <CommonCardDetailsModal />;
             case "ChapterPurchaseModal":
                 return <ChapterPurchaseModal />;
             case "ConfirmRemoveCartModal":
@@ -62,7 +61,10 @@ export default function AllModal() {
                 return <AssignStaffRoleModal />;
             case "AddStaffModal":
                 return <AddStaffModal />;
-
+            case "BookDetailsModal":
+                return <BookDetailsModal />;
+            case "ChapterDetailsModal":
+                return <ChapterDetailsModal />;
             default:
                 return null;
         }

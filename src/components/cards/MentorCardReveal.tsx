@@ -1,21 +1,20 @@
 'use client'
 
-import React from 'react'
 import { User } from 'lucide-react'
 import ImageComponent from '../ui/ImageComponent'
 import { FacebookIcon, LinkedinIcon } from '../ui/AllSVG'
-import type { IAuthorSocialLinks } from '@/types/user/HomeAllChapters'
+import { IHomeAllContentAuthorSocial } from '@/types/user/HomeAllChapters'
 
 interface MentorCardRevealProps {
-    name: string
+    name?: string | null
     avatar?: string | null
     bio?: string | null
-    social?: IAuthorSocialLinks | null
+    social?: IHomeAllContentAuthorSocial | null
 }
 
 export default function MentorCardReveal({ name, avatar, bio, social }: MentorCardRevealProps) {
-    const linkedin = social?.linkedin?.trim()
-    const facebook = social?.facebook?.trim()
+    const linkedin = social?.linkedin?.trim() ?? ''
+    const facebook = social?.facebook?.trim() ?? ''
 
     return (
         <div
@@ -24,7 +23,7 @@ export default function MentorCardReveal({ name, avatar, bio, social }: MentorCa
         >
             {avatar ? (
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 shrink-0">
-                    <ImageComponent src={avatar} alt={name} object_cover={true} />
+                    <ImageComponent src={avatar ?? ''} alt={name ?? ''} object_cover={true} />
                 </div>
             ) : (
                 <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center shrink-0">

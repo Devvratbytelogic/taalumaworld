@@ -11,7 +11,7 @@ import Button from '@/components/ui/Button';
 import { useAppDispatch } from '@/store/hooks';
 import { openModal } from '@/store/slices/allModalSlice';
 import { VISIBLE } from '@/constants/contentMode';
-import { IBookItem, IChapterItem } from '@/types/user/HomeAllChapters';
+import { IHomeAllContentItem } from '@/types/user/HomeAllChapters';
 
 export default function AuthorsPage() {
   return (
@@ -200,14 +200,14 @@ function AuthorDetail({ id }: { id: string }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {items.map((item) => {
               const isBook = item.type === 'book';
-              const contentItem = item as IBookItem | IChapterItem;
+              const contentItem = item as IHomeAllContentItem;
               return (
                 <button
                   key={contentItem.id}
                   onClick={() => {
                     dispatch(
                       openModal({
-                        componentName: 'CommonCardDetailsModal',
+                        componentName: isBook ? 'BookDetailsModal' : 'ChapterDetailsModal',
                         data: { chapter: contentItem },
                       }),
                     );
@@ -227,7 +227,7 @@ function AuthorDetail({ id }: { id: string }) {
                     <h3 className="font-bold line-clamp-1">{contentItem.title}</h3>
                     {!isBook && (
                       <p className="text-sm text-muted-foreground">
-                        Bp. {(contentItem as IChapterItem).chapterNumber} · {(contentItem as IChapterItem).bookTitle}
+                        Bp. {contentItem.chapterNumber} · {contentItem.bookTitle}
                       </p>
                     )}
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-1">

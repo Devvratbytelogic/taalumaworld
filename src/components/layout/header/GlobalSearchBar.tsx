@@ -10,9 +10,8 @@ import { VISIBLE } from '@/constants/contentMode';
 import { useAppDispatch } from '@/store/hooks';
 import { openModal } from '@/store/slices/allModalSlice';
 import { BooksEntity, ChaptersEntity } from '@/types/user/saech';
-import { IBookItem, IChapterItem } from '@/types/user/HomeAllChapters';
 
-function mapBookToContentItem(book: BooksEntity): IBookItem {
+function mapBookToContentItem(book: BooksEntity) {
   return {
     type: 'book',
     id: book.id,
@@ -34,7 +33,7 @@ function mapBookToContentItem(book: BooksEntity): IBookItem {
   };
 }
 
-function mapChapterToContentItem(chapter: ChaptersEntity): IChapterItem {
+function mapChapterToContentItem(chapter: ChaptersEntity) {
   return {
     type: 'chapter',
     id: chapter.id,
@@ -236,7 +235,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                       key={book.id}
                       onClick={() => {
                         saveSearch(book.title);
-                        dispatch(openModal({ componentName: 'CommonCardDetailsModal', data: { chapter: mapBookToContentItem(book) } }));
+                        dispatch(openModal({ componentName: 'BookDetailsModal', data: { chapter: mapBookToContentItem(book) } }));
                         clearAndClose();
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -261,7 +260,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                       key={chapter.id}
                       onClick={() => {
                         saveSearch(chapter.title);
-                        dispatch(openModal({ componentName: 'CommonCardDetailsModal', data: { chapter: mapChapterToContentItem(chapter) } }));
+                        dispatch(openModal({ componentName: 'ChapterDetailsModal', data: { chapter: mapChapterToContentItem(chapter) } }));
                         clearAndClose();
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"

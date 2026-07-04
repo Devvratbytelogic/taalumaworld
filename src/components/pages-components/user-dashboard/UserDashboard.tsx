@@ -1,21 +1,22 @@
 'use client';
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BookOpen, Book, Clock, User, Settings, Home } from 'lucide-react';
+import { BookOpen, Book, Clock, User, Settings, Home, GraduationCap } from 'lucide-react';
 import { DashboardHome } from './DashboardHome';
 import { MyChaptersPage } from './MyChaptersPage';
 import { MyBooksPage } from './MyBooksPage';
 import { ReadingHistory } from './ReadingHistory';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
+import { BecomeMentorPage } from './BecomeMentorPage';
 import { cn } from '@/components/ui/utils';
 import { clearAuthCookies } from '@/utils/authCookies';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { getHomeRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 
-type DashboardPage = 'dashboard' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings';
+type DashboardPage = 'dashboard' | 'my-chapters' | 'my-books' | 'history' | 'profile' | 'settings' | 'become-mentor';
 
-const VALID_PAGES: DashboardPage[] = ['dashboard', 'my-chapters', 'my-books', 'history', 'profile', 'settings'];
+const VALID_PAGES: DashboardPage[] = ['dashboard', 'my-chapters', 'my-books', 'history', 'profile', 'settings', 'become-mentor'];
 
 function UserDashboardInner() {
   const router = useRouter();
@@ -43,6 +44,7 @@ function UserDashboardInner() {
     { id: 'my-chapters' as DashboardPage, label: 'My Blueprints', icon: BookOpen, show: true },
     { id: 'my-books' as DashboardPage, label: 'My Series', icon: Book, show: true },
     { id: 'history' as DashboardPage, label: 'Reading History', icon: Clock, show: true },
+    { id: 'become-mentor' as DashboardPage, label: 'Become a Mentor', icon: GraduationCap, show: true },
     { id: 'settings' as DashboardPage, label: 'Settings', icon: Settings, show: true },
   ].filter(item => item.show);
 
@@ -58,6 +60,8 @@ function UserDashboardInner() {
         return <ReadingHistory />;
       case 'profile':
         return <ProfilePage />;
+      case 'become-mentor':
+        return <BecomeMentorPage />;
       case 'settings':
         return <SettingsPage onLogout={handleLogout} />;
       default:
@@ -105,7 +109,7 @@ function UserDashboardInner() {
   );
 }
 
-export function   UserDashboard() {
+export function UserDashboard() {
   return (
     <Suspense fallback={<UserDashboardSkeleton />}>
       <UserDashboardInner />

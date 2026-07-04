@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bell, Book, FileEdit, FileText, FolderTree, GraduationCap, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, UserCircle, Users, Award } from 'lucide-react';
-import { getAdminDashboardRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { Bell, Book, ClipboardList, FileEdit, FileText, FolderTree, GraduationCap, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, UserCircle, Users, Award } from 'lucide-react';
+import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
@@ -29,6 +29,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'Mentor Management',
         items: [
             { id: 'authors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
+            { id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
             { id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
         ],
     },

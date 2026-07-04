@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Book, Clock, ArrowRight } from 'lucide-react';
+import { BookOpen, Book, Clock, ArrowRight, GraduationCap } from 'lucide-react';
 import DashboardHomeSkeleton from '@/components/skeleton-loader/DashboardHomeSkeleton';
 import { useGetGlobalSettingsQuery, useGetMyBooksQuery, useGetMyChaptersQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 
@@ -115,6 +115,26 @@ export function DashboardHome() {
           </p>
           <p className="text-sm text-muted-foreground">
             View all your recently read items
+          </p>
+        </button>
+
+        {/* Become a Mentor Card */}
+        <button
+          onClick={() => onPageChange('become-mentor')}
+          className="bg-linear-to-br from-emerald-50 to-emerald-100/50 rounded-3xl p-6 hover:shadow-lg transition-all text-left group"
+        >
+          <div className="flex items-start justify-between mb-4">
+            <div className="p-3 bg-emerald-600 rounded-2xl">
+              <GraduationCap className="h-6 w-6 text-white" />
+            </div>
+            <ArrowRight className="h-5 w-5 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+          <h3 className="text-xl font-bold mb-2">Become a Mentor</h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Share your expertise with Career Architects
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Apply to join the TaalumaWorld mentor community
           </p>
         </button>
 

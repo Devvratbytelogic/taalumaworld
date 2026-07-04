@@ -152,8 +152,8 @@ export default function PrimaryHeader() {
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className={
                     headerUserPhoto
-                      ? 'h-10 w-10 shrink-0 cursor-pointer rounded-full overflow-hidden ring-2 ring-transparent hover:opacity-95 hover:ring-primary/25 transition-all'
-                      : 'h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm hover:bg-primary/90 transition-colors cursor-pointer shrink-0'
+                      ? 'border h-10 w-10 shrink-0 cursor-pointer rounded-full overflow-hidden ring-2 ring-transparent hover:opacity-95 hover:ring-primary/25 transition-all'
+                      : 'border h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm hover:bg-primary/90 transition-colors cursor-pointer shrink-0'
                   }
                   role="button"
                   tabIndex={0}

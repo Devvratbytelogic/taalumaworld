@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation';
 import PrimaryHeader from '@/components/layout/header/PrimaryHeader';
 import PrimaryFooter from '@/components/layout/footer/PrimaryFooter';
 
-export default function ConditionalSiteLayout({ children, isAuthenticated, userRole }: { children: React.ReactNode, isAuthenticated: boolean, userRole: string }) {
+export default function ConditionalSiteLayout({ children, isAuthenticated, userRole, logo, contentMode }: { children: React.ReactNode, isAuthenticated: boolean, userRole: string, logo: string, contentMode: string }) {
     const pathname = usePathname();
     const isAdminRoute = pathname.startsWith('/admin');
     const isPortalRoute = pathname.startsWith('/portal');
@@ -11,7 +11,7 @@ export default function ConditionalSiteLayout({ children, isAuthenticated, userR
 
     return (
         <>
-            {!hideSiteChrome && <PrimaryHeader isAuthenticated={isAuthenticated} userRole={userRole ?? ''} />}
+            {!hideSiteChrome && <PrimaryHeader logo={logo} isAuthenticated={isAuthenticated} userRole={userRole ?? ''} contentMode={contentMode} />}
             {children}
             {!hideSiteChrome && <PrimaryFooter />}
         </>

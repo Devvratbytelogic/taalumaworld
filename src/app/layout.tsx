@@ -62,8 +62,11 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const authToken = cookieStore.get("auth_token")?.value;
   const userRole = cookieStore.get("user_role")?.value;
+  // const logo = globalSettings?.logo ?? '/images/new-logo.png';
+  const logo = '/images/new-logo.png';
+  const contentMode = globalSettings?.visible ?? '';
   const isAuthenticated = !!authToken;
-  
+
 
   return (
     <html lang="en" className={`${roboto.variable} ${ubuntu.variable}`}>
@@ -101,7 +104,7 @@ export default async function RootLayout({
           <ContentProtection />
         )}
         <AppProviders>
-          <ConditionalSiteLayout isAuthenticated={isAuthenticated} userRole={userRole ?? ''}>
+          <ConditionalSiteLayout isAuthenticated={isAuthenticated} userRole={userRole ?? ''} logo={logo} contentMode={contentMode}>
             {children}
           </ConditionalSiteLayout>
         </AppProviders>

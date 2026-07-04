@@ -5,7 +5,7 @@ import toast from '@/utils/toast';
 import { Menu, ShoppingCart, BookMarked, LogOut, User, ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
-import { useGetCartQuery, useGetGlobalSettingsQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetCartQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import { openModal } from '@/store/slices/allModalSlice';
 import { VISIBLE } from '@/constants/contentMode';
 import Button from '@/components/ui/Button';
@@ -22,18 +22,17 @@ import ImageComponent from '@/components/ui/ImageComponent';
 interface PrimaryHeaderProps {
   isAuthenticated: boolean;
   userRole: string;
+  logo: string;
+  contentMode: string;
 }
-export default function PrimaryHeader({ isAuthenticated, userRole }: PrimaryHeaderProps) {
+export default function PrimaryHeader({ logo, isAuthenticated, userRole, contentMode }: PrimaryHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const pathName = usePathname();
   const dispatch = useAppDispatch();
 
-  const { data: globalSettings } = useGetGlobalSettingsQuery();
-  const contentMode = globalSettings?.data?.visible;
-  const logo = globalSettings?.data?.logo as string | null | undefined;
-  const brandName = globalSettings?.data?.marketplace_name || 'TaalumaWorld';
+  const brandName = 'TaalumaWorld';
 
   const isAdmin = userRole === 'admin' || userRole === 'author';
 

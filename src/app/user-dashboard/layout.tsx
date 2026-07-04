@@ -48,7 +48,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
   const userPhoto = profileData?.data?.profile_pic ?? '';
 
   return (
-    <div className="min-h-screen bg-gray-50/80">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:py-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
           <aside className="lg:w-64 shrink-0 xl:w-72">

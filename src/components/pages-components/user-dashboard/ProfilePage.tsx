@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import { Mail, Camera, Check, Pencil, Calendar, UserRound, ShieldCheck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
+import { fieldInvalidClassName } from '@/components/ui/field-styles';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from '@/utils/toast';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
@@ -135,13 +136,13 @@ export function ProfilePage() {
       </UserDashboardPageHeader>
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="relative h-24 bg-linear-to-r from-primary/15 via-primary/8 to-gray-50">
-          <span className="absolute right-6 bottom-0 inline-flex translate-y-1/2 items-center gap-1.5 rounded-md border border-primary/15 bg-white px-3 py-1.5 text-xs font-medium text-primary sm:right-8">
+        <div className="relative h-24 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90">
+          <span className="absolute right-6 bottom-0 inline-flex translate-y-1/2 items-center gap-1.5 rounded-full border border-primary/20 bg-white/95 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-primary backdrop-blur-sm sm:right-8">
             <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
             Career Architect
           </span>
 
-          <div className="absolute left-6 bottom-0 flex max-w-[calc(100%-10rem)] translate-y-1/2 items-end gap-4 sm:left-8 sm:max-w-[calc(100%-12rem)] sm:gap-5">
+          <div className="absolute left-6 bottom-0 flex max-w-[calc(100%-10rem)] translate-y-1/2 items-end gap-4 rounded-2xl border border-primary/20 bg-white/75 py-2.5 pl-2.5 pr-4 ring-1 ring-white/80 ring-inset backdrop-blur-sm sm:left-8 sm:max-w-[calc(100%-12rem)] sm:gap-5 sm:pr-5">
             <label className={isEditing ? 'relative shrink-0 cursor-pointer' : 'relative shrink-0'}>
               <div className="rounded-full ring-4 ring-white">
                 <UserAvatar
@@ -167,11 +168,11 @@ export function ProfilePage() {
             </label>
 
             <div className="min-w-0 pb-0.5">
-              <h2 className="truncate text-xl font-semibold leading-tight text-gray-900">
+              <h2 className="truncate text-lg font-medium tracking-tight text-gray-900 sm:text-xl">
                 {profile?.name ?? '—'}
               </h2>
               <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-gray-500">
-                <Mail className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
                 {profile?.email ?? '—'}
               </p>
             </div>
@@ -249,7 +250,7 @@ export function ProfilePage() {
                         onBlur={handleBlur}
                         placeholder="Enter your full name"
                         disabled={isSubmitting}
-                        className={errors.fullName && touched.fullName ? 'border-red-500 bg-white' : 'bg-white'}
+                        className={errors.fullName && touched.fullName ? fieldInvalidClassName : undefined}
                       />
                       {errors.fullName && touched.fullName ? (
                         <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>

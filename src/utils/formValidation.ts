@@ -348,3 +348,36 @@ export const authorSchema = Yup.object({
       !v || v instanceof File || (typeof v === 'string' && /^https?:\/\//.test(v))
     ),
 });
+
+// Add / Edit Institution Modal Validation Schema
+export const institutionSchema = Yup.object({
+  name: Yup.string().trim().required('Institution name is required'),
+  country: Yup.string().trim().required('Country is required'),
+  contact_email: emailRules.label('Contact email'),
+  email_domains: Yup.string().trim().required('At least one email domain is required'),
+  promotional_start_date: Yup.string().required('Start date is required'),
+  promotional_end_date: Yup.string()
+    .required('End date is required')
+    .test('after-start', 'End date must be on or after start date', function (value) {
+      const start = this.parent.promotional_start_date;
+      if (!value || !start) return true;
+      return value >= start;
+    }),
+  re_access_type: Yup.string().oneOf(['market', 'discounted']),
+  re_access_discount: Yup.number().when('re_access_type', {
+    is: 'discounted',
+    then: (schema) => schema.min(1, 'Min 1%').max(100, 'Max 100%').required('Discount is required'),
+    otherwise: (schema) => schema.optional(),
+  }),
+});
+
+// Extend Promotional Period Modal — pass context: { currentEnd } from Formik
+export const extendPromotionSchema = Yup.object({
+  new_end_date: Yup.string()
+    .required('New end date is required')
+    .test('after-current', 'New date must be after current end date', function (value) {
+      const currentEnd = this.options.context?.currentEnd as string | undefined;
+      if (!value || !currentEnd) return true;
+      return value > currentEnd;
+    }),
+});

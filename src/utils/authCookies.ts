@@ -42,7 +42,7 @@ export function setAuthCookies(data: AuthResponseData): void {
     if (role != null && role !== '') {
         const roleValue = typeof role === 'string' ? role : (role.name ?? role.id ?? role._id)
         if (roleValue) {
-            Cookies.set('user_role', String(roleValue), SESSION_COOKIE_OPTIONS)
+            Cookies.set('user_role', String(roleValue?.toLowerCase()), SESSION_COOKIE_OPTIONS)
         }
     }
 

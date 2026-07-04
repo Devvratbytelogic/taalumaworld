@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'nextjs-toploader/app';
 import { getAuthorsRoutePath } from '@/routes/routes';
 import { Search, X, BookOpen, FileText, User, Clock } from 'lucide-react';
@@ -67,6 +67,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -92,6 +93,16 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
     }, 350);
     return () => clearTimeout(timer);
   }, [query]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   const { data: searchData, isFetching } = useGetSearchResultsQuery(debouncedQuery, {
     skip: debouncedQuery.length < 2,
@@ -128,12 +139,11 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   };
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="group/search relative w-full">
       <form onSubmit={handleSubmit} className="relative">
         <Search
-          className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors ${
-            isOpen ? 'text-primary' : 'text-gray-400'
-          }`}
+          className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 transition-colors group-focus-within/search:text-primary"
+          aria-hidden
         />
         <Input
           type="text"
@@ -141,9 +151,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className={`pl-11 pr-10 w-full py-3 rounded-full transition-all ${
-            isOpen ? 'border-primary' : ''
-          }`}
+          className="h-10 w-full rounded-full py-2 pl-10 pr-10"
         />
         {query && (
           <button

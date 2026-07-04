@@ -6,6 +6,7 @@ import ConditionalSiteLayout from "@/components/layout/ConditionalSiteLayout";
 import { ContentProtection } from "@/components/ContentProtection";
 import { API_BASE_URL } from "@/utils/config";
 import Script from "next/script";
+import { cookies } from "next/headers";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -58,6 +59,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const globalSettings = await fetchGlobalSettings();
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("auth_token")?.value;
+  const userRole = cookieStore.get("user_role")?.value;
+  const isAuthenticated = !!authToken;
+  
 
   return (
     <html lang="en" className={`${roboto.variable} ${ubuntu.variable}`}>
@@ -95,7 +101,7 @@ export default async function RootLayout({
           <ContentProtection />
         )}
         <AppProviders>
-          <ConditionalSiteLayout>
+          <ConditionalSiteLayout isAuthenticated={isAuthenticated} userRole={userRole ?? ''}>
             {children}
           </ConditionalSiteLayout>
         </AppProviders>

@@ -98,9 +98,9 @@ export default function MobileSearchBar() {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isOpen]);
 
   const { data: searchData, isFetching } = useGetSearchResultsQuery(debouncedQuery, {
     skip: debouncedQuery.length < 2,
@@ -149,12 +149,11 @@ export default function MobileSearchBar() {
   };
 
   return (
-    <div ref={containerRef} className="lg:hidden pb-4 relative">
+    <div ref={containerRef} className="group/search relative pb-4 lg:hidden">
       <form onSubmit={handleSearch} className="relative">
         <Search
-          className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors ${
-            isOpen ? 'text-primary' : 'text-gray-400'
-          }`}
+          className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 transition-colors group-focus-within/search:text-primary"
+          aria-hidden
         />
         <Input
           type="text"
@@ -162,9 +161,7 @@ export default function MobileSearchBar() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className={`w-full pl-12 pr-10 py-2 rounded-full border-2 transition-colors ${
-            isOpen ? 'border-primary' : 'border-gray-200'
-          }`}
+          className="h-10 w-full rounded-full py-2 pl-12 pr-10"
         />
         {searchQuery && (
           <button

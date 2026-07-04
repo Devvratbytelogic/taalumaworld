@@ -1,17 +1,42 @@
 'use client';
 
+import { useMemo } from 'react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useFormik } from 'formik';
-import { Mail, Camera, Check, Pencil, Calendar, UserRound, ShieldCheck } from 'lucide-react';
+import {
+  Mail,
+  Camera,
+  Check,
+  Pencil,
+  Calendar,
+  UserRound,
+  ShieldCheck,
+  BookOpen,
+  BookMarked,
+  TrendingUp,
+  CheckCircle,
+} from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { fieldInvalidClassName } from '@/components/ui/field-styles';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
-import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
+import {
+  useGetMyBooksQuery,
+  useGetMyChaptersQuery,
+  useGetReadingHistoryQuery,
+  useGetUserProfileQuery,
+} from '@/store/rtkQueries/userGetAPI';
 import { useUserUpdateProfileMutation } from '@/store/rtkQueries/userAuthApi';
 import { updateProfileSchema } from '@/utils/formValidation';
 import moment from 'moment';
+import {
+  getUserDashboardHistoryRoutePath,
+  getUserDashboardMyBooksRoutePath,
+  getUserDashboardMyChaptersRoutePath,
+} from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 export function ProfilePage() {
@@ -20,8 +45,51 @@ export function ProfilePage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const { data: profileData, isLoading } = useGetUserProfileQuery();
+  const { data: booksData, isLoading: isBooksLoading } = useGetMyBooksQuery();
+  const { data: chaptersData, isLoading: isChaptersLoading } = useGetMyChaptersQuery();
+  const { data: historyData, isLoading: isHistoryLoading } = useGetReadingHistoryQuery();
   const [updateProfile] = useUserUpdateProfileMutation();
   const profile = profileData?.data;
+
+  const isKpisLoading = isBooksLoading || isChaptersLoading || isHistoryLoading;
+
+  const kpiItems = useMemo(
+    () => [
+      {
+        label: 'Series owned',
+        value: booksData?.data?.summary?.totalBooks ?? 0,
+        icon: BookOpen,
+        iconClass: 'text-primary',
+        href: getUserDashboardMyBooksRoutePath(),
+      },
+      {
+        label: 'Blueprints',
+        value: chaptersData?.data?.summary?.totalChapters ?? 0,
+        icon: BookMarked,
+        iconClass: 'text-primary',
+        href: getUserDashboardMyChaptersRoutePath(),
+      },
+      {
+        label: 'In progress',
+        value:
+          historyData?.data?.summary?.inProgress ??
+          (booksData?.data?.summary?.inProgress ?? 0) + (chaptersData?.data?.summary?.inProgress ?? 0),
+        icon: TrendingUp,
+        iconClass: 'text-primary',
+        href: getUserDashboardHistoryRoutePath(),
+      },
+      {
+        label: 'Completed',
+        value:
+          historyData?.data?.summary?.completed ??
+          (booksData?.data?.summary?.completed ?? 0) + (chaptersData?.data?.summary?.completed ?? 0),
+        icon: CheckCircle,
+        iconClass: 'text-green-600',
+        href: getUserDashboardHistoryRoutePath(),
+      },
+    ],
+    [booksData, chaptersData, historyData]
+  );
 
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } =
     useFormik({
@@ -83,7 +151,11 @@ export function ProfilePage() {
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
           <div className="h-32 bg-gray-100" />
           <div className="space-y-4 px-6 py-8">
-            <div className="h-20 w-20 -mt-14 rounded-full bg-gray-200" />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-16 rounded-lg bg-gray-50" />
+              ))}
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-16 rounded-lg bg-gray-50" />
@@ -143,29 +215,35 @@ export function ProfilePage() {
           </span>
 
           <div className="absolute left-6 bottom-0 flex max-w-[calc(100%-10rem)] translate-y-1/2 items-end gap-4 rounded-2xl border border-primary/20 bg-white/75 py-2.5 pl-2.5 pr-4 ring-1 ring-white/80 ring-inset backdrop-blur-sm sm:left-8 sm:max-w-[calc(100%-12rem)] sm:gap-5 sm:pr-5">
-            <label className={isEditing ? 'relative shrink-0 cursor-pointer' : 'relative shrink-0'}>
-              <div className="rounded-full ring-4 ring-white">
-                <UserAvatar
-                  userName={values.fullName || profile?.name || ''}
-                  userPhoto={displayPhoto}
-                  size="xl"
-                />
-              </div>
-              {isEditing && (
-                <>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={isSubmitting}
+            <div className="flex shrink-0 flex-col items-center">
+              <label className={isEditing ? 'relative cursor-pointer' : 'relative'}>
+                <div className="rounded-full border ring-4 ring-white">
+                  <UserAvatar
+                    userName={values.fullName || profile?.name || ''}
+                    userPhoto={displayPhoto}
+                    size="xl"
                   />
-                  <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity hover:opacity-100">
-                    <Camera className="h-5 w-5 text-white" />
-                  </span>
-                </>
-              )}
-            </label>
+                </div>
+                {isEditing && (
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                      disabled={isSubmitting}
+                    />
+                    <span className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/45 text-white">
+                      <Camera className="h-4 w-4" aria-hidden />
+                      <span className="mt-0.5 text-[10px] font-medium leading-none">Change</span>
+                    </span>
+                  </>
+                )}
+              </label>
+              {isEditing ? (
+                <p className="mt-1.5 max-w-16 text-center text-[10px] leading-tight text-gray-500">Max 2MB</p>
+              ) : null}
+            </div>
 
             <div className="min-w-0 pb-0.5">
               <h2 className="truncate text-lg font-medium tracking-tight text-gray-900 sm:text-xl">
@@ -175,14 +253,42 @@ export function ProfilePage() {
                 <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
                 {profile?.email ?? '—'}
               </p>
+              {isEditing ? (
+                <p className="mt-2 text-xs text-primary">Tap your photo to upload a new image</p>
+              ) : null}
             </div>
           </div>
         </div>
 
         <div className="relative px-6 pb-8 pt-12 sm:px-8">
-          {isEditing && (
-            <p className="text-sm text-gray-500">Click your photo to upload a new image (max 2MB)</p>
-          )}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 mt-6">
+            {kpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 transition-colors hover:border-gray-300 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                    <Icon className={cn('h-4 w-4', iconClass)} aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    {isKpisLoading ? (
+                      <div className="space-y-1.5 animate-pulse">
+                        <div className="h-5 w-8 rounded bg-gray-200" />
+                        <div className="h-3 w-16 rounded bg-gray-100" />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-xl font-semibold tracking-tight text-gray-900">{value}</p>
+                        <p className="truncate text-sm text-gray-500">{label}</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
 
           <div className="mt-8 border-t border-gray-100 pt-8">
             {!isEditing ? (

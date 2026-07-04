@@ -1,5 +1,4 @@
 'use client';
-import React from 'react'
 import CommonCard from '@/components/cards/CommonCard';
 import FilterOptions from './FilterOptions';
 import { useGetAllChaptersQuery } from '@/store/rtkQueries/userGetAPI';

@@ -8,6 +8,7 @@ import { cn } from '@/components/ui/utils';
 import type { ItemsEntity } from '@/types/user/myChapters';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { getReadChapterRoutePath } from '@/routes/routes';
+import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 type FilterType = 'all' | 'reading' | 'completed' | 'unread';
 
@@ -102,11 +103,10 @@ export function MyChaptersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="mb-2">
-        <h1 className="text-3xl font-bold mb-1">My Blueprints</h1>
-        <p className="text-muted-foreground">Your personal collection of purchased blueprints</p>
-      </div>
+      <UserDashboardPageHeader
+        title="My Blueprints"
+        description="Your personal collection of purchased blueprints"
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

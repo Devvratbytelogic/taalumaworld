@@ -10,6 +10,7 @@ import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import moment from 'moment';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { getHomeRoutePath } from '@/routes/routes';
+import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 export function SettingsPage() {
   const { data: profileRes, isLoading: isLoadingProfile } = useGetUserProfileQuery()
@@ -93,10 +94,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Manage your account settings and preferences</p>
-      </div>
+      <UserDashboardPageHeader title="Settings" description="Manage your account settings and preferences" />
 
       <div className="rounded-lg border border-gray-200/80 bg-white p-6 sm:p-8">
         <div className="max-w-2xl">

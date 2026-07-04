@@ -5,6 +5,7 @@ import { Clock, Calendar } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useGetReadingHistoryQuery } from '@/store/rtkQueries/userGetAPI';
 import type { IMyReadingHistoryAPIResponseItemsEntity } from '@/types/user/readingHistory';
+import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 export function ReadingHistory() {
   const router = useRouter();
@@ -75,10 +76,7 @@ export function ReadingHistory() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Reading History</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Track your reading journey and progress</p>
-      </div>
+      <UserDashboardPageHeader title="Reading History" description="Track your reading journey and progress" />
 
       {historyItems.length > 0 ? (
         <div className="rounded-lg border border-gray-200/80 bg-white p-4 sm:p-6">

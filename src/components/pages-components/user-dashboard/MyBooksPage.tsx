@@ -9,6 +9,7 @@ import type { IMyBookItem } from '@/types/user/myBooks';
 import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
 import { getHomeRoutePath, getReadBookRoutePath } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 type FilterType = 'all' | 'reading' | 'completed' | 'unread';
 
@@ -74,11 +75,7 @@ export function MyBooksPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="mb-2">
-        <h1 className="text-3xl font-bold mb-1">My Series</h1>
-        <p className="text-muted-foreground">Your personal collection of purchased series</p>
-      </div>
+      <UserDashboardPageHeader title="My Series" description="Your personal collection of purchased series" />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

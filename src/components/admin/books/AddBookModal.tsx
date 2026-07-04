@@ -232,15 +232,15 @@ export function AddBookModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="xl" className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent size="xl" className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 max-w-2xl">
+        <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
           <DialogTitle>Create New Series</DialogTitle>
           <DialogDescription>
             Add a new series to the platform. Fill in the details below.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col min-h-0">
-          <div className="space-y-4 py-4 admin_panel max-h-[70vh] custom_scrollbar overflow-y-auto">
+        <form onSubmit={handleSubmit} className="admin_panel flex min-h-0 flex-1 flex-col">
+          <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto p-6!">
             <div className="space-y-2">
               <Label htmlFor="book-title">Title<span className="text-red-500">*</span></Label>
               <Input
@@ -496,7 +496,7 @@ export function AddBookModal({
               onOgImageClear={clearOgImage}
             />
           </div>
-          <DialogFooter>
+          <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">
             <Button
               type="button"
               className="global_btn rounded_full outline_primary"

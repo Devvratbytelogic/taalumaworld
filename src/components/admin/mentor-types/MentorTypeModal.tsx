@@ -99,7 +99,7 @@ export function MentorTypeModal({ open, mentorType, onOpenChange, onSubmit }: Me
         </DialogHeader>
 
         <form noValidate onSubmit={handleSubmit} className="admin_panel flex min-h-0 flex-1 flex-col">
-          <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto px-8 py-4">
+          <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto p-6!">
             <div className="space-y-2">
               <Label htmlFor="name">Mentor type name</Label>
               <Input

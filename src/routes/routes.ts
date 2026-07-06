@@ -4,6 +4,16 @@ export function getHomeRoutePath(): string {
   return '/';
 }
 
+
+export function getSeriesRoutePath(slug: string): string {
+  return `/series/${slug}`;
+}
+
+export function getBlueprintRoutePath(slug: string): string {
+  return `/blueprint/${slug}`;
+}
+
+
 export function getAboutUsRoutePath(): string {
   return '/why-taaluma-exists';
 }

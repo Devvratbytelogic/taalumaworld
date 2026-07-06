@@ -94,7 +94,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
       <header className="sticky top-0 z-50 border-b border-gray-200/80 bg-white/95 backdrop-blur-md">
         <HeaderToolbar />
 
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container">
           <div className="flex items-center justify-between gap-4 py-3.5">
             <Link href={getHomeRoutePath()} className="flex shrink-0 items-center">
               <div className="h-10 w-[148px] sm:w-[160px]">

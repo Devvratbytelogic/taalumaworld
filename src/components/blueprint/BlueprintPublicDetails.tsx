@@ -10,6 +10,8 @@ interface BlueprintPublicDetailsProps {
 }
 
 export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsProps) {
+  console.log('data', data);
+  
 
   return (
     <>
@@ -36,13 +38,13 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
                   <p className="text-sm font-medium text-[#1A1A1A]">{data?.title}</p>
                   <p className="mt-1 text-xs text-[#6B6B6B]">
                     Blueprint {data?.chapterNumber}
-                    {data?.pageCount ? ` · ${data?.pageCount} pages` : ''}
+                    {/* {data?.pageCount ? ` · ${data?.pageCount} pages` : ''} */}
                   </p>
                 </div>
 
                 <div className="px-6 py-8 sm:px-8 sm:py-10">
                   {data?.pdf ? (
-                    <PdfReader url={data?.pdf} title={data?.title} />
+                    <PdfReader url={data?.pdf ?? ''} title={data?.title ?? ''} />
                   ) : (
                     <MarkdownContent
                       content={data?.content ?? ''}

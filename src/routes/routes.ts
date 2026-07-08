@@ -140,16 +140,6 @@ export function getMentorForgotPasswordRoutePath(): string {
   return '/mentor/forgot-password';
 }
 
-export function getMentorResetPasswordRoutePath(): string {
-  return '/mentor/reset-password';
-}
-
-export function getMentorVerifyRoutePath(
-  params: { email: string; type: 'account' | 'verify' },
-): string {
-  const search = new URLSearchParams({ email: params.email, type: params.type });
-  return `/mentor/verify?${search.toString()}`;
-}
 
 /** Hidden administrator login — not linked on the public site */
 export function getAdminPortalLoginRoutePath(): string {

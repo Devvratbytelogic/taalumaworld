@@ -7,7 +7,7 @@ import { Mail } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { forgotPasswordSchema } from '@/utils/formValidation';
-import { useAuthorForgotPasswordMutation } from '@/store/rtkQueries/adminAuth';
+import { useAdminForgotPasswordMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import {
@@ -17,14 +17,14 @@ import {
 
 export function ForgotPasswordForm() {
     const router = useRouter();
-    const [authorForgotPassword, { isLoading: isSending }] = useAuthorForgotPasswordMutation();
+    const [adminForgotPassword, { isLoading: isSending }] = useAdminForgotPasswordMutation();
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: { email: '' },
         validationSchema: forgotPasswordSchema,
         onSubmit: async (formValues, { resetForm }) => {
             try {
-                const res = await authorForgotPassword({ user_id: formValues.email }).unwrap();
+                const res = await adminForgotPassword({ user_id: formValues.email }).unwrap();
                 toast.success((res as { message?: string }).message ?? 'Verification code sent to your email.');
                 resetForm();
                 router.push(getMentorVerifyRoutePath({ email: formValues.email, type: 'verify' }));

@@ -17,14 +17,14 @@ export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
                 body: userData,
             }),
         }),
-        authorForgotPassword: builder.mutation({
+        adminForgotPassword: builder.mutation({
             query: (userData) => ({
                 url: `/admin/forgot-password`,
                 method: "POST",
                 body: userData,
             }),
         }),
-        authorResetPassword: builder.mutation({
+        adminResetPassword: builder.mutation({
             query: ({ token, payload }) => ({
                 url: `/admin/new-password`,
                 method: "POST",
@@ -59,8 +59,8 @@ export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
 export const {
     useAdminLoginMutation,
     useAuthorRegisterMutation,
-    useAuthorForgotPasswordMutation,
-    useAuthorResetPasswordMutation,
+    useAdminForgotPasswordMutation,
+    useAdminResetPasswordMutation,
     useAdminVerifyOtpMutation,
     useAdminResendOtpMutation,
     useAdminChangePasswordMutation,

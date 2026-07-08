@@ -33,19 +33,18 @@ export default function OtpVerification() {
                     code: formValues.code,
                     type: modalData.type,
                 }).unwrap();
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    toast.success(res?.message ?? 'Verification successful!');
+                    resetForm();
 
-                toast.success((res as { message?: string }).message ?? 'Verification successful!');
-                resetForm();
-
-                if (modalData.type === 'account') {
-                    dispatch(openModal({ componentName: 'SignIn', data: '' }));
-                } else {
-                    const tempToken = (res as { data?: string }).data ?? '';
-                    Cookies.set('reset_password_token', tempToken, { expires: 1 / 24, sameSite: 'strict' });
-                    dispatch(openModal({ componentName: 'ResetPassword', data: { email: modalData.email, code: formValues.code } }));
+                    if (modalData.type === 'account') {
+                        dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                    } else {
+                        dispatch(openModal({ componentName: 'ResetPassword', data: { email: modalData.email, code: formValues.code } }));
+                    }
                 }
-            } catch {
-                toast.error('Invalid or expired code. Please try again.');
+            } catch (error) {
+                console.error('Invalid or expired code. Please try again.', error);
             }
         },
     });
@@ -53,10 +52,12 @@ export default function OtpVerification() {
     const handleResend = async () => {
         if (!modalData?.email) return;
         try {
-            const res = await userResendOtp({ email: modalData.email }).unwrap();
-            toast.success((res as { message?: string }).message ?? 'Code resent successfully!');
-        } catch {
-            toast.error('Failed to resend code. Please try again.');
+            const res = await userResendOtp({ email: modalData.email, type: modalData.type }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res?.message ?? 'Code resent successfully!');
+            }
+        } catch (error) {
+            console.error('Failed to resend code. Please try again.', error);
         }
     };
 

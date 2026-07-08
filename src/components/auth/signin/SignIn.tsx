@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
@@ -18,45 +18,39 @@ import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup'
 import { RootState } from '@/store/store'
 import { getMentorLoginRoutePath } from '@/routes/routes'
 
-type SignModalData = { redirectTo?: string }
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false)
     const dispatch = useDispatch()
     const router = useRouter()
-    const { isOpen, data, componentName } = useSelector((state: RootState) => state.allModal)
+    const { isOpen } = useSelector((state: RootState) => state.allModal)
     const [userLogin, { isLoading: userLoginLoading }] = useUserLoginMutation()
 
-    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
+    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: { email: '', password: '' },
         validationSchema: signInSchema,
-        onSubmit: async (vals, { resetForm: rf }) => {
-            const modalPayload = data as SignModalData | null | undefined
+        onSubmit: async (vals) => {
 
             try {
                 const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
-                if (!res.success || !res.data) return
+                console.log('res', res);
 
-                const { token, user } = res.data as {
-                    token: string
-                    user: { id?: string | number; _id?: string }
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    setAuthCookies({
+                        token: res?.data?.token ?? '',
+                        user: { id: res?.data?.id, email: res?.data?.email },
+                        role: res?.data?.userRole?.name ?? '',
+                    })
+
+                    dispatch(rtkQuerieSetup.util.invalidateTags([
+                        'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
+                    ]))
+
+                    router.refresh()
+                    toast.success(res?.message ?? 'Sign in successful!')
+                    dispatch(closeModal())
                 }
 
-                setAuthCookies({
-                    token,
-                    user: { id: String(user.id ?? user._id), _id: user._id },
-                    role: 'user',
-                })
-
-                dispatch(rtkQuerieSetup.util.invalidateTags([
-                    'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
-                ]))
-
-                const redirectTo = modalPayload?.redirectTo
-                dispatch(closeModal())
-                rf()
-                toast.success(res.message ?? 'Sign in successful!')
-                if (redirectTo) router.push(redirectTo)
             } catch (error) {
                 const errMsg = (error as { data?: { message?: string } })?.data?.message ?? ''
                 if (errMsg.toLowerCase().includes('verify your account')) {
@@ -70,15 +64,6 @@ export default function SignIn() {
         },
     })
 
-    useEffect(() => {
-        if (!isOpen) return
-        if (componentName === 'AuthorSignIn') {
-            dispatch(closeModal())
-            router.push(getMentorLoginRoutePath())
-            return
-        }
-        resetForm()
-    }, [isOpen, componentName, dispatch, router, resetForm])
 
     return (
         <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">

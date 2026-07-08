@@ -1,7 +1,6 @@
 import Cookies from 'js-cookie'
 
 const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const, expires: 7 } // 7 days
-/** Session cookies: no expires = removed when browser/tab is closed */
 const SESSION_COOKIE_OPTIONS = { ...COOKIE_OPTIONS }
 
 /** Cookie name for auth token (used by server/layout for reading auth state) */
@@ -11,9 +10,8 @@ export const AUTH_COOKIE_NAME = 'auth_token'
 export interface AuthResponseData {
     token?: string
     access_token?: string
-    user?: { _id?: string; id?: string; [key: string]: unknown }
-    /** Role can be a string (e.g. "Vendor") or object with name/id/_id */
-    role?: string | { _id?: string; id?: string; name?: string; [key: string]: unknown }
+    user?: { id?: string; email?: string }
+    role?: string
 }
 
 /**
@@ -28,22 +26,22 @@ function dispatchAuthChanged(): void {
 }
 
 export function setAuthCookies(data: AuthResponseData): void {
-    const token = data.token ?? data.access_token
+    const token = data.token ?? data.access_token;
+    const userId = data.user?.id;
+    const email = data.user?.email;
+    const role = data.role;
+
     if (token) {
         Cookies.set('auth_token', token, SESSION_COOKIE_OPTIONS)
     }
-
-    const userId = data.user?._id ?? data.user?.id
     if (userId) {
-        Cookies.set('userID', String(userId), SESSION_COOKIE_OPTIONS)
+        Cookies.set('userID', userId, SESSION_COOKIE_OPTIONS)
     }
-
-    const role = data.role
-    if (role != null && role !== '') {
-        const roleValue = typeof role === 'string' ? role : (role.name ?? role.id ?? role._id)
-        if (roleValue) {
-            Cookies.set('user_role', String(roleValue?.toLowerCase()), SESSION_COOKIE_OPTIONS)
-        }
+    if (email) {
+        Cookies.set('user_email', email, SESSION_COOKIE_OPTIONS)
+    }
+    if (role) {
+        Cookies.set('user_role', role, SESSION_COOKIE_OPTIONS)
     }
 
     dispatchAuthChanged()
@@ -61,26 +59,12 @@ export function getUserId(): string | undefined {
     return Cookies.get('userID')
 }
 
-/** Returns true if the user has an auth token (client-only). */
+export function getUserEmail(): string | undefined {
+    return Cookies.get('user_email')
+}
+
 export function hasAuthCookie(): boolean {
     return !!getAuthToken()
-}
-
-/**
- * Temporary token used only for the forgot-password "new password" request.
- * When set, baseQuery uses this instead of auth_token cookie so the user is not logged in.
- * Cleared by baseQuery after the request is prepared.
- */
-let resetTokenForNextRequest: string | null = null
-
-export function setResetTokenForNextRequest(token: string | null): void {
-    resetTokenForNextRequest = token
-}
-
-export function getAndClearResetTokenForNextRequest(): string | null {
-    const token = resetTokenForNextRequest
-    resetTokenForNextRequest = null
-    return token
 }
 
 /** Clear auth cookies on logout */

@@ -4,7 +4,7 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
     endpoints: builder => ({
         userLogin: builder.mutation({
             query: (userData) => ({
-                url: `/user/login`,
+                url: `/admin/login`,
                 method: "POST",
                 body: userData,
             }),
@@ -18,36 +18,36 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
         }),
         userForgotPassword: builder.mutation({
             query: (userData) => ({
-                url: `/user/forgot-password`,
+                url: `/admin/forgot-password`,
                 method: "POST",
                 body: userData,
             }),
         }),
         userResetPassword: builder.mutation({
-            query: ({ token, payload }) => ({
-                url: `/user/new-password`,
+            query: ({ payload }) => ({
+                url: `/admin/forgot-password-change`,
                 method: "POST",
                 body: payload,
-                headers: { Authorization: `Bearer ${token}` },
+                // headers: { Authorization: `Bearer ${token}` },
             }),
         }),
         userVerifyOtp: builder.mutation({
             query: (userData) => ({
-                url: `/user/verify`,
+                url: `/admin/verify`,
                 method: "POST",
                 body: userData,
             }),
         }),
         userResendOtp: builder.mutation({
             query: (userData) => ({
-                url: `/user/resend-code`,
+                url: `/admin/resend-otp`,
                 method: "POST",
                 body: userData,
             }),
         }),
         userChangePassword: builder.mutation({
             query: (userData) => ({
-                url: `/user/change-password`,
+                url: `/admin/change-password`,
                 method: "POST",
                 body: userData,
             }),

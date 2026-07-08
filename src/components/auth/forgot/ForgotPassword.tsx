@@ -25,12 +25,13 @@ export default function ForgotPassword() {
         onSubmit: async (formValues, { resetForm }) => {
             try {
                 const res = await userForgotPassword({ user_id: formValues.email }).unwrap();
-                toast.success((res as { message?: string }).message ?? 'Verification code sent to your email.');
-                resetForm();
-                dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'verify' } }));
-            } catch {
-                // toast.error('Failed to send reset code. Please check your email and try again.');
-                console.log('Failed to send reset code. Please check your email and try again.');
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    toast.success(res?.message ?? 'Verification code sent to your email.');
+                    resetForm();
+                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'forgot_password' } }));
+                }
+            } catch (error) {
+                console.error('Failed to send reset code. Please check your email and try again.', error);
             }
         },
     });

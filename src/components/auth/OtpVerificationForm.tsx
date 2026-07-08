@@ -48,8 +48,8 @@ export function OtpVerificationForm() {
                     Cookies.set('author_reset_password_token', tempToken, { expires: 1 / 24, sameSite: 'strict' });
                     router.push(getMentorResetPasswordRoutePath());
                 }
-            } catch {
-                toast.error('Invalid or expired code. Please try again.');
+            } catch (error) {
+                console.error('Invalid or expired code. Please try again.', error);
             }
         },
     });
@@ -59,8 +59,8 @@ export function OtpVerificationForm() {
         try {
             const res = await authorResendOtp({ email }).unwrap();
             toast.success((res as { message?: string }).message ?? 'Code resent successfully!');
-        } catch {
-            toast.error('Failed to resend code. Please try again.');
+        } catch (error) {
+            console.error('Failed to resend code. Please try again.', error);
         }
     };
 

@@ -28,22 +28,20 @@ export default function ResetPassword() {
         },
         validationSchema: resetPasswordSchema,
         onSubmit: async (formValues, { resetForm }) => {
-            const token = Cookies.get('reset_password_token') ?? '';
             try {
                 const res = await userResetPassword({
-                    token,
                     payload: {
                         password: formValues.password,
                         confirm_password: formValues.confirmPassword,
                     },
                 }).unwrap();
-                toast.success((res as { message?: string }).message ?? 'Password updated successfully!');
-                Cookies.remove('reset_password_token');
-                resetForm();
-                dispatch(openModal({ componentName: 'SignIn', data: '' }));
-            } catch {
-                // toast.error('Failed to reset password. Please try again.');
-                console.log('Failed to reset password. Please try again.');
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    toast.success(res?.message ?? 'Password updated successfully!');
+                    resetForm();
+                    dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                }
+            } catch (error) {
+                console.error('Failed to reset password. Please try again.', error);
             }
         },
     });

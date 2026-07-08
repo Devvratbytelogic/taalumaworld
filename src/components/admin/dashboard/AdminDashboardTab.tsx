@@ -68,7 +68,10 @@ export function AdminDashboardTab() {
     globalSettingsData?.data?.visible === 'book' ? 'books' : 'chapters';
 
   // ── KPI counts ──────────────────────────────────────────────────────────────
+  console.log('usersData', usersData);
+
   const allUsers = usersData?.data ?? [];
+  console.log('allUsers', allUsers);
   const allBooks = booksData?.data ?? [];
   const allChapters = chaptersData?.data ?? [];
   const allTestimonials = testimonialsData?.data ?? [];
@@ -82,12 +85,12 @@ export function AdminDashboardTab() {
     return s !== 'active' && s !== 'published';
   }).length;
 
-  const totalUsers = allUsers.length;
-  const totalBooks = allBooks.length;
-  const totalChapters = allChapters.length;
-  const totalPurchases = allUsers.reduce((sum, u) => sum + (u.purchases ?? 0), 0);
+  const totalUsers = allUsers?.pagination?.total ?? 0;
+  const totalBooks = allBooks?.length;
+  const totalChapters = allChapters?.length;
+  const totalPurchases = allUsers?.users?.reduce((sum, u) => sum + (u.purchases ?? 0), 0);
 
-  const userGrowth = calcUserGrowth(allUsers.map((u) => u.createdAt));
+  const userGrowth = calcUserGrowth(allUsers?.users?.map((u) => u.createdAt) ?? []);
 
   // New chapters/books added in last 30d
   const MS_30D = 30 * 24 * 60 * 60 * 1000;
@@ -117,7 +120,7 @@ export function AdminDashboardTab() {
     },
     {
       title: 'Total Purchases',
-      value: totalPurchases.toLocaleString(),
+      value: totalPurchases?.toLocaleString() ?? 0,
       change: 0,
       icon: KshIcon,
       color: 'green',
@@ -134,7 +137,7 @@ export function AdminDashboardTab() {
   ];
 
   // ── Recent activity: last 5 registered users ────────────────────────────────
-  const recentActivity: ActivityItem[] = [...allUsers]
+  const recentActivity: ActivityItem[] = [...allUsers?.users ?? []]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5)
     .map((user, idx) => ({
@@ -149,25 +152,25 @@ export function AdminDashboardTab() {
   const topContent: TopContentItem[] =
     contentMode === 'chapters'
       ? [...allChapters]
-          .sort((a, b) => b.price - a.price)
-          .slice(0, 5)
-          .map((chapter, idx) => ({
-            id: idx + 1,
-            title: chapter.title,
-            sales: 0,
-            revenue: chapter.price,
-            trend: 0,
-          }))
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 5)
+        .map((chapter, idx) => ({
+          id: idx + 1,
+          title: chapter.title,
+          sales: 0,
+          revenue: chapter.price,
+          trend: 0,
+        }))
       : [...allBooks]
-          .sort((a, b) => b.price - a.price)
-          .slice(0, 5)
-          .map((book, idx) => ({
-            id: idx + 1,
-            title: book.title,
-            sales: 0,
-            revenue: book.price,
-            trend: 0,
-          }));
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 5)
+        .map((book, idx) => ({
+          id: idx + 1,
+          title: book.title,
+          sales: 0,
+          revenue: book.price,
+          trend: 0,
+        }));
 
   return (
     <AdminPage>

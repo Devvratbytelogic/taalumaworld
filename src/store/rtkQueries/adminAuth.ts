@@ -32,21 +32,21 @@ export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
                 headers: { Authorization: `Bearer ${token}` },
             }),
         }),
-        authorVerifyOtp: builder.mutation({
+        adminVerifyOtp: builder.mutation({
             query: (userData) => ({
                 url: `/admin/verify`,
                 method: "POST",
                 body: userData,
             }),
         }),
-        authorResendOtp: builder.mutation({
+        adminResendOtp: builder.mutation({
             query: (userData) => ({
                 url: `/admin/resend-code`,
                 method: "POST",
                 body: userData,
             }),
         }),
-        authorChangePassword: builder.mutation({
+        adminChangePassword: builder.mutation({
             query: (userData) => ({
                 url: `/user/change-password`,
                 method: "POST",
@@ -61,7 +61,7 @@ export const {
     useAuthorRegisterMutation,
     useAuthorForgotPasswordMutation,
     useAuthorResetPasswordMutation,
-    useAuthorVerifyOtpMutation,
-    useAuthorResendOtpMutation,
-    useAuthorChangePasswordMutation, 
+    useAdminVerifyOtpMutation,
+    useAdminResendOtpMutation,
+    useAdminChangePasswordMutation,
 } = adminAuthApi;

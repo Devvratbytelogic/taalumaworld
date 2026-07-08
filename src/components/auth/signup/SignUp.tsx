@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
-import { Camera, ChevronDown, Eye, EyeOff, GraduationCap, Lock, Mail, User } from 'lucide-react'
+import { Camera, Eye, EyeOff, GraduationCap, Lock, Mail, User } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
-import Select, { type DropdownIndicatorProps, type GroupBase } from 'react-select'
+import Select, { type StylesConfig } from 'react-select'
 import { useFormik } from 'formik'
 import { careerArchitectSignUpSchema } from '@/utils/formValidation'
 import { RootState } from '@/store/store'
@@ -30,6 +30,63 @@ const UNIVERSITY_OPTIONS = PARTNER_UNIVERSITIES.map((u) => ({
     value: u.id,
     label: u.name,
 }))
+
+type UniversityOption = (typeof UNIVERSITY_OPTIONS)[number]
+
+const UNIVERSITY_SELECT_STYLES: StylesConfig<UniversityOption, false> = {
+    control: (base, state) => ({
+        ...base,
+        minHeight: 48,
+        height: 48,
+        borderRadius: 'var(--radius-md)',
+        borderColor: state.isFocused
+            ? 'color-mix(in srgb, var(--primary) 30%, transparent)'
+            : '#e5e7eb',
+        backgroundColor: '#ffffff',
+        boxShadow: state.isFocused
+            ? '0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent)'
+            : 'none',
+        fontSize: '0.875rem',
+        cursor: state.isDisabled ? 'not-allowed' : 'pointer',
+        opacity: state.isDisabled ? 0.5 : 1,
+        '&:hover': {
+            borderColor: state.isFocused
+                ? 'color-mix(in srgb, var(--primary) 30%, transparent)'
+                : '#e5e7eb',
+        },
+    }),
+    valueContainer: (base) => ({
+        ...base,
+        height: 48,
+        padding: '0 16px',
+    }),
+    input: (base) => ({
+        ...base,
+        margin: 0,
+        padding: 0,
+    }),
+    indicatorsContainer: (base) => ({
+        ...base,
+        height: 48,
+    }),
+    placeholder: (base) => ({
+        ...base,
+        color: '#9ca3af',
+    }),
+    singleValue: (base) => ({
+        ...base,
+        color: '#111827',
+    }),
+    indicatorSeparator: (base) => ({
+        ...base,
+        backgroundColor: '#e5e7eb',
+    }),
+    dropdownIndicator: (base) => ({
+        ...base,
+        color: '#9ca3af',
+        padding: '0 8px',
+    }),
+}
 
 
 export default function SignUp() {
@@ -189,11 +246,10 @@ export default function SignUp() {
                         </div>
 
                         <div
-                            className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
-                                values.isPartnerStudent
-                                    ? 'border-primary/30 bg-linear-to-br from-primary/5 to-primary/2 shadow-sm'
+                            className={`rounded-2xl border transition-all duration-200 overflow-hidden ${values.isPartnerStudent
+                                    ? 'border-primary/30 bg-linear-to-br from-primary/5 to-primary/2'
                                     : 'border-gray-200 bg-muted/30 hover:border-primary/20'
-                            }`}
+                                }`}
                         >
                             <label className="flex items-start gap-3 p-4 cursor-pointer">
                                 <Checkbox
@@ -235,15 +291,14 @@ export default function SignUp() {
                                         </label>
                                         <Select
                                             inputId="signup-university"
-                                            instanceId="signup-university"
                                             name="university"
-                                            classNamePrefix="university-select"
                                             options={UNIVERSITY_OPTIONS}
                                             value={UNIVERSITY_OPTIONS.find((o) => o.value === values.university) ?? null}
                                             onChange={(option) => setFieldValue('university', option?.value ?? '')}
                                             onBlur={() => setFieldTouched('university', true)}
                                             placeholder="Choose your university"
                                             isDisabled={isSubmitting}
+                                            styles={UNIVERSITY_SELECT_STYLES}
                                         />
                                     </div>
 
@@ -475,7 +530,7 @@ export default function SignUp() {
                     <div className="w-full text-center text-sm">
                         <Link
                             href={getMentorSignupRoutePath()}
-                            className="font-medium text-muted-foreground hover:text-primary transition-colors"
+                            className="font-medium text-primary hover:text-primary/80 transition-colors"
                             onClick={() => dispatch(closeModal())}
                         >
                             Register as Mentor →

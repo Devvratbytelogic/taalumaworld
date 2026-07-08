@@ -33,7 +33,6 @@ export default function SignIn() {
 
             try {
                 const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
-                console.log('res', res);
 
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     setAuthCookies({

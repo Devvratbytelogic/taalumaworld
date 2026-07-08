@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
-import BlueprintShareButtons from '@/components/blueprint/BlueprintShareButtons';
+import ShareButtons from '@/components/blueprint/ShareButtons';
 import { useAuth } from '@/hooks/useAuth';
 import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
@@ -162,7 +162,7 @@ export default function ChapterDetailsModal() {
 
           <div className="border-t pt-3">
             <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Blueprint</h3>
-            <BlueprintShareButtons
+            <ShareButtons
               shareableLink={chapter?.shareable_link ?? ''}
               title={chapter?.title}
               description={chapter?.description}

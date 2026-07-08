@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { API_BASE_URL } from '@/utils/config';
 import type { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
+import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -47,4 +48,8 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
 
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
   return serverFetch<ISingleChapterAPIResponse>(`/user/content/chapter/${encodeURIComponent(slug)}`);
+}
+
+export async function getSingleSeriesServerAPI({ slug }: { slug: string }) {
+  return serverFetch<ISingleBookAPIResponse>(`/user/content/book/${encodeURIComponent(slug)}`);
 }

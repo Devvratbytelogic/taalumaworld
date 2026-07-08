@@ -12,7 +12,7 @@ import ReadChapterPageSkeleton from '@/components/skeleton-loader/ReadChapterPag
 import PdfViewerSkeleton from '@/components/skeleton-loader/PdfViewerSkeleton';
 import { openModal } from '@/store/slices/allModalSlice';
 import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
-import BlueprintShareButtons from '@/components/blueprint/BlueprintShareButtons';
+import ShareButtons from '@/components/blueprint/ShareButtons';
 import { useUpdateReadingProgressMutation } from '@/store/rtkQueries/userPostAPI';
 const PdfViewer = dynamic(() => import('@/components/ui/PdfViewer'), {
   ssr: false,
@@ -219,8 +219,8 @@ export default function ReadChapterPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <BlueprintShareButtons
-              shareableLink={currentChapter.shareable_link}
+            <ShareButtons
+              shareableLink={currentChapter.shareable_link ?? ''}
               title={currentChapter.title}
               description={currentChapter.description}
               size="sm"

@@ -2,7 +2,7 @@
 
 import { BookOpen, FileText } from 'lucide-react';
 import ImageComponent from '@/components/ui/ImageComponent';
-import BlueprintShareButtons from '@/components/blueprint/BlueprintShareButtons';
+import ShareButtons from '@/components/blueprint/ShareButtons';
 import { ISingleChapterAPIResponseData } from '@/types/user/singleChapter';
 import { getSeriesRoutePath } from '@/routes/routes';
 import Link from 'next/link';
@@ -77,7 +77,7 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
 
               <div>
                 <p className="mb-3 text-sm font-medium text-foreground">Share this blueprint</p>
-                <BlueprintShareButtons
+                <ShareButtons
                   shareableLink={data?.shareable_link ?? ''}
                   title={data?.title ?? ''}
                   description={data?.description ?? ''}

@@ -5,7 +5,7 @@ import { Check, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { FacebookIcon, LinkedinIcon, TwitterIcon, WhatsAppIcon } from '@/components/ui/AllSVG';
 
-interface BlueprintShareButtonsProps {
+interface ShareButtonsProps {
     shareableLink: string;
     title: string;
     description?: string;
@@ -19,12 +19,12 @@ const sizeClasses = {
     lg: 'h-10 w-10',
 };
 
-export default function BlueprintShareButtons({
+export default function ShareButtons({
     shareableLink,
     title,
     size = 'md',
     showCopyLink = true,
-}: BlueprintShareButtonsProps) {
+}: ShareButtonsProps) {
     const [copied, setCopied] = useState(false);
 
     const shareLinks = [

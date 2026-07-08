@@ -1,3 +1,4 @@
+import type { IMentor } from '@/types/user/singleChapter';
 
 export interface ISingleBookAPIResponse {
     http_status_code: number;
@@ -9,6 +10,7 @@ export interface ISingleBookAPIResponse {
 }
 export interface ISingleBookAPIResponseData {
     id: string;
+    slug?: string;
     type: string;
     title: string;
     description: string;
@@ -21,10 +23,19 @@ export interface ISingleBookAPIResponseData {
     priceLabel: string;
     fromPrice: number;
     author: string;
-    authorAvatar?: null;
+    authorAvatar?: string | null;
+    authorBio?: string;
+    mentor?: IMentor | null;
+    shareable_link?: string;
     category: Category;
     subcategory?: null;
     isPurchased: boolean;
+    metaTitle?: string;
+    metaDescription?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    jsonLd?: string;
     chapters: IBookChapterItem[];
 }
 export interface Category {
@@ -35,6 +46,7 @@ export interface Category {
 
 export interface IBookChapterItem {
     _id: string;
+    slug?: string;
     book: string;
     number: number;
     page: number;

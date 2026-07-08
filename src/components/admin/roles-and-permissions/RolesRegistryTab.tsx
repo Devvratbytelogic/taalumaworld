@@ -8,15 +8,11 @@ import {
     useGetAllRolesQuery,
 } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
-import type { IAllRolesEntity, IRole } from '@/types/rolesPermissions';
-import { Badge } from '@/components/ui/badge';
-import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table';
 import { AdminSearchInput, AdminStatCard, AdminTableShell } from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
 
-function ActionMenu({ role, onEdit, onDelete }: { role: IRole; onEdit: () => void; onDelete: () => void }) {
+function ActionMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {
     const [open, setOpen] = useState(false);
     return (
         <div className="relative">
@@ -128,7 +124,6 @@ export function RolesRegistryTab() {
                                     </TableCell>
                                     <TableCell className="px-2 py-3 align-top">
                                         <ActionMenu
-                                            role={role}
                                             onEdit={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role } }))}
                                             onDelete={() => { }}
                                         />

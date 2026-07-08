@@ -104,7 +104,7 @@ export default function SignUp() {
     const [profileImage, setProfileImage] = useState<File | null>(null)
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
-    
+
 
     const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation()
 
@@ -468,44 +468,29 @@ export default function SignUp() {
                         </div>
 
                         <div className="rounded-2xl border border-gray-100 bg-muted/20 p-4 space-y-3">
-                            <AgreementCheckbox
-                                id="agreeTerms"
-                                checked={values.agreeTerms}
-                                error={errors.agreeTerms}
-                                touched={touched.agreeTerms}
-                                onCheckedChange={(checked) => setFieldValue('agreeTerms', checked)}
-                                onBlur={() => setFieldTouched('agreeTerms', true)}
-                                disabled={isSubmitting}
-                            >
-                                I agree to the{' '}
-                                <Link
-                                    href={getTermsOfServiceRoutePath()}
-                                    target="_blank"
-                                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                    onClick={(e) => e.stopPropagation()}
+                            {agreementsData && agreementsData?.length > 0 && agreementsData?.map((agreement) =>
+                                <AgreementCheckbox
+                                    id={agreement?.agreement_id}
+                                    checked={values.agreeTerms}
+                                    error={errors.agreeTerms}
+                                    touched={touched.agreeTerms}
+                                    onCheckedChange={(checked) => setFieldValue('agreeTerms', checked)}
+                                    onBlur={() => setFieldTouched('agreeTerms', true)}
+                                    disabled={isSubmitting}
                                 >
-                                    Terms of Service
-                                </Link>
-                            </AgreementCheckbox>
-                            <AgreementCheckbox
-                                id="agreePrivacy"
-                                checked={values.agreePrivacy}
-                                error={errors.agreePrivacy}
-                                touched={touched.agreePrivacy}
-                                onCheckedChange={(checked) => setFieldValue('agreePrivacy', checked)}
-                                onBlur={() => setFieldTouched('agreePrivacy', true)}
-                                disabled={isSubmitting}
-                            >
-                                I have read the{' '}
-                                <Link
-                                    href={getPrivacyPolicyRoutePath()}
-                                    target="_blank"
-                                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    Privacy Policy
-                                </Link>
-                            </AgreementCheckbox>
+                                    I agree to the{' '}
+                                    <Link
+                                        href={getTermsOfServiceRoutePath()}
+                                        target="_blank"
+                                        className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {agreement?.title}
+                                    </Link>
+                                </AgreementCheckbox>
+                            )}
+
+                           
                             <AgreementCheckbox
                                 id="sendUpdates"
                                 checked={values.sendUpdates}

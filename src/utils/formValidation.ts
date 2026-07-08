@@ -72,6 +72,11 @@ export const signUpSchema = Yup.object(signUpBaseSchema);
 
 export const careerArchitectSignUpSchema = Yup.object({
   ...signUpBaseSchema,
+  university: Yup.string().when('isPartnerStudent', {
+    is: true,
+    then: (schema) => schema.required('Please select your university'),
+    otherwise: (schema) => schema.optional(),
+  }),
   agreeTerms: Yup.boolean().oneOf([true], 'You must agree to the Terms of Service'),
   agreePrivacy: Yup.boolean().oneOf([true], 'You must read the Privacy Policy'),
   sendUpdates: Yup.boolean(),

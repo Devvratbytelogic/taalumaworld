@@ -2,10 +2,10 @@ import { ICartAPIResponse } from '@/types/user/cart';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export type MpesaPaymentStatusResponse = {
-  success?: boolean;
-  data?: {
-    status?: 'pending' | 'completed' | 'cancel' | 'failed';
-  };
+    success?: boolean;
+    data?: {
+        status?: 'pending' | 'completed' | 'cancel' | 'failed';
+    };
 };
 import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
@@ -21,6 +21,8 @@ import { IUserAllCategoriesAPIResponse } from '@/types/user/allCategory';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import { IUserAllTagsAPIResponse } from '@/types/user/allTags';
 import { IActiveReadersAPIResponse } from '@/types/activeReaders';
+import { IAllAgreementsDataAPIResponse } from './allAgreements';
+import { UserTypeValue } from '@/constants/common';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -169,6 +171,24 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+
+
+
+
+
+
+
+
+
+        // new flow endpoints
+        getAllAgreementsData: builder.query<IAllAgreementsDataAPIResponse, { userType: UserTypeValue }>({
+            query: ({ userType }) => ({
+                url: `/user/agreements/active-list`,
+                method: 'GET',
+                params: userType ? { userType } : undefined,
+            }),
+        }),
     }),
 });
 
@@ -192,4 +212,11 @@ export const {
     useGetSearchResultsQuery,
     useLazyGetTransactionInvoiceQuery,
     useLazyGetMpesaPaymentStatusQuery,
+
+
+
+
+
+    // new flow endpoints
+    useGetAllAgreementsDataQuery,
 } = clientSideGetApis;

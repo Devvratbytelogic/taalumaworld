@@ -17,6 +17,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getMentorSignupRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath, } from '@/routes/routes'
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
+import { useGetAllAgreementsDataQuery } from '@/store/rtkQueries/userGetAPI'
+import { USER_TYPE } from '@/constants/common'
 
 
 const AVATAR_BORDER_COLOR = '#C8D7EE'
@@ -86,6 +88,10 @@ const UNIVERSITY_SELECT_STYLES: StylesConfig<UniversityOption, false> = {
         color: '#9ca3af',
         padding: '0 8px',
     }),
+    menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999,
+    }),
 }
 
 
@@ -98,6 +104,7 @@ export default function SignUp() {
     const [profileImage, setProfileImage] = useState<File | null>(null)
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    
 
     const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation()
 
@@ -132,7 +139,7 @@ export default function SignUp() {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
-    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm, setFieldValue, setFieldTouched } = useFormik({
+    const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, setFieldValue, setFieldTouched } = useFormik({
         initialValues: {
             name: '',
             email: '',
@@ -140,7 +147,6 @@ export default function SignUp() {
             confirmPassword: '',
             isPartnerStudent: false,
             university: '',
-            universityEmail: '',
             agreeTerms: false,
             agreePrivacy: false,
             sendUpdates: false,
@@ -173,7 +179,9 @@ export default function SignUp() {
             }
         },
     })
-
+    const { data: agreementsResponse } = useGetAllAgreementsDataQuery({ userType: values.isPartnerStudent ? USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT : USER_TYPE.CAREER_ARCHITECT });
+    const agreementsData = agreementsResponse?.data
+    console.log(agreementsData)
     const selectedUniversity = PARTNER_UNIVERSITIES.find((u) => u.id === values.university)
 
     return (
@@ -247,8 +255,8 @@ export default function SignUp() {
 
                         <div
                             className={`rounded-2xl border transition-all duration-200 overflow-hidden ${values.isPartnerStudent
-                                    ? 'border-primary/30 bg-linear-to-br from-primary/5 to-primary/2'
-                                    : 'border-gray-200 bg-muted/30 hover:border-primary/20'
+                                ? 'border-primary/30 bg-linear-to-br from-primary/5 to-primary/2'
+                                : 'border-gray-200 bg-muted/30 hover:border-primary/20'
                                 }`}
                         >
                             <label className="flex items-start gap-3 p-4 cursor-pointer">
@@ -260,7 +268,7 @@ export default function SignUp() {
                                         setFieldValue('isPartnerStudent', checked === true)
                                         if (!checked) {
                                             setFieldValue('university', '')
-                                            setFieldValue('universityEmail', '')
+                                            setFieldTouched('university', false)
                                         }
                                     }}
                                     onBlur={handleBlur}
@@ -282,9 +290,19 @@ export default function SignUp() {
                                     </p>
                                 </div>
                             </label>
+                        </div>
 
-                            {values.isPartnerStudent && (
-                                <div className="px-4 pb-4 space-y-3 border-t border-primary/10 pt-3">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                                    Account details
+                                </span>
+                                <div className="flex-1 h-px bg-border" />
+                            </div>
+
+
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {values.isPartnerStudent && (
                                     <div className="space-y-1.5">
                                         <label htmlFor="signup-university" className="text-sm font-medium text-foreground">
                                             Select University
@@ -298,49 +316,39 @@ export default function SignUp() {
                                             onBlur={() => setFieldTouched('university', true)}
                                             placeholder="Choose your university"
                                             isDisabled={isSubmitting}
-                                            styles={UNIVERSITY_SELECT_STYLES}
+                                            menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                            menuPosition="fixed"
+                                            noOptionsMessage={() => (
+                                                <span className="text-xs text-muted-foreground">
+                                                    University not listed?{' '}
+                                                    <Link
+                                                        href="mailto:teamtaaluma@taaluma.world"
+                                                        className="text-primary font-medium hover:text-primary/80"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        teamtaaluma@taaluma.world
+                                                    </Link>
+                                                </span>
+                                            )}
+                                            styles={{
+                                                ...UNIVERSITY_SELECT_STYLES,
+                                                control: (base, state) => ({
+                                                    ...(UNIVERSITY_SELECT_STYLES.control?.(base, state) ?? base),
+                                                    borderColor:
+                                                        errors.university && touched.university
+                                                            ? '#ef4444'
+                                                            : state.isFocused
+                                                                ? 'color-mix(in srgb, var(--primary) 30%, transparent)'
+                                                                : '#e5e7eb',
+                                                }),
+                                            }}
                                         />
+                                        {errors.university && touched.university && (
+                                            <p className="text-sm text-red-600">{errors.university}</p>
+                                        )}
                                     </div>
+                                )}
 
-                                    <div className="space-y-1.5">
-                                        <label htmlFor="signup-university-email" className="text-sm font-medium text-foreground">
-                                            University Email Address
-                                        </label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                            <Input
-                                                id="signup-university-email"
-                                                name="universityEmail"
-                                                type="email"
-                                                placeholder={selectedUniversity?.emailHint ?? 'you@university.ac.ke'}
-                                                className="user_input_style partner_field"
-                                                value={values.universityEmail}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                disabled={isSubmitting}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <p className="text-xs text-muted-foreground">
-                                        University not listed?{' '}
-                                        <Link href="mailto:teamtaaluma@taaluma.world" className="text-primary font-medium hover:text-primary/80">
-                                            teamtaaluma@taaluma.world
-                                        </Link>
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-3">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
-                                    Account details
-                                </span>
-                                <div className="flex-1 h-px bg-border" />
-                            </div>
-
-                            <div className="grid gap-3 sm:grid-cols-2">
                                 <div className="space-y-1.5">
                                     <label htmlFor="signup-name" className="text-sm font-medium text-foreground">
                                         Full Name
@@ -366,7 +374,7 @@ export default function SignUp() {
 
                                 <div className="space-y-1.5">
                                     <label htmlFor="signup-email" className="text-sm font-medium text-foreground">
-                                        {values.isPartnerStudent ? 'Personal Email Address' : 'Email Address'}
+                                        {values.isPartnerStudent ? 'University Email Address' : 'Email Address'}
                                     </label>
                                     <div className="relative">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -374,7 +382,11 @@ export default function SignUp() {
                                             id="signup-email"
                                             name="email"
                                             type="email"
-                                            placeholder="you@example.com"
+                                            placeholder={
+                                                values.isPartnerStudent
+                                                    ? (selectedUniversity?.emailHint ?? 'you@university.ac.ke')
+                                                    : 'you@example.com'
+                                            }
                                             className={`user_input_style ${errors.email && touched.email && 'border-red-500'}`}
                                             disabled={isSubmitting}
                                             value={values.email}

@@ -12,7 +12,6 @@ import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import {
     getMentorLoginRoutePath,
-    getMentorVerifyRoutePath,
 } from '@/routes/routes';
 
 export function ForgotPasswordForm() {

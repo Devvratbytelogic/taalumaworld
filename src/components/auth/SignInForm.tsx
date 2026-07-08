@@ -12,7 +12,7 @@ import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
-import { getHomeRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath, getMentorVerifyRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath } from '@/routes/routes';
 import usePreventRefresh from '@/hooks/preventRefresh';
 
 type StaffSignInVariant = 'mentor' | 'admin';
@@ -47,11 +47,7 @@ export function SignInForm({ variant }: SignInFormProps) {
                     }
                 }
             } catch (error) {
-                const errMsg = (error as { data?: { message?: string } })?.data?.message ?? '';
-                if (errMsg.toLowerCase().includes('verify your account')) {
-                    toast.info(errMsg);
-                    router.push(getMentorVerifyRoutePath({ email: vals.email, type: 'account' }));
-                }
+                console.error('Failed to login. Please try again.', error);
             }
         },
     });

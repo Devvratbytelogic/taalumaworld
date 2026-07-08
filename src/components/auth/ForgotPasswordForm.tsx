@@ -59,7 +59,7 @@ export function ForgotPasswordForm() {
                             name="email"
                             type="email"
                             placeholder="you@example.com"
-                            className={`pl-12 h-12 rounded-2xl ${errors.email && touched.email ? 'border-red-500' : ''}`}
+                            className={`user_input_style ${errors.email && touched.email ? 'border-red-500' : ''}`}
                             disabled={isSubmitting}
                             value={values.email}
                             onChange={handleChange}

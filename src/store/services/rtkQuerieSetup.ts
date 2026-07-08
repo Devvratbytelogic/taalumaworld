@@ -53,6 +53,7 @@ const REQUEST_TIMEOUT_MS = 30_000;
 const baseQuery = fetchBaseQuery({
     baseUrl: API_BASE_URL,
     timeout: REQUEST_TIMEOUT_MS,
+    credentials: 'include',
     prepareHeaders: async (headers) => {
         const token = Cookies.get("auth_token") || null
         const deviceId = Cookies.get("device") || ''

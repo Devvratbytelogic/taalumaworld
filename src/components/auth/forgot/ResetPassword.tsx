@@ -70,7 +70,7 @@ export default function ResetPassword() {
                                     id="password"
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="Enter a new password"
-                                    className={`pl-12 pr-12 h-12 rounded-2xl ${errors.password && touched.password ? 'border-red-500' : ''}`}
+                                    className={`user_input_style ${errors.password && touched.password && 'border-red-500'}`}
                                     disabled={isSubmitting}
                                     value={values.password}
                                     onChange={handleChange}
@@ -101,7 +101,7 @@ export default function ResetPassword() {
                                     id="confirmPassword"
                                     type={showConfirmPassword ? 'text' : 'password'}
                                     placeholder="Re-enter your password"
-                                    className={`pl-12 pr-12 h-12 rounded-2xl ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : ''}`}
+                                    className={`user_input_style ${errors.confirmPassword && touched.confirmPassword && 'border-red-500'}`}
                                     disabled={isSubmitting}
                                     value={values.confirmPassword}
                                     onChange={handleChange}

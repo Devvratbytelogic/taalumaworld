@@ -147,7 +147,7 @@ export function SignUpForm() {
                     <label htmlFor="signup-name" className="text-sm font-medium text-foreground">Full Name</label>
                     <div className="relative">
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="signup-name" name="name" type="text" placeholder="John Doe" className={`pl-12 h-12 rounded-2xl ${errors.name && touched.name ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.name} onChange={handleChange} onBlur={handleBlur} />
+                        <Input id="signup-name" name="name" type="text" placeholder="John Doe" className={`user_input_style ${errors.name && touched.name ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.name} onChange={handleChange} onBlur={handleBlur} />
                     </div>
                     {errors.name && touched.name && <p className="text-sm text-red-600">{errors.name}</p>}
                 </div>
@@ -156,7 +156,7 @@ export function SignUpForm() {
                     <label htmlFor="signup-email" className="text-sm font-medium text-foreground">Email Address</label>
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="signup-email" name="email" type="email" placeholder="you@example.com" className={`pl-12 h-12 rounded-2xl ${errors.email && touched.email ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.email} onChange={handleChange} onBlur={handleBlur} />
+                        <Input id="signup-email" name="email" type="email" placeholder="you@example.com" className={`user_input_style ${errors.email && touched.email ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.email} onChange={handleChange} onBlur={handleBlur} />
                     </div>
                     {errors.email && touched.email && <p className="text-sm text-red-600">{errors.email}</p>}
                 </div>

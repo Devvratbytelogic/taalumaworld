@@ -87,7 +87,7 @@ export default function SignIn() {
                                     type="email"
                                     name="email"
                                     placeholder="you@example.com"
-                                    className={`pl-12 h-12 rounded-2xl ${errors.email && touched.email ? 'border-red-500' : ''}`}
+                                    className={`user_input_style ${errors.email && touched.email && 'border-red-500'}`}
                                     disabled={isSubmitting}
                                     value={values.email}
                                     onChange={handleChange}
@@ -110,7 +110,7 @@ export default function SignIn() {
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     placeholder="Enter your password"
-                                    className={`pl-12 pr-12 h-12 rounded-2xl ${errors.password && touched.password ? 'border-red-500' : ''}`}
+                                    className={`user_input_style ${errors.password && touched.password && 'border-red-500'}`}
                                     disabled={isSubmitting}
                                     value={values.password}
                                     onChange={handleChange}

@@ -8,7 +8,7 @@ import {
     useGetAllRolesQuery,
 } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
-import type { IRole } from '@/types/rolesPermissions';
+import type { IAllRolesEntity, IRole } from '@/types/rolesPermissions';
 import { Badge } from '@/components/ui/badge';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -50,24 +50,18 @@ function ActionMenu({ role, onEdit, onDelete }: { role: IRole; onEdit: () => voi
     );
 }
 
+
 export function RolesRegistryTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
-    const { data, isLoading, isFetching } = useGetAllRolesQuery({ search: debouncedSearch, page: 1, limit: 10 });
-
-    const roles: IRole[] = data?.data ?? [];
-
-    const loading = isLoading || isFetching;
-    const systemCount = roles.filter((r) => r.is_system).length;
+    const { data: res, isLoading } = useGetAllRolesQuery({ page: 1, limit: 10, search: debouncedSearch });
+    const roles = res?.data?.data ?? [];
+    const totalRoles = res?.data?.total ?? 0;
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <AdminStatCard label="Total Roles" value={roles.length} icon={Shield} tone="blue" />
-                <AdminStatCard label="System Roles" value={systemCount} icon={Lock} tone="slate" />
-                <AdminStatCard label="Custom Roles" value={roles.length - systemCount} icon={Shield} tone="green" />
-            </div>
+
 
             <div className="flex flex-col sm:flex-row gap-3">
                 <AdminSearchInput
@@ -92,14 +86,13 @@ export function RolesRegistryTab() {
                             <TableHead className="w-10 px-4">#</TableHead>
                             <TableHead className="w-[200px] px-4">Role</TableHead>
                             <TableHead className="px-4">Description</TableHead>
-                            <TableHead className="w-[110px] px-4">Type</TableHead>
                             <TableHead className="w-[100px] px-4 text-right">Permissions</TableHead>
                             <TableHead className="w-[90px] px-4 text-right">Assigned</TableHead>
-                            <TableHead className="w-12 px-2" />
+                            <TableHead className="w-12 px-2">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {loading
+                        {isLoading
                             ? Array.from({ length: 4 }).map((_, i) => (
                                 <TableRow key={i}>
                                     {Array.from({ length: 7 }).map((__, j) => (
@@ -109,17 +102,16 @@ export function RolesRegistryTab() {
                                     ))}
                                 </TableRow>
                             ))
-                            : roles.map((role, idx) => (
-                                <TableRow key={role._id}>
+                            : roles.map((role, index) => (
+                                <TableRow key={index}>
                                     <TableCell className="px-4 py-3 text-muted-foreground text-sm align-top">
-                                        {idx + 1}
+                                        {index + 1}
                                     </TableCell>
                                     <TableCell className="px-4 py-3 align-top whitespace-normal">
                                         <div className="flex items-start gap-2">
                                             <Shield className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                                             <div className="min-w-0">
-                                                <p className="font-medium text-sm">{role.name}</p>
-                                                <code className="text-xs text-muted-foreground break-all">{role.id}</code>
+                                                <p className="font-medium text-sm">{role?.name}</p>
                                             </div>
                                         </div>
                                     </TableCell>
@@ -128,26 +120,17 @@ export function RolesRegistryTab() {
                                             {role.description}
                                         </p>
                                     </TableCell>
-                                    <TableCell className="px-4 py-3 align-top">
-                                        {role.is_system ? (
-                                            <Badge className="bg-blue-100 text-blue-700 border-blue-200 gap-1 whitespace-nowrap">
-                                                <Lock className="h-3 w-3" /> System
-                                            </Badge>
-                                        ) : (
-                                            <Badge variant="secondary" className="whitespace-nowrap">Custom</Badge>
-                                        )}
+                                    <TableCell className="px-4 py-3 text-center text-sm font-medium align-top">
+                                        {role?.permissions?.length}
                                     </TableCell>
-                                    <TableCell className="px-4 py-3 text-right text-sm font-medium align-top">
-                                        {role.permissions.length}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-right text-sm font-medium align-top">
-                                        {role.user_count}
+                                    <TableCell className="px-4 py-3 text-center text-sm font-medium align-top">
+                                        {role?.number_of_users}
                                     </TableCell>
                                     <TableCell className="px-2 py-3 align-top">
                                         <ActionMenu
                                             role={role}
                                             onEdit={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role } }))}
-                                            onDelete={() => {}}
+                                            onDelete={() => { }}
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -155,7 +138,7 @@ export function RolesRegistryTab() {
                     </TableBody>
                 </Table>
 
-                {!loading && roles.length === 0 && (
+                {!isLoading && roles.length === 0 && (
                     <div className="p-12 text-center space-y-3">
                         <Shield className="h-10 w-10 text-primary mx-auto opacity-50" />
                         <p className="font-semibold text-gray-800">No roles found</p>

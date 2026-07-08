@@ -1,3 +1,94 @@
+export interface IAllRolesAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IAllRolesAPIResponseData;
+  message: string;
+  timestamp: string;
+}
+export interface IAllRolesAPIResponseData {
+  data?: (IAllRolesEntity)[] | null;
+  total: number;
+  limit: number;
+  currentPage: number;
+  pages: number;
+}
+export interface IAllRolesEntity {
+  _id: string;
+  name: string;
+  description: string;
+  number_of_users: number;
+  permissions: string[];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ─── Roles & Permissions Module Types ─────────────────────────────────────────
 
 export type UserSegmentType =
@@ -66,12 +157,6 @@ export interface IPermissionsMatrix {
 
 // ─── API Response Wrappers ─────────────────────────────────────────────────────
 
-export interface IAllRolesAPIResponse {
-  http_status_code: number;
-  status: boolean;
-  message: string;
-  data: IRole[];
-}
 
 export interface ISingleRoleAPIResponse {
   http_status_code: number;

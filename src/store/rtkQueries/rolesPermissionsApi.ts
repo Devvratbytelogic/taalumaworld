@@ -22,8 +22,12 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
         // ── GET endpoints ──────────────────────────────────────────────────────
 
         getAllRoles: builder.query<IAllRolesAPIResponse, { page?: number; limit?: number; search?: string } | void>({
-            // query: () => ({ url: `/admin/roles`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_ROLES }),
+            query: (params) => (
+                {
+                    url: `/admin/get-roles`,
+                    method: 'GET',
+                    params: params ?? {}
+                }),
             providesTags: ['AdminRoles'],
         }),
 
@@ -45,11 +49,15 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminRoles'],
         }),
 
-        // ── Mutation endpoints (UI-only — no data changes) ─────────────────────
 
-        addRole: builder.mutation<IMutationAPIResponse, IRoleFormValues>({
-            // query: (payload) => ({ url: `/admin/roles`, method: 'POST', body: payload }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
+        addRole: builder.mutation({
+            query: (payload) => (
+                {
+                    url: `/admin/add-role`,
+                    method: 'POST',
+                    body: payload
+                }),
+            invalidatesTags: ['AdminRoles'],
         }),
 
         updateRole: builder.mutation<IMutationAPIResponse, { id: string; values: IRoleFormValues }>({

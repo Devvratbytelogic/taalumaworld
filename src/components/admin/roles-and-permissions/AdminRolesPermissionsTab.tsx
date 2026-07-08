@@ -8,7 +8,7 @@ import { PermissionsMatrixTab } from './PermissionsMatrixTab';
 import { StaffAssignmentsTab } from './StaffAssignmentsTab';
 import { UserSegmentsTab } from './UserSegmentsTab';
 import { AdminPage, AdminPageHeader, adminPanelClass } from '@/components/admin/layout/AdminContent';
-import { cn } from '@/components/ui/utils';
+import { useDebounce } from '@/hooks/useDebounce';
 
 type Tab = 'roles' | 'permissions' | 'staff' | 'segments';
 
@@ -41,8 +41,8 @@ const TABS: { id: Tab; label: string; icon: React.ElementType; description: stri
 
 export function AdminRolesPermissionsTab() {
   const [activeTab, setActiveTab] = useState<Tab>('roles');
-  const { data } = useGetAllRolesQuery();
-  const roles = data?.data ?? [];
+
+  // console.log('roles', roles);
   const activeTabMeta = TABS.find((t) => t.id === activeTab);
 
   return (
@@ -50,20 +50,10 @@ export function AdminRolesPermissionsTab() {
       <AdminPageHeader
         title="Roles & Permissions"
         description="Central RBAC — manage roles, permissions, and user segments across the platform"
-      >
-        <div className="flex gap-3">
-          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-center min-w-[5.5rem]">
-            <p className="text-xl font-semibold tracking-tight text-slate-900">{roles.length}</p>
-            <p className="text-xs text-slate-500">Roles</p>
-          </div>
-          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-center min-w-[5.5rem]">
-            <p className="text-xl font-semibold tracking-tight text-slate-900">4</p>
-            <p className="text-xs text-slate-500">User Segments</p>
-          </div>
-        </div>
-      </AdminPageHeader>
+      />
+       
 
-      <div className={cn(adminPanelClass, 'p-1.5')}>
+      <div className={`${adminPanelClass} p-1.5`}>
         <div className="flex flex-wrap gap-1">
           {TABS.map((tab) => {
             const Icon = tab.icon;
@@ -73,12 +63,10 @@ export function AdminRolesPermissionsTab() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  'inline-flex flex-1 sm:flex-none items-center justify-center sm:justify-start gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
-                  isActive
+                className={`inline-flex flex-1 sm:flex-none items-center justify-center sm:justify-start gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isActive
                     ? 'bg-primary text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                )}
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline">{tab.label}</span>

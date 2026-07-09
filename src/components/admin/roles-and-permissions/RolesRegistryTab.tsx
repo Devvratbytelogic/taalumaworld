@@ -1,64 +1,124 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
-import { Plus, MoreVertical, Edit2, Trash2, Shield, Lock } from 'lucide-react';
+import { type GridColDef } from '@mui/x-data-grid';
+import { Plus, MoreVertical, Edit2, Trash2, Shield } from 'lucide-react';
 import {
     useGetAllRolesQuery,
 } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table';
-import { AdminSearchInput, AdminStatCard, AdminTableShell } from '@/components/admin/layout/AdminContent';
+import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
+import CommonDataTable from '../CommonDataTable';
 
-function ActionMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {
-    const [open, setOpen] = useState(false);
-    return (
-        <div className="relative">
-            <button
-                onClick={() => setOpen((p) => !p)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-                <MoreVertical className="h-4 w-4 text-gray-500" />
-            </button>
-            {open && (
-                <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-                    <div className="absolute right-0 top-8 z-20 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-40">
-                        <button
-                            onClick={() => { setOpen(false); onEdit(); }}
-                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                            <Edit2 className="h-3.5 w-3.5" /> Edit
-                        </button>
-                        <hr className="my-1 border-gray-100" />
-                        <button
-                            onClick={() => { setOpen(false); onDelete(); }}
-                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
-                            <Trash2 className="h-3.5 w-3.5" /> Delete
-                        </button>
-                    </div>
-                </>
-            )}
-        </div>
-    );
-}
 
 
 export function RolesRegistryTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const debouncedSearch = useDebounce(search, 500);
-    const { data: res, isLoading } = useGetAllRolesQuery({ page: 1, limit: 10, search: debouncedSearch });
+    const { data: res, isLoading } = useGetAllRolesQuery({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        search: debouncedSearch,
+    });
     const roles = res?.data?.data ?? [];
     const totalRoles = res?.data?.total ?? 0;
 
+    useEffect(() => {
+        setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    }, [debouncedSearch]);
+
+    const columns: GridColDef[] = [
+        {
+            field: 'index',
+            headerName: '#',
+            width: 60,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
+            renderCell: (params) => {
+                const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+                return (
+                    <span className="text-sm text-muted-foreground">
+                        {paginationModel.page * paginationModel.pageSize + rowIndex + 1}
+                    </span>
+                );
+            },
+        },
+        {
+            field: 'name',
+            headerName: 'Role',
+            minWidth: 200,
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                    <Shield className="h-4 w-4 text-primary shrink-0" />
+                    <span className="font-medium text-sm">{params.value}</span>
+                </div>
+            ),
+        },
+        {
+            field: 'description',
+            headerName: 'Description',
+            flex: 1,
+            minWidth: 200,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    {params.value}
+                </p>
+            ),
+        },
+        {
+            field: 'permissions',
+            headerName: 'Permissions',
+            width: 100,
+            sortable: false,
+            valueGetter: (value: string[]) => value?.length ?? 0,
+            renderCell: (params) => (
+                <span className="text-sm font-medium">{params.value}</span>
+            ),
+        },
+        {
+            field: 'number_of_users',
+            headerName: 'Assigned',
+            width: 100,
+            sortable: false,
+            renderCell: (params) => (
+                <span className="text-sm font-medium">{params.value}</span>
+            ),
+        },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 150,
+            sortable: false,
+            renderCell: (params) => (
+                <div className='action_buttons'>
+                    <button
+                        className="edit_button"
+                        onClick={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: params.row } }))}
+                    >
+                        <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                        className="delete_button"
+                        onClick={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: params.row } }))}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </button>
+                </div>
+            ),
+        },
+    ]
+
     return (
         <div className="space-y-6">
-
-
             <div className="flex flex-col sm:flex-row gap-3">
                 <AdminSearchInput
                     placeholder="Search roles..."
@@ -75,74 +135,18 @@ export function RolesRegistryTab() {
                 </Button>
             </div>
 
-            <AdminTableShell>
-                <Table className="table-fixed">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-10 px-4">#</TableHead>
-                            <TableHead className="w-[200px] px-4">Role</TableHead>
-                            <TableHead className="px-4">Description</TableHead>
-                            <TableHead className="w-[100px] px-4 text-right">Permissions</TableHead>
-                            <TableHead className="w-[90px] px-4 text-right">Assigned</TableHead>
-                            <TableHead className="w-12 px-2">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading
-                            ? Array.from({ length: 4 }).map((_, i) => (
-                                <TableRow key={i}>
-                                    {Array.from({ length: 7 }).map((__, j) => (
-                                        <TableCell key={j} className="px-4 py-3">
-                                            <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                            : roles.map((role, index) => (
-                                <TableRow key={index}>
-                                    <TableCell className="px-4 py-3 text-muted-foreground text-sm align-top">
-                                        {index + 1}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 align-top whitespace-normal">
-                                        <div className="flex items-start gap-2">
-                                            <Shield className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                                            <div className="min-w-0">
-                                                <p className="font-medium text-sm">{role?.name}</p>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 align-top whitespace-normal">
-                                        <p className="text-sm text-muted-foreground leading-relaxed">
-                                            {role.description}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-center text-sm font-medium align-top">
-                                        {role?.permissions?.length}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-center text-sm font-medium align-top">
-                                        {role?.number_of_users}
-                                    </TableCell>
-                                    <TableCell className="px-2 py-3 align-top">
-                                        <ActionMenu
-                                            onEdit={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role } }))}
-                                            onDelete={() => { }}
-                                        />
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                    </TableBody>
-                </Table>
-
-                {!isLoading && roles.length === 0 && (
-                    <div className="p-12 text-center space-y-3">
-                        <Shield className="h-10 w-10 text-primary mx-auto opacity-50" />
-                        <p className="font-semibold text-gray-800">No roles found</p>
-                        <p className="text-sm text-muted-foreground">
-                            Click &quot;Create Role&quot; to add a custom role.
-                        </p>
-                    </div>
-                )}
-            </AdminTableShell>
+            <div className='border border-gray-200 rounded-md overflow-hidden'>
+                <CommonDataTable
+                    rows={roles}
+                    columns={columns}
+                    getRowId={(row) => row._id}
+                    loading={isLoading}
+                    paginationMode="server"
+                    rowCount={totalRoles}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                />
+            </div>
         </div>
     );
 }

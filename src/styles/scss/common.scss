@@ -1,3 +1,22 @@
 .user_input_style {
     @apply px-12 h-12 rounded-md;
 }
+
+
+.action_buttons {
+    @apply flex items-center gap-2;
+
+    .edit_button {
+        @apply border border-primary rounded-sm p-2 text-primary hover:bg-primary hover:text-white cursor-pointer;
+        &:hover {
+            @apply bg-primary text-white;
+        }
+    }
+
+    .delete_button {
+        @apply border border-red-500 rounded-sm p-2 text-red-500 hover:bg-red-500 hover:text-white cursor-pointer;
+        &:hover {
+            @apply bg-red-500 text-white;
+        }
+    }
+}

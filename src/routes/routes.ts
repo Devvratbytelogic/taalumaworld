@@ -167,7 +167,7 @@ export function getAdminSectionRoutePath(section: string): string {
     dashboard: '/admin/dashboard',
     pages: '/admin/pages',
     settings: '/admin/settings',
-    books: '/admin/books',
+    books: '/admin/series',
     chapters: '/admin/blueprints',
     categories: '/admin/categories',
     authors: '/admin/authors',

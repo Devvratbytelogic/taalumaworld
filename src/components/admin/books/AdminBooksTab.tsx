@@ -1,93 +1,205 @@
-import { useState } from 'react';
-import { BookOpen, Layers, Users } from 'lucide-react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { type GridColDef } from '@mui/x-data-grid';
+import { Eye, Edit2, Trash2 } from 'lucide-react';
 import { useGetAllBooksQuery, useGetAllAuthorLeadersQuery, useGetAllCategoriesQuery, } from '@/store/rtkQueries/adminGetApi';
 import { useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } from '@/store/rtkQueries/adminPostApi';
-import toast from '@/utils/toast';
+import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import { useDebounce } from '@/hooks/useDebounce';
+import CommonDataTable from '../CommonDataTable';
 import { AdminBooksHeader } from './AdminBooksHeader';
 import { AdminBooksSearch } from './AdminBooksSearch';
-import { BookListing } from './BookListing';
+import { BookPreviewModal } from './BookPreviewModal';
 import { AddBookModal } from './AddBookModal';
 import { EditBookModal } from './EditBookModal';
-import { DeleteBookDialog } from './DeleteBookDialog';
-import { BookPreviewModal } from './BookPreviewModal';
-import { IAllBooksAPIResponseDataEntity } from '@/types/books';
-import AdminBooksSkeleton from '@/components/skeleton-loader/AdminBooksSkeleton';
-import { AdminPage, AdminStatCard } from '@/components/admin/layout/AdminContent';
-import { useDebounce } from '@/hooks/useDebounce';
+import ImageComponent from '@/components/ui/ImageComponent';
+import { Badge } from '@/components/ui/badge';
+import toast from '@/utils/toast';
 
 export function AdminBooksTab() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [previewBook, setPreviewBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
-  const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
-  const [deleteConfirmBook, setDeleteConfirmBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageLimit, setPageLimit] = useState(10);
+  const dispatch = useDispatch();
+  const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLeader, setSelectedLeader] = useState('');
-  const debouncedSearch = useDebounce(searchQuery, 500);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [previewBook, setPreviewBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
 
-  const queryParams = {
-    page,
-    limit: pageLimit,
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data: booksResponse, isLoading } = useGetAllBooksQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
     ...(selectedCategory ? { category: selectedCategory } : {}),
     ...(selectedLeader ? { leader: selectedLeader } : {}),
-    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
-  };
-  const { data: booksResponse, isLoading: isBooksLoading, isFetching: isBooksFetching } = useGetAllBooksQuery(queryParams);
+  });
+
   const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
   const { data: categoriesResponse } = useGetAllCategoriesQuery();
-  const books = booksResponse?.data ?? [];
+
+  const books = booksResponse?.data?.data ?? [];
   const thoughtLeaders = leadersResponse?.data?.leaders ?? [];
   const categories = categoriesResponse?.data ?? [];
+  const categoryOptions = categories.map((c) => ({ id: c._id, name: c.name }));
+  const leaderOptions = thoughtLeaders.map((l) => ({ id: l._id ?? l.id, name: l.fullName }));
+
+  const totalBooks = booksResponse?.data?.total ?? 0;
 
   const [addBook, { isLoading: isAdding }] = useAddBookMutation();
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
-  const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
+  const [deleteBook] = useDeleteBookMutation();
 
-  const categoryOptions = categories.length > 0 ? categories.map((c) => ({ id: c._id, name: c.name })) : [];
-  const leaderOptions = thoughtLeaders.length > 0 ? thoughtLeaders.map((l) => ({ id: l._id ?? l.id, name: l.fullName })) : [];
+  useEffect(() => {
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  }, [debouncedSearch, selectedCategory, selectedLeader]);
 
-
-  const hasActiveFilters = !!(selectedCategory || selectedLeader);
-
-  const handleEditBook = (book: IAllBooksAPIResponseDataEntity) => {
-    setEditingBook(book);
-  };
-
-  const handleDeleteBook = (book: IAllBooksAPIResponseDataEntity) => {
-    setDeleteConfirmBook(book);
-  };
-
-  const confirmDeleteBook = async () => {
-    if (!deleteConfirmBook) return;
+  const onDeleteBook = async (id: string) => {
     try {
-      await deleteBook({ id: deleteConfirmBook._id }).unwrap();
-      toast.success(`"${deleteConfirmBook.title}" deleted`);
-      setDeleteConfirmBook(null);
-    } catch {
-      toast.error('Failed to delete series');
+      await deleteBook({ id }).unwrap();
+      toast.success('Series deleted successfully');
+      dispatch(closeModal());
+    } catch (error) {
+      console.error('Error deleting series:', error);
     }
   };
 
-  const openPreview = (book: IAllBooksAPIResponseDataEntity) => {
-    setPreviewBook(book);
-  };
+  const columns: GridColDef[] = [
+    {
+      field: 'index',
+      headerName: '#',
+      width: 60,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
+        const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+        return (
+          <span className="text-sm text-muted-foreground">
+            {paginationModel.page * paginationModel.pageSize + rowIndex + 1}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'title',
+      headerName: 'Series Title',
+      minWidth: 240,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-sm bg-muted shrink-0 overflow-hidden">
+            {params.row.coverImage ? (
+              <ImageComponent
+                src={params.row.coverImage}
+                alt={params.row.title}
+                object_cover={true}
+              />
+            ) : null}
+          </div>
+          <p className="font-medium text-sm whitespace-nowrap">{params.row.title}</p>
+        </div>
+      ),
+    },
+    {
+      field: 'mentor',
+      headerName: 'Mentor',
+      minWidth: 160,
+      sortable: false,
+      valueGetter: (_value, row) => row.thoughtLeader?.fullName ?? 'Unknown',
+      renderCell: (params) => (
+        <span className="text-sm whitespace-nowrap">{params.value}</span>
+      ),
+    },
+    {
+      field: 'category',
+      headerName: 'Category',
+      minWidth: 140,
+      sortable: false,
+      valueGetter: (_value, row) => row.category?.name ?? 'N/A',
+      renderCell: (params) => (
+        <Badge variant="outline" className="text-xs whitespace-nowrap">
+          {params.value}
+        </Badge>
+      ),
+    },
+    {
+      field: 'pricingModel',
+      headerName: 'Pricing',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm capitalize whitespace-nowrap">
+          {params.value === 'book' ? 'Series' : 'Blueprint'}
+        </span>
+      ),
+    },
+    {
+      field: 'price',
+      headerName: 'Price',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm font-semibold text-primary whitespace-nowrap">
+          {params.row.pricingModel === 'book' && params.value != null
+            ? `KSH ${Number(params.value).toFixed(2)}`
+            : '—'}
+        </span>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="action_buttons">
+          <button
+            type="button"
+            className="edit_button"
+            onClick={() => setPreviewBook(params.row)}
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            className="edit_button"
+            onClick={() => setEditingBook(params.row)}
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            className="delete_button"
+            onClick={() => dispatch(openModal({
+              componentName: 'DeleteConfirmation',
+              data: {
+                itemName: params.row.title,
+                onDelete: () => onDeleteBook(params.row.id ?? params.row._id),
+              },
+            }))}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <AdminPage>
+    <div className="space-y-6">
       <AdminBooksHeader onCreateBook={() => setIsCreateModalOpen(true)} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <AdminStatCard label="Total Series" value={books?.length ?? 0} icon={BookOpen} tone="blue" />
-        <AdminStatCard label="Mentors" value={thoughtLeaders.length} icon={Users} tone="green" />
-        <AdminStatCard label="Categories" value={categories.length} icon={Layers} tone="purple" />
-      </div>
+
 
       <AdminBooksSearch
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        searchQuery={search}
+        onSearchChange={setSearch}
         categories={categoryOptions}
         leaders={leaderOptions}
         selectedCategory={selectedCategory}
@@ -96,20 +208,18 @@ export function AdminBooksTab() {
         onLeaderChange={setSelectedLeader}
       />
 
-      {isBooksLoading || isBooksFetching ? (
-        <AdminBooksSkeleton />
-      ) : (
-        <BookListing
-          books={books}
-          totalCount={books?.length ?? 0}
-          searchQuery={searchQuery}
-          hasActiveFilters={hasActiveFilters}
-          onCreateBook={() => setIsCreateModalOpen(true)}
-          onPreview={openPreview}
-          onEdit={handleEditBook}
-          onDelete={handleDeleteBook}
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={books}
+          columns={columns}
+          getRowId={(row) => row.id ?? row._id}
+          loading={isLoading}
+          paginationMode="server"
+          rowCount={totalBooks}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
         />
-      )}
+      </div>
 
       <BookPreviewModal
         book={previewBook}
@@ -135,14 +245,6 @@ export function AdminBooksTab() {
         onSubmit={updateBook}
         isSubmitting={isUpdating}
       />
-
-      <DeleteBookDialog
-        book={deleteConfirmBook}
-        open={!!deleteConfirmBook}
-        onOpenChange={(open) => !open && setDeleteConfirmBook(null)}
-        onConfirm={confirmDeleteBook}
-        isDeleting={isDeleting}
-      />
-    </AdminPage>
+    </div>
   );
 }

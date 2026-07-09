@@ -38,7 +38,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         /** Books */
         getAllBooks: builder.query<IAllBooksAPIResponse, { page?: number; limit?: number; search?: string; category?: string; leader?: string } | void>({
             query: (params) => ({
-                url: `/admin/books`,
+                url: `/admin/series`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),
@@ -48,7 +48,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         /** Chapters */
         getAllAdminChapters: builder.query<IAllChaptersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
-                url: `/admin/chapters`,
+                url: `/admin/blueprints`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),

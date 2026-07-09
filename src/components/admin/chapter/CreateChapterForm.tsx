@@ -1,19 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import { Save, X, Upload } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
@@ -28,13 +21,21 @@ import {
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
-import type { Book, Author } from '@/types/content';
 import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
+import ReactSelect from 'react-select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
+import { SELECT_STYLES } from '@/constants/selectStyle';
 
 const initialFormValues = {
   bookId: '',
@@ -57,6 +58,10 @@ const initialFormValues = {
   json_ld: '',
 };
 
+function slugFromTitle(title: string): string {
+  return title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
 export function CreateChapterForm() {
   const router = useRouter();
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
@@ -64,32 +69,16 @@ export function CreateChapterForm() {
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const slugManuallyEdited = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
-  const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
   const [addChapter, { isLoading: isAdding }] = useAddChapterMutation();
 
-  const rawBooks = booksResponse?.data ?? [];
-  const leaders = leadersResponse?.data?.leaders ?? [];
-  const books = rawBooks.map((b: { id?: string; _id?: string; thoughtLeader?: { _id?: string; id?: string } }) => ({
-    ...b,
-    id: b.id ?? b._id,
-    authorId: (b as { thoughtLeader?: { _id?: string; id?: string } }).thoughtLeader?._id ?? (b as { thoughtLeader?: { id?: string } }).thoughtLeader?.id,
-  })) as unknown as Book[];
-  const authors = leaders.map((l: { _id: string; fullName: string }) => ({ id: l._id, name: l.fullName })) as unknown as Author[];
+  const books = booksResponse?.data ?? [];
+  const bookOptions = books.length > 0 ? books.map((book) => ({ value: book.id, label: book.title })) : [];
 
-  const {
-    values,
-    errors,
-    touched,
-    isSubmitting,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setFieldValue,
-    setFieldTouched,
-    resetForm,
-  } = useFormik({
+
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
     validationSchema: addChapterSchema,
     onSubmit: async (vals) => {
@@ -129,10 +118,11 @@ export function CreateChapterForm() {
         setOgImagePreviewUrl(null);
         setPdfFile(null);
         resetForm({ values: initialFormValues });
+        slugManuallyEdited.current = false;
         toast.success('Blueprint created successfully');
-        router.push(`/admin/chapters`);
+        router.push(getAdminSectionRoutePath('chapters'));
       } catch (err) {
-        console.error('error during create chapter', err);  
+        console.error('error during create chapter', err);
       }
     },
   });
@@ -226,14 +216,19 @@ export function CreateChapterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
-      <div className="space-y-2">
+      <div className="space-y-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Series <span className="text-red-500">*</span></Label>
-            <Select
-              value={values.bookId || undefined}
-              onValueChange={(value) => {
-                setFieldValue('bookId', value ?? '');
+            <ReactSelect
+              inputId="chapter-series"
+              name="bookId"
+              classNamePrefix="react-select"
+              options={bookOptions}
+              value={bookOptions?.find((o) => o.value === values.bookId) ?? null}
+              onChange={(option) => {
+                const value = option?.value ?? '';
+                setFieldValue('bookId', value);
                 setFieldTouched('bookId', true);
                 const book = books.find((b) => b.id === value);
                 const model = book?.pricingModel ?? (book as { type?: string })?.type ?? 'chapter';
@@ -242,19 +237,13 @@ export function CreateChapterForm() {
                   setFieldValue('price', 0);
                 }
               }}
-              disabled={books.length === 0}
-            >
-              <SelectTrigger className={errors.bookId && touched.bookId ? 'border-red-500' : undefined}>
-                <SelectValue placeholder={books.length === 0 ? 'No series available' : 'Select series'} />
-              </SelectTrigger>
-              <SelectContent>
-                {books.map((book) => (
-                  <SelectItem key={book.id} value={book.id}>
-                    {book.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onBlur={() => setFieldTouched('bookId', true)}
+              placeholder={books.length === 0 ? 'No series available' : 'Select series'}
+              isDisabled={books.length === 0 || isSubmittingState}
+              menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+              menuPosition="fixed"
+              styles={SELECT_STYLES}
+            />
             {books.length === 0 && (
               <p className="text-sm text-muted-foreground">Create a series first from the Admin Series section.</p>
             )}
@@ -272,8 +261,9 @@ export function CreateChapterForm() {
               value={values.title}
               onChange={(e) => {
                 handleChange(e);
-                const slug = e.target.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                setFieldValue('slug', slug);
+                if (!slugManuallyEdited.current) {
+                  setFieldValue('slug', slugFromTitle(e.target.value));
+                }
               }}
               onBlur={handleBlur}
               disabled={isSubmittingState}
@@ -291,10 +281,13 @@ export function CreateChapterForm() {
             id="chapter-slug"
             name="slug"
             value={values.slug}
-            readOnly
-            disabled
-            placeholder="Auto-generated from title"
-            
+            onChange={(e) => {
+              slugManuallyEdited.current = true;
+              setFieldValue('slug', slugFromTitle(e.target.value));
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmittingState}
+            placeholder="e.g., introduction-to-leadership"
           />
         </div>
 
@@ -309,7 +302,7 @@ export function CreateChapterForm() {
             onBlur={handleBlur}
             disabled={isSubmittingState}
             rows={3}
-           
+
           />
         </div>
 
@@ -524,7 +517,7 @@ export function CreateChapterForm() {
               <span className="px-3 text-center text-sm text-slate-400">Preview</span>
             </div>
           )}
-        
+
         </div>
 
         <OpenGraphFieldsSection
@@ -558,6 +551,7 @@ export function CreateChapterForm() {
         onCheckedChange={(checked) => setFieldValue('agreeContentOwnership', checked)}
         onBlur={() => setFieldTouched('agreeContentOwnership', true)}
         disabled={isSubmittingState}
+        
       >
         I own or have rights to this content · No third-party infringement · I understand Taaluma may remove
         non-compliant content. See the{' '}

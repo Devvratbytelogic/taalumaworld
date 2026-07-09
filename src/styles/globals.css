@@ -705,7 +705,7 @@
 }
 
 .admin_panel [data-slot='input'],
-.admin_panel input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']):not([type='range']):not([type='color']):not([type='image']) {
+.admin_panel input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']):not([type='range']):not([type='color']):not([type='image']):not(.react-select__input) {
   height: 2.5rem !important;
   min-height: 2.5rem !important;
   max-height: 2.5rem !important;
@@ -791,15 +791,15 @@
 .admin_panel [data-slot='textarea']:focus-visible,
 .admin_panel [data-slot='rich-text-editor']:focus-within,
 .admin_panel .admin-form-trigger:focus-visible,
-.admin_panel input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']):not([type='range']):not([type='color']):not([type='image']):focus,
-.admin_panel input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']):not([type='range']):not([type='color']):not([type='image']):focus-visible,
+.admin_panel input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']):not([type='range']):not([type='color']):not([type='image']):not(.react-select__input):focus,
+.admin_panel input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']):not([type='range']):not([type='color']):not([type='image']):not(.react-select__input):focus-visible,
 .admin_panel select:focus,
 .admin_panel select:focus-visible,
 .admin_panel textarea:focus,
 .admin_panel textarea:focus-visible {
   outline: none;
   border-color: rgb(226 232 240);
-  box-shadow: 0 0 0 1px rgba(10, 102, 194, 0.492) !important;
+  box-shadow: 0 0 0 1px rgba(10, 102, 194, 0.492);
 }
 
 .admin_panel [data-slot='label'],

@@ -25,7 +25,6 @@ export function AgreementCheckbox({
     children,
 }: AgreementCheckboxProps) {
     const hasError = Boolean(error && touched)
-
     return (
         <div className="flex items-start gap-3">
             <Checkbox
@@ -35,11 +34,11 @@ export function AgreementCheckbox({
                 onBlur={onBlur}
                 disabled={disabled}
                 aria-invalid={hasError}
-                className={`mt-0.5 rounded-md ${hasError ? 'border-red-500 data-[state=checked]:border-red-500' : ''}`}
+                className={`mt-0.5 rounded-md ${hasError ? 'border-red-500! data-[state=checked]:border-red-500!' : ''}`}
             />
             <label
                 htmlFor={id}
-                className={`text-sm leading-snug cursor-pointer ${hasError ? 'text-red-600' : 'text-foreground'}`}
+                className={`text-sm leading-snug cursor-pointer ${hasError ? 'text-red-600!' : 'text-foreground'}`}
             >
                 {children}
             </label>

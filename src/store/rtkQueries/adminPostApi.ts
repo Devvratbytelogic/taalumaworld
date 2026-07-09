@@ -103,7 +103,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         /** Chapters */
         addChapter: builder.mutation({
             query: (payload: FormData) => ({
-                url: `/admin/chapters`,
+                url: `/admin/blueprints`,
                 method: 'POST',
                 body: payload,
             }),
@@ -111,7 +111,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         }),
         updateChapter: builder.mutation({
             query: ({ id, values }) => ({
-                url: `/admin/chapters/${id}`,
+                url: `/admin/blueprints/${id}`,
                 method: 'PUT',
                 body: values,
             }),
@@ -119,7 +119,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         }),
         deleteChapter: builder.mutation({
             query: ({ id }) => ({
-                url: `/admin/chapters/${id}`,
+                url: `/admin/blueprints/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['AdminChapters'],

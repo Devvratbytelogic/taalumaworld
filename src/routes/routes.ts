@@ -168,7 +168,7 @@ export function getAdminSectionRoutePath(section: string): string {
     pages: '/admin/pages',
     settings: '/admin/settings',
     books: '/admin/books',
-    chapters: '/admin/chapters',
+    chapters: '/admin/blueprints',
     categories: '/admin/categories',
     authors: '/admin/authors',
     mentor_types: '/admin/types/mentor-types',
@@ -193,11 +193,11 @@ export function getAdminSectionRoutePath(section: string): string {
 }
 
 export function getCreateChapterRoutePath(): string {
-  return '/admin/chapter/create';
+  return '/admin/blueprints/create';
 }
 
 export function getEditChapterRoutePath(chapterId: string): string {
-  return `/admin/chapter/edit/${chapterId}`;
+  return `/admin/blueprints/edit/${chapterId}`;
 }
 
 export function getDesignSystemRoutePath(): string {

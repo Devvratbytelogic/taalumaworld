@@ -19,6 +19,7 @@ import { AssignStaffRoleModal } from '../admin/roles-and-permissions/AssignStaff
 import { AddStaffModal } from '../admin/roles-and-permissions/AddStaffModal';
 import BookDetailsModal from './common-card-details/BookDetailsModal';
 import ChapterDetailsModal from './common-card-details/ChapterDetailsModal';
+import DeleteConfirmation from '../admin/DeleteConfirmation';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -65,6 +66,8 @@ export default function AllModal() {
                 return <BookDetailsModal />;
             case "ChapterDetailsModal":
                 return <ChapterDetailsModal />;
+            case "DeleteConfirmation":
+                return <DeleteConfirmation />;
             default:
                 return null;
         }

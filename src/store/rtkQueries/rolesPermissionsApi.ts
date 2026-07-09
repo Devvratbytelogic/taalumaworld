@@ -60,14 +60,23 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminRoles'],
         }),
 
-        updateRole: builder.mutation<IMutationAPIResponse, { id: string; values: IRoleFormValues }>({
-            // query: ({ id, values }) => ({ url: `/admin/roles/${id}`, method: 'PUT', body: values }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
+        updateRole: builder.mutation<IMutationAPIResponse, { id: string; payload: IRoleFormValues }>({
+            query: ({ payload, id }) => (
+                {
+                    url: `/admin/update-role/${id}`,
+                    method: 'PUT',
+                    body: payload
+                }),
+            invalidatesTags: ['AdminRoles'],
         }),
 
         deleteRole: builder.mutation<IMutationAPIResponse, { id: string }>({
-            // query: ({ id }) => ({ url: `/admin/roles/${id}`, method: 'DELETE' }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: ({ id }) => (
+                {
+                    url: `/admin/delete-role/${id}`,
+                    method: 'DELETE',
+                }),
+            invalidatesTags: ['AdminRoles'],
         }),
 
         updateRolePermissions: builder.mutation<IMutationAPIResponse, { roleId: string; permissionIds: string[] }>({

@@ -427,3 +427,9 @@ export const extendPromotionSchema = Yup.object({
       return value > currentEnd;
     }),
 });
+
+// Add / Edit Role Modal Validation Schema
+export const roleSchema = Yup.object({
+  name: Yup.string().trim().required('Role name is required'),
+  description: Yup.string().trim(),
+});

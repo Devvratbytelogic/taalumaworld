@@ -4,15 +4,14 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Plus, MoreVertical, Edit2, Trash2, Shield } from 'lucide-react';
-import {
-    useGetAllRolesQuery,
-} from '@/store/rtkQueries/rolesPermissionsApi';
-import { openModal } from '@/store/slices/allModalSlice';
+import { Plus, Edit2, Trash2, Shield } from 'lucide-react';
+import { useGetAllRolesQuery, } from '@/store/rtkQueries/rolesPermissionsApi';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
 import CommonDataTable from '../CommonDataTable';
-
+import { useDeleteRoleMutation } from '@/store/rtkQueries/rolesPermissionsApi';
+import toast from '@/utils/toast'
 
 
 export function RolesRegistryTab() {
@@ -27,11 +26,23 @@ export function RolesRegistryTab() {
     });
     const roles = res?.data?.data ?? [];
     const totalRoles = res?.data?.total ?? 0;
+    const [deleteRole] = useDeleteRoleMutation();
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
     }, [debouncedSearch]);
 
+    const onDeleteRole = async (id: string) => {
+        try {
+            const res = await deleteRole({ id }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res?.message ?? 'Role deleted successfully');
+                dispatch(closeModal());
+            }
+        } catch (error) {
+            console.error('Error deleting role', error);
+        }
+    }
     const columns: GridColDef[] = [
         {
             field: 'index',
@@ -102,13 +113,19 @@ export function RolesRegistryTab() {
                 <div className='action_buttons'>
                     <button
                         className="edit_button"
-                        onClick={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: params.row } }))}
+                        onClick={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: params.row, isEdit: true } }))}
                     >
                         <Edit2 className="h-4 w-4" />
                     </button>
                     <button
                         className="delete_button"
-                        onClick={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: params.row } }))}
+                        onClick={() => dispatch(openModal({
+                            componentName: 'DeleteConfirmation',
+                            data: {
+                                itemName: params.row.name,
+                                onDelete: () => onDeleteRole(params.row._id),
+                            },
+                        }))}
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>

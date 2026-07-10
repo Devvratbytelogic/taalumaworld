@@ -8,13 +8,12 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
 import Button from '../../ui/Button';
-import { Switch } from '../../ui/switch';
-import { cn } from '../../ui/utils';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
+import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 
 const defaultValues = {
   platformName: '',
@@ -34,10 +33,10 @@ const defaultValues = {
   iphone_app_url: '',
   meta_title: '',
   meta_description: '',
-  meta_keywords: '',
-  og_tag: '',
-  search_console: '',
-  schema_markup: '',
+  og_title: '',
+  og_description: '',
+  og_image: null as File | string | null,
+  json_ld: '',
   google_analytics_id: '',
   google_tag_manager: '',
   facebook_pixel: '',
@@ -94,7 +93,10 @@ export function GeneralSettingsCard() {
   const { data: res, isLoading } = useGetAdminGlobalSettingsQuery();
   const [updateGlobalSettings, { isLoading: isUpdating }] = useUpdateGlobalSettingsMutation();
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const ogImageIsObjectUrlRef = useRef(false);
 
   const data = res?.data;
 
@@ -116,10 +118,10 @@ export function GeneralSettingsCard() {
     iphone_app_url: data?.iphone_app_url ?? '',
     meta_title: data?.meta_title ?? '',
     meta_description: data?.meta_description ?? '',
-    meta_keywords: data?.meta_keywords ?? '',
-    og_tag: data?.og_tag ?? '',
-    search_console: data?.search_console ?? '',
-    schema_markup: data?.schema_markup ?? '',
+    og_title: data?.og_title ?? data?.og_tag ?? '',
+    og_description: data?.og_description ?? '',
+    og_image: data?.og_image ?? null,
+    json_ld: data?.json_ld ?? data?.schema_markup ?? '',
     google_analytics_id: data?.google_analytics_id ?? '',
     google_tag_manager: data?.google_tag_manager ?? '',
     facebook_pixel: data?.facebook_pixel ?? '',
@@ -147,9 +149,11 @@ export function GeneralSettingsCard() {
       try {
         const formData = new FormData();
         (Object.keys(values) as (keyof FormValues)[]).forEach((key) => {
+          if (key === 'og_image') return;
           formData.append(key, String(values[key]));
         });
         if (logoFile) formData.append('logo', logoFile);
+        if (ogImageFile) formData.append('og_image', ogImageFile);
         await updateGlobalSettings(formData).unwrap();
         toast.success('Settings updated successfully');
       } catch {
@@ -158,7 +162,39 @@ export function GeneralSettingsCard() {
     },
   });
 
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit } = formik;
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched } = formik;
+
+  const existingOgImage = typeof data?.og_image === 'string' ? data.og_image : null;
+
+  const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file (e.g. JPG, PNG)');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image must be less than 2MB');
+        return;
+      }
+      if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      setOgImageFile(file);
+      setOgImagePreviewUrl(URL.createObjectURL(file));
+      ogImageIsObjectUrlRef.current = true;
+      setFieldValue('og_image', file);
+      setFieldTouched('og_image', true);
+    }
+    e.target.value = '';
+  };
+
+  const clearOgImage = () => {
+    if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+    setOgImageFile(null);
+    setOgImagePreviewUrl(existingOgImage);
+    ogImageIsObjectUrlRef.current = false;
+    setFieldValue('og_image', existingOgImage);
+    setFieldTouched('og_image', true);
+  };
 
   const field = (name: keyof FormValues) => ({
     id: name as string,
@@ -315,72 +351,6 @@ export function GeneralSettingsCard() {
             </div>
           </section>
 
-          {/* ── Header & Display ── */}
-          <section>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-sm">Content Visibility Mode</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    Platform is currently in <span className="font-semibold">{values.visible === 'book' ? 'Series' : 'Blueprint'}</span> mode
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={cn('text-sm font-medium transition-colors', values.visible === 'chapter' ? 'text-primary' : 'text-muted-foreground')}>
-                    Blueprint
-                  </span>
-                  <Switch
-                    checked={values.visible === 'book'}
-                    onCheckedChange={(checked) => formik.setFieldValue('visible', checked ? 'book' : 'chapter')}
-                  />
-                  <span className={cn('text-sm font-medium transition-colors', values.visible === 'book' ? 'text-primary' : 'text-muted-foreground')}>
-                    Series
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-
-          {/* ── SEO ── */}
-          <section>
-            <SectionHeading title="SEO" />
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="meta_title">Meta Title</Label>
-                  <Input {...field('meta_title')} />
-                  <FieldError msg={touched.meta_title ? errors.meta_title : ''} />
-                </div>
-                <div>
-                  <Label htmlFor="og_tag">OG Tag</Label>
-                  <Input {...field('og_tag')} />
-                  <FieldError msg={touched.og_tag ? errors.og_tag : ''} />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="meta_description">Meta Description</Label>
-                <Textarea {...field('meta_description')} rows={2} />
-                <FieldError msg={touched.meta_description ? errors.meta_description : ''} />
-              </div>
-              <div>
-                <Label htmlFor="meta_keywords">Meta Keywords</Label>
-                <Input {...field('meta_keywords')} placeholder="series, reading, blueprints" />
-                <FieldError msg={touched.meta_keywords ? errors.meta_keywords : ''} />
-              </div>
-              <div>
-                <Label htmlFor="search_console">Search Console Verification</Label>
-                <Input {...field('search_console')} placeholder="google-site-verification=..." />
-                <FieldError msg={touched.search_console ? errors.search_console : ''} />
-              </div>
-              <div>
-                <Label htmlFor="schema_markup">Schema Markup</Label>
-                <Textarea {...field('schema_markup')} rows={3} placeholder='<script type="application/ld+json">...</script>' className={`mt-2 font-mono text-sm${errors.schema_markup && touched.schema_markup ? ' border-red-500' : ''}`} />
-                <FieldError msg={touched.schema_markup ? errors.schema_markup : ''} />
-              </div>
-            </div>
-          </section>
-
           {/* ── Analytics ── */}
           <section>
             <SectionHeading title="Analytics & Tracking" />
@@ -471,6 +441,27 @@ export function GeneralSettingsCard() {
               />
             </div>
           </section>
+
+          <OpenGraphFieldsSection
+            idPrefix="global-settings"
+            values={{
+              meta_title: values.meta_title,
+              meta_description: values.meta_description,
+              og_title: values.og_title,
+              og_description: values.og_description,
+              og_image: values.og_image,
+              json_ld: values.json_ld,
+            }}
+            errors={errors}
+            touched={touched}
+            handleChange={handleChange}
+            handleBlur={handleBlur}
+            disabled={isUpdating || formik.isSubmitting}
+            ogImagePreviewUrl={ogImagePreviewUrl ?? existingOgImage}
+            ogImageFileName={ogImageFile?.name ?? null}
+            onOgImageChange={handleOgImageChange}
+            onOgImageClear={clearOgImage}
+          />
 
           <div className="flex justify-end pt-2">
             <Button

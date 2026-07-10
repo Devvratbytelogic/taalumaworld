@@ -282,13 +282,7 @@ export const globalSettingsSchema = Yup.object({
   // App URLs
   android_app_url: urlSchema,
   iphone_app_url: urlSchema,
-  // SEO
-  meta_title: Yup.string().trim(),
-  meta_description: Yup.string().trim(),
-  meta_keywords: Yup.string().trim(),
-  og_tag: Yup.string().trim(),
-  search_console: Yup.string().trim(),
-  schema_markup: Yup.string().trim(),
+  ...openGraphFieldsSchema,
   // Analytics
   google_analytics_id: Yup.string().trim(),
   google_tag_manager: Yup.string().trim(),

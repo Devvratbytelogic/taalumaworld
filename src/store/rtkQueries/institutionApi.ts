@@ -1,13 +1,7 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
-import type {
-    IAllInstitutionsAPIResponse,
-    ISingleInstitutionAPIResponse,
-    IInstitutionUsageReportAPIResponse,
-    IRegistrationPromptAPIResponse,
-} from '@/types/institution';
+import type { IAllInstitutionsAPIResponse } from '@/types/institution';
+import { ISingleInstitutionAPIResponse } from '@/types/singleInstitution';
 import {
-    DUMMY_INSTITUTIONS,
-    DUMMY_INSTITUTION_BY_ID,
     DUMMY_USAGE_REPORT,
     DUMMY_REGISTRATION_PROMPT,
     DUMMY_MUTATION_SUCCESS,
@@ -17,30 +11,34 @@ export const institutionApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
 
         // ── GET endpoints ──────────────────────────────────────────────────────
-
         /** List all partner institutions */
-        getAllInstitutions: builder.query<IAllInstitutionsAPIResponse, void>({
-            // query: () => ({ url: `/admin/institutions`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_INSTITUTIONS }),
+        getAllInstitutions: builder.query<IAllInstitutionsAPIResponse, { search?: string; page?: number; limit?: number; status?: string; isDeleted?: boolean }>({
+            query: (params) => ({
+                url: `/admin/institutions`,
+                method: 'GET',
+                params: params ?? {},
+            }),
             providesTags: ['AdminInstitutions'],
         }),
 
         /** Single institution details */
         getInstitutionById: builder.query<ISingleInstitutionAPIResponse, string>({
-            // query: (id) => ({ url: `/admin/institutions/${id}`, method: 'GET' }),
-            queryFn: (_id) => ({ data: DUMMY_INSTITUTION_BY_ID }),
+            query: (id) => ({
+                url: `/admin/institutions/${id}`,
+                method: 'GET',
+            }),
             providesTags: (_result, _err, id) => [{ type: 'AdminInstitutions', id }],
         }),
 
         /** Usage / analytics report for all institutions */
-        getInstitutionUsageReport: builder.query<IInstitutionUsageReportAPIResponse, void>({
+        getInstitutionUsageReport: builder.query<any, void>({
             // query: () => ({ url: `/admin/institutions/usage-report`, method: 'GET' }),
             queryFn: () => ({ data: DUMMY_USAGE_REPORT }),
             providesTags: ['AdminInstitutionUsage'],
         }),
 
         /** Registration prompt settings */
-        getRegistrationPromptSettings: builder.query<IRegistrationPromptAPIResponse, void>({
+        getRegistrationPromptSettings: builder.query<any, void>({
             // query: () => ({ url: `/admin/institutions/registration-prompt`, method: 'GET' }),
             queryFn: () => ({ data: DUMMY_REGISTRATION_PROMPT }),
             providesTags: ['AdminRegistrationPrompt'],
@@ -50,45 +48,50 @@ export const institutionApi = rtkQuerieSetup.injectEndpoints({
 
         /** Create a new institution */
         addInstitution: builder.mutation({
-            // query: (payload) => ({ url: `/admin/institutions`, method: 'POST', body: payload }),
-            queryFn: (_payload) => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: (payload) => ({
+                url: `/admin/institutions`,
+                method: 'POST',
+                body: payload,
+            }),
             invalidatesTags: ['AdminInstitutions', 'AdminInstitutionUsage'],
         }),
 
         /** Update institution details */
         updateInstitution: builder.mutation({
             // query: ({ id, values }: { id: string; values: Record<string, unknown> }) => ({ url: `/admin/institutions/${id}`, method: 'PUT', body: values }),
-            queryFn: (_args: { id: string; values: Record<string, unknown> }) => ({
-                data: DUMMY_MUTATION_SUCCESS,
+            query: ({ id, values }) => ({
+                url: `/admin/institutions/${id}`,
+                method: 'PUT',
+                body: values,
             }),
             invalidatesTags: ['AdminInstitutions', 'AdminInstitutionUsage'],
         }),
 
         /** Suspend an institution (pause promotional access) */
         suspendInstitution: builder.mutation({
-            // query: ({ id }: { id: string }) => ({ url: `/admin/institutions/${id}/suspend`, method: 'PUT' }),
-            queryFn: (_args: { id: string }) => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: ({ id }) => ({
+                url: `/admin/institutions/${id}/suspend`,
+                method: 'PUT',
+            }),
             invalidatesTags: ['AdminInstitutions'],
         }),
 
         /** Restore a suspended institution */
         restoreInstitution: builder.mutation({
-            // query: ({ id }: { id: string }) => ({ url: `/admin/institutions/${id}/restore`, method: 'PUT' }),
-            queryFn: (_args: { id: string }) => ({ data: DUMMY_MUTATION_SUCCESS }),
-            invalidatesTags: ['AdminInstitutions'],
-        }),
-
-        /** Terminate an institution partnership */
-        terminateInstitution: builder.mutation({
-            // query: ({ id }: { id: string }) => ({ url: `/admin/institutions/${id}/terminate`, method: 'PUT' }),
-            queryFn: (_args: { id: string }) => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: ({ id }) => (
+                {
+                    url: `/admin/institutions/restore/${id}`,
+                    method: 'PUT',
+                }),
             invalidatesTags: ['AdminInstitutions'],
         }),
 
         /** Delete an institution (hard delete) */
         deleteInstitution: builder.mutation({
-            // query: ({ id }: { id: string }) => ({ url: `/admin/institutions/${id}`, method: 'DELETE' }),
-            queryFn: (_args: { id: string }) => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: ({ id }) => ({
+                url: `/admin/institutions/${id}`,
+                method: 'DELETE',
+            }),
             invalidatesTags: ['AdminInstitutions', 'AdminInstitutionUsage'],
         }),
 
@@ -131,7 +134,6 @@ export const {
     useUpdateInstitutionMutation,
     useSuspendInstitutionMutation,
     useRestoreInstitutionMutation,
-    useTerminateInstitutionMutation,
     useDeleteInstitutionMutation,
     useUpdateInstitutionBlueprintAccessMutation,
     useExtendPromotionalPeriodMutation,

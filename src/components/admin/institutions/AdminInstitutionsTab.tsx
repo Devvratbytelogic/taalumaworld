@@ -46,9 +46,9 @@ const TABS: { id: Tab; label: string; icon: React.ElementType; description: stri
 
 export function AdminInstitutionsTab() {
     const [activeTab, setActiveTab] = useState<Tab>('registry');
-    const { data } = useGetAllInstitutionsQuery();
-    const institutions = data?.data ?? [];
-    const activeCount = institutions.filter((i) => i.status === 'active').length;
+    const { data } = useGetAllInstitutionsQuery({});
+    const totalInstitutions = data?.data?.total ?? 0;
+    
 
     return (
         <div className="space-y-6">
@@ -70,11 +70,11 @@ export function AdminInstitutionsTab() {
                     </div>
                     <div className="flex gap-3">
                         <div className="bg-accent rounded-2xl px-5 py-3 text-center">
-                            <p className="text-2xl font-bold text-primary">{institutions.length}</p>
+                            <p className="text-2xl font-bold text-primary">{totalInstitutions}</p>
                             <p className="text-xs text-muted-foreground">Partners</p>
                         </div>
                         <div className="bg-green-50 rounded-2xl px-5 py-3 text-center">
-                            <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+                                <p className="text-2xl font-bold text-green-600">{totalInstitutions}</p>
                             <p className="text-xs text-muted-foreground">Active</p>
                         </div>
                     </div>
@@ -90,11 +90,10 @@ export function AdminInstitutionsTab() {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex-1 sm:flex-none justify-center sm:justify-start ${
-                                isActive
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex-1 sm:flex-none justify-center sm:justify-start ${isActive
                                     ? 'bg-primary text-white shadow-sm'
                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                            }`}
+                                }`}
                         >
                             <Icon className="h-4 w-4 shrink-0" />
                             <span className="hidden sm:inline">{tab.label}</span>

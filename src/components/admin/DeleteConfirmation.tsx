@@ -67,6 +67,7 @@ export default function DeleteConfirmation() {
                         className="global_btn rounded_full bg-danger text-white flex-1"
                         onPress={handleDelete}
                         isLoading={isLoading}
+                        startContent={<Trash2 className="h-4 w-4" />}
                     >
                         Delete
                     </Button>

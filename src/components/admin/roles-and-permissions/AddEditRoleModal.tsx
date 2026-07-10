@@ -24,12 +24,12 @@ export function AddEditRoleModal() {
 
     const onClose = () => dispatch(closeModal());
 
-    const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit } = useFormik({
+    const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue } = useFormik({
         enableReinitialize: true,
         initialValues: {
             name: role?.name ?? '',
             description: role?.description ?? '',
-            number_of_users: 5,
+            number_of_users: role?.number_of_users ?? 0,
         },
         validationSchema: roleSchema,
         onSubmit: async (formValues) => {
@@ -68,7 +68,7 @@ export function AddEditRoleModal() {
                         </p>
                     </ModalHeader>
 
-                    <ModalBody className="space-y-4 py-4">
+                    <ModalBody className="py-4">
                         <div>
                             <label className={labelCls} htmlFor="name">
                                 Role Name <span className="text-red-500">*</span>
@@ -101,6 +101,28 @@ export function AddEditRoleModal() {
                             />
                             {touched.description && errors.description && typeof errors.description === 'string' ? (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                            ) : null}
+                        </div>
+                        <div>
+                            <label className={labelCls} htmlFor="number_of_users">
+                                Number of Users
+                            </label>
+                            <input
+                                id="number_of_users"
+                                name="number_of_users"
+                                type="number"
+                                min={0}
+                                className={inputCls}
+                                value={values.number_of_users}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFieldValue('number_of_users', val === '' ? 0 : Number(val));
+                                }}
+                                onBlur={handleBlur}
+                                placeholder="0"
+                            />
+                            {touched.number_of_users && errors.number_of_users && typeof errors.number_of_users === 'string' ? (
+                                <p className="mt-1 text-sm text-red-600">{errors.number_of_users}</p>
                             ) : null}
                         </div>
                     </ModalBody>

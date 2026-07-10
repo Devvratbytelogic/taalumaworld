@@ -130,6 +130,7 @@ export interface IRole {
 export interface IRoleFormValues {
   name: string;
   description: string;
+  number_of_users: number;
 }
 
 export interface IStaffFormValues {

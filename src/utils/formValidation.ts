@@ -422,4 +422,8 @@ export const extendPromotionSchema = Yup.object({
 export const roleSchema = Yup.object({
   name: Yup.string().trim().required('Role name is required'),
   description: Yup.string().trim(),
+  number_of_users: Yup.number()
+    .transform((v) => (v === '' || v == null ? 0 : Number(v)))
+    .integer('Must be a whole number')
+    .min(0, 'Number of users cannot be negative'),
 });

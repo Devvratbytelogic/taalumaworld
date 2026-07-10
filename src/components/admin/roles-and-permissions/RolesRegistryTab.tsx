@@ -32,17 +32,18 @@ export function RolesRegistryTab() {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
     }, [debouncedSearch]);
 
-    const onDeleteRole = async (id: string) => {
-        try {
-            const res = await deleteRole({ id }).unwrap();
-            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-                toast.success(res?.message ?? 'Role deleted successfully');
-                dispatch(closeModal());
-            }
-        } catch (error) {
-            console.error('Error deleting role', error);
-        }
-    }
+    // const onDeleteRole = async (id: string) => {
+    //     try {
+    //         const res = await deleteRole({ id }).unwrap();
+    //         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+    //             toast.success(res?.message ?? 'Role deleted successfully');
+    //             dispatch(closeModal());
+    //         }
+    //     } catch (error) {
+    //         console.error('Error deleting role', error);
+    //     }
+    // }
+    
     const columns: GridColDef[] = [
         {
             field: 'index',
@@ -117,7 +118,7 @@ export function RolesRegistryTab() {
                     >
                         <Edit2 className="h-4 w-4" />
                     </button>
-                    <button
+                    {/* <button
                         className="delete_button"
                         onClick={() => dispatch(openModal({
                             componentName: 'DeleteConfirmation',
@@ -128,7 +129,7 @@ export function RolesRegistryTab() {
                         }))}
                     >
                         <Trash2 className="h-4 w-4" />
-                    </button>
+                    </button> */}
                 </div>
             ),
         },

@@ -265,7 +265,7 @@ export function PermissionsMatrixTab() {
                                                         {allEnabled ? 'Clear all' : 'Enable all'}
                                                     </button>
                                                 </div>
-                                                <div className="rounded-xl border border-gray-100 divide-y divide-gray-50">
+                                                <div className="rounded-md border border-gray-100 divide-y divide-gray-50">
                                                     {perms.map((perm) => {
                                                         const checked = rolePermissions.includes(perm.id);
                                                         return (

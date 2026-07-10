@@ -23,7 +23,7 @@ export default function CommonDataTable({ rows, columns, getRowId, loading, pagi
                 rowCount={rowCount}
                 paginationModel={paginationModel}
                 onPaginationModelChange={onPaginationModelChange}
-                pageSizeOptions={[10, 25, 50]}
+                pageSizeOptions={[2, 25, 50]}
                 // disableRowSelectionOnClick
                 // autoHeight
                 // getRowHeight={() => 'auto'}

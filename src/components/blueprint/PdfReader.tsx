@@ -11,8 +11,7 @@ interface PdfReaderProps {
 
 export default function PdfReader({ url, title }: PdfReaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  console.log('url', url);
-  console.log('url', url);
+
   useDearFlip(containerRef, {
     pdfUrl: url,
     title,

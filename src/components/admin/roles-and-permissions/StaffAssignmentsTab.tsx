@@ -1,29 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
-import { Plus, MoreVertical, UserCog, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
-import {
-    useGetAllStaffQuery,
-    useGetAllRolesQuery,
-} from '@/store/rtkQueries/rolesPermissionsApi';
+import { type GridColDef } from '@mui/x-data-grid';
+import { AlertCircle, CheckCircle, Edit2, Plus, UserCog } from 'lucide-react';
+import { useGetAllStaffQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
-import type { IStaffMember } from '@/types/rolesPermissions';
+import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
+import { useDebounce } from '@/hooks/useDebounce';
+import CommonDataTable from '../CommonDataTable';
 import { Badge } from '@/components/ui/badge';
-import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
-import { AdminSearchInput, AdminTableShell } from '@/components/admin/layout/AdminContent';
+import moment from 'moment';
 
-function formatDate(iso?: string) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('en-GB', {
-        day: '2-digit', month: 'short', year: 'numeric',
-    });
-}
 
-function StatusBadge({ status }: { status: IStaffMember['status'] }) {
+function StatusBadge({ status }: { status: string }) {
     if (status === 'active') {
         return (
             <Badge className="bg-green-100 text-green-700 border-green-200 gap-1 capitalize whitespace-nowrap">
@@ -37,58 +28,92 @@ function StatusBadge({ status }: { status: IStaffMember['status'] }) {
         </Badge>
     );
 }
-
-function ActionMenu({
-    onAssign,
-    onDelete,
-}: {
-    onAssign: () => void;
-    onDelete: () => void;
-}) {
-    const [open, setOpen] = useState(false);
-    return (
-        <div className="relative">
-            <button
-                onClick={() => setOpen((p) => !p)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-                <MoreVertical className="h-4 w-4 text-gray-500" />
-            </button>
-            {open && (
-                <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-                    <div className="absolute right-0 top-8 z-20 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-44">
-                        <button
-                            onClick={() => { setOpen(false); onAssign(); }}
-                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                            <UserCog className="h-3.5 w-3.5" /> Assign Role
-                        </button>
-                        <hr className="my-1 border-gray-100" />
-                        <button
-                            onClick={() => { setOpen(false); onDelete(); }}
-                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
-                            <Trash2 className="h-3.5 w-3.5" /> Delete
-                        </button>
-                    </div>
-                </>
-            )}
-        </div>
-    );
-}
-
 export function StaffAssignmentsTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
-    const { data: staffData, isLoading, isFetching } = useGetAllStaffQuery();
-    const { data: rolesData } = useGetAllRolesQuery();
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const debouncedSearch = useDebounce(search, 500);
 
-    const staff = staffData?.data ?? [];
-    const roles = rolesData?.data ?? [];
-    const roleNameMap = Object.fromEntries(roles.map((r) => [r.id, r.name]));
+    const { data: staffData, isLoading } = useGetAllStaffQuery({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        search: debouncedSearch,
+    });
 
-    const loading = isLoading || isFetching;
+    const staff = staffData?.data?.users ?? [];
+    const totalStaff = staffData?.data?.pagination?.total ?? 0;
+
+    useEffect(() => {
+        setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    }, [debouncedSearch]);
+
+    const columns: GridColDef[] = [
+        {
+            field: 'index',
+            headerName: '#',
+            width: 60,
+            sortable: false,
+            renderCell: (params) => {
+                const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+                return paginationModel.page * paginationModel.pageSize + rowIndex + 1;
+            },
+        },
+        {
+            field: 'name',
+            headerName: 'Staff Member',
+            flex: 1,
+            minWidth: 220,
+            sortable: false,
+            renderCell: (params) => (
+                <div>
+                    <p className="font-medium text-sm">{params.row.name}</p>
+                    <p className="text-xs text-muted-foreground">{params.row.email}</p>
+                </div>
+            ),
+        },
+        {
+            field: 'role',
+            headerName: 'Role',
+            width: 180,
+            sortable: false,
+            renderCell: (params) => (
+                <Badge variant="secondary" className="whitespace-nowrap">
+                    {params.row.role?.name ?? params.row.role_id}
+                </Badge>
+            ),
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            width: 120,
+            sortable: false,
+            renderCell: (params) => <StatusBadge status={params.value} />,
+        },
+        {
+            field: 'updatedAt',
+            headerName: 'Last Active',
+            width: 130,
+            sortable: false,
+            valueFormatter: (value) =>
+                value && moment(value).isValid() ? moment(value).format('DD MMM YYYY') : '—',
+        },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 80,
+            sortable: false,
+            renderCell: (params) => (
+                <div className='action_buttons'>
+                    <button
+                        className="edit_button"
+                        onClick={() => dispatch(openModal({ componentName: 'AddEditStaffModal', data: { staff: params.row, isEdit: true } }))}
+                    >
+                        <Edit2 className="h-4 w-4" />
+                    </button>
+                </div>
+            ),
+        },
+    ];
 
     return (
         <div className="space-y-6">
@@ -101,75 +126,25 @@ export function StaffAssignmentsTab() {
                 <Button
                     color="primary"
                     className="rounded-xl"
-                    onPress={() => dispatch(openModal({ componentName: 'AddStaffModal', data: {} }))}
+                    onPress={() => dispatch(openModal({ componentName: 'AddEditStaffModal', }))}
                     startContent={<Plus className="h-4 w-4" />}
                 >
                     Add Staff
                 </Button>
             </div>
 
-            <AdminTableShell>
-                <Table className="table-fixed w-full">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-10 px-4">#</TableHead>
-                            <TableHead className="px-4">Staff Member</TableHead>
-                            <TableHead className="w-[210px] px-4">Role</TableHead>
-                            <TableHead className="w-[120px] px-4">Status</TableHead>
-                            <TableHead className="w-[130px] px-4">Last Active</TableHead>
-                            <TableHead className="w-12 px-2" />
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {loading
-                            ? Array.from({ length: 5 }).map((_, i) => (
-                                <TableRow key={i}>
-                                    {Array.from({ length: 6 }).map((__, j) => (
-                                        <TableCell key={j} className="px-4 py-3">
-                                            <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                            : staff.map((member, idx) => (
-                                <TableRow key={member._id}>
-                                    <TableCell className="px-4 py-3 text-muted-foreground text-sm align-middle">
-                                        {idx + 1}
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 align-middle whitespace-normal">
-                                        <p className="font-medium text-sm text-gray-900">{member.name}</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5 break-all">{member.email}</p>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 align-middle">
-                                        <Badge variant="secondary" className="whitespace-nowrap">
-                                            {roleNameMap[member.role] ?? member.role}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 align-middle">
-                                        <StatusBadge status={member.status} />
-                                    </TableCell>
-                                    <TableCell className="px-4 py-3 text-sm text-muted-foreground align-middle whitespace-nowrap">
-                                        {formatDate(member.last_active)}
-                                    </TableCell>
-                                    <TableCell className="px-2 py-3 align-middle">
-                                        <ActionMenu
-                                            onAssign={() => dispatch(openModal({ componentName: 'AssignStaffRoleModal', data: { staff: member } }))}
-                                            onDelete={() => {}}
-                                        />
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                    </TableBody>
-                </Table>
-
-                {!loading && staff.length === 0 && (
-                    <div className="p-12 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Click &quot;Add Staff&quot; to assign a role to a new team member.
-                        </p>
-                    </div>
-                )}
-            </AdminTableShell>
+            <div className="border border-gray-200 rounded-md overflow-hidden">
+                <CommonDataTable
+                    rows={staff}
+                    columns={columns}
+                    getRowId={(row) => row._id}
+                    loading={isLoading}
+                    paginationMode="server"
+                    rowCount={totalStaff}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                />
+            </div>
         </div>
     );
 }

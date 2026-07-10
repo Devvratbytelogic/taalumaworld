@@ -427,3 +427,10 @@ export const roleSchema = Yup.object({
     .integer('Must be a whole number')
     .min(0, 'Number of users cannot be negative'),
 });
+
+// Add Staff Modal Validation Schema
+export const staffSchema = Yup.object({
+  name: Yup.string().trim().required('Full name is required'),
+  email: emailRules.label('Email'),
+  role_id: Yup.string().required('Role is required'),
+});

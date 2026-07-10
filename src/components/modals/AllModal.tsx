@@ -15,11 +15,10 @@ import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
 import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
 import { ExtendPromotionModal } from '../admin/institutions/ExtendPromotionModal';
 import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModal';
-import { AssignStaffRoleModal } from '../admin/roles-and-permissions/AssignStaffRoleModal';
-import { AddStaffModal } from '../admin/roles-and-permissions/AddStaffModal';
 import BookDetailsModal from './common-card-details/BookDetailsModal';
 import ChapterDetailsModal from './common-card-details/ChapterDetailsModal';
 import DeleteConfirmation from '../admin/DeleteConfirmation';
+import { AddEditStaffModal } from '../admin/roles-and-permissions/AddEditStaffModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -58,10 +57,8 @@ export default function AllModal() {
                 return <ExtendPromotionModal />;
             case "AddEditRoleModal":
                 return <AddEditRoleModal />;
-            case "AssignStaffRoleModal":
-                return <AssignStaffRoleModal />;
-            case "AddStaffModal":
-                return <AddStaffModal />;
+            case "AddEditStaffModal":
+                return <AddEditStaffModal />;
             case "BookDetailsModal":
                 return <BookDetailsModal />;
             case "ChapterDetailsModal":

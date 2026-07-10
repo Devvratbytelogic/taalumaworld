@@ -9,9 +9,7 @@ import type {
     IStaffFormValues,
 } from '@/types/rolesPermissions';
 import {
-    DUMMY_ROLES,
     DUMMY_PERMISSIONS_MATRIX,
-    DUMMY_STAFF,
     DUMMY_USER_SEGMENTS,
     DUMMY_MUTATION_SUCCESS,
 } from '@/app/admin/roles-and-permissions/dummydata';
@@ -30,26 +28,6 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                 }),
             providesTags: ['AdminRoles'],
         }),
-
-        getPermissionsMatrix: builder.query<IPermissionsMatrixAPIResponse, void>({
-            // query: () => ({ url: `/admin/roles/permissions-matrix`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_PERMISSIONS_MATRIX }),
-            providesTags: ['AdminPermissions'],
-        }),
-
-        getAllStaff: builder.query<IAllStaffAPIResponse, void>({
-            // query: () => ({ url: `/admin/staff`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_STAFF }),
-            providesTags: ['AdminStaff'],
-        }),
-
-        getUserSegments: builder.query<IAllUserSegmentsAPIResponse, void>({
-            // query: () => ({ url: `/admin/user-segments`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_USER_SEGMENTS }),
-            providesTags: ['AdminRoles'],
-        }),
-
-
         addRole: builder.mutation({
             query: (payload) => (
                 {
@@ -59,7 +37,6 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                 }),
             invalidatesTags: ['AdminRoles'],
         }),
-
         updateRole: builder.mutation<IMutationAPIResponse, { id: string; payload: IRoleFormValues }>({
             query: ({ payload, id }) => (
                 {
@@ -69,7 +46,6 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                 }),
             invalidatesTags: ['AdminRoles'],
         }),
-
         deleteRole: builder.mutation<IMutationAPIResponse, { id: string }>({
             query: ({ id }) => (
                 {
@@ -77,6 +53,50 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                     method: 'DELETE',
                 }),
             invalidatesTags: ['AdminRoles'],
+        }),
+
+        getPermissionsMatrix: builder.query<IPermissionsMatrixAPIResponse, void>({
+            // query: () => ({ url: `/admin/roles/permissions-matrix`, method: 'GET' }),
+            queryFn: () => ({ data: DUMMY_PERMISSIONS_MATRIX }),
+            providesTags: ['AdminPermissions'],
+        }),
+
+        getAllStaff: builder.query<IAllStaffAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
+                url: `/admin/get-all-users`,
+                method: 'GET',
+                params: params ?? {}
+            }),
+            providesTags: ['AdminStaff'],
+        }),
+        addStaff: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/register-staff`,
+                method: 'POST',
+                body: payload
+            }),
+            invalidatesTags: ['AdminStaff'],
+        }),
+        updateStaff: builder.mutation({
+            query: ({ id, payload }) => ({
+                url: `/admin/register-staff/${id}`,
+                method: 'PUT',
+                body: payload
+            }),
+            invalidatesTags: ['AdminStaff'],
+        }),
+        deleteStaff: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/delete-staff/${id}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['AdminStaff'],
+        }),
+
+        getUserSegments: builder.query<IAllUserSegmentsAPIResponse, void>({
+            // query: () => ({ url: `/admin/user-segments`, method: 'GET' }),
+            queryFn: () => ({ data: DUMMY_USER_SEGMENTS }),
+            providesTags: ['AdminRoles'],
         }),
 
         updateRolePermissions: builder.mutation<IMutationAPIResponse, { roleId: string; permissionIds: string[] }>({
@@ -89,15 +109,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
         }),
 
-        addStaff: builder.mutation<IMutationAPIResponse, IStaffFormValues>({
-            // query: (payload) => ({ url: `/admin/staff`, method: 'POST', body: payload }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
-        }),
 
-        deleteStaff: builder.mutation<IMutationAPIResponse, { id: string }>({
-            // query: ({ id }) => ({ url: `/admin/staff/${id}`, method: 'DELETE' }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
-        }),
     }),
 });
 
@@ -110,7 +122,7 @@ export const {
     useUpdateRoleMutation,
     useDeleteRoleMutation,
     useUpdateRolePermissionsMutation,
-    useAssignStaffRoleMutation,
     useAddStaffMutation,
+    useUpdateStaffMutation,
     useDeleteStaffMutation,
 } = rolesPermissionsApi;

@@ -29,6 +29,85 @@ export interface IAllRolesEntity {
 
 
 
+export interface IAllStaffAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IAllStaffAPIResponseData;
+  message: string;
+  timestamp: string;
+}
+export interface IAllStaffAPIResponseData {
+  users?: (IAllStaffEntity)[] | null;
+  pagination: IPagination;
+}
+export interface IAllStaffEntity {
+  _id: string;
+  name: string;
+  email: string;
+  is_verified: boolean;
+  status: string;
+  role_id: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  dob: string;
+  professionalBio: string;
+  profile_pic: string;
+  username: string;
+  role: IRole;
+  user_type: string;
+  mentor_info?: null;
+}
+export interface IRole {
+  _id: string;
+  name: string;
+  description: string;
+  number_of_users: number;
+}
+export interface IPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -173,12 +252,6 @@ export interface IPermissionsMatrixAPIResponse {
   data: IPermissionsMatrix;
 }
 
-export interface IAllStaffAPIResponse {
-  http_status_code: number;
-  status: boolean;
-  message: string;
-  data: IStaffMember[];
-}
 
 export interface IAllUserSegmentsAPIResponse {
   http_status_code: number;

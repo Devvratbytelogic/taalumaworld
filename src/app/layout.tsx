@@ -7,6 +7,7 @@ import { ContentProtection } from "@/components/ContentProtection";
 import { API_BASE_URL } from "@/utils/config";
 import Script from "next/script";
 import { cookies } from "next/headers";
+import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -20,20 +21,10 @@ const ubuntu = Ubuntu({
   weight: ["300", "400", "500", "700"],
 });
 
-async function fetchGlobalSettings() {
-  try {
-    const res = await fetch(`${API_BASE_URL}user/get-global`, {
-      cache: "no-store",
-    });
-    const json = await res.json();
-    return json?.data ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await fetchGlobalSettings();
+  const res = await getGlobalSettingsServerAPI();
+  const data = res?.data ?? null;
 
   if (data) {
     return {
@@ -58,7 +49,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const globalSettings = await fetchGlobalSettings();
+  const res = await getGlobalSettingsServerAPI();
+  const globalSettings = res?.data ?? null;
   const cookieStore = await cookies();
   const authToken = cookieStore.get("auth_token")?.value;
   const userRole = cookieStore.get("user_role")?.value;

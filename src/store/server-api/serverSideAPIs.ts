@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { API_BASE_URL } from '@/utils/config';
 import type { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
+import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -46,6 +47,9 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
   }
 }
 
+export async function getGlobalSettingsServerAPI() {
+  return serverFetch<IGlobalSettingsAPIResponse>(`/user/get-global`);
+}
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
   return serverFetch<ISingleChapterAPIResponse>(`/user/content/chapter/${encodeURIComponent(slug)}`);
 }

@@ -46,6 +46,9 @@ export function AdminChaptersTab() {
     const dispatch = useDispatch();
     const router = useRouter();
     const [search, setSearch] = useState('');
+    const [filterByBook, setFilterByBook] = useState<string | null>(null);
+    const [filterByStatus, setFilterByStatus] = useState<string | null>(null);
+    const [filterByIsDeleted, setFilterByIsDeleted] = useState<boolean | null>(null);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [previewChapter, setPreviewChapter] = useState<IAllChaptersAPIResponseData | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -56,6 +59,9 @@ export function AdminChaptersTab() {
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
         search: debouncedSearch,
+        book_id: filterByBook,
+        status: filterByStatus,
+        isDeleted: filterByIsDeleted,
     });
 
     const chapters = chaptersResponse?.data ?? [];

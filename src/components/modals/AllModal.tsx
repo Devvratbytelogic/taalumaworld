@@ -19,6 +19,7 @@ import BookDetailsModal from './common-card-details/BookDetailsModal';
 import ChapterDetailsModal from './common-card-details/ChapterDetailsModal';
 import DeleteConfirmation from '../admin/DeleteConfirmation';
 import { AddEditStaffModal } from '../admin/roles-and-permissions/AddEditStaffModal';
+import { UpdateStaffStatusModal } from '../admin/roles-and-permissions/UpdateStaffStatusModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -59,6 +60,8 @@ export default function AllModal() {
                 return <AddEditRoleModal />;
             case "AddEditStaffModal":
                 return <AddEditStaffModal />;
+            case "UpdateStaffStatusModal":
+                return <UpdateStaffStatusModal />;
             case "BookDetailsModal":
                 return <BookDetailsModal />;
             case "ChapterDetailsModal":

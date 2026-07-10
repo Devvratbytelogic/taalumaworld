@@ -2,7 +2,8 @@
 
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import Button from '@/components/ui/Button';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { useAddStaffMutation, useGetAllRolesQuery, useUpdateStaffMutation } from '@/store/rtkQueries/rolesPermissionsApi';
@@ -65,9 +66,11 @@ export function AddEditStaffModal() {
             <ModalContent className="admin_panel">
                 <form noValidate onSubmit={handleSubmit}>
                     <ModalHeader className="flex flex-col gap-1">
-                        <p className="text-xl font-bold">Add Staff Member</p>
+                        <p className="text-xl font-bold">{isEdit ? 'Edit Staff Member' : 'Add Staff Member'}</p>
                         <p className="text-sm font-normal text-muted-foreground">
-                            Assign a role to a new administrator or mentor.
+                            {isEdit
+                                ? 'Update staff member details and role assignment.'
+                                : 'Assign a role to a new administrator or mentor.'}
                         </p>
                     </ModalHeader>
 
@@ -133,10 +136,19 @@ export function AddEditStaffModal() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button variant="light" onPress={onClose} isDisabled={isLoading}>
+                        <Button
+                            className="global_btn outline_primary"
+                            onPress={onClose}
+                            isDisabled={isLoading}
+                        >
                             Cancel
                         </Button>
-                        <Button color="primary" type="submit" isLoading={isLoading}>
+                        <Button
+                            type="submit"
+                            className="global_btn bg_primary"
+                            isLoading={isLoading}
+                            isDisabled={isLoading}
+                        >
                             {isEdit ? 'Update Staff' : 'Add Staff'}
                         </Button>
                     </ModalFooter>

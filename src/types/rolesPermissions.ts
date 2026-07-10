@@ -218,6 +218,11 @@ export interface IStaffFormValues {
   role: string;
 }
 
+export interface IUpdateStaffStatusPayload {
+  status: string;
+  status_reason: string;
+}
+
 export interface IStaffMember {
   _id: string;
   name: string;

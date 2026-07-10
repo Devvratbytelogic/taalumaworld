@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { AlertCircle, CheckCircle, Edit2, Plus, UserCog } from 'lucide-react';
+import { AlertCircle, Ban, CheckCircle, Edit2, Plus } from 'lucide-react';
 import { useGetAllStaffQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
 import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
@@ -39,7 +39,6 @@ export function StaffAssignmentsTab() {
         limit: paginationModel.pageSize,
         search: debouncedSearch,
     });
-
     const staff = staffData?.data?.users ?? [];
     const totalStaff = staffData?.data?.pagination?.total ?? 0;
 
@@ -100,15 +99,32 @@ export function StaffAssignmentsTab() {
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 80,
+            width: 120,
             sortable: false,
             renderCell: (params) => (
-                <div className='action_buttons'>
+                <div className="action_buttons">
                     <button
                         className="edit_button"
-                        onClick={() => dispatch(openModal({ componentName: 'AddEditStaffModal', data: { staff: params.row, isEdit: true } }))}
+                        onClick={() => dispatch(openModal({
+                            componentName: 'AddEditStaffModal',
+                            data: { staff: params.row, isEdit: true },
+                        }))}
                     >
                         <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                        className={`${params.row.status === 'active' ? 'delete_button' : 'active_button'}`}
+                        title={params.row.status === 'active' ? 'Suspend user' : 'Activate user'}
+                        onClick={() => dispatch(openModal({
+                            componentName: 'UpdateStaffStatusModal',
+                            data: { staff: params.row },
+                        }))}
+                    >
+                        {params.row.status === 'active' ? (
+                            <Ban className="h-4 w-4" />
+                        ) : (
+                            <CheckCircle className="h-4 w-4" />
+                        )}
                     </button>
                 </div>
             ),

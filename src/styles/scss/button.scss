@@ -4,7 +4,7 @@ button {
 }
 
 .global_btn {
-    @apply min-w-30 px-6 min-h-10 bg-primary text-white;
+    @apply min-w-24 px-6 min-h-10 bg-primary text-white;
 
     &.medium_height {
         @apply min-h-8;
@@ -52,9 +52,9 @@ button {
         @apply bg-red-500 text-white border border-red-500 outline-none;
     }
 
-    /* success outline button */
-    &.success_outline {
-        @apply text-success border border-success bg-transparent;
+    /* success filled button */
+    &.success_btn {
+        @apply bg-green-600 text-white border border-green-600 outline-none;
     }
 }
 

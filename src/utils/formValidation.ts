@@ -434,3 +434,7 @@ export const staffSchema = Yup.object({
   email: emailRules.label('Email'),
   role_id: Yup.string().required('Role is required'),
 });
+
+export const staffStatusSchema = Yup.object({
+  status_reason: Yup.string().trim().required('Reason is required'),
+});

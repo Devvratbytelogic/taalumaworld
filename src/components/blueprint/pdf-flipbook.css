@@ -1,0 +1,22 @@
+.dearflip-reader-root {
+  width: 100%;
+  min-height: 720px;
+  background: #e5e5e5;
+}
+
+.dearflip-reader-container {
+  width: 100%;
+  min-height: 720px;
+}
+
+.dearflip-reader-container .df-container {
+  min-height: 720px !important;
+}
+
+@media (max-width: 768px) {
+  .dearflip-reader-root,
+  .dearflip-reader-container,
+  .dearflip-reader-container .df-container {
+    min-height: 560px;
+  }
+}

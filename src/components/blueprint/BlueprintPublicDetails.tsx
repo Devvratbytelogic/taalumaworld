@@ -2,7 +2,13 @@
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import type { ISingleChapterAPIResponseData } from '@/types/user/singleChapter';
 import MentorDetails from './MentorDetails';
-import PdfReader from './PdfReader';
+import dynamic from 'next/dynamic';
+import PdfViewerSkeleton from '@/components/skeleton-loader/PdfViewerSkeleton';
+
+const PdfReader = dynamic(() => import('./PdfReader'), {
+  ssr: false,
+  loading: () => <PdfViewerSkeleton />,
+});
 
 
 interface BlueprintPublicDetailsProps {
@@ -10,9 +16,6 @@ interface BlueprintPublicDetailsProps {
 }
 
 export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsProps) {
-  console.log('data', data);
-  
-
   return (
     <>
       <section className="container">
@@ -42,7 +45,7 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
                   </p>
                 </div>
 
-                <div className="px-6 py-8 sm:px-8 sm:py-10">
+                <div className={data?.pdf ? '' : 'px-6 py-8 sm:px-8 sm:py-10'}>
                   {data?.pdf ? (
                     <PdfReader url={data?.pdf ?? ''} title={data?.title ?? ''} />
                   ) : (

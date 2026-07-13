@@ -24,21 +24,17 @@ import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
-import type { IAuthorLeaderEntity } from '@/types/authleaders';
-import type { CategoryEntity } from '@/types/categories';
-import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
-import { cn } from '@/components/ui/utils';
-import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
+import { slugify } from '@/utils/slugify';
 
 const initialFormValues = {
   title: '',
   description: '',
-  thoughtLeader: '',
   category: '',
   subcategory: '',
   tags: [] as string[],
   tagsInput: '',
   pricingModel: 'book',
+  status: 'Published',
   price: '' as number | '',
   cover_image: null as File | null,
   meta_title: '',
@@ -52,8 +48,6 @@ const initialFormValues = {
 interface AddBookModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  thoughtLeaders: IAuthorLeaderEntity[];
-  categories: CategoryEntity[];
   onSubmit: (payload: FormData) => { unwrap: () => Promise<unknown> };
   isSubmitting?: boolean;
 }
@@ -61,8 +55,6 @@ interface AddBookModalProps {
 export function AddBookModal({
   open,
   onOpenChange,
-  thoughtLeaders,
-  categories,
   onSubmit,
   isSubmitting = false,
 }: AddBookModalProps) {
@@ -70,33 +62,22 @@ export function AddBookModal({
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
-  const { data: staffData } = useGetAllUsersQuery({ type: 'mentor' })
-  const mentors = staffData?.data?.users ?? [];
-  const mentorOptions = mentors.map((m) => ({ id: m._id, name: m.name }));
-  const {
-    values,
-    errors,
-    touched,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setFieldValue,
-    setFieldTouched,
-    resetForm,
-  } = useFormik({
+
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
     validationSchema: addBookSchema,
     onSubmit: async (vals) => {
       const formData = new FormData();
       formData.append('title', vals.title);
-      formData.append('thoughtLeader', vals.thoughtLeader);
+      formData.append('slug', slugify(vals.title));
       formData.append('category', vals.category);
       if (vals.subcategory) formData.append('subcategory', vals.subcategory);
       formData.append('description', vals.description ?? '');
       formData.append('pricingModel', vals.pricingModel);
+      formData.append('status', vals.status);
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
-      formData.append('tags', vals.tags.join(','));
+      vals.tags.forEach((tag, index) => formData.append(`tags[${index}]`, tag));
       if (vals.meta_title) formData.append('meta_title', vals.meta_title);
       if (vals.meta_description) formData.append('meta_description', vals.meta_description);
       if (vals.og_title) formData.append('og_title', vals.og_title);
@@ -117,34 +98,10 @@ export function AddBookModal({
         onOpenChange(false);
         toast.success('Series created successfully');
       } catch {
-        // toast.error('Failed to create book');
         console.error('Failed to create book');
       }
     },
   });
-
-  const subcategories: SubcategoriesEntity[] = (() => {
-    if (!values.category) return [];
-    const cat = categories.find((c) => (c as IAllCategoriesAPIResponseData).id === values.category || (c as IAllCategoriesAPIResponseData)._id === values.category);
-    return (cat?.subcategories ?? []).filter(Boolean) as SubcategoriesEntity[];
-  })();
-
-  useEffect(() => {
-    if (!open) {
-      setFieldValue('subcategory', '');
-      resetForm({ values: initialFormValues });
-      setCoverFile(null);
-      setCoverPreviewUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return null;
-      });
-      setOgImageFile(null);
-      setOgImagePreviewUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return null;
-      });
-    }
-  }, [open, resetForm, setFieldValue]);
 
   const addTag = (tag: string) => {
     const t = tag.trim();
@@ -230,13 +187,10 @@ export function AddBookModal({
     onOpenChange(false);
   };
 
-  const getCategoryId = (c: CategoryEntity) => (c as IAllCategoriesAPIResponseData).id ?? (c as IAllCategoriesAPIResponseData)._id;
-  const getLeaderId = (l: IAuthorLeaderEntity) => l.id ?? l._id;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="xl" className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 max-w-2xl">
-        <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
+        <DialogHeader className="shrink-0 border-b! border-slate-100 px-6 pb-4 pt-6 pr-12">
           <DialogTitle>Create New Series</DialogTitle>
           <DialogDescription>
             Add a new series to the platform. Fill in the details below.
@@ -277,34 +231,40 @@ export function AddBookModal({
                 <p className="text-sm text-red-600">{errors.description}</p>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
-                <Label>Mentor<span className="text-red-500">*</span></Label>
-                <Select
-                  value={values.thoughtLeader}
-                  onValueChange={(value) => {
-                    setFieldValue('thoughtLeader', value);
-                    setFieldTouched('thoughtLeader', true);
-                  }}
-                >
-                  <SelectTrigger
-                    className={errors.thoughtLeader && touched.thoughtLeader ? 'border-red-500' : ''}
-                  >
-                    <SelectValue placeholder="Select mentor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {thoughtLeaders.map((l) => (
-                      <SelectItem key={getLeaderId(l)} value={l._id}>
-                        {l.fullName}
-                      </SelectItem>
+                <Label htmlFor="book-tags">Tags</Label>
+                <Input
+                  id="book-tags"
+                  name="tagsInput"
+                  placeholder="Type a tag and press Enter or comma to add"
+                  value={values.tagsInput}
+                  onChange={handleChange}
+                  onKeyDown={handleTagsInputKeyDown}
+                  disabled={isSubmitting}
+                />
+                {values.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {values.tags.map((tag, index) => (
+                      <span
+                        key={`${tag}-${index}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1 text-sm"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(index)}
+                          className="rounded-full p-0.5 hover:bg-muted-foreground/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          aria-label={`Remove tag ${tag}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
                     ))}
-                  </SelectContent>
-                </Select>
-                {errors.thoughtLeader && touched.thoughtLeader && (
-                  <p className="text-sm text-red-600">{errors.thoughtLeader}</p>
+                  </div>
                 )}
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label>Category<span className="text-red-500">*</span></Label>
                 <Select
                   value={values.category}
@@ -330,7 +290,7 @@ export function AddBookModal({
                 {errors.category && touched.category && (
                   <p className="text-sm text-red-600">{errors.category}</p>
                 )}
-              </div>
+              </div> */}
             </div>
             {/* {subcategories.length > 0 && (
               <div className="space-y-2">
@@ -351,48 +311,14 @@ export function AddBookModal({
                   </SelectContent>
                 </Select>
               </div>
-            )} */}
-            <div className="space-y-2">
-              <Label htmlFor="book-tags">Tags</Label>
-              <Input
-                id="book-tags"
-                name="tagsInput"
-                placeholder="Type a tag and press Enter or comma to add"
-                value={values.tagsInput}
-                onChange={handleChange}
-                onKeyDown={handleTagsInputKeyDown}
-                disabled={isSubmitting}
-              />
-              {values.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {values.tags.map((tag, index) => (
-                    <span
-                      key={`${tag}-${index}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(index)}
-                        className="rounded-full p-0.5 hover:bg-muted-foreground/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        aria-label={`Remove tag ${tag}`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            )}  */}
+
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
                 <Label htmlFor="book-cover">Cover Image<span className="text-red-500">*</span></Label>
                 <label
                   htmlFor="book-cover"
-                  className={cn(
-                    'blueprint-file-picker',
-                    errors.cover_image && touched.cover_image && 'border-red-500',
-                  )}
+                  className={`blueprint-file-picker ${errors.cover_image && touched.cover_image ? 'border-red-500' : ''}`}
                 >
                   <input
                     id="book-cover"
@@ -434,6 +360,26 @@ export function AddBookModal({
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select
+                  value={values.status}
+                  onValueChange={(value: 'Draft' | 'Published') =>
+                    setFieldValue('status', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Draft">Draft</SelectItem>
+                    <SelectItem value="Published">Published</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.status && touched.status && (
+                  <p className="text-sm text-red-600">{errors.status}</p>
+                )}
+              </div>
               <div className="space-y-2">
                 <Label>Pricing model</Label>
                 <Select

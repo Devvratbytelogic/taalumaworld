@@ -36,7 +36,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Books */
-        getAllBooks: builder.query<IAllBooksAPIResponse, { page?: number; limit?: number; search?: string; category?: string; leader?: string } | void>({
+        getAllBooks: builder.query<IAllBooksAPIResponse, { page?: number; limit?: number; search?: string; category?: string; mentor_id?: string; status?: string; isMine?: boolean; isDeleted?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/series`,
                 method: 'GET',

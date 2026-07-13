@@ -77,7 +77,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         /** Books */
         addBook: builder.mutation({
             query: (payload) => ({
-                url: `/admin/books`,
+                url: `/admin/series`,
                 method: 'POST',
                 body: payload,
             }),
@@ -85,7 +85,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         }),
         updateBook: builder.mutation({
             query: ({ id, values }) => ({
-                url: `/admin/books/${id}`,
+                url: `/admin/series/${id}`,
                 method: 'PUT',
                 body: values,
             }),
@@ -93,7 +93,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         }),
         deleteBook: builder.mutation({
             query: ({ id }) => ({
-                url: `/admin/books/${id}`,
+                url: `/admin/series/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['AdminBooks'],

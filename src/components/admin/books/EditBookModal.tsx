@@ -20,24 +20,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog';
-import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import { editBookSchema } from '@/utils/formValidation';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
-import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
-import type { IAuthorLeaderEntity } from '@/types/authleaders';
-import type { CategoryEntity } from '@/types/categories';
-import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
+import { IBook } from '@/types/books';
+import { slugify } from '@/utils/slugify';
 
 const emptyFormValues = {
   title: '',
   description: '',
-  thoughtLeader: '',
-  category: '',
-  subcategory: '',
   tags: [] as string[],
   tagsInput: '',
   pricingModel: 'book',
+  status: 'Published',
   price: '' as number | '',
   cover_image: null as File | null,
   meta_title: '',
@@ -48,60 +43,10 @@ const emptyFormValues = {
   json_ld: '',
 };
 
-function getOpenGraphValuesFromBook(book: IAllBooksAPIResponseDataEntity) {
-  const record = book as IAllBooksAPIResponseDataEntity & {
-    meta_title?: string;
-    meta_description?: string;
-    og_title?: string;
-    og_description?: string;
-    og_image?: string;
-    json_ld?: string;
-  };
-  return {
-    meta_title: book.metaTitle ?? record.meta_title ?? '',
-    meta_description: book.metaDescription ?? record.meta_description ?? '',
-    og_title: book.ogTitle ?? record.og_title ?? '',
-    og_description: book.ogDescription ?? record.og_description ?? '',
-    og_image: (book.ogImage ?? record.og_image ?? null) as File | string | null,
-    json_ld: book.jsonLd ?? record.json_ld ?? '',
-  };
-}
-
-function getInitialValuesFromBook(book: IAllBooksAPIResponseDataEntity | null): typeof emptyFormValues {
-  if (!book) return emptyFormValues;
-  const thoughtLeaderId = typeof book.thoughtLeader === 'object' && book.thoughtLeader
-    ? (book.thoughtLeader as { _id?: string })._id ?? ''
-    : '';
-  const categoryId = typeof book.category === 'object' && book.category
-    ? (book.category as { _id?: string })._id ?? ''
-    : '';
-  const subcategoryId = book.subcategory && typeof book.subcategory === 'object'
-    ? (book.subcategory as { _id?: string })._id ?? ''
-    : '';
-  const tags = Array.isArray(book.tags)
-    ? (book.tags.filter(Boolean) as string[])
-    : [];
-  return {
-    title: book.title ?? '',
-    description: book.description ?? '',
-    thoughtLeader: thoughtLeaderId,
-    category: categoryId,
-    subcategory: subcategoryId,
-    tags,
-    tagsInput: '',
-    pricingModel: book.pricingModel === 'chapter' ? 'chapter' : 'book',
-    price: book.price != null ? book.price : '',
-    cover_image: null as File | null,
-    ...getOpenGraphValuesFromBook(book),
-  };
-}
-
 interface EditBookModalProps {
-  book: IAllBooksAPIResponseDataEntity | null;
+  book: IBook | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  thoughtLeaders: IAuthorLeaderEntity[];
-  categories: CategoryEntity[];
   onSubmit: (args: { id: string; values: FormData }) => { unwrap: () => Promise<unknown> };
   isSubmitting?: boolean;
 }
@@ -110,8 +55,6 @@ export function EditBookModal({
   book,
   open,
   onOpenChange,
-  thoughtLeaders,
-  categories,
   onSubmit,
   isSubmitting = false,
 }: EditBookModalProps) {
@@ -122,7 +65,22 @@ export function EditBookModal({
   const coverIsObjectUrlRef = useRef(false);
   const ogImageIsObjectUrlRef = useRef(false);
 
-  const initialValues = getInitialValuesFromBook(book);
+  const initialValues = {
+    title: book?.title ?? '',
+    description: book?.description ?? '',
+    tags: Array.isArray(book?.tags) ? (book?.tags.filter(Boolean) as string[]) : [],
+    tagsInput: '',
+    pricingModel: book?.pricingModel === 'chapter' ? 'chapter' : 'book',
+    status: book?.status ?? 'Published',
+    price: (book?.price ?? '') as number | '',
+    cover_image: null as File | null,
+    meta_title: book?.meta_title ?? '',
+    meta_description: book?.meta_description ?? '',
+    og_title: book?.og_title ?? '',
+    og_description: book?.og_description ?? '',
+    og_image: (book?.og_image ?? null) as File | string | null,
+    json_ld: book?.json_ld ?? '',
+  }
 
   const {
     values,
@@ -142,14 +100,13 @@ export function EditBookModal({
       if (!book) return;
       const formData = new FormData();
       formData.append('title', vals.title);
-      formData.append('thoughtLeader', vals.thoughtLeader);
-      formData.append('category', vals.category);
-      if (vals.subcategory) formData.append('subcategory', vals.subcategory);
+      formData.append('slug', slugify(vals.title));
       formData.append('description', vals.description ?? '');
       formData.append('pricingModel', vals.pricingModel);
+      formData.append('status', vals.status);
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
-      formData.append('tags', values.tags.join(','));
+      values.tags.forEach((tag, index) => formData.append(`tags[${index}]`, tag));
       if (vals.meta_title) formData.append('meta_title', vals.meta_title);
       if (vals.meta_description) formData.append('meta_description', vals.meta_description);
       if (vals.og_title) formData.append('og_title', vals.og_title);
@@ -170,24 +127,17 @@ export function EditBookModal({
         onOpenChange(false);
         toast.success('Series updated successfully');
       } catch {
-        toast.error('Failed to update series');
+        console.error('Failed to update series');
       }
     },
   });
-
-  const subcategories: SubcategoriesEntity[] = (() => {
-    if (!values.category) return [];
-    const cat = categories.find((c) => (c as IAllCategoriesAPIResponseData).id === values.category || (c as IAllCategoriesAPIResponseData)._id === values.category);
-    return (cat?.subcategories ?? []).filter(Boolean) as SubcategoriesEntity[];
-  })();
 
   useEffect(() => {
     if (open && book) {
       setCoverPreviewUrl(book.coverImage || null);
       coverIsObjectUrlRef.current = false;
       setCoverFile(null);
-      const existingOgImage = book.ogImage ?? (book as { og_image?: string }).og_image ?? null;
-      setOgImagePreviewUrl(existingOgImage);
+      setOgImagePreviewUrl(book.og_image ?? null);
       ogImageIsObjectUrlRef.current = false;
       setOgImageFile(null);
     }
@@ -278,7 +228,7 @@ export function EditBookModal({
   const clearOgImage = () => {
     if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
-    const existingOgImage = book?.ogImage ?? (book as { og_image?: string } | null)?.og_image ?? null;
+    const existingOgImage = book?.og_image ?? null;
     setOgImagePreviewUrl(existingOgImage);
     ogImageIsObjectUrlRef.current = false;
     setFieldValue('og_image', existingOgImage);
@@ -297,9 +247,6 @@ export function EditBookModal({
     resetForm({ values: emptyFormValues });
     onOpenChange(false);
   };
-
-  const getCategoryId = (c: CategoryEntity) => (c as IAllCategoriesAPIResponseData).id ?? (c as IAllCategoriesAPIResponseData)._id;
-  const getLeaderId = (l: IAuthorLeaderEntity) => l.id ?? l._id;
 
   if (!book) return null;
 
@@ -347,112 +294,39 @@ export function EditBookModal({
                 <p className="text-sm text-red-600">{errors.description}</p>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
-                <Label>Mentor<span className="text-red-500">*</span></Label>
-                <Select
-                  value={values.thoughtLeader}
-                  onValueChange={(value) => {
-                    setFieldValue('thoughtLeader', value);
-                    setFieldTouched('thoughtLeader', true);
-                  }}
-                >
-                  <SelectTrigger
-                    className={errors.thoughtLeader && touched.thoughtLeader ? 'border-red-500' : ''}
-                  >
-                    <SelectValue placeholder="Select mentor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {thoughtLeaders.map((l) => (
-                      <SelectItem key={getLeaderId(l)} value={l._id}>
-                        {l.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.thoughtLeader && touched.thoughtLeader && (
-                  <p className="text-sm text-red-600">{errors.thoughtLeader}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label>Category<span className="text-red-500">*</span></Label>
-                <Select
-                  value={values.category}
-                  onValueChange={(value) => {
-                    setFieldValue('category', value);
-                    setFieldValue('subcategory', '');
-                    setFieldTouched('category', true);
-                  }}
-                >
-                  <SelectTrigger
-                    className={errors.category && touched.category ? 'border-red-500' : ''}
-                  >
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((c) => (
-                      <SelectItem key={getCategoryId(c)} value={(c as IAllCategoriesAPIResponseData)._id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.category && touched.category && (
-                  <p className="text-sm text-red-600">{errors.category}</p>
-                )}
-              </div>
-            </div>
-            {/* {subcategories.length > 0 && (
-              <div className="space-y-2">
-                <Label>Subcategory (optional)</Label>
-                <Select
-                  value={values.subcategory}
-                  onValueChange={(value) => setFieldValue('subcategory', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select subcategory" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subcategories.map((s) => (
-                      <SelectItem key={s.id ?? s._id} value={s._id}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )} */}
-            <div className="space-y-2">
-              <Label htmlFor="edit-book-tags">Tags</Label>
-              <Input
-                id="edit-book-tags"
-                name="tagsInput"
-                placeholder="Type a tag and press Enter or comma to add"
-                value={values.tagsInput}
-                onChange={handleChange}
-                onKeyDown={handleTagsInputKeyDown}
-                disabled={isSubmitting}
-              />
-              {values.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {values.tags.map((tag, index) => (
-                    <span
-                      key={`${tag}-${index}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(index)}
-                        className="rounded-full p-0.5 hover:bg-muted-foreground/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        aria-label={`Remove tag ${tag}`}
+                <Label htmlFor="edit-book-tags">Tags</Label>
+                <Input
+                  id="edit-book-tags"
+                  name="tagsInput"
+                  placeholder="Type a tag and press Enter or comma to add"
+                  value={values.tagsInput}
+                  onChange={handleChange}
+                  onKeyDown={handleTagsInputKeyDown}
+                  disabled={isSubmitting}
+                />
+                {values.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {values.tags.map((tag, index) => (
+                      <span
+                        key={`${tag}-${index}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1 text-sm"
                       >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(index)}
+                          className="rounded-full p-0.5 hover:bg-muted-foreground/20 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          aria-label={`Remove tag ${tag}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
@@ -498,6 +372,26 @@ export function EditBookModal({
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select
+                  value={values.status}
+                  onValueChange={(value: 'Draft' | 'Published') =>
+                    setFieldValue('status', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Draft">Draft</SelectItem>
+                    <SelectItem value="Published">Published</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.status && touched.status && (
+                  <p className="text-sm text-red-600">{errors.status}</p>
+                )}
+              </div>
               <div className="space-y-2">
                 <Label>Pricing model</Label>
                 <Select

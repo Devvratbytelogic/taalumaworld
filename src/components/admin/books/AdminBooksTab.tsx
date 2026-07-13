@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2 } from 'lucide-react';
-import { useGetAllBooksQuery, useGetAllAuthorLeadersQuery, useGetAllCategoriesQuery, } from '@/store/rtkQueries/adminGetApi';
+import { useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
 import { useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } from '@/store/rtkQueries/adminPostApi';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -17,12 +17,15 @@ import { EditBookModal } from './EditBookModal';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { Badge } from '@/components/ui/badge';
 import toast from '@/utils/toast';
+import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 
 export function AdminBooksTab() {
   const dispatch = useDispatch();
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLeader, setSelectedLeader] = useState('');
+  const [filterByStatus, setFilterByStatus] = useState('');
+  const [filterByIsDeleted, setFilterByIsDeleted] = useState('');
+  const [filterByIsMine, setFilterByIsMine] = useState(false);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [previewBook, setPreviewBook] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -34,18 +37,17 @@ export function AdminBooksTab() {
     page: paginationModel.page + 1,
     limit: paginationModel.pageSize,
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
-    ...(selectedCategory ? { category: selectedCategory } : {}),
-    ...(selectedLeader ? { leader: selectedLeader } : {}),
+    ...(selectedLeader ? { mentor_id: selectedLeader } : {}),
+    ...(filterByStatus ? { status: filterByStatus } : {}),
+    ...(filterByIsDeleted ? { isDeleted: filterByIsDeleted === 'true' } : {}),
+    ...(filterByIsMine ? { isMine: true } : {}),
   });
 
-  const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
-  const { data: categoriesResponse } = useGetAllCategoriesQuery();
+  const { data: leadersResponse } = useGetAllUsersQuery({ type: 'mentor' });
 
   const books = booksResponse?.data?.data ?? [];
-  const thoughtLeaders = leadersResponse?.data?.leaders ?? [];
-  const categories = categoriesResponse?.data ?? [];
-  const categoryOptions = categories.map((c) => ({ id: c._id, name: c.name }));
-  const leaderOptions = thoughtLeaders.map((l) => ({ id: l._id ?? l.id, name: l.fullName }));
+  const thoughtLeaders = leadersResponse?.data?.data ?? [];
+  const leaderOptions = thoughtLeaders.map((l) => ({ value: l._id, label: l.name }));
 
   const totalBooks = booksResponse?.data?.total ?? 0;
 
@@ -55,7 +57,7 @@ export function AdminBooksTab() {
 
   useEffect(() => {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-  }, [debouncedSearch, selectedCategory, selectedLeader]);
+  }, [debouncedSearch, selectedLeader, filterByStatus, filterByIsDeleted, filterByIsMine]);
 
   const onDeleteBook = async (id: string) => {
     try {
@@ -87,7 +89,7 @@ export function AdminBooksTab() {
     {
       field: 'title',
       headerName: 'Series Title',
-      minWidth: 240,
+      minWidth: 150,
       flex: 1,
       sortable: false,
       renderCell: (params) => (
@@ -110,23 +112,23 @@ export function AdminBooksTab() {
       headerName: 'Mentor',
       minWidth: 160,
       sortable: false,
-      valueGetter: (_value, row) => row.thoughtLeader?.fullName ?? 'Unknown',
+      valueGetter: (_value, row) => row.createdBy?.name ?? 'Unknown',
       renderCell: (params) => (
         <span className="text-sm whitespace-nowrap">{params.value}</span>
       ),
     },
-    {
-      field: 'category',
-      headerName: 'Category',
-      minWidth: 140,
-      sortable: false,
-      valueGetter: (_value, row) => row.category?.name ?? 'N/A',
-      renderCell: (params) => (
-        <Badge variant="outline" className="text-xs whitespace-nowrap">
-          {params.value}
-        </Badge>
-      ),
-    },
+    // {
+    //   field: 'category',
+    //   headerName: 'Category',
+    //   minWidth: 140,
+    //   sortable: false,
+    //   valueGetter: (_value, row) => row.category?.name ?? 'N/A',
+    //   renderCell: (params) => (
+    //     <Badge variant="outline" className="text-xs whitespace-nowrap">
+    //       {params.value}
+    //     </Badge>
+    //   ),
+    // },
     {
       field: 'pricingModel',
       headerName: 'Pricing',
@@ -199,12 +201,15 @@ export function AdminBooksTab() {
       <AdminBooksSearch
         searchQuery={search}
         onSearchChange={setSearch}
-        categories={categoryOptions}
         leaders={leaderOptions}
-        selectedCategory={selectedCategory}
         selectedLeader={selectedLeader}
-        onCategoryChange={setSelectedCategory}
         onLeaderChange={setSelectedLeader}
+        selectedStatus={filterByStatus}
+        onStatusChange={setFilterByStatus}
+        selectedIsDeleted={filterByIsDeleted}
+        onIsDeletedChange={setFilterByIsDeleted}
+        isMine={filterByIsMine}
+        onIsMineChange={setFilterByIsMine}
       />
 
       <div className="border border-gray-200 rounded-md overflow-hidden">
@@ -229,8 +234,7 @@ export function AdminBooksTab() {
       <AddBookModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        thoughtLeaders={thoughtLeaders}
-        categories={categories}
+        // categories={categories}
         onSubmit={addBook}
         isSubmitting={isAdding}
       />
@@ -239,8 +243,6 @@ export function AdminBooksTab() {
         book={editingBook}
         open={!!editingBook}
         onOpenChange={(open) => !open && setEditingBook(null)}
-        thoughtLeaders={thoughtLeaders}
-        categories={categories}
         onSubmit={updateBook}
         isSubmitting={isUpdating}
       />

@@ -23,7 +23,7 @@ export interface IBook {
   pricingModel: string;
   price: number;
   tags?: (string)[] | null;
-  createdBy?: null;
+  createdBy?: createdBy;
   deletedAt?: null;
   createdAt: string;
   updatedAt: string;
@@ -34,5 +34,12 @@ export interface IBook {
   og_description: string;
   og_image: string;
   og_title: string;
+  id: string;
+}
+export interface createdBy {
+  _id: string;
+  name: string;
+  profile_pic: string;
+  email: string;
   id: string;
 }

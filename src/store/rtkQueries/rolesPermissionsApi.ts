@@ -2,7 +2,7 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type {
     IAllRolesAPIResponse,
     IPermissionsMatrixAPIResponse,
-    IAllStaffAPIResponse,
+    IAllUsersAPIResponse,
     IAllUserSegmentsAPIResponse,
     IMutationAPIResponse,
 } from '@/types/rolesPermissions';
@@ -59,7 +59,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminPermissions'],
         }),
 
-        getAllUsers: builder.query<IAllStaffAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getAllUsers: builder.query<IAllUsersAPIResponse, { page?: number; limit?: number; search?: string, type?: string } | void>({
             query: (params) => ({
                 url: `/admin/get-all-users`,
                 method: 'GET',

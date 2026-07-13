@@ -43,5 +43,6 @@ export const SELECT_STYLES: StylesConfig<SelectOption, false> = {
     menuPortal: (base) => ({
         ...base,
         zIndex: 9999,
+        pointerEvents: 'auto',
     }),
 };

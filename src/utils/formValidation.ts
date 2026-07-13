@@ -170,7 +170,7 @@ const openGraphFieldsSchema = {
     }),
 };
 
-// Add Book Modal Validation Schema (matches API: title, thoughtLeader, category, subcategory, description, pricingModel, price, cover_image, tags)
+// Add Book Modal Validation Schema (matches API: title, description, pricingModel, price, status, slug, cover_image, tags)
 export const addBookSchema = Yup.object({
   title: Yup.string()
     .trim()
@@ -178,12 +178,11 @@ export const addBookSchema = Yup.object({
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
-  thoughtLeader: Yup.string().required('Please select a mentor'),
-  category: Yup.string().required('Please select a category'),
   cover_image: Yup.mixed<File>()
     .required('Please select a cover image')
     .test('is-file', 'Please select a cover image', (v) => v instanceof File),
   pricingModel: Yup.string().oneOf(['book', 'chapter']),
+  status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
   price: Yup.number()
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
     .when('pricingModel', {
@@ -201,16 +200,19 @@ export const editBookSchema = Yup.object({
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
-  thoughtLeader: Yup.string().required('Please select a mentor'),
-  category: Yup.string().required('Please select a category'),
   cover_image: Yup.mixed<File>()
     .nullable()
     .optional()
     .test('is-file-or-null', 'Please select a valid image file', (v) => v == null || v instanceof File),
+  pricingModel: Yup.string().oneOf(['book', 'chapter']),
+  status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
   price: Yup.number()
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-    .min(1, 'Price must be greater than 1')
-    .required('Price is required'),
+    .when('pricingModel', {
+      is: 'book',
+      then: (schema) => schema.min(1, 'Price must be greater than 1').required('Price is required'),
+      otherwise: (schema) => schema.optional(),
+    }),
   ...openGraphFieldsSchema,
 });
 

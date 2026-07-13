@@ -6,7 +6,6 @@ import {
   adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 
 interface BookOption {
   id: string;
@@ -93,13 +92,14 @@ export function AdminChaptersSearch({
             <option value="true">Deleted only</option>
           </select>
 
-          <label className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700">
-            <Checkbox
-              checked={isMine}
-              onCheckedChange={(checked) => onIsMineChange(checked === true)}
-            />
-            <Label className="cursor-pointer font-normal">My blueprints</Label>
-          </label>
+          <button
+            type="button"
+            onClick={() => onIsMineChange(!isMine)}
+            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
+            <span className="font-normal">My blueprints</span>
+          </button>
 
           {hasActiveFilters ? (
             <button

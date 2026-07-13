@@ -27,7 +27,7 @@ import {
   useGetAllAdminChaptersQuery,
 } from '@/store/rtkQueries/adminGetApi';
 import type { Book, Author } from '@/types/content';
-import type { IAllChaptersAPIResponseData } from '@/types/chapter';
+import type { IChapter } from '@/types/chapter';
 import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
@@ -56,27 +56,19 @@ const initialFormValues = {
   json_ld: '',
 };
 
-function getOpenGraphValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
-  const record = chapter as IAllChaptersAPIResponseData & {
-    meta_title?: string;
-    meta_description?: string;
-    og_title?: string;
-    og_description?: string;
-    og_image?: string;
-    json_ld?: string;
-  };
+function getOpenGraphValuesFromChapter(chapter: IChapter) {
   return {
-    meta_title: chapter.metaTitle ?? record.meta_title ?? '',
-    meta_description: chapter.metaDescription ?? record.meta_description ?? '',
-    og_title: chapter.ogTitle ?? record.og_title ?? '',
-    og_description: chapter.ogDescription ?? record.og_description ?? '',
-    og_image: (chapter.ogImage ?? record.og_image ?? null) as File | string | null,
-    json_ld: chapter.jsonLd ?? record.json_ld ?? '',
+    meta_title: chapter.meta_title ?? '',
+    meta_description: chapter.meta_description ?? '',
+    og_title: chapter.og_title ?? '',
+    og_description: chapter.og_description ?? '',
+    og_image: (chapter.og_image ?? null) as File | string | null,
+    json_ld: chapter.json_ld ?? '',
   };
 }
 
-function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
-  const bookId = (chapter.book as { id?: string; _id?: string })?.id ?? (chapter.book as { id?: string; _id?: string })?._id ?? '';
+function formValuesFromChapter(chapter: IChapter) {
+  const bookId = chapter.series?.id ?? chapter.series?._id ?? '';
   const title = chapter.title ?? '';
   const slug = chapter.slug ?? title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   return {
@@ -86,7 +78,6 @@ function formValuesFromChapter(chapter: IAllChaptersAPIResponseData) {
     description: chapter.description ?? '',
     content: chapter.content ?? '',
     sequence: chapter.number ?? 1,
-    // page: chapter.page ?? 1,
     isFree: chapter.isFree ?? false,
     price: (chapter.price ?? 0) as number | undefined,
     status: chapter.status ?? 'Published',
@@ -112,18 +103,18 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
 
   const chapter = useMemo(() => {
-    const list = chaptersResponse?.data ?? [];
-    return list.find((c: IAllChaptersAPIResponseData) => (c.id ?? c._id) === chapterId) ?? null;
-  }, [chaptersResponse?.data, chapterId]);
+    const list = chaptersResponse?.data?.data ?? [];
+    return list.find((c) => (c.id ?? c._id) === chapterId) ?? null;
+  }, [chaptersResponse?.data?.data, chapterId]);
 
   const initialValues = useMemo(() => {
     if (chapter) return formValuesFromChapter(chapter);
     return initialFormValues;
   }, [chapter]);
 
-  const rawBooks = booksResponse?.data ?? [];
+  const rawBooks = booksResponse?.data?.data ?? [];
   const leaders = leadersResponse?.data?.leaders ?? [];
-  const books = rawBooks.map((b: { id?: string; _id?: string; thoughtLeader?: { _id?: string; id?: string } }) => ({
+  const books = rawBooks.map((b) => ({
     ...b,
     id: b.id ?? b._id,
     authorId: (b as { thoughtLeader?: { _id?: string; id?: string } }).thoughtLeader?._id ?? (b as { thoughtLeader?: { id?: string } }).thoughtLeader?.id,
@@ -199,7 +190,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
   useEffect(() => {
     if (chapter) {
-      const existingOgImage = chapter.ogImage ?? (chapter as { og_image?: string }).og_image ?? null;
+      const existingOgImage = chapter.og_image ?? null;
       if (!ogImageFile) {
         setOgImagePreviewUrl(existingOgImage);
       }
@@ -281,7 +272,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const clearOgImage = () => {
     if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
-    const existingOgImage = chapter?.ogImage ?? (chapter as { og_image?: string } | undefined)?.og_image ?? null;
+    const existingOgImage = chapter?.og_image ?? null;
     setOgImagePreviewUrl(existingOgImage);
     setFieldValue('og_image', existingOgImage);
     setFieldTouched('og_image', true);
@@ -417,62 +408,6 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="chapter-sequence">Blueprint number <span className="text-red-500">*</span></Label>
-            <Input
-              id="chapter-sequence"
-              name="sequence"
-              type="number"
-              min={1}
-              value={values.sequence ?? ''}
-              onChange={(e) => {
-                if (e.target.value === '') {
-                  setFieldValue('sequence', '');
-                  return;
-                }
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('sequence', Number.isNaN(n) ? 1 : Math.max(1, n));
-              }}
-              onBlur={(e) => {
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('sequence', Number.isNaN(n) || n < 1 ? 1 : n);
-                handleBlur(e);
-              }}
-              disabled={isSubmittingState}
-              className={errors.sequence && touched.sequence ? 'border-red-500' : undefined}
-            />
-            {errors.sequence && touched.sequence && (
-              <p className="text-sm text-red-600">{errors.sequence}</p>
-            )}
-          </div>
-          {/* <div className="space-y-2">
-            <Label htmlFor="chapter-page">Page<span className="text-red-500">*</span></Label>
-            <Input
-              id="chapter-page"
-              name="page"
-              type="number"
-              min={0}
-              value={values.page ?? ''}
-              onChange={(e) => {
-                if (e.target.value === '') {
-                  setFieldValue('page', '');
-                  return;
-                }
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('page', Number.isNaN(n) ? 0 : Math.max(0, n));
-              }}
-              onBlur={(e) => {
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('page', Number.isNaN(n) || n < 0 ? 0 : n);
-                handleBlur(e);
-              }}
-              disabled={isSubmittingState}
-              className={errors.page && touched.page ? 'border-red-500' : ''}
-            />
-            {errors.page && touched.page && (
-              <p className="text-sm text-red-600">{errors.page}</p>
-            )}
-          </div> */}
           {chapterPricingEnabled ? (
             <>
               <div className="space-y-2 flex flex-col justify-end">

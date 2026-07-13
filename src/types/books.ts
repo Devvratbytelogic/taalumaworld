@@ -7,13 +7,13 @@ export interface IAllBooksAPIResponse {
   timestamp: string;
 }
 export interface IAllBooksAPIResponseData {
-  data: IAllBooksAPIResponseDataEntity[] | null;
+  data?: (IBook)[] | null;
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
-export interface IAllBooksAPIResponseDataEntity {
+export interface IBook {
   _id: string;
   title: string;
   slug: string;
@@ -22,7 +22,7 @@ export interface IAllBooksAPIResponseDataEntity {
   status: string;
   pricingModel: string;
   price: number;
-  tags?: (string | null)[] | null;
+  tags?: (string)[] | null;
   createdBy?: null;
   deletedAt?: null;
   createdAt: string;

@@ -222,10 +222,6 @@ export const addChapterSchema = Yup.object({
     .required('Please enter a blueprint title'),
   description: Yup.string(),
   content: Yup.string(),
-  sequence: Yup.number()
-    .integer('Must be a whole number')
-    .min(1, 'Sequence must be at least 1')
-    .required('Sequence is required'),
   isFree: Yup.boolean(),
   price: Yup.number()
     .when('isFree', {

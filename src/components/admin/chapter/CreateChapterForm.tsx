@@ -44,7 +44,6 @@ const initialFormValues = {
   description: '',
   content: '',
   sequence: 1,
-  // page: 1,
   isFree: false,
   price: 0 as number | undefined,
   status: 'Published',
@@ -74,8 +73,9 @@ export function CreateChapterForm() {
   const { data: booksResponse } = useGetAllBooksQuery();
   const [addChapter, { isLoading: isAdding }] = useAddChapterMutation();
 
-  const books = booksResponse?.data ?? [];
-  const bookOptions = books.length > 0 ? books.map((book) => ({ value: book.id, label: book.title })) : [];
+  const booksData = booksResponse?.data;
+  const books = booksData?.data ?? [];
+  const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
 
 
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
@@ -341,62 +341,6 @@ export function CreateChapterForm() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="chapter-sequence">Blueprint number <span className="text-red-500">*</span></Label>
-            <Input
-              id="chapter-sequence"
-              name="sequence"
-              type="number"
-              min={1}
-              value={values.sequence ?? ''}
-              onChange={(e) => {
-                if (e.target.value === '') {
-                  setFieldValue('sequence', '');
-                  return;
-                }
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('sequence', Number.isNaN(n) ? 1 : Math.max(1, n));
-              }}
-              onBlur={(e) => {
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('sequence', Number.isNaN(n) || n < 1 ? 1 : n);
-                handleBlur(e);
-              }}
-              disabled={isSubmittingState}
-              className={errors.sequence && touched.sequence ? 'border-red-500' : undefined}
-            />
-            {errors.sequence && touched.sequence && (
-              <p className="text-sm text-red-600">{errors.sequence}</p>
-            )}
-          </div>
-          {/* <div className="space-y-2">
-            <Label htmlFor="chapter-page">Page<span className="text-red-500">*</span></Label>
-            <Input
-              id="chapter-page"
-              name="page"
-              type="number"
-              min={0}
-              value={values.page ?? ''}
-              onChange={(e) => {
-                if (e.target.value === '') {
-                  setFieldValue('page', '');
-                  return;
-                }
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('page', Number.isNaN(n) ? 0 : Math.max(0, n));
-              }}
-              onBlur={(e) => {
-                const n = parseInt(e.target.value, 10);
-                setFieldValue('page', Number.isNaN(n) || n < 0 ? 0 : n);
-                handleBlur(e);
-              }}
-              disabled={isSubmittingState}
-              className={errors.page && touched.page ? 'border-red-500' : ''}
-            />
-            {errors.page && touched.page && (
-              <p className="text-sm text-red-600">{errors.page}</p>
-            )}
-          </div> */}
           {chapterPricingEnabled ? (
             <>
               <div className="space-y-2 flex flex-col justify-end">
@@ -551,7 +495,7 @@ export function CreateChapterForm() {
         onCheckedChange={(checked) => setFieldValue('agreeContentOwnership', checked)}
         onBlur={() => setFieldTouched('agreeContentOwnership', true)}
         disabled={isSubmittingState}
-        
+
       >
         I own or have rights to this content · No third-party infringement · I understand Taaluma may remove
         non-compliant content. See the{' '}

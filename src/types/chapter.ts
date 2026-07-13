@@ -2,66 +2,56 @@ export interface IAllChaptersAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data?: (IAllChaptersAPIResponseData)[] | null;
+  data: IAllChaptersAPIResponseData;
   message: string;
   timestamp: string;
 }
 export interface IAllChaptersAPIResponseData {
-  _id: string;
-  book: Book;
-  number: number;
+  data?: (IChapter)[] | null;
+  total: number;
   page: number;
+  limit: number;
+  totalPages: number;
+}
+export interface IChapter {
+  _id: string;
+  number: number;
   title: string;
+  slug: string;
   description: string;
   content: string;
   isFree: boolean;
   coverImage: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  jsonLd?: string;
+  pdf: string;
+  page: number;
   price: number;
   status: string;
-  slug?: string;
-  shareable_link?: string;
-  createdBy: string;
+  deletedAt?: null;
+  meta_title: string;
+  meta_description: string;
+  og_title: string;
+  createdBy: ICreatedBy;
+  og_description: string;
+  og_image: string;
+  json_ld: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
   id: string;
+  series: ISeries;
 }
-export interface Book {
+export interface ISeries {
   _id: string;
   title: string;
-  thoughtLeader: ThoughtLeader;
-  category: string;
-  subcategory: string;
-  description: string;
+  slug: string;
   coverImage: string;
-  pricingModel: string;
-  price: number;
-  tags?: (string)[] | null;
-  createdBy: string;
-  deletedAt?: null;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
   id: string;
 }
-export interface ThoughtLeader {
+
+export interface ICreatedBy {
   _id: string;
-  fullName: string;
+  name: string;
+  profile_pic: string;
   email: string;
-  professionalBio: string;
-  avatar: string;
-  status: string;
-  followersCount: number;
-  createdBy: string;
-  deletedAt?: null;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
   id: string;
 }

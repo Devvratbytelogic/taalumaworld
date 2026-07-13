@@ -6,7 +6,6 @@ import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2 } from 'lucide-react';
 import { useGetAllBooksQuery, useGetAllAuthorLeadersQuery, useGetAllCategoriesQuery, } from '@/store/rtkQueries/adminGetApi';
 import { useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } from '@/store/rtkQueries/adminPostApi';
-import type { IAllBooksAPIResponseDataEntity } from '@/types/books';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
 import CommonDataTable from '../CommonDataTable';
@@ -25,9 +24,9 @@ export function AdminBooksTab() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedLeader, setSelectedLeader] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-  const [previewBook, setPreviewBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
+  const [previewBook, setPreviewBook] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingBook, setEditingBook] = useState<IAllBooksAPIResponseDataEntity | null>(null);
+  const [editingBook, setEditingBook] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 

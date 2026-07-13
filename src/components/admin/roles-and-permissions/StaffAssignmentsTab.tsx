@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
 import { AlertCircle, Ban, CheckCircle, Edit2, Plus } from 'lucide-react';
-import { useGetAllStaffQuery } from '@/store/rtkQueries/rolesPermissionsApi';
+import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
 import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -28,13 +28,14 @@ function StatusBadge({ status }: { status: string }) {
         </Badge>
     );
 }
+
 export function StaffAssignmentsTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const debouncedSearch = useDebounce(search, 500);
 
-    const { data: staffData, isLoading } = useGetAllStaffQuery({
+    const { data: staffData, isLoading } = useGetAllUsersQuery({
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
         search: debouncedSearch,

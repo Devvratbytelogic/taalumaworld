@@ -59,7 +59,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminPermissions'],
         }),
 
-        getAllStaff: builder.query<IAllStaffAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getAllUsers: builder.query<IAllStaffAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
                 url: `/admin/get-all-users`,
                 method: 'GET',
@@ -115,7 +115,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
 export const {
     useGetAllRolesQuery,
     useGetPermissionsMatrixQuery,
-    useGetAllStaffQuery,
+    useGetAllUsersQuery,
     useGetUserSegmentsQuery,
     useAddRoleMutation,
     useUpdateRoleMutation,

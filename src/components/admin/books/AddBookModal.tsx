@@ -28,6 +28,7 @@ import type { IAuthorLeaderEntity } from '@/types/authleaders';
 import type { CategoryEntity } from '@/types/categories';
 import type { IAllCategoriesAPIResponseData, SubcategoriesEntity } from '@/types/categories';
 import { cn } from '@/components/ui/utils';
+import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 
 const initialFormValues = {
   title: '',
@@ -69,7 +70,9 @@ export function AddBookModal({
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
-
+  const { data: staffData } = useGetAllUsersQuery({ type: 'mentor' })
+  const mentors = staffData?.data?.users ?? [];
+  const mentorOptions = mentors.map((m) => ({ id: m._id, name: m.name }));
   const {
     values,
     errors,
@@ -302,7 +305,7 @@ export function AddBookModal({
                 )}
               </div>
               <div className="space-y-2">
-              <Label>Category<span className="text-red-500">*</span></Label>
+                <Label>Category<span className="text-red-500">*</span></Label>
                 <Select
                   value={values.category}
                   onValueChange={(value) => {
@@ -449,30 +452,30 @@ export function AddBookModal({
                 </Select>
               </div>
               {values.pricingModel === 'book' && (
-              <div className="space-y-2">
-                <Label htmlFor="book-price">Price (KSH) <span className="text-red-500">*</span></Label>
-                <Input
-                  id="book-price"
-                  name="price"
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  placeholder="0.00"
-                  value={values.price === '' ? '' : values.price}
-                  onChange={(e) =>
-                    setFieldValue(
-                      'price',
-                      e.target.value === '' ? '' : Number(e.target.value)
-                    )
-                  }
-                  onBlur={handleBlur}
-                  disabled={isSubmitting}
-                  className={errors.price && touched.price ? 'border-red-500' : ''}
-                />
-                {errors.price && touched.price && (
-                  <p className="text-sm text-red-600">{errors.price}</p>
-                )}
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="book-price">Price (KSH) <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="book-price"
+                    name="price"
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    placeholder="0.00"
+                    value={values.price === '' ? '' : values.price}
+                    onChange={(e) =>
+                      setFieldValue(
+                        'price',
+                        e.target.value === '' ? '' : Number(e.target.value)
+                      )
+                    }
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    className={errors.price && touched.price ? 'border-red-500' : ''}
+                  />
+                  {errors.price && touched.price && (
+                    <p className="text-sm text-red-600">{errors.price}</p>
+                  )}
+                </div>
               )}
             </div>
             <OpenGraphFieldsSection

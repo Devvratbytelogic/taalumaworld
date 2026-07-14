@@ -1,21 +1,25 @@
-import { Mail, Ban } from 'lucide-react';
-import Button from '../../ui/Button';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
-import { Badge } from '../../ui/badge';
+'use client';
+
+import { Mail, Ban, CircleCheck, X } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../../ui/dialog';
-import type { IAllUsersDataEntity } from '@/types/allUsers';
+} from '@/components/ui/dialog';
+import type { IAllUsersEntity } from '@/types/rolesPermissions';
 
 interface ViewProfileModalProps {
-  user: IAllUsersDataEntity | null;
+  user: IAllUsersEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSendEmail?: (user: IAllUsersDataEntity) => void;
-  onSuspend?: (user: IAllUsersDataEntity) => void;
+  onSendEmail?: (user: IAllUsersEntity) => void;
+  onSuspend?: (user: IAllUsersEntity) => void;
 }
 
 export function ViewProfileModal({
@@ -27,78 +31,114 @@ export function ViewProfileModal({
 }: ViewProfileModalProps) {
   if (!user) return null;
 
+  const isSuspended = user.status === 'suspended';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>User Profile</DialogTitle>
+      <DialogContent className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
+          <DialogTitle>{user.name}</DialogTitle>
+          <DialogDescription>Read-only view of the user&apos;s profile.</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 pt-2">
-          <div className="flex flex-col items-center gap-4">
-            <Avatar className="h-24 w-24">
+        <div className="custom_scrollbar flex-1 space-y-5 overflow-y-auto p-6!">
+          <div className="flex flex-col items-center gap-3">
+            <Avatar className="border h-20 w-20">
               <AvatarImage src={user.profile_pic ?? ''} alt={user.name} />
-              <AvatarFallback className="text-2xl">{user.name[0]}</AvatarFallback>
+              <AvatarFallback className="text-2xl">{user.name?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="text-center">
-              <h3 className="text-xl font-semibold text-foreground">{user.name}</h3>
+              <h3 className="text-lg font-semibold text-slate-900">{user.name}</h3>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-lg border bg-muted/30 p-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Role</span>
-              <Badge variant={user.role?.name === 'Premium User' ? 'default' : 'outline'}>
-                {user.role?.name ?? '-'}
-              </Badge>
+          <dl className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Role</dt>
+              <dd className="mt-1">
+                <Badge>{user.role?.name ?? '-'}</Badge>
+              </dd>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Status</span>
-              <Badge
-                variant="outline"
-                className="bg-green-50 text-green-700 border-green-200"
-              >
-                {user.status || 'active'}
-              </Badge>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Status</dt>
+              <dd className="mt-1">
+                <Badge
+                  variant="outline"
+                  className={
+                    isSuspended
+                      ? 'bg-red-50 text-red-700 border-red-200'
+                      : 'bg-green-50 text-green-700 border-green-200'
+                  }
+                >
+                  {user.status || 'active'}
+                </Badge>
+              </dd>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Join Date</span>
-              <span className="font-medium">{user.joinDate}</span>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">User type</dt>
+              <dd className="mt-1 text-sm capitalize text-slate-700">{user.user_type ?? '-'}</dd>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Purchases</span>
-              <span className="font-medium">{user.purchases}</span>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Join date</dt>
+              <dd className="mt-1 text-sm text-slate-700">
+                {user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : '-'}
+              </dd>
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2 justify-end">
-            <Button
-              onPress={() => onOpenChange(false)}
-              className="global_btn rounded_full outline_primary"
-            >
-              Close
-            </Button>
-            {onSendEmail && (
-              <Button
-                onPress={() => onSendEmail(user)}
-                className="global_btn rounded_full bg_primary"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Send Email
-              </Button>
-            )}
-            {onSuspend && (
-              <Button
-                onPress={() => onSuspend(user)}
-                className="global_btn rounded_full bg-destructive text-destructive-foreground"
-              >
-                <Ban className="h-4 w-4 mr-2" />
-                Suspend User
-              </Button>
-            )}
-          </div>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Verified</dt>
+              <dd className="mt-1">
+                <Badge
+                  variant="outline"
+                  className={
+                    user.is_verified
+                      ? 'bg-green-50 text-green-700 border-green-200'
+                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                  }
+                >
+                  {user.is_verified ? 'Yes' : 'No'}
+                </Badge>
+              </dd>
+            </div>
+          </dl>
         </div>
+
+        <DialogFooter className="shrink-0 border-t border-slate-100 px-6 py-4">
+          <Button
+            type="button"
+            onPress={() => onOpenChange(false)}
+            className="global_btn rounded_full outline_primary"
+            startContent={<X className="h-4 w-4" />}
+          >
+            Close
+          </Button>
+          {onSendEmail && (
+            <Button
+              type="button"
+              onPress={() => onSendEmail(user)}
+              className="global_btn rounded_full bg_primary"
+              startContent={<Mail className="h-4 w-4" />}
+            >
+              Send Email
+            </Button>
+          )}
+          {onSuspend && (
+            <Button
+              type="button"
+              onPress={() => onSuspend(user)}
+              className={`global_btn rounded_full ${isSuspended ? 'success_btn' : 'danger_btn'}`}
+              startContent={isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+            >
+              {isSuspended ? 'Activate User' : 'Suspend User'}
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

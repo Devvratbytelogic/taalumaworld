@@ -72,7 +72,7 @@ export function AdminBooksTab() {
     ...(filterByIsMine ? { isMine: true } : {}),
   });
 
-  const { data: leadersResponse } = useGetAllUsersQuery({ type: 'mentor' });
+  const { data: leadersResponse } = useGetAllUsersQuery({ user_type: 'mentor' });
 
   const books = booksResponse?.data?.data ?? [];
   const thoughtLeaders = leadersResponse?.data?.data ?? [];

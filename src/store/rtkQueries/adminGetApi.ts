@@ -72,16 +72,6 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['GlobalSettings'],
         }),
 
-        /** users */
-        getAllUsers: builder.query<IAllUsersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
-            query: (params) => ({
-                url: `/admin/get-all-users`,
-                method: 'GET',
-                params: params ? { ...params } : {},
-            }),
-            providesTags: ['AdminUsers'],
-        }),
-
         /** testimonials */
         getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
@@ -167,7 +157,6 @@ export const {
     useGetAllAdminChaptersQuery,
     useGetChapterByIdQuery,
     useGetAdminGlobalSettingsQuery,
-    useGetAllUsersQuery,
     useGetAllTestimonialsQuery,
     useGetAllFaqsQuery,
     useGetAdminProfileQuery,

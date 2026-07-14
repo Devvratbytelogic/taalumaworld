@@ -3,63 +3,77 @@
  * View and manage platform users
  */
 
-import { useState, useEffect } from 'react';
+'use client';
+
+import { useState } from 'react';
+import { type GridColDef } from '@mui/x-data-grid';
+import { Eye, Mail, Ban, CircleCheck } from 'lucide-react';
 import toast from '@/utils/toast';
+import type { IAllUsersEntity } from '@/types/rolesPermissions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminUsersHeader } from './AdminUsersHeader';
 import { AdminUsersSearch } from './AdminUsersSearch';
-import { UserListing } from './UserListing';
 import { ViewProfileModal } from './ViewProfileModal';
 import { SuspendUserDialog } from './SuspendUserDialog';
-import { useGetAllUsersQuery } from '@/store/rtkQueries/adminGetApi';
-import { useSuspendUserMutation } from '@/store/rtkQueries/adminPostApi';
+import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useDebounce } from '@/hooks/useDebounce';
-import { IAllUsersDataEntity } from '@/types/allUsers';
 
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  active: 'bg-green-50 text-green-700 border-green-200',
+  suspended: 'bg-red-50 text-red-700 border-red-200',
+};
 
 export function AdminUsersTab() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [profileUser, setProfileUser] = useState<IAllUsersDataEntity | null>(null);
-  const [suspendUser, setSuspendUser] = useState<IAllUsersDataEntity | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageLimit, setPageLimit] = useState(10);
+  const [profileUser, setProfileUser] = useState<IAllUsersEntity | null>(null);
+  const [suspendUser, setSuspendUser] = useState<IAllUsersEntity | null>(null);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+
   const debouncedSearch = useDebounce(searchQuery, 400);
-  const queryParams = {
-    page,
-    limit: pageLimit,
+
+  const { data: usersResponse, isLoading } = useGetAllUsersQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    user_type: 'user',
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  });
+  const [updateUserStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
+
+  const users = usersResponse?.data?.data ?? [];
+  const totalUsers = usersResponse?.data?.total ?? 0;
+
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetToFirstPage();
   };
-  const { data, isLoading, isFetching } = useGetAllUsersQuery(queryParams);
-  const [suspendUserMutation, { isLoading: isSuspending }] = useSuspendUserMutation();
 
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
-
-  const users = data?.data ?? [];
-  const pagination = data?.pagination;
-  const totalUsers = pagination?.total ?? data?.totalUsers ?? 0;
-  const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalUsers / pageLimit));
-
-
-  const handleViewProfile = (user: IAllUsersDataEntity) => {
+  const handleViewProfile = (user: IAllUsersEntity) => {
     setProfileUser(user);
   };
 
-  const handleSendEmail = (user: IAllUsersDataEntity) => {
+  const handleSendEmail = (user: IAllUsersEntity) => {
     window.location.href = `mailto:${user.email}`;
   };
 
-  const handleSuspend = (user: IAllUsersDataEntity) => {
+  const handleSuspend = (user: IAllUsersEntity) => {
     setSuspendUser(user);
   };
 
-  const confirmSuspend = async () => {
+  const confirmSuspend = async (statusReason: string) => {
     if (suspendUser) {
+      const newStatus = suspendUser.status === 'suspended' ? 'active' : 'suspended';
       try {
-        await suspendUserMutation({ id: suspendUser.id }).unwrap();
-        toast.success(`"${suspendUser.name}" has been suspended`);
+        await updateUserStatus({
+          id: suspendUser._id,
+          payload: { status: newStatus, status_reason: statusReason },
+        }).unwrap();
+        toast.success(`"${suspendUser.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
       } catch {
-        toast.error(`Failed to suspend "${suspendUser.name}"`);
+        toast.error(`Failed to update "${suspendUser.name}"`);
       } finally {
         setSuspendUser(null);
         setProfileUser(null);
@@ -67,35 +81,152 @@ export function AdminUsersTab() {
     }
   };
 
-  const handleSuspendFromProfile = (user: IAllUsersDataEntity) => {
+  const handleSuspendFromProfile = (user: IAllUsersEntity) => {
     setProfileUser(null);
     setSuspendUser(user);
   };
+
+  const columns: GridColDef[] = [
+    {
+      field: 'index',
+      headerName: '#',
+      width: 60,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
+        const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+        return (
+          <span className="text-sm text-muted-foreground">
+            {paginationModel.page * paginationModel.pageSize + rowIndex + 1}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'name',
+      headerName: 'User',
+      minWidth: 220,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="flex items-center gap-3 min-w-0">
+          <Avatar className="border h-9 w-9 shrink-0">
+            <AvatarImage src={params.row.profile_pic ?? ''} />
+            <AvatarFallback>{params.row.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <span className="font-medium text-sm truncate">{params.row.name}</span>
+        </div>
+      ),
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => <span className="text-sm text-slate-700 truncate">{params.row.email}</span>,
+    },
+    {
+      field: 'role',
+      headerName: 'Role',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => <Badge>{params.row.role?.name ?? '-'}</Badge>,
+    },
+    {
+      field: 'user_type',
+      headerName: 'User Type',
+      width: 140,
+      sortable: false,
+      renderCell: (params) => <span className="text-sm capitalize text-slate-700">{params.row.user_type ?? '-'}</span>,
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Join Date',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-700">
+          {params.row.createdAt
+            ? new Date(params.row.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
+            : '-'}
+        </span>
+      ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className={STATUS_BADGE_CLASS[params.row.status] ?? STATUS_BADGE_CLASS.active}>
+          {params.row.status || 'active'}
+        </Badge>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => {
+        const isSuspended = params.row.status === 'suspended';
+        return (
+          <div className="action_buttons">
+            <button
+              type="button"
+              className="active_button"
+              title="View profile"
+              onClick={() => handleViewProfile(params.row)}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="edit_button"
+              title="Send email"
+              onClick={() => handleSendEmail(params.row)}
+            >
+              <Mail className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className={isSuspended ? 'active_button' : 'delete_button'}
+              title={isSuspended ? 'Activate user' : 'Suspend user'}
+              onClick={() => handleSuspend(params.row)}
+            >
+              {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="space-y-6">
       <AdminUsersHeader totalCount={totalUsers} />
 
-      <AdminUsersSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <AdminUsersSearch searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-      <UserListing
-        users={users}
-        searchQuery={debouncedSearch}
-        page={page}
-        pageLimit={pageLimit}
-        totalUsers={totalUsers}
-        totalPages={totalPages}
-        isLoading={isLoading}
-        isFetching={isFetching}
-        onPageChange={setPage}
-        onPageLimitChange={(limit) => {
-          setPageLimit(limit);
-          setPage(1);
-        }}
-        onViewProfile={handleViewProfile}
-        onSendEmail={handleSendEmail}
-        onSuspend={handleSuspend}
-      />
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={users}
+          columns={columns}
+          getRowId={(row) => row._id}
+          loading={isLoading}
+          paginationMode="server"
+          rowCount={totalUsers}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
 
       <ViewProfileModal
         user={profileUser}

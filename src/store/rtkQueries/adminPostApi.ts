@@ -140,15 +140,6 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
         }),
 
 
-        /** users */
-        suspendUser: builder.mutation({
-            query: ({ id }) => ({
-                url: `/admin/block-user/${id}`,
-                method: 'PUT',
-            }),
-            invalidatesTags: ['AdminUsers'],
-        }),
-
         /** testimonials */
         addTestimonial: builder.mutation({
             query: (payload) => ({
@@ -238,9 +229,6 @@ export const {
     useUpdateChapterMutation,
     useDeleteChapterMutation,
     useRestoreChapterMutation,
-
-    // Users
-    useSuspendUserMutation,
 
     // Testimonials
     useAddTestimonialMutation,

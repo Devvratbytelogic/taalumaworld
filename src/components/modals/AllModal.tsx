@@ -18,6 +18,7 @@ import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModa
 import BookDetailsModal from './common-card-details/BookDetailsModal';
 import ChapterDetailsModal from './common-card-details/ChapterDetailsModal';
 import DeleteConfirmation from '../admin/DeleteConfirmation';
+import RestoreConfirmation from '../admin/RestoreConfirmation';
 import { AddEditStaffModal } from '../admin/roles-and-permissions/AddEditStaffModal';
 import { UpdateStaffStatusModal } from '../admin/roles-and-permissions/UpdateStaffStatusModal';
 
@@ -68,6 +69,8 @@ export default function AllModal() {
                 return <ChapterDetailsModal />;
             case "DeleteConfirmation":
                 return <DeleteConfirmation />;
+            case "RestoreConfirmation":
+                return <RestoreConfirmation />;
             default:
                 return null;
         }

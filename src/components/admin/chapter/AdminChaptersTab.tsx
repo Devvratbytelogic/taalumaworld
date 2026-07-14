@@ -4,9 +4,13 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Edit2, Trash2, ChevronDown, Loader2 } from 'lucide-react';
+import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2 } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
-import { useDeleteChapterMutation, useUpdateChapterMutation } from '@/store/rtkQueries/adminPostApi';
+import {
+    useDeleteChapterMutation,
+    useUpdateChapterMutation,
+    useRestoreChapterMutation,
+} from '@/store/rtkQueries/adminPostApi';
 import type { IAllChaptersAPIResponseData, IChapter } from '@/types/chapter';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -48,7 +52,7 @@ export function AdminChaptersTab() {
     const [search, setSearch] = useState('');
     const [filterByBook, setFilterByBook] = useState('');
     const [filterByStatus, setFilterByStatus] = useState('');
-    const [filterByIsDeleted, setFilterByIsDeleted] = useState('');
+    const [isTrashView, setIsTrashView] = useState(false);
     const [filterByIsMine, setFilterByIsMine] = useState(false);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [previewChapter, setPreviewChapter] = useState<IAllChaptersAPIResponseData | null>(null);
@@ -62,7 +66,7 @@ export function AdminChaptersTab() {
         search: debouncedSearch,
         ...(filterByBook ? { book_id: filterByBook } : {}),
         ...(filterByStatus ? { status: filterByStatus } : {}),
-        ...(filterByIsDeleted ? { isDeleted: filterByIsDeleted === 'true' } : {}),
+        ...(isTrashView ? { isDeleted: true } : {}),
         ...(filterByIsMine ? { isMine: true } : {}),
     });
 
@@ -77,10 +81,11 @@ export function AdminChaptersTab() {
 
     const [deleteChapter] = useDeleteChapterMutation();
     const [updateChapter] = useUpdateChapterMutation();
+    const [restoreChapter] = useRestoreChapterMutation();
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    }, [debouncedSearch, filterByBook, filterByStatus, filterByIsDeleted, filterByIsMine]);
+    }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine]);
 
     const onDeleteChapter = async (id: string) => {
         try {
@@ -89,6 +94,16 @@ export function AdminChaptersTab() {
             dispatch(closeModal());
         } catch (error) {
             console.error('Error deleting chapter:', error);
+        }
+    };
+
+    const onRestoreChapter = async (id: string) => {
+        try {
+            await restoreChapter({ id }).unwrap();
+            toast.success('Blueprint restored successfully');
+            dispatch(closeModal());
+        } catch (error) {
+            console.error('Error restoring chapter:', error);
         }
     };
 
@@ -245,26 +260,45 @@ export function AdminChaptersTab() {
                     >
                         <Eye className="h-4 w-4" />
                     </button> */}
-                    <button
-                        type="button"
-                        className="edit_button"
-                        onClick={() => router.push(getEditChapterRoutePath(params.row.id))}
-                    >
-                        <Edit2 className="h-4 w-4" />
-                    </button>
-                    <button
-                        type="button"
-                        className="delete_button"
-                        onClick={() => dispatch(openModal({
-                            componentName: 'DeleteConfirmation',
-                            data: {
-                                itemName: params.row.title,
-                                onDelete: () => onDeleteChapter(params.row.id),
-                            },
-                        }))}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </button>
+                    {isTrashView ? (
+                        <button
+                            type="button"
+                            className="active_button"
+                            title="Restore blueprint"
+                            onClick={() => dispatch(openModal({
+                                componentName: 'RestoreConfirmation',
+                                data: {
+                                    itemName: params.row.title,
+                                    onRestore: () => onRestoreChapter(params.row.id),
+                                },
+                            }))}
+                        >
+                            <RotateCcw className="h-4 w-4" />
+                        </button>
+                    ) : (
+                        <>
+                            <button
+                                type="button"
+                                className="edit_button"
+                                onClick={() => router.push(getEditChapterRoutePath(params.row.id))}
+                            >
+                                <Edit2 className="h-4 w-4" />
+                            </button>
+                            <button
+                                type="button"
+                                className="delete_button"
+                                onClick={() => dispatch(openModal({
+                                    componentName: 'DeleteConfirmation',
+                                    data: {
+                                        itemName: params.row.title,
+                                        onDelete: () => onDeleteChapter(params.row.id),
+                                    },
+                                }))}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        </>
+                    )}
                 </div>
             ),
         },
@@ -272,7 +306,10 @@ export function AdminChaptersTab() {
 
     return (
         <div className="space-y-6">
-            <AdminChaptersHeader />
+            <AdminChaptersHeader
+                isTrashView={isTrashView}
+                onToggleTrash={() => setIsTrashView((prev) => !prev)}
+            />
 
             <AdminChaptersSearch
                 searchQuery={search}
@@ -282,8 +319,6 @@ export function AdminChaptersTab() {
                 onBookChange={setFilterByBook}
                 selectedStatus={filterByStatus}
                 onStatusChange={setFilterByStatus}
-                selectedIsDeleted={filterByIsDeleted}
-                onIsDeletedChange={setFilterByIsDeleted}
                 isMine={filterByIsMine}
                 onIsMineChange={setFilterByIsMine}
             />

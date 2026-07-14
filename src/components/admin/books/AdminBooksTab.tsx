@@ -3,9 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Edit2, Trash2 } from 'lucide-react';
+import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2 } from 'lucide-react';
 import { useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
-import { useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } from '@/store/rtkQueries/adminPostApi';
+import {
+  useAddBookMutation,
+  useUpdateBookMutation,
+  useDeleteBookMutation,
+  useRestoreBookMutation,
+} from '@/store/rtkQueries/adminPostApi';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
 import CommonDataTable from '../CommonDataTable';
@@ -16,20 +21,44 @@ import { AddBookModal } from './AddBookModal';
 import { EditBookModal } from './EditBookModal';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
+
+const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
+  Published: {
+    badge: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+    dot: 'bg-green-500',
+    label: 'Published',
+  },
+  Draft: {
+    badge: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
+    dot: 'bg-yellow-500',
+    label: 'Draft',
+  },
+};
+
+const STATUSES = ['Published', 'Draft'] as const;
 
 export function AdminBooksTab() {
   const dispatch = useDispatch();
   const [search, setSearch] = useState('');
   const [selectedLeader, setSelectedLeader] = useState('');
   const [filterByStatus, setFilterByStatus] = useState('');
-  const [filterByIsDeleted, setFilterByIsDeleted] = useState('');
+  const [isTrashView, setIsTrashView] = useState(false);
   const [filterByIsMine, setFilterByIsMine] = useState(false);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [previewBook, setPreviewBook] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -39,7 +68,7 @@ export function AdminBooksTab() {
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
     ...(selectedLeader ? { mentor_id: selectedLeader } : {}),
     ...(filterByStatus ? { status: filterByStatus } : {}),
-    ...(filterByIsDeleted ? { isDeleted: filterByIsDeleted === 'true' } : {}),
+    ...(isTrashView ? { isDeleted: true } : {}),
     ...(filterByIsMine ? { isMine: true } : {}),
   });
 
@@ -54,10 +83,11 @@ export function AdminBooksTab() {
   const [addBook, { isLoading: isAdding }] = useAddBookMutation();
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
   const [deleteBook] = useDeleteBookMutation();
+  const [restoreBook] = useRestoreBookMutation();
 
   useEffect(() => {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-  }, [debouncedSearch, selectedLeader, filterByStatus, filterByIsDeleted, filterByIsMine]);
+  }, [debouncedSearch, selectedLeader, filterByStatus, isTrashView, filterByIsMine]);
 
   const onDeleteBook = async (id: string) => {
     try {
@@ -66,6 +96,34 @@ export function AdminBooksTab() {
       dispatch(closeModal());
     } catch (error) {
       console.error('Error deleting series:', error);
+    }
+  };
+
+  const onRestoreBook = async (id: string) => {
+    try {
+      await restoreBook({ id }).unwrap();
+      toast.success('Series restored successfully');
+      dispatch(closeModal());
+    } catch (error) {
+      console.error('Error restoring series:', error);
+    }
+  };
+
+  const handleStatusChange = async (book: { _id?: string; id?: string; status?: string }, status: string) => {
+    const id = book._id ?? book.id ?? '';
+    if (!id || status === book.status || updatingId) return;
+
+    const formData = new FormData();
+    formData.append('status', status);
+    setUpdatingId(id);
+
+    try {
+      await updateBook({ id, values: formData }).unwrap();
+      toast.success(`Series marked as ${status}`);
+    } catch {
+      toast.error('Failed to update status');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -154,6 +212,58 @@ export function AdminBooksTab() {
       ),
     },
     {
+      field: 'status',
+      headerName: 'Status',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => {
+        const book = params.row;
+        const config = STATUS_CONFIG[book.status] ?? STATUS_CONFIG.Draft;
+        const bookId = book._id ?? book.id;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild disabled={!!updatingId}>
+              <button type="button" className="focus:outline-none">
+                <Badge
+                  variant="outline"
+                  className={`cursor-pointer select-none transition-colors flex items-center gap-1.5 ${config.badge}`}
+                >
+                  {updatingId === bookId ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+                  )}
+                  {book.status}
+                  <ChevronDown className="h-3 w-3 opacity-60" />
+                </Badge>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-40">
+              <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
+                Change status
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {STATUSES.map((s) => (
+                <DropdownMenuItem
+                  key={s}
+                  onSelect={() => handleStatusChange(book, s)}
+                  className="flex items-center gap-2"
+                  disabled={book.status === s}
+                >
+                  <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[s].dot}`} />
+                  {STATUS_CONFIG[s].label}
+                  {book.status === s ? (
+                    <span className="ml-auto text-xs text-muted-foreground">current</span>
+                  ) : null}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+    {
       field: 'actions',
       headerName: 'Actions',
       width: 150,
@@ -167,26 +277,45 @@ export function AdminBooksTab() {
           >
             <Eye className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            className="edit_button"
-            onClick={() => setEditingBook(params.row)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className="delete_button"
-            onClick={() => dispatch(openModal({
-              componentName: 'DeleteConfirmation',
-              data: {
-                itemName: params.row.title,
-                onDelete: () => onDeleteBook(params.row.id ?? params.row._id),
-              },
-            }))}
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
+          {isTrashView ? (
+            <button
+              type="button"
+              className="active_button"
+              title="Restore series"
+              onClick={() => dispatch(openModal({
+                componentName: 'RestoreConfirmation',
+                data: {
+                  itemName: params.row.title,
+                  onRestore: () => onRestoreBook(params.row._id),
+                },
+              }))}
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="edit_button"
+                onClick={() => setEditingBook(params.row)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                className="delete_button"
+                onClick={() => dispatch(openModal({
+                  componentName: 'DeleteConfirmation',
+                  data: {
+                    itemName: params.row.title,
+                    onDelete: () => onDeleteBook(params.row._id),
+                  },
+                }))}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
+          )}
         </div>
       ),
     },
@@ -194,9 +323,11 @@ export function AdminBooksTab() {
 
   return (
     <div className="space-y-6">
-      <AdminBooksHeader onCreateBook={() => setIsCreateModalOpen(true)} />
-
-
+      <AdminBooksHeader
+        onCreateBook={() => setIsCreateModalOpen(true)}
+        isTrashView={isTrashView}
+        onToggleTrash={() => setIsTrashView((prev) => !prev)}
+      />
 
       <AdminBooksSearch
         searchQuery={search}
@@ -206,8 +337,6 @@ export function AdminBooksTab() {
         onLeaderChange={setSelectedLeader}
         selectedStatus={filterByStatus}
         onStatusChange={setFilterByStatus}
-        selectedIsDeleted={filterByIsDeleted}
-        onIsDeletedChange={setFilterByIsDeleted}
         isMine={filterByIsMine}
         onIsMineChange={setFilterByIsMine}
       />

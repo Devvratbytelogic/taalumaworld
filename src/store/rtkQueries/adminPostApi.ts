@@ -98,6 +98,13 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminBooks'],
         }),
+        restoreBook: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/series/restore/${id}`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['AdminBooks'],
+        }),
 
 
         /** Chapters */
@@ -121,6 +128,13 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             query: ({ id }) => ({
                 url: `/admin/blueprints/${id}`,
                 method: 'DELETE',
+            }),
+            invalidatesTags: ['AdminChapters'],
+        }),
+        restoreChapter: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/blueprints/restore/${id}`,
+                method: 'POST',
             }),
             invalidatesTags: ['AdminChapters'],
         }),
@@ -216,12 +230,14 @@ export const {
     useAddBookMutation,
     useUpdateBookMutation,
     useDeleteBookMutation,
+    useRestoreBookMutation,
 
 
     // Chapters
     useAddChapterMutation,
     useUpdateChapterMutation,
     useDeleteChapterMutation,
+    useRestoreChapterMutation,
 
     // Users
     useSuspendUserMutation,

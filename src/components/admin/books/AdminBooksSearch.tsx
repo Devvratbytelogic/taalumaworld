@@ -1,10 +1,6 @@
 import { X } from 'lucide-react';
 import ReactSelect from 'react-select';
-import {
-  AdminSearchInput,
-  AdminSearchPanel,
-  adminFilterPillClass,
-} from '@/components/admin/layout/AdminContent';
+import { AdminSearchInput, AdminSearchPanel, adminFilterPillClass, } from '@/components/admin/layout/AdminContent';
 import { Checkbox } from '@/components/ui/checkbox';
 import { filterSelectStyles, type FilterOption } from '@/constants/filterSelectStyle';
 
@@ -16,8 +12,6 @@ interface AdminBooksSearchProps {
   onLeaderChange: (value: string) => void;
   selectedStatus: string;
   onStatusChange: (value: string) => void;
-  selectedIsDeleted: string;
-  onIsDeletedChange: (value: string) => void;
   isMine: boolean;
   onIsMineChange: (value: boolean) => void;
 }
@@ -25,11 +19,6 @@ interface AdminBooksSearchProps {
 const STATUS_OPTIONS: FilterOption[] = [
   { value: 'Published', label: 'Published' },
   { value: 'Draft', label: 'Draft' },
-];
-
-const IS_DELETED_OPTIONS: FilterOption[] = [
-  { value: 'false', label: 'Active only' },
-  { value: 'true', label: 'Deleted only' },
 ];
 
 export function AdminBooksSearch({
@@ -40,21 +29,16 @@ export function AdminBooksSearch({
   onLeaderChange,
   selectedStatus,
   onStatusChange,
-  selectedIsDeleted,
-  onIsDeletedChange,
   isMine,
   onIsMineChange,
 }: AdminBooksSearchProps) {
-  const hasActiveFilters = Boolean(
-    selectedLeader || selectedStatus || selectedIsDeleted || isMine
-  );
+  const hasActiveFilters = Boolean(selectedLeader || selectedStatus || isMine);
 
   const menuPortalTarget = typeof document !== 'undefined' ? document.body : null;
 
   const clearAll = () => {
     onLeaderChange('');
     onStatusChange('');
-    onIsDeletedChange('');
     onIsMineChange(false);
   };
 
@@ -96,26 +80,12 @@ export function AdminBooksSearch({
             styles={filterSelectStyles}
           />
 
-          <ReactSelect<FilterOption, false>
-            inputId="books-filter-deleted"
-            classNamePrefix="react-select"
-            options={IS_DELETED_OPTIONS}
-            value={IS_DELETED_OPTIONS.find((o) => o.value === selectedIsDeleted) ?? null}
-            onChange={(option) => onIsDeletedChange(option?.value ?? '')}
-            placeholder="All series"
-            isClearable
-            isSearchable={false}
-            menuPortalTarget={menuPortalTarget}
-            menuPosition="fixed"
-            styles={filterSelectStyles}
-          />
-
           <button
             type="button"
             onClick={() => onIsMineChange(!isMine)}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+            className="flex h-9 w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50"
           >
-            <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
+            <Checkbox checked={isMine} className="h-4 w-4" />
             <span className="font-normal">My series</span>
           </button>
 
@@ -146,14 +116,6 @@ export function AdminBooksSearch({
             <span className={adminFilterPillClass}>
               {selectedStatus}
               <button type="button" onClick={() => onStatusChange('')} className="hover:text-primary/70">
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          ) : null}
-          {selectedIsDeleted ? (
-            <span className={adminFilterPillClass}>
-              {selectedIsDeleted === 'true' ? 'Deleted only' : 'Active only'}
-              <button type="button" onClick={() => onIsDeletedChange('')} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
             </span>

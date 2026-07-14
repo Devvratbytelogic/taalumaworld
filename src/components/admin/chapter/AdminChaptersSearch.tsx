@@ -20,8 +20,6 @@ interface AdminChaptersSearchProps {
   onBookChange: (value: string) => void;
   selectedStatus: string;
   onStatusChange: (value: string) => void;
-  selectedIsDeleted: string;
-  onIsDeletedChange: (value: string) => void;
   isMine: boolean;
   onIsMineChange: (value: boolean) => void;
 }
@@ -36,17 +34,14 @@ export function AdminChaptersSearch({
   onBookChange,
   selectedStatus,
   onStatusChange,
-  selectedIsDeleted,
-  onIsDeletedChange,
   isMine,
   onIsMineChange,
 }: AdminChaptersSearchProps) {
-  const hasActiveFilters = selectedBook || selectedStatus || selectedIsDeleted || isMine;
+  const hasActiveFilters = selectedBook || selectedStatus || isMine;
 
   const clearAll = () => {
     onBookChange('');
     onStatusChange('');
-    onIsDeletedChange('');
     onIsMineChange(false);
   };
 
@@ -80,16 +75,6 @@ export function AdminChaptersSearch({
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
-          </select>
-
-          <select
-            value={selectedIsDeleted}
-            onChange={(e) => onIsDeletedChange(e.target.value)}
-            className={adminSelectClass}
-          >
-            <option value="">All blueprints</option>
-            <option value="false">Active only</option>
-            <option value="true">Deleted only</option>
           </select>
 
           <button
@@ -128,14 +113,6 @@ export function AdminChaptersSearch({
             <span className={adminFilterPillClass}>
               {selectedStatus}
               <button type="button" onClick={() => onStatusChange('')} className="hover:text-primary/70">
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          ) : null}
-          {selectedIsDeleted ? (
-            <span className={adminFilterPillClass}>
-              {selectedIsDeleted === 'true' ? 'Deleted only' : 'Active only'}
-              <button type="button" onClick={() => onIsDeletedChange('')} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
             </span>

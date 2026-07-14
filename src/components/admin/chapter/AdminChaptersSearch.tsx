@@ -77,14 +77,21 @@ export function AdminChaptersSearch({
             ))}
           </select>
 
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             onClick={() => onIsMineChange(!isMine)}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onIsMineChange(!isMine);
+              }
+            }}
+            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
           >
             <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
             <span className="font-normal">My blueprints</span>
-          </button>
+          </div>
 
           {hasActiveFilters ? (
             <button

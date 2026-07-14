@@ -80,14 +80,21 @@ export function AdminBooksSearch({
             styles={filterSelectStyles}
           />
 
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             onClick={() => onIsMineChange(!isMine)}
-            className="flex h-9 w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onIsMineChange(!isMine);
+              }
+            }}
+            className="flex h-9 w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
           >
-            <Checkbox checked={isMine} className="h-4 w-4" />
+            <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none h-4 w-4" />
             <span className="font-normal">My series</span>
-          </button>
+          </div>
 
           {hasActiveFilters ? (
             <button

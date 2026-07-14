@@ -27,14 +27,14 @@ import {
   useAddInstitutionMutation,
   useUpdateInstitutionMutation,
 } from '@/store/rtkQueries/institutionApi';
-import type { IInstitution, ReAccessPricingType } from '@/types/institution';
+import type { IAllInstitutionsDataEntity } from '@/types/institution';
 import toast from '@/utils/toast';
 import { institutionSchema } from '@/utils/formValidation';
 
 export function AddEditInstitutionModal() {
   const dispatch = useDispatch();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-  const institution: IInstitution | null = data?.institution ?? null;
+  const institution: IAllInstitutionsDataEntity | null = data?.institution ?? null;
   const isEdit = !!institution;
 
   const [addInstitution, { isLoading: isAdding }] = useAddInstitutionMutation();
@@ -46,28 +46,42 @@ export function AddEditInstitutionModal() {
     enableReinitialize: true,
     initialValues: {
       name: institution?.name ?? '',
-      country: institution?.country ?? 'Kenya',
       contact_email: institution?.contact_email ?? '',
-      email_domains: institution?.email_domains?.map((d) => d.domain).join(', ') ?? '',
-      promotional_start_date: institution?.promotional_access?.start_date?.substring(0, 10) ?? '',
-      promotional_end_date: institution?.promotional_access?.end_date?.substring(0, 10) ?? '',
-      re_access_type: institution?.re_access_pricing?.type ?? 'market',
-      re_access_discount: institution?.re_access_pricing?.discount_percentage ?? 0,
+      domains: institution?.domains?.join(', ') ?? '',
+      promo_start: institution?.promo_start?.substring(0, 10) ?? '',
+      promo_end: institution?.promo_end?.substring(0, 10) ?? '',
+      status: institution?.status ?? 'Active',
+      books_pricing_type: institution?.books_pricing_type ?? 'Market Price',
+      discount_percentage: institution?.discount_percentage ?? 0,
     },
     validationSchema: institutionSchema,
     onSubmit: async (formValues) => {
+      const payload = {
+        name: formValues.name.trim(),
+        domains: formValues.domains
+          .split(',')
+          .map((domain) => domain.trim())
+          .filter(Boolean),
+        promo_start: formValues.promo_start,
+        promo_end: formValues.promo_end,
+        status: formValues.status,
+        contact_email: formValues.contact_email.trim(),
+        books_pricing_type: formValues.books_pricing_type,
+        discount_percentage:
+          formValues.books_pricing_type === 'Discounted Price' ? Number(formValues.discount_percentage) : 0,
+      };
 
       try {
         if (isEdit) {
-          await updateInstitution({ id: institution!._id, values: formValues }).unwrap();
+          await updateInstitution({ id: institution!._id, values: payload }).unwrap();
           toast.success('Institution updated');
         } else {
-          await addInstitution(formValues).unwrap();
+          await addInstitution(payload).unwrap();
           toast.success('Institution added');
         }
         onClose();
-      } catch {
-        // handled by RTK layer
+      } catch(error) {
+        console.error('Failed to add/update institution', error);
       }
     },
   });
@@ -104,51 +118,38 @@ export function AddEditInstitutionModal() {
                 {touched.name && errors.name ? <p className="text-sm text-red-600">{errors.name}</p> : null}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="contact_email">
+                  Contact Email <span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="country"
-                  name="country"
-                  value={values.country}
+                  id="contact_email"
+                  name="contact_email"
+                  type="email"
+                  value={values.contact_email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="e.g. Kenya"
+                  placeholder="teamtaaluma@taaluma.world"
                 />
-                {touched.country && errors.country ? <p className="text-sm text-red-600">{errors.country}</p> : null}
+                {touched.contact_email && errors.contact_email ? (
+                  <p className="text-sm text-red-600">{errors.contact_email}</p>
+                ) : null}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contact_email">
-                Contact Email <span className="text-red-500">*</span>
+              <Label htmlFor="domains">
+                Email Domains <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="contact_email"
-                name="contact_email"
-                type="email"
-                value={values.contact_email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="partnerships@university.ac.ke"
-              />
-              {touched.contact_email && errors.contact_email ? (
-                <p className="text-sm text-red-600">{errors.contact_email}</p>
-              ) : null}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email_domains">
-                Institutional Email Domains <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email_domains"
-                name="email_domains"
-                value={values.email_domains}
+                id="domains"
+                name="domains"
+                value={values.domains}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="students.uonbi.ac.ke, uonbi.ac.ke"
               />
-              {touched.email_domains && errors.email_domains ? (
-                <p className="text-sm text-red-600">{errors.email_domains}</p>
+              {touched.domains && errors.domains ? (
+                <p className="text-sm text-red-600">{errors.domains}</p>
               ) : null}
               <p className="text-xs text-slate-500">Comma-separated. Domain matching is case-insensitive.</p>
             </div>
@@ -159,36 +160,36 @@ export function AddEditInstitutionModal() {
               </Label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="promotional_start_date" className="text-xs text-slate-500">
+                  <Label htmlFor="promo_start" className="text-xs text-slate-500">
                     Start Date <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="promotional_start_date"
-                    name="promotional_start_date"
+                    id="promo_start"
+                    name="promo_start"
                     type="date"
-                    value={values.promotional_start_date}
+                    value={values.promo_start}
                     onChange={handleChange}
                     onBlur={handleBlur}
                   />
-                  {touched.promotional_start_date && errors.promotional_start_date ? (
-                    <p className="text-sm text-red-600">{errors.promotional_start_date}</p>
+                  {touched.promo_start && errors.promo_start ? (
+                    <p className="text-sm text-red-600">{errors.promo_start}</p>
                   ) : null}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="promotional_end_date" className="text-xs text-slate-500">
+                  <Label htmlFor="promo_end" className="text-xs text-slate-500">
                     End Date <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="promotional_end_date"
-                    name="promotional_end_date"
+                    id="promo_end"
+                    name="promo_end"
                     type="date"
-                    value={values.promotional_end_date}
+                    value={values.promo_end}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    min={values.promotional_start_date}
+                    min={values.promo_start}
                   />
-                  {touched.promotional_end_date && errors.promotional_end_date ? (
-                    <p className="text-sm text-red-600">{errors.promotional_end_date}</p>
+                  {touched.promo_end && errors.promo_end ? (
+                    <p className="text-sm text-red-600">{errors.promo_end}</p>
                   ) : null}
                 </div>
               </div>
@@ -197,50 +198,66 @@ export function AddEditInstitutionModal() {
               </p>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={values.status}
+                onValueChange={(v) => setFieldValue('status', v)}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-3">
-              <Label>Re-Access Pricing (after expiry)</Label>
+              <Label>Books Pricing (after promo expiry)</Label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="re_access_type" className="text-xs text-slate-500">
+                  <Label htmlFor="books_pricing_type" className="text-xs text-slate-500">
                     Pricing Type
                   </Label>
                   <Select
-                    value={values.re_access_type}
-                    onValueChange={(v) => setFieldValue('re_access_type', v as ReAccessPricingType)}
+                    value={values.books_pricing_type}
+                    onValueChange={(v) => setFieldValue('books_pricing_type', v)}
                   >
-                    <SelectTrigger id="re_access_type">
+                    <SelectTrigger id="books_pricing_type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="market">Market Price</SelectItem>
-                      <SelectItem value="discounted">Discounted Price</SelectItem>
+                      <SelectItem value="Market Price">Market Price</SelectItem>
+                      <SelectItem value="Discounted Price">Discounted Price</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                {values.re_access_type === 'discounted' ? (
+                {values.books_pricing_type === 'Discounted Price' ? (
                   <div className="space-y-2">
-                    <Label htmlFor="re_access_discount" className="text-xs text-slate-500">
+                    <Label htmlFor="discount_percentage" className="text-xs text-slate-500">
                       Discount Percentage
                     </Label>
                     <Input
-                      id="re_access_discount"
-                      name="re_access_discount"
+                      id="discount_percentage"
+                      name="discount_percentage"
                       type="number"
                       min={1}
                       max={100}
-                      value={values.re_access_discount}
+                      value={values.discount_percentage}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="e.g. 30"
                     />
-                    {touched.re_access_discount && errors.re_access_discount ? (
-                      <p className="text-sm text-red-600">{errors.re_access_discount}</p>
+                    {touched.discount_percentage && errors.discount_percentage ? (
+                      <p className="text-sm text-red-600">{errors.discount_percentage}</p>
                     ) : null}
                   </div>
                 ) : null}
               </div>
               <p className="text-xs text-slate-500">
-                Upon expiry, users lose free access but can re-access content at this price.
+                Upon promo expiry, users lose free access but can re-access books at this price.
               </p>
             </div>
           </div>

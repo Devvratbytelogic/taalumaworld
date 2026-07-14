@@ -125,7 +125,7 @@ export function InstitutionRegistryTab() {
         setUpdatingId(id);
         try {
             await updateInstitution({ id, values: { status: newStatus } }).unwrap();
-            toast.success(newStatus === 'suspended' ? 'Institution suspended' : 'Institution activated');
+            toast.success(newStatus === 'Inactive' ? 'Institution deactivated' : 'Institution activated');
         } catch {
             console.error('Failed to update institution status');
         } finally {
@@ -201,7 +201,7 @@ export function InstitutionRegistryTab() {
             sortable: false,
             renderCell: (params) => {
                 const institution = params.row;
-                const config = STATUS_CONFIG[institution.status] ?? STATUS_CONFIG.active;
+                const config = STATUS_CONFIG[institution.status] ?? STATUS_CONFIG.Active;
 
                 return (
                     <DropdownMenu>

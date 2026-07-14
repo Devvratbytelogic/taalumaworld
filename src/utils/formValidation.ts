@@ -386,20 +386,20 @@ export const mentorConversionApplicationSchema = Yup.object({
 // Add / Edit Institution Modal Validation Schema
 export const institutionSchema = Yup.object({
   name: Yup.string().trim().required('Institution name is required'),
-  country: Yup.string().trim().required('Country is required'),
   contact_email: emailRules.label('Contact email'),
-  email_domains: Yup.string().trim().required('At least one email domain is required'),
-  promotional_start_date: Yup.string().required('Start date is required'),
-  promotional_end_date: Yup.string()
+  domains: Yup.string().trim().required('At least one email domain is required'),
+  promo_start: Yup.string().required('Start date is required'),
+  promo_end: Yup.string()
     .required('End date is required')
     .test('after-start', 'End date must be on or after start date', function (value) {
-      const start = this.parent.promotional_start_date;
+      const start = this.parent.promo_start;
       if (!value || !start) return true;
       return value >= start;
     }),
-  re_access_type: Yup.string().oneOf(['market', 'discounted']),
-  re_access_discount: Yup.number().when('re_access_type', {
-    is: 'discounted',
+  status: Yup.string().oneOf(['Active', 'Inactive']),
+  books_pricing_type: Yup.string().oneOf(['Market Price', 'Discounted Price']),
+  discount_percentage: Yup.number().when('books_pricing_type', {
+    is: 'Discounted Price',
     then: (schema) => schema.min(1, 'Min 1%').max(100, 'Max 100%').required('Discount is required'),
     otherwise: (schema) => schema.optional(),
   }),

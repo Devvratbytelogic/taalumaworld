@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Edit2, FileSignature, RotateCcw, Trash2 } from 'lucide-react';
@@ -54,9 +54,22 @@ export function AdminAgreementTypesTab() {
   const [deleteAgreementType] = useDeleteAgreementTypeMutation();
   const [restoreAgreementType] = useRestoreAgreementTypeMutation();
 
-  useEffect(() => {
-    setPaginationModel((prev) => ({ ...prev, page: 0 }));
-  }, [debouncedSearch, statusFilter, isTrashView]);
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    resetToFirstPage();
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    resetToFirstPage();
+  };
+
+  const handleToggleTrash = () => {
+    setIsTrashView((prev) => !prev);
+    resetToFirstPage();
+  };
 
   const handleSave = async (values: AgreementTypeFormValues, id?: string) => {
     try {
@@ -232,7 +245,7 @@ export function AdminAgreementTypesTab() {
     <div className="space-y-6">
       <AdminAgreementTypesHeader
         isTrashView={isTrashView}
-        onToggleTrash={() => setIsTrashView((prev) => !prev)}
+        onToggleTrash={handleToggleTrash}
         onCreateType={() => {
           setEditingType(null);
           setIsModalOpen(true);
@@ -241,9 +254,9 @@ export function AdminAgreementTypesTab() {
 
       <AdminAgreementTypesSearch
         searchQuery={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         selectedStatus={statusFilter}
-        onStatusChange={setStatusFilter}
+        onStatusChange={handleStatusChange}
       />
 
       <div className="border border-gray-200 rounded-md overflow-hidden">

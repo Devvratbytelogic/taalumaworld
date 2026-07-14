@@ -19,8 +19,10 @@ export interface IAllAgreementsDataEntity {
   slug: string;
   status: string;
   agreementType: AgreementType;
+  version: string;
   is_required: boolean;
   can_block: boolean;
+  isEditable: boolean;
 }
 export interface AgreementType {
   _id: string;
@@ -49,6 +51,7 @@ export interface ISingleAgreementData {
   touchpoints?: (string)[] | null;
   is_required: boolean;
   can_block: boolean;
+  isEditable: boolean;
   deletedAt?: null;
   createdAt: string;
   updatedAt: string;

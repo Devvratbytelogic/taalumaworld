@@ -53,7 +53,7 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Agreements */
-        getAllAgreements: builder.query<IAllAgreementsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; agreement_type_id?: string; touchPoint?: string; userType?: string; isDeleted?: boolean } | void>({
+        getAllAgreements: builder.query<IAllAgreementsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; agreementType?: string } | void>({
             query: (params) => ({
                 url: `/admin/agreements`,
                 method: 'GET',

@@ -443,3 +443,16 @@ export const agreementTypeSchema = Yup.object({
   description: Yup.string().trim().min(2, 'Description is required').required('Description is required'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
 });
+
+// Add / Edit Agreement Modal Validation Schema
+export const agreementSchema = Yup.object({
+  title: Yup.string().trim().min(2, 'Title is required').required('Title is required'),
+  slug: Yup.string().trim().required('Slug is required'),
+  content: Yup.string().trim().required('Agreement content is required'),
+  agreementType: Yup.string().required('Please select an agreement type'),
+  status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
+  visible_to: Yup.array().of(Yup.string().required()).min(1, 'Select at least one user type').required(),
+  touchpoints: Yup.array().of(Yup.string().required()).min(1, 'Select at least one touchpoint').required(),
+  is_required: Yup.boolean(),
+  can_block: Yup.boolean(),
+});

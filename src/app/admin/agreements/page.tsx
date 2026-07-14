@@ -1,7 +1,5 @@
-import React from 'react'
+import { AdminAgreementsTab } from '@/components/admin/agreements/AdminAgreementsTab';
 
 export default function AgreementsPage() {
-  return (
-    <>page</>
-  )
+  return <AdminAgreementsTab />;
 }

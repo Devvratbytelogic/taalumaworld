@@ -1,94 +1,40 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
-import { Save, X, Upload } from 'lucide-react';
+import { Save, X, Upload, FileText } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
 import { addChapterSchema } from '@/utils/formValidation';
+import { appendUserIpToFormData } from '@/utils/clientIp';
 import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
-import { useUpdateChapterMutation } from '@/store/rtkQueries/adminPostApi';
-import {
-  useGetAllBooksQuery,
-  useGetAllAuthorLeadersQuery,
-  useGetAllAdminChaptersQuery,
-} from '@/store/rtkQueries/adminGetApi';
-import type { Book, Author } from '@/types/content';
-import type { IChapter } from '@/types/chapter';
-import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath } from '@/routes/routes';
+import { useUpdateChapterMutation, } from '@/store/rtkQueries/adminPostApi';
+import { useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
+import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
+import ReactSelect from 'react-select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
+import { SELECT_STYLES } from '@/constants/selectStyle';
 
-const initialFormValues = {
-  bookId: '',
-  title: '',
-  slug: '',
-  description: '',
-  content: '',
-  sequence: 1,
-  // page: 1,
-  isFree: false,
-  price: 0 as number | undefined,
-  status: 'Published',
-  cover_image: null as File | string | null,
-  agreeContentOwnership: false,
-  meta_title: '',
-  meta_description: '',
-  og_title: '',
-  og_description: '',
-  og_image: null as File | string | null,
-  json_ld: '',
-};
 
-function getOpenGraphValuesFromChapter(chapter: IChapter) {
-  return {
-    meta_title: chapter.meta_title ?? '',
-    meta_description: chapter.meta_description ?? '',
-    og_title: chapter.og_title ?? '',
-    og_description: chapter.og_description ?? '',
-    og_image: (chapter.og_image ?? null) as File | string | null,
-    json_ld: chapter.json_ld ?? '',
-  };
+
+function slugFromTitle(title: string): string {
+  return title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
-function formValuesFromChapter(chapter: IChapter) {
-  const bookId = chapter.series?.id ?? chapter.series?._id ?? '';
-  const title = chapter.title ?? '';
-  const slug = chapter.slug ?? title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  return {
-    bookId,
-    title,
-    slug,
-    description: chapter.description ?? '',
-    content: chapter.content ?? '',
-    sequence: chapter.number ?? 1,
-    isFree: chapter.isFree ?? false,
-    price: (chapter.price ?? 0) as number | undefined,
-    status: chapter.status ?? 'Published',
-    cover_image: (chapter.coverImage ?? null) as File | string | null,
-    agreeContentOwnership: false,
-    ...getOpenGraphValuesFromChapter(chapter),
-  };
+interface EditChapterFormProps {
+  chapterId: string;
 }
-
-type EditChapterFormProps = { chapterId: string };
-
 export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const router = useRouter();
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
@@ -96,45 +42,42 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const slugManuallyEdited = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
-  const { data: leadersResponse } = useGetAllAuthorLeadersQuery();
-  const { data: chaptersResponse } = useGetAllAdminChaptersQuery();
+  const { data: chapterResponse } = useGetChapterByIdQuery(chapterId);
   const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
 
-  const chapter = useMemo(() => {
-    const list = chaptersResponse?.data?.data ?? [];
-    return list.find((c) => (c.id ?? c._id) === chapterId) ?? null;
-  }, [chaptersResponse?.data?.data, chapterId]);
+  const booksData = booksResponse?.data;
+  const books = booksData?.data ?? [];
+  const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
 
-  const initialValues = useMemo(() => {
-    if (chapter) return formValuesFromChapter(chapter);
-    return initialFormValues;
-  }, [chapter]);
+  const chapterData = chapterResponse?.data;
 
-  const rawBooks = booksResponse?.data?.data ?? [];
-  const leaders = leadersResponse?.data?.leaders ?? [];
-  const books = rawBooks.map((b) => ({
-    ...b,
-    id: b.id ?? b._id,
-    authorId: (b as { thoughtLeader?: { _id?: string; id?: string } }).thoughtLeader?._id ?? (b as { thoughtLeader?: { id?: string } }).thoughtLeader?.id,
-  })) as unknown as Book[];
-  const authors = leaders.map((l: { _id: string; fullName: string }) => ({ id: l._id, name: l.fullName })) as unknown as Author[];
 
-  const {
-    values,
-    errors,
-    touched,
-    isSubmitting,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setFieldValue,
-    setFieldTouched,
-  } = useFormik({
-    initialValues,
-    enableReinitialize: true,
+  const initialFormValues = {
+    bookId: chapterData?.series?.id ?? '',
+    title: chapterData?.title ?? '',
+    slug: chapterData?.slug ?? '',
+    description: chapterData?.description ?? '',
+    content: chapterData?.content ?? '',
+    sequence: chapterData?.number ?? 1,
+    isFree: chapterData?.isFree ?? false,
+    price: chapterData?.price ?? 0 as number | undefined,
+    status: chapterData?.status ?? 'Published',
+    cover_image: chapterData?.coverImage ?? null as File | null,
+    agreeContentOwnership: false,
+    meta_title: chapterData?.meta_title ?? '',
+    meta_description: chapterData?.meta_description ?? '',
+    og_title: chapterData?.og_title ?? '',
+    og_description: chapterData?.og_description ?? '',
+    og_image: chapterData?.og_image ?? null as File | null,
+    json_ld: chapterData?.json_ld ?? '',
+  };
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
+    initialValues: initialFormValues,
     validationSchema: addChapterSchema,
+    enableReinitialize: true,
     onSubmit: async (vals) => {
       const formData = new FormData();
       formData.append('book', vals.bookId);
@@ -148,9 +91,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       }
       formData.append('status', vals.status);
       // formData.append('page', String(vals.page ?? 1));
-      if (featuredImageFile) {
-        formData.append('cover_image', featuredImageFile);
-      }
+      if (featuredImageFile) formData.append('cover_image', featuredImageFile);
       if (pdfFile) {
         formData.append('pdf_file', pdfFile);
       }
@@ -162,24 +103,23 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (vals.json_ld) formData.append('json_ld', vals.json_ld);
       formData.append('slug', vals.slug);
       const baseUrl = APP_SITE_URL.replace(/\/$/, '');
-      formData.append('shareable_link', `${baseUrl}/${getUserId() ?? ''}/${getUserRole() ?? ''}/${vals.slug}`);
+      formData.append('shareable_link', `${baseUrl}${getReadChapterRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
+      await appendUserIpToFormData(formData);
       try {
-        await updateChapter({ id: chapterId, values: formData }).unwrap();
-        if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
-        if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
+        const res = await updateChapter({ id: chapterId, values: formData }).unwrap();
+        if (featuredImageFile && featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+        if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
         setFeaturedImageFile(null);
         setFeaturedImagePreviewUrl(null);
         setOgImageFile(null);
         setOgImagePreviewUrl(null);
         setPdfFile(null);
+        resetForm({ values: initialFormValues });
+        slugManuallyEdited.current = false;
         toast.success('Blueprint updated successfully');
-        router.push(`/admin/chapters`);
-      } catch (err: unknown) {
-        const message =
-          (err as { data?: { message?: string }; message?: string })?.data?.message ||
-          (err as { message?: string })?.message ||
-          'Failed to update blueprint';
-        toast.error(message);
+        router.push(getAdminSectionRoutePath('chapters'));
+      } catch (err) {
+        console.error('error during update chapter', err);
       }
     },
   });
@@ -189,20 +129,18 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const chapterPricingEnabled = pricingModel === 'chapter';
 
   useEffect(() => {
-    if (chapter) {
-      const existingOgImage = chapter.og_image ?? null;
-      if (!ogImageFile) {
-        setOgImagePreviewUrl(existingOgImage);
-      }
-    }
-  }, [chapter, ogImageFile]);
+    if (!chapterData) return;
+    if (!featuredImageFile) setFeaturedImagePreviewUrl(chapterData.coverImage || null);
+    if (!ogImageFile) setOgImagePreviewUrl(chapterData.og_image || null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterData]);
 
   useEffect(() => {
     return () => {
-      if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
-      if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
+      if (featuredImageFile && featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+      if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     };
-  }, [featuredImagePreviewUrl, ogImagePreviewUrl, ogImageFile]);
+  }, [featuredImageFile, featuredImagePreviewUrl, ogImageFile, ogImagePreviewUrl]);
 
   const handleFeaturedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -241,11 +179,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   };
 
   const clearFeaturedImage = () => {
-    if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+    if (featuredImageFile && featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
     setFeaturedImageFile(null);
-    setFeaturedImagePreviewUrl(null);
-    // Revert to the existing server URL if available so validation stays satisfied
-    setFieldValue('cover_image', existingCoverUrl ?? null);
+    const existingCoverImage = chapterData?.coverImage || null;
+    setFeaturedImagePreviewUrl(existingCoverImage);
+    setFieldValue('cover_image', existingCoverImage);
     setFieldTouched('cover_image', true);
   };
 
@@ -260,7 +198,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         toast.error('Image must be less than 2MB');
         return;
       }
-      if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
+      if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       setOgImageFile(file);
       setOgImagePreviewUrl(URL.createObjectURL(file));
       setFieldValue('og_image', file);
@@ -270,9 +208,9 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   };
 
   const clearOgImage = () => {
-    if (ogImagePreviewUrl && ogImageFile) URL.revokeObjectURL(ogImagePreviewUrl);
+    if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
-    const existingOgImage = chapter?.og_image ?? null;
+    const existingOgImage = chapterData?.og_image || null;
     setOgImagePreviewUrl(existingOgImage);
     setFieldValue('og_image', existingOgImage);
     setFieldTouched('og_image', true);
@@ -281,19 +219,22 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const clearPdf = () => setPdfFile(null);
 
   const isSubmittingState = isSubmitting || isUpdating;
-  const existingCoverUrl = chapter?.coverImage ?? null;
-  const showCoverPreview = featuredImagePreviewUrl ?? (existingCoverUrl && !featuredImageFile ? existingCoverUrl : null);
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
-      <div className="space-y-2">
+      <div className="space-y-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Series <span className="text-red-500">*</span></Label>
-            <Select
-              value={values.bookId || undefined}
-              onValueChange={(value) => {
-                setFieldValue('bookId', value ?? '');
+            <ReactSelect
+              inputId="chapter-series"
+              name="bookId"
+              classNamePrefix="react-select"
+              options={bookOptions}
+              value={bookOptions?.find((o) => o.value === values.bookId) ?? null}
+              onChange={(option) => {
+                const value = option?.value ?? '';
+                setFieldValue('bookId', value);
                 setFieldTouched('bookId', true);
                 const book = books.find((b) => b.id === value);
                 const model = book?.pricingModel ?? (book as { type?: string })?.type ?? 'chapter';
@@ -302,19 +243,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                   setFieldValue('price', 0);
                 }
               }}
-              disabled={books.length === 0}
-            >
-              <SelectTrigger className={errors.bookId && touched.bookId ? 'border-red-500' : undefined}>
-                <SelectValue placeholder={books.length === 0 ? 'No series available' : 'Select series'} />
-              </SelectTrigger>
-              <SelectContent>
-                {books.map((book) => (
-                  <SelectItem key={book.id} value={book.id}>
-                    {book.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onBlur={() => setFieldTouched('bookId', true)}
+              placeholder={books.length === 0 ? 'No series available' : 'Select series'}
+              isDisabled={books.length === 0 || isSubmittingState}
+              menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+              menuPosition="fixed"
+              styles={SELECT_STYLES}
+            />
             {books.length === 0 && (
               <p className="text-sm text-muted-foreground">Create a series first from the Admin Series section.</p>
             )}
@@ -332,8 +267,9 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               value={values.title}
               onChange={(e) => {
                 handleChange(e);
-                const slug = e.target.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                setFieldValue('slug', slug);
+                if (!slugManuallyEdited.current) {
+                  setFieldValue('slug', slugFromTitle(e.target.value));
+                }
               }}
               onBlur={handleBlur}
               disabled={isSubmittingState}
@@ -351,10 +287,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             id="chapter-slug"
             name="slug"
             value={values.slug}
-            readOnly
-            disabled
-            placeholder="Auto-generated from title"
-            
+            onChange={(e) => {
+              slugManuallyEdited.current = true;
+              setFieldValue('slug', slugFromTitle(e.target.value));
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmittingState}
+            placeholder="e.g., introduction-to-leadership"
           />
         </div>
 
@@ -369,7 +308,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             onBlur={handleBlur}
             disabled={isSubmittingState}
             rows={3}
-           
+
           />
         </div>
 
@@ -405,6 +344,17 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               </Button>
             ) : null}
           </div>
+          {!pdfFile && chapterData?.pdf ? (
+            <Link
+              href={chapterData.pdf}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              <FileText className="h-4 w-4 shrink-0 text-red-500" />
+              <span className="truncate">Current PDF</span>
+            </Link>
+          ) : null}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -498,18 +448,18 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                 className="sr-only"
               />
               <span className="truncate">
-                {featuredImageFile ? featuredImageFile.name : existingCoverUrl ? 'Replace cover image (optional)...' : 'Select cover image...'}
+                {featuredImageFile ? featuredImageFile.name : featuredImagePreviewUrl ? 'Replace cover image...' : 'Select cover image...'}
               </span>
             </label>
             {errors.cover_image && touched.cover_image && (
               <p className="text-sm text-red-600">{errors.cover_image as string}</p>
             )}
           </div>
-          {showCoverPreview ? (
+          {featuredImagePreviewUrl ? (
             <div className="relative inline-block">
               <div className="image-preview">
                 <img
-                  src={showCoverPreview}
+                  src={featuredImagePreviewUrl}
                   alt="Blueprint preview"
                   className="w-full h-full object-cover"
                 />
@@ -528,10 +478,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <span className="px-3 text-center text-sm text-slate-400">Preview</span>
             </div>
           )}
+
         </div>
 
         <OpenGraphFieldsSection
-          idPrefix="edit-chapter"
+          idPrefix="chapter"
           values={{
             meta_title: values.meta_title,
             meta_description: values.meta_description,
@@ -561,6 +512,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         onCheckedChange={(checked) => setFieldValue('agreeContentOwnership', checked)}
         onBlur={() => setFieldTouched('agreeContentOwnership', true)}
         disabled={isSubmittingState}
+
       >
         I own or have rights to this content · No third-party infringement · I understand Taaluma may remove
         non-compliant content. See the{' '}
@@ -579,7 +531,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           type="submit"
           className="global_btn rounded_full bg_primary"
           startContent={<Save className="h-4 w-4" />}
-          isDisabled={isSubmittingState || books.length === 0 || !chapter}
+          isDisabled={isSubmittingState || books.length === 0}
           isLoading={isSubmittingState}
         >
           Update Blueprint

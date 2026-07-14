@@ -12,6 +12,7 @@ import { IAllTransactionsAPIResponse } from '@/types/transaction';
 import { IAllContactusDataAPIResponse } from '@/types/contactData';
 import { IAllSubscribersAPIResponse } from '@/types/subscribers';
 import { IAllOrdersAPIResponse } from '@/types/order';
+import { ISingleChapterAPIResponse } from '@/types/singleChapter';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -51,6 +52,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 url: `/admin/blueprints`,
                 method: 'GET',
                 params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminChapters'],
+        }),
+        getChapterById: builder.query<ISingleChapterAPIResponse, string>({
+            query: (id) => ({
+                url: `/admin/blueprints/${id}`,
+                method: 'GET',
             }),
             providesTags: ['AdminChapters'],
         }),
@@ -157,6 +165,7 @@ export const {
     useGetAllAuthorLeadersQuery,
     useGetAllBooksQuery,
     useGetAllAdminChaptersQuery,
+    useGetChapterByIdQuery,
     useGetAdminGlobalSettingsQuery,
     useGetAllUsersQuery,
     useGetAllTestimonialsQuery,

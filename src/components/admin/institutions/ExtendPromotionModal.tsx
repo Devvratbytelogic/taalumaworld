@@ -16,8 +16,8 @@ import {
 } from '@/components/ui/dialog';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import { useExtendPromotionalPeriodMutation } from '@/store/rtkQueries/institutionApi';
-import type { IInstitution } from '@/types/institution';
+// import { useExtendPromotionalPeriodMutation } from '@/store/rtkQueries/institutionApi';
+// import type { IInstitution } from '@/types/institution';
 import toast from '@/utils/toast';
 import { extendPromotionSchema } from '@/utils/formValidation';
 

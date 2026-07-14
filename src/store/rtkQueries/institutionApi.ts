@@ -1,141 +1,146 @@
+import { IAllInstitutionsAPIResponse, IInstituteMessageAPIResponse, IInstitutionAccessAPIResponse, ISingleInstitutionAPIResponse } from '@/types/institution';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
-import type { IAllInstitutionsAPIResponse } from '@/types/institution';
-import { ISingleInstitutionAPIResponse } from '@/types/singleInstitution';
-import {
-    DUMMY_USAGE_REPORT,
-    DUMMY_REGISTRATION_PROMPT,
-    DUMMY_MUTATION_SUCCESS,
-} from '@/app/admin/institutions/dummydata';
 
 export const institutionApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
-
-        // ── GET endpoints ──────────────────────────────────────────────────────
-        /** List all partner institutions */
-        getAllInstitutions: builder.query<IAllInstitutionsAPIResponse, { search?: string; page?: number; limit?: number; status?: string; isDeleted?: boolean }>({
+        /** Institutions */
+        getAllInstitutions: builder.query<IAllInstitutionsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; isDeleted?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/institutions`,
                 method: 'GET',
-                params: params ?? {},
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminInstitutions'],
         }),
-
-        /** Single institution details */
         getInstitutionById: builder.query<ISingleInstitutionAPIResponse, string>({
             query: (id) => ({
                 url: `/admin/institutions/${id}`,
                 method: 'GET',
             }),
-            providesTags: (_result, _err, id) => [{ type: 'AdminInstitutions', id }],
+            providesTags: ['AdminInstitutions'],
         }),
-
-        /** Usage / analytics report for all institutions */
-        getInstitutionUsageReport: builder.query<any, void>({
-            // query: () => ({ url: `/admin/institutions/usage-report`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_USAGE_REPORT }),
-            providesTags: ['AdminInstitutionUsage'],
-        }),
-
-        /** Registration prompt settings */
-        getRegistrationPromptSettings: builder.query<any, void>({
-            // query: () => ({ url: `/admin/institutions/registration-prompt`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_REGISTRATION_PROMPT }),
-            providesTags: ['AdminRegistrationPrompt'],
-        }),
-
-        // ── Mutation endpoints ──────────────────────────────────────────────────
-
-        /** Create a new institution */
         addInstitution: builder.mutation({
             query: (payload) => ({
                 url: `/admin/institutions`,
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags: ['AdminInstitutions', 'AdminInstitutionUsage'],
+            invalidatesTags: ['AdminInstitutions'],
         }),
-
-        /** Update institution details */
         updateInstitution: builder.mutation({
-            // query: ({ id, values }: { id: string; values: Record<string, unknown> }) => ({ url: `/admin/institutions/${id}`, method: 'PUT', body: values }),
             query: ({ id, values }) => ({
                 url: `/admin/institutions/${id}`,
                 method: 'PUT',
                 body: values,
             }),
-            invalidatesTags: ['AdminInstitutions', 'AdminInstitutionUsage'],
-        }),
-
-        /** Suspend an institution (pause promotional access) */
-        suspendInstitution: builder.mutation({
-            query: ({ id }) => ({
-                url: `/admin/institutions/${id}/suspend`,
-                method: 'PUT',
-            }),
             invalidatesTags: ['AdminInstitutions'],
         }),
-
-        /** Restore a suspended institution */
-        restoreInstitution: builder.mutation({
-            query: ({ id }) => (
-                {
-                    url: `/admin/institutions/restore/${id}`,
-                    method: 'PUT',
-                }),
-            invalidatesTags: ['AdminInstitutions'],
-        }),
-
-        /** Delete an institution (hard delete) */
         deleteInstitution: builder.mutation({
             query: ({ id }) => ({
                 url: `/admin/institutions/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['AdminInstitutions', 'AdminInstitutionUsage'],
+            invalidatesTags: ['AdminInstitutions'],
         }),
-
-        /** Update which blueprints are enabled for an institution */
-        updateInstitutionBlueprintAccess: builder.mutation({
-            // query: ({ id, blueprint_ids }: { id: string; blueprint_ids: string[] }) => ({ url: `/admin/institutions/${id}/blueprints`, method: 'PUT', body: { blueprint_ids } }),
-            queryFn: (_args: { id: string; blueprint_ids: string[] }) => ({
-                data: DUMMY_MUTATION_SUCCESS,
-            }),
-            invalidatesTags: (_result, _err, { id }) => [{ type: 'AdminInstitutions', id }],
-        }),
-
-        /** Extend promotional period for an institution */
-        extendPromotionalPeriod: builder.mutation({
-            // query: ({ id, end_date }: { id: string; end_date: string }) => ({ url: `/admin/institutions/${id}/extend-promotion`, method: 'PUT', body: { end_date } }),
-            queryFn: (_args: { id: string; end_date: string }) => ({
-                data: DUMMY_MUTATION_SUCCESS,
+        restoreInstitution: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/institutions/restore/${id}`,
+                method: 'POST',
             }),
             invalidatesTags: ['AdminInstitutions'],
         }),
 
-        /** Update registration prompt settings */
-        updateRegistrationPrompt: builder.mutation({
-            // query: (payload) => ({ url: `/admin/institutions/registration-prompt`, method: 'PUT', body: payload }),
-            queryFn: (_payload) => ({ data: DUMMY_MUTATION_SUCCESS }),
-            invalidatesTags: ['AdminRegistrationPrompt'],
+        /** Institution Access */
+        getInstitutionAccess: builder.query<IInstitutionAccessAPIResponse, { institutionId: string; search?: string; page?: number; limit?: number }>({
+            query: ({ institutionId, ...params }) => ({
+                url: `/admin/institutions/${institutionId}/access`,
+                method: 'GET',
+                params,
+            }),
+            providesTags: ['AdminInstitutionAccess'],
+        }),
+        addInstitutionAccess: builder.mutation({
+            query: ({ institutionId, values }) => ({
+                url: `/admin/institutions/${institutionId}/access`,
+                method: 'POST',
+                body: values,
+            }),
+            invalidatesTags: ['AdminInstitutionAccess'],
+        }),
+        updateInstitutionAccess: builder.mutation({
+            query: ({ institutionId, accessId, values }) => ({
+                url: `/admin/institutions/${institutionId}/access/${accessId}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminInstitutionAccess'],
+        }),
+        deleteInstitutionAccess: builder.mutation({
+            query: ({ institutionId, accessId }) => ({
+                url: `/admin/institutions/${institutionId}/access/${accessId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['AdminInstitutionAccess'],
+        }),
+
+        /** Bulk book pricing */
+        bulkUpdateBookPricing: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/institutions/bulk-update-book-pricing`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminInstitutions'],
+        }),
+
+        /** Institute Messages */
+        getInstituteMessages: builder.query<IInstituteMessageAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
+                url: `/admin/institute-message`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminInstituteMessages'],
+        }),
+        addInstituteMessage: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/institute-message`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminInstituteMessages'],
+        }),
+        updateInstituteMessage: builder.mutation({
+            query: ({ messageId, values }) => ({
+                url: `/admin/institute-message/${messageId}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminInstituteMessages'],
         }),
     }),
 });
 
 export const {
-    // Queries
+    // Institutions
     useGetAllInstitutionsQuery,
     useGetInstitutionByIdQuery,
-    useGetInstitutionUsageReportQuery,
-    useGetRegistrationPromptSettingsQuery,
-
-    // Mutations
     useAddInstitutionMutation,
     useUpdateInstitutionMutation,
-    useSuspendInstitutionMutation,
-    useRestoreInstitutionMutation,
     useDeleteInstitutionMutation,
-    useUpdateInstitutionBlueprintAccessMutation,
-    useExtendPromotionalPeriodMutation,
-    useUpdateRegistrationPromptMutation,
+    useRestoreInstitutionMutation,
+
+    // Institution Access
+    useGetInstitutionAccessQuery,
+    useAddInstitutionAccessMutation,
+    useUpdateInstitutionAccessMutation,
+    useDeleteInstitutionAccessMutation,
+
+    // Bulk book pricing
+    useBulkUpdateBookPricingMutation,
+
+    // Institute Messages
+    useGetInstituteMessagesQuery,
+    useAddInstituteMessageMutation,
+    useUpdateInstituteMessageMutation,
 } = institutionApi;

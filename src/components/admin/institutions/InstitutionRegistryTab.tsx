@@ -1,81 +1,99 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
 import {
-    Plus, Search, CheckCircle, AlertCircle,
-    XCircle, Edit2, Pause, Play, Trash2, Download,
+    Plus, Search, Edit2, Trash2, RotateCcw, Download, ArrowLeft, ChevronDown, Loader2,
+    Building2, CheckCircle2, Ban,
 } from 'lucide-react';
 import {
     useGetAllInstitutionsQuery,
-    useSuspendInstitutionMutation,
-    useRestoreInstitutionMutation,
+    useUpdateInstitutionMutation,
     useDeleteInstitutionMutation,
+    useRestoreInstitutionMutation,
 } from '@/store/rtkQueries/institutionApi';
-import { openModal } from '@/store/slices/allModalSlice';
-import type { IInstitution } from '@/types/institution';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import type { IAllInstitutionsDataEntity } from '@/types/institution';
 import toast from '@/utils/toast';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useDebounce } from '@/hooks/useDebounce';
+import { AdminStatCard } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '../CommonDataTable';
 import moment from 'moment';
+
+const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
+    Active: {
+        badge: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+        dot: 'bg-green-500',
+        label: 'Active',
+    },
+    Inactive: {
+        badge: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+        dot: 'bg-amber-500',
+        label: 'Inactive',
+    },
+};
+
+const STATUSES = ['Active', 'Inactive'] as const;
 
 function daysUntil(iso?: string) {
     if (!iso) return null;
     return Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
 }
 
-function StatusBadge({ status }: { status: string }) {
-    if (status === 'active') {
-        return (
-            <Badge className="bg-green-100 text-green-700 border-green-200 gap-1 capitalize whitespace-nowrap">
-                <CheckCircle className="h-3 w-3 shrink-0" /> Active
-            </Badge>
-        );
-    }
-    if (status === 'suspended') {
-        return (
-            <Badge className="bg-amber-100 text-amber-700 border-amber-200 gap-1 capitalize whitespace-nowrap">
-                <AlertCircle className="h-3 w-3 shrink-0" /> Suspended
-            </Badge>
-        );
-    }
-    return (
-        <Badge variant="secondary" className="gap-1 capitalize whitespace-nowrap">
-            <XCircle className="h-3 w-3 shrink-0" /> {status}
-        </Badge>
-    );
-}
-
 export function InstitutionRegistryTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
-    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [status, setStatus] = useState('');
-    const [isDeleted, setIsDeleted] = useState(false);
+    const [isTrashView, setIsTrashView] = useState(false);
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
     const debouncedSearch = useDebounce(search, 500);
 
     const { data: response, isLoading } = useGetAllInstitutionsQuery({
-        search: debouncedSearch,
-        status,
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
-        isDeleted,
+        ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+        ...(status ? { status } : {}),
+        ...(isTrashView ? { isDeleted: true } : {}),
     });
 
-    const [suspendInstitution] = useSuspendInstitutionMutation();
-    const [restoreInstitution] = useRestoreInstitutionMutation();
+    const [updateInstitution] = useUpdateInstitutionMutation();
     const [deleteInstitution] = useDeleteInstitutionMutation();
+    const [restoreInstitution] = useRestoreInstitutionMutation();
 
     const institutions = response?.data?.data ?? [];
     const totalInstitutions = response?.data?.total ?? 0;
+    const totalActive = response?.data?.active ?? 0;
+    const totalInactive = response?.data?.inactive ?? 0;
 
-    useEffect(() => {
-        setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    }, [debouncedSearch, status, isDeleted]);
+    const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        resetToFirstPage();
+    };
+
+    const handleStatusChange = (value: string) => {
+        setStatus(value);
+        resetToFirstPage();
+    };
+
+    const handleToggleTrash = () => {
+        setIsTrashView((prev) => !prev);
+        resetToFirstPage();
+    };
 
     const handleExportCSV = () => {
         const rows = [
@@ -100,9 +118,44 @@ export function InstitutionRegistryTab() {
         URL.revokeObjectURL(url);
     };
 
-    const activeCount = institutions.filter((i) => i.status === 'active').length;
+    const onInstitutionStatusChange = async (institution: IAllInstitutionsDataEntity, newStatus: string) => {
+        const id = institution._id;
+        if (!id || newStatus === institution.status || updatingId) return;
 
-    const columns: GridColDef<IInstitution>[] = [
+        setUpdatingId(id);
+        try {
+            await updateInstitution({ id, values: { status: newStatus } }).unwrap();
+            toast.success(newStatus === 'suspended' ? 'Institution suspended' : 'Institution activated');
+        } catch {
+            console.error('Failed to update institution status');
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
+    const onDeleteInstitution = async (id: string) => {
+        try {
+            await deleteInstitution({ id }).unwrap();
+            toast.success('Institution deleted successfully');
+            dispatch(closeModal());
+        } catch {
+            console.error('Failed to delete institution');
+        }
+    };
+
+    const onRestoreInstitution = async (id: string) => {
+        try {
+            await restoreInstitution({ id }).unwrap();
+            toast.success('Institution restored successfully');
+            dispatch(closeModal());
+        } catch {
+            console.error('Failed to restore institution');
+        }
+    };
+
+    
+
+    const columns: GridColDef[] = [
         {
             field: 'index',
             headerName: '#',
@@ -133,9 +186,9 @@ export function InstitutionRegistryTab() {
             sortable: false,
             renderCell: (params) => (
                 <div className="flex flex-col gap-0.5">
-                    {(params.row.domains ?? []).map((domain) => (
+                    {(params.row.domains ?? []).map((domain: string) => (
                         <code key={domain} className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">
-                            @{domain}
+                            {domain}
                         </code>
                     ))}
                 </div>
@@ -144,9 +197,53 @@ export function InstitutionRegistryTab() {
         {
             field: 'status',
             headerName: 'Status',
-            width: 130,
+            width: 150,
             sortable: false,
-            renderCell: (params) => <StatusBadge status={params.value} />,
+            renderCell: (params) => {
+                const institution = params.row;
+                const config = STATUS_CONFIG[institution.status] ?? STATUS_CONFIG.active;
+
+                return (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild disabled={!!updatingId}>
+                            <button type="button" className="focus:outline-none">
+                                <Badge
+                                    variant="outline"
+                                    className={`cursor-pointer select-none transition-colors flex items-center gap-1.5 ${config.badge}`}
+                                >
+                                    {updatingId === institution._id ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                        <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+                                    )}
+                                    {config.label}
+                                    <ChevronDown className="h-3 w-3 opacity-60" />
+                                </Badge>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-40">
+                            <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
+                                Change status
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {STATUSES.map((s) => (
+                                <DropdownMenuItem
+                                    key={s}
+                                    onSelect={() => onInstitutionStatusChange(institution, s)}
+                                    className="flex items-center gap-2"
+                                    disabled={institution.status === s}
+                                >
+                                    <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[s]?.dot}`} />
+                                    {STATUS_CONFIG[s]?.label}
+                                    {institution?.status === s ? (
+                                        <span className="ml-auto text-xs text-muted-foreground">current</span>
+                                    ) : null}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                );
+            },
         },
         {
             field: 'promo_end',
@@ -176,65 +273,62 @@ export function InstitutionRegistryTab() {
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 140,
+            width: 100,
             sortable: false,
             renderCell: (params) => (
                 <div className="action_buttons">
-                    <button
-                        className="edit_button"
-                        onClick={() => dispatch(openModal({
-                            componentName: 'AddEditInstitutionModal',
-                            data: { institution: params.row },
-                        }))}
-                    >
-                        <Edit2 className="h-4 w-4" />
-                    </button>
-                    {params.row.status === 'active' ? (
+                    {isTrashView ? (
                         <button
-                            className="delete_button"
-                            title="Suspend institution"
-                            onClick={async () => {
-                                try {
-                                    await suspendInstitution({ id: params.row._id }).unwrap();
-                                    toast.success('Institution suspended');
-                                } catch {
-                                    toast.error('Failed to suspend institution');
-                                }
-                            }}
-                        >
-                            <Pause className="h-4 w-4" />
-                        </button>
-                    ) : (
-                        <button
+                            type="button"
                             className="active_button"
                             title="Restore institution"
-                            onClick={async () => {
-                                try {
-                                    await restoreInstitution({ id: params.row._id }).unwrap();
-                                    toast.success('Institution restored');
-                                } catch {
-                                    toast.error('Failed to restore institution');
-                                }
-                            }}
-                        >
-                            <Play className="h-4 w-4" />
-                        </button>
-                    )}
-                    <button
-                        className="delete_button"
-                        title="Delete institution"
-                        onClick={async () => {
-                            if (!confirm(`Permanently delete ${params.row.name}? This cannot be undone.`)) return;
-                            try {
-                                await deleteInstitution({ id: params.row._id }).unwrap();
-                                toast.success('Institution deleted');
-                            } catch {
-                                toast.error('Failed to delete institution');
+                            onClick={() =>
+                                dispatch(
+                                    openModal({
+                                        componentName: 'RestoreConfirmation',
+                                        data: {
+                                            itemName: params.row.name,
+                                            onRestore: () => onRestoreInstitution(params.row._id),
+                                        },
+                                    }),
+                                )
                             }
-                        }}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </button>
+                        >
+                            <RotateCcw className="h-4 w-4" />
+                        </button>
+                    ) : (
+                        <>
+                            <button
+                                type="button"
+                                className="edit_button"
+                                title="Edit institution"
+                                onClick={() => dispatch(openModal({
+                                    componentName: 'AddEditInstitutionModal',
+                                    data: { institution: params.row },
+                                }))}
+                            >
+                                <Edit2 className="h-4 w-4" />
+                            </button>
+                            <button
+                                type="button"
+                                className="delete_button"
+                                title="Delete institution"
+                                onClick={() =>
+                                    dispatch(
+                                        openModal({
+                                            componentName: 'DeleteConfirmation',
+                                            data: {
+                                                itemName: params.row.name,
+                                                onDelete: () => onDeleteInstitution(params.row._id),
+                                            },
+                                        }),
+                                    )
+                                }
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        </>
+                    )}
                 </div>
             ),
         },
@@ -242,21 +336,25 @@ export function InstitutionRegistryTab() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-wrap gap-4">
-                <div className="bg-accent rounded-2xl px-5 py-3 text-center">
-                    <p className="text-2xl font-bold text-primary">{totalInstitutions}</p>
-                    <p className="text-xs text-muted-foreground">Total Partners</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-lg font-semibold text-slate-900">Partner Institutions</h2>
+                    <p className="text-sm text-slate-500">Manage registered universities and their access status.</p>
                 </div>
-                <div className="bg-green-50 rounded-2xl px-5 py-3 text-center">
-                    <p className="text-2xl font-bold text-green-600">{activeCount}</p>
-                    <p className="text-xs text-muted-foreground">Active</p>
-                </div>
-                <div className="bg-amber-50 rounded-2xl px-5 py-3 text-center">
-                    <p className="text-2xl font-bold text-amber-600">
-                        {institutions.filter((i) => i.status === 'suspended').length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Suspended</p>
-                </div>
+
+                <Button
+                    className={`global_btn rounded_full ${isTrashView ? 'outline_primary' : 'danger_outline'}`}
+                    onPress={handleToggleTrash}
+                    startContent={isTrashView ? <ArrowLeft className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                >
+                    {isTrashView ? 'Back to institutions' : 'Trash'}
+                </Button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <AdminStatCard label="Total Partners" value={totalInstitutions} icon={Building2} tone="blue" />
+                <AdminStatCard label="Active" value={totalActive} icon={CheckCircle2} tone="green" />
+                <AdminStatCard label="Inactive" value={totalInactive} icon={Ban} tone="orange" />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -265,10 +363,21 @@ export function InstitutionRegistryTab() {
                     <Input
                         placeholder="Search by name, country or domain..."
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         className="pl-10"
                     />
                 </div>
+                {!isTrashView && (
+                    <select
+                        value={status}
+                        onChange={(e) => handleStatusChange(e.target.value)}
+                        className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    >
+                        <option value="">All statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                )}
                 <button
                     onClick={handleExportCSV}
                     disabled={isLoading || institutions.length === 0}
@@ -276,14 +385,16 @@ export function InstitutionRegistryTab() {
                 >
                     <Download className="h-4 w-4" /> Export CSV
                 </button>
-                <Button
-                    color="primary"
-                    className="rounded-xl"
-                    onPress={() => dispatch(openModal({ componentName: 'AddEditInstitutionModal', data: { institution: null } }))}
-                    startContent={<Plus className="h-4 w-4" />}
-                >
-                    Add Institution
-                </Button>
+                {!isTrashView && (
+                    <Button
+                        color="primary"
+                        className="rounded-xl"
+                        onPress={() => dispatch(openModal({ componentName: 'AddEditInstitutionModal', data: { institution: null } }))}
+                        startContent={<Plus className="h-4 w-4" />}
+                    >
+                        Add Institution
+                    </Button>
+                )}
             </div>
 
             <div className="border border-gray-200 rounded-md overflow-hidden">

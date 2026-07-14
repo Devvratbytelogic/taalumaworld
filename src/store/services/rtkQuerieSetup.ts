@@ -184,6 +184,8 @@ export const rtkQuerieSetup = createApi({
         'AdminBlueprintOrders',
         'AdminInstitutions',
         'AdminInstitutionUsage',
+        'AdminInstitutionAccess',
+        'AdminInstituteMessages',
         'AdminRegistrationPrompt',
         'AdminRoles',
         'AdminPermissions',

@@ -16,7 +16,7 @@ import {
 } from '@mdxeditor/editor';
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
-import { useRef, useEffect, useMemo } from 'react';
+import { memo, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/components/ui/utils';
 
 function createEditorPlugins(imageUploadHandler: (file: File) => Promise<string>) {
@@ -59,7 +59,7 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-export function RichTextEditor({
+function RichTextEditorComponent({
   value,
   onChange,
   placeholder = 'Write your blueprint content here...',
@@ -71,6 +71,13 @@ export function RichTextEditor({
   const ref = useRef<MDXEditorMethods>(null);
   const onImageUploadRef = useRef(onImageUpload);
   onImageUploadRef.current = onImageUpload;
+  // Tracks the markdown value last emitted by this editor's own onChange, so
+  // the sync effect below can tell "user typed here" apart from "value changed
+  // externally" (e.g. loading chapter data, resetForm) and only call
+  // setMarkdown for the latter. Calling setMarkdown on every keystroke forces
+  // MDXEditor to fully re-parse and reset its internal editor state, which is
+  // what caused the typing lag / cursor jumps.
+  const lastEmittedValueRef = useRef(value);
 
   const editorPlugins = useMemo(
     () =>
@@ -89,9 +96,10 @@ export function RichTextEditor({
   );
 
   useEffect(() => {
-    if (ref.current && value !== undefined && value !== null) {
+    if (ref.current && value !== undefined && value !== null && value !== lastEmittedValueRef.current) {
       ref.current.setMarkdown(value);
     }
+    lastEmittedValueRef.current = value;
   }, [value]);
 
   return (
@@ -103,7 +111,10 @@ export function RichTextEditor({
       <MDXEditor
         ref={ref}
         markdown={value ?? ''}
-        onChange={(markdown) => onChange(markdown)}
+        onChange={(markdown) => {
+          lastEmittedValueRef.current = markdown;
+          onChange(markdown);
+        }}
         placeholder={placeholder}
         readOnly={disabled}
         plugins={editorPlugins}
@@ -112,3 +123,5 @@ export function RichTextEditor({
     </div>
   );
 }
+
+export const RichTextEditor = memo(RichTextEditorComponent);

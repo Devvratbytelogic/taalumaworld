@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import { Save, X, Upload, FileText } from 'lucide-react';
@@ -132,7 +132,6 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     if (!chapterData) return;
     if (!featuredImageFile) setFeaturedImagePreviewUrl(chapterData.coverImage || null);
     if (!ogImageFile) setOgImagePreviewUrl(chapterData.og_image || null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterData]);
 
   useEffect(() => {
@@ -219,6 +218,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const clearPdf = () => setPdfFile(null);
 
   const isSubmittingState = isSubmitting || isUpdating;
+
+  const handleContentChange = useCallback(
+    (html: string) => setFieldValue('content', html),
+    [setFieldValue]
+  );
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
@@ -316,7 +320,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           <Label>Blueprint content</Label>
           <RichTextEditor
             value={values.content}
-            onChange={(html) => setFieldValue('content', html)}
+            onChange={handleContentChange}
             placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
             disabled={isSubmittingState}
             minHeight="320px"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import { Save, X, Upload } from 'lucide-react';
@@ -214,6 +214,11 @@ export function CreateChapterForm() {
 
   const isSubmittingState = isSubmitting || isAdding;
 
+  const handleContentChange = useCallback(
+    (html: string) => setFieldValue('content', html),
+    [setFieldValue]
+  );
+
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
       <div className="space-y-4">
@@ -310,7 +315,7 @@ export function CreateChapterForm() {
           <Label>Blueprint content</Label>
           <RichTextEditor
             value={values.content}
-            onChange={(html) => setFieldValue('content', html)}
+            onChange={handleContentChange}
             placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
             disabled={isSubmittingState}
             minHeight="320px"

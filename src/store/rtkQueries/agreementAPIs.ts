@@ -1,5 +1,7 @@
+import { IAllAgreementsAPIResponse, IGetAgreementByTouchpointAndUserTypeAPIResponse, IGetUserConsentStatusAPIResponse, ISingleAgreementAPIResponse } from '@/types/agreements';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IAddAgreementTypeAPIResponse, IAllAgreementTypesAPIResponse, } from '@/types/agreementTypes';
+
 
 export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -49,6 +51,70 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminAgreementTypes'],
         }),
+
+        /** Agreements */
+        getAllAgreements: builder.query<IAllAgreementsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; agreement_type_id?: string; touchPoint?: string; userType?: string; isDeleted?: boolean } | void>({
+            query: (params) => ({
+                url: `/admin/agreements`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminAgreements'],
+        }),
+        getAgreementById: builder.query<ISingleAgreementAPIResponse, string>({
+            query: (id) => ({
+                url: `/admin/agreements/${id}`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminAgreements'],
+        }),
+        getAgreementByTouchpointAndUserType: builder.query<IGetAgreementByTouchpointAndUserTypeAPIResponse, { touchPoint: string; userType: string }>({
+            query: ({ touchPoint, userType }) => ({
+                url: `/admin/agreements/by-touchpoint-and-user-type`,
+                method: 'GET',
+                params: { touchPoint, userType },
+            }),
+            providesTags: ['AdminAgreements'],
+        }),
+        addAgreement: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/agreements`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminAgreements'],
+        }),
+        updateAgreement: builder.mutation({
+            query: ({ agreementId, values }) => ({
+                url: `/admin/agreements/${agreementId}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminAgreements'],
+        }),
+        acceptAgreement: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/agreements/accept`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus'],
+        }),
+        acceptAllAgreements: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/agreements/accept-all`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus'],
+        }),
+        getUserConsentStatus: builder.query<IGetUserConsentStatusAPIResponse, { userType: string }>({
+            query: (userType) => ({
+                url: `/admin/agreements/user-consent-status/${userType}`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminUserConsentStatus'],
+        }),
     }),
 });
 
@@ -60,4 +126,14 @@ export const {
     useUpdateAgreementTypeMutation,
     useDeleteAgreementTypeMutation,
     useRestoreAgreementTypeMutation,
+
+    // Agreements
+    useGetAllAgreementsQuery,
+    useGetAgreementByIdQuery,
+    useGetAgreementByTouchpointAndUserTypeQuery,
+    useAddAgreementMutation,
+    useUpdateAgreementMutation,
+    useAcceptAgreementMutation,
+    useAcceptAllAgreementsMutation,
+    useGetUserConsentStatusQuery,
 } = agreementAPIs;

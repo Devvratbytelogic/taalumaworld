@@ -188,6 +188,8 @@ export function getAdminSectionRoutePath(section: string): string {
     moderation: '/admin/moderation',
     analytics: '/admin/analytics',
     reports: '/admin/reports',
+    agreements: '/admin/agreements',
+    agreement_types: '/admin/agreements/agreement-types',
   };
   return map[section] ?? '/admin/dashboard';
 }

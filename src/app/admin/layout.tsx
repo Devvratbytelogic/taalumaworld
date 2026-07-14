@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bell, Book, ClipboardList, FileEdit, FileText, FolderTree, GraduationCap, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, UserCircle, Users, Award } from 'lucide-react';
+import { Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, UserCircle, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -39,6 +39,13 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
             { id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
             // { id: 'categories', label: 'Categories', href: getAdminSectionRoutePath('categories'), icon: FolderTree },
+        ],
+    },
+    {
+        title: 'Legal',
+        items: [
+            { id: 'agreement_types', label: 'Agreement Types', href: getAdminSectionRoutePath('agreement_types'), icon: FolderTree },
+            { id: 'agreements', label: 'Agreements', href: getAdminSectionRoutePath('agreements'), icon: FileSignature },
         ],
     },
     {

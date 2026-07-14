@@ -436,3 +436,10 @@ export const staffSchema = Yup.object({
 export const staffStatusSchema = Yup.object({
   status_reason: Yup.string().trim().required('Reason is required'),
 });
+
+// Add / Edit Agreement Type Modal Validation Schema
+export const agreementTypeSchema = Yup.object({
+  name: Yup.string().trim().min(2, 'Name is required').required('Name is required'),
+  description: Yup.string().trim().min(2, 'Description is required').required('Description is required'),
+  status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
+});

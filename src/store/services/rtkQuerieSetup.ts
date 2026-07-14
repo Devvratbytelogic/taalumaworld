@@ -188,6 +188,7 @@ export const rtkQuerieSetup = createApi({
         'AdminRoles',
         'AdminPermissions',
         'AdminStaff',
+        'AdminAgreementTypes',
     ],
     endpoints: () => ({}),
 });

@@ -1,111 +1,149 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
-import { Search, BookOpen, CheckCircle, XCircle, Save } from 'lucide-react';
-import { useGetAllInstitutionsQuery, useUpdateInstitutionBlueprintAccessMutation } from '@/store/rtkQueries/institutionApi';
+import { Search, BookOpen, CheckCircle, XCircle, Save, X } from 'lucide-react';
+import { useGetAllInstitutionsQuery, useGetInstitutionAccessQuery, useAddInstitutionAccessMutation, useDeleteInstitutionAccessMutation } from '@/store/rtkQueries/institutionApi';
 import { useGetAllAdminChaptersQuery } from '@/store/rtkQueries/adminGetApi';
-import type { IInstitution } from '@/types/institution';
+import type { IAllInstitutionsDataEntity } from '@/types/institution';
+import type { IChapter } from '@/types/chapter';
 import toast from '@/utils/toast';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useDebounce } from '@/hooks/useDebounce';
+import BlueprintAccessSkeleton from '@/components/skeleton-loader/BlueprintAccessSkeleton';
+import { openModal, closeModal } from '@/store/slices/allModalSlice';
 
 export function BlueprintAccessTab() {
+    const dispatch = useDispatch();
     const [selectedInstitutionId, setSelectedInstitutionId] = useState<string>('');
     const [search, setSearch] = useState('');
-    const [localSelected, setLocalSelected] = useState<Set<string>>(new Set());
-    const [isDirty, setIsDirty] = useState(false);
+    const [localSelected, setLocalSelected] = useState<string[]>([]);
+    const debouncedSearch = useDebounce(search, 500);
 
     const { data: instData, isLoading: loadingInst } = useGetAllInstitutionsQuery();
-    const { data: bpData, isLoading: loadingBP } = useGetAllAdminChaptersQuery();
-    const [updateAccess, { isLoading: isSaving }] = useUpdateInstitutionBlueprintAccessMutation();
+    const { data: bpData, isLoading: loadingBP } = useGetAllAdminChaptersQuery({ search: debouncedSearch });
+    const { data: accessData, isFetching: loadingAccess } = useGetInstitutionAccessQuery(
+        { institutionId: selectedInstitutionId },
+        { skip: !selectedInstitutionId }
+    );
+    const [addAccess, { isLoading: isAdding }] = useAddInstitutionAccessMutation();
+    const [deleteAccess] = useDeleteInstitutionAccessMutation();
 
-    const institutions: IInstitution[] = instData?.data ?? [];
-    const blueprints = bpData?.data ?? [];
+    const institutions: IAllInstitutionsDataEntity[] = instData?.data?.data ?? [];
+    const blueprints = bpData?.data?.data ?? [];
+    const accessEntries = accessData?.data?.data ?? [];
 
     const selectedInstitution = institutions.find((i) => i._id === selectedInstitutionId) ?? null;
+    const activeBookIds = accessEntries.map((e) => e.chapter_id);
+    const isDirty =
+        !!selectedInstitution &&
+        (localSelected.length !== activeBookIds.length || !activeBookIds.every((id) => localSelected.includes(id)));
 
-    const handleSelectInstitution = (inst: IInstitution) => {
+    useEffect(() => {
+        if (!selectedInstitutionId || loadingAccess) return;
+        setLocalSelected(accessEntries.map((e) => e.chapter_id));
+    }, [selectedInstitutionId, loadingAccess]);
+
+    const handleSelectInstitution = (inst: IAllInstitutionsDataEntity) => {
         setSelectedInstitutionId(inst._id);
-        setLocalSelected(new Set(inst.blueprint_ids ?? []));
-        setIsDirty(false);
         setSearch('');
     };
 
     const toggleBlueprint = (id: string) => {
-        setLocalSelected((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id); else next.add(id);
-            return next;
-        });
-        setIsDirty(true);
+        setLocalSelected((prev) =>
+            prev.includes(id) ? prev.filter((existingId) => existingId !== id) : [...prev, id]
+        );
     };
 
-    const toggleAll = (ids: string[]) => {
-        const allSelected = ids.every((id) => localSelected.has(id));
-        setLocalSelected((prev) => {
-            const next = new Set(prev);
-            ids.forEach((id) => allSelected ? next.delete(id) : next.add(id));
-            return next;
-        });
-        setIsDirty(true);
+    const handleRemoveAccess = (bp: IChapter) => {
+        if (!selectedInstitution) return;
+        const existing = accessEntries.find((e) => e.chapter_id === bp._id);
+
+        dispatch(
+            openModal({
+                componentName: 'DeleteConfirmation',
+                data: {
+                    itemName: bp.title,
+                    onDelete: async () => {
+                        try {
+                            if (existing) {
+                                await deleteAccess({
+                                    institutionId: selectedInstitution._id,
+                                    accessId: existing._id,
+                                }).unwrap();
+                            }
+                            setLocalSelected((prev) => prev.filter((id) => id !== bp._id));
+                            toast.success('Blueprint access removed');
+                            dispatch(closeModal());
+                        } catch (error) {
+                            console.error('Error removing blueprint access', error);
+                            toast.error('Failed to remove blueprint access');
+                        }
+                    },
+                },
+            })
+        );
     };
 
     const handleSave = async () => {
-        if (!selectedInstitution) return;
+        if (!selectedInstitution || !isDirty) return;
         try {
-            await updateAccess({
-                id: selectedInstitution._id,
-                blueprint_ids: Array.from(localSelected),
+            const res = await addAccess({
+                institutionId: selectedInstitution._id,
+                values: { chapter_ids: localSelected },
             }).unwrap();
-            toast.success('Blueprint access updated');
-            setIsDirty(false);
-        } catch { /* handled by RTK */ }
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success('Blueprint access updated');
+            }
+        } catch (error) {
+            console.error('Error saving blueprint access', error);
+            toast.error('Failed to save blueprint access');
+        }
     };
 
-    const q = search.toLowerCase();
-    const filteredBP = blueprints.filter(
-        (b) =>
-            (b.title ?? '').toLowerCase().includes(q) ||
-            (b.book?.category ?? '').toLowerCase().includes(q)
-    );
+    const isSaving = isAdding;
 
-    const loading = loadingInst || loadingBP;
+    if (loadingInst) {
+        return <BlueprintAccessSkeleton />;
+    }
 
     return (
         <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+            {/* <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
                 <strong>How it works:</strong> Select an institution, then toggle which blueprints are
                 available to its verified students during their promotional period. Granular control
                 is available at both admin and mentor level.
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Institution list */}
                 <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
                     <p className="text-sm font-semibold text-gray-700">Select Institution</p>
-                    {loading ? (
+                    {loadingInst ? (
                         Array.from({ length: 4 }).map((_, i) => (
                             <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />
                         ))
-                    ) : institutions.length === 0 ? (
+                    ) : institutions?.length === 0 ? (
                         <p className="text-sm text-muted-foreground py-4 text-center">
                             No institutions registered yet.
                         </p>
                     ) : (
-                        institutions.map((inst) => (
+                        institutions?.length > 0 && institutions?.map((inst) => (
                             <button
-                                key={inst._id}
+                                key={inst?._id}
+                                type="button"
                                 onClick={() => handleSelectInstitution(inst)}
-                                className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
-                                    selectedInstitutionId === inst._id
-                                        ? 'border-primary bg-primary/5'
-                                        : 'border-gray-200 hover:border-gray-300'
-                                }`}
+                                className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${selectedInstitutionId === inst._id
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                    }`}
                             >
-                                <p className="text-sm font-medium">{inst.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {(inst.blueprint_ids ?? []).length} blueprint(s) enabled
+                                <p className="text-sm font-medium">{inst?.name}</p>
+                                <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                    {selectedInstitutionId === inst?._id
+                                        ? `${localSelected?.length} blueprint(s) enabled`
+                                        : inst?.contact_email}
                                 </p>
                             </button>
                         ))
@@ -125,20 +163,12 @@ export function BlueprintAccessTab() {
                         <>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-semibold">{selectedInstitution.name}</p>
+                                    <p className="font-semibold">{selectedInstitution?.name}</p>
                                     <p className="text-xs text-muted-foreground">
-                                        {localSelected.size} / {blueprints.length} blueprints enabled
+                                        {localSelected?.length} / {blueprints?.length ?? 0} blueprints enabled
                                     </p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button
-                                        onClick={() => toggleAll(filteredBP.map((b) => b._id))}
-                                        className="text-xs text-primary hover:underline"
-                                    >
-                                        {filteredBP.every((b) => localSelected.has(b._id))
-                                            ? 'Deselect all'
-                                            : 'Select all'}
-                                    </button>
                                     {isDirty && (
                                         <Button
                                             size="sm"
@@ -164,48 +194,130 @@ export function BlueprintAccessTab() {
                             </div>
 
                             <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                                {filteredBP.length === 0 ? (
+                                {loadingBP || loadingAccess ? (
+                                    Array.from({ length: 4 }).map((_, i) => (
+                                        <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+                                    ))
+                                ) : blueprints?.length === 0 ? (
                                     <p className="text-sm text-muted-foreground py-4 text-center">
                                         No blueprints match your search.
                                     </p>
                                 ) : (
-                                    filteredBP.map((bp) => {
-                                        const enabled = localSelected.has(bp._id);
+                                    blueprints?.length > 0 && blueprints?.map((bp) => {
+                                        const enabled = localSelected?.includes(bp?._id);
                                         return (
                                             <div
-                                                key={bp._id}
-                                                className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                                                    enabled
-                                                        ? 'border-green-300 bg-green-50'
-                                                        : 'border-gray-200 hover:border-gray-300'
-                                                }`}
-                                                onClick={() => toggleBlueprint(bp._id)}
-                                            >
-                                                <div
-                                                    className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
-                                                        enabled ? 'bg-green-500' : 'bg-gray-200'
+                                                key={bp?._id}
+                                                onClick={() => toggleBlueprint(bp?._id)}
+                                                className={`group flex items-center gap-3.5 rounded-md border p-3 cursor-pointer transition-all ${enabled
+                                                    ? 'border-green-200! bg-green-50/60'
+                                                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/60'
                                                     }`}
-                                                >
-                                                    {enabled && (
-                                                        <CheckCircle className="h-3.5 w-3.5 text-white" />
-                                                    )}
-                                                    {!enabled && (
-                                                        <XCircle className="h-3.5 w-3.5 text-gray-400" />
-                                                    )}
+                                            >
+                                                {/* Cover image */}
+                                                <div className="relative h-14 w-14 shrink-0">
+                                                    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-md bg-slate-100 ring-1 ring-inset ring-black/5">
+                                                        <BookOpen className="h-5 w-5 text-slate-300" />
+                                                        {bp?.coverImage && (
+                                                            <img
+                                                                src={bp?.coverImage ?? ''}
+                                                                alt={bp?.title}
+                                                                className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div
+                                                        className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white ${enabled ? 'bg-green-500' : 'bg-gray-300'}`}
+                                                    >
+                                                        {enabled ? <CheckCircle className="h-3 w-3 text-white" /> : <XCircle className="h-3 w-3 text-white" />}
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium truncate">
-                                                        {bp.title}
+
+                                                {/* Details */}
+                                                <div className="flex-1 min-w-0 space-y-1.5">
+                                                    <p className="text-sm font-semibold text-slate-900 truncate">
+                                                        {bp?.title}
                                                     </p>
-                                                    {bp.book?.category && (
-                                                        <Badge variant="secondary" className="text-xs mt-0.5">
-                                                            {bp.book.category}
-                                                        </Badge>
+
+                                                    {(bp?.series?.title || bp?.createdBy?.name) && (
+                                                        <div className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
+                                                            {bp?.series?.title && (
+                                                                <span className="truncate">
+                                                                    Series: <span className="text-slate-600">{bp.series.title}</span>
+                                                                </span>
+                                                            )}
+                                                            {bp?.series?.title && bp?.createdBy?.name && (
+                                                                <span className="text-slate-300">•</span>
+                                                            )}
+                                                            {bp?.createdBy?.name && (
+                                                                <span className="flex items-center gap-1 truncate">
+                                                                    {bp.createdBy.profile_pic ? (
+                                                                        <img
+                                                                            src={bp.createdBy.profile_pic}
+                                                                            alt={bp.createdBy.name}
+                                                                            className="h-4 w-4 shrink-0 rounded-full border object-cover"
+                                                                            onError={(e) => {
+                                                                                e.currentTarget.style.display = 'none';
+                                                                            }}
+                                                                        />
+                                                                    ) : null}
+                                                                    <span className="truncate">By {bp.createdBy.name}</span>
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex flex-wrap items-center gap-1.5">
+                                                        {bp?.price != null && (
+                                                            <span
+                                                                className={`rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ${Number(bp.price) > 0 ? 'bg-primary/10 text-primary' : 'bg-emerald-50 text-emerald-600'
+                                                                    }`}
+                                                            >
+                                                                {Number(bp.price) > 0 ? `KSH ${Number(bp.price).toFixed(2)}` : 'Free'}
+                                                            </span>
+                                                        )}
+                                                        {bp?.status && (
+                                                            <span
+                                                                className={`rounded-full px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${bp.status === 'Published'
+                                                                    ? 'bg-blue-50 text-blue-600'
+                                                                    : 'bg-amber-50 text-amber-600'
+                                                                    }`}
+                                                            >
+                                                                {bp.status}
+                                                            </span>
+                                                        )}
+                                                        {bp?.series?.pricingModel && (
+                                                            <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[11px] font-medium capitalize whitespace-nowrap text-purple-600">
+                                                                {bp.series.pricingModel}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Status */}
+                                                <div className="flex shrink-0 items-center gap-1.5">
+                                                    <span
+                                                        className={`rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap ${enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+                                                    >
+                                                        {enabled ? 'Enabled' : 'Disabled'}
+                                                    </span>
+                                                    {enabled && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRemoveAccess(bp);
+                                                            }}
+                                                            className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors hover:bg-red-100 hover:text-red-600"
+                                                            aria-label="Remove blueprint access"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </button>
                                                     )}
                                                 </div>
-                                                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                                    {enabled ? 'Enabled' : 'Disabled'}
-                                                </span>
                                             </div>
                                         );
                                     })

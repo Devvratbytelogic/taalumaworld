@@ -120,14 +120,12 @@ export interface IInstitutionAccessData {
 export interface IInstitutionAccessDataEntity {
   _id: string;
   institution_id: string;
-  book_id: string;
+  chapter_id: string;
+  blueprint_id: string;
   __v: number;
   createdAt: string;
   created_by: string;
-  is_active: boolean;
-  mentor_opt_in: boolean;
   updatedAt: string;
-  series_id: string;
 }
 
 

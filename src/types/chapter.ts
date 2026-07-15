@@ -45,6 +45,8 @@ export interface ISeries {
   title: string;
   slug: string;
   coverImage: string;
+  pricingModel: string;
+  price: number;
   id: string;
 }
 

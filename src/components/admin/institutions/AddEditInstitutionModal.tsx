@@ -184,6 +184,7 @@ export function AddEditInstitutionModal() {
                     value={values.promo_start}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    min={new Date().toISOString().substring(0, 10)}
                   />
                   {touched.promo_start && errors.promo_start ? (
                     <p className="text-sm text-red-600">{errors.promo_start}</p>

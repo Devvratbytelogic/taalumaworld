@@ -5,12 +5,10 @@ import { Building2, BookOpen, BarChart3, MessageSquare, Clock } from 'lucide-rea
 import { AdminPageHeader, adminPanelClass } from '@/components/admin/layout/AdminContent';
 import { cn } from '@/components/ui/utils';
 import { InstitutionRegistryTab } from './InstitutionRegistryTab';
-// import { BlueprintAccessTab } from './BlueprintAccessTab';
-// import { PromotionConfigTab } from './PromotionConfigTab';
-// import { UsageReportTab } from './UsageReportTab';
-// import { RegistrationPromptTab } from './RegistrationPromptTab';
+import { BlueprintAccessTab } from './BlueprintAccessTab';
+import { RegistrationPromptTab } from './RegistrationPromptTab';;
 
-type Tab = 'registry' | 'blueprints' | 'promotions' | 'usage' | 'prompt';
+type Tab = 'registry' | 'blueprints' | 'usage' | 'prompt';
 
 const TABS: { id: Tab; label: string; icon: React.ElementType; description: string }[] = [
     {
@@ -24,12 +22,6 @@ const TABS: { id: Tab; label: string; icon: React.ElementType; description: stri
         label: 'Blueprint Access',
         icon: BookOpen,
         description: 'Configure blueprints per institution',
-    },
-    {
-        id: 'promotions',
-        label: 'Promotions',
-        icon: Clock,
-        description: 'Promotional periods and expiry control',
     },
     {
         id: 'usage',
@@ -82,8 +74,9 @@ export function AdminInstitutionsTab() {
 
             {/* Active tab content */}
             {activeTab === 'registry' && <InstitutionRegistryTab />}
-            {/* {activeTab === 'blueprints' && <BlueprintAccessTab />}
-            {activeTab === 'promotions' && <PromotionConfigTab />}
+            {activeTab === 'blueprints' && <BlueprintAccessTab />}
+            {activeTab === 'prompt' && <RegistrationPromptTab />}
+            {/* {activeTab === 'promotions' && <PromotionConfigTab />}
             {activeTab === 'usage' && <UsageReportTab />}
             {activeTab === 'prompt' && <RegistrationPromptTab />} */}
         </div>

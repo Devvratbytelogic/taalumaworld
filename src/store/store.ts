@@ -17,9 +17,16 @@ export const store = configureStore({
     reading: readingReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(
-      rtkQuerieSetup.middleware
-    ),
+    getDefaultMiddleware({
+      // The shared confirmation modals (DeleteConfirmation/RestoreConfirmation, etc.)
+      // are opened via `openModal({ data: { onDelete/onRestore: () => ... } } })`,
+      // which intentionally stores a callback function in the store's `data` field.
+      serializableCheck: {
+        ignoredActions: ['allCommonModal/openModal'],
+        ignoredActionPaths: ['payload.data'],
+        ignoredPaths: ['allModal.data'],
+      },
+    }).concat(rtkQuerieSetup.middleware),
 });
 
 // Enable refetchOnFocus/refetchOnReconnect behaviors

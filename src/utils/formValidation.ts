@@ -400,7 +400,7 @@ export const institutionSchema = Yup.object({
     then: (schema) => schema.min(1, 'Min 1%').max(100, 'Max 100%').required('Discount is required'),
     otherwise: (schema) => schema.optional(),
   }),
-  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
+  // accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
 // Extend Promotional Period Modal — pass context: { currentEnd } from Formik
@@ -412,6 +412,14 @@ export const extendPromotionSchema = Yup.object({
       if (!value || !currentEnd) return true;
       return value > currentEnd;
     }),
+});
+
+// Registration Prompt Tab Validation Schema
+export const registrationPromptSchema = Yup.object({
+  is_enabled: Yup.boolean(),
+  heading: Yup.string().trim().required('Heading is required'),
+  message: Yup.string().trim().required('Message body is required'),
+  contact_email: emailRules.label('Contact email'),
 });
 
 // Add / Edit Role Modal Validation Schema

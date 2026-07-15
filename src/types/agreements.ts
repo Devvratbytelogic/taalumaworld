@@ -17,6 +17,7 @@ export interface IAllAgreementsDataEntity {
   _id: string;
   title: string;
   slug: string;
+  text: string;
   status: string;
   agreementType: AgreementType;
   version: string;
@@ -43,6 +44,7 @@ export interface ISingleAgreementData {
   _id: string;
   title: string;
   slug: string;
+  text: string;
   status: string;
   agreementType: ISingleAgreementAgreementType;
   version: string;
@@ -76,6 +78,7 @@ export interface IGetAgreementByTouchpointAndUserTypeDataEntity {
   _id: string;
   title: string;
   slug: string;
+  text: string;
   status: string;
   agreementType: IGetAgreementByTouchpointAndUserTypeAgreementType;
   version: string;

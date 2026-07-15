@@ -16,7 +16,7 @@ import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
 import { useUpdateChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import { useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
-import { getAdminSectionRoutePath, getContentOwnershipLicensingRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getPolicyBySlugRoutePath, getReadChapterRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
@@ -25,6 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
 import { SELECT_STYLES } from '@/constants/selectStyle';
+import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
+import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 
 
 
@@ -46,11 +48,18 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
   const { data: booksResponse } = useGetAllBooksQuery();
   const { data: chapterResponse } = useGetChapterByIdQuery(chapterId);
+  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
+    touchPoint: AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD,
+    userType: AGREEMENT_VISIBLE_USER_TYPES.MENTOR,
+  });
   const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
 
   const booksData = booksResponse?.data;
   const books = booksData?.data ?? [];
   const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
+  const blueprintAgreements = agreementsResponse?.data ?? [];
+  // Only agreements the API marks as `is_required` must be accepted before submitting.
+  const requiredAgreementIds = blueprintAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
   const chapterData = chapterResponse?.data;
 
@@ -66,7 +75,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     price: chapterData?.price ?? 0 as number | undefined,
     status: chapterData?.status ?? 'Published',
     cover_image: chapterData?.coverImage ?? null as File | null,
-    agreeContentOwnership: false,
+    accepted_agreement_ids: [] as string[],
     meta_title: chapterData?.meta_title ?? '',
     meta_description: chapterData?.meta_description ?? '',
     og_title: chapterData?.og_title ?? '',
@@ -78,6 +87,10 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     initialValues: initialFormValues,
     validationSchema: addChapterSchema,
     enableReinitialize: true,
+    validate: (vals) => {
+      const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
+      return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+    },
     onSubmit: async (vals) => {
       const formData = new FormData();
       formData.append('book', vals.bookId);
@@ -101,6 +114,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (vals.og_description) formData.append('og_description', vals.og_description);
       if (ogImageFile) formData.append('og_image', ogImageFile);
       if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      vals.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
       formData.append('slug', vals.slug);
       const baseUrl = APP_SITE_URL.replace(/\/$/, '');
       formData.append('shareable_link', `${baseUrl}${getReadChapterRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
@@ -223,6 +237,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     (html: string) => setFieldValue('content', html),
     [setFieldValue]
   );
+
+  const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
@@ -508,27 +524,36 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
       </div>
 
-      <AgreementCheckbox
-        id="agreeContentOwnership"
-        checked={values.agreeContentOwnership}
-        error={errors.agreeContentOwnership}
-        touched={touched.agreeContentOwnership}
-        onCheckedChange={(checked) => setFieldValue('agreeContentOwnership', checked)}
-        onBlur={() => setFieldTouched('agreeContentOwnership', true)}
-        disabled={isSubmittingState}
-
-      >
-        I own or have rights to this content · No third-party infringement · I understand Taaluma may remove
-        non-compliant content. See the{' '}
-        <Link
-          href={getContentOwnershipLicensingRoutePath()}
-          target="_blank"
-          className="font-semibold text-primary hover:text-primary/80 transition-colors"
-          onClick={(e) => e.stopPropagation()}
+      {blueprintAgreements && blueprintAgreements?.length > 0 && blueprintAgreements?.map((agreement) => (
+        <AgreementCheckbox
+          key={agreement._id}
+          id={agreement._id}
+          checked={values.accepted_agreement_ids.includes(agreement._id)}
+          error={agreementsError}
+          touched={touched.accepted_agreement_ids}
+          onCheckedChange={(checked) => {
+            const ids = checked
+              ? [...values.accepted_agreement_ids, agreement._id]
+              : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
+            setFieldValue('accepted_agreement_ids', ids);
+          }}
+          onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+          disabled={isSubmittingState}
         >
-          Content Ownership Policy
-        </Link>
-      </AgreementCheckbox>
+          {agreement && agreement?.text} &nbsp;
+          <Link
+            href={getPolicyBySlugRoutePath(agreement?.slug ?? '')}
+            target="_blank"
+            className="font-semibold text-primary hover:text-primary/80 transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {agreement?.title}
+          </Link>
+          <span className="font-medium">
+            {agreement.is_required && <span className="text-red-500"> *</span>}
+          </span>
+        </AgreementCheckbox>
+      ))}
 
       <div className="form-footer">
         <Button

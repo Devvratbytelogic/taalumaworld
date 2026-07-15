@@ -26,6 +26,9 @@ export function getFAQRoutePath(): string {
   return '/faq';
 }
 
+export function getPolicyBySlugRoutePath(slug: string): string {
+  return `/policies/${slug}`;
+}
 export function getPrivacyPolicyRoutePath(): string {
   return '/policies/privacy-policy';
 }

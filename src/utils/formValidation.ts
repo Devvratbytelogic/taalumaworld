@@ -236,10 +236,7 @@ export const addChapterSchema = Yup.object({
     }),
   status: Yup.string().required('Status is required'),
   cover_image: Yup.mixed().required('Cover image is required'),
-  agreeContentOwnership: Yup.boolean().oneOf(
-    [true],
-    'You must confirm content ownership and rights',
-  ),
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
   ...openGraphFieldsSchema,
 });
 
@@ -448,6 +445,7 @@ export const agreementTypeSchema = Yup.object({
 export const agreementSchema = Yup.object({
   title: Yup.string().trim().min(2, 'Title is required').required('Title is required'),
   slug: Yup.string().trim().required('Slug is required'),
+  text: Yup.string().trim().required('Text is required'),
   content: Yup.string().trim().required('Agreement content is required'),
   agreementType: Yup.string().required('Please select an agreement type'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),

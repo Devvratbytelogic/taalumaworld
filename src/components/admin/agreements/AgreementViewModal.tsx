@@ -57,6 +57,10 @@ export function AgreementViewModal({ open, agreementId, onOpenChange }: Agreemen
                 <dd className="mt-1 text-sm text-slate-700">{agreement.slug}</dd>
               </div>
               <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Text</dt>
+                <dd className="mt-1 text-sm text-slate-700">{agreement.text || '—'}</dd>
+              </div>
+              <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Agreement type</dt>
                 <dd className="mt-1 text-sm text-slate-700">{agreement.agreementType?.name ?? '—'}</dd>
               </div>

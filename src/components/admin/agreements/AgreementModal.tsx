@@ -23,6 +23,7 @@ import { useGetAgreementByIdQuery } from '@/store/rtkQueries/agreementAPIs';
 export type AgreementFormValues = {
   title: string;
   slug: string;
+  text: string;
   content: string;
   agreementType: string;
   status: 'active' | 'inactive';
@@ -35,6 +36,7 @@ export type AgreementFormValues = {
 const emptyValues: AgreementFormValues = {
   title: '',
   slug: '',
+  text: '',
   content: '',
   agreementType: '',
   status: 'active',
@@ -85,6 +87,7 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
       values: {
         title: agreement.title,
         slug: agreement.slug,
+        text: agreement.text ?? '',
         content: agreement.content ?? '',
         agreementType: agreement.agreementType?._id ?? '',
         status: (agreement.status as 'active' | 'inactive') ?? 'active',
@@ -164,6 +167,23 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                   />
                   {errors.slug && touched.slug ? <p className="text-sm text-red-600">{errors.slug}</p> : null}
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="agreement-text">
+                  Text<span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="agreement-text"
+                  name="text"
+                  placeholder="e.g., Short text for this agreement"
+                  value={values.text}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className={errors.text && touched.text ? 'border-red-500' : ''}
+                />
+                {errors.text && touched.text ? <p className="text-sm text-red-600">{errors.text}</p> : null}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">

@@ -400,6 +400,7 @@ export const institutionSchema = Yup.object({
     then: (schema) => schema.min(1, 'Min 1%').max(100, 'Max 100%').required('Discount is required'),
     otherwise: (schema) => schema.optional(),
   }),
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
 // Extend Promotional Period Modal — pass context: { currentEnd } from Formik

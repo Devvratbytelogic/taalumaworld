@@ -2,6 +2,7 @@
 
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
+import Link from 'next/link';
 import { Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -14,19 +15,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import {
   useAddInstitutionMutation,
   useUpdateInstitutionMutation,
 } from '@/store/rtkQueries/institutionApi';
+import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
+import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import type { IAllInstitutionsDataEntity } from '@/types/institution';
 import toast from '@/utils/toast';
 import { institutionSchema } from '@/utils/formValidation';
@@ -39,10 +37,19 @@ export function AddEditInstitutionModal() {
 
   const [addInstitution, { isLoading: isAdding }] = useAddInstitutionMutation();
   const [updateInstitution, { isLoading: isUpdating }] = useUpdateInstitutionMutation();
+  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
+    // touchPoint: AGREEMENT_TOUCHPOINTS.UNIVERSITY_REGISTRATION,
+    touchPoint: "",
+    userType: AGREEMENT_VISIBLE_USER_TYPES.SUPER_ADMIN,
+  });
+
+  const institutionAgreements = agreementsResponse?.data ?? [];
+  // Only agreements the API marks as `is_required` must be accepted before submitting.
+  const requiredAgreementIds = institutionAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
   const onClose = () => dispatch(closeModal());
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue } = useFormik({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched } = useFormik({
     enableReinitialize: true,
     initialValues: {
       name: institution?.name ?? '',
@@ -53,8 +60,13 @@ export function AddEditInstitutionModal() {
       status: institution?.status ?? 'Active',
       books_pricing_type: institution?.books_pricing_type ?? 'Market Price',
       discount_percentage: institution?.discount_percentage ?? 0,
+      accepted_agreement_ids: [] as string[],
     },
     validationSchema: institutionSchema,
+    validate: (vals) => {
+      const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
+      return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+    },
     onSubmit: async (formValues) => {
       const payload = {
         name: formValues.name.trim(),
@@ -69,6 +81,7 @@ export function AddEditInstitutionModal() {
         books_pricing_type: formValues.books_pricing_type,
         discount_percentage:
           formValues.books_pricing_type === 'Discounted Price' ? Number(formValues.discount_percentage) : 0,
+        accepted_agreement_ids: formValues.accepted_agreement_ids,
       };
 
       try {
@@ -87,6 +100,7 @@ export function AddEditInstitutionModal() {
   });
 
   const isLoading = isAdding || isUpdating || isSubmitting;
+  const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -200,39 +214,37 @@ export function AddEditInstitutionModal() {
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select
+              <select
+                id="status"
+                name="status"
                 value={values.status}
-                onValueChange={(v) => setFieldValue('status', v)}
+                onChange={(e) => setFieldValue('status', e.target.value)}
+                onBlur={handleBlur}
+                className="w-full"
               >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
             </div>
 
             <div className="space-y-3">
-              <Label>Books Pricing (after promo expiry)</Label>
+              <Label>Pricing (after promo expiry)</Label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="books_pricing_type" className="text-xs text-slate-500">
                     Pricing Type
                   </Label>
-                  <Select
+                  <select
+                    id="books_pricing_type"
+                    name="books_pricing_type"
                     value={values.books_pricing_type}
-                    onValueChange={(v) => setFieldValue('books_pricing_type', v)}
+                    onChange={(e) => setFieldValue('books_pricing_type', e.target.value)}
+                    onBlur={handleBlur}
+                    className="w-full"
                   >
-                    <SelectTrigger id="books_pricing_type">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Market Price">Market Price</SelectItem>
-                      <SelectItem value="Discounted Price">Discounted Price</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="Market Price">Market Price</option>
+                    <option value="Discounted Price">Discounted Price</option>
+                  </select>
                 </div>
                 {values.books_pricing_type === 'Discounted Price' ? (
                   <div className="space-y-2">
@@ -260,6 +272,41 @@ export function AddEditInstitutionModal() {
                 Upon promo expiry, users lose free access but can re-access books at this price.
               </p>
             </div>
+
+            {institutionAgreements && institutionAgreements.length > 0 && (
+              <div className="space-y-3">
+                {institutionAgreements.map((agreement) => (
+                  <AgreementCheckbox
+                    key={agreement._id}
+                    id={agreement._id}
+                    checked={values.accepted_agreement_ids.includes(agreement._id)}
+                    error={agreementsError}
+                    touched={touched.accepted_agreement_ids}
+                    onCheckedChange={(checked) => {
+                      const ids = checked
+                        ? [...values.accepted_agreement_ids, agreement._id]
+                        : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
+                      setFieldValue('accepted_agreement_ids', ids);
+                    }}
+                    onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+                    disabled={isLoading}
+                  >
+                    {agreement && agreement?.text} &nbsp;
+                    <Link
+                      href={getPolicyBySlugRoutePath(agreement?.slug ?? '')}
+                      target="_blank"
+                      className="font-semibold text-primary hover:text-primary/80 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {agreement?.title}
+                    </Link>
+                    <span className="font-medium">
+                      {agreement.is_required && <span className="text-red-500"> *</span>}
+                    </span>
+                  </AgreementCheckbox>
+                ))}
+              </div>
+            )}
           </div>
 
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

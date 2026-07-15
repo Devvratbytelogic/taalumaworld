@@ -71,6 +71,7 @@ export interface IAllUsersEntity {
   mentor_economy?: MentorEconomy | null;
   dob?: string | null;
   username?: string | null;
+  short_code?: string | null;
 }
 export interface Role {
   _id: string;
@@ -119,7 +120,7 @@ export interface ItemsEntity {
 export interface ProfileCompletion {
   profile_completion_percentage: number;
   completed_fields?: (CompletedFieldsEntity)[] | null;
-  pending_fields?: (null)[] | null;
+  pending_fields?: (CompletedFieldsEntity)[] | null;
 }
 export interface CompletedFieldsEntity {
   section: string;

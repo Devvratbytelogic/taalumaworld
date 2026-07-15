@@ -25,8 +25,7 @@ export function AdminAuthorsHeader() {
         description="Review and manage mentors on the platform"
       >
         <Button
-          color="primary"
-          className="rounded-xl"
+          className="global_btn bg_primary rounded_full"
           onPress={() => setIsInviteModalOpen(true)}
           startContent={<Mail className="h-4 w-4" />}
         >

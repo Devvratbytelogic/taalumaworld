@@ -1,112 +1,257 @@
-import { useState, useEffect } from 'react';
-import { useGetAllAuthorLeadersQuery } from '@/store/rtkQueries/adminGetApi';
-import AdminAuthorsSkeleton from '@/components/skeleton-loader/AdminAuthorsSkeleton';
-import { useUpdateAuthorLeaderMutation, useDeleteAuthorLeaderMutation } from '@/store/rtkQueries/adminPostApi';
-import toast from '@/utils/toast';
-import type { Author } from '@/types/content';
-import { AdminAuthorsHeader } from './AdminAuthorsHeader';
-import { AdminAuthorsStats } from './AdminAuthorsStats';
-import { AdminAuthorsSearch } from './AdminAuthorsSearch';
-import { AuthorListing } from './AuthorListing';
-import { DeleteAuthorDialog } from './DeleteAuthorDialog';
-import { useDebounce } from '@/hooks/useDebounce';
+'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { type GridColDef } from '@mui/x-data-grid';
+import { Eye, Mail, Ban, CircleCheck, BadgeCheck } from 'lucide-react';
+import toast from '@/utils/toast';
+import type { IAllUsersEntity } from '@/types/rolesPermissions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { AdminAuthorsHeader } from './AdminAuthorsHeader';
+import { AdminAuthorsSearch } from './AdminAuthorsSearch';
+import { SuspendUserDialog } from '@/components/admin/users/SuspendUserDialog';
+import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
+import { useDebounce } from '@/hooks/useDebounce';
+import { getAdminMentorDetailRoutePath } from '@/routes/routes';
+
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  active: 'bg-green-50 text-green-700 border-green-200',
+  suspended: 'bg-red-50 text-red-700 border-red-200',
+};
+
+const formatWalletBalance = (balance?: number | null, currency?: string | null) => {
+  if (balance === undefined || balance === null) return '-';
+  try {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(balance);
+  } catch {
+    return `${currency ?? ''} ${balance}`.trim();
+  }
+};
 
 export function AdminAuthorsTab() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageLimit, setPageLimit] = useState(10);
+  const [suspendAuthor, setSuspendAuthor] = useState<IAllUsersEntity | null>(null);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+
   const debouncedSearch = useDebounce(searchQuery, 400);
-  const [deleteConfirmAuthor, setDeleteConfirmAuthor] = useState<Author | null>(null);
 
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
-
-  const queryParams = {
-    page,
-    limit: pageLimit,
+  const { data: authorsResponse, isLoading } = useGetAllUsersQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    user_type: 'mentor',
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  });
+  const [updateAuthorStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
+
+  const authors = authorsResponse?.data?.data ?? [];
+  const totalAuthors = authorsResponse?.data?.total ?? 0;
+
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetToFirstPage();
   };
 
-  const { data: leadersResponse, isLoading, isFetching } = useGetAllAuthorLeadersQuery(queryParams);
-  const [updateAuthorLeader] = useUpdateAuthorLeaderMutation();
-  const [deleteAuthorLeader] = useDeleteAuthorLeaderMutation();
+  const handleViewProfile = (author: IAllUsersEntity) => {
+    router.push(getAdminMentorDetailRoutePath(author._id));
+  };
 
-  const authors = leadersResponse?.data?.leaders ?? [];
-  const pagination = leadersResponse?.data?.pagination;
-  const totalAuthors = pagination?.total ?? leadersResponse?.data?.totalAuthors ?? 0;
-  const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalAuthors / pageLimit));
+  const handleSendEmail = (author: IAllUsersEntity) => {
+    window.location.href = `mailto:${author.email}`;
+  };
 
-  const handleUpdateStatus = async (author: Author, status: string) => {
-    if (!author.id) return;
-    try {
-      const formData = new FormData();
-      formData.append('status', status);
-      await updateAuthorLeader({ id: author.id, values: formData }).unwrap();
-      toast.success(`Status updated to ${status}`);
-    } catch {
-      toast.error('Failed to update status');
+  const handleSuspend = (author: IAllUsersEntity) => {
+    setSuspendAuthor(author);
+  };
+
+  const confirmSuspend = async (statusReason: string) => {
+    if (suspendAuthor) {
+      const newStatus = suspendAuthor.status === 'suspended' ? 'active' : 'suspended';
+      try {
+        await updateAuthorStatus({
+          id: suspendAuthor._id,
+          payload: { status: newStatus, status_reason: statusReason },
+        }).unwrap();
+        toast.success(`"${suspendAuthor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+      } catch {
+        toast.error(`Failed to update "${suspendAuthor.name}"`);
+      } finally {
+        setSuspendAuthor(null);
+      }
     }
   };
 
-  const handleDeleteAuthor = (author: Author) => {
-    setDeleteConfirmAuthor(author);
-  };
-
-  const confirmDeleteAuthor = async () => {
-    if (!deleteConfirmAuthor) return;
-    try {
-      await deleteAuthorLeader({ id: deleteConfirmAuthor.id }).unwrap();
-      toast.success(`"${deleteConfirmAuthor.name}" deleted`);
-      setDeleteConfirmAuthor(null);
-    } catch {
-      toast.error('Failed to delete mentor');
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <AdminAuthorsHeader />
-        <AdminAuthorsSkeleton />
-      </div>
-    );
-  }
+  const columns: GridColDef[] = [
+    {
+      field: 'index',
+      headerName: '#',
+      width: 60,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
+        const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+        return (
+          <span className="text-sm text-muted-foreground">
+            {paginationModel.page * paginationModel.pageSize + rowIndex + 1}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'name',
+      headerName: 'Mentor',
+      minWidth: 220,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="flex items-center gap-3 min-w-0">
+          <Avatar className="border h-9 w-9 shrink-0">
+            <AvatarImage src={params.row.profile_pic ?? ''} />
+            <AvatarFallback>{params.row.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <span className="font-medium text-sm truncate">{params.row.name}</span>
+        </div>
+      ),
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => <span className="text-sm text-slate-700 truncate">{params.row.email}</span>,
+    },
+    {
+      field: 'tier',
+      headerName: 'Tier',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => <Badge variant="outline">{params.row.mentor_economy?.tier?.code ?? '-'}</Badge>,
+    },
+    {
+      field: 'is_verified_mentor',
+      headerName: 'Verified Mentor',
+      width: 150,
+      sortable: false,
+      renderCell: (params) =>
+        params.row.mentor_economy?.is_verified_mentor ? (
+          <Badge variant="outline" className="gap-1 bg-blue-50 text-blue-700 border-blue-200">
+            <BadgeCheck className="h-3 w-3" /> Verified
+          </Badge>
+        ) : (
+          <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200">
+            Unverified
+          </Badge>
+        ),
+    },
+    {
+      field: 'wallet_balance',
+      headerName: 'Wallet Balance',
+      width: 140,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-700">
+          {formatWalletBalance(params.row.mentor_economy?.wallet?.balance, params.row.mentor_economy?.wallet?.currency)}
+        </span>
+      ),
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Join Date',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-700">
+          {params.row.createdAt
+            ? new Date(params.row.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
+            : '-'}
+        </span>
+      ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 110,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className={STATUS_BADGE_CLASS[params.row.status] ?? STATUS_BADGE_CLASS.active}>
+          {params.row.status || 'active'}
+        </Badge>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => {
+        const isSuspended = params.row.status === 'suspended';
+        return (
+          <div className="action_buttons">
+            <button
+              type="button"
+              className="active_button"
+              title="View profile"
+              onClick={() => handleViewProfile(params.row)}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="edit_button"
+              title="Send email"
+              onClick={() => handleSendEmail(params.row)}
+            >
+              <Mail className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className={isSuspended ? 'active_button' : 'delete_button'}
+              title={isSuspended ? 'Activate mentor' : 'Suspend mentor'}
+              onClick={() => handleSuspend(params.row)}
+            >
+              {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="space-y-6">
       <AdminAuthorsHeader />
 
-      <AdminAuthorsStats authors={authors} />
+      <AdminAuthorsSearch searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-      <AdminAuthorsSearch
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={authors}
+          columns={columns}
+          getRowId={(row) => row._id}
+          loading={isLoading}
+          paginationMode="server"
+          rowCount={totalAuthors}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
 
-      <AuthorListing
-        authors={authors}
-        searchQuery={debouncedSearch}
-        page={page}
-        pageLimit={pageLimit}
-        totalAuthors={totalAuthors}
-        totalPages={totalPages}
-        isFetching={isFetching}
-        onPageChange={setPage}
-        onPageLimitChange={(limit) => {
-          setPageLimit(limit);
-          setPage(1);
-        }}
-        onUpdateStatus={handleUpdateStatus}
-        onDelete={handleDeleteAuthor}
-      />
-
-      <DeleteAuthorDialog
-        author={deleteConfirmAuthor}
-        open={!!deleteConfirmAuthor}
-        onOpenChange={(open) => !open && setDeleteConfirmAuthor(null)}
-        onConfirm={confirmDeleteAuthor}
+      <SuspendUserDialog
+        user={suspendAuthor}
+        open={!!suspendAuthor}
+        onOpenChange={(open) => !open && setSuspendAuthor(null)}
+        onConfirm={confirmSuspend}
+        isLoading={isSuspending}
       />
     </div>
   );

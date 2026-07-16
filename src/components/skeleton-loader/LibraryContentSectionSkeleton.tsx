@@ -15,7 +15,7 @@ export default function LibraryContentSectionSkeleton() {
             className="bg-white rounded-3xl overflow-hidden border border-border flex flex-col h-full"
           >
             {/* Cover image — matches aspect-2/1 */}
-            <div className="aspect-2/1 bg-gray-200 shrink-0" />
+            <div className="aspect-2/2 bg-gray-200 shrink-0" />
 
             <div className="px-4 py-3 space-y-2 flex flex-col flex-1">
               {/* Badges row */}

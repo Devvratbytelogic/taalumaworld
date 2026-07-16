@@ -5,13 +5,8 @@ import Button from '../../ui/Button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { nativeSelectClassName } from '../../ui/field-styles';
+import { cn } from '../../ui/utils';
 import {
   Dialog,
   DialogContent,
@@ -375,41 +370,37 @@ export function EditBookModal({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Status</Label>
-                <Select
+                <Label htmlFor="edit-book-status">Status</Label>
+                <select
+                  id="edit-book-status"
+                  name="status"
                   value={values.status}
-                  onValueChange={(value: 'Draft' | 'Published') =>
-                    setFieldValue('status', value)
-                  }
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className={cn(nativeSelectClassName, errors.status && touched.status ? 'border-red-500' : '')}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Draft">Draft</SelectItem>
-                    <SelectItem value="Published">Published</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="Draft">Draft</option>
+                  <option value="Published">Published</option>
+                </select>
                 {errors.status && touched.status && (
                   <p className="text-sm text-red-600">{errors.status}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Pricing model</Label>
-                <Select
+                <Label htmlFor="edit-book-pricingModel">Pricing model</Label>
+                <select
+                  id="edit-book-pricingModel"
+                  name="pricingModel"
                   value={values.pricingModel}
-                  onValueChange={(value: 'book' | 'chapter') =>
-                    setFieldValue('pricingModel', value)
-                  }
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className={nativeSelectClassName}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="chapter">blueprint</SelectItem>
-                    <SelectItem value="book">series</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="chapter">blueprint</option>
+                  <option value="book">series</option>
+                </select>
               </div>
               {values.pricingModel === 'book' && (
                 <div className="space-y-2">

@@ -11,8 +11,8 @@ const avatarColors = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626']
 
 export default function HomeMentorShowcase() {
     const router = useRouter()
-    const { data, isLoading } = useGetUserAllAuthorsQuery()
-    const mentors = data?.data?.items?.slice(0, 4) ?? []
+    const { data:response, isLoading } = useGetUserAllAuthorsQuery()
+    const mentors = response?.data?.data?.slice(0, 4) ?? []
 
     if (!isLoading && mentors.length === 0) return null
 
@@ -47,30 +47,25 @@ export default function HomeMentorShowcase() {
                         </div>
                     ) : (
                         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                            {mentors.map((mentor, index) => (
+                            {mentors?.map((mentor, index) => (
                                 <div
-                                    key={mentor.id}
-                                    className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center gap-3"
+                                    key={index}
+                                    className="bg-white rounded-md p-6 border transition-shadow flex flex-col items-center text-center gap-3"
                                 >
-                                    {mentor.avatar ? (
+                                    {mentor?.profile_pic ? (
                                         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
-                                            <ImageComponent src={mentor.avatar} alt={mentor.fullName} object_cover={true} />
+                                            <ImageComponent src={mentor?.profile_pic} alt={mentor?.name} object_cover={true} />
                                         </div>
                                     ) : (
                                         <div
                                             className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
                                             style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
                                         >
-                                            {mentor.fullName.charAt(0).toUpperCase()}
+                                            {mentor?.name?.charAt(0).toUpperCase()}
                                         </div>
                                     )}
                                     <div className="space-y-1">
-                                        <h3 className="font-semibold text-foreground leading-tight">{mentor.fullName}</h3>
-                                        {mentor.professionalBio && (
-                                            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                                                {mentor.professionalBio}
-                                            </p>
-                                        )}
+                                        <h3 className="font-semibold text-foreground leading-tight">{mentor?.name}</h3>
                                     </div>
                                 </div>
                             ))}

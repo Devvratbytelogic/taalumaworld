@@ -83,7 +83,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         /** get all authors */
         getUserAllAuthors: builder.query<IUserAllAuthorsAPIResponse, void>({
             query: () => ({
-                url: `/user/authors`,
+                url: `/user/mentor-list`,
                 method: 'GET',
             }),
         }),
@@ -105,7 +105,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         /** get user profile */
         getUserProfile: builder.query<IUserProfileAPIResponse, void>({
             query: () => ({
-                url: `/user/get-user-profile`,
+                url: `/admin/get-profile`,
                 method: 'GET',
             }),
             providesTags: ['UserProfile'],

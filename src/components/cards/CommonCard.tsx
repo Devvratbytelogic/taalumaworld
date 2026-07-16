@@ -30,7 +30,7 @@ export default function CommonCard({ data }: CommonCardProps) {
             }
         >
             {/* Cover Image */}
-            <div className="overflow-hidden bg-muted relative shrink-0">
+            <div className="aspect-2/2 overflow-hidden bg-muted relative shrink-0">
                 <div className="w-full h-full transition-transform group-hover/card:scale-105">
                     <ImageComponent src={data?.coverImage ?? ''} alt={data?.title ?? ''} object_cover={true} />
                 </div>

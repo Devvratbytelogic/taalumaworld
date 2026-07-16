@@ -128,24 +128,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminSubscribers'],
         }),
 
-        /** Book Orders */
-        getAllBookOrders: builder.query<IAllOrdersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        /** Orders (single endpoint, filtered client-side by `type`: 'books' | 'chapter') */
+        getAllOrders: builder.query<IAllOrdersAPIResponse, { type: 'books' | 'chapter'; page?: number; limit?: number; search?: string }>({
             query: (params) => ({
                 url: `/admin/orders`,
                 method: 'GET',
-                params: { type: 'books', ...(params || {}) },
+                params,
             }),
-            providesTags: ['AdminBookOrders'],
-        }),
-
-        /** Blueprint Orders */
-        getAllBlueprintOrders: builder.query<IAllOrdersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
-            query: (params) => ({
-                url: `/admin/orders`,
-                method: 'GET',
-                params: { type: 'chapters', ...(params || {}) },
-            }),
-            providesTags: ['AdminBlueprintOrders'],
+            providesTags: ['AdminOrders'],
         }),
     }),
 });
@@ -163,6 +153,5 @@ export const {
     useGetAllTransactionsQuery,
     useGetAllContactusDataQuery,
     useGetAllSubscribersQuery,
-    useGetAllBookOrdersQuery,
-    useGetAllBlueprintOrdersQuery,
+    useGetAllOrdersQuery,
 } = clientSideGetApis;

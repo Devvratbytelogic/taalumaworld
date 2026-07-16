@@ -124,7 +124,7 @@ export default function BookDetailsModal() {
                                         )}
                                         <div className="flex-1 min-w-0">
                                             <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-2 py-0 text-sm mb-0.5">
-                                                Blueprint {item?.number}
+                                                Blueprint {item?.chapterNumber ?? item?.blueprintNumber}
                                             </Badge>
                                             <p className="font-medium text-sm line-clamp-1 tracking-tight">{item?.title}</p>
                                             {item?.description && (
@@ -137,7 +137,7 @@ export default function BookDetailsModal() {
                                                     className="global_btn rounded_full bg_primary text-sm px-3 py-1 h-auto min-h-0"
                                                     onPress={() => {
                                                         dispatch(closeModal());
-                                                        router.push(getReadChapterRoutePath(item?._id));
+                                                        router.push(getReadChapterRoutePath(item?.slug ?? item?.id));
                                                     }}
                                                 >
                                                     Read
@@ -163,7 +163,7 @@ export default function BookDetailsModal() {
                                                 </Button>
                                             ) : (
                                                 <AddToCartButton
-                                                    chapterId={item?._id}
+                                                    chapterId={item?.id}
                                                     bookId={book?.id}
                                                     type="chapter"
                                                     price={item?.price}

@@ -2,72 +2,81 @@ export interface IHomeAllChaptersAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data: IHomeAllContentData;
+  data: IHomeAllChaptersData;
   message: string;
   timestamp: string;
 }
-export interface IHomeAllContentData {
+export interface IHomeAllChaptersData {
   viewMode: string;
-  items?: (IHomeAllContentItem)[] | null;
+  items?: (IHomeAllChaptersItemsEntity)[] | null;
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
-export interface IHomeAllContentItem {
-  _id: string;
+export interface IHomeAllChaptersItemsEntity {
   id: string;
+  slug?: string;
   type: string;
-  chapterNumber: number;
   title: string;
   description: string;
-  chapters?: (IHomeAllContentItem)[] | null;
-  pageCount?: number | null;
-  number: number;
-  price: number;
-  isFree: boolean;
   coverImage: string;
-  bookId: IHomeAllContentBookId;
-  pricingModel: string;
-  chapterCount: number; 
-  bookTitle: string;
-  author: string;
-  authorBio: string;
-  authorSocial: IHomeAllContentAuthorSocial;
-  authorAvatar?: string | null;
-  category: IHomeAllContentCategory;
-  subcategory?: IHomeAllContentCategory | null;
+  price: number;
+  effectivePrice: number;
+  pricingAccessType: string;
+  tags?: (string)[] | null;
   canRead: boolean;
+  isPurchased: boolean;
   isCart: boolean;
+  isWishlisted: boolean;
+  mentor: IHomeAllChaptersMentor;
+  /** Original 'book' | 'chapter' value (see VISIBLE) — kept for backward compatibility since `type` can now also be 'series' */
+  legacyType: string;
+
+  /** Present when the item is a standalone blueprint (viewMode: "chapter") */
+  chapterNumber?: number;
+  blueprintNumber?: number;
+  pageCount?: number;
+  isFree?: boolean;
+  bookId?: string;
+  bookTitle?: string;
+  seriesId?: string;
+  seriesTitle?: string;
+
+  /** Present when the item is a series/book (viewMode: "series") */
+  pricingModel?: string;
+  totalPages?: number;
+  chapterCount?: number;
+  isChapterPricing?: boolean;
+  priceLabel?: string;
+  fromPrice?: number;
 }
-export interface IHomeAllContentAuthorSocial {
-  linkedin: string;
-  facebook: string;
-}
-export interface IHomeAllContentBookId {
-  _id: string;
-  title: string;
-  thoughtLeader: IHomeAllContentThoughtLeader;
-  category: IHomeAllContentCategory;
-  subcategory?: IHomeAllContentCategory | null;
-  description: string;
-  coverImage: string;
-  pricingModel: string;
-  price: number;
-  tags?: (null)[] | null;
-  createdBy: string;
-  deletedAt?: null;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
-export interface IHomeAllContentThoughtLeader {
-  _id: string;
-  fullName: string;
-  avatar?: null;
-}
-export interface IHomeAllContentCategory {
-  _id: string;
+export interface IHomeAllChaptersMentor {
   name: string;
-  slug: string;
+  email: string;
+  profile_pic: string;
+  bio?: string | null;
+  is_verified: boolean;
+  is_mentor_verified: boolean;
+  linkedin?: string | null;
+  facebook?: string | null;
+}
+
+/** @deprecated use IHomeAllChaptersItemsEntity */
+export type IHomeAllContentItem = IHomeAllChaptersItemsEntity;
+
+/** Minimal chapter shape used by the read-chapter purchase flow */
+export interface IChapterItem {
+  _id?: string;
+  id: string;
+  number?: number;
+  chapterNumber?: number;
+  title: string;
+  description?: string;
+  content?: string;
+  isFree?: boolean;
+  price: number;
+  coverImage?: string;
+  type: string;
+  status?: string;
 }

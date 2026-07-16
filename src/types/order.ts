@@ -1,56 +1,69 @@
-export interface IOrderPagination {
+export interface IAllOrdersAPIResponse {
+    http_status_code: number;
+    http_status_msg: string;
+    success: boolean;
+    data: IAllOrdersData;
+    message: string;
+    timestamp: string;
+}
+export interface IAllOrdersData {
+    summary: Summary;
+    data: IAllOrdersData1;
+}
+export interface Summary {
+    totalRevenue: number;
+    totalOrders: number;
+    completedOrders: number;
+    paidOrders: number;
+    statusCounts: StatusCounts;
+    paymentStatusCounts: PaymentStatusCounts;
+}
+export interface StatusCounts {
+    completed: number;
+}
+export interface PaymentStatusCounts {
+    Paid: number;
+}
+export interface IAllOrdersData1 {
+    data?: (IAllOrdersDataEntity)[] | null;
     total: number;
     page: number;
     limit: number;
     totalPages: number;
 }
-
-export interface IOrderItemEntity {
+export interface IAllOrdersDataEntity {
+    id: string;
+    orderNumber: number;
+    invoiceNumber: number;
+    itemCount: number;
+    item: string;
+    paymentType: string;
+    totalAmount: number;
+    discountAmount: number;
+    couponCode?: null;
+    couponDiscount?: number | null;
+    taxAmount: number;
+    status: string;
+    paymentStatus: string;
+    paymentMethod: string;
+    transactionId: string;
+    paidAt: string;
+    createdAt: string;
+    customer: Customer;
+    items?: (ItemsEntity)[] | null;
+}
+export interface Customer {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+}
+export interface ItemsEntity {
     id: string;
     type: string;
     title: string;
     quantity: number;
     price: number;
     total: number;
-}
-
-export interface IOrderCustomer {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-}
-
-export interface IOrderEntity {
-    id: string;
-    orderNumber: number;
-    invoiceNumber: number;
-    itemCount: number;
-    totalAmount: number;
-    discountAmount: number;
-    couponCode: string | null;
-    couponDiscount: number | null;
-    taxAmount: number;
-    status: string;
-    paymentStatus: string;
-    paymentMethod: string;
-    transactionId: string;
-    paidAt: string | null;
-    createdAt: string;
-    customer: IOrderCustomer;
-    items: IOrderItemEntity[];
-}
-
-export interface IAllOrdersAPIResponseData {
-    orders: IOrderEntity[];
-    pagination: IOrderPagination;
-}
-
-export interface IAllOrdersAPIResponse {
-    http_status_code: number;
-    http_status_msg: string;
-    success: boolean;
-    data: IAllOrdersAPIResponseData;
-    message: string;
-    timestamp: string;
+    legacyType: string;
 }

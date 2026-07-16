@@ -3,13 +3,17 @@
 import { User } from 'lucide-react'
 import ImageComponent from '../ui/ImageComponent'
 import { FacebookIcon, LinkedinIcon } from '../ui/AllSVG'
-import { IHomeAllContentAuthorSocial } from '@/types/user/HomeAllChapters'
+
+interface MentorCardRevealSocial {
+    linkedin?: string | null
+    facebook?: string | null
+}
 
 interface MentorCardRevealProps {
     name?: string | null
     avatar?: string | null
     bio?: string | null
-    social?: IHomeAllContentAuthorSocial | null
+    social?: MentorCardRevealSocial | null
 }
 
 export default function MentorCardReveal({ name, avatar, bio, social }: MentorCardRevealProps) {

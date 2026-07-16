@@ -10,10 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { mentorSignUpSchema } from '@/utils/formValidation';
-import { useAuthorRegisterMutation } from '@/store/rtkQueries/adminAuth';
+import { useRegisterMentorMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import { getHomeRoutePath, getMentorAgreementRoutePath, getMentorLoginRoutePath, } from '@/routes/routes';
+import { getHomeRoutePath, getMentorLoginRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes';
+import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
+import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -24,7 +26,14 @@ export function SignUpForm() {
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [profilePreview, setProfilePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [authorRegister, { isLoading: isRegistering }] = useAuthorRegisterMutation();
+    const [registerMentor, { isLoading: isRegistering }] = useRegisterMentorMutation();
+    const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
+        touchPoint: AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION,
+        userType: AGREEMENT_VISIBLE_USER_TYPES.MENTOR,
+      });
+
+    const agreements = agreementsResponse?.data ?? [];
+    const requiredAgreementIds = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
     const handleAvatarClick = () => fileInputRef.current?.click();
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,27 +65,27 @@ export function SignUpForm() {
             password: '',
             confirmPassword: '',
             professionalBio: '',
-            agreeMentorAgreement: false,
-            agreeRevenueShare: false,
-            agreeContentAndCommunity: false,
+            accepted_agreement_ids: [] as string[],
         },
         validationSchema: mentorSignUpSchema,
+        validate: (vals) => {
+            const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
+            return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+        },
         onSubmit: async (formValues, { resetForm: rf }) => {
             try {
                 const formData = new FormData();
                 formData.append('name', formValues.name);
                 formData.append('email', formValues.email);
                 formData.append('password', formValues.password);
-                formData.append('password_confirmation', formValues.confirmPassword);
+                formData.append('confirm_password', formValues.confirmPassword);
                 if (profileImage) formData.append('profile_pic', profileImage);
                 if (formValues.professionalBio.trim()) {
                     formData.append('professionalBio', formValues.professionalBio.trim());
                 }
-                formData.append('mentor_agreement_accepted', String(formValues.agreeMentorAgreement));
-                formData.append('revenue_share_accepted', String(formValues.agreeRevenueShare));
-                formData.append('content_policy_accepted', String(formValues.agreeContentAndCommunity));
+                formValues.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
 
-                const res = await authorRegister(formData).unwrap();
+                const res = await registerMentor(formData).unwrap();
                 if (profilePreview) URL.revokeObjectURL(profilePreview);
                 setProfileImage(null);
                 setProfilePreview(null);
@@ -87,6 +96,8 @@ export function SignUpForm() {
             }
         },
     });
+
+    const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
     return (
         <AuthPageShell
@@ -157,7 +168,7 @@ export function SignUpForm() {
                         <label htmlFor="signup-password" className="text-sm font-medium text-foreground">Password</label>
                         <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="signup-password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Create a password" className={`pl-12 pr-12 h-12 rounded-2xl ${errors.password && touched.password ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.password} onChange={handleChange} onBlur={handleBlur} />
+                            <Input id="signup-password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Create a password" className={`pl-12 pr-12 h-12 rounded-md ${errors.password && touched.password ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.password} onChange={handleChange} onBlur={handleBlur} />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" disabled={isSubmitting}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </button>
@@ -169,7 +180,7 @@ export function SignUpForm() {
                         <label htmlFor="signup-confirmPassword" className="text-sm font-medium text-foreground">Confirm Password</label>
                         <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="signup-confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="Re-enter your password" className={`pl-12 pr-12 h-12 rounded-2xl ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.confirmPassword} onChange={handleChange} onBlur={handleBlur} />
+                            <Input id="signup-confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="Re-enter your password" className={`pl-12 pr-12 h-12 rounded-md ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.confirmPassword} onChange={handleChange} onBlur={handleBlur} />
                             <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" disabled={isSubmitting}>
                                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </button>
@@ -187,7 +198,7 @@ export function SignUpForm() {
                         name="professionalBio"
                         rows={4}
                         placeholder="Tell Career Architects about your expertise..."
-                        className={`rounded-2xl ${errors.professionalBio && touched.professionalBio ? 'border-red-500' : ''}`}
+                        className={`rounded-md ${errors.professionalBio && touched.professionalBio ? 'border-red-500' : ''}`}
                         disabled={isSubmitting}
                         value={values.professionalBio}
                         onChange={handleChange}
@@ -197,10 +208,34 @@ export function SignUpForm() {
                 </div>
 
                 <div className="space-y-3 pt-1">
-                    <AgreementCheckbox id="agreeMentorAgreement" checked={values.agreeMentorAgreement} error={errors.agreeMentorAgreement} touched={touched.agreeMentorAgreement} onCheckedChange={(checked) => setFieldValue('agreeMentorAgreement', checked)} onBlur={() => setFieldTouched('agreeMentorAgreement', true)} disabled={isSubmitting}>
-                        I agree to the{' '}
-                        <Link href={getMentorAgreementRoutePath()} target="_blank" className="font-semibold text-primary hover:text-primary/80" onClick={(e) => e.stopPropagation()}>Mentor Agreement</Link>
-                    </AgreementCheckbox>
+                    {agreements.map((agreement) => (
+                        <AgreementCheckbox
+                            key={agreement._id}
+                            id={agreement._id}
+                            checked={values.accepted_agreement_ids.includes(agreement._id)}
+                            error={agreementsError}
+                            touched={touched.accepted_agreement_ids}
+                            onCheckedChange={(checked) => {
+                                const ids = checked
+                                    ? [...values.accepted_agreement_ids, agreement._id]
+                                    : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
+                                setFieldValue('accepted_agreement_ids', ids);
+                            }}
+                            onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+                            disabled={isSubmitting}
+                        >
+                            I agree to the{' '}
+                            <Link
+                                href={getPolicyBySlugRoutePath(agreement.slug)}
+                                target="_blank"
+                                className="font-semibold text-primary hover:text-primary/80"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {agreement.title}
+                            </Link>
+                            {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
+                        </AgreementCheckbox>
+                    ))}
                 </div>
 
                 <Button type="submit" className="global_btn bg_primary w-full" disabled={isSubmitting || isRegistering} isLoading={isSubmitting || isRegistering}>

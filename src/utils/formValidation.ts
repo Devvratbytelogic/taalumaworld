@@ -85,12 +85,7 @@ export const careerArchitectSignUpSchema = Yup.object({
 export const mentorSignUpSchema = Yup.object({
   ...signUpBaseSchema,
   professionalBio: Yup.string().max(500, 'Bio must be 500 characters or less'),
-  agreeMentorAgreement: Yup.boolean().oneOf([true], 'You must agree to the Mentor Agreement'),
-  agreeRevenueShare: Yup.boolean().oneOf([true], 'You must agree to the Revenue Share Agreement'),
-  agreeContentAndCommunity: Yup.boolean().oneOf(
-    [true],
-    'You must agree to the Content Ownership & Licensing Policy and Community Standards Policy',
-  ),
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
 export const forgotPasswordSchema = Yup.object({

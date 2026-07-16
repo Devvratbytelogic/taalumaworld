@@ -1,155 +1,267 @@
 'use client';
 
 import { useState } from 'react';
-import { Award, Crown, Plus, Tags, Users } from 'lucide-react';
-import { Button } from '@heroui/react';
-import toast from '@/utils/toast';
-import {
-  AdminPage,
-  AdminPageHeader,
-  AdminSearchInput,
-  AdminSearchPanel,
-  AdminStatCard,
-} from '@/components/admin/layout/AdminContent';
-import { INITIAL_MENTOR_TYPES, type MentorType } from '@/components/admin/mentor-types/data/mentorTypesData';
-import { MentorTypeListing } from './MentorTypeListing';
-import { MentorTypeModal, type MentorTypeFormValues } from './MentorTypeModal';
+import { type GridColDef } from '@mui/x-data-grid';
+import { Award, Edit2, Plus, X } from 'lucide-react';
+import { AdminPage, AdminPageHeader, AdminSearchInput, AdminSearchPanel, adminFilterPillClass, adminSelectClass } from '@/components/admin/layout/AdminContent';
+import Button from '@/components/ui/Button';
+import { Badge } from '@/components/ui/badge';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useGetAllMentorTiersQuery } from '@/store/rtkQueries/mentorApis';
+import type { IAllMentorTiersEntity } from '@/types/mentorTier';
+import { MentorTypeModal } from './MentorTypeModal';
+import moment from 'moment';
+import ImageComponent from '@/components/ui/ImageComponent';
 
-function toSlug(name: string) {
-  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  inactive: 'bg-slate-100 text-slate-600 border-slate-200',
+};
+
+const STATUS_OPTIONS = ['active', 'inactive'];
 
 export function AdminMentorTypesTab() {
-  const [types, setTypes] = useState<MentorType[]>(INITIAL_MENTOR_TYPES);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingType, setEditingType] = useState<MentorType | null>(null);
+  const [editingTier, setEditingTier] = useState<IAllMentorTiersEntity | null>(null);
 
-  const searchText = searchQuery.trim().toLowerCase();
-  const filteredTypes = searchText
-    ? types.filter(
-        (type) =>
-          type.name.toLowerCase().includes(searchText) ||
-          type.slug.toLowerCase().includes(searchText) ||
-          type.badgeLabel.toLowerCase().includes(searchText),
-      )
-    : types;
+  const debouncedSearch = useDebounce(searchQuery, 400);
 
-  const foundingType = types.find((type) => type.slug === 'founding-mentor');
+  const { data, isLoading } = useGetAllMentorTiersQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+    ...(statusFilter ? { status: statusFilter } : {}),
+  });
 
-  const handleSave = (values: MentorTypeFormValues, id?: string) => {
-    const slug = toSlug(values.name);
+  const tiers = data?.data?.data ?? [];
+  const total = data?.data?.total ?? 0;
+  const hasActiveFilters = !!statusFilter;
 
-    if (id) {
-      setTypes((prev) =>
-        prev.map((type) =>
-          type.id === id
-            ? {
-                ...type,
-                name: values.name.trim(),
-                slug,
-                mentorSharePercent: values.mentorSharePercent,
-                taalumaSharePercent: values.taalumaSharePercent,
-                badgeLabel: values.badgeLabel.trim(),
-                eligibilityCriteria: values.eligibilityCriteria.trim(),
-                startDate: values.startDate || undefined,
-                endDate: values.endDate || undefined,
-                isActive: values.isActive,
-                maxActiveMentors: values.maxActiveMentors,
-                agreementVersion: values.agreementVersion.trim(),
-              }
-            : type,
-        ),
-      );
-      toast.success('Mentor type updated');
-      return;
-    }
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
 
-    if (types.some((type) => type.slug === slug)) {
-      toast.error('A mentor type with this name already exists');
-      return;
-    }
-
-    setTypes((prev) => [
-      ...prev,
-      {
-        id: `mt_${slug}`,
-        name: values.name.trim(),
-        slug,
-        mentorSharePercent: values.mentorSharePercent,
-        taalumaSharePercent: values.taalumaSharePercent,
-        badgeLabel: values.badgeLabel.trim(),
-        eligibilityCriteria: values.eligibilityCriteria.trim(),
-        startDate: values.startDate || undefined,
-        endDate: values.endDate || undefined,
-        isActive: values.isActive,
-        maxActiveMentors: values.maxActiveMentors,
-        agreementVersion: values.agreementVersion.trim(),
-        schedules: ['Schedule A – Revenue Share'],
-        activeMentorCount: 0,
-      },
-    ]);
-    toast.success('Mentor type created');
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetToFirstPage();
   };
 
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    resetToFirstPage();
+  };
+
+  const columns: GridColDef[] = [
+    {
+      field: 'index',
+      headerName: '#',
+      width: 60,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
+        const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+        return (
+          <span className="text-sm text-muted-foreground">
+            {paginationModel.page * paginationModel.pageSize + rowIndex + 1}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'code',
+      headerName: 'Tier code',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-primary/10">
+            {params.row.badge ? (
+              <ImageComponent src={params.row.badge || ''} alt='Mentor tier badge' object_cover={true} />
+            ) : (
+              <Award className="h-4 w-4 text-primary" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-sm text-slate-900">{params.row.code}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      field: 'revenue_share',
+      headerName: 'Revenue share',
+      minWidth: 190,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-700">
+          {params.row.mentor_share_percent}% Mentor / {params.row.platform_share_percent}% Platform
+        </span>
+      ),
+    },
+    {
+      field: 'rank',
+      headerName: 'Rank',
+      width: 80,
+      sortable: false,
+      renderCell: (params) => <span className="text-sm text-slate-700">#{params.row.rank}</span>,
+    },
+    {
+      field: 'eligibility',
+      headerName: 'Eligibility criteria',
+      minWidth: 220,
+      flex: 1.2,
+      sortable: false,
+      renderCell: (params) => {
+        const criteria: string[] = [];
+        if (params.row.max_mentors) criteria.push(`Max ${params.row.max_mentors} mentors`);
+        if (params.row.min_confirmed_sales) criteria.push(`${params.row.min_confirmed_sales}+ sales`);
+        if (params.row.min_days_since_published) criteria.push(`${params.row.min_days_since_published}+ days live`);
+        if (params.row.min_words_per_blueprint) criteria.push(`${params.row.min_words_per_blueprint}+ words`);
+        return criteria.length ? (
+          <span className="truncate text-sm text-slate-600" title={criteria.join(' · ')}>
+            {criteria.join(' · ')}
+          </span>
+        ) : (
+          <span className="text-sm text-slate-400">No criteria</span>
+        );
+      },
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-500">
+          {params.row.createdAt
+            ? moment(params.row.createdAt).format('DD MMM YYYY')
+            : '—'}
+        </span>
+      ),
+    },
+    {
+      field: 'is_verified_tier',
+      headerName: 'Verified Tier',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className={params.row.is_verified_tier ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}>
+          {params.row.is_verified_tier ? 'Yes' : 'No'}
+        </Badge>
+      ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className={STATUS_BADGE_CLASS[params.row.status] ?? 'border-slate-200 text-slate-600'}>
+          {params.row.status === 'active' ? 'Active' : 'Inactive'}
+        </Badge>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 100,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="action_buttons">
+          <button
+            type="button"
+            className="edit_button"
+            title="Edit mentor tier"
+            onClick={() => setEditingTier(params.row)}
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <AdminPage>
-      <AdminPageHeader
-        eyebrow="Mentor Management"
-        title="Mentor Types"
-        description="Configure mentor categories, revenue share, badges, and agreement requirements."
-      >
-        <Button
-          color="primary"
-          className="rounded-xl"
-          onPress={() => setIsCreateOpen(true)}
-          startContent={<Plus className="h-4 w-4" />}
+    <>
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor Tiers"
+          description="Configure mentor tiers, revenue share, and rank used to grade mentor performance."
         >
-          Add mentor type
-        </Button>
-      </AdminPageHeader>
+          <Button className="global_btn rounded_full bg_primary" onPress={() => setIsCreateOpen(true)} startContent={<Plus className="h-4 w-4" />}>
+            Add mentor tier
+          </Button>
+        </AdminPageHeader>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <AdminStatCard label="Active types" value={types.filter((t) => t.isActive).length} icon={Award} tone="blue" />
-        <AdminStatCard
-          label="Mentors assigned"
-          value={types.reduce((sum, t) => sum + t.activeMentorCount, 0)}
-          icon={Users}
-          tone="green"
+        <AdminSearchPanel>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <AdminSearchInput value={searchQuery} onChange={handleSearchChange} placeholder="Search by tier code..." />
+
+            <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+              <select
+                value={statusFilter}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className={adminSelectClass}
+              >
+                <option value="">All statuses</option>
+                {STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status} className="capitalize">
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </option>
+                ))}
+              </select>
+
+              {hasActiveFilters ? (
+                <button
+                  type="button"
+                  onClick={() => handleStatusChange('')}
+                  className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Clear
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {hasActiveFilters ? (
+            <div className="flex flex-wrap gap-2">
+              <span className={adminFilterPillClass}>
+                {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                <button type="button" onClick={() => handleStatusChange('')} className="hover:text-primary/70">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            </div>
+          ) : null}
+        </AdminSearchPanel>
+        <div className="border border-gray-200 rounded-md overflow-hidden">
+          <CommonDataTable
+            rows={tiers}
+            columns={columns}
+            getRowId={(row) => row._id}
+            loading={isLoading}
+            paginationMode="server"
+            rowCount={total}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+          />
+        </div>
+
+
+        <MentorTypeModal open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+        <MentorTypeModal
+          open={!!editingTier}
+          mentorTier={editingTier}
+          onOpenChange={(open) => !open && setEditingTier(null)}
         />
-        <AdminStatCard
-          label="Founding mentors"
-          value={foundingType ? `${foundingType.activeMentorCount} / ${foundingType.maxActiveMentors ?? '—'}` : '—'}
-          icon={Crown}
-          tone="orange"
-        />
-        <AdminStatCard
-          label="Inactive types"
-          value={types.filter((t) => !t.isActive).length}
-          icon={Tags}
-          tone="slate"
-        />
-      </div>
-
-      <AdminSearchPanel>
-        <AdminSearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search mentor types..." />
-      </AdminSearchPanel>
-
-      <MentorTypeListing
-        types={filteredTypes}
-        totalCount={types.length}
-        searchQuery={searchQuery}
-        onCreateType={() => setIsCreateOpen(true)}
-        onEdit={setEditingType}
-      />
-
-      <MentorTypeModal open={isCreateOpen} onOpenChange={setIsCreateOpen} onSubmit={handleSave} />
-      <MentorTypeModal
-        open={!!editingType}
-        mentorType={editingType}
-        onOpenChange={(open) => !open && setEditingType(null)}
-        onSubmit={handleSave}
-      />
-    </AdminPage>
+      </AdminPage>
+    </>
   );
 }

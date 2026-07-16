@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { Save, X } from 'lucide-react';
+import { Award, Save, Upload, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,184 +14,284 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import type { MentorType } from '@/components/admin/mentor-types/data/mentorTypesData';
+import toast from '@/utils/toast';
+import { mentorTierSchema } from '@/utils/formValidation';
+import { useAddMentorTierMutation, useUpdateMentorTierMutation } from '@/store/rtkQueries/mentorApis';
+import type { IAllMentorTiersEntity } from '@/types/mentorTier';
 
-export type MentorTypeFormValues = {
-  name: string;
-  mentorSharePercent: number;
-  taalumaSharePercent: number;
-  badgeLabel: string;
-  eligibilityCriteria: string;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  maxActiveMentors?: number;
-  agreementVersion: string;
-};
 
-const schema = Yup.object({
-  name: Yup.string().trim().min(2, 'Name is required').required('Name is required'),
-  mentorSharePercent: Yup.number().min(0).max(100).required('Required'),
-  badgeLabel: Yup.string().trim().min(2, 'Badge label is required').required('Badge label is required'),
-  agreementVersion: Yup.string().trim().required('Agreement version is required'),
-});
-
-const emptyValues: MentorTypeFormValues = {
-  name: '',
-  mentorSharePercent: 80,
-  taalumaSharePercent: 20,
-  badgeLabel: '',
-  eligibilityCriteria: '',
-  startDate: '',
-  endDate: '',
-  isActive: true,
-  agreementVersion: 'v1.0',
-};
 
 interface MentorTypeModalProps {
   open: boolean;
-  mentorType?: MentorType | null;
+  mentorTier?: IAllMentorTiersEntity | null;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: MentorTypeFormValues, id?: string) => void;
+  onSuccess?: () => void;
 }
 
-export function MentorTypeModal({ open, mentorType, onOpenChange, onSubmit }: MentorTypeModalProps) {
-  const isEditing = !!mentorType;
+export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: MentorTypeModalProps) {
+  const isEditing = !!mentorTier;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [badgeFile, setBadgeFile] = useState<File | null>(null);
+  const [badgePreview, setBadgePreview] = useState<string | null>(null);
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, resetForm, setFieldValue } = useFormik({
-    initialValues: emptyValues,
-    validationSchema: schema,
-    onSubmit: (formValues) => {
-      onSubmit(formValues, mentorType?.id);
-      onOpenChange(false);
+  const [addMentorTier, { isLoading: isAdding }] = useAddMentorTierMutation();
+  const [updateMentorTier, { isLoading: isUpdating }] = useUpdateMentorTierMutation();
+  const isSaving = isAdding || isUpdating;
+
+  const initialValues = {
+    code: mentorTier?.code || '',
+    mentor_share_percent: mentorTier?.mentor_share_percent || 0,
+    platform_share_percent: mentorTier?.platform_share_percent || 0,
+    rank: mentorTier?.rank || 0,
+    status: mentorTier?.status || 'active',
+    max_mentors: mentorTier?.max_mentors || 0,
+    min_confirmed_sales: mentorTier?.min_confirmed_sales || 0,
+    min_days_since_published: mentorTier?.min_days_since_published || 0,
+    min_words_per_blueprint: mentorTier?.min_words_per_blueprint || 0,
+    badge: mentorTier?.badge || null,
+  };
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, resetForm, setFieldValue } = useFormik({
+    initialValues,
+    validationSchema: mentorTierSchema,
+    enableReinitialize: true,
+    onSubmit: async (formValues) => {
+      const fd = new FormData();
+      fd.append('code', formValues.code);
+      fd.append('mentor_share_percent', String(formValues.mentor_share_percent));
+      fd.append('platform_share_percent', String(formValues.platform_share_percent));
+      fd.append('rank', String(formValues.rank));
+      fd.append('status', formValues.status);
+      fd.append('max_mentors', String(formValues.max_mentors));
+      fd.append('min_confirmed_sales', String(formValues.min_confirmed_sales));
+      fd.append('min_days_since_published', String(formValues.min_days_since_published));
+      fd.append('min_words_per_blueprint', String(formValues.min_words_per_blueprint));
+      if (badgeFile) fd.append('badge', badgeFile);
+
+      try {
+        if (isEditing && mentorTier) {
+          await updateMentorTier({ id: mentorTier._id, values: fd }).unwrap();
+          toast.success('Mentor tier updated');
+        } else {
+          await addMentorTier(fd).unwrap();
+          toast.success('Mentor tier created');
+        }
+        onOpenChange(false);
+        onSuccess?.();
+      } catch {
+        toast.error(isEditing ? 'Failed to update mentor tier' : 'Failed to create mentor tier');
+      }
     },
   });
 
   useEffect(() => {
     if (!open) return;
-    resetForm({
-      values: mentorType
-        ? {
-            name: mentorType.name,
-            mentorSharePercent: mentorType.mentorSharePercent,
-            taalumaSharePercent: mentorType.taalumaSharePercent,
-            badgeLabel: mentorType.badgeLabel,
-            eligibilityCriteria: mentorType.eligibilityCriteria,
-            startDate: mentorType.startDate ?? '',
-            endDate: mentorType.endDate ?? '',
-            isActive: mentorType.isActive,
-            maxActiveMentors: mentorType.maxActiveMentors,
-            agreementVersion: mentorType.agreementVersion,
-          }
-        : emptyValues,
-    });
-  }, [open, mentorType, resetForm]);
+    setBadgeFile(null);
+    setBadgePreview(mentorTier?.badge ?? null);
+  }, [open, mentorTier, resetForm]);
+
+  useEffect(() => {
+    if (badgeFile) {
+      const url = URL.createObjectURL(badgeFile);
+      setBadgePreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [badgeFile]);
+
+  const handleBadgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file (e.g. JPG, PNG, SVG)');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Badge image must be less than 2MB');
+      return;
+    }
+    setBadgeFile(file);
+    setFieldValue('badge', file);
+    e.target.value = '';
+  };
+
+  const clearBadge = () => {
+    setBadgeFile(null);
+    setBadgePreview(null);
+    setFieldValue('badge', null);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
-          <DialogTitle>{isEditing ? 'Edit mentor type' : 'Add mentor type'}</DialogTitle>
-          <DialogDescription>
-            Configure revenue share, badge, eligibility, and agreement version.
-          </DialogDescription>
+          <DialogTitle>{isEditing ? 'Edit mentor tier' : 'Add mentor tier'}</DialogTitle>
+          <DialogDescription>Configure the tier code, revenue share, rank, eligibility, and badge.</DialogDescription>
         </DialogHeader>
 
         <form noValidate onSubmit={handleSubmit} className="admin_panel flex min-h-0 flex-1 flex-col">
           <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto p-6!">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                {badgePreview ? (
+                  <img src={badgePreview} alt="Badge preview" className="h-full w-full object-cover" onError={() => setBadgePreview(null)} />
+                ) : (
+                  <Award className="h-7 w-7 text-slate-300" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <Label className="mb-1 block">
+                  Badge <span className="font-normal text-muted-foreground">(optional)</span>
+                </Label>
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleBadgeChange} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    className="global_btn outline_primary rounded_full shrink-0"
+                    startContent={<Upload className="h-4 w-4" />}
+                    onPress={() => fileInputRef.current?.click()}
+                  >
+                    {badgePreview ? 'Change image' : 'Choose image'}
+                  </Button>
+                  {badgePreview ? (
+                    <button type="button" onClick={clearBadge} className="shrink-0 text-xs text-red-600 hover:underline">
+                      Remove
+                    </button>
+                  ) : null}
+                </div>
+                {badgeFile ? (
+                  <p className="mt-1 max-w-full truncate text-xs text-slate-500" title={badgeFile.name}>
+                    {badgeFile.name}
+                  </p>
+                ) : null}
+                <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, SVG — max 2 MB</p>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="name">Mentor type name</Label>
+              <Label htmlFor="code">
+                Tier code<span className="text-red-500">*</span>
+              </Label>
               <Input
-                id="name"
-                name="name"
-                value={values.name}
-                onChange={(e) => {
-                  handleChange(e);
-                  if (!isEditing && !values.badgeLabel) setFieldValue('badgeLabel', e.target.value);
-                }}
+                id="code"
+                name="code"
+                value={values.code}
+                onChange={(e) => setFieldValue('code', e.target.value.toUpperCase())}
                 onBlur={handleBlur}
-                placeholder="e.g. Standard Mentor"
+                placeholder="e.g. STANDARD"
               />
-              {errors.name && touched.name ? <p className="text-sm text-red-600">{errors.name}</p> : null}
+              {errors.code && touched.code ? <p className="text-sm text-red-600">{errors.code}</p> : null}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="mentorSharePercent">Mentor share (%)</Label>
+                <Label htmlFor="mentor_share_percent">
+                  Mentor share (%)<span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="mentorSharePercent"
+                  id="mentor_share_percent"
                   type="text"
                   inputMode="numeric"
-                  value={values.mentorSharePercent}
+                  value={values.mentor_share_percent}
                   onChange={(e) => {
                     const share = Math.min(100, Math.max(0, Number(e.target.value.replace(/[^\d]/g, '')) || 0));
-                    setFieldValue('mentorSharePercent', share);
-                    setFieldValue('taalumaSharePercent', 100 - share);
+                    setFieldValue('mentor_share_percent', share);
+                    setFieldValue('platform_share_percent', 100 - share);
                   }}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="taalumaSharePercent">Taaluma share (%)</Label>
-                <Input id="taalumaSharePercent" value={values.taalumaSharePercent} readOnly className="bg-slate-50" />
+                <Label htmlFor="platform_share_percent">Platform share (%)</Label>
+                <Input id="platform_share_percent" value={values.platform_share_percent} readOnly className="bg-slate-50" />
               </div>
             </div>
-            <p className="text-xs text-slate-400">Taaluma share updates automatically to total 100%.</p>
-
-            <div className="space-y-2">
-              <Label htmlFor="badgeLabel">Badge label</Label>
-              <Input id="badgeLabel" name="badgeLabel" value={values.badgeLabel} onChange={handleChange} onBlur={handleBlur} placeholder="e.g. Founding Mentor" />
-              {errors.badgeLabel && touched.badgeLabel ? <p className="text-sm text-red-600">{errors.badgeLabel}</p> : null}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="eligibilityCriteria">Eligibility criteria</Label>
-              <textarea
-                id="eligibilityCriteria"
-                name="eligibilityCriteria"
-                value={values.eligibilityCriteria}
-                onChange={handleChange}
-                rows={3}
-                placeholder="Describe who qualifies for this mentor type..."
-                className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
+            <p className="text-xs text-slate-400">Platform share updates automatically to total 100%.</p>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start date</Label>
-                <Input id="startDate" name="startDate" type="date" value={values.startDate} onChange={handleChange} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="endDate">End date</Label>
-                <Input id="endDate" name="endDate" type="date" value={values.endDate} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="agreementVersion">Agreement version</Label>
-                <Input id="agreementVersion" name="agreementVersion" value={values.agreementVersion} onChange={handleChange} onBlur={handleBlur} placeholder="v1.0" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="maxActiveMentors">Max active mentors</Label>
+                <Label htmlFor="rank">
+                  Rank<span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="maxActiveMentors"
+                  id="rank"
                   type="text"
                   inputMode="numeric"
-                  value={values.maxActiveMentors ?? ''}
+                  value={values.rank}
                   onChange={(e) => {
                     const digits = e.target.value.replace(/[^\d]/g, '');
-                    setFieldValue('maxActiveMentors', digits ? Number(digits) : undefined);
+                    setFieldValue('rank', digits ? Number(digits) : 0);
                   }}
-                  placeholder="Optional"
+                  placeholder="e.g. 1"
                 />
+                {errors.rank && touched.rank ? <p className="text-sm text-red-600">{errors.rank}</p> : null}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">
+                  Status<span className="text-red-500">*</span>
+                </Label>
+                <select
+                  id="status"
+                  name="status"
+                  value={values.status}
+                  onChange={handleChange}
+                  className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
               </div>
             </div>
 
-            <label className="flex items-center gap-2 text-sm text-slate-700">
-              <input type="checkbox" checked={values.isActive} onChange={(e) => setFieldValue('isActive', e.target.checked)} className="rounded border-slate-300" />
-              Active
-            </label>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Eligibility criteria (optional)</p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="max_mentors">Max mentors</Label>
+                <Input
+                  id="max_mentors"
+                  name="max_mentors"
+                  type="text"
+                  inputMode="numeric"
+                  value={values.max_mentors}
+                  onChange={(e) => setFieldValue('max_mentors', e.target.value.replace(/[^\d]/g, ''))}
+                  placeholder="e.g. 10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="min_confirmed_sales">Min confirmed sales</Label>
+                <Input
+                  id="min_confirmed_sales"
+                  name="min_confirmed_sales"
+                  type="text"
+                  inputMode="numeric"
+                  value={values.min_confirmed_sales}
+                  onChange={(e) => setFieldValue('min_confirmed_sales', e.target.value.replace(/[^\d]/g, ''))}
+                  placeholder="e.g. 5"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="min_days_since_published">Min days since published</Label>
+                <Input
+                  id="min_days_since_published"
+                  name="min_days_since_published"
+                  type="text"
+                  inputMode="numeric"
+                  value={values.min_days_since_published}
+                  onChange={(e) => setFieldValue('min_days_since_published', e.target.value.replace(/[^\d]/g, ''))}
+                  placeholder="e.g. 30"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="min_words_per_blueprint">Min words per blueprint</Label>
+                <Input
+                  id="min_words_per_blueprint"
+                  name="min_words_per_blueprint"
+                  type="text"
+                  inputMode="numeric"
+                  value={values.min_words_per_blueprint}
+                  onChange={(e) => setFieldValue('min_words_per_blueprint', e.target.value.replace(/[^\d]/g, ''))}
+                  placeholder="e.g. 500"
+                />
+              </div>
+            </div>
           </div>
 
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">
@@ -200,9 +299,9 @@ export function MentorTypeModal({ open, mentorType, onOpenChange, onSubmit }: Me
               <X className="h-4 w-4" />
               Cancel
             </Button>
-            <Button type="submit" className="global_btn bg_primary rounded_full" isLoading={isSubmitting}>
+            <Button type="submit" className="global_btn bg_primary rounded_full" isLoading={isSaving}>
               <Save className="h-4 w-4" />
-              {isEditing ? 'Save changes' : 'Create type'}
+              {isEditing ? 'Save changes' : 'Create tier'}
             </Button>
           </DialogFooter>
         </form>

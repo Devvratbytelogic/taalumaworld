@@ -63,9 +63,9 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminAuthorLeaders'],
         }),
-        inviteAuthorLeader: builder.mutation({
-            query: (payload: { email: string; fullName?: string }) => ({
-                url: `/admin/leaders/invite`,
+        inviteMentor: builder.mutation({
+            query: (payload: FormData) => ({
+                url: `/admin/invite-mentor`,
                 method: 'POST',
                 body: payload,
             }),
@@ -215,7 +215,7 @@ export const {
     useAddAuthorLeaderMutation,
     useUpdateAuthorLeaderMutation,
     useDeleteAuthorLeaderMutation,
-    useInviteAuthorLeaderMutation,
+    useInviteMentorMutation,
 
     // Books
     useAddBookMutation,

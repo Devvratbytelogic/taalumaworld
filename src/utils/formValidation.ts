@@ -450,6 +450,28 @@ export const agreementTypeSchema = Yup.object({
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
 });
 
+// Add / Edit Mentor Tier Modal Validation Schema
+const optionalNonNegativeNumber = Yup.number()
+  .transform((v) => (v === '' || v == null ? undefined : Number(v)))
+  .min(0, 'Must be 0 or more')
+  .optional();
+
+export const mentorTierSchema = Yup.object({
+  code: Yup.string().trim().min(2, 'Tier code is required').required('Tier code is required'),
+  mentor_share_percent: Yup.number().min(0).max(100).required('Required'),
+  platform_share_percent: Yup.number().min(0).max(100).required('Required'),
+  rank: Yup.number().min(1, 'Rank must be at least 1').required('Rank is required'),
+  status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
+  max_mentors: optionalNonNegativeNumber,
+  min_confirmed_sales: optionalNonNegativeNumber,
+  min_days_since_published: optionalNonNegativeNumber,
+  min_words_per_blueprint: optionalNonNegativeNumber,
+  badge: Yup.mixed()
+    .nullable()
+    .optional()
+    .test('badge', 'Badge must be an image file', (v) => !v || v instanceof File || typeof v === 'string'),
+});
+
 // Add / Edit Agreement Modal Validation Schema
 export const agreementSchema = Yup.object({
   title: Yup.string().trim().min(2, 'Title is required').required('Title is required'),

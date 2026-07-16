@@ -4,18 +4,18 @@ import { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
-import { useInviteAuthorLeaderMutation } from '@/store/rtkQueries/adminPostApi';
+import { useInviteMentorMutation } from '@/store/rtkQueries/adminPostApi';
 import { InviteMentorModal, type InviteMentorFormValues } from './InviteMentorModal';
 
 export function AdminAuthorsHeader() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [inviteAuthorLeader] = useInviteAuthorLeaderMutation();
+  const [inviteMentor] = useInviteMentorMutation();
 
   const handleInviteMentor = async (values: InviteMentorFormValues) => {
-    await inviteAuthorLeader({
-      email: values.email.trim(),
-      ...(values.fullName.trim() ? { fullName: values.fullName.trim() } : {}),
-    }).unwrap();
+    const formData = new FormData();
+    formData.append('email', values.email.trim());
+    if (values.fullName.trim()) formData.append('name', values.fullName.trim());
+    await inviteMentor(formData).unwrap();
   };
 
   return (

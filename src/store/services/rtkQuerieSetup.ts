@@ -193,6 +193,8 @@ export const rtkQuerieSetup = createApi({
         'AdminAgreementTypes',
         'AdminAgreements',
         'AdminUserConsentStatus',
+        'AdminMentorTiers',
+        'AdminMentorApplications',
     ],
     endpoints: () => ({}),
 });

@@ -69,7 +69,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags: ['AdminAuthorLeaders'],
+            invalidatesTags: ['AdminStaff'],
         }),
 
 

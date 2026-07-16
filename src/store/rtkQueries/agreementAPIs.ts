@@ -109,7 +109,7 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus'],
         }),
         getUserConsentStatus: builder.query<IGetUserConsentStatusAPIResponse, { userType: string }>({
-            query: (userType) => ({
+            query: ({ userType }) => ({
                 url: `/admin/agreements/user-consent-status/${userType}`,
                 method: 'GET',
             }),

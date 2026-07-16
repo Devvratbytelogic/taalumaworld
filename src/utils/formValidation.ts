@@ -256,6 +256,30 @@ export const updateProfileSchema = Yup.object({
     .required('Name is required'),
 });
 
+// Mentor Profile Tab — Profile details (name, bio, social links) Validation Schema
+export const mentorProfileDetailsSchema = Yup.object({
+  name: Yup.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be at most 60 characters').required('Name is required'),
+  professionalBio: Yup.string().trim().max(500, 'Bio must be at most 500 characters').optional(),
+  facebook: Yup.string().trim().url('Enter a valid URL').optional(),
+  linkedin: Yup.string().trim().url('Enter a valid URL').optional(),
+});
+
+// Mentor Profile Tab — Payout details (bank / M-Pesa / tax) Validation Schema
+export const mentorPayoutDetailsSchema = Yup.object({
+  bank_name: Yup.string().trim().max(120, 'Too long').required('Bank name is required'),
+  bank_number: Yup.string().trim().max(40, 'Too long').required('Account number is required'),
+  bank_branch: Yup.string().trim().max(120, 'Too long').required('Bank branch is required'),
+  mpesa_number: Yup.string().trim().max(20, 'Too long').required('M-Pesa number is required'),
+  tax_id: Yup.string().trim().max(40, 'Too long').required('Tax ID is required'),
+  preferred_payment_frequency: Yup.string().trim().required('Preferred payout frequency is required'),
+  is_vat_registered: Yup.boolean().required(),
+  vat_number: Yup.string().trim().max(40, 'Too long').when('is_vat_registered', {
+    is: true,
+    then: (schema) => schema.required('VAT number is required'),
+    otherwise: (schema) => schema.optional(),
+  }),
+});
+
 // Global Settings Validation Schema
 const urlSchema = Yup.string().url('Must be a valid URL (https://...)');
 export const globalSettingsSchema = Yup.object({

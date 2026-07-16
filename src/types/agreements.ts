@@ -119,6 +119,8 @@ export interface IGetUserConsentStatusData {
 export interface IGetUserConsentStatusAgreementsEntity {
   _id: string;
   title: string;
+  is_required: boolean;
+  slug?: string | null;
   agreement_type: IGetUserConsentStatusAgreementType;
   current_version: string;
   accepted_version: string;

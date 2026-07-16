@@ -13,15 +13,7 @@ import { mentorSignUpSchema } from '@/utils/formValidation';
 import { useAuthorRegisterMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import {
-    getCommunityStandardsRoutePath,
-    getContentOwnershipLicensingRoutePath,
-    getHomeRoutePath,
-    getMentorAgreementRoutePath,
-    getMentorLoginRoutePath,
-    getMentorVerifyRoutePath,
-    getRevenueShareAgreementRoutePath,
-} from '@/routes/routes';
+import { getHomeRoutePath, getMentorAgreementRoutePath, getMentorLoginRoutePath, } from '@/routes/routes';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -90,7 +82,6 @@ export function SignUpForm() {
                 setProfilePreview(null);
                 rf();
                 toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.');
-                router.push(getMentorVerifyRoutePath({ email: formValues.email, type: 'account' }));
             } catch {
                 console.error('Registration failed. Please try again.');
             }
@@ -209,16 +200,6 @@ export function SignUpForm() {
                     <AgreementCheckbox id="agreeMentorAgreement" checked={values.agreeMentorAgreement} error={errors.agreeMentorAgreement} touched={touched.agreeMentorAgreement} onCheckedChange={(checked) => setFieldValue('agreeMentorAgreement', checked)} onBlur={() => setFieldTouched('agreeMentorAgreement', true)} disabled={isSubmitting}>
                         I agree to the{' '}
                         <Link href={getMentorAgreementRoutePath()} target="_blank" className="font-semibold text-primary hover:text-primary/80" onClick={(e) => e.stopPropagation()}>Mentor Agreement</Link>
-                    </AgreementCheckbox>
-                    <AgreementCheckbox id="agreeRevenueShare" checked={values.agreeRevenueShare} error={errors.agreeRevenueShare} touched={touched.agreeRevenueShare} onCheckedChange={(checked) => setFieldValue('agreeRevenueShare', checked)} onBlur={() => setFieldTouched('agreeRevenueShare', true)} disabled={isSubmitting}>
-                        I agree to the{' '}
-                        <Link href={getRevenueShareAgreementRoutePath()} target="_blank" className="font-semibold text-primary hover:text-primary/80" onClick={(e) => e.stopPropagation()}>Revenue Share Agreement</Link>
-                    </AgreementCheckbox>
-                    <AgreementCheckbox id="agreeContentAndCommunity" checked={values.agreeContentAndCommunity} error={errors.agreeContentAndCommunity} touched={touched.agreeContentAndCommunity} onCheckedChange={(checked) => setFieldValue('agreeContentAndCommunity', checked)} onBlur={() => setFieldTouched('agreeContentAndCommunity', true)} disabled={isSubmitting}>
-                        I agree to the{' '}
-                        <Link href={getContentOwnershipLicensingRoutePath()} target="_blank" className="font-semibold text-primary hover:text-primary/80" onClick={(e) => e.stopPropagation()}>Content Ownership &amp; Licensing Policy</Link>
-                        {' '}and{' '}
-                        <Link href={getCommunityStandardsRoutePath()} target="_blank" className="font-semibold text-primary hover:text-primary/80" onClick={(e) => e.stopPropagation()}>Community Standards Policy</Link>
                     </AgreementCheckbox>
                 </div>
 

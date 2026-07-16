@@ -5,9 +5,9 @@ import WhyTaalumaExists from '@/components/pages-components/about/WhyTaalumaExis
 import MissionVision from '@/components/pages-components/about/MissionVision';
 import OurStory from '@/components/pages-components/about/OurStory';
 import CoreValues from '@/components/pages-components/about/CoreValues';
-import MentorMarketplace from '@/components/pages-components/about/MentorMarketplace';
 import BlueprintShowcase from '@/components/pages-components/about/BlueprintShowcase';
 import CommonCTA from '@/components/cta/CommonCTA';
+import HomeMentorShowcase from '@/components/pages-components/home/HomeMentorShowcase';
 
 export default function AboutUsPage() {
     return (
@@ -29,7 +29,7 @@ export default function AboutUsPage() {
                 <CoreValues />
 
                 {/* Meet Some of Our Mentors */}
-                <MentorMarketplace />
+                <HomeMentorShowcase />
 
                 {/* Featured Blueprints */}
                 <BlueprintShowcase />

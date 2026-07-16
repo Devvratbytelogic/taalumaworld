@@ -77,7 +77,7 @@ export default function FilterModal() {
   const isLoadingFilters = isLoadingCategories || isLoadingAuthors || isLoadingTags;
 
   const categories = categoriesResponse?.data ?? [];
-  const authors = authorsResponse?.data?.items ?? [];
+  const authors = authorsResponse?.data?.data ?? [];
   const allTags = tagsResponse?.data?.tags ?? [];
 
   const progressFilters = [
@@ -265,7 +265,7 @@ export default function FilterModal() {
                         className="rounded-md pointer-events-none"
                       />
                       <span className="text-sm cursor-pointer tracking-tight flex-1">
-                        {author.fullName}
+                        {author.name}
                       </span>
                     </div>
                   ))}

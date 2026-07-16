@@ -78,9 +78,9 @@ export default function CommonCard({ data }: CommonCardProps) {
                                 <span className="truncate">{data?.bookTitle}</span>
                             </Badge>
                         )}
-                        <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-sm font-medium">
+                        {/* <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1 text-sm font-medium">
                         Blueprint {data?.chapterNumber}
-                        </Badge>
+                        </Badge> */}
                     </div>
                 )}
 

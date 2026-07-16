@@ -30,7 +30,7 @@ export function SignUpForm() {
     const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
         touchPoint: AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION,
         userType: AGREEMENT_VISIBLE_USER_TYPES.MENTOR,
-      });
+    });
 
     const agreements = agreementsResponse?.data ?? [];
     const requiredAgreementIds = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
@@ -86,11 +86,13 @@ export function SignUpForm() {
                 formValues.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
 
                 const res = await registerMentor(formData).unwrap();
-                if (profilePreview) URL.revokeObjectURL(profilePreview);
-                setProfileImage(null);
-                setProfilePreview(null);
-                rf();
-                toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.');
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    if (profilePreview) URL.revokeObjectURL(profilePreview);
+                    setProfileImage(null);
+                    setProfilePreview(null);
+                    rf();
+                    toast.success(res.message ?? 'Account created! Please verify your email.');
+                }
             } catch {
                 console.error('Registration failed. Please try again.');
             }

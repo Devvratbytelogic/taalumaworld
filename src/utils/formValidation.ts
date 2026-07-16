@@ -77,8 +77,8 @@ export const careerArchitectSignUpSchema = Yup.object({
     then: (schema) => schema.required('Please select your university'),
     otherwise: (schema) => schema.optional(),
   }),
-  agreeTerms: Yup.boolean().oneOf([true], 'You must agree to the Terms of Service'),
-  agreePrivacy: Yup.boolean().oneOf([true], 'You must read the Privacy Policy'),
+  referralCode: Yup.string().optional(),
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
   sendUpdates: Yup.boolean(),
 });
 

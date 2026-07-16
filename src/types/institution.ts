@@ -132,6 +132,27 @@ export interface IInstitutionAccessDataEntity {
 
 
 
+export interface IPartnerInstitutionsAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data?: (IPartnerInstitutionEntity)[] | null;
+  message: string;
+  timestamp: string;
+}
+export interface IPartnerInstitutionEntity {
+  id: string;
+  name: string;
+  domains?: (string)[] | null;
+  promo_start: string;
+  promo_end: string;
+  promo_active: boolean;
+  contact_email: string;
+}
+
+
+
+
 export interface IInstituteMessageAPIResponse {
   http_status_code: number;
   http_status_msg: string;

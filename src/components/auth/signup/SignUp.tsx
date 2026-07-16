@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
-import { Camera, Eye, EyeOff, GraduationCap, Lock, Mail, User } from 'lucide-react'
+import { Camera, Eye, EyeOff, Gift, GraduationCap, Lock, Mail, User } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import Select, { type StylesConfig } from 'react-select'
 import { useFormik } from 'formik'
@@ -15,25 +15,20 @@ import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
 import toast from '@/utils/toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getMentorSignupRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath, } from '@/routes/routes'
+import { getMentorSignupRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes'
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
-import { useGetAllAgreementsDataQuery } from '@/store/rtkQueries/userGetAPI'
-import { USER_TYPE } from '@/constants/common'
+import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs'
+import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements'
+import { useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
 
 
 const AVATAR_BORDER_COLOR = '#C8D7EE'
 
-const PARTNER_UNIVERSITIES = [
-    { id: 'uon', name: 'University of Nairobi', emailHint: 'you@students.uonbi.ac.ke' },
-    { id: 'strathmore', name: 'Strathmore University', emailHint: 'you@strathmore.edu' },
-]
-
-const UNIVERSITY_OPTIONS = PARTNER_UNIVERSITIES.map((u) => ({
-    value: u.id,
-    label: u.name,
-}))
-
-type UniversityOption = (typeof UNIVERSITY_OPTIONS)[number]
+interface UniversityOption {
+    value: string
+    label: string
+    domains: string[]
+}
 
 const UNIVERSITY_SELECT_STYLES: StylesConfig<UniversityOption, false> = {
     control: (base, state) => ({
@@ -104,9 +99,8 @@ export default function SignUp() {
     const [profileImage, setProfileImage] = useState<File | null>(null)
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-
     const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation()
+
 
     useEffect(() => {
         if (!isOpen) return
@@ -147,14 +141,14 @@ export default function SignUp() {
             confirmPassword: '',
             isPartnerStudent: false,
             university: '',
-            agreeTerms: false,
-            agreePrivacy: false,
-            sendUpdates: false,
-            agreeMentorAgreement: false,
-            agreeRevenueShare: false,
-            agreeContentAndCommunity: false,
+            referralCode: '',
+            accepted_agreement_ids: [] as string[],
         },
         validationSchema: careerArchitectSignUpSchema,
+        validate: (vals) => {
+            const allRequiredAccepted = requiredAgreementIds.every((id: string) => vals.accepted_agreement_ids.includes(id))
+            return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' }
+        },
         onSubmit: async (formValues, { resetForm: rf }) => {
             try {
                 const formData = new FormData()
@@ -163,9 +157,9 @@ export default function SignUp() {
                 formData.append('password', formValues.password)
                 formData.append('password_confirmation', formValues.confirmPassword)
                 if (profileImage) formData.append('profile_pic', profileImage)
-                formData.append('terms_accepted', String(formValues.agreeTerms))
-                formData.append('privacy_accepted', String(formValues.agreePrivacy))
-                formData.append('send_updates', String(formValues.sendUpdates))
+                if (formValues.referralCode.trim()) formData.append('referral_code', formValues.referralCode.trim())
+                if (formValues.isPartnerStudent && formValues.university) formData.append('institution_id', formValues.university)
+                formValues.accepted_agreement_ids.forEach((id: string, index: number) => formData.append(`accepted_agreement_ids[${index}]`, id))
 
                 const res = await userRegister(formData).unwrap()
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
@@ -181,10 +175,20 @@ export default function SignUp() {
             }
         },
     })
-    const { data: agreementsResponse } = useGetAllAgreementsDataQuery({ userType: values.isPartnerStudent ? USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT : USER_TYPE.CAREER_ARCHITECT });
-    const agreementsData = agreementsResponse?.data
-    console.log(agreementsData)
-    const selectedUniversity = PARTNER_UNIVERSITIES.find((u) => u.id === values.university)
+
+    const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
+        touchPoint: values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION,
+        userType: values.isPartnerStudent ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT,
+    });
+
+    const agreements = agreementsResponse?.data ?? []
+    const requiredAgreementIds: string[] = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id)
+    const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined
+
+    const { data: partnerInstitutionsResponse, isFetching: isLoadingPartnerInstitutions } = useGetPartnerInstitutionsQuery(undefined, { skip: !values.isPartnerStudent })
+    const partnerInstitutions = partnerInstitutionsResponse?.data ?? []
+    const universityOptions = partnerInstitutions?.map((institution) => ({ value: institution.id, label: institution.name, domains: institution.domains ?? [] })) ?? []
+    const selectedUniversity = partnerInstitutions?.find((institution) => institution.id === values.university)
 
     return (
         <Modal
@@ -312,14 +316,24 @@ export default function SignUp() {
                                         <Select
                                             inputId="signup-university"
                                             name="university"
-                                            options={UNIVERSITY_OPTIONS}
-                                            value={UNIVERSITY_OPTIONS.find((o) => o.value === values.university) ?? null}
+                                            options={universityOptions}
+                                            value={universityOptions.find((o) => o.value === values.university) ?? null}
                                             onChange={(option) => setFieldValue('university', option?.value ?? '')}
                                             onBlur={() => setFieldTouched('university', true)}
-                                            placeholder="Choose your university"
+                                            placeholder={isLoadingPartnerInstitutions ? 'Loading universities...' : 'Choose your university'}
+                                            isLoading={isLoadingPartnerInstitutions}
                                             isDisabled={isSubmitting}
-                                            menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                                             menuPosition="fixed"
+                                            // formatOptionLabel={(option, { context }) => (
+                                            //     <span className="flex flex-col">
+                                            //         <span>{option.label}</span>
+                                            //         {context === 'menu' && option.domains.length > 0 && (
+                                            //             <span className="text-xs text-muted-foreground">
+                                            //                 {option.domains.join(', ')}
+                                            //             </span>
+                                            //         )}
+                                            //     </span>
+                                            // )}
                                             noOptionsMessage={() => (
                                                 <span className="text-xs text-muted-foreground">
                                                     University not listed?{' '}
@@ -386,7 +400,7 @@ export default function SignUp() {
                                             type="email"
                                             placeholder={
                                                 values.isPartnerStudent
-                                                    ? (selectedUniversity?.emailHint ?? 'you@university.ac.ke')
+                                                    ? `you@${selectedUniversity?.domains?.[0] ?? 'example.com'}`
                                                     : 'you@example.com'
                                             }
                                             className={`user_input_style ${errors.email && touched.email && 'border-red-500'}`}
@@ -467,40 +481,60 @@ export default function SignUp() {
                                     )}
                                 </div>
                             </div>
+
+                            <div className="space-y-1.5">
+                                <label htmlFor="signup-referralCode" className="text-sm font-medium text-foreground">
+                                    Referral Code <span className="font-normal text-muted-foreground">(optional)</span>
+                                </label>
+                                <div className="relative">
+                                    <Gift className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                    <Input
+                                        id="signup-referralCode"
+                                        name="referralCode"
+                                        type="text"
+                                        placeholder="Enter referral code"
+                                        className={`user_input_style ${errors.referralCode && touched.referralCode && 'border-red-500'}`}
+                                        disabled={isSubmitting}
+                                        value={values.referralCode}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                </div>
+                                {errors.referralCode && touched.referralCode && (
+                                    <p className="text-sm text-red-600">{errors.referralCode}</p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="rounded-2xl border border-gray-100 bg-muted/20 p-4 space-y-3">
-                            {agreementsData && agreementsData?.length > 0 && agreementsData?.map((agreement) =>
+                            {agreements.map((agreement) => (
                                 <AgreementCheckbox
-                                    id={agreement?.agreement_id}
-                                    checked={values.agreeTerms}
-                                    error={errors.agreeTerms}
-                                    touched={touched.agreeTerms}
-                                    onCheckedChange={(checked) => setFieldValue('agreeTerms', checked)}
-                                    onBlur={() => setFieldTouched('agreeTerms', true)}
+                                    key={agreement._id}
+                                    id={agreement._id}
+                                    checked={values.accepted_agreement_ids.includes(agreement._id)}
+                                    error={agreementsError}
+                                    touched={touched.accepted_agreement_ids}
+                                    onCheckedChange={(checked) => {
+                                        const ids = checked
+                                            ? [...values.accepted_agreement_ids, agreement._id]
+                                            : values.accepted_agreement_ids.filter((id: string) => id !== agreement._id)
+                                        setFieldValue('accepted_agreement_ids', ids)
+                                    }}
+                                    onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
                                     disabled={isSubmitting}
                                 >
                                     I agree to the{' '}
                                     <Link
-                                        href={getTermsOfServiceRoutePath()}
+                                        href={getPolicyBySlugRoutePath(agreement.slug)}
                                         target="_blank"
                                         className="font-semibold text-primary hover:text-primary/80 transition-colors"
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        {agreement?.title}
+                                        {agreement.title}
                                     </Link>
+                                    {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
                                 </AgreementCheckbox>
-                            )}
-
-                           
-                            <AgreementCheckbox
-                                id="sendUpdates"
-                                checked={values.sendUpdates}
-                                onCheckedChange={(checked) => setFieldValue('sendUpdates', checked)}
-                                disabled={isSubmitting}
-                            >
-                                Send me updates <span className="text-muted-foreground">(optional)</span>
-                            </AgreementCheckbox>
+                            ))}
                         </div>
 
                         <Button

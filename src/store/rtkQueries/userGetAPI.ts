@@ -23,6 +23,7 @@ import { IUserAllTagsAPIResponse } from '@/types/user/allTags';
 import { IActiveReadersAPIResponse } from '@/types/activeReaders';
 import { IAllAgreementsDataAPIResponse } from './allAgreements';
 import { UserTypeValue } from '@/constants/common';
+import { IPartnerInstitutionsAPIResponse } from '@/types/institution';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -189,6 +190,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 params: userType ? { userType } : undefined,
             }),
         }),
+        /** get partner institutions offering free access during their promo period */
+        getPartnerInstitutions: builder.query<IPartnerInstitutionsAPIResponse, void>({
+            query: () => ({
+                url: `/user/institutions/partners`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -219,4 +227,5 @@ export const {
 
     // new flow endpoints
     useGetAllAgreementsDataQuery,
+    useGetPartnerInstitutionsQuery,
 } = clientSideGetApis;

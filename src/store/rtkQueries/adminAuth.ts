@@ -48,7 +48,7 @@ export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
         }),
         adminResendOtp: builder.mutation({
             query: (userData) => ({
-                url: `/admin/resend-code`,
+                url: `/admin/resend-otp`,
                 method: "POST",
                 body: userData,
             }),

@@ -201,7 +201,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Profile completion</p>
               <p className="mt-1 text-lg font-semibold text-slate-900">{profile?.profile_completion_percentage ?? 0}%</p>
@@ -212,8 +212,24 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                 />
               </div>
             </div>
-            {/* <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Verification</p>
+            <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Email verification</p>
+              <p
+                className={cn(
+                  'mt-1 inline-flex items-center gap-1.5 text-sm font-semibold',
+                  profile?.is_verified ? 'text-emerald-700' : 'text-amber-700',
+                )}
+              >
+                {profile?.is_verified ? (
+                  <ShieldCheck className="h-4 w-4" />
+                ) : (
+                  <CircleAlert className="h-4 w-4" />
+                )}
+                {profile?.is_verified ? 'Verified' : 'Not verified'}
+              </p>
+            </div>
+            <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Mentor Verification</p>
               <p
                 className={cn(
                   'mt-1 inline-flex items-center gap-1.5 text-sm font-semibold',
@@ -227,7 +243,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                 )}
                 {profile?.mentor_info?.is_verified_mentor ? 'Verified' : 'Not verified'}
               </p>
-            </div> */}
+            </div>
             <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Account status</p>
               <p
@@ -629,13 +645,7 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 ) : null}
               </div>
 
-              <div
-                onClick={() => !isSubmitting && setFieldValue('is_vat_registered', !values.is_vat_registered)}
-                className={cn(
-                  'flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3.5 py-2.5 transition-colors sm:col-span-2',
-                  isSubmitting ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-slate-50',
-                )}
-              >
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3.5 py-2.5 sm:col-span-2">
                 <div className="flex items-center gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                     <Receipt className="h-4 w-4" />
@@ -648,7 +658,6 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 <Switch
                   checked={values.is_vat_registered}
                   onCheckedChange={(checked) => setFieldValue('is_vat_registered', checked)}
-                  onClick={(e) => e.stopPropagation()}
                   disabled={isSubmitting}
                 />
               </div>

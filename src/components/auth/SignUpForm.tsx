@@ -13,9 +13,10 @@ import { mentorSignUpSchema } from '@/utils/formValidation';
 import { useRegisterMentorMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import { getHomeRoutePath, getMentorLoginRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes';
+import { getHomeRoutePath, getMentorDashboardRoutePath, getMentorLoginRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { setAuthCookies } from '@/utils/authCookies';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -92,6 +93,12 @@ export function SignUpForm() {
                     setProfilePreview(null);
                     rf();
                     toast.success(res.message ?? 'Account created! Please verify your email.');
+                    setAuthCookies({
+                        token: res?.data?.token ?? '',
+                        user: { id: res?.data?.id, email: res?.data?.email },
+                        role: res?.data?.userRole?.name ?? '',
+                    });
+                    router.push(getMentorDashboardRoutePath());
                 }
             } catch {
                 console.error('Registration failed. Please try again.');

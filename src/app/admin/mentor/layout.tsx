@@ -24,6 +24,10 @@ import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
+import { useAdminResendOtpMutation } from '@/store/rtkQueries/adminAuth';
+import toast from '@/utils/toast';
 import {
   getMentorBlueprintPerformanceRoutePath,
   getMentorBooksRoutePath,
@@ -90,13 +94,30 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 
 export default function MentorLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: profileData } = useGetAdminProfileQuery();
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const { data: profileData, refetch: refetchProfile } = useGetAdminProfileQuery();
+  const [adminResendOtp, { isLoading: isSendingOtp }] = useAdminResendOtpMutation();
   const isActiveMentor = profileData?.data?.status === 'active';
   const isVerifiedMentor = profileData?.data?.is_verified;
   const isAccountBlocked = !isVerifiedMentor || !isActiveMentor;
+  const mentorEmail = profileData?.data?.email ?? '';
 
-  const handleVerifyAccountClick = () => {
-    console.log('verify account clicked');
+  const handleVerifyAccountClick = async () => {
+    if (!mentorEmail || isSendingOtp) return;
+    try {
+      const res = await adminResendOtp({ email: mentorEmail, type: 'email_verification' }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Verification code sent to your email.');
+        setShowOtpModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to send verification code. Please try again.', error);
+    }
+  };
+
+  const handleOtpVerified = () => {
+    setShowOtpModal(false);
+    refetchProfile();
   };
 
   return (
@@ -166,6 +187,17 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </main>
+
+      <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
+        <DialogContent size="sm">
+          <CommonOTPVerification
+            email={mentorEmail}
+            type="email_verification"
+            isAdmin={false}
+            onVerified={handleOtpVerified}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

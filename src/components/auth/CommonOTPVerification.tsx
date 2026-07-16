@@ -12,8 +12,10 @@ interface CommonOTPVerificationProps {
     email: string;
     type: 'email_verification' | 'login_2fa';
     isAdmin: boolean;
+    /** Called on successful verification instead of the default cookie-set + dashboard redirect. */
+    onVerified?: () => void;
 }
-export default function CommonOTPVerification({ email, type, isAdmin }: CommonOTPVerificationProps) {
+export default function CommonOTPVerification({ email, type, isAdmin, onVerified }: CommonOTPVerificationProps) {
     const router = useRouter();
     const [adminVerifyOtp, { isLoading: isVerifying }] = useAdminVerifyOtpMutation();
     const [adminResendOtp, { isLoading: isResending }] = useAdminResendOtpMutation();
@@ -27,12 +29,16 @@ export default function CommonOTPVerification({ email, type, isAdmin }: CommonOT
 
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res.message ?? 'Verification successful!');
-                    setAuthCookies({
-                        token: res?.data?.token ?? '',
-                        user: { id: res?.data?.id, email: res?.data?.email },
-                        role: res?.data?.userRole?.name ?? '',
-                    })
-                    router.push(isAdmin ? getAdminDashboardRoutePath() : getMentorDashboardRoutePath());
+                    if (onVerified) {
+                        onVerified();
+                    } else {
+                        setAuthCookies({
+                            token: res?.data?.token ?? '',
+                            user: { id: res?.data?.id, email: res?.data?.email },
+                            role: res?.data?.userRole?.name ?? '',
+                        })
+                        router.push(isAdmin ? getAdminDashboardRoutePath() : getMentorDashboardRoutePath());
+                    }
                 }
             } catch (error) {
                 console.error('Invalid or expired code. Please try again.', error);
@@ -42,7 +48,7 @@ export default function CommonOTPVerification({ email, type, isAdmin }: CommonOT
 
     const handleResend = async () => {
         try {
-            const res = await adminResendOtp({ email }).unwrap();
+            const res = await adminResendOtp({ email, type }).unwrap();
             toast.success((res as { message?: string }).message ?? 'Code resent successfully!');
         } catch (error) {
             console.error('Failed to resend code. Please try again.', error);

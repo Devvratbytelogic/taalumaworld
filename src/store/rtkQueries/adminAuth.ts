@@ -33,7 +33,7 @@ export const adminAuthApi = rtkQuerieSetup.injectEndpoints({
         }),
         adminResetPassword: builder.mutation({
             query: ({ token, payload }) => ({
-                url: `/admin/new-password`,
+                url: `/admin/forgot-password-change`,
                 method: "POST",
                 body: payload,
                 headers: { Authorization: `Bearer ${token}` },

@@ -4,13 +4,14 @@ import { otpVerificationSchema } from '@/utils/formValidation';
 import { useFormik } from 'formik';
 import toast from '@/utils/toast';
 import { Button } from '@heroui/react';
+import Cookies from 'js-cookie';
 import { setAuthCookies } from '@/utils/authCookies';
 import { useRouter } from 'next/navigation';
 import { getAdminDashboardRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
 
 interface CommonOTPVerificationProps {
     email: string;
-    type: 'email_verification' | 'login_2fa';
+    type: 'email_verification' | 'login_2fa' | 'forgot_password';
     isAdmin: boolean;
     /** Called on successful verification instead of the default cookie-set + dashboard redirect. */
     onVerified?: () => void;
@@ -29,7 +30,9 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
 
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res.message ?? 'Verification successful!');
-                    if (onVerified) {
+                    if (type === 'forgot_password') {
+                        onVerified?.();
+                    } else if (onVerified) {
                         onVerified();
                     } else {
                         setAuthCookies({

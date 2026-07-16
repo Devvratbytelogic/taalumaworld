@@ -40,8 +40,8 @@ export function StaffAssignmentsTab() {
         limit: paginationModel.pageSize,
         search: debouncedSearch,
     });
-    const staff = staffData?.data?.users ?? [];
-    const totalStaff = staffData?.data?.pagination?.total ?? 0;
+    const staff = staffData?.data?.data ?? [];
+    const totalStaff = staffData?.data?.total ?? 0;
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));

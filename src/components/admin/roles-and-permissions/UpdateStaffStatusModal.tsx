@@ -9,7 +9,6 @@ import { RootState } from '@/store/store';
 import { useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
 import { staffStatusSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
-import type { IAllStaffEntity } from '@/types/rolesPermissions';
 
 const inputCls =
     'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
@@ -18,7 +17,7 @@ const labelCls = 'block text-sm font-medium text-gray-700 mb-1';
 export function UpdateStaffStatusModal() {
     const dispatch = useDispatch();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-    const staff = data?.staff as IAllStaffEntity | null;
+    const staff = data?.staff as any | null;
 
     const [updateStaffStatus, { isLoading: isUpdating }] = useUpdateStaffStatusMutation();
     const onClose = () => dispatch(closeModal());

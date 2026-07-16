@@ -20,11 +20,13 @@ import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, g
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
-import { useGetAdminGlobalSettingsQuery, useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
-import type { AdminRole } from '@/types/admin';
+import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { USER_TYPE } from '@/constants/common';
+import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 
 interface AdminHeaderProps {
+    profileData: IAdminProfileAPIResponse;
     onMobileMenuToggle: () => void;
 }
 
@@ -118,12 +120,12 @@ function TopBarContentMode({
     );
 }
 
-export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
+export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProps) {
     const router = useRouter();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
     const { data: globalSettings, isFetching: isSettingsLoading } = useGetAdminGlobalSettingsQuery();
-    const { data: profileData } = useGetAdminProfileQuery();
-
+    
+ 
     const visible = globalSettings?.data?.visible ?? 'chapter';
     const logo = globalSettings?.data?.logo as string | null | undefined;
     const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
@@ -132,10 +134,10 @@ export function AdminHeader({ onMobileMenuToggle }: AdminHeaderProps) {
         name: profileData?.data?.name ?? 'Admin User',
         email: profileData?.data?.email ?? '',
         avatar: profileData?.data?.profile_pic ?? '',
-        role: (profileData?.data?.role?.name?.toLowerCase() === 'author' ? 'author' : 'admin') as AdminRole,
+        role: profileData?.data?.role?.name,
     };
 
-    const isAuthor = adminUser.role === 'author' || getUserRole()?.toLowerCase() === 'author';
+    const isAuthor = adminUser.role === USER_TYPE.MENTOR || getUserRole() === USER_TYPE.MENTOR;
     const roleLabel = isAuthor ? 'Mentor' : (profileData?.data?.role?.name ?? 'Admin');
 
     const onContentModeToggle = async (isBooks: boolean) => {

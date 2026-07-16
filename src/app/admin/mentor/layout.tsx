@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
+  AlertTriangle,
+  ArrowRight,
   BarChart3,
   Book,
   Download,
@@ -10,6 +13,7 @@ import {
   History,
   LayoutDashboard,
   Link2,
+  ShieldAlert,
   ShoppingCart,
   Tag,
   TrendingUp,
@@ -28,6 +32,7 @@ import {
   getMentorCouponsRoutePath,
   getMentorDashboardRoutePath,
   getMentorPaymentHistoryRoutePath,
+  getMentorProfileRoutePath,
   getMentorReferralsRoutePath,
   getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
@@ -37,6 +42,8 @@ import {
   getMentorUsersRoutePath,
   getMentorWalletRoutePath,
 } from '@/routes/routes';
+import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
+import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 
 const NAV_GROUPS: SidebarNavGroup[] = [
   {
@@ -83,21 +90,81 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 
 export default function MentorLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: profileData } = useGetAdminProfileQuery();
+  const isActiveMentor = profileData?.data?.status === 'active';
+  const isVerifiedMentor = profileData?.data?.is_verified;
+  const isAccountBlocked = !isVerifiedMentor || !isActiveMentor;
+
+  const handleVerifyAccountClick = () => {
+    console.log('verify account clicked');
+  };
 
   return (
     <div
       className="min-h-screen bg-slate-50/80 admin_panel [--admin-header-height:6rem]"
       style={{ '--admin-sidebar-width': ADMIN_SIDEBAR_WIDTH } as React.CSSProperties}
     >
-      <AdminHeader onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
-      <AdminSidebar
-        groups={NAV_GROUPS}
-        mobileMenuOpen={mobileMenuOpen}
-        onCloseMobileMenu={() => setMobileMenuOpen(false)}
-      />
+      <AdminHeader profileData={profileData as IAdminProfileAPIResponse} onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
+      <div
+        className={`${isAccountBlocked ? 'pointer-events-none opacity-50' : ''}`}
+        aria-disabled={isAccountBlocked}
+        inert={isAccountBlocked ? true : undefined}
+      >
+        <AdminSidebar
+          groups={NAV_GROUPS}
+          mobileMenuOpen={mobileMenuOpen}
+          onCloseMobileMenu={() => setMobileMenuOpen(false)}
+        />
+      </div>
 
       <main className="min-w-0 lg:ml-(--admin-sidebar-width)">
-        <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:py-7">{children}</div>
+        <div className="mx-auto w-full max-w-full px-4 py-6 sm:px-6 lg:py-7">
+          {profileData && !isVerifiedMentor ? (
+            <div className="mb-6 flex flex-col gap-3 rounded-md border border-blue-200! bg-blue-50 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                <ShieldAlert className="h-5 w-5 text-blue-600" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-blue-900">Verify your account</p>
+                <p className="text-sm text-blue-700">Please verify your account first to access all mentor features.</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleVerifyAccountClick}
+                className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              >
+                Verify Account
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            profileData && !isActiveMentor && (
+              <div className="mb-6 flex flex-col gap-3 rounded-md border border-amber-200! bg-amber-50 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-amber-900">Complete your account setup</p>
+                  <p className="text-sm text-amber-700">Your mentor account isn&apos;t active yet. Complete your profile to unlock the full dashboard.</p>
+                </div>
+                <Link
+                  href={getMentorProfileRoutePath()}
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+                >
+                  Complete Profile
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            )
+          )}
+          <div
+            // className={`${isAccountBlocked ? 'pointer-events-none opacity-50' : ''}`}
+            // aria-disabled={isAccountBlocked}
+            // inert={isAccountBlocked ? true : undefined}
+          >
+            {children}
+          </div>
+        </div>
       </main>
     </div>
   );

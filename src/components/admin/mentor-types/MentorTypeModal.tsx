@@ -68,15 +68,14 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
       if (badgeFile) fd.append('badge', badgeFile);
 
       try {
-        if (isEditing && mentorTier) {
-          await updateMentorTier({ id: mentorTier._id, values: fd }).unwrap();
-          toast.success('Mentor tier updated');
-        } else {
-          await addMentorTier(fd).unwrap();
-          toast.success('Mentor tier created');
+        const res = isEditing && mentorTier
+          ? await updateMentorTier({ id: mentorTier._id, values: fd }).unwrap()
+          : await addMentorTier(fd).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          toast.success(res.message ?? (isEditing ? 'Mentor tier updated' : 'Mentor tier created'));
+          onOpenChange(false);
+          onSuccess?.();
         }
-        onOpenChange(false);
-        onSuccess?.();
       } catch {
         toast.error(isEditing ? 'Failed to update mentor tier' : 'Failed to create mentor tier');
       }

@@ -73,15 +73,14 @@ export function AdminAgreementTypesTab() {
 
   const handleSave = async (values: AgreementTypeFormValues, id?: string) => {
     try {
-      if (id) {
-        await updateAgreementType({ id, values }).unwrap();
-        toast.success('Agreement type updated successfully');
-      } else {
-        await addAgreementType(values).unwrap();
-        toast.success('Agreement type created successfully');
+      const res = id
+        ? await updateAgreementType({ id, values }).unwrap()
+        : await addAgreementType(values).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? (id ? 'Agreement type updated successfully' : 'Agreement type created successfully'));
+        setIsModalOpen(false);
+        setEditingType(null);
       }
-      setIsModalOpen(false);
-      setEditingType(null);
     } catch (error) {
       console.error('Error saving agreement type', error);
     }
@@ -89,9 +88,11 @@ export function AdminAgreementTypesTab() {
 
   const onDeleteAgreementType = async (id: string) => {
     try {
-      await deleteAgreementType({ id }).unwrap();
-      toast.success('Agreement type deleted successfully');
-      dispatch(closeModal());
+      const res = await deleteAgreementType({ id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Agreement type deleted successfully');
+        dispatch(closeModal());
+      }
     } catch (error) {
       console.error('Error deleting agreement type', error);
     }
@@ -99,9 +100,11 @@ export function AdminAgreementTypesTab() {
 
   const onRestoreAgreementType = async (id: string) => {
     try {
-      await restoreAgreementType({ id }).unwrap();
-      toast.success('Agreement type restored successfully');
-      dispatch(closeModal());
+      const res = await restoreAgreementType({ id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Agreement type restored successfully');
+        dispatch(closeModal());
+      }
     } catch (error) {
       console.error('Error restoring agreement type', error);
     }

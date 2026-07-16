@@ -72,7 +72,6 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
     enableReinitialize: true,
     onSubmit: async (formValues) => {
       await onSubmit(formValues, agreementId ?? undefined);
-      onOpenChange(false);
     },
   });
 

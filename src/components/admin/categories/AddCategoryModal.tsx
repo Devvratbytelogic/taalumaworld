@@ -82,8 +82,6 @@ export function AddCategoryModal({
         subcategories: values.subcategories,
       };
       await onSubmit(payload);
-      resetForm({ values: initialFormValues });
-      onOpenChange(false);
     },
   });
 

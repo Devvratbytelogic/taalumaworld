@@ -67,15 +67,17 @@ export function BlueprintAccessTab() {
                     itemName: bp.title,
                     onDelete: async () => {
                         try {
-                            if (existing) {
-                                await deleteAccess({
+                            const res = existing
+                                ? await deleteAccess({
                                     institutionId: selectedInstitution._id,
                                     accessId: existing._id,
-                                }).unwrap();
+                                }).unwrap()
+                                : null;
+                            if (!existing || res?.http_status_code === 200 || res?.http_status_code === 201) {
+                                setLocalSelected((prev) => prev.filter((id) => id !== bp._id));
+                                toast.success(res?.message ?? 'Blueprint access removed');
+                                dispatch(closeModal());
                             }
-                            setLocalSelected((prev) => prev.filter((id) => id !== bp._id));
-                            toast.success('Blueprint access removed');
-                            dispatch(closeModal());
                         } catch (error) {
                             console.error('Error removing blueprint access', error);
                             toast.error('Failed to remove blueprint access');

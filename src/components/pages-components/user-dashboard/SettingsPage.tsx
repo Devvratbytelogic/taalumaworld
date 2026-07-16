@@ -66,12 +66,14 @@ export function SettingsPage() {
         password: newPassword,
         password_confirmation: confirmPassword,
       }).unwrap();
-      toast.success((res as { message?: string }).message ?? 'Password changed successfully!');
-      setIsChangingPassword(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setErrors({});
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Password changed successfully!');
+        setIsChangingPassword(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setErrors({});
+      }
     } catch (err) {
       const message = (err as { data?: { message?: string } })?.data?.message;
       // toast.error(message ?? 'Failed to change password. Please try again.');

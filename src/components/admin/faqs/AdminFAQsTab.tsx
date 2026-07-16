@@ -36,9 +36,11 @@ export function AdminFAQsTab() {
 
   const handleAdd = async (values: FAQFormValues) => {
     try {
-      await addFAQ(values).unwrap();
-      toast.success('FAQ added successfully');
-      setShowAddForm(false);
+      const res = await addFAQ(values).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'FAQ added successfully');
+        setShowAddForm(false);
+      }
     } catch {
       // Error handled by API layer
     }
@@ -46,9 +48,11 @@ export function AdminFAQsTab() {
 
   const handleUpdate = async (id: string, values: FAQFormValues) => {
     try {
-      await updateFAQ({ id, values }).unwrap();
-      toast.success('FAQ updated successfully');
-      setEditingId(null);
+      const res = await updateFAQ({ id, values }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'FAQ updated successfully');
+        setEditingId(null);
+      }
     } catch {
       // Error handled by API layer
     }
@@ -57,9 +61,11 @@ export function AdminFAQsTab() {
   const confirmDelete = async () => {
     if (!deleteConfirmFAQ) return;
     try {
-      await deleteFAQ({ id: deleteConfirmFAQ._id }).unwrap();
-      toast.success('FAQ deleted');
-      setDeleteConfirmFAQ(null);
+      const res = await deleteFAQ({ id: deleteConfirmFAQ._id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'FAQ deleted');
+        setDeleteConfirmFAQ(null);
+      }
     } catch {
       // Error handled by API layer
     }

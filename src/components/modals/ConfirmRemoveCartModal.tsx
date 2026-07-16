@@ -20,9 +20,11 @@ export default function ConfirmRemoveCartModal() {
 
     const handleConfirm = async () => {
         try {
-            await removeCartItem(itemId).unwrap()
-            addToast({ title: 'Removed', description: 'Item removed from cart.', color: 'success', timeout: 2000 })
-            dispatch(closeModal())
+            const res = await removeCartItem(itemId).unwrap()
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                addToast({ title: 'Removed', description: res?.message ?? 'Item removed from cart.', color: 'success', timeout: 2000 })
+                dispatch(closeModal())
+            }
         } catch {
             // error toast handled globally in rtkQuerieSetup
         }

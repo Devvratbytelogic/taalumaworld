@@ -46,7 +46,6 @@ export function AgreementTypeModal({ open, agreementType, onOpenChange, onSubmit
     enableReinitialize: true,
     onSubmit: async (formValues) => {
       await onSubmit(formValues, agreementType?._id);
-      onOpenChange(false);
     },
   });
 

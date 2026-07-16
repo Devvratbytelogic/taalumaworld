@@ -167,8 +167,10 @@ export function PromotionConfigTab() {
                                             className="text-amber-600 border-amber-300"
                                             onPress={async () => {
                                                 try {
-                                                    await suspend({ id: inst._id }).unwrap();
-                                                    toast.success('Institution suspended');
+                                                    const res = await suspend({ id: inst._id }).unwrap();
+                                                    if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                                                        toast.success(res.message ?? 'Institution suspended');
+                                                    }
                                                 } catch { /* handled */ }
                                             }}
                                         >
@@ -182,8 +184,10 @@ export function PromotionConfigTab() {
                                             variant="bordered"
                                             onPress={async () => {
                                                 try {
-                                                    await restore({ id: inst._id }).unwrap();
-                                                    toast.success('Institution restored');
+                                                    const res = await restore({ id: inst._id }).unwrap();
+                                                    if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                                                        toast.success(res.message ?? 'Institution restored');
+                                                    }
                                                 } catch { /* handled */ }
                                             }}
                                         >
@@ -198,8 +202,10 @@ export function PromotionConfigTab() {
                                             onPress={async () => {
                                                 if (!confirm(`Terminate ${inst.name}?`)) return;
                                                 try {
-                                                    await terminate({ id: inst._id }).unwrap();
-                                                    toast.success('Institution terminated');
+                                                    const res = await terminate({ id: inst._id }).unwrap();
+                                                    if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                                                        toast.success(res.message ?? 'Institution terminated');
+                                                    }
                                                 } catch { /* handled */ }
                                             }}
                                         >

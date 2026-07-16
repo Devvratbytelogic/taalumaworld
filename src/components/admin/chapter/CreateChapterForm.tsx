@@ -123,17 +123,19 @@ export function CreateChapterForm() {
       await appendUserIpToFormData(formData);
       try {
         const res = await addChapter(formData).unwrap();
-        if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
-        if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
-        setFeaturedImageFile(null);
-        setFeaturedImagePreviewUrl(null);
-        setOgImageFile(null);
-        setOgImagePreviewUrl(null);
-        setPdfFile(null);
-        resetForm({ values: initialFormValues });
-        slugManuallyEdited.current = false;
-        toast.success('Blueprint created successfully');
-        router.push(getAdminSectionRoutePath('chapters'));
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+          if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+          setFeaturedImageFile(null);
+          setFeaturedImagePreviewUrl(null);
+          setOgImageFile(null);
+          setOgImagePreviewUrl(null);
+          setPdfFile(null);
+          resetForm({ values: initialFormValues });
+          slugManuallyEdited.current = false;
+          toast.success(res.message ?? 'Blueprint created successfully');
+          router.push(getAdminSectionRoutePath('chapters'));
+        }
       } catch (err) {
         console.error('error during create chapter', err);
       }

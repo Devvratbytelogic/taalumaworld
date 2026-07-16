@@ -87,16 +87,18 @@ export function AddBookModal({
       await appendUserIpToFormData(formData);
 
       try {
-        await onSubmit(formData).unwrap();
-        if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
-        if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
-        setCoverFile(null);
-        setCoverPreviewUrl(null);
-        setOgImageFile(null);
-        setOgImagePreviewUrl(null);
-        resetForm({ values: initialFormValues });
-        onOpenChange(false);
-        toast.success('Series created successfully');
+        const res = (await onSubmit(formData).unwrap()) as { http_status_code?: number; message?: string };
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+          if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+          setCoverFile(null);
+          setCoverPreviewUrl(null);
+          setOgImageFile(null);
+          setOgImagePreviewUrl(null);
+          resetForm({ values: initialFormValues });
+          onOpenChange(false);
+          toast.success(res.message ?? 'Series created successfully');
+        }
       } catch {
         console.error('Failed to create book');
       }

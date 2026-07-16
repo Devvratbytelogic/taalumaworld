@@ -85,14 +85,13 @@ export function AddEditInstitutionModal() {
       };
 
       try {
-        if (isEdit) {
-          await updateInstitution({ id: institution!._id, values: payload }).unwrap();
-          toast.success('Institution updated');
-        } else {
-          await addInstitution(payload).unwrap();
-          toast.success('Institution added');
+        const res = isEdit
+          ? await updateInstitution({ id: institution!._id, values: payload }).unwrap()
+          : await addInstitution(payload).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          toast.success(res.message ?? (isEdit ? 'Institution updated' : 'Institution added'));
+          onClose();
         }
-        onClose();
       } catch(error) {
         console.error('Failed to add/update institution', error);
       }

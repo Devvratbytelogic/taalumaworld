@@ -124,8 +124,10 @@ export function InstitutionRegistryTab() {
 
         setUpdatingId(id);
         try {
-            await updateInstitution({ id, values: { status: newStatus } }).unwrap();
-            toast.success(newStatus === 'Inactive' ? 'Institution deactivated' : 'Institution activated');
+            const res = await updateInstitution({ id, values: { status: newStatus } }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? (newStatus === 'Inactive' ? 'Institution deactivated' : 'Institution activated'));
+            }
         } catch {
             console.error('Failed to update institution status');
         } finally {
@@ -135,9 +137,11 @@ export function InstitutionRegistryTab() {
 
     const onDeleteInstitution = async (id: string) => {
         try {
-            await deleteInstitution({ id }).unwrap();
-            toast.success('Institution deleted successfully');
-            dispatch(closeModal());
+            const res = await deleteInstitution({ id }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? 'Institution deleted successfully');
+                dispatch(closeModal());
+            }
         } catch {
             console.error('Failed to delete institution');
         }
@@ -145,9 +149,11 @@ export function InstitutionRegistryTab() {
 
     const onRestoreInstitution = async (id: string) => {
         try {
-            await restoreInstitution({ id }).unwrap();
-            toast.success('Institution restored successfully');
-            dispatch(closeModal());
+            const res = await restoreInstitution({ id }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? 'Institution restored successfully');
+                dispatch(closeModal());
+            }
         } catch {
             console.error('Failed to restore institution');
         }

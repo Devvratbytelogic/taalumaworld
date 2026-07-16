@@ -6,6 +6,7 @@ import { Button } from '@heroui/react';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import { useInviteMentorMutation } from '@/store/rtkQueries/adminPostApi';
 import { InviteMentorModal, type InviteMentorFormValues } from './InviteMentorModal';
+import toast from '@/utils/toast';
 
 export function AdminAuthorsHeader() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -15,7 +16,10 @@ export function AdminAuthorsHeader() {
     const formData = new FormData();
     formData.append('email', values.email.trim());
     if (values.fullName.trim()) formData.append('name', values.fullName.trim());
-    await inviteMentor(formData).unwrap();
+    const res = await inviteMentor(formData).unwrap();
+    if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+      toast.success(res.message ?? 'Invitation sent successfully');
+    }
   };
 
   return (

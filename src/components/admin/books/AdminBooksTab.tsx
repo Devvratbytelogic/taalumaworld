@@ -91,9 +91,11 @@ export function AdminBooksTab() {
 
   const onDeleteBook = async (id: string) => {
     try {
-      await deleteBook({ id }).unwrap();
-      toast.success('Series deleted successfully');
-      dispatch(closeModal());
+      const res = await deleteBook({ id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Series deleted successfully');
+        dispatch(closeModal());
+      }
     } catch (error) {
       console.error('Error deleting series:', error);
     }
@@ -101,9 +103,11 @@ export function AdminBooksTab() {
 
   const onRestoreBook = async (id: string) => {
     try {
-      await restoreBook({ id }).unwrap();
-      toast.success('Series restored successfully');
-      dispatch(closeModal());
+      const res = await restoreBook({ id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Series restored successfully');
+        dispatch(closeModal());
+      }
     } catch (error) {
       console.error('Error restoring series:', error);
     }
@@ -118,8 +122,10 @@ export function AdminBooksTab() {
     setUpdatingId(id);
 
     try {
-      await updateBook({ id, values: formData }).unwrap();
-      toast.success(`Series marked as ${status}`);
+      const res = await updateBook({ id, values: formData }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? `Series marked as ${status}`);
+      }
     } catch {
       toast.error('Failed to update status');
     } finally {

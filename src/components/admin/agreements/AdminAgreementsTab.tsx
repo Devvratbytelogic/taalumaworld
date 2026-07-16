@@ -74,17 +74,17 @@ export function AdminAgreementsTab() {
 
   const handleSave = async (values: AgreementFormValues, id?: string) => {
     try {
-      if (id) {
-        await updateAgreement({ agreementId: id, values }).unwrap();
-        toast.success('Agreement updated successfully');
-      } else {
-        await addAgreement(values).unwrap();
-        toast.success('Agreement created successfully');
+      const res = id
+        ? await updateAgreement({ agreementId: id, values }).unwrap()
+        : await addAgreement(values).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        console.log('res', res);
+        toast.success(res.message ?? (id ? 'Agreement updated successfully' : 'Agreement created successfully'));
+        setIsModalOpen(false);
+        setEditingAgreementId(null);
       }
-      setIsModalOpen(false);
-      setEditingAgreementId(null);
-    } catch {
-      // Error toast handled by API layer
+    } catch (error) {
+      console.error('Error saving agreement', error);
     }
   };
 

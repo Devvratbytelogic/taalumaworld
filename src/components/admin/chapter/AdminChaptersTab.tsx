@@ -89,9 +89,11 @@ export function AdminChaptersTab() {
 
     const onDeleteChapter = async (id: string) => {
         try {
-            await deleteChapter({ id }).unwrap();
-            toast.success('Blueprint deleted successfully');
-            dispatch(closeModal());
+            const res = await deleteChapter({ id }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? 'Blueprint deleted successfully');
+                dispatch(closeModal());
+            }
         } catch (error) {
             console.error('Error deleting chapter:', error);
         }
@@ -99,9 +101,11 @@ export function AdminChaptersTab() {
 
     const onRestoreChapter = async (id: string) => {
         try {
-            await restoreChapter({ id }).unwrap();
-            toast.success('Blueprint restored successfully');
-            dispatch(closeModal());
+            const res = await restoreChapter({ id }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? 'Blueprint restored successfully');
+                dispatch(closeModal());
+            }
         } catch (error) {
             console.error('Error restoring chapter:', error);
         }
@@ -115,8 +119,10 @@ export function AdminChaptersTab() {
         setUpdatingId(chapter.id);
 
         try {
-            await updateChapter({ id: chapter.id, values: formData }).unwrap();
-            toast.success(`Blueprint marked as ${status}`);
+            const res = await updateChapter({ id: chapter.id, values: formData }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? `Blueprint marked as ${status}`);
+            }
         } catch {
             toast.error('Failed to update status');
         } finally {

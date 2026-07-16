@@ -115,17 +115,19 @@ export function EditBookModal({
       if (vals.json_ld) formData.append('json_ld', vals.json_ld);
 
       try {
-        await onSubmit({ id: book._id, values: formData }).unwrap();
-        if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
-        if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
-        setCoverFile(null);
-        setCoverPreviewUrl(null);
-        setOgImageFile(null);
-        setOgImagePreviewUrl(null);
-        coverIsObjectUrlRef.current = false;
-        ogImageIsObjectUrlRef.current = false;
-        onOpenChange(false);
-        toast.success('Series updated successfully');
+        const res = (await onSubmit({ id: book._id, values: formData }).unwrap()) as { http_status_code?: number; message?: string };
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+          if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+          setCoverFile(null);
+          setCoverPreviewUrl(null);
+          setOgImageFile(null);
+          setOgImagePreviewUrl(null);
+          coverIsObjectUrlRef.current = false;
+          ogImageIsObjectUrlRef.current = false;
+          onOpenChange(false);
+          toast.success(res.message ?? 'Series updated successfully');
+        }
       } catch {
         console.error('Failed to update series');
       }

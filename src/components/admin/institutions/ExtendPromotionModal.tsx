@@ -37,9 +37,11 @@ export function ExtendPromotionModal() {
     onSubmit: async (formValues) => {
       if (!institution) return;
       try {
-        await extendPeriod({ id: institution._id, end_date: formValues.new_end_date }).unwrap();
-        toast.success('Promotional period extended');
-        onClose();
+        const res = await extendPeriod({ id: institution._id, end_date: formValues.new_end_date }).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          toast.success(res.message ?? 'Promotional period extended');
+          onClose();
+        }
       } catch(error) {
         console.error('Error extending promotional period', error);
       }

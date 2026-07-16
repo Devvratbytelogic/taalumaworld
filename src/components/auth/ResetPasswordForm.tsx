@@ -34,10 +34,12 @@ export function ResetPasswordForm() {
                     },
                 }).unwrap();
 
-                toast.success((res as { message?: string }).message ?? 'Password updated successfully!');
-                Cookies.remove('author_reset_password_token');
-                resetForm();
-                router.push(getMentorLoginRoutePath());
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    toast.success(res.message ?? 'Password updated successfully!');
+                    Cookies.remove('author_reset_password_token');
+                    resetForm();
+                    router.push(getMentorLoginRoutePath());
+                }
             } catch {
                 console.log('Failed to reset password. Please try again.');
             }

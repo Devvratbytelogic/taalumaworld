@@ -60,9 +60,11 @@ export function AdminCategoriesTab() {
   const confirmDeleteCategory = async () => {
     if (!deleteConfirmCategory) return;
     try {
-      await deleteCategory({ id: deleteConfirmCategory.id }).unwrap();
-      toast.success(`"${deleteConfirmCategory.name}" deleted`);
-      setDeleteConfirmCategory(null);
+      const res = await deleteCategory({ id: deleteConfirmCategory.id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? `"${deleteConfirmCategory.name}" deleted`);
+        setDeleteConfirmCategory(null);
+      }
     } catch {
       // Error toast handled by API layer
     }
@@ -70,9 +72,11 @@ export function AdminCategoriesTab() {
 
   const handleAddCategory = async (payload: { name: string; slug: string; subcategories: unknown[] }) => {
     try {
-      await addCategory(payload).unwrap();
-      toast.success('Category created successfully');
-      setIsCreateModalOpen(false);
+      const res = await addCategory(payload).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Category created successfully');
+        setIsCreateModalOpen(false);
+      }
     } catch {
       // Error toast handled by API layer
     }
@@ -83,9 +87,11 @@ export function AdminCategoriesTab() {
     values: { name: string; slug: string; subcategories: unknown[] }
   ) => {
     try {
-      await updateCategory({ id, values }).unwrap();
-      toast.success('Category updated successfully');
-      setEditingCategory(null);
+      const res = await updateCategory({ id, values }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Category updated successfully');
+        setEditingCategory(null);
+      }
     } catch {
       // Error toast handled by API layer
     }

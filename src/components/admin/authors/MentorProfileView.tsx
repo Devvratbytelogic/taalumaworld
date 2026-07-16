@@ -150,11 +150,13 @@ export function MentorProfileView() {
     if (!suspendMentor) return;
     const newStatus = suspendMentor.status === 'suspended' ? 'active' : 'suspended';
     try {
-      await updateMentorStatus({
+      const res = await updateMentorStatus({
         id: suspendMentor._id,
         payload: { status: newStatus, status_reason: statusReason },
       }).unwrap();
-      toast.success(`"${suspendMentor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? `"${suspendMentor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+      }
     } catch {
       toast.error(`Failed to update "${suspendMentor.name}"`);
     } finally {

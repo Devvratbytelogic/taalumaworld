@@ -121,17 +121,19 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       await appendUserIpToFormData(formData);
       try {
         const res = await updateChapter({ id: chapterId, values: formData }).unwrap();
-        if (featuredImageFile && featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
-        if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
-        setFeaturedImageFile(null);
-        setFeaturedImagePreviewUrl(null);
-        setOgImageFile(null);
-        setOgImagePreviewUrl(null);
-        setPdfFile(null);
-        resetForm({ values: initialFormValues });
-        slugManuallyEdited.current = false;
-        toast.success('Blueprint updated successfully');
-        router.push(getAdminSectionRoutePath('chapters'));
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          if (featuredImageFile && featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+          if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+          setFeaturedImageFile(null);
+          setFeaturedImagePreviewUrl(null);
+          setOgImageFile(null);
+          setOgImagePreviewUrl(null);
+          setPdfFile(null);
+          resetForm({ values: initialFormValues });
+          slugManuallyEdited.current = false;
+          toast.success(res.message ?? 'Blueprint updated successfully');
+          router.push(getAdminSectionRoutePath('chapters'));
+        }
       } catch (err) {
         console.error('error during update chapter', err);
       }

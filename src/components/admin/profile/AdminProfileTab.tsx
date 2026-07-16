@@ -62,11 +62,13 @@ export function AdminProfileTab() {
         formData.append('professionalBio', formValues.professionalBio?.trim() ?? '');
         if (photoFile) formData.append('profile_pic', photoFile);
 
-        await updateAdminProfile(formData).unwrap();
-        setTempPhoto('');
-        setPhotoFile(null);
-        setIsEditing(false);
-        toast.success('Profile updated successfully!');
+        const res = await updateAdminProfile(formData).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          setTempPhoto('');
+          setPhotoFile(null);
+          setIsEditing(false);
+          toast.success(res.message ?? 'Profile updated successfully!');
+        }
       } catch {
         toast.error('Failed to update profile. Please try again.');
       }

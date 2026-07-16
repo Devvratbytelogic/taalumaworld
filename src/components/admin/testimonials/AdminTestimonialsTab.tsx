@@ -39,9 +39,11 @@ export function AdminTestimonialsTab() {
 
   const handleAdd = async (formData: FormData) => {
     try {
-      await addTestimonial(formData).unwrap();
-      toast.success('Testimonial added successfully');
-      setShowAddForm(false);
+      const res = await addTestimonial(formData).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Testimonial added successfully');
+        setShowAddForm(false);
+      }
     } catch {
       // Error handled by API layer
     }
@@ -49,9 +51,11 @@ export function AdminTestimonialsTab() {
 
   const handleUpdate = async (id: string, formData: FormData) => {
     try {
-      await updateTestimonial({ id, values: formData }).unwrap();
-      toast.success('Testimonial updated successfully');
-      setEditingId(null);
+      const res = await updateTestimonial({ id, values: formData }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Testimonial updated successfully');
+        setEditingId(null);
+      }
     } catch {
       // Error handled by API layer
     }
@@ -60,9 +64,11 @@ export function AdminTestimonialsTab() {
   const confirmDelete = async () => {
     if (!deleteConfirmTestimonial) return;
     try {
-      await deleteTestimonial({ id: deleteConfirmTestimonial._id }).unwrap();
-      toast.success('Testimonial deleted');
-      setDeleteConfirmTestimonial(null);
+      const res = await deleteTestimonial({ id: deleteConfirmTestimonial._id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? 'Testimonial deleted');
+        setDeleteConfirmTestimonial(null);
+      }
     } catch {
       // Error handled by API layer
     }

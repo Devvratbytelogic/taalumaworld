@@ -168,12 +168,14 @@ export default function SignUp() {
                 formData.append('send_updates', String(formValues.sendUpdates))
 
                 const res = await userRegister(formData).unwrap()
-                if (profilePreview) URL.revokeObjectURL(profilePreview)
-                setProfileImage(null)
-                setProfilePreview(null)
-                rf()
-                toast.success((res as { message?: string }).message ?? 'Account created! Please verify your email.')
-                dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }))
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    if (profilePreview) URL.revokeObjectURL(profilePreview)
+                    setProfileImage(null)
+                    setProfilePreview(null)
+                    rf()
+                    toast.success(res.message ?? 'Account created! Please verify your email.')
+                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }))
+                }
             } catch {
                 console.error('Registration failed. Please try again.')
             }

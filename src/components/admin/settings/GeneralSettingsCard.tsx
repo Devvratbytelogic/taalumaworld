@@ -154,8 +154,10 @@ export function GeneralSettingsCard() {
         });
         if (logoFile) formData.append('logo', logoFile);
         if (ogImageFile) formData.append('og_image', ogImageFile);
-        await updateGlobalSettings(formData).unwrap();
-        toast.success('Settings updated successfully');
+        const res = await updateGlobalSettings(formData).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          toast.success(res.message ?? 'Settings updated successfully');
+        }
       } catch {
         toast.error('Failed to update settings. Please try again.');
       }

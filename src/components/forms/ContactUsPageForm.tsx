@@ -32,19 +32,21 @@ export default function ContactUsPageForm() {
         validationSchema: contactFormSchema,
         onSubmit: async (values, { resetForm }) => {
             try {
-                await postContactUs({
+                const res = await postContactUs({
                     name: values.name,
                     email: values.email,
                     subject: values.subject,
                     inquiryType: values.inquiryType,
                     message: values.message,
                 }).unwrap();
-                setIsSubmitted(true);
-                toast.success('Message sent successfully!');
-                setTimeout(() => {
-                    setIsSubmitted(false);
-                    resetForm();
-                }, 3000);
+                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                    setIsSubmitted(true);
+                    toast.success(res.message ?? 'Message sent successfully!');
+                    setTimeout(() => {
+                        setIsSubmitted(false);
+                        resetForm();
+                    }, 3000);
+                }
             } catch {
                 toast.error('Failed to send message. Please try again.');
             }

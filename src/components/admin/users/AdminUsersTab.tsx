@@ -67,11 +67,13 @@ export function AdminUsersTab() {
     if (suspendUser) {
       const newStatus = suspendUser.status === 'suspended' ? 'active' : 'suspended';
       try {
-        await updateUserStatus({
+        const res = await updateUserStatus({
           id: suspendUser._id,
           payload: { status: newStatus, status_reason: statusReason },
         }).unwrap();
-        toast.success(`"${suspendUser.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          toast.success(res.message ?? `"${suspendUser.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+        }
       } catch {
         toast.error(`Failed to update "${suspendUser.name}"`);
       } finally {

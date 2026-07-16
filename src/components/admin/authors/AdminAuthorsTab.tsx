@@ -72,11 +72,13 @@ export function AdminAuthorsTab() {
     if (suspendAuthor) {
       const newStatus = suspendAuthor.status === 'suspended' ? 'active' : 'suspended';
       try {
-        await updateAuthorStatus({
+        const res = await updateAuthorStatus({
           id: suspendAuthor._id,
           payload: { status: newStatus, status_reason: statusReason },
         }).unwrap();
-        toast.success(`"${suspendAuthor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          toast.success(res.message ?? `"${suspendAuthor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
+        }
       } catch {
         toast.error(`Failed to update "${suspendAuthor.name}"`);
       } finally {

@@ -205,13 +205,15 @@ export default function PrimaryFooter() {
                                         disabled={isSubscribing || !newsletterEmail}
                                         onPress={async () => {
                                             try {
-                                                await subscribeToNewsletter({
+                                                const res = await subscribeToNewsletter({
                                                     email: newsletterEmail,
                                                     send_updates: sendUpdates,
                                                 }).unwrap();
-                                                toast.success('Subscribed successfully!');
-                                                setNewsletterEmail('');
-                                                setSendUpdates(false);
+                                                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                                                    toast.success(res.message ?? 'Subscribed successfully!');
+                                                    setNewsletterEmail('');
+                                                    setSendUpdates(false);
+                                                }
                                             } catch {
                                                 toast.error('Failed to subscribe. Please try again.');
                                             }

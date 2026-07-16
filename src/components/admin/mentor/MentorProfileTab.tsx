@@ -128,11 +128,13 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
         formData.append('linkedin', formValues.linkedin?.trim() ?? '');
         if (photoFile) formData.append('profile_pic', photoFile);
 
-        await updateAdminProfile(formData).unwrap();
-        setTempPhoto('');
-        setPhotoFile(null);
-        setIsEditing(false);
-        toast.success('Profile updated successfully!');
+        const res = await updateAdminProfile(formData).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          setTempPhoto('');
+          setPhotoFile(null);
+          setIsEditing(false);
+          toast.success(res.message ?? 'Profile updated successfully!');
+        }
       } catch(error) {
         console.error('Failed to update profile. Please try again.', error);
       }
@@ -449,9 +451,11 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
     validationSchema: mentorPayoutDetailsSchema,
     onSubmit: async (formValues) => {
       try {
-        await updateMentorInfo(formValues).unwrap();
-        setIsEditing(false);
-        toast.success('Payout details updated successfully!');
+        const res = await updateMentorInfo(formValues).unwrap();
+        if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          setIsEditing(false);
+          toast.success(res.message ?? 'Payout details updated successfully!');
+        }
       } catch(error) {
         console.error('Failed to update payout details. Please try again.', error);
       }

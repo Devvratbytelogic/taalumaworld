@@ -101,11 +101,13 @@ export function ProfilePage() {
           const formData = new FormData();
           formData.append('name', formValues.fullName.trim());
           if (photoFile) formData.append('profile_pic', photoFile);
-          await updateProfile(formData).unwrap();
-          setTempPhoto('');
-          setPhotoFile(null);
-          setIsEditing(false);
-          toast.success('Profile updated successfully!');
+          const res = await updateProfile(formData).unwrap();
+          if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+            setTempPhoto('');
+            setPhotoFile(null);
+            setIsEditing(false);
+            toast.success(res.message ?? 'Profile updated successfully!');
+          }
         } catch {
           toast.error('Failed to update profile. Please try again.');
         }

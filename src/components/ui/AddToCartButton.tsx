@@ -29,15 +29,17 @@ export default function AddToCartButton({
 
     const handleAddToCart = async () => {
         try {
-            await addChapterToCart({
+            const res = await addChapterToCart({
                 ...(type !== VISIBLE.BOOK && chapterId && { chapter_id: chapterId }),
                 ...(bookId && { book_id: bookId }),
                 type,
                 ...(price !== undefined && { price: String(price) }),
             }).unwrap();
 
-            toast.success('Added to cart!');
-            onSuccess?.();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res.message ?? 'Added to cart!');
+                onSuccess?.();
+            }
         } catch {
             // toast.error('Failed to add to cart', {
             //     description: 'Please try again or contact support.',

@@ -19,7 +19,11 @@ import { getMentorSignupRoutePath, getPolicyBySlugRoutePath, } from '@/routes/ro
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs'
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements'
-import { useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
+import { useGetInstituteMessageQuery, useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
+
+const DEFAULT_PARTNER_PROMPT_HEADING = 'Partner university student'
+const DEFAULT_PARTNER_PROMPT_MESSAGE = 'Use your official university email to access selected content free during our promotional period.'
+const DEFAULT_PARTNER_PROMPT_CONTACT_EMAIL = 'teamtaaluma@taaluma.world'
 
 
 const AVATAR_BORDER_COLOR = '#C8D7EE'
@@ -190,6 +194,13 @@ export default function SignUp() {
     const universityOptions = partnerInstitutions?.map((institution) => ({ value: institution.id, label: institution.name, domains: institution.domains ?? [] })) ?? []
     const selectedUniversity = partnerInstitutions?.find((institution) => institution.id === values.university)
 
+    const { data: instituteMessageResponse } = useGetInstituteMessageQuery(undefined, { skip: !isOpen })
+    const instituteMessage = instituteMessageResponse?.data ?? null
+    const isPartnerPromptEnabled = instituteMessage ? instituteMessage.status !== 'Inactive' : true
+    const partnerPromptHeading = isPartnerPromptEnabled ? (instituteMessage?.heading || DEFAULT_PARTNER_PROMPT_HEADING) : DEFAULT_PARTNER_PROMPT_HEADING
+    const partnerPromptMessage = isPartnerPromptEnabled ? (instituteMessage?.message || DEFAULT_PARTNER_PROMPT_MESSAGE) : DEFAULT_PARTNER_PROMPT_MESSAGE
+    const partnerPromptContactEmail = isPartnerPromptEnabled ? (instituteMessage?.contact_email || DEFAULT_PARTNER_PROMPT_CONTACT_EMAIL) : DEFAULT_PARTNER_PROMPT_CONTACT_EMAIL
+
     return (
         <Modal
             isOpen={isOpen}
@@ -285,15 +296,17 @@ export default function SignUp() {
                                     <div className="flex flex-wrap items-center gap-2">
                                         <GraduationCap className="h-4 w-4 text-primary shrink-0" />
                                         <span className="text-sm font-semibold text-foreground">
-                                            Partner university student
+                                            {partnerPromptHeading}
                                         </span>
                                         <span className="text-[10px] font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                                             Free access
                                         </span>
                                     </div>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Use your official university email to access selected content free during our promotional period.
-                                    </p>
+                                    <div className="text-xs text-muted-foreground leading-relaxed space-y-1">
+                                        {partnerPromptMessage.split('\n').map((line, i) =>
+                                            line.trim() ? <p key={i}>{line}</p> : <br key={i} />
+                                        )}
+                                    </div>
                                 </div>
                             </label>
                         </div>
@@ -338,11 +351,11 @@ export default function SignUp() {
                                                 <span className="text-xs text-muted-foreground">
                                                     University not listed?{' '}
                                                     <Link
-                                                        href="mailto:teamtaaluma@taaluma.world"
+                                                        href={`mailto:${partnerPromptContactEmail}`}
                                                         className="text-primary font-medium hover:text-primary/80"
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
-                                                        teamtaaluma@taaluma.world
+                                                        {partnerPromptContactEmail}
                                                     </Link>
                                                 </span>
                                             )}

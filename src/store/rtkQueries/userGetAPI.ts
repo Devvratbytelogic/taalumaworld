@@ -23,7 +23,7 @@ import { IUserAllTagsAPIResponse } from '@/types/user/allTags';
 import { IActiveReadersAPIResponse } from '@/types/activeReaders';
 import { IAllAgreementsDataAPIResponse } from './allAgreements';
 import { UserTypeValue } from '@/constants/common';
-import { IPartnerInstitutionsAPIResponse } from '@/types/institution';
+import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -197,6 +197,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        /** get the registration prompt message shown to prospective partner-university students */
+        getInstituteMessage: builder.query<IInstituteMessageAPIResponse, void>({
+            query: () => ({
+                url: `/user/institute-message`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -228,4 +235,5 @@ export const {
     // new flow endpoints
     useGetAllAgreementsDataQuery,
     useGetPartnerInstitutionsQuery,
+    useGetInstituteMessageQuery,
 } = clientSideGetApis;

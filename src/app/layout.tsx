@@ -4,7 +4,6 @@ import "../styles/globals.css";
 import { AppProviders } from "../components/providers/AppProviders";
 import ConditionalSiteLayout from "@/components/layout/ConditionalSiteLayout";
 import { ContentProtection } from "@/components/ContentProtection";
-import { API_BASE_URL } from "@/utils/config";
 import Script from "next/script";
 import { cookies } from "next/headers";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";

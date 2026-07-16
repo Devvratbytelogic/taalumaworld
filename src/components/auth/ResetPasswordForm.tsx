@@ -9,7 +9,7 @@ import { Eye, EyeOff, Lock } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { resetPasswordSchema } from '@/utils/formValidation';
-import { useAuthorResetPasswordMutation } from '@/store/rtkQueries/adminAuth';
+import { useAdminResetPasswordMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import { getMentorLoginRoutePath } from '@/routes/routes';
@@ -18,7 +18,7 @@ export function ResetPasswordForm() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [authorResetPassword, { isLoading: isResetting }] = useAuthorResetPasswordMutation();
+    const [authorResetPassword, { isLoading: isResetting }] = useAdminResetPasswordMutation();
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: { password: '', confirmPassword: '' },

@@ -8,6 +8,8 @@ import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
+import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
+import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 
 const NAV_GROUPS: SidebarNavGroup[] = [
     {
@@ -69,6 +71,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { data: profileData } = useGetAdminProfileQuery();
 
     if (pathname.startsWith(getMentorRoutePath())) {
         return <>{children}</>;
@@ -79,7 +82,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
             className="min-h-screen bg-slate-50/80 admin_panel [--admin-header-height:6rem]"
             style={{ '--admin-sidebar-width': ADMIN_SIDEBAR_WIDTH } as React.CSSProperties}
         >
-            <AdminHeader onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
+            <AdminHeader profileData={profileData as IAdminProfileAPIResponse} onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
             <AdminSidebar
                 groups={NAV_GROUPS}
                 mobileMenuOpen={mobileMenuOpen}

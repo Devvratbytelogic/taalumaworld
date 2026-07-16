@@ -13,7 +13,6 @@ import FilterModal from './FilterModal';
 import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
 import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
-import { ExtendPromotionModal } from '../admin/institutions/ExtendPromotionModal';
 import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModal';
 import BookDetailsModal from './common-card-details/BookDetailsModal';
 import ChapterDetailsModal from './common-card-details/ChapterDetailsModal';
@@ -55,8 +54,6 @@ export default function AllModal() {
                 return <ConfirmRemoveCartModal />;
             case "AddEditInstitutionModal":
                 return <AddEditInstitutionModal />;
-            case "ExtendPromotionModal":
-                return <ExtendPromotionModal />;
             case "AddEditRoleModal":
                 return <AddEditRoleModal />;
             case "AddEditStaffModal":

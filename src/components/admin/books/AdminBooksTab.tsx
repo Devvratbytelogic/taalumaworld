@@ -278,7 +278,8 @@ export function AdminBooksTab() {
         <div className="action_buttons">
           <button
             type="button"
-            className="edit_button"
+            className="active_button"
+            title="View series"
             onClick={() => setPreviewBook(params.row)}
           >
             <Eye className="h-4 w-4" />

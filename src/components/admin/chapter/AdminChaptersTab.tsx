@@ -11,13 +11,12 @@ import {
     useUpdateChapterMutation,
     useRestoreChapterMutation,
 } from '@/store/rtkQueries/adminPostApi';
-import type { IAllChaptersAPIResponseData, IChapter } from '@/types/chapter';
+import type { IChapter } from '@/types/chapter';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
 import CommonDataTable from '../CommonDataTable';
 import { AdminChaptersHeader } from './AdminChaptersHeader';
 import { AdminChaptersSearch } from './AdminChaptersSearch';
-import { ChapterPreviewModal } from './ChapterPreviewModal';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -28,7 +27,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getEditChapterRoutePath } from '@/routes/routes';
+import { getEditChapterRoutePath, getViewChapterRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
@@ -55,7 +54,6 @@ export function AdminChaptersTab() {
     const [isTrashView, setIsTrashView] = useState(false);
     const [filterByIsMine, setFilterByIsMine] = useState(false);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-    const [previewChapter, setPreviewChapter] = useState<IAllChaptersAPIResponseData | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const debouncedSearch = useDebounce(search, 500);
@@ -259,13 +257,14 @@ export function AdminChaptersTab() {
             sortable: false,
             renderCell: (params) => (
                 <div className="action_buttons">
-                    {/* <button
+                    <button
                         type="button"
-                        className="edit_button"
-                        onClick={() => setPreviewChapter(params.row)}
+                        className="active_button"
+                        title="View blueprint"
+                        onClick={() => router.push(getViewChapterRoutePath(params.row.id))}
                     >
                         <Eye className="h-4 w-4" />
-                    </button> */}
+                    </button>
                     {isTrashView ? (
                         <button
                             type="button"
@@ -341,12 +340,6 @@ export function AdminChaptersTab() {
                     onPaginationModelChange={setPaginationModel}
                 />
             </div>
-
-            <ChapterPreviewModal
-                chapter={previewChapter}
-                open={!!previewChapter}
-                onOpenChange={(open) => !open && setPreviewChapter(null)}
-            />
         </div>
     );
 }

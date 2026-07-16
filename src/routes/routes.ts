@@ -209,6 +209,10 @@ export function getEditChapterRoutePath(chapterId: string): string {
   return `/admin/blueprints/edit/${chapterId}`;
 }
 
+export function getViewChapterRoutePath(chapterId: string): string {
+  return `/admin/blueprints/view/${chapterId}`;
+}
+
 export function getDesignSystemRoutePath(): string {
   return '/design-system';
 }

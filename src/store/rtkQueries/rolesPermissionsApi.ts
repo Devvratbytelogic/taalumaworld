@@ -6,11 +6,6 @@ import type {
     IAllUserSegmentsAPIResponse,
     IMutationAPIResponse,
 } from '@/types/rolesPermissions';
-import {
-    DUMMY_PERMISSIONS_MATRIX,
-    DUMMY_USER_SEGMENTS,
-    DUMMY_MUTATION_SUCCESS,
-} from '@/app/admin/roles-and-permissions/dummydata';
 
 export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -54,8 +49,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         getPermissionsMatrix: builder.query<IPermissionsMatrixAPIResponse, void>({
-            // query: () => ({ url: `/admin/roles/permissions-matrix`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_PERMISSIONS_MATRIX }),
+            query: () => ({ url: `/admin/roles/permissions-matrix`, method: 'GET' }),
             providesTags: ['AdminPermissions'],
         }),
 
@@ -93,19 +87,16 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         getUserSegments: builder.query<IAllUserSegmentsAPIResponse, void>({
-            // query: () => ({ url: `/admin/user-segments`, method: 'GET' }),
-            queryFn: () => ({ data: DUMMY_USER_SEGMENTS }),
+            query: () => ({ url: `/admin/user-segments`, method: 'GET' }),
             providesTags: ['AdminRoles'],
         }),
 
         updateRolePermissions: builder.mutation<IMutationAPIResponse, { roleId: string; permissionIds: string[] }>({
-            // query: ({ roleId, permissionIds }) => ({ url: `/admin/roles/${roleId}/permissions`, method: 'PUT', body: { permissionIds } }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: ({ roleId, permissionIds }) => ({ url: `/admin/roles/${roleId}/permissions`, method: 'PUT', body: { permissionIds } }),
         }),
 
         assignStaffRole: builder.mutation<IMutationAPIResponse, { staffId: string; roleId: string }>({
-            // query: ({ staffId, roleId }) => ({ url: `/admin/staff/${staffId}/role`, method: 'PUT', body: { roleId } }),
-            queryFn: () => ({ data: DUMMY_MUTATION_SUCCESS }),
+            query: ({ staffId, roleId }) => ({ url: `/admin/staff/${staffId}/role`, method: 'PUT', body: { roleId } }),
         }),
 
 

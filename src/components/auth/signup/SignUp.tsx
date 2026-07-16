@@ -172,7 +172,7 @@ export default function SignUp() {
                     setProfilePreview(null)
                     rf()
                     toast.success(res.message ?? 'Account created! Please verify your email.')
-                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'account' } }))
+                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'email_verification', through:'login' } }))
                 }
             } catch {
                 console.error('Registration failed. Please try again.')

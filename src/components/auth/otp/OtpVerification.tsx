@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import OtpInput from '@/components/auth/OtpInput';
 import Button from '@/components/ui/Button';
@@ -9,13 +10,15 @@ import { otpVerificationSchema } from '@/utils/formValidation';
 import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useUserVerifyOtpMutation, useUserResendOtpMutation } from '@/store/rtkQueries/userAuthApi';
+import { setAuthCookies } from '@/utils/authCookies';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import toast from '@/utils/toast';
-import Cookies from 'js-cookie';
 
 export default function OtpVerification() {
     const dispatch = useDispatch();
+    const router = useRouter();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-    const modalData = data as { email: string; type: 'account' | 'verify' } | null;
+    const modalData = data 
 
     const [userVerifyOtp, { isLoading: isVerifying }] = useUserVerifyOtpMutation();
     const [userResendOtp, { isLoading: isResending }] = useUserResendOtpMutation();
@@ -32,13 +35,21 @@ export default function OtpVerification() {
                     email: modalData.email,
                     code: formValues.code,
                     type: modalData.type,
+                    through: modalData.through,
                 }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res?.message ?? 'Verification successful!');
                     resetForm();
 
-                    if (modalData.type === 'account') {
-                        dispatch(openModal({ componentName: 'SignIn', data: '' }));
+                    if (modalData.type === 'email_verification') {
+                        setAuthCookies({
+                            token: res?.data?.token ?? '',
+                            user: { id: res?.data?.id, email: res?.data?.email },
+                            role: res?.data?.userRole?.name ?? '',
+                        });
+
+                        router.refresh()
+                        dispatch(closeModal())
                     } else {
                         dispatch(openModal({ componentName: 'ResetPassword', data: { email: modalData.email, code: formValues.code } }));
                     }

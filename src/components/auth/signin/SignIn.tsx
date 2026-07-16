@@ -35,30 +35,22 @@ export default function SignIn() {
                 const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
 
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-                    setAuthCookies({
-                        token: res?.data?.token ?? '',
-                        user: { id: res?.data?.id, email: res?.data?.email },
-                        role: res?.data?.userRole?.name ?? '',
-                    })
-
-                    dispatch(rtkQuerieSetup.util.invalidateTags([
-                        'AllChapters', 'Cart', 'UserProfile', 'MyChapters', 'ReadingHistory',
-                    ]))
-
-                    router.refresh()
                     toast.success(res?.message ?? 'Sign in successful!')
-                    dispatch(closeModal())
+                    if (res?.data?.requires_email_verification) {
+                        dispatch(openModal({ componentName: 'OtpVerification', data: { email: vals.email, type: 'email_verification', through: 'login' } }))
+                    } else {
+                        setAuthCookies({
+                            token: res?.data?.token ?? '',
+                            user: { id: res?.data?.id, email: res?.data?.email },
+                            role: res?.data?.userRole?.name ?? '',
+                        })
+                        router.refresh()
+                        dispatch(closeModal())
+                    }
                 }
 
             } catch (error) {
-                const errMsg = (error as { data?: { message?: string } })?.data?.message ?? ''
-                if (errMsg.toLowerCase().includes('verify your account')) {
-                    toast.info(errMsg)
-                    dispatch(openModal({
-                        componentName: 'OtpVerification',
-                        data: { email: vals.email, type: 'account' },
-                    }))
-                }
+                console.error('Sign in failed. Please try again.', error)
             }
         },
     })

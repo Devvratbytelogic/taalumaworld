@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useMpesaPaymentMutation } from '@/store/rtkQueries/userPostAPI';
 import { useLazyGetMpesaPaymentStatusQuery } from '@/store/rtkQueries/userGetAPI';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
+import { useAppDispatch } from '@/store/hooks';
 import { mpesaLog } from '@/utils/mpesaLogger';
 
 const DEFAULT_WAIT_SECONDS = 300;
@@ -10,10 +12,12 @@ const STATUS_POLL_MS = 2_000;
 export type MpesaPayResult = {
   success?: boolean;
   data?: {
-    response?: {
-      ResponseCode?: string;
-      CheckoutRequestID?: string;
-      MerchantRequestID?: string;
+    gateway?: {
+      response?: {
+        ResponseCode?: string;
+        CheckoutRequestID?: string;
+        MerchantRequestID?: string;
+      };
     };
   };
 };
@@ -26,10 +30,10 @@ export type MpesaErrorState = {
 };
 
 export type UseMpesaPaymentFlowOptions = {
-  getAmount: () => number;
   cartID?: string;
   chapterID?: string;
   type?: string;
+  acceptedAgreementIds?: string[];
   /** @deprecated Phone is now collected via the built-in phone modal. */
   getPhone?: () => number;
   waitSeconds?: number;
@@ -40,13 +44,14 @@ export type UseMpesaPaymentFlowOptions = {
 const SKIP_MPESA = process.env.NEXT_PUBLIC_SKIP_MPESA === 'true';
 
 export function useMpesaPaymentFlow({
-  getAmount,
   cartID,
   chapterID,
   type,
+  acceptedAgreementIds = [],
   waitSeconds = DEFAULT_WAIT_SECONDS,
   onSuccess,
 }: UseMpesaPaymentFlowOptions) {
+  const dispatch = useAppDispatch();
   const [mpesaPayment] = useMpesaPaymentMutation();
   const [fetchPaymentStatus] = useLazyGetMpesaPaymentStatusQuery();
 
@@ -102,11 +107,12 @@ export function useMpesaPaymentFlow({
   /** Step 1: open the phone-number modal (or skip M-Pesa entirely in test mode). */
   const startPayment = useCallback(async () => {
     if (SKIP_MPESA) {
-      mpesaLog('TEST_MODE_SKIP', 'warn', { amount: getAmount() });
+      mpesaLog('TEST_MODE_SKIP', 'warn', {});
       setIsInitiating(true);
       try {
         const fakeCheckoutId = `TEST-${Date.now()}`;
-        mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId: fakeCheckoutId, amount: getAmount() });
+        mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId: fakeCheckoutId });
+        dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
         await Promise.resolve(onSuccessRef.current());
       } catch {
         mpesaLog('CHECKOUT_FAILED', 'error', { error: 'Exception thrown in skip-mpesa mode' });
@@ -118,34 +124,33 @@ export function useMpesaPaymentFlow({
       }
       return;
     }
-    mpesaLog('PAYMENT_INITIATED', 'info', { amount: getAmount() });
+    mpesaLog('PAYMENT_INITIATED', 'info', {});
     setIsPhoneModalOpen(true);
-  }, [getAmount]);
+  }, [dispatch]);
 
   /** Step 2: called by MpesaPhoneModal with the collected phone number. */
   const confirmPayment = useCallback(
     async (phone: number) => {
       setIsInitiating(true);
-      mpesaLog('PAYMENT_INITIATED', 'info', { amount: getAmount(), phone });
+      mpesaLog('PAYMENT_INITIATED', 'info', { phone });
       try {
         const res = (await mpesaPayment({
-          amount: getAmount(),
           phone,
           cart_id: cartID,
           chapter_id: chapterID,
           type: type,
+          accepted_agreement_ids: acceptedAgreementIds,
         }).unwrap()) as MpesaPayResult;
 
-        const responseCode = res?.data?.response?.ResponseCode;
-        const checkoutId = res?.data?.response?.MerchantRequestID;
+        const responseCode = res?.data?.gateway?.response?.ResponseCode;
+        const checkoutId = res?.data?.gateway?.response?.MerchantRequestID;
 
         if (res?.success && responseCode === '0' && checkoutId) {
           mpesaLog('STK_PUSH_SUCCESS', 'info', {
             checkoutId,
             responseCode,
-            amount: getAmount(),
             phone,
-            meta: { merchantRequestId: res?.data?.response?.MerchantRequestID, checkoutRequestId: res?.data?.response?.CheckoutRequestID },
+            meta: { merchantRequestId: res?.data?.gateway?.response?.MerchantRequestID, checkoutRequestId: res?.data?.gateway?.response?.CheckoutRequestID },
           });
           checkoutIdRef.current = checkoutId;
           finalizedRef.current = false;
@@ -159,7 +164,6 @@ export function useMpesaPaymentFlow({
 
         mpesaLog('STK_PUSH_FAILED', 'error', {
           responseCode: responseCode ?? 'none',
-          amount: getAmount(),
           phone,
           error: `success=${res?.success}, responseCode=${responseCode}, checkoutId=${checkoutId}`,
         });
@@ -169,17 +173,14 @@ export function useMpesaPaymentFlow({
         setIsInitiating(false);
       } catch (err) {
         mpesaLog('STK_PUSH_FAILED', 'error', {
-          amount: getAmount(),
           phone,
           error: err instanceof Error ? err.message : 'Unknown exception during STK push',
         });
-        toast.error('Payment Failed', {
-          description: 'Please try again or contact support.',
-        });
+        console.error('Payment Failed', err );
         setIsInitiating(false);
       }
     },
-    [getAmount, mpesaPayment, cartID, chapterID, type]
+    [mpesaPayment, cartID, chapterID, type, acceptedAgreementIds]
   );
 
   /** Countdown timer — shows progress and times out the wait after waitSeconds. */
@@ -241,6 +242,7 @@ export function useMpesaPaymentFlow({
           mpesaLog('POLL_COMPLETED', 'info', { checkoutId });
           checkoutIdRef.current = null;
           setShowPaymentSuccessMessage(true);
+          dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
           await new Promise(resolve => setTimeout(resolve, 1000));
           setShowPaymentSuccessMessage(false);
           setIsWaiting(false);
@@ -294,7 +296,7 @@ export function useMpesaPaymentFlow({
     }, STATUS_POLL_MS);
 
     return () => stopPolling();
-  }, [isWaiting, fetchPaymentStatus, stopPolling]);
+  }, [isWaiting, fetchPaymentStatus, stopPolling, dispatch]);
 
   return {
     startPayment,

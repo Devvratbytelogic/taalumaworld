@@ -21,7 +21,7 @@ interface CartSummaryProps {
   itemCount: number;
   discountAmount: number;
   taxAmount: number;
-  onCheckout: () => void;
+  onCheckout: (acceptedAgreementIds: string[]) => void;
   isLoading?: boolean;
   couponCode?: string | null;
 }
@@ -68,7 +68,7 @@ export default function CartSummary({
       setAgreementTouched(true);
       return;
     }
-    onCheckout();
+    onCheckout(acceptedAgreementIds);
   };
 
   const handleApplyCoupon = async (code: string) => {

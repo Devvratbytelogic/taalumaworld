@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
@@ -8,12 +9,16 @@ import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
 import { openModal } from '@/store/slices/allModalSlice';
 import { ICartItemEntity } from '@/types/user/cart';
 import { VISIBLE } from '@/constants/contentMode';
-import { getBlueprintRoutePath, getCartCheckoutRoutePath, getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
+import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
+import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { Badge } from '@/components/ui/badge';
 import CartPageSkeleton from '@/components/skeleton-loader/CartPageSkeleton';
 import CartNoData from './CartNoData';
 import CartSummary from './CartSummary';
+import PaymentConfirmed from './PaymentConfirmed';
 
 function CartItemCard({ item }: { item: ICartItemEntity }) {
   const dispatch = useDispatch();
@@ -103,19 +108,12 @@ function CartItemCard({ item }: { item: ICartItemEntity }) {
 }
 
 export default function CartPage() {
-  const router = useRouter();
+  const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
+  const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const { data: cartResponse, isLoading } = useGetCartQuery();
 
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
-
-  if (isLoading) {
-    return <CartPageSkeleton />;
-  }
-
-  if (cartItems.length === 0) {
-    return <CartNoData />;
-  }
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + (item.selling_price ?? 0) * (item.quantity ?? 1),
@@ -126,9 +124,30 @@ export default function CartPage() {
   const total = cartData?.total_amount ?? Math.max(subtotal - discountAmount + taxAmount, 0);
   const itemCount = cartData?.item_count ?? cartItems.length;
 
-  const handleCheckout = () => {
-    router.push(getCartCheckoutRoutePath());
+  // Hooks must run unconditionally, so this is declared before the early returns below.
+  const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
+    cartID: cartData?._id,
+    type: 'cart',
+    acceptedAgreementIds,
+    onSuccess: () => setIsPaymentConfirmed(true),
+  });
+
+  const handleCheckout = (ids: string[]) => {
+    setAcceptedAgreementIds(ids);
+    startPayment();
   };
+
+  if (isPaymentConfirmed) {
+    return <PaymentConfirmed />;
+  }
+
+  if (isLoading) {
+    return <CartPageSkeleton />;
+  }
+
+  if (cartItems.length === 0) {
+    return <CartNoData />;
+  }
 
   return (
     <div className="min-h-screen py-6 sm:py-8">
@@ -168,11 +187,15 @@ export default function CartPage() {
               discountAmount={discountAmount}
               taxAmount={taxAmount}
               onCheckout={handleCheckout}
+              isLoading={isInitiating}
               couponCode={cartData?.coupon_code}
             />
           </div>
         </div>
       </div>
+
+      <MpesaPhoneModal {...phoneModalProps} />
+      <MpesaWaitModal {...waitModalProps} />
     </div>
   );
 }

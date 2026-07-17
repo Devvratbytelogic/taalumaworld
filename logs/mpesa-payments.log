@@ -7,3 +7,54 @@
 {"timestamp":"2026-07-17T04:00:46.153Z","event":"STK_PUSH_FAILED","level":"error","responseCode":"none","amount":200,"phone":254712345678,"error":"success=true, responseCode=undefined, checkoutId=undefined"}
 {"timestamp":"2026-07-17T04:00:54.051Z","event":"PAYMENT_INITIATED","level":"info","amount":200,"phone":254712345678}
 {"timestamp":"2026-07-17T04:00:54.275Z","event":"STK_PUSH_FAILED","level":"error","amount":200,"phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T11:52:09.215Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T11:52:39.932Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T11:52:46.417Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T11:52:46.852Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T11:53:13.383Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T11:53:13.582Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T11:53:49.767Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T11:53:58.020Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T11:53:58.416Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T11:58:12.720Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T11:58:13.031Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T12:02:18.506Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:02:26.739Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:02:28.196Z","event":"STK_PUSH_FAILED","level":"error","responseCode":"none","phone":254712345678,"error":"success=true, responseCode=undefined, checkoutId=undefined"}
+{"timestamp":"2026-07-17T12:02:34.623Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:02:34.878Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T12:02:50.422Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:02:50.669Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T12:03:03.873Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:03:04.134Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T12:03:15.090Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:03:15.376Z","event":"STK_PUSH_FAILED","level":"error","phone":254712345678,"error":"Unknown exception during STK push"}
+{"timestamp":"2026-07-17T12:04:26.191Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:04:33.940Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:04:35.145Z","event":"STK_PUSH_FAILED","level":"error","responseCode":"none","phone":254712345678,"error":"success=true, responseCode=undefined, checkoutId=undefined"}
+{"timestamp":"2026-07-17T12:09:49.511Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:09:52.077Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:09:52.948Z","event":"STK_PUSH_FAILED","level":"error","responseCode":"none","phone":254712345678,"error":"success=true, responseCode=undefined, checkoutId=undefined"}
+{"timestamp":"2026-07-17T12:13:48.931Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:13:51.880Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:13:52.720Z","event":"STK_PUSH_FAILED","level":"error","responseCode":"none","phone":254712345678,"error":"success=true, responseCode=undefined, checkoutId=undefined"}
+{"timestamp":"2026-07-17T12:14:23.281Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:14:26.030Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:14:26.920Z","event":"STK_PUSH_FAILED","level":"error","responseCode":"none","phone":254712345678,"error":"success=true, responseCode=undefined, checkoutId=undefined"}
+{"timestamp":"2026-07-17T12:16:25.246Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:16:26.153Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"09432-78728730-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"09432-78728730-1","checkoutRequestId":"ws_CO_17072026174625216116"}}
+{"timestamp":"2026-07-17T12:16:30.409Z","event":"POLL_TICK","level":"info","checkoutId":"09432-78728730-1","status":"completed"}
+{"timestamp":"2026-07-17T12:16:30.410Z","event":"POLL_COMPLETED","level":"info","checkoutId":"09432-78728730-1"}
+{"timestamp":"2026-07-17T12:16:31.411Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"09432-78728730-1"}
+{"timestamp":"2026-07-17T12:17:20.646Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:17:33.113Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:17:33.987Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"97912-85481134-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"97912-85481134-1","checkoutRequestId":"ws_CO_17072026174732247549"}}
+{"timestamp":"2026-07-17T12:17:37.461Z","event":"POLL_TICK","level":"info","checkoutId":"97912-85481134-1","status":"completed"}
+{"timestamp":"2026-07-17T12:17:37.462Z","event":"POLL_COMPLETED","level":"info","checkoutId":"97912-85481134-1"}
+{"timestamp":"2026-07-17T12:17:38.465Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"97912-85481134-1"}
+{"timestamp":"2026-07-17T12:21:07.015Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-17T12:21:15.482Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-17T12:21:16.472Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"91910-69476936-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"91910-69476936-1","checkoutRequestId":"ws_CO_17072026175115231172"}}
+{"timestamp":"2026-07-17T12:21:18.974Z","event":"POLL_TICK","level":"info","checkoutId":"91910-69476936-1","status":"completed"}
+{"timestamp":"2026-07-17T12:21:18.976Z","event":"POLL_COMPLETED","level":"info","checkoutId":"91910-69476936-1"}
+{"timestamp":"2026-07-17T12:21:19.981Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"91910-69476936-1"}

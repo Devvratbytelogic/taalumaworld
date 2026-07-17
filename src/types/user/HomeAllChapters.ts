@@ -21,7 +21,7 @@ export interface IHomeAllChaptersItemsEntity {
   title: string;
   description: string;
   coverImage: string;
-  price: number;
+  // price: number;
   effectivePrice: number;
   pricingAccessType: string;
   tags?: (string)[] | null;
@@ -49,7 +49,7 @@ export interface IHomeAllChaptersItemsEntity {
   chapterCount?: number;
   isChapterPricing?: boolean;
   priceLabel?: string;
-  fromPrice?: number;
+  // fromPrice?: number;
 }
 export interface IHomeAllChaptersMentor {
   name: string;

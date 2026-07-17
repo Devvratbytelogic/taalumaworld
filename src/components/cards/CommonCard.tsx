@@ -16,15 +16,15 @@ interface CommonCardProps {
 
 export default function CommonCard({ data }: CommonCardProps) {
     const dispatch = useDispatch()
-    // `type` can be 'series' for series/book listings, so fall back to `legacyType` ('book' | 'chapter') to stay backward compatible
-    const isBook = data?.type === VISIBLE.BOOK
-    const isChapterPriced = isBook && (data?.pricingModel === VISIBLE.CHAPTER || !!data?.isChapterPricing)
-    const displayPrice = data?.effectivePrice ?? data?.price ?? 0
-    const hasDiscount = (data?.price ?? 0) > displayPrice
+    const isBook = data?.type === 'series'
+    console.log('isBook', isBook);
+
+    const isChapterPriced = isBook && (data?.pricingModel === VISIBLE.CHAPTER)
+    const displayPrice = data?.effectivePrice
 
     return (
         <Card
-            className="group/card overflow-hidden cursor-pointer hover-lift transition-all hover:border-primary/50 rounded-md flex flex-col h-full"
+            className="group/card overflow-hidden cursor-pointer hover-lift gap-4 transition-all hover:border-primary/50 rounded-md flex flex-col h-full"
             onClick={() =>
                 dispatch(
                     openModal({
@@ -56,35 +56,19 @@ export default function CommonCard({ data }: CommonCardProps) {
                     type={data?.legacyType}
                     isWishlisted={data?.isWishlisted}
                 />
+            </div>
 
-                {/* Top-right badge */}
-                <div className="absolute top-3.5 right-3.5 z-2">
+            <CardContent className="last:pb-4 px-4 space-y-1.5 flex flex-col flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
                     {isBook ? (
-                        <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium ${!isChapterPriced ? 'text-primary border-primary/20' : 'text-gray-700 border-gray-200'}`}>
+                        <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs text-primary border-primary/20`}>
                             {!isChapterPriced ? 'Full Series' : 'By Blueprint'}
                         </Badge>
                     ) : data?.isFree ? (
-                        <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium">
+                        <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs">
                             Free
                         </Badge>
                     ) : null}
-                </div>
-            </div>
-
-            <CardContent className="px-4 space-y-1.5 flex flex-col flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                    {isBook
-                        ? data?.tags?.slice(0, 2).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-sm font-medium rounded-full px-3 py-1">
-                                {tag}
-                            </Badge>
-                        ))
-                        : data?.bookTitle && (
-                            <Badge variant="outline" className="text-sm font-medium rounded-full px-3 py-1 max-w-37">
-                                <BookOpen className="h-3 w-3 mr-1.5 shrink-0" />
-                                <span className="truncate">{data?.bookTitle}</span>
-                            </Badge>
-                        )}
                 </div>
 
                 {/* Title */}
@@ -110,36 +94,17 @@ export default function CommonCard({ data }: CommonCardProps) {
                         }
                     </div>
 
-                    {isBook ? (
-                        isChapterPriced ? (
-                            <div className="text-right leading-tight">
-                                <span className="font-semibold text-lg text-primary">
-                                    KSH {(data?.fromPrice ?? displayPrice).toFixed(2)}
-                                </span>
-                                <p className="text-xs text-muted-foreground">{data?.priceLabel ?? 'Per chapter'}</p>
-                            </div>
-                        ) : displayPrice > 0 ? (
-                            <div className="flex items-center gap-2">
-                                {hasDiscount && (
-                                    <span className="text-sm text-muted-foreground line-through">KSH {data?.price?.toFixed(2)}</span>
-                                )}
-                                <span className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</span>
-                            </div>
-                        ) : (
-                            <span className="text-primary text-sm tracking-tight">View Blueprints</span>
+                    {isBook
+                        ? (displayPrice > 0
+                            ? <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</p>
+                            : <p className="font-semibold text-lg text-primary">FREE</p>
                         )
-                    ) : (
-                        data?.isFree ? (
-                            <span className="font-medium text-success tracking-tight">Free to Read</span>
-                        ) : displayPrice > 0 ? (
-                            <div className="flex items-center gap-2">
-                                {hasDiscount && (
-                                    <span className="text-sm text-muted-foreground line-through">KSH {data?.price?.toFixed(2)}</span>
-                                )}
-                                <span className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</span>
-                            </div>
-                        ) : null
-                    )}
+                        : (data?.isFree
+                            ? <p className="font-medium text-success tracking-tight">Free to Read</p>
+                            : displayPrice > 0 ? (
+                                <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</p>
+                            ) : <p className="font-semibold text-lg text-primary">FREE</p>
+                        )}
                 </div>
             </CardContent>
         </Card>

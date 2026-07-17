@@ -1,74 +1,52 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, TrendingUp, CheckCircle, Play, BookMarked, FileDown } from 'lucide-react';
+import {
+  BookOpen,
+  BookMarked,
+  TrendingUp,
+  CheckCircle,
+  CircleDashed,
+  Play,
+  FileDown,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetMyChaptersQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
-import { cn } from '@/components/ui/utils';
-import type { ItemsEntity } from '@/types/user/myChapters';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { cn } from '@/components/ui/utils';
+import { useGetMyChaptersQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
+import type { ItemsEntity } from '@/types/user/myChapters';
 import { getBlueprintRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import moment from 'moment';
 
-type FilterType = 'all' | 'reading' | 'completed' | 'unread';
+type FilterType = 'all' | 'inProgress' | 'completed' | 'unread';
+
+const PAGE_LIMIT = 10;
 
 export function MyChaptersPage() {
   const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [filter, setFilter] = useState<FilterType>('all');
+  const [page, setPage] = useState(1);
   const [invoiceDownloadingOrderId, setInvoiceDownloadingOrderId] = useState<string | null>(null);
 
-  const { data: myChaptersData, isLoading } = useGetMyChaptersQuery();
+  const { data: myChaptersData, isLoading, isFetching } = useGetMyChaptersQuery({
+    page,
+    limit: PAGE_LIMIT,
+    inProgress: filter === 'inProgress',
+    completed: filter === 'completed',
+    unread: filter === 'unread',
+  });
   const [fetchTransactionInvoice] = useLazyGetTransactionInvoiceQuery();
+
   const chapters: ItemsEntity[] = myChaptersData?.data?.items ?? [];
+  const summary = myChaptersData?.data?.summary;
+  const pagination = myChaptersData?.data?.pagination;
 
-  const stats = useMemo(
-    () => ({
-      total: chapters.length,
-      reading: chapters.filter((c) => c.progressPercent > 0 && !c.completed).length,
-      completed: chapters.filter((c) => c.completed).length,
-      unread: chapters.filter((c) => c.progressPercent === 0 && !c.completed).length,
-    }),
-    [chapters]
-  );
-
-  const filteredChapters = useMemo(() => {
-    switch (activeFilter) {
-      case 'reading':
-        return chapters.filter((c) => c.progressPercent > 0 && !c.completed);
-      case 'completed':
-        return chapters.filter((c) => c.completed);
-      case 'unread':
-        return chapters.filter((c) => c.progressPercent === 0 && !c.completed);
-      default:
-        return chapters;
-    }
-  }, [chapters, activeFilter]);
-
-  const getProgressStatus = (progressPercent: number, completed: boolean) => {
-    if (completed || progressPercent >= 100) return { label: 'Completed', color: 'text-green-600' };
-    if (progressPercent > 0) return { label: 'In progress', color: 'text-primary' };
-    return { label: 'Not started', color: 'text-gray-500' };
-  };
-
-  const normalizeProgress = (value?: number) => Math.min(100, Math.max(0, value ?? 0));
-
-  const getReadAction = (progressPercent: number, completed: boolean) => {
-    const progress = normalizeProgress(progressPercent);
-    const isCompleted = completed || progress >= 100;
-
-    if (isCompleted) {
-      return { label: 'Read again', icon: BookOpen };
-    }
-    if (progress > 0) {
-      return { label: 'Continue reading', icon: BookOpen };
-    }
-    return { label: 'Start reading', icon: Play };
-  };
-
-  const shouldShowDescription = (title?: string, description?: string) => {
-    const normalizedTitle = title?.trim().toLowerCase();
-    const normalizedDescription = description?.trim().toLowerCase();
-    return Boolean(normalizedDescription && normalizedDescription !== normalizedTitle);
+  const handleFilterChange = (nextFilter: FilterType) => {
+    setFilter(nextFilter);
+    setPage(1);
   };
 
   const handleDownloadInvoice = async (orderId: string) => {
@@ -97,8 +75,8 @@ export function MyChaptersPage() {
           description="Your personal collection of purchased blueprints"
         />
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {[...Array(3)].map((_, i) => (
+          <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+            {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-5 py-4 sm:px-6">
                 <div className="h-9 w-9 rounded-md bg-gray-200" />
                 <div className="space-y-2">
@@ -126,10 +104,37 @@ export function MyChaptersPage() {
   }
 
   const statItems = [
-    { icon: BookOpen, label: 'Total blueprints', value: stats.total, iconClass: 'text-primary' },
-    { icon: TrendingUp, label: 'In progress', value: stats.reading, iconClass: 'text-primary' },
-    { icon: CheckCircle, label: 'Completed', value: stats.completed, iconClass: 'text-green-600' },
+    { icon: BookOpen, label: 'Total blueprints', value: summary?.totalChapters ?? 0, iconClass: 'text-primary' },
+    { icon: TrendingUp, label: 'In progress', value: summary?.inProgress ?? 0, iconClass: 'text-primary' },
+    { icon: CheckCircle, label: 'Completed', value: summary?.completed ?? 0, iconClass: 'text-green-600' },
+    { icon: CircleDashed, label: 'Unread', value: summary?.unread ?? 0, iconClass: 'text-gray-500' },
   ] as const;
+
+  const filterTabs: { key: FilterType; label: string }[] = [
+    { key: 'all', label: `All (${summary?.totalChapters ?? 0})` },
+    { key: 'inProgress', label: `In progress (${summary?.inProgress ?? 0})` },
+    { key: 'completed', label: `Completed (${summary?.completed ?? 0})` },
+    { key: 'unread', label: `Unread (${summary?.unread ?? 0})` },
+  ];
+
+  const emptyStateCopy: Record<FilterType, { title: string; description: string }> = {
+    all: {
+      title: 'No blueprints yet',
+      description: "You haven't purchased any blueprints yet. Start exploring and build your collection.",
+    },
+    inProgress: {
+      title: 'No blueprints in progress',
+      description: 'Blueprints you start reading will show up here.',
+    },
+    completed: {
+      title: 'No completed blueprints',
+      description: 'Blueprints you finish reading will show up here.',
+    },
+    unread: {
+      title: 'No unread blueprints',
+      description: "You've started reading all of your blueprints.",
+    },
+  };
 
   return (
     <div className="space-y-6">
@@ -139,7 +144,7 @@ export function MyChaptersPage() {
       />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {statItems.map(({ icon: Icon, label, value, iconClass }) => (
             <div key={label} className="flex items-center gap-3 px-5 py-4 sm:px-6">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
@@ -155,39 +160,51 @@ export function MyChaptersPage() {
 
         <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-            {(
-              [
-                { key: 'all', label: `All (${stats.total})` },
-                { key: 'reading', label: `Reading (${stats.reading})` },
-                { key: 'completed', label: `Completed (${stats.completed})` },
-                { key: 'unread', label: `Unread (${stats.unread})` },
-              ] as { key: FilterType; label: string }[]
-            ).map(({ key, label }) => (
+            {filterTabs.map(({ key, label }) => (
               <Button
                 key={key}
                 type="button"
-                className={cn('global_btn shrink-0 rounded_full', activeFilter === key ? 'bg_primary' : 'outline_primary')}
-                onPress={() => setActiveFilter(key)}
+                className={cn('global_btn shrink-0 rounded_full', filter === key ? 'bg_primary' : 'outline_primary')}
+                isDisabled={isFetching}
+                onPress={() => handleFilterChange(key)}
               >
                 {label}
               </Button>
             ))}
           </div>
           <p className="text-sm text-gray-500">
-            {filteredChapters.length} blueprint{filteredChapters.length !== 1 ? 's' : ''}
+            {pagination?.totalItems ?? 0} blueprint{(pagination?.totalItems ?? 0) !== 1 ? 's' : ''}
           </p>
         </div>
 
-        <div className="p-4 sm:p-6">
-          {filteredChapters.length > 0 ? (
+        <div className={cn('p-4 sm:p-6 transition-opacity', isFetching ? 'opacity-60' : '')}>
+          {chapters.length > 0 ? (
             <div className="flex flex-col gap-4">
-              {filteredChapters.map((chapter) => {
-                const progress = normalizeProgress(chapter.progressPercent);
-                const isCompleted = chapter.completed || progress >= 100;
-                const status = getProgressStatus(progress, chapter.completed);
-                const readAction = getReadAction(progress, chapter.completed);
-                const ReadIcon = readAction.icon;
-                const showDescription = shouldShowDescription(chapter.title, chapter.description);
+              {chapters && chapters?.length > 0 && chapters?.map((chapter) => {
+                const progress = chapter?.percentage;
+                const isCompleted = chapter?.completed;
+
+                let statusLabel = 'Not started';
+                let statusColor = 'text-gray-500';
+                if (isCompleted) {
+                  statusLabel = 'Completed';
+                  statusColor = 'text-green-600';
+                } else if (progress > 0) {
+                  statusLabel = 'In progress';
+                  statusColor = 'text-primary';
+                }
+
+                let readLabel = 'Start reading';
+                let ReadIcon = Play;
+                if (isCompleted) {
+                  readLabel = 'Read again';
+                  ReadIcon = BookOpen;
+                } else if (progress > 0) {
+                  readLabel = 'Continue reading';
+                  ReadIcon = BookOpen;
+                }
+
+                const description = chapter.description?.trim();
 
                 return (
                   <article
@@ -196,12 +213,7 @@ export function MyChaptersPage() {
                   >
                     <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-gray-100 sm:aspect-auto sm:w-40 sm:min-h-[168px] md:w-44">
                       <div className="h-full w-full transition-transform duration-300 group-hover:scale-[1.02]">
-                        <ImageComponent
-                          key={chapter.chapterId}
-                          src={chapter.coverImage}
-                          alt={chapter.title}
-                          object_cover={true}
-                        />
+                        <ImageComponent src={chapter.coverImage || ''} alt={chapter.title} object_cover={true} />
                       </div>
 
                       {isCompleted ? (
@@ -226,7 +238,7 @@ export function MyChaptersPage() {
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
-                          <span>Blueprint {chapter.chapterNumber}</span>
+                          <span>Blueprint {chapter.blueprintNumber || chapter.chapterNumber}</span>
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
@@ -235,15 +247,13 @@ export function MyChaptersPage() {
 
                         <h3 className="line-clamp-2 text-base font-medium text-gray-900">{chapter.title}</h3>
 
-                        {showDescription ? (
-                          <p className="mt-1.5 line-clamp-2 text-sm text-gray-500">{chapter.description}</p>
-                        ) : null}
+                        <p className="mt-1.5 line-clamp-2 text-sm text-gray-500">{chapter.description}</p>
 
                         <div className="mt-4 max-w-md">
                           <div className="mb-1.5 flex items-center justify-between text-xs text-gray-500">
                             <span>Progress</span>
                             <div className="flex items-center gap-2">
-                              <span className={status.color}>{status.label}</span>
+                              <span className={statusColor}>{statusLabel}</span>
                               <span className="font-medium tabular-nums text-gray-700">{Math.round(progress)}%</span>
                             </div>
                           </div>
@@ -256,6 +266,11 @@ export function MyChaptersPage() {
                               style={{ width: `${progress}%` }}
                             />
                           </div>
+                          {chapter.progressUpdatedAt ? (
+                            <p className="mt-1.5 text-xs text-gray-400">
+                              Last updated: {moment(chapter.progressUpdatedAt).format('MMM D, YYYY hh:mm A')}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
 
@@ -266,7 +281,7 @@ export function MyChaptersPage() {
                           onPress={() => router.push(getBlueprintRoutePath(chapter.chapterId))}
                         >
                           <ReadIcon className="h-4 w-4" />
-                          {readAction.label}
+                          {readLabel}
                         </Button>
 
                         {chapter.order_id ? (
@@ -274,7 +289,7 @@ export function MyChaptersPage() {
                             type="button"
                             className="global_btn rounded_full outline_primary w-full"
                             isDisabled={invoiceDownloadingOrderId === chapter.order_id}
-                            onPress={() => handleDownloadInvoice(chapter.order_id)}
+                            onPress={() => handleDownloadInvoice(chapter.order_id as string)}
                           >
                             <FileDown className="h-4 w-4" />
                             {invoiceDownloadingOrderId === chapter.order_id ? 'Downloading…' : 'Invoice'}
@@ -292,17 +307,9 @@ export function MyChaptersPage() {
                 <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white">
                   <BookOpen className="h-5 w-5 text-primary" aria-hidden />
                 </span>
-                <h3 className="mb-2 text-base font-semibold text-gray-900">
-                  {activeFilter === 'all'
-                    ? 'No blueprints yet'
-                    : `No ${activeFilter === 'reading' ? 'in progress' : activeFilter === 'completed' ? 'completed' : 'unread'} blueprints`}
-                </h3>
-                <p className="mb-6 text-sm text-gray-500">
-                  {activeFilter === 'all'
-                    ? "You haven't purchased any blueprints yet. Start exploring and build your collection."
-                    : 'No blueprints match this filter.'}
-                </p>
-                {activeFilter === 'all' ? (
+                <h3 className="mb-2 text-base font-semibold text-gray-900">{emptyStateCopy[filter].title}</h3>
+                <p className="mb-6 text-sm text-gray-500">{emptyStateCopy[filter].description}</p>
+                {filter === 'all' ? (
                   <Button
                     type="button"
                     onPress={() => router.push(getHomeRoutePath())}
@@ -313,7 +320,7 @@ export function MyChaptersPage() {
                 ) : (
                   <Button
                     type="button"
-                    onPress={() => setActiveFilter('all')}
+                    onPress={() => handleFilterChange('all')}
                     className="global_btn rounded_full outline_primary"
                   >
                     Show All Blueprints
@@ -323,6 +330,35 @@ export function MyChaptersPage() {
             </div>
           )}
         </div>
+
+        {pagination && pagination.totalPages > 1 ? (
+          <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p className="text-sm text-gray-500">
+              Page <span className="font-medium text-gray-700">{pagination.currentPage}</span> of{' '}
+              <span className="font-medium text-gray-700">{pagination.totalPages}</span>
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                className="global_btn rounded_full outline_primary"
+                isDisabled={pagination.currentPage <= 1 || isFetching}
+                onPress={() => setPage((prev) => Math.max(1, prev - 1))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <Button
+                type="button"
+                className="global_btn rounded_full outline_primary"
+                isDisabled={pagination.currentPage >= pagination.totalPages || isFetching}
+                onPress={() => setPage((prev) => Math.min(pagination.totalPages, prev + 1))}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

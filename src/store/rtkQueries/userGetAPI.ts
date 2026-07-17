@@ -33,6 +33,14 @@ export interface IGetAllChaptersParams {
     readingProgress?: string | null;
 }
 
+export interface IGetMyChaptersParams {
+    page?: number;
+    limit?: number;
+    inProgress?: boolean;
+    completed?: boolean;
+    unread?: boolean;
+}
+
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         /** get global settings */
@@ -120,10 +128,17 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['UserProfile'],
         }),
         /** get my chapters */
-        getMyChapters: builder.query<IMyChaptersAPIResponse, void>({
-            query: () => ({
-                url: `/user/my-chapters`,
+        getMyChapters: builder.query<IMyChaptersAPIResponse, IGetMyChaptersParams | void>({
+            query: (params) => ({
+                url: `/user/my-blueprints`,
                 method: 'GET',
+                params: {
+                    page: params?.page ?? 1,
+                    limit: params?.limit ?? 10,
+                    ...(params?.inProgress ? { inProgress: true } : {}),
+                    ...(params?.completed ? { completed: true } : {}),
+                    ...(params?.unread ? { unread: true } : {}),
+                },
             }),
             providesTags: ['MyChapters'],
         }),

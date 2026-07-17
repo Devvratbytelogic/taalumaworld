@@ -5,6 +5,7 @@ import { useLazyGetMpesaPaymentStatusQuery } from '@/store/rtkQueries/userGetAPI
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { useAppDispatch } from '@/store/hooks';
 import { mpesaLog } from '@/utils/mpesaLogger';
+import { useRouter } from 'next/navigation';
 
 const DEFAULT_WAIT_SECONDS = 300;
 const STATUS_POLL_MS = 2_000;
@@ -54,6 +55,7 @@ export function useMpesaPaymentFlow({
   const dispatch = useAppDispatch();
   const [mpesaPayment] = useMpesaPaymentMutation();
   const [fetchPaymentStatus] = useLazyGetMpesaPaymentStatusQuery();
+  const router = useRouter();
 
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isInitiating, setIsInitiating] = useState(false);
@@ -113,6 +115,7 @@ export function useMpesaPaymentFlow({
         const fakeCheckoutId = `TEST-${Date.now()}`;
         mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId: fakeCheckoutId });
         dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
+        router.refresh();
         await Promise.resolve(onSuccessRef.current());
       } catch {
         mpesaLog('CHECKOUT_FAILED', 'error', { error: 'Exception thrown in skip-mpesa mode' });

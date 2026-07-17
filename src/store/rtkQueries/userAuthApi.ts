@@ -4,7 +4,7 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
     endpoints: builder => ({
         userLogin: builder.mutation({
             query: (userData) => ({
-                url: `/admin/login`,
+                url: `/user/login`,
                 method: "POST",
                 body: userData,
             }),

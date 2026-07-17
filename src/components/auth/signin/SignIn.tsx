@@ -14,7 +14,6 @@ import { useFormik } from 'formik'
 import { signInSchema } from '@/utils/formValidation'
 import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { setAuthCookies } from '@/utils/authCookies'
-import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup'
 import { RootState } from '@/store/store'
 import { getMentorLoginRoutePath } from '@/routes/routes'
 

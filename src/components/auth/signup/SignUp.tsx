@@ -150,8 +150,29 @@ export default function SignUp() {
         },
         validationSchema: careerArchitectSignUpSchema,
         validate: (vals) => {
+            const validationErrors: Record<string, string> = {}
+
             const allRequiredAccepted = requiredAgreementIds.every((id: string) => vals.accepted_agreement_ids.includes(id))
-            return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' }
+            if (!allRequiredAccepted) {
+                validationErrors.accepted_agreement_ids = 'Please accept all required agreements before submitting.'
+            }
+
+            if (vals.isPartnerStudent && vals.university && vals.email) {
+                const institution = partnerInstitutions.find((inst) => inst.id === vals.university)
+                const domains = (institution?.domains ?? []).map((domain) => domain.toLowerCase())
+                const emailDomain = vals.email.trim().toLowerCase().split('@')[1]
+
+                if (domains.length > 0 && emailDomain) {
+                    const isAllowedDomain = domains.some((domain) => emailDomain === domain || emailDomain.endsWith(`.${domain}`))
+                    if (!isAllowedDomain) {
+                        validationErrors.email = domains.length === 1
+                            ? `Please use your university email ending in @${domains[0]}`
+                            : `Please use your university email ending in one of: ${domains.map((domain) => `@${domain}`).join(', ')}`
+                    }
+                }
+            }
+
+            return validationErrors
         },
         onSubmit: async (formValues, { resetForm: rf }) => {
             try {

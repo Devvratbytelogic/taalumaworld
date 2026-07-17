@@ -82,10 +82,11 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Faqs */
-        getAllFaqs: builder.query<IAllFaqsAPIResponse, void>({
-            query: () => ({
+        getAllFaqs: builder.query<IAllFaqsAPIResponse, { page?: number; limit?: number; search?: string; status?: string } | void>({
+            query: (params) => ({
                 url: `/admin/faqs`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminFAQs'],
         }),
@@ -111,16 +112,17 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         
         getAllContactusData: builder.query<IAllContactusDataAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
-                url: `/admin/all-contact-us`,
+                url: `/admin/contact-us`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),
+            providesTags: ['AdminContactUs'],
         }),
 
         /** Subscribers */
-        getAllSubscribers: builder.query<IAllSubscribersAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getAllSubscribers: builder.query<IAllSubscribersAPIResponse, { page?: number; limit?: number; search?: string; status?: string } | void>({
             query: (params) => ({
-                url: `/admin/all-subscriber`,
+                url: `/admin/subscribers`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),

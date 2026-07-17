@@ -182,6 +182,7 @@ export const rtkQuerieSetup = createApi({
         'GlobalSettings',
         'AdminSubscribers',
         'AdminOrders',
+        'AdminContactUs',
         'AdminInstitutions',
         'AdminInstitutionUsage',
         'AdminInstitutionAccess',

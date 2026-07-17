@@ -1,6 +1,13 @@
 'use client';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Pencil, Trash2 } from 'lucide-react';
+import { type GridColDef } from '@mui/x-data-grid';
 import toast from '@/utils/toast';
+import { cn } from '@/components/ui/utils';
+import { Badge } from '@/components/ui/badge';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useGetAllFaqsQuery } from '@/store/rtkQueries/adminGetApi';
 import {
   useAddFAQMutation,
@@ -8,31 +15,59 @@ import {
   useDeleteFAQMutation,
 } from '@/store/rtkQueries/adminPostApi';
 import type { IAllFaqsDataEntity } from '@/types/faqs';
-import AdminFAQsSkeleton from '@/components/skeleton-loader/AdminFAQsSkeleton';
+import { useDebounce } from '@/hooks/useDebounce';
 import { AdminFAQsHeader } from './AdminFAQsHeader';
 import { AdminFAQsSearch } from './AdminFAQsSearch';
 import { FAQForm, type FAQFormValues } from './FAQForm';
-import { FAQListing } from './FAQListing';
-import { DeleteFAQDialog } from './DeleteFAQDialog';
+
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  Inactive: 'bg-red-50 text-red-700 border-red-200',
+};
+
+const TYPE_LABEL: Record<string, string> = {
+  reading: 'Reading',
+  payment: 'Payment',
+  account: 'Account',
+};
 
 export function AdminFAQsTab() {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const debouncedSearch = useDebounce(searchQuery, 500);
+  const queryParams = {
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+    ...(statusFilter ? { status: statusFilter } : {}),
+  };
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteConfirmFAQ, setDeleteConfirmFAQ] = useState<IAllFaqsDataEntity | null>(null);
 
-  const { data, isLoading, isFetching } = useGetAllFaqsQuery();
+  const { data, isLoading, isFetching } = useGetAllFaqsQuery(queryParams);
   const [addFAQ, { isLoading: isAdding }] = useAddFAQMutation();
   const [updateFAQ, { isLoading: isUpdating }] = useUpdateFAQMutation();
-  const [deleteFAQ, { isLoading: isDeleting }] = useDeleteFAQMutation();
+  const [deleteFAQ] = useDeleteFAQMutation();
 
-  const faqs = data?.data ?? [];
+  const listData = data?.data;
+  const faqs = listData?.data ?? [];
+  const totalFAQs = listData?.total ?? 0;
 
-  const filtered = faqs.filter(
-    (f) =>
-      f.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      f.answer.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const editingFAQ = editingId ? faqs.find((f) => f._id === editingId) ?? null : null;
+
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetToFirstPage();
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    resetToFirstPage();
+  };
 
   const handleAdd = async (values: FAQFormValues) => {
     try {
@@ -58,57 +93,135 @@ export function AdminFAQsTab() {
     }
   };
 
-  const confirmDelete = async () => {
-    if (!deleteConfirmFAQ) return;
+  const onDeleteFAQ = async (id: string) => {
     try {
-      const res = await deleteFAQ({ id: deleteConfirmFAQ._id }).unwrap();
+      const res = await deleteFAQ({ id }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
         toast.success(res.message ?? 'FAQ deleted');
-        setDeleteConfirmFAQ(null);
+        dispatch(closeModal());
       }
     } catch {
       // Error handled by API layer
     }
   };
 
+  const columns: GridColDef<IAllFaqsDataEntity>[] = [
+    {
+      field: 'question',
+      headerName: 'Question',
+      minWidth: 240,
+      flex: 1.4,
+      sortable: false,
+      renderCell: (params) => (
+        <p className="text-sm font-medium truncate">{params.row.question}</p>
+      ),
+    },
+    {
+      field: 'answer',
+      headerName: 'Answer',
+      minWidth: 260,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <p className="text-sm text-muted-foreground truncate">{params.row.answer}</p>
+      ),
+    },
+    {
+      field: 'type',
+      headerName: 'Type',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className="capitalize bg-gray-50 text-gray-600 border-gray-200">
+          {TYPE_LABEL[params.row.type] ?? params.row.type}
+        </Badge>
+      ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge
+          variant="outline"
+          className={cn('capitalize', STATUS_BADGE_CLASS[params.row.status] ?? 'bg-gray-50 text-gray-600 border-gray-200')}
+        >
+          {params.row.status || '—'}
+        </Badge>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 100,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <div className="action_buttons">
+          <button
+            type="button"
+            className="edit_button"
+            title="Edit FAQ"
+            onClick={() => { setEditingId(params.row._id); setShowAddForm(false); }}
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            className="delete_button"
+            title="Delete FAQ"
+            onClick={() => dispatch(openModal({
+              componentName: 'DeleteConfirmation',
+              data: {
+                itemName: params.row.question,
+                onDelete: () => onDeleteFAQ(params.row._id),
+              },
+            }))}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <AdminFAQsHeader
-        totalCount={faqs.length}
+        totalCount={totalFAQs}
         onAddFAQ={() => { setShowAddForm(true); setEditingId(null); }}
       />
 
-      {showAddForm && (
+      {(showAddForm || editingFAQ) && (
         <FAQForm
-          isLoading={isAdding}
-          onSubmit={handleAdd}
-          onCancel={() => setShowAddForm(false)}
+          initial={editingFAQ ?? undefined}
+          isLoading={editingFAQ ? isUpdating : isAdding}
+          onSubmit={editingFAQ ? (values) => handleUpdate(editingFAQ._id, values) : handleAdd}
+          onCancel={() => { setShowAddForm(false); setEditingId(null); }}
         />
       )}
 
-      <AdminFAQsSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-
-      {isLoading || isFetching ? (
-        <AdminFAQsSkeleton />
-      ) : (
-        <FAQListing
-          faqs={filtered}
-          editingId={editingId}
-          isUpdating={isUpdating}
-          onEdit={(id) => { setEditingId(id); setShowAddForm(false); }}
-          onCancelEdit={() => setEditingId(null)}
-          onUpdate={handleUpdate}
-          onDelete={setDeleteConfirmFAQ}
-        />
-      )}
-
-      <DeleteFAQDialog
-        faq={deleteConfirmFAQ}
-        open={!!deleteConfirmFAQ}
-        onOpenChange={(open) => !open && setDeleteConfirmFAQ(null)}
-        onConfirm={confirmDelete}
-        isDeleting={isDeleting}
+      <AdminFAQsSearch
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        selectedStatus={statusFilter}
+        onStatusChange={handleStatusChange}
       />
+
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={faqs}
+          columns={columns}
+          getRowId={(row) => row._id}
+          loading={isLoading || isFetching}
+          paginationMode="server"
+          rowCount={totalFAQs}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
     </div>
   );
 }

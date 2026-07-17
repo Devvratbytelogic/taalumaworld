@@ -1,13 +1,14 @@
 'use client';
 import { useState } from 'react';
 import { Button } from '@heroui/react';
-import type { IAllFaqsDataEntity, FAQType } from '@/types/faqs';
+import type { IAllFaqsDataEntity, FAQType, FAQStatus } from '@/types/faqs';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 
 export interface FAQFormValues {
   question: string;
   answer: string;
   type: FAQType;
+  status: FAQStatus;
 }
 
 interface FAQFormProps {
@@ -23,6 +24,8 @@ const FAQ_TYPE_OPTIONS: { value: FAQType; label: string }[] = [
   { value: 'account', label: 'Account' },
 ];
 
+const FAQ_STATUS_OPTIONS: FAQStatus[] = ['Active', 'Inactive'];
+
 const inputCls =
   'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
 
@@ -31,6 +34,7 @@ export function FAQForm({ initial = {}, onSubmit, onCancel, isLoading }: FAQForm
     question: initial.question ?? '',
     answer: initial.answer ?? '',
     type: initial.type ?? 'reading',
+    status: initial.status ?? 'Active',
   });
 
   const handleSubmit = async () => {
@@ -66,6 +70,22 @@ export function FAQForm({ initial = {}, onSubmit, onCancel, isLoading }: FAQForm
             {FAQ_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="w-40 shrink-0">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Status <span className="text-red-500">*</span>
+          </label>
+          <select
+            className={inputCls}
+            value={values.status}
+            onChange={(e) => setValues((p) => ({ ...p, status: e.target.value as FAQStatus }))}
+          >
+            {FAQ_STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
           </select>

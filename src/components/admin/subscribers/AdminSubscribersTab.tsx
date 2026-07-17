@@ -1,20 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, Search, CheckCircle, XCircle, Download } from 'lucide-react';
+import { Users, CheckCircle, XCircle, Download, X } from 'lucide-react';
+import { type GridColDef } from '@mui/x-data-grid';
 import { useGetAllSubscribersQuery } from '@/store/rtkQueries/adminGetApi';
 import type { SubscriberEntry } from '@/types/subscribers';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import CommonDataTable from '@/components/admin/CommonDataTable';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    AdminPageHeader,
+    AdminSearchPanel,
+    AdminSearchInput,
+    AdminStatCard,
+    adminFilterPillClass,
+    adminSelectClass,
+} from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
+
+const STATUS_OPTIONS = ['Active', 'Inactive'];
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('en-US', {
@@ -26,19 +29,35 @@ function formatDate(iso: string) {
 
 export function AdminSubscribersTab() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [page, setPage] = useState(1);
-    const [pageLimit, setPageLimit] = useState(10);
+    const [statusFilter, setStatusFilter] = useState('');
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const debouncedSearch = useDebounce(searchQuery, 500);
     const queryParams = {
-        page,
-        limit: pageLimit,
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
         ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+        ...(statusFilter ? { status: statusFilter } : {}),
     };
     const { data, isLoading, isFetching } = useGetAllSubscribersQuery(queryParams);
 
-    const subscribers = data?.data ?? [];
-    const activeCount = subscribers.filter((s: SubscriberEntry) => s.status).length;
+    const listData = data?.data;
+    const subscribers = listData?.data ?? [];
+    const totalSubscribers = listData?.total ?? 0;
     const loading = isLoading || isFetching;
+
+    const hasActiveFilters = !!statusFilter;
+
+    const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+    const handleSearchChange = (value: string) => {
+        setSearchQuery(value);
+        resetToFirstPage();
+    };
+
+    const handleStatusChange = (value: string) => {
+        setStatusFilter(value);
+        resetToFirstPage();
+    };
 
     const handleExportCSV = () => {
         const rows = [
@@ -60,129 +79,141 @@ export function AdminSubscribersTab() {
         URL.revokeObjectURL(url);
     };
 
+    const columns: GridColDef<SubscriberEntry>[] = [
+        {
+            field: 'email',
+            headerName: 'Email',
+            minWidth: 220,
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <a
+                    href={`mailto:${params.row.email}`}
+                    className="text-primary hover:underline truncate"
+                >
+                    {params.row.email}
+                </a>
+            ),
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            width: 130,
+            sortable: false,
+            renderCell: (params) => (
+                params.row.status ? (
+                    <Badge className="bg-green-100 text-green-700 border-green-200 gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Active
+                    </Badge>
+                ) : (
+                    <Badge variant="secondary" className="gap-1">
+                        <XCircle className="h-3 w-3" />
+                        Inactive
+                    </Badge>
+                )
+            ),
+        },
+        {
+            field: 'date_of_subscription',
+            headerName: 'Subscribed On',
+            minWidth: 160,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    {params.row.date_of_subscription}
+                </p>
+            ),
+        },
+        {
+            field: 'createdAt',
+            headerName: 'Joined',
+            minWidth: 140,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    {formatDate(params.row.createdAt)}
+                </p>
+            ),
+        },
+    ];
+
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="admin-surface p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold text-foreground mb-2">Subscribers</h1>
-                        <p className="text-muted-foreground">Manage newsletter and email subscribers</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="bg-accent rounded-2xl px-5 py-3 text-center">
-                            <p className="text-2xl font-bold text-primary">{subscribers.length}</p>
-                            <p className="text-xs text-muted-foreground">Total</p>
-                        </div>
-                        <div className="bg-green-50 rounded-2xl px-5 py-3 text-center">
-                            <p className="text-2xl font-bold text-green-600">{activeCount}</p>
-                            <p className="text-xs text-muted-foreground">Active</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <AdminPageHeader
+                title="Subscribers"
+                description="Manage newsletter and email subscribers"
+            >
+                
+            </AdminPageHeader>
 
-            {/* Search + Export */}
-            <div className="admin-surface p-5">
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder="Search by email, name or date..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10"
-                        />
-                    </div>
-                    <button
-                        onClick={handleExportCSV}
-                        disabled={loading || subscribers && subscribers?.length === 0}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                    >
-                        <Download className="h-4 w-4" />
-                        Export CSV
-                    </button>
-                </div>
-            </div>
+            <AdminSearchPanel>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <AdminSearchInput
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        placeholder="Search by email, name or date…"
+                    />
 
-            {/* Table */}
-            <div className="admin-surface overflow-hidden">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-12">#</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="whitespace-nowrap">Subscribed On</TableHead>
-                            <TableHead className="whitespace-nowrap">Joined</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {loading
-                            ? Array.from({ length: 8 }).map((_, i) => (
-                                <TableRow key={i}>
-                                    {Array.from({ length: 5 }).map((__, j) => (
-                                        <TableCell key={j}>
-                                            <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                            : subscribers && subscribers?.length > 0 && subscribers?.map((sub: SubscriberEntry, idx: number) => (
-                                <TableRow key={sub._id}>
-                                    <TableCell className="text-muted-foreground text-sm">
-                                        {idx + 1}
-                                    </TableCell>
-                                    <TableCell>
-                                        <a
-                                            href={`mailto:${sub.email}`}
-                                            className="text-primary hover:underline truncate block max-w-56"
-                                        >
-                                            {sub.email}
-                                        </a>
-                                    </TableCell>
-                                    <TableCell>
-                                        {sub.status ? (
-                                            <Badge className="bg-green-100 text-green-700 border-green-200 gap-1">
-                                                <CheckCircle className="h-3 w-3" />
-                                                Active
-                                            </Badge>
-                                        ) : (
-                                            <Badge variant="secondary" className="gap-1">
-                                                <XCircle className="h-3 w-3" />
-                                                Inactive
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                                        {sub.date_of_subscription}
-                                    </TableCell>
-                                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                                        {formatDate(sub.createdAt)}
-                                    </TableCell>
-                                </TableRow>
+                    <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => handleStatusChange(e.target.value)}
+                            className={adminSelectClass}
+                        >
+                            <option value="">All statuses</option>
+                            {STATUS_OPTIONS.map((s) => (
+                                <option key={s} value={s}>
+                                    {s}
+                                </option>
                             ))}
-                    </TableBody>
-                </Table>
+                        </select>
 
-                {!loading && subscribers && subscribers?.length === 0 && (
-                    <div className="p-12">
-                        <div className="text-center space-y-4">
-                            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
-                                <Users className="h-8 w-8 text-primary" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold">No subscribers found</h3>
-                                <p className="text-muted-foreground">
-                                    {searchQuery
-                                        ? 'Try adjusting your search query'
-                                        : 'There are no subscribers to display'}
-                                </p>
-                            </div>
-                        </div>
+                        {hasActiveFilters ? (
+                            <button
+                                type="button"
+                                onClick={() => handleStatusChange('')}
+                                className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+                            >
+                                <X className="h-3.5 w-3.5" />
+                                Clear
+                            </button>
+                        ) : null}
+
+                        <button
+                            onClick={handleExportCSV}
+                            disabled={loading || subscribers.length === 0}
+                            className="inline-flex items-center gap-2 px-4 h-9 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                        >
+                            <Download className="h-4 w-4" />
+                            Export CSV
+                        </button>
                     </div>
-                )}
+                </div>
+
+                {hasActiveFilters ? (
+                    <div className="flex flex-wrap gap-2">
+                        <span className={adminFilterPillClass}>
+                            {statusFilter}
+                            <button type="button" onClick={() => handleStatusChange('')} className="hover:text-primary/70">
+                                <X className="h-3 w-3" />
+                            </button>
+                        </span>
+                    </div>
+                ) : null}
+            </AdminSearchPanel>
+
+            <div className="border border-gray-200 rounded-md overflow-hidden">
+                <CommonDataTable
+                    rows={subscribers}
+                    columns={columns}
+                    getRowId={(row) => row._id}
+                    loading={loading}
+                    paginationMode="server"
+                    rowCount={totalSubscribers}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                />
             </div>
         </div>
     );

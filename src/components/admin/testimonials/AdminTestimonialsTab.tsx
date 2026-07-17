@@ -1,6 +1,13 @@
 'use client';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Pencil, Trash2, UserCircle } from 'lucide-react';
+import { type GridColDef } from '@mui/x-data-grid';
 import toast from '@/utils/toast';
+import { cn } from '@/components/ui/utils';
+import { Badge } from '@/components/ui/badge';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useGetAllTestimonialsQuery } from '@/store/rtkQueries/adminGetApi';
 import {
   useAddTestimonialMutation,
@@ -8,42 +15,43 @@ import {
   useDeleteTestimonialMutation,
 } from '@/store/rtkQueries/adminPostApi';
 import type { ITestimonialsDataEntity } from '@/types/testimonial';
-import AdminTestimonialsSkeleton from '@/components/skeleton-loader/AdminTestimonialsSkeleton';
-import { AdminPagination } from '@/components/admin/shared/AdminPagination';
 import { AdminTestimonialsHeader } from './AdminTestimonialsHeader';
 import { AdminTestimonialsSearch } from './AdminTestimonialsSearch';
 import { TestimonialForm } from './TestimonialForm';
-import { TestimonialListing } from './TestimonialListing';
-import { DeleteTestimonialDialog } from './DeleteTestimonialDialog';
+import { StarRating } from './StarRating';
 import { useDebounce } from '@/hooks/useDebounce';
 
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  Inactive: 'bg-red-50 text-red-700 border-red-200',
+};
+
 export function AdminTestimonialsTab() {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageLimit, setPageLimit] = useState(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const debouncedSearch = useDebounce(searchQuery, 500);
   const queryParams = {
-    page,
-    limit: pageLimit,
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
     ...(statusFilter ? { status: statusFilter } : {}),
   };
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteConfirmTestimonial, setDeleteConfirmTestimonial] = useState<ITestimonialsDataEntity | null>(null);
 
   const { data, isLoading, isFetching } = useGetAllTestimonialsQuery(queryParams);
   const [addTestimonial, { isLoading: isAdding }] = useAddTestimonialMutation();
   const [updateTestimonial, { isLoading: isUpdating }] = useUpdateTestimonialMutation();
-  const [deleteTestimonial, { isLoading: isDeleting }] = useDeleteTestimonialMutation();
+  const [deleteTestimonial] = useDeleteTestimonialMutation();
 
   const listData = data?.data;
   const testimonials = listData?.data ?? [];
   const totalTestimonials = listData?.total ?? 0;
-  const totalPages = listData?.totalPages ?? 1;
+  const editingTestimonial = editingId ? testimonials.find((t) => t._id === editingId) ?? null : null;
 
-  const resetToFirstPage = () => setPage(1);
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
@@ -79,18 +87,109 @@ export function AdminTestimonialsTab() {
     }
   };
 
-  const confirmDelete = async () => {
-    if (!deleteConfirmTestimonial) return;
+  const onDeleteTestimonial = async (id: string) => {
     try {
-      const res = await deleteTestimonial({ id: deleteConfirmTestimonial._id }).unwrap();
+      const res = await deleteTestimonial({ id }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
         toast.success(res.message ?? 'Testimonial deleted');
-        setDeleteConfirmTestimonial(null);
+        dispatch(closeModal());
       }
     } catch {
       // Error handled by API layer
     }
   };
+
+  const columns: GridColDef<ITestimonialsDataEntity>[] = [
+    {
+      field: 'name',
+      headerName: 'Testimonial',
+      minWidth: 220,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 border border-gray-200 shrink-0 flex items-center justify-center">
+            {params.row.photo ? (
+              <img src={params.row.photo} alt={params.row.name} className="w-full h-full object-cover" />
+            ) : (
+              <UserCircle className="h-5 w-5 text-gray-300" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium truncate">{params.row.name}</p>
+            {params.row.title && (
+              <p className="text-xs text-muted-foreground truncate">{params.row.title}</p>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      field: 'rating',
+      headerName: 'Rating',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => <StarRating rating={params.row.rating} />,
+    },
+    {
+      field: 'message',
+      headerName: 'Message',
+      minWidth: 240,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <p className="text-sm text-muted-foreground truncate">{params.row.message}</p>
+      ),
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge
+          variant="outline"
+          className={cn('capitalize', STATUS_BADGE_CLASS[params.row.status] ?? 'bg-gray-50 text-gray-600 border-gray-200')}
+        >
+          {params.row.status || '—'}
+        </Badge>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 100,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <div className="action_buttons">
+          <button
+            type="button"
+            className="edit_button"
+            title="Edit testimonial"
+            onClick={() => { setEditingId(params.row._id); setShowAddForm(false); }}
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            className="delete_button"
+            title="Delete testimonial"
+            onClick={() => dispatch(openModal({
+              componentName: 'DeleteConfirmation',
+              data: {
+                itemName: params.row.name,
+                onDelete: () => onDeleteTestimonial(params.row._id),
+              },
+            }))}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -99,11 +198,12 @@ export function AdminTestimonialsTab() {
         onAddTestimonial={() => { setShowAddForm(true); setEditingId(null); }}
       />
 
-      {showAddForm && (
+      {(showAddForm || editingTestimonial) && (
         <TestimonialForm
-          isLoading={isAdding}
-          onSubmit={handleAdd}
-          onCancel={() => setShowAddForm(false)}
+          initial={editingTestimonial ?? undefined}
+          isLoading={editingTestimonial ? isUpdating : isAdding}
+          onSubmit={editingTestimonial ? (fd) => handleUpdate(editingTestimonial._id, fd) : handleAdd}
+          onCancel={() => { setShowAddForm(false); setEditingId(null); }}
         />
       )}
 
@@ -114,39 +214,18 @@ export function AdminTestimonialsTab() {
         onStatusChange={handleStatusChange}
       />
 
-      {isLoading || isFetching ? (
-        <AdminTestimonialsSkeleton />
-      ) : (
-        <>
-          <TestimonialListing
-            testimonials={testimonials}
-            editingId={editingId}
-            isUpdating={isUpdating}
-            onEdit={(id) => { setEditingId(id); setShowAddForm(false); }}
-            onCancelEdit={() => setEditingId(null)}
-            onUpdate={handleUpdate}
-            onDelete={setDeleteConfirmTestimonial}
-          />
-
-          <AdminPagination
-            page={page}
-            limit={pageLimit}
-            total={totalTestimonials}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            onLimitChange={(limit) => { setPageLimit(limit); resetToFirstPage(); }}
-            itemLabel="testimonials"
-          />
-        </>
-      )}
-
-      <DeleteTestimonialDialog
-        testimonial={deleteConfirmTestimonial}
-        open={!!deleteConfirmTestimonial}
-        onOpenChange={(open) => !open && setDeleteConfirmTestimonial(null)}
-        onConfirm={confirmDelete}
-        isDeleting={isDeleting}
-      />
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={testimonials}
+          columns={columns}
+          getRowId={(row) => row._id}
+          loading={isLoading || isFetching}
+          paginationMode="server"
+          rowCount={totalTestimonials}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
     </div>
   );
 }

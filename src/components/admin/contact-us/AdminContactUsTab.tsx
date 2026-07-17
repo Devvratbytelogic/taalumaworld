@@ -1,43 +1,94 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { type GridColDef } from '@mui/x-data-grid';
 import { useGetAllContactusDataQuery } from '@/store/rtkQueries/adminGetApi';
 import { Input } from '@/components/ui/input';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
-
-function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
+import type { IAllContactusDataAPIResponseData } from '@/types/contactData';
+import moment from 'moment';
 
 export function AdminContactUsTab() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [page, setPage] = useState(1);
-    const [pageLimit, setPageLimit] = useState(10);
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const debouncedSearch = useDebounce(searchQuery, 500);
     const queryParams = {
-        page,
-        limit: pageLimit,
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
         ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
     };
     const { data, isLoading, isFetching } = useGetAllContactusDataQuery(queryParams);
 
-    const entries = data?.data ?? [];
+    const listData = data?.data;
+    const entries = listData?.data ?? [];
+    const totalEntries = listData?.total ?? 0;
     const loading = isLoading || isFetching;
+
+    const handleSearchChange = (value: string) => {
+        setSearchQuery(value);
+        setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    };
+
+    const columns: GridColDef<IAllContactusDataAPIResponseData>[] = [
+        {
+            field: 'name',
+            headerName: 'Name',
+            minWidth: 160,
+            flex: 0.8,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm font-medium truncate">{params.row.name}</p>
+            ),
+        },
+        {
+            field: 'email',
+            headerName: 'Email',
+            minWidth: 200,
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <a
+                    href={`mailto:${params.row.email}`}
+                    className="text-primary hover:underline truncate"
+                >
+                    {params.row.email}
+                </a>
+            ),
+        },
+        {
+            field: 'subject',
+            headerName: 'Subject',
+            minWidth: 180,
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm truncate">{params.row.subject}</p>
+            ),
+        },
+        {
+            field: 'message',
+            headerName: 'Message',
+            minWidth: 260,
+            flex: 1.4,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground truncate">{params.row.message}</p>
+            ),
+        },
+        {
+            field: 'createdAt',
+            headerName: 'Date',
+            minWidth: 160,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    {params.row.createdAt ? moment(params.row.createdAt).format('DD/MM/YYYY HH:mm') : '—'}
+                </p>
+            ),
+        },
+    ];
 
     return (
         <div className="space-y-6">
@@ -51,7 +102,7 @@ export function AdminContactUsTab() {
                         </p>
                     </div>
                     <div className="bg-accent rounded-2xl px-5 py-3 text-center">
-                        <p className="text-2xl font-bold text-primary">{entries.length}</p>
+                        <p className="text-2xl font-bold text-primary">{totalEntries}</p>
                         <p className="text-xs text-muted-foreground">Total Messages</p>
                     </div>
                 </div>
@@ -65,85 +116,24 @@ export function AdminContactUsTab() {
                         type="search"
                         placeholder="Search by name, email, subject or message..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         className="pl-10"
                     />
                 </div>
             </div>
 
             {/* Table */}
-            <div className="admin-surface overflow-hidden">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>#</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Subject</TableHead>
-                            <TableHead>Message</TableHead>
-                            <TableHead className="whitespace-nowrap">Date</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {loading
-                            ? Array.from({ length: 6 }).map((_, i) => (
-                                <TableRow key={i}>
-                                    {Array.from({ length: 6 }).map((__, j) => (
-                                        <TableCell key={j}>
-                                            <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                            : entries && entries?.length > 0 && entries?.map((entry, idx) => (
-                                <TableRow key={entry._id}>
-                                    <TableCell className="text-muted-foreground text-sm w-10">
-                                        {idx + 1}
-                                    </TableCell>
-                                    <TableCell className="font-medium max-w-36 truncate">
-                                        {entry.name}
-                                    </TableCell>
-                                    <TableCell className="max-w-48">
-                                        <a
-                                            href={`mailto:${entry.email}`}
-                                            className="text-primary hover:underline truncate block max-w-48"
-                                        >
-                                            {entry.email}
-                                        </a>
-                                    </TableCell>
-                                    <TableCell className="max-w-48 truncate">
-                                        {entry.subject}
-                                    </TableCell>
-                                    <TableCell className="max-w-64">
-                                        <p className="truncate text-muted-foreground text-sm">
-                                            {entry.message}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                                        {formatDate(entry.createdAt)}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                    </TableBody>
-                </Table>
-
-                {!loading && entries && entries?.length === 0 && (
-                    <div className="p-12">
-                        <div className="text-center space-y-4">
-                            <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center">
-                                <Mail className="h-8 w-8 text-primary" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold">No messages found</h3>
-                                <p className="text-muted-foreground">
-                                    {searchQuery
-                                        ? 'Try adjusting your search query'
-                                        : 'There are no contact submissions to display'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
+            <div className="border border-gray-200 rounded-md overflow-hidden">
+                <CommonDataTable
+                    rows={entries}
+                    columns={columns}
+                    getRowId={(row) => row._id}
+                    loading={loading}
+                    paginationMode="server"
+                    rowCount={totalEntries}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                />
             </div>
         </div>
     );

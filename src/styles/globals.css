@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin '../../hero.ts';
+@plugin '@tailwindcss/typography';
 @import "./scss/button.scss";
 @import "./scss/scrollbar.scss";
 @import "./scss/common.scss";

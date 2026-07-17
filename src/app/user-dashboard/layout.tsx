@@ -30,7 +30,7 @@ const NAV_GROUPS = [
     items: [
       { href: getUserDashboardMyChaptersRoutePath(), label: 'My Blueprints', icon: BookOpen },
       { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
-      { href: getUserDashboardHistoryRoutePath(), label: 'Reading History', icon: Clock },
+      // { href: getUserDashboardHistoryRoutePath(), label: 'Reading History', icon: Clock },
     ],
   },
   {

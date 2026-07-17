@@ -18,7 +18,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { id: 'dashboard', label: 'Dashboard', href: getAdminDashboardRoutePath(), icon: LayoutDashboard },
             { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
-            { model: 'Role', id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
+            { model: 'Role', submodel: ['Permission', 'Staff'], id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
         ],
     },
     {
@@ -55,7 +55,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'User Management',
         items: [
             { model: 'User', id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
-            { model: 'Institution', id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
+            { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
     },
     {
@@ -80,7 +80,12 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     }
 
     const visibleNavGroups = NAV_GROUPS
-        .map((group) => ({ ...group, items: group.items.filter((item) => hasAccess(item.model)) }))
+        .map((group) => ({
+            ...group,
+            items: group.items.filter(
+                (item) => hasAccess(item.model) || item.submodel?.some((submodel) => hasAccess(submodel)),
+            ),
+        }))
         .filter((group) => group.items.length > 0);
 
     return (

@@ -6,6 +6,7 @@ import { cn } from '@/components/ui/utils';
 
 export interface SidebarNavItem {
   model?: string;
+  submodel?: string[];
   id: string;
   label: string;
   icon: React.ElementType;

@@ -14,7 +14,7 @@ type Tab = 'registry' | 'blueprints' | 'usage' | 'prompt';
 
 const TABS: { id: Tab; model: string; label: string; icon: React.ElementType; description: string }[] = [
     {
-        model: 'Institution',
+        model: 'Institutions',
         id: 'registry',
         label: 'Institution Registry',
         icon: Building2,
@@ -35,7 +35,7 @@ const TABS: { id: Tab; model: string; label: string; icon: React.ElementType; de
         description: 'Registrations, conversions & analytics',
     },
     {
-        model: 'Registration Prompt',
+        model: 'Institute Registration Prompt',
         id: 'prompt',
         label: 'Registration Prompt',
         icon: MessageSquare,

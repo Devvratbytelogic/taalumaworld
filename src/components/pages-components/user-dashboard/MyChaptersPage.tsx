@@ -278,7 +278,7 @@ export function MyChaptersPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getBlueprintRoutePath(chapter.chapterId))}
+                          onPress={() => router.push(getBlueprintRoutePath(chapter.slug ?? chapter.chapterId ?? ''))}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readLabel}

@@ -22,9 +22,9 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
             {/* Content */}
             <div className="min-w-0 flex-1 space-y-6">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {/* <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                   Blueprint {data?.chapterNumber}
-                </span>
+                </span> */}
                 {data?.category?.name && (
                   <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
                     {data?.category?.name}

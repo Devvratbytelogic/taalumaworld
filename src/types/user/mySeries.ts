@@ -28,7 +28,8 @@ export interface ItemsEntity {
   pricingModel: string;
   tags?: (string)[] | null;
   totalPages: number;
-  chapterCount: number;
+  chapterCount: number; 
+  slug: string;
   isChapterPricing: boolean;
   priceLabel: string;
   fromPrice: number;

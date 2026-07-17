@@ -234,7 +234,7 @@ export function MyBooksPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getSeriesRoutePath(item.id))}
+                          onPress={() => router.push(getSeriesRoutePath(item.slug ?? item.id ?? ''))}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readLabel}

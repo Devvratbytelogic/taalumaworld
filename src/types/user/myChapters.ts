@@ -20,6 +20,7 @@ export interface ISummary {
 export interface ItemsEntity {
   chapterId: string;
   order_id?: string | null;
+  slug: string;
   chapterNumber: number;
   title: string;
   description: string;

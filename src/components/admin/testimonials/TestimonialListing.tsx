@@ -21,18 +21,11 @@ export function TestimonialListing({
   onUpdate,
   onDelete,
 }: TestimonialListingProps) {
-  if (testimonials.length === 0) {
-    return (
-      <div className="text-center py-16 text-gray-400">
-        <Star className="h-10 w-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No testimonials found.</p>
-      </div>
-    );
-  }
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {testimonials.map((t) => (
+      {testimonials && testimonials?.length > 0 ? testimonials?.map((t) => (
         <TestimonialCard
           key={t._id}
           testimonial={t}
@@ -43,7 +36,12 @@ export function TestimonialListing({
           onUpdate={(fd) => onUpdate(t._id, fd)}
           onDelete={() => onDelete(t)}
         />
-      ))}
+      )) : (
+        <div className="col-span-full text-center py-16 text-gray-400">
+          <Star className="h-10 w-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">No testimonials found.</p>
+        </div>
+      )}
     </div>
   );
 }

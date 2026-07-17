@@ -5,13 +5,12 @@ import { IAllBooksAPIResponse } from '@/types/books';
 import { IAllChaptersAPIResponse } from '@/types/chapter';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
-import { IAllUsersAPIResponse } from '@/types/allUsers';
 import { IAllFaqsAPIResponse } from '@/types/faqs';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 import { IAllTransactionsAPIResponse } from '@/types/transaction';
 import { IAllContactusDataAPIResponse } from '@/types/contactData';
 import { IAllSubscribersAPIResponse } from '@/types/subscribers';
-import { IAllOrdersAPIResponse } from '@/types/order';
+import { IAllOrdersAPIResponse, ISingleOrderAPIResponse } from '@/types/order';
 import { ISingleChapterAPIResponse } from '@/types/singleChapter';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -73,7 +72,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** testimonials */
-        getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getAllTestimonials: builder.query<IAllTestimonialsAPIResponse, { page?: number; limit?: number; search?: string; status?: string } | void>({
             query: (params) => ({
                 url: `/admin/testimonial`,
                 method: 'GET',
@@ -137,6 +136,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminOrders'],
         }),
+        getOrderById: builder.query<ISingleOrderAPIResponse, string>({
+            query: (id) => ({
+                url: `/admin/orders/${id}`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminOrders'],
+        }),
     }),
 });
 
@@ -154,4 +160,5 @@ export const {
     useGetAllContactusDataQuery,
     useGetAllSubscribersQuery,
     useGetAllOrdersQuery,
+    useGetOrderByIdQuery,
 } = clientSideGetApis;

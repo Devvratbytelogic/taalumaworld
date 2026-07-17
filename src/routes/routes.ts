@@ -213,6 +213,10 @@ export function getViewChapterRoutePath(chapterId: string): string {
   return `/admin/blueprints/view/${chapterId}`;
 }
 
+export function getViewOrderRoutePath(orderId: string): string {
+  return `/admin/orders/${orderId}`;
+}
+
 export function getDesignSystemRoutePath(): string {
   return '/design-system';
 }

@@ -9,6 +9,7 @@ import {
 } from '@/store/rtkQueries/adminPostApi';
 import type { ITestimonialsDataEntity } from '@/types/testimonial';
 import AdminTestimonialsSkeleton from '@/components/skeleton-loader/AdminTestimonialsSkeleton';
+import { AdminPagination } from '@/components/admin/shared/AdminPagination';
 import { AdminTestimonialsHeader } from './AdminTestimonialsHeader';
 import { AdminTestimonialsSearch } from './AdminTestimonialsSearch';
 import { TestimonialForm } from './TestimonialForm';
@@ -18,6 +19,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 
 export function AdminTestimonialsTab() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(10);
   const debouncedSearch = useDebounce(searchQuery, 500);
@@ -25,6 +27,7 @@ export function AdminTestimonialsTab() {
     page,
     limit: pageLimit,
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+    ...(statusFilter ? { status: statusFilter } : {}),
   };
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -35,7 +38,22 @@ export function AdminTestimonialsTab() {
   const [updateTestimonial, { isLoading: isUpdating }] = useUpdateTestimonialMutation();
   const [deleteTestimonial, { isLoading: isDeleting }] = useDeleteTestimonialMutation();
 
-  const testimonials = data?.data ?? [];
+  const listData = data?.data;
+  const testimonials = listData?.data ?? [];
+  const totalTestimonials = listData?.total ?? 0;
+  const totalPages = listData?.totalPages ?? 1;
+
+  const resetToFirstPage = () => setPage(1);
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetToFirstPage();
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    resetToFirstPage();
+  };
 
   const handleAdd = async (formData: FormData) => {
     try {
@@ -77,7 +95,7 @@ export function AdminTestimonialsTab() {
   return (
     <div className="space-y-6">
       <AdminTestimonialsHeader
-        totalCount={testimonials.length}
+        totalCount={totalTestimonials}
         onAddTestimonial={() => { setShowAddForm(true); setEditingId(null); }}
       />
 
@@ -89,20 +107,37 @@ export function AdminTestimonialsTab() {
         />
       )}
 
-      <AdminTestimonialsSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <AdminTestimonialsSearch
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        selectedStatus={statusFilter}
+        onStatusChange={handleStatusChange}
+      />
 
       {isLoading || isFetching ? (
         <AdminTestimonialsSkeleton />
       ) : (
-        <TestimonialListing
-          testimonials={testimonials}
-          editingId={editingId}
-          isUpdating={isUpdating}
-          onEdit={(id) => { setEditingId(id); setShowAddForm(false); }}
-          onCancelEdit={() => setEditingId(null)}
-          onUpdate={handleUpdate}
-          onDelete={setDeleteConfirmTestimonial}
-        />
+        <>
+          <TestimonialListing
+            testimonials={testimonials}
+            editingId={editingId}
+            isUpdating={isUpdating}
+            onEdit={(id) => { setEditingId(id); setShowAddForm(false); }}
+            onCancelEdit={() => setEditingId(null)}
+            onUpdate={handleUpdate}
+            onDelete={setDeleteConfirmTestimonial}
+          />
+
+          <AdminPagination
+            page={page}
+            limit={pageLimit}
+            total={totalTestimonials}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            onLimitChange={(limit) => { setPageLimit(limit); resetToFirstPage(); }}
+            itemLabel="testimonials"
+          />
+        </>
       )}
 
       <DeleteTestimonialDialog

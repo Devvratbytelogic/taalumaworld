@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input } from '@heroui/react';
-import { Tooltip } from '@heroui/react';
-import { Search, ShoppingBag, BookOpen, FileText, Download, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ShoppingBag, BookOpen, FileText, Eye } from 'lucide-react';
 import { type GridColDef } from '@mui/x-data-grid';
-import Cookies from 'js-cookie';
 import { cn } from '@/components/ui/utils';
 import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
+import { AdminSearchInput, AdminSearchPanel } from '@/components/admin/layout/AdminContent';
 import { OrderStats } from './OrderStats';
 import { useGetAllOrdersQuery } from '@/store/rtkQueries/adminGetApi';
 import { useDebounce } from '@/hooks/useDebounce';
-import { API_BASE_URL } from '@/utils/config';
-import { IAllOrdersDataEntity } from '@/types/order';
+import { getViewOrderRoutePath } from '@/routes/routes';
+import { IAllOrdersAPIResponseDataEntityItem } from '@/types/order';
+import moment from 'moment';
 
 type OrderTab = 'books' | 'blueprints';
 
@@ -29,52 +29,8 @@ const PAYMENT_STATUS_BADGE_CLASS: Record<string, string> = {
     partial: 'bg-amber-50 text-amber-700 border-amber-200',
 };
 
-function DownloadInvoiceButton({ orderId, orderNumber }: { orderId: string; orderNumber: number }) {
-    const [isDownloading, setIsDownloading] = useState(false);
-
-    async function handleDownload() {
-        setIsDownloading(true);
-        try {
-            const token = Cookies.get('auth_token') || '';
-            const deviceId = Cookies.get('device') || '';
-            const userId = Cookies.get('userID') || '';
-            const res = await fetch(`${API_BASE_URL}/admin/invoice/${orderId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    device: deviceId,
-                    userID: userId,
-                },
-            });
-            if (!res.ok) throw new Error('Failed to download invoice');
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `invoice-${orderNumber}.pdf`;
-            a.click();
-            URL.revokeObjectURL(url);
-        } catch {
-            // handled by disabling the button state below
-        } finally {
-            setIsDownloading(false);
-        }
-    }
-
-    return (
-        <button
-            type="button"
-            disabled={isDownloading}
-            onClick={handleDownload}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition"
-        >
-            {isDownloading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-            Invoice
-        </button>
-    );
-}
-
 export function AdminOrdersTab() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<OrderTab>('blueprints');
     const [searchQuery, setSearchQuery] = useState('');
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
@@ -98,84 +54,64 @@ export function AdminOrdersTab() {
     const orders = listData?.data ?? [];
     const totalOrders = listData?.total ?? 0;
 
-    const columns: GridColDef<IAllOrdersDataEntity>[] = [
+    const columns: GridColDef<IAllOrdersAPIResponseDataEntityItem>[] = [
         {
-            field: 'orderNumber',
+            field: 'orderId',
             headerName: 'Order #',
             width: 110,
             sortable: false,
-            renderCell: (params) => <span className="font-semibold text-sm">#{params.row.orderNumber}</span>,
+            renderCell: (params) => <span className="font-semibold text-sm">#{params.row.orderId}</span>,
         },
         {
-            field: 'customer',
+            field: 'userName',
             headerName: 'Customer',
             minWidth: 180,
             flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{params.row.customer?.name ?? '—'}</p>
-                    <p className="text-xs text-muted-foreground truncate">{params.row.customer?.email ?? '—'}</p>
+                    <p className="text-sm font-medium truncate">{params.row.userName ?? '—'}</p>
+                    <p className="text-xs text-muted-foreground truncate">{params.row.userEmail ?? '—'}</p>
                 </div>
             ),
         },
         {
-            field: 'items',
-            headerName: 'Items',
-            minWidth: 200,
+            field: 'transactionId',
+            headerName: 'Transaction ID',
+            minWidth: 180,
             flex: 1,
             sortable: false,
-            renderCell: (params) => {
-                const items = params.row.items ?? [];
-                const firstItem = items[0];
-                const extraCount = items.length - 1;
-                if (!firstItem) return <span className="text-sm text-muted-foreground">—</span>;
-                return (
-                    <div className="min-w-0">
-                        <div className="text-sm truncate">{firstItem.title}</div>
-                        {extraCount > 0 && (
-                            <Tooltip
-                                content={
-                                    <div className="py-1 px-0.5 space-y-1.5 max-w-56">
-                                        {items.slice(1).map((item) => (
-                                            <div key={item.id} className="flex items-center gap-2">
-                                                <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                                                <span className="text-xs leading-snug">{item.title}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                }
-                                placement="right"
-                                delay={100}
-                                closeDelay={0}
-                            >
-                                <span className="cursor-default text-xs text-primary font-medium underline decoration-dotted underline-offset-2">
-                                    +{extraCount} more
-                                </span>
-                            </Tooltip>
-                        )}
-                    </div>
-                );
-            },
+            renderCell: (params) => (
+                <span className="text-sm truncate">{params.row.transactionId ?? '—'}</span>
+            ),
         },
         {
-            field: 'totalAmount',
+            field: 'itemCount',
+            headerName: 'Items',
+            width: 90,
+            sortable: false,
+            renderCell: (params) => (
+                <span className="text-sm">{params.row.itemCount ?? 0}</span>
+            ),
+        },
+        {
+            field: 'amount',
             headerName: 'Amount',
             width: 130,
             sortable: false,
             renderCell: (params) => (
                 <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                    KSH {(params.row.totalAmount ?? 0).toFixed(2)}
+                    KSH {(params.row.amount ?? 0).toFixed(2)}
                 </span>
             ),
         },
         {
-            field: 'paymentStatus',
+            field: 'status',
             headerName: 'Payment',
             width: 170,
             sortable: false,
             renderCell: (params) => {
-                const s = (params.row.paymentStatus || '').toLowerCase();
+                const s = (params.row.status || '').toLowerCase();
                 return (
                     <div className="flex items-center gap-2 min-w-0">
                         <span className="text-xs text-muted-foreground truncate">{params.row.paymentMethod}</span>
@@ -183,30 +119,39 @@ export function AdminOrdersTab() {
                             variant="outline"
                             className={cn('capitalize shrink-0', PAYMENT_STATUS_BADGE_CLASS[s] ?? 'bg-gray-50 text-gray-600 border-gray-200')}
                         >
-                            {params.row.paymentStatus || '—'}
+                            {params.row.status || '—'}
                         </Badge>
                     </div>
                 );
             },
         },
         {
-            field: 'createdAt',
+            field: 'date',
             headerName: 'Date',
             width: 130,
             sortable: false,
             renderCell: (params) => (
-                <span className="text-sm whitespace-nowrap text-muted-foreground">{params.row.createdAt}</span>
+                <span className="text-sm whitespace-nowrap text-muted-foreground">{params.row.date ? moment(params.row.date).format('DD/MM/YYYY HH:mm') : '—'}</span>
             ),
         },
         {
             field: 'actions',
             headerName: '',
-            width: 120,
+            width: 80,
             sortable: false,
             filterable: false,
             disableColumnMenu: true,
             renderCell: (params) => (
-                <DownloadInvoiceButton orderId={params.row.id} orderNumber={params.row.orderNumber} />
+                <div className="action_buttons">
+                    <button
+                        type="button"
+                        className="active_button"
+                        title="View order"
+                        onClick={() => router.push(getViewOrderRoutePath(params.row.id))}
+                    >
+                        <Eye className="h-4 w-4" />
+                    </button>
+                </div>
             ),
         },
     ];
@@ -271,17 +216,13 @@ export function AdminOrdersTab() {
             {summary && <OrderStats summary={summary} />}
 
             {/* Search */}
-            <div className="admin-surface p-5">
-                <Input
-                    startContent={<Search className="h-4 w-4 text-muted-foreground" />}
-                    type="search"
-                    placeholder={`Search ${activeTab === 'books' ? 'series' : 'blueprint'} orders by name, email, item or status...`}
-                    radius="full"
-                    className="w-full max-w-xl"
+            <AdminSearchPanel>
+                <AdminSearchInput
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={setSearchQuery}
+                    placeholder={`Search ${activeTab === 'books' ? 'series' : 'blueprint'} orders by name, email, item or status...`}
                 />
-            </div>
+            </AdminSearchPanel>
 
             {/* Table */}
             <div className="border border-gray-200 rounded-md overflow-hidden">

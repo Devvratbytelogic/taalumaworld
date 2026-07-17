@@ -6,13 +6,6 @@ import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import type { ITestimonialsDataEntity } from '@/types/testimonial';
 import { testimonialSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
@@ -24,7 +17,7 @@ interface TestimonialFormProps {
   isLoading: boolean;
 }
 
-const STATUSES = ['Pending', 'Approved', 'Rejected'] as const;
+const STATUSES = ['Active', 'Inactive'] as const;
 
 export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }: TestimonialFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,14 +41,13 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
     handleBlur,
     handleSubmit,
     setFieldValue,
-    setFieldTouched,
   } = useFormik({
     initialValues: {
       name: initial.name ?? '',
       title: initial.title ?? '',
       message: initial.message ?? '',
       rating: initial.rating ?? 5,
-      status: initial.status ?? 'Pending',
+      status: initial.status ?? 'Active',
       photo: null as File | null,
     },
     validationSchema: testimonialSchema,
@@ -213,23 +205,19 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
         {/* Status */}
         <div className="space-y-2">
           <Label htmlFor="t-status">Status <span className="text-red-500">*</span></Label>
-          <Select
+          <select
+            id="t-status"
+            name="status"
             value={values.status}
-            onValueChange={(v) => { setFieldValue('status', v); setFieldTouched('status', true); }}
+            onChange={handleChange}
+            onBlur={handleBlur}
             disabled={isSubmittingState}
+            className={`h-10 w-full rounded-md border bg-white px-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 ${errors.status && touched.status ? 'border-red-500' : 'border-slate-200'}`}
           >
-            <SelectTrigger
-              id="t-status"
-              className={errors.status && touched.status ? 'border-red-500' : ''}
-            >
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              {STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
           {errors.status && touched.status && (
             <p className="text-sm text-red-600">{errors.status}</p>
           )}

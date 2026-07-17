@@ -2,13 +2,13 @@ export interface IAllOrdersAPIResponse {
     http_status_code: number;
     http_status_msg: string;
     success: boolean;
-    data: IAllOrdersData;
+    data: IAllOrdersAPIResponseData;
     message: string;
     timestamp: string;
 }
-export interface IAllOrdersData {
+export interface IAllOrdersAPIResponseData {
     summary: Summary;
-    data: IAllOrdersData1;
+    data: IAllOrdersAPIResponseDataEntity;
 }
 export interface Summary {
     totalRevenue: number;
@@ -24,41 +24,63 @@ export interface StatusCounts {
 export interface PaymentStatusCounts {
     Paid: number;
 }
-export interface IAllOrdersData1 {
-    data?: (IAllOrdersDataEntity)[] | null;
+export interface IAllOrdersAPIResponseDataEntity {
+    data?: (IAllOrdersAPIResponseDataEntityItem)[] | null;
     total: number;
     page: number;
     limit: number;
     totalPages: number;
 }
-export interface IAllOrdersDataEntity {
+export interface IAllOrdersAPIResponseDataEntityItem {
     id: string;
-    orderNumber: number;
+    orderId: number;
+    transactionId: string;
+    userName: string;
+    userEmail: string;
+    itemCount: number;
+    amount: number;
+    date: string;
+    paymentMethod: string;
+    status: string;
+}
+
+/** GET /admin/orders/:id */
+export interface ISingleOrderAPIResponse {
+    http_status_code: number;
+    http_status_msg: string;
+    success: boolean;
+    data: ISingleOrderData;
+    message: string;
+    timestamp: string;
+}
+export interface ISingleOrderData {
+    id: string;
+    orderId: number;
     invoiceNumber: number;
     itemCount: number;
     item: string;
     paymentType: string;
     totalAmount: number;
     discountAmount: number;
-    couponCode?: null;
-    couponDiscount?: number | null;
+    couponCode: string | null;
+    couponDiscount: number | null;
     taxAmount: number;
     status: string;
     paymentStatus: string;
     paymentMethod: string;
     transactionId: string;
-    paidAt: string;
+    paidAt: string | null;
     createdAt: string;
-    customer: Customer;
-    items?: (ItemsEntity)[] | null;
+    customer: IOrderCustomer;
+    items: IOrderLineItem[];
 }
-export interface Customer {
+export interface IOrderCustomer {
     id: string;
     name: string;
     email: string;
     phone: string;
 }
-export interface ItemsEntity {
+export interface IOrderLineItem {
     id: string;
     type: string;
     title: string;

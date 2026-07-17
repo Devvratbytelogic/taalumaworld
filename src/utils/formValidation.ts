@@ -330,7 +330,7 @@ export const testimonialSchema = Yup.object({
     .max(5, 'Rating cannot exceed 5')
     .required('Rating is required'),
   status: Yup.string()
-    .oneOf(['Pending', 'Approved', 'Rejected'], 'Select a valid status')
+    .oneOf(['Active', 'Inactive'], 'Select a valid status')
     .required('Status is required'),
   photo: Yup.mixed().nullable().optional(),
 });

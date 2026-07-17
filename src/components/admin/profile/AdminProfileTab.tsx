@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { Avatar } from '@heroui/react';
-import { Calendar, Camera, Check, Mail, Pencil, Shield, X } from 'lucide-react';
+import { Ban, Calendar, Camera, Check, CheckCircle2, Facebook, Linkedin, Lock, Mail, Pencil, Shield, User, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -16,13 +17,9 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation } from '@/store/rtkQueries/adminPostApi';
+import { mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
-
-const updateProfileSchema = Yup.object({
-  name: Yup.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be at most 60 characters').required('Name is required'),
-  professionalBio: Yup.string().trim().max(500, 'Bio must be at most 500 characters').optional(),
-});
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -52,14 +49,18 @@ export function AdminProfileTab() {
     initialValues: {
       name: profile?.name ?? '',
       professionalBio: profile?.professionalBio ?? '',
+      facebook: profile?.facebook ?? '',
+      linkedin: profile?.linkedin ?? '',
     },
-    validationSchema: updateProfileSchema,
+    validationSchema: mentorProfileDetailsSchema,
     onSubmit: async (formValues) => {
       try {
         const formData = new FormData();
         formData.append('name', formValues.name.trim());
         formData.append('email', profile?.email ?? '');
         formData.append('professionalBio', formValues.professionalBio?.trim() ?? '');
+        formData.append('facebook', formValues.facebook?.trim() ?? '');
+        formData.append('linkedin', formValues.linkedin?.trim() ?? '');
         if (photoFile) formData.append('profile_pic', photoFile);
 
         const res = await updateAdminProfile(formData).unwrap();
@@ -104,6 +105,8 @@ export function AdminProfileTab() {
   const displayPhoto = tempPhoto || profile?.profile_pic || '';
   const displayName = values.name || profile?.name || 'Admin';
   const roleName = profile?.role?.name ?? 'Admin';
+  const isSuspended = !!profile?.isSuspended;
+  const permissions = profile?.permission ?? [];
 
   return (
     <AdminPage>
@@ -138,6 +141,17 @@ export function AdminProfileTab() {
                   <Shield className="h-3.5 w-3.5" />
                   {roleName}
                 </span>
+                <span
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium capitalize',
+                    isSuspended
+                      ? 'border-red-200 bg-red-50 text-red-700'
+                      : 'border-emerald-200 bg-emerald-50 text-emerald-700',
+                  )}
+                >
+                  {isSuspended ? <Ban className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                  {isSuspended ? 'Suspended' : (profile?.status ?? 'Active')}
+                </span>
                 {profile?.createdAt ? (
                   <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
                     <Calendar className="h-3.5 w-3.5" />
@@ -168,6 +182,53 @@ export function AdminProfileTab() {
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Member since</dt>
                 <dd className="mt-1 text-sm font-medium text-slate-900">{formatDate(profile?.createdAt)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Username</dt>
+                <dd className="mt-1 flex items-center gap-1.5 text-sm font-medium text-slate-900">
+                  <User className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  {profile?.username || '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Date of birth</dt>
+                <dd className="mt-1 text-sm font-medium text-slate-900">{formatDate(profile?.dob ?? undefined)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Facebook</dt>
+                <dd className="mt-1 flex items-center gap-1.5 text-sm font-medium text-slate-900">
+                  {profile?.facebook ? (
+                    <Link
+                      href={profile.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-primary hover:underline"
+                    >
+                      <Facebook className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{profile.facebook}</span>
+                    </Link>
+                  ) : (
+                    '—'
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">LinkedIn</dt>
+                <dd className="mt-1 flex items-center gap-1.5 text-sm font-medium text-slate-900">
+                  {profile?.linkedin ? (
+                    <Link
+                      href={profile.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-primary hover:underline"
+                    >
+                      <Linkedin className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{profile.linkedin}</span>
+                    </Link>
+                  ) : (
+                    '—'
+                  )}
+                </dd>
               </div>
               <div className="sm:col-span-2">
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Bio</dt>
@@ -232,6 +293,34 @@ export function AdminProfileTab() {
                   />
                   <p className="text-xs text-slate-400">Email cannot be changed</p>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="facebook">Facebook URL</Label>
+                  <Input
+                    id="facebook"
+                    name="facebook"
+                    value={values.facebook}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    placeholder="https://facebook.com/yourprofile"
+                    className={errors.facebook && touched.facebook ? 'border-red-500' : ''}
+                  />
+                  {errors.facebook && touched.facebook ? <p className="text-sm text-red-600">{errors.facebook}</p> : null}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin">LinkedIn URL</Label>
+                  <Input
+                    id="linkedin"
+                    name="linkedin"
+                    value={values.linkedin}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    placeholder="https://linkedin.com/in/yourprofile"
+                    className={errors.linkedin && touched.linkedin ? 'border-red-500' : ''}
+                  />
+                  {errors.linkedin && touched.linkedin ? <p className="text-sm text-red-600">{errors.linkedin}</p> : null}
+                </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="professionalBio">Bio</Label>
                   <textarea
@@ -270,6 +359,45 @@ export function AdminProfileTab() {
             </form>
           )}
         </div>
+      </AdminPanel>
+
+      <AdminPanel padding={false} className="overflow-hidden">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
+          <div>
+            <h2 className="text-base font-semibold text-slate-900">Role Permissions</h2>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Access granted via the <span className="font-medium">{roleName}</span> role.
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+            <Lock className="h-3.5 w-3.5" />
+            Read-only
+          </span>
+        </div>
+        {permissions.length > 0 ? (
+          <ul className="max-h-[420px] divide-y divide-slate-100 overflow-y-auto p-6 pt-0">
+            {permissions.map((entry) => (
+              <li key={entry._id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <span className="text-sm font-medium text-slate-800">{entry.model}</span>
+                {entry.permission && entry.permission.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {entry.permission.map((perm) => (
+                      <Badge key={perm} variant="outline" className="capitalize bg-primary/5 text-primary border-primary/20">
+                        {perm}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-xs text-slate-400">No access</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="p-6 text-sm text-slate-500">
+            No permission restrictions are configured for this role — full platform access is granted by default.
+          </div>
+        )}
       </AdminPanel>
     </AdminPage>
   );

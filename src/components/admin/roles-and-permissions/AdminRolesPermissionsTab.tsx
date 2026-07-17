@@ -9,20 +9,23 @@ import { AdminPage, AdminPageHeader, adminPanelClass } from '@/components/admin/
 
 type Tab = 'roles' | 'permissions' | 'staff';
 
-const TABS: { id: Tab; label: string; icon: React.ElementType; description: string }[] = [
+const TABS: { model: string; id: Tab; label: string; icon: React.ElementType; description: string }[] = [
   {
+    model: 'Role',
     id: 'roles',
     label: 'Roles Registry',
     icon: Shield,
     description: 'Create, edit, and delete roles',
   },
   {
+    model: 'Permission',
     id: 'permissions',
     label: 'Permissions Matrix',
     icon: Grid3X3,
     description: 'Adjust role permissions dynamically without code changes',
   },
   {
+    model: 'Staff',
     id: 'staff',
     label: 'Staff Assignments',
     icon: UserCog,

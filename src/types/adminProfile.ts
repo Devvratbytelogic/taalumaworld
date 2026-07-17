@@ -9,36 +9,44 @@ export interface IAdminProfileAPIResponse {
 export interface IAdminProfileAPIResponseData {
   _id: string;
   name: string;
-  profile_pic: string;
+  profile_pic?: string | null;
   email: string;
   is_verified: boolean;
   status: string;
-  fcm_token?: (null)[] | null;
-  professionalBio: string;
-  linkedin: string;
-  facebook: string;
+  isSuspended?: boolean;
+  fcm_token?: (string | null)[] | null;
+  professionalBio?: string | null;
+  linkedin?: string | null;
+  facebook?: string | null;
   role_id: string;
   institution_id?: null;
-  status_reason: string;
-  status_changed_at: string;
+  status_reason?: string | null;
+  status_changed_at?: string | null;
   deleted_at?: null;
   createdAt: string;
   updatedAt: string;
   __v: number;
-  short_code: string;
+  short_code?: string;
   id: string;
+  dob?: string | null;
+  username?: string | null;
   role: Role;
   user_type: string;
-  permission?: (null)[] | null;
-  mentor_info: MentorInfo;
-  profile_completion_percentage: number;
-  mentor_economy: MentorEconomy;
+  permission?: (IAdminProfilePermissionEntity)[] | null;
+  mentor_info?: MentorInfo;
+  profile_completion_percentage?: number;
+  mentor_economy?: MentorEconomy;
 }
 export interface Role {
   _id: string;
   name: string;
   description: string;
   number_of_users: number;
+}
+export interface IAdminProfilePermissionEntity {
+  _id: string;
+  model: string;
+  permission?: (string)[] | null;
 }
 export interface MentorInfo {
   _id: string;

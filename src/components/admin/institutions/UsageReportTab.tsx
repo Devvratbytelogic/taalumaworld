@@ -70,77 +70,109 @@ export function UsageReportTab() {
             field: 'name',
             headerName: 'Institution',
             flex: 1,
-            minWidth: 200,
+            minWidth: 220,
             sortable: false,
-            renderCell: (params) => (
-                <div>
-                    <p className="font-medium text-sm">{params.row.name}</p>
-                    <Badge
-                        variant="outline"
-                        className={params.row.status === 'Active'
-                            ? 'bg-green-50 text-green-700 border-green-200 mt-0.5'
-                            : 'bg-amber-50 text-amber-700 border-amber-200 mt-0.5'}
-                    >
-                        {params.row.status}
-                    </Badge>
-                </div>
-            ),
+            renderCell: (params) => {
+                const initial = String(params.row.name ?? '?').trim().charAt(0).toUpperCase() || '?';
+                return (
+                    <div className="flex items-center gap-3 py-2 min-w-0">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                            {initial}
+                        </div>
+                        <div className="min-w-0 leading-tight">
+                            <p className="truncate text-sm font-medium text-slate-800" title={params.row.name}>
+                                {params.row.name}
+                            </p>
+                            <Badge
+                                variant="outline"
+                                className={`mt-1 h-5 gap-1 px-2 text-[11px] font-medium ${params.row.status === 'Active'
+                                    ? 'bg-green-50 text-green-700 border-green-200'
+                                    : 'bg-amber-50 text-amber-700 border-amber-200'}`}
+                            >
+                                <span
+                                    className={`h-1.5 w-1.5 rounded-full ${params.row.status === 'Active' ? 'bg-green-500' : 'bg-amber-500'}`}
+                                />
+                                {params.row.status}
+                            </Badge>
+                        </div>
+                    </div>
+                );
+            },
         },
         {
             field: 'registrations',
             headerName: 'Registrations',
             width: 130,
             sortable: false,
-            renderCell: (params) => <span className="text-sm font-medium">{params.value}</span>,
+            align: 'right',
+            headerAlign: 'right',
+            renderCell: (params) => <span className="text-sm font-medium text-slate-700">{params.value}</span>,
         },
         {
             field: 'activeUsers',
             headerName: 'Active Users',
             width: 120,
             sortable: false,
-            renderCell: (params) => <span className="text-sm font-medium">{params.value}</span>,
+            align: 'right',
+            headerAlign: 'right',
+            renderCell: (params) => <span className="text-sm font-medium text-slate-700">{params.value}</span>,
         },
         {
             field: 'blueprintViews',
             headerName: 'Blueprint Views',
             width: 140,
             sortable: false,
-            renderCell: (params) => <span className="text-sm font-medium">{params.value}</span>,
+            align: 'right',
+            headerAlign: 'right',
+            renderCell: (params) => <span className="text-sm font-medium text-slate-700">{params.value}</span>,
         },
         {
             field: 'conversions',
             headerName: 'Conversions',
             width: 120,
             sortable: false,
-            renderCell: (params) => <span className="text-sm font-medium">{params.value}</span>,
+            align: 'right',
+            headerAlign: 'right',
+            renderCell: (params) => <span className="text-sm font-medium text-slate-700">{params.value}</span>,
         },
         {
             field: 'conversionRate',
             headerName: 'Conversion Rate',
-            width: 140,
+            width: 150,
             sortable: false,
-            renderCell: (params) => <span className="text-sm font-medium">{params.value}%</span>,
+            align: 'right',
+            headerAlign: 'right',
+            renderCell: (params) => (
+                <span className={`text-sm font-semibold ${params.value >= 50 ? 'text-green-600' : 'text-slate-700'}`}>
+                    {params.value}%
+                </span>
+            ),
         },
         {
             field: 'promoEnd',
             headerName: 'Promo End',
             width: 130,
             sortable: false,
-            valueFormatter: (value) =>
-                value && moment(value).isValid() ? moment(value).format('DD MMM YYYY') : '—',
+            renderCell: (params) => (
+                <span className="text-sm text-slate-600">
+                    {params.value && moment(params.value).isValid() ? moment(params.value).format('DD MMM YYYY') : '—'}
+                </span>
+            ),
         },
         {
             field: 'daysLeft',
             headerName: 'Days Left',
-            width: 100,
+            width: 110,
             sortable: false,
+            align: 'right',
+            headerAlign: 'right',
             renderCell: (params) => {
                 const days = params.value as number;
-                if (days == null) return '—';
-                if (days < 0) return <span className="text-red-500 text-xs font-medium">Expired</span>;
+                if (days == null) return <span className="text-sm text-slate-400">—</span>;
+                if (days < 0) return <span className="text-xs font-semibold text-red-500">Expired</span>;
                 const urgent = days <= 7;
                 return (
-                    <span className={`text-sm font-medium ${urgent ? 'text-red-500' : 'text-gray-700'}`}>
+                    <span className={`text-sm font-semibold ${urgent ? 'text-red-500' : 'text-slate-700'}`}>
                         {days}d
                     </span>
                 );

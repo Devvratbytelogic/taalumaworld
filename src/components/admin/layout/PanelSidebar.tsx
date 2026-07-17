@@ -5,6 +5,7 @@ import { Avatar } from '@heroui/react';
 import { cn } from '@/components/ui/utils';
 
 export interface SidebarNavItem {
+  model?: string;
   id: string;
   label: string;
   icon: React.ElementType;

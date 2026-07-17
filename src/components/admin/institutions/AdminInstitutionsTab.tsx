@@ -11,26 +11,30 @@ import { RegistrationPromptTab } from './RegistrationPromptTab';
 
 type Tab = 'registry' | 'blueprints' | 'usage' | 'prompt';
 
-const TABS: { id: Tab; label: string; icon: React.ElementType; description: string }[] = [
+const TABS: { id: Tab; model: string; label: string; icon: React.ElementType; description: string }[] = [
     {
+        model: 'Institution',
         id: 'registry',
         label: 'Institution Registry',
         icon: Building2,
         description: 'Register and manage partner universities',
     },
     {
+        model: 'Institution Access',
         id: 'blueprints',
         label: 'Blueprint Access',
         icon: BookOpen,
         description: 'Configure blueprints per institution',
     },
     {
+        model: 'Institute Usage Report',
         id: 'usage',
         label: 'Usage Report',
         icon: BarChart3,
         description: 'Registrations, conversions & analytics',
     },
     {
+        model: 'Registration Prompt',
         id: 'prompt',
         label: 'Registration Prompt',
         icon: MessageSquare,

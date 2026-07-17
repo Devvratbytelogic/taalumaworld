@@ -16,54 +16,54 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'System',
         items: [
             { id: 'dashboard', label: 'Dashboard', href: getAdminDashboardRoutePath(), icon: LayoutDashboard },
-            { id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
-            { id: 'roles_permissions', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
+            { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
+            { model: 'Role', id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
         ],
     },
     {
         title: 'Commerce',
         items: [
-            { id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
-            { id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
+            { model: 'Transaction', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
+            { model: 'Order', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
         ],
     },
     {
         title: 'Mentor Management',
         items: [
-            { id: 'authors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
-            { id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
-            { id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
+            { model: 'Mentor', id: 'mentors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
+            { model: 'Mentor Application', id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
+            { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
         ],
     },
     {
         title: 'Content Management',
         items: [
-            { id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
-            { id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
+            { model: 'Series', id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
+            { model: 'Blueprint', id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
             // { id: 'categories', label: 'Categories', href: getAdminSectionRoutePath('categories'), icon: FolderTree },
         ],
     },
     {
         title: 'Legal',
         items: [
-            { id: 'agreement_types', label: 'Agreement Types', href: getAdminSectionRoutePath('agreement_types'), icon: FolderTree },
-            { id: 'agreements', label: 'Agreements', href: getAdminSectionRoutePath('agreements'), icon: FileSignature },
+            { model: 'Agreement Type', id: 'agreement_types', label: 'Agreement Types', href: getAdminSectionRoutePath('agreement_types'), icon: FolderTree },
+            { model: 'Agreement', id: 'agreements', label: 'Agreements', href: getAdminSectionRoutePath('agreements'), icon: FileSignature },
         ],
     },
     {
         title: 'User Management',
         items: [
-            { id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
-            { id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
+            { model: 'User', id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
+            { model: 'Institution', id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
     },
     {
         title: 'Community',
         items: [
-            { id: 'testimonials', label: 'Testimonials', href: getAdminSectionRoutePath('testimonials'), icon: MessageSquare },
-            { id: 'faqs', label: 'FAQs', href: getAdminSectionRoutePath('faqs'), icon: FileEdit },
-            { id: 'contact_us', label: 'Help & Trust Center', href: getAdminSectionRoutePath('contact_us'), icon: Mail },
-            { id: 'subscribers', label: 'Subscribers', href: getAdminSectionRoutePath('subscribers'), icon: Bell },
+            { model: 'Testimonial', id: 'testimonials', label: 'Testimonials', href: getAdminSectionRoutePath('testimonials'), icon: MessageSquare },
+            { model: 'FAQs', id: 'faqs', label: 'FAQs', href: getAdminSectionRoutePath('faqs'), icon: FileEdit },
+            { model: 'Contact Us', id: 'contact_us', label: 'Help & Trust Center', href: getAdminSectionRoutePath('contact_us'), icon: Mail },
+            { model: 'Subscriber', id: 'subscribers', label: 'Subscribers', href: getAdminSectionRoutePath('subscribers'), icon: Bell },
         ],
     },
 ];

@@ -1,4 +1,4 @@
-import { IAllInstitutionsAPIResponse, IInstituteMessageAPIResponse, IInstitutionAccessAPIResponse, ISingleInstitutionAPIResponse } from '@/types/institution';
+import { IAllInstitutionsAPIResponse, IInstituteMessageAPIResponse, IInstitutionAccessAPIResponse, IInstitutionKpisAPIResponse, ISingleInstitutionAPIResponse } from '@/types/institution';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const institutionApi = rtkQuerieSetup.injectEndpoints({
@@ -48,6 +48,16 @@ export const institutionApi = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
             }),
             invalidatesTags: ['AdminInstitutions'],
+        }),
+
+        /** Institution Usage Report */
+        getInstitutionKpis: builder.query<IInstitutionKpisAPIResponse, { page?: number; limit?: number; search?: string; status?: string } | void>({
+            query: (params) => ({
+                url: `/admin/institutions/kpis`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminInstitutions'],
         }),
 
         /** Institution Access */
@@ -129,6 +139,9 @@ export const {
     useUpdateInstitutionMutation,
     useDeleteInstitutionMutation,
     useRestoreInstitutionMutation,
+
+    // Institution Usage Report
+    useGetInstitutionKpisQuery,
 
     // Institution Access
     useGetInstitutionAccessQuery,

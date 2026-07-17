@@ -105,7 +105,7 @@ export function StaffAssignmentsTab() {
             sortable: false,
             renderCell: (params) => (
                 <div className="action_buttons">
-                    <button
+                    {/* <button
                         className="edit_button"
                         onClick={() => dispatch(openModal({
                             componentName: 'AddEditStaffModal',
@@ -113,7 +113,7 @@ export function StaffAssignmentsTab() {
                         }))}
                     >
                         <Edit2 className="h-4 w-4" />
-                    </button>
+                    </button> */}
                     <button
                         className={`${params.row.status === 'active' ? 'delete_button' : 'active_button'}`}
                         title={params.row.status === 'active' ? 'Suspend user' : 'Activate user'}

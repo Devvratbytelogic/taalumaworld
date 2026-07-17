@@ -6,7 +6,8 @@ import { AdminPageHeader, adminPanelClass } from '@/components/admin/layout/Admi
 import { cn } from '@/components/ui/utils';
 import { InstitutionRegistryTab } from './InstitutionRegistryTab';
 import { BlueprintAccessTab } from './BlueprintAccessTab';
-import { RegistrationPromptTab } from './RegistrationPromptTab';;
+import { UsageReportTab } from './UsageReportTab';
+import { RegistrationPromptTab } from './RegistrationPromptTab';
 
 type Tab = 'registry' | 'blueprints' | 'usage' | 'prompt';
 
@@ -75,10 +76,8 @@ export function AdminInstitutionsTab() {
             {/* Active tab content */}
             {activeTab === 'registry' && <InstitutionRegistryTab />}
             {activeTab === 'blueprints' && <BlueprintAccessTab />}
-            {activeTab === 'prompt' && <RegistrationPromptTab />}
-            {/* {activeTab === 'promotions' && <PromotionConfigTab />}
             {activeTab === 'usage' && <UsageReportTab />}
-            {activeTab === 'prompt' && <RegistrationPromptTab />} */}
+            {activeTab === 'prompt' && <RegistrationPromptTab />}
         </div>
     );
 }

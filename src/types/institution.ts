@@ -153,6 +153,49 @@ export interface IPartnerInstitutionEntity {
 
 
 
+export interface IInstitutionKpisAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IInstitutionKpisData;
+  message: string;
+  timestamp: string;
+}
+export interface IInstitutionKpisData {
+  summary: IInstitutionKpisSummary;
+  institutions?: (IInstitutionKpiEntity)[] | null;
+  pagination: IInstitutionKpisPagination;
+}
+export interface IInstitutionKpisSummary {
+  totalRegistrations: number;
+  activeUsers: number;
+  blueprintViews: number;
+  paidConversions: number;
+  averageConversionRate: number;
+}
+export interface IInstitutionKpiEntity {
+  id: string;
+  name: string;
+  status: string;
+  registrations: number;
+  activeUsers: number;
+  blueprintViews: number;
+  conversions: number;
+  conversionRate: number;
+  promoEnd: string;
+  daysLeft: number;
+  promoStatus: string;
+}
+export interface IInstitutionKpisPagination {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+
+
+
 export interface IInstituteMessageAPIResponse {
   http_status_code: number;
   http_status_msg: string;

@@ -7,7 +7,7 @@ import FAQSkeleton from '@/components/skeleton-loader/FAQSkeleton'
 
 export default function FAQ() {
     const { data, isLoading } = useGetFAQQuery()
-    const faqs = data?.data
+    const faqs = data?.data?.data
 
     return (
         <>

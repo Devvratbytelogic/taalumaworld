@@ -20,7 +20,7 @@ export default function FaqSearch() {
     const { data, isLoading, isError } = useGetFAQQuery(
         selectedCategory !== 'all' ? { type: selectedCategory } : undefined
     );
-    const faqs = data?.data ?? [];
+    const faqs = data?.data?.data ?? [];
 
     const filteredFAQs = faqs.filter(faq => {
         if (searchQuery === '') return true;

@@ -26,9 +26,16 @@ export interface IFAQAPIResponse {
     http_status_code: number;
     http_status_msg: string;
     success: boolean;
-    data?: (IFAQAPIResponseDataEntity)[] | null;
+    data: IFAQAPIResponseData;
     message: string;
     timestamp: string;
+}
+export interface IFAQAPIResponseData {
+    data?: (IFAQAPIResponseDataEntity)[] | null;
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 export interface IFAQAPIResponseDataEntity {
     _id: string;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, CheckCircle, XCircle, Download, X } from 'lucide-react';
+import { Users, CheckCircle, XCircle, X } from 'lucide-react';
 import { type GridColDef } from '@mui/x-data-grid';
 import { useGetAllSubscribersQuery } from '@/store/rtkQueries/adminGetApi';
 import type { SubscriberEntry } from '@/types/subscribers';
@@ -57,26 +57,6 @@ export function AdminSubscribersTab() {
     const handleStatusChange = (value: string) => {
         setStatusFilter(value);
         resetToFirstPage();
-    };
-
-    const handleExportCSV = () => {
-        const rows = [
-            ['#', 'Email', 'Status', 'Subscribed On'],
-            ...(subscribers && subscribers?.length > 0 ? subscribers?.map((s: SubscriberEntry, i: number) => [
-                String(i + 1),
-                s.email,
-                s.status ? 'Active' : 'Inactive',
-                s.date_of_subscription,
-            ]) : []),
-        ];
-        const csv = rows.map((r: string[]) => r.map((v: string) => `"${v}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'subscribers.csv';
-        a.click();
-        URL.revokeObjectURL(url);
     };
 
     const columns: GridColDef<SubscriberEntry>[] = [
@@ -179,15 +159,6 @@ export function AdminSubscribersTab() {
                                 Clear
                             </button>
                         ) : null}
-
-                        <button
-                            onClick={handleExportCSV}
-                            disabled={loading || subscribers.length === 0}
-                            className="inline-flex items-center gap-2 px-4 h-9 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                        >
-                            <Download className="h-4 w-4" />
-                            Export CSV
-                        </button>
                     </div>
                 </div>
 

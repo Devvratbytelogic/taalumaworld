@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
 import {
-    Plus, Search, Edit2, Trash2, RotateCcw, Download, ArrowLeft, ChevronDown, Loader2,
+    Plus, Search, Edit2, Trash2, RotateCcw, ArrowLeft, ChevronDown, Loader2,
     Building2, CheckCircle2, Ban,
 } from 'lucide-react';
 import {
@@ -93,29 +93,6 @@ export function InstitutionRegistryTab() {
     const handleToggleTrash = () => {
         setIsTrashView((prev) => !prev);
         resetToFirstPage();
-    };
-
-    const handleExportCSV = () => {
-        const rows = [
-            ['Institution', 'Contact Email', 'Domains', 'Status', 'Promo End'],
-            ...institutions.map((inst) => [
-                inst.name,
-                inst.contact_email,
-                (inst.domains ?? []).join(' | '),
-                inst.status,
-                inst.promo_end && moment(inst.promo_end).isValid()
-                    ? moment(inst.promo_end).format('DD MMM YYYY')
-                    : '—',
-            ]),
-        ];
-        const csv = rows.map((r) => r.map((v) => `"${v}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'institutions.csv';
-        a.click();
-        URL.revokeObjectURL(url);
     };
 
     const onInstitutionStatusChange = async (institution: IAllInstitutionsDataEntity, newStatus: string) => {
@@ -384,13 +361,6 @@ export function InstitutionRegistryTab() {
                         <option value="Inactive">Inactive</option>
                     </select>
                 )}
-                <button
-                    onClick={handleExportCSV}
-                    disabled={isLoading || institutions.length === 0}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 whitespace-nowrap"
-                >
-                    <Download className="h-4 w-4" /> Export CSV
-                </button>
                 {!isTrashView && (
                     <Button
                         color="primary"

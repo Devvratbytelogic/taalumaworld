@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Users, UserCheck, Eye, CreditCard, Percent, Download, Search } from 'lucide-react';
+import { Users, UserCheck, Eye, CreditCard, Percent, Search } from 'lucide-react';
 import { useGetInstitutionKpisQuery } from '@/store/rtkQueries/institutionApi';
 import { AdminStatCard } from '@/components/admin/layout/AdminContent';
 import { Input } from '@/components/ui/input';
@@ -38,31 +38,6 @@ export function UsageReportTab() {
     const handleStatusChange = (value: string) => {
         setStatus(value);
         resetToFirstPage();
-    };
-
-    const handleExportCSV = () => {
-        const rows = [
-            ['Institution', 'Status', 'Registrations', 'Active Users', 'Blueprint Views', 'Conversions', 'Conversion Rate', 'Promo End', 'Days Left'],
-            ...institutions.map((inst) => [
-                inst.name,
-                inst.status,
-                inst.registrations,
-                inst.activeUsers,
-                inst.blueprintViews,
-                inst.conversions,
-                `${inst.conversionRate}%`,
-                inst.promoEnd && moment(inst.promoEnd).isValid() ? moment(inst.promoEnd).format('DD MMM YYYY') : '—',
-                inst.daysLeft,
-            ]),
-        ];
-        const csv = rows.map((r) => r.map((v) => `"${v}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'institution-usage-report.csv';
-        a.click();
-        URL.revokeObjectURL(url);
     };
 
     const columns: GridColDef[] = [
@@ -209,14 +184,6 @@ export function UsageReportTab() {
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                 </select>
-                <button
-                    type="button"
-                    onClick={handleExportCSV}
-                    disabled={isLoading || institutions.length === 0}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 whitespace-nowrap"
-                >
-                    <Download className="h-4 w-4" /> Export CSV
-                </button>
             </div>
 
             <div className="border border-gray-200 rounded-md overflow-hidden">

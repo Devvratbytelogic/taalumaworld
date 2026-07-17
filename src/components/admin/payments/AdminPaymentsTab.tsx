@@ -4,7 +4,6 @@
  */
 
 import { useState } from 'react';
-import toast from '@/utils/toast';
 import type { PaymentEntry } from './PaymentListing';
 import { AdminPaymentsHeader } from './AdminPaymentsHeader';
 import { AdminPaymentsSearch } from './AdminPaymentsSearch';
@@ -56,16 +55,10 @@ export function AdminPaymentsTab(props?: AdminPaymentsTabProps) {
 
   const totalRevenue = mockPayments.reduce((sum, p) => sum + p.amount, 0);
 
-  const handleExport = () => {
-    toast.success('Export started. Download will begin shortly.');
-    // TODO: wire to actual export API
-  };
-
   return (
     <div className="space-y-6">
       <AdminPaymentsHeader
         totalRevenue={totalRevenue}
-        onExport={handleExport}
       />
 
       <AdminPaymentsSearch

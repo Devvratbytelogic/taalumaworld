@@ -1,5 +1,3 @@
-import type { IMentor } from '@/types/user/singleChapter';
-
 export interface ISingleBookAPIResponse {
     http_status_code: number;
     http_status_msg: string;
@@ -9,58 +7,84 @@ export interface ISingleBookAPIResponse {
     timestamp: string;
 }
 export interface ISingleBookAPIResponseData {
+    bookDetails: IBookDetails;
+    chapters: IChapters;
+}
+export interface IBookDetails {
     id: string;
-    slug?: string;
+    slug: string;
     type: string;
     title: string;
     description: string;
+    shareable_link: string;
     coverImage: string;
     price: number;
+    effectivePrice: number;
+    pricingAccessType: string;
     pricingModel: string;
+    status: string;
+    tags?: (string)[] | null;
     totalPages: number;
     chapterCount: number;
     isChapterPricing: boolean;
     priceLabel: string;
     fromPrice: number;
-    author: string;
-    authorAvatar?: string | null;
-    authorBio?: string;
-    mentor?: IMentor | null;
-    shareable_link?: string;
-    category: Category;
-    subcategory?: null;
+    mentor: Mentor;
     isPurchased: boolean;
-    metaTitle?: string;
-    metaDescription?: string;
-    ogTitle?: string;
-    ogDescription?: string;
-    ogImage?: string;
-    jsonLd?: string;
-    chapters: IBookChapterItem[];
+    purchasedDirectly: boolean;
+    purchasedViaChapter: boolean;
+    accessType: string;
+    canRead: boolean;
+    isWishlisted: boolean;
+    meta_title: string;
+    meta_description: string;
+    og_title: string;
+    og_description: string;
+    og_image: string;
+    json_ld: string;
+    legacyType: string;
+    blueprintNumbers?: (number)[] | null;
 }
-export interface Category {
-    _id: string;
+export interface Mentor {
     name: string;
-    slug: string;
+    email: string;
+    profile_pic: string;
+    is_verified: boolean;
+    is_mentor_verified: boolean;
+    linkedin: string;
+    facebook: string;
 }
-
-export interface IBookChapterItem {
-    _id: string;
-    slug?: string;
-    book: string;
-    number: number;
+export interface IChapters {
+    data?: (IChapterEntity)[] | null;
+    total: number;
     page: number;
+    limit: number;
+    totalPages: number;
+}
+export interface IChapterEntity {
+    id: string;
+    slug: string;
+    chapterNumber: number;
     title: string;
     description: string;
-    content: string;
-    isFree: boolean;
-    canRead: boolean;
-    coverImage: string;
-    pdf: string | null;
+    pageCount: number;
     price: number;
-    status: string;
-    createdBy: string;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
+    effectivePrice: number;
+    pricingAccessType: string;
+    isFree: boolean;
+    coverImage: string;
+    canRead: boolean;
+    isPurchased: boolean;
+    isCart: boolean;
+    isWishlisted: boolean;
+    percentage: number;
+    completed: boolean;
+    readStatus: string;
+    meta_title: string;
+    meta_description: string;
+    og_title: string;
+    og_description: string;
+    og_image: string;
+    json_ld: string;
+    blueprintNumber: number;
 }

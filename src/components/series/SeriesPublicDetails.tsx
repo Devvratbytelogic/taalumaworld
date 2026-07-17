@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import ImageComponent from '@/components/ui/ImageComponent';
 import MentorDetails from '@/components/blueprint/MentorDetails';
 import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
+import type { IMentor } from '@/types/user/singleChapter';
 import { getBlueprintRoutePath } from '@/routes/routes';
 
 interface SeriesPublicDetailsProps {
@@ -12,7 +13,20 @@ interface SeriesPublicDetailsProps {
 }
 
 export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) {
-  const chapters = data?.chapters ?? [];
+  const bookDetails = data?.bookDetails ?? null;
+  const chapters = data?.chapters?.data ?? [];
+
+  const mentor: IMentor | null = bookDetails?.mentor
+    ? {
+        name: bookDetails.mentor.name,
+        profilePicture: bookDetails.mentor.profile_pic,
+        email: bookDetails.mentor.email,
+        phone: '',
+        bio: '',
+        linkedin: bookDetails.mentor.linkedin,
+        facebook: bookDetails.mentor.facebook,
+      }
+    : null;
 
   return (
     <section className="container">
@@ -21,7 +35,7 @@ export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) 
           <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
             Overview
           </p>
-          <MentorDetails data={data?.mentor ?? null} />
+          <MentorDetails data={mentor} />
         </aside>
 
         <div className="min-w-0">
@@ -47,13 +61,13 @@ export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) 
                       </div>
                     ) : (
                       <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg border border-[#ECECEC] bg-primary/10 text-sm font-bold text-primary">
-                        {chapter?.number}
+                        {chapter?.chapterNumber}
                       </div>
                     )}
 
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium uppercase tracking-[0.12em] text-primary">
-                        Blueprint {chapter?.number ?? 0}
+                        Blueprint {chapter?.chapterNumber ?? 0}
                       </p>
                       <p className="mt-1 font-medium text-[#1A1A1A]">{chapter?.title}</p>
                       {chapter?.description && (

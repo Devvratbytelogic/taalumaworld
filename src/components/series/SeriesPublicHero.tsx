@@ -11,6 +11,8 @@ interface SeriesPublicHeroProps {
 }
 
 export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) {
+  const bookDetails = data?.bookDetails ?? null;
+  const mentor = bookDetails?.mentor ?? null;
 
   return (
     <section className="border-b border-border pb-10">
@@ -21,51 +23,47 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                 Series
               </span>
-              {data?.category?.name && (
+             
+              {bookDetails?.priceLabel && (
                 <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {data?.category?.name ?? ''}
-                </span>
-              )}
-              {data?.priceLabel && (
-                <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {data?.priceLabel ?? ''}
+                  {bookDetails?.priceLabel ?? ''}
                 </span>
               )}
             </div>
 
             <h1 className="font-ubuntu text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
-              {data?.title}
+              {bookDetails?.title}
             </h1>
 
-            {data?.description && <p className="text-base line-clamp-6">{data?.description}</p>}
+            {bookDetails?.description && <p className="text-base line-clamp-6">{bookDetails?.description}</p>}
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-border py-4 text-sm">
-              {data?.author && (
+              {mentor?.name && (
                 <div className="flex items-center gap-2.5">
-                  {data?.authorAvatar ? (
+                  {mentor?.profile_pic ? (
                     <div className="h-9 w-9 overflow-hidden rounded-full border border-border">
-                      <ImageComponent src={data?.authorAvatar ?? ''} alt={data?.author ?? ''} object_cover />
+                      <ImageComponent src={mentor?.profile_pic ?? ''} alt={mentor?.name ?? ''} object_cover />
                     </div>
                   ) : (
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase text-foreground">
-                      {data?.author?.slice(0, 2) ?? ''}
+                      {mentor?.name?.slice(0, 2) ?? ''}
                     </div>
                   )}
                   <div>
                     <p className="text-xs text-muted-foreground">Mentor</p>
-                    <p className="font-medium text-foreground">{data?.author ?? ''}</p>
+                    <p className="font-medium text-foreground">{mentor?.name ?? ''}</p>
                   </div>
                 </div>
               )}
 
-              {!!data?.chapterCount && (
+              {!!bookDetails?.chapterCount && (
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Blueprints</p>
-                    <p className="font-medium text-foreground">{data?.chapterCount ?? 0} blueprints</p>
+                    <p className="font-medium text-foreground">{bookDetails?.chapterCount ?? 0} blueprints</p>
                   </div>
                 </div>
               )}
@@ -74,9 +72,9 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
             <div>
               <p className="mb-3 text-sm font-medium text-foreground">Share this series</p>
               <ShareButtons
-                shareableLink={data?.shareable_link ?? ''}
-                title={data?.title ?? ''}
-                description={data?.description ?? ''}
+                shareableLink={bookDetails?.shareable_link ?? ''}
+                title={bookDetails?.title ?? ''}
+                description={bookDetails?.description ?? ''}
                 size="md"
               />
             </div>
@@ -84,8 +82,8 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
 
           <div className="mx-auto w-48 shrink-0 sm:w-52 md:mx-0 md:w-56">
             <div className="aspect-3/4 overflow-hidden rounded-2xl border border-border bg-muted shadow-[0_20px_40px_-24px_rgba(0,0,0,0.18)]">
-              {data?.coverImage ? (
-                <ImageComponent src={data?.coverImage ?? ''} alt={data?.title ?? ''} object_cover={false} priority />
+              {bookDetails?.coverImage ? (
+                <ImageComponent src={bookDetails?.coverImage ?? ''} alt={bookDetails?.title ?? ''} object_cover={false} priority />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 bg-muted p-6 text-center">
                   <FileText className="h-10 w-10 text-muted-foreground/40" />

@@ -7,7 +7,7 @@ import { useGetMyChaptersQuery, useLazyGetTransactionInvoiceQuery } from '@/stor
 import { cn } from '@/components/ui/utils';
 import type { ItemsEntity } from '@/types/user/myChapters';
 import ImageComponent from '@/components/ui/ImageComponent';
-import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 type FilterType = 'all' | 'reading' | 'completed' | 'unread';
@@ -263,7 +263,7 @@ export function MyChaptersPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getReadChapterRoutePath(chapter.chapterId))}
+                          onPress={() => router.push(getBlueprintRoutePath(chapter.chapterId))}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readAction.label}

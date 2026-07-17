@@ -3,7 +3,7 @@
 import ImageComponent from '@/components/ui/ImageComponent';
 import NameInitials from '@/components/ui/NameInitials';
 import type { IMentor } from '@/types/user/singleChapter';
-import { Facebook, Globe, Mail, Phone, Twitter } from 'lucide-react';
+import { Facebook, Globe, Linkedin, Mail, Phone } from 'lucide-react';
 
 interface MentorDetailsProps {
     data: IMentor | null;
@@ -29,6 +29,7 @@ function SocialLink({ href, label, icon: Icon, }: {
 }
 
 export default function MentorDetails({ data }: MentorDetailsProps) {
+    console.log('data', data);
     // if (!data) {
     //     return (
     //         <div className="rounded-2xl border border-[#ECECEC] bg-[#FAFAFA] px-5 py-8 text-center">
@@ -38,7 +39,7 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
     // }
 
     const hasContact = Boolean(data?.email || data?.phone);
-    const hasSocial = Boolean(data?.social?.website || data?.social?.twitter || data?.social?.facebook);
+    const hasSocial = Boolean(data?.linkedin || data?.facebook);
 
     return (
         <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_32px_-24px_rgba(0,0,0,0.18)]">
@@ -113,9 +114,8 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
                             Connect
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            <SocialLink href={data?.social?.website ?? ''} label="Website" icon={Globe} />
-                            <SocialLink href={data?.social?.twitter ?? ''} label="Twitter" icon={Twitter} />
-                            <SocialLink href={data?.social?.facebook ?? ''} label="Facebook" icon={Facebook} />
+                            <SocialLink href={data?.linkedin ?? ''} label="LinkedIn" icon={Linkedin} />
+                            <SocialLink href={data?.facebook ?? ''} label="Facebook" icon={Facebook} />
                         </div>
                     </div>
                 )}

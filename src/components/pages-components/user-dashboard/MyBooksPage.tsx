@@ -7,7 +7,7 @@ import { useGetMyBooksQuery, useLazyGetTransactionInvoiceQuery } from '@/store/r
 import { cn } from '@/components/ui/utils';
 import type { IMyBookItem } from '@/types/user/myBooks';
 import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
-import { getHomeRoutePath, getReadBookRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
@@ -223,7 +223,7 @@ export function MyBooksPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getReadBookRoutePath(book?.id ?? ''))}
+                          onPress={() => router.push(getSeriesRoutePath(book?.id ?? ''))}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readAction.label}

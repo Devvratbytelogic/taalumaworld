@@ -10,7 +10,6 @@ import ResetPassword from '../auth/forgot/ResetPassword';
 import OtpVerification from '../auth/otp/OtpVerification';
 import LoginRequiredModal from '../auth/LoginRequiredModal';
 import FilterModal from './FilterModal';
-import { ChapterPurchaseModal } from '../pages-components/chapter/ChapterPurchaseModal';
 import ConfirmRemoveCartModal from './ConfirmRemoveCartModal';
 import { AddEditInstitutionModal } from '../admin/institutions/AddEditInstitutionModal';
 import { AddEditRoleModal } from '../admin/roles-and-permissions/AddEditRoleModal';
@@ -20,6 +19,7 @@ import DeleteConfirmation from '../admin/DeleteConfirmation';
 import RestoreConfirmation from '../admin/RestoreConfirmation';
 import { AddEditStaffModal } from '../admin/roles-and-permissions/AddEditStaffModal';
 import { UpdateStaffStatusModal } from '../admin/roles-and-permissions/UpdateStaffStatusModal';
+import ChapterPurchaseModal from '../pages-components/chapter/ChapterPurchaseModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();

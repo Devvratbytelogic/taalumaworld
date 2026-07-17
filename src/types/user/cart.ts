@@ -47,6 +47,7 @@ export interface CartItemEntity {
 }
 export interface Chapter {
   _id: string;
+  slug: string;
   book: Book;
   number: number;
   page: number;
@@ -66,6 +67,7 @@ export interface Chapter {
 export interface Book {
   _id: string;
   title: string;
+  slug: string;
   thoughtLeader: ThoughtLeader;
   category: string;
   subcategory?: null;
@@ -73,6 +75,7 @@ export interface Book {
 export interface CartBook {
   _id: string;
   title: string;
+  slug: string;
   coverImage: string;
   description: string;
   price: number;

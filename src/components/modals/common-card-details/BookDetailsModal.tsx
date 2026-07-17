@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Lock, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, Eye, Lock, ShoppingCart, User } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
@@ -10,7 +10,7 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useAuth } from '@/hooks/useAuth';
 import { VISIBLE } from '@/constants/contentMode';
-import { getCartRoutePath, getReadBookRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getCartRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { IHomeAllContentItem } from '@/types/user/HomeAllChapters';
@@ -45,9 +45,9 @@ export default function BookDetailsModal() {
         router.push(getCartRoutePath());
     };
 
-    const readBook = () => {
+    const viewFullDetails = () => {
         onClose();
-        router.push(getReadBookRoutePath(book?.id));
+        router.push(getSeriesRoutePath(book?.slug ?? book?.id));
     };
 
     return (
@@ -137,7 +137,7 @@ export default function BookDetailsModal() {
                                                     className="global_btn rounded_full bg_primary text-sm px-3 py-1 h-auto min-h-0"
                                                     onPress={() => {
                                                         dispatch(closeModal());
-                                                        router.push(getReadChapterRoutePath(item?.slug ?? item?.id));
+                                                        router.push(getBlueprintRoutePath(item?.slug ?? item?.id));
                                                     }}
                                                 >
                                                     Read
@@ -206,36 +206,44 @@ export default function BookDetailsModal() {
                 </ModalBody>
 
                 <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
-                    {isFullBook && hasPrice ? (
-                        book?.isPurchased ? (
-                            <Button className="global_btn rounded_full bg_primary w-full" onPress={readBook} startContent={<BookOpen className="h-4 w-4" />}>
-                                Read Series
-                            </Button>
-                        ) : !isAuthenticated ? (
+                    {isFullBook && hasPrice && !book?.isPurchased ? (
+                        <>
                             <Button
-                                className="global_btn rounded_full bg_primary w-full"
-                                onPress={() => openLogin('cart', 'book')}
-                                startContent={<ShoppingCart className="h-4 w-4" />}
+                                className="global_btn rounded_full outline_primary shrink-0"
+                                onPress={viewFullDetails}
+                                startContent={<Eye className="h-4 w-4" />}
                             >
-                                Buy Complete Series - KSH {book.price.toFixed(2)}
+                                View Details
                             </Button>
-                        ) : book?.isCart ? (
-                            <Button className="global_btn rounded_full bg_primary w-full" onPress={goToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-                                Go to Cart
-                            </Button>
-                        ) : (
-                            // complete series add to cart button
-                            <AddToCartButton
-                                bookId={book?.id}
-                                type="book"
-                                price={book?.price}
-                                className="global_btn rounded_full bg_primary w-full"
-                                label={`Buy Complete Series - KSH ${book?.price?.toFixed(2) ?? '0.00'}`}
-                                onSuccess={goToCart}
-                            />
-                        )
+
+                            <div className="flex-1">
+                                {!isAuthenticated ? (
+                                    <Button
+                                        className="global_btn rounded_full bg_primary w-full"
+                                        onPress={() => openLogin('cart', 'book')}
+                                        startContent={<ShoppingCart className="h-4 w-4" />}
+                                    >
+                                        Buy Complete Series - KSH {book.price.toFixed(2)}
+                                    </Button>
+                                ) : book?.isCart ? (
+                                    <Button className="global_btn rounded_full bg_primary w-full" onPress={goToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+                                        Go to Cart
+                                    </Button>
+                                ) : (
+                                    // complete series add to cart button
+                                    <AddToCartButton
+                                        bookId={book?.id}
+                                        type="book"
+                                        price={book?.price}
+                                        className="global_btn rounded_full bg_primary w-full"
+                                        label={`Buy Complete Series - KSH ${book?.price?.toFixed(2) ?? '0.00'}`}
+                                        onSuccess={goToCart}
+                                    />
+                                )}
+                            </div>
+                        </>
                     ) : (
-                        <Button className="global_btn rounded_full bg_primary w-full" onPress={readBook} startContent={<BookOpen className="h-4 w-4" />}>
+                        <Button className="global_btn rounded_full bg_primary w-full" onPress={viewFullDetails} startContent={<BookOpen className="h-4 w-4" />}>
                             Read Series
                         </Button>
                     )}

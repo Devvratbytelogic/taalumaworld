@@ -16,6 +16,7 @@ interface BlueprintPublicDetailsProps {
 }
 
 export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsProps) {
+  console.log('data', data);
   return (
     <>
       <section className="container">
@@ -24,7 +25,7 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
               Overview
             </p>
-            <MentorDetails data={data?.mentor ?? null} />
+            <MentorDetails data={data?.createdBy ?? null} />
           </aside>
 
           <div className="min-w-0">

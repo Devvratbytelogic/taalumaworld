@@ -18,6 +18,21 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['Cart'],
         }),
+        addToWishlist: builder.mutation({
+            query: (body) => ({
+                url: `/user/add-wishlist`,
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['Wishlist', 'AllChapters'],
+        }),
+        removeFromWishlist: builder.mutation({
+            query: (wishlistItemId) => ({
+                url: `/user/remove-wishlist/${wishlistItemId}`,
+                method: 'GET',
+            }),
+            invalidatesTags: ['Wishlist', 'AllChapters'],
+        }),
         directPurchaseChapter: builder.mutation({
             query: (body) => ({
                 url: `/user/direct-purchase`,
@@ -33,14 +48,6 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
             invalidatesTags: ['Cart', 'AllChapters', 'MyChapters'],
-        }),
-        updateReadingProgress: builder.mutation({
-            query: (body) => ({
-                url: `/user/content/reading-progress`,
-                method: 'PUT',
-                body,
-            }),
-            invalidatesTags: ['ReadingHistory', 'MyChapters'],
         }),
         postContactUs: builder.mutation({
             query: (body) => ({
@@ -76,9 +83,10 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
 export const {
     useAddChapterToCartMutation,
     useRemoveCartItemMutation,
+    useAddToWishlistMutation,
+    useRemoveFromWishlistMutation,
     useDirectPurchaseChapterMutation,
     useCheckOutCartMutation,
-    useUpdateReadingProgressMutation,
     usePostContactUsMutation,
     useSubscribeToNewsletterMutation,
     useMpesaPaymentMutation,

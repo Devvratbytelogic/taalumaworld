@@ -1,5 +1,4 @@
 import React from 'react'
-import { getReadChapterRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { Modal, ModalContent, ModalBody, } from '@heroui/react'
@@ -93,12 +92,7 @@ export default function LoginRequiredModal() {
             {/* Actions */}
             <div className="space-y-3">
               <Button
-                onPress={() => dispatch(openModal({
-                  componentName: 'SignIn',
-                  data: (action === 'read' && (data as { chapterId?: string })?.chapterId)
-                    ? { redirectTo: getReadChapterRoutePath((data as { chapterId: string }).chapterId) }
-                    : ''
-                }))}
+                onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                className='global_btn bg_primary w-full'
                startContent={<LogIn />}
               >
@@ -117,12 +111,7 @@ export default function LoginRequiredModal() {
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{' '}
                 <button
-                  onClick={() => dispatch(openModal({
-                  componentName: 'SignUp',
-                  data: (action === 'read' && (data as { chapterId?: string })?.chapterId)
-                    ? { redirectTo: getReadChapterRoutePath((data as { chapterId: string }).chapterId) }
-                    : ''
-                }))}
+                  onClick={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                   className="text-primary hover:text-primary/80 transition-colors font-semibold"
                 >
                   Sign Up

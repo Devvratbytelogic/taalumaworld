@@ -24,7 +24,7 @@ export interface ISingleChapterAPIResponseData {
   bookTitle: string;
   author: string;
   authorAvatar?: string | null;
-  mentor: IMentor | null;
+  createdBy: IMentor | null;
   category: Category;
   subcategory?: null;
   canRead: boolean;
@@ -46,9 +46,6 @@ export interface IMentor {
   email: string;
   phone: string;
   bio: string;
-  social: {
-    website: string;
-    twitter: string;
-    facebook: string;
-  }
+  linkedin: string;
+  facebook: string;
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { useFormik } from 'formik';
 import { CheckCircle, Lock, CreditCard, BookOpen, Loader2, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -155,7 +155,7 @@ export function CheckoutPage() {
                 onPress={() => {
                   const firstChapter = purchasedChapters[0];
                   if (firstChapter) {
-                    router.push(getReadChapterRoutePath(firstChapter.id));
+                    router.push(getBlueprintRoutePath(firstChapter.id));
                   }
                 }}
                 startContent={<BookOpen className="h-5 w-5" />}

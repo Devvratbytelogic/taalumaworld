@@ -272,21 +272,3 @@ export function getMyChaptersRoutePath(): string {
 export function getMyBooksRoutePath(): string {
   return '/my-books';
 }
-
-// export function getSearchRoutePath(query: string): string {
-//   return `/search?q=${encodeURIComponent(query)}`;
-// }
-
-// ─── Dynamic Routes ────────────────────────────────────────────────────────
-
-export function getReadChapterRoutePath(chapterId: string): string {
-  return `/read-chapter/${chapterId}`;
-}
-
-export function getReadBookRoutePath(bookId: string): string {
-  return `/read-book/${bookId}`;
-}
-
-export function getHomeWithSelectionRoutePath(selectedChapterId: string, selectedBookId: string): string {
-  return `/?selectedChapterId=${selectedChapterId}&selectedBookId=${selectedBookId}`;
-}

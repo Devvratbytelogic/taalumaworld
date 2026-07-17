@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { BookOpen, FileText, Lock, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, Eye, Lock, ShoppingCart, User } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
@@ -10,7 +10,7 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { useAuth } from '@/hooks/useAuth';
-import { getCartRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getCartRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 
@@ -44,13 +44,9 @@ export default function ChapterDetailsModal() {
     router.push(getCartRoutePath());
   };
 
-  const readChapter = () => {
-    if (!isAuthenticated) {
-      openLogin('read', 'chapter');
-      return;
-    }
+  const viewFullDetails = () => {
     dispatch(closeModal());
-    router.push(getReadChapterRoutePath(chapter.id));
+    router.push(getBlueprintRoutePath(chapter?.slug ?? chapter?.id));
   };
 
   return (
@@ -100,14 +96,7 @@ export default function ChapterDetailsModal() {
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-3 p-3 bg-accent/30 rounded-2xl">
-            <div className="flex items-start gap-2">
-              <FileText className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <div>
-                <div className="text-sm text-muted-foreground tracking-tight">Pages</div>
-                <div className="font-semibold text-sm tracking-tight">{chapter?.pageCount ?? 0}</div>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-3 p-3 bg-accent/30 rounded-2xl">
             <div className="flex items-start gap-2">
               <span className="text-xs font-bold text-primary mt-0.5 shrink-0">KSh</span>
               <div>
@@ -125,7 +114,7 @@ export default function ChapterDetailsModal() {
               <div className="flex items-start gap-2">
                 <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-sm text-muted-foreground tracking-tight">Part of</div>
+                  <div className="text-sm text-muted-foreground tracking-tight">Series Name</div>
                   <div className="font-semibold text-sm line-clamp-1 tracking-tight">{chapter?.bookTitle}</div>
                 </div>
               </div>
@@ -174,55 +163,69 @@ export default function ChapterDetailsModal() {
 
         <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
           {chapter?.isFree || chapter?.canRead ? (
-            <Button className="global_btn rounded_full bg_primary w-full" onPress={readChapter} startContent={<BookOpen className="h-4 w-4" />}>
+            <Button className="global_btn rounded_full bg_primary w-full" onPress={viewFullDetails} startContent={<BookOpen className="h-4 w-4" />}>
               {chapter?.isFree ? 'Read Free Blueprint' : 'Read Blueprint'}
             </Button>
-          ) : isBookPricing ? (
-            !isAuthenticated ? (
-              <Button
-                className="global_btn rounded_full bg_primary w-full"
-                onPress={() => openLogin('cart', 'chapter')}
-                startContent={<ShoppingCart className="h-4 w-4" />}
-              >
-                Buy Complete Series - KSH {bookPrice.toFixed(2)}
-              </Button>
-            ) : chapter.isCart ? (
-              <Button className="global_btn rounded_full bg_primary w-full" onPress={goToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-                Go to Cart
-              </Button>
-            ) : (
-              <AddToCartButton
-                chapterId={bookDbId}
-                bookId={bookDbId}
-                type="book"
-                price={bookPrice}
-                className="global_btn rounded_full bg_primary w-full"
-                label={`Buy Complete Series - KSH ${bookPrice.toFixed(2)}`}
-                onSuccess={goToCart}
-              />
-            )
-          ) : !isAuthenticated ? (
-            <Button
-              className="global_btn rounded_full bg_primary w-full"
-              onPress={() => openLogin('cart', 'chapter')}
-              startContent={<ShoppingCart className="h-4 w-4" />}
-            >
-              Add to Cart - KSH {chapter?.price?.toFixed(2) ?? '0.00'}
-            </Button>
-          ) : chapter?.isCart ? (
-            <Button className="global_btn rounded_full bg_primary w-full" onPress={goToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
-              Go to Cart
-            </Button>
           ) : (
-            <AddToCartButton
-              chapterId={chapter?.id}
-              bookId={bookDbId}
-              type={chapter?.type}
-              price={chapter?.price}
-              className="global_btn rounded_full bg_primary w-full"
-              label={`Add to Cart - KSH ${chapter?.price?.toFixed(2) ?? '0.00'}`}
-              onSuccess={goToCart}
-            />
+            <>
+              <Button
+                className="global_btn rounded_full outline_primary shrink-0"
+                onPress={viewFullDetails}
+                startContent={<Eye className="h-4 w-4" />}
+              >
+                View Details
+              </Button>
+
+              <div className="flex-1">
+                {isBookPricing ? (
+                  !isAuthenticated ? (
+                    <Button
+                      className="global_btn rounded_full bg_primary w-full"
+                      onPress={() => openLogin('cart', 'chapter')}
+                      startContent={<ShoppingCart className="h-4 w-4" />}
+                    >
+                      Buy Complete Series - KSH {bookPrice.toFixed(2)}
+                    </Button>
+                  ) : chapter.isCart ? (
+                    <Button className="global_btn rounded_full bg_primary w-full" onPress={goToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+                      Go to Cart
+                    </Button>
+                  ) : (
+                    <AddToCartButton
+                      chapterId={bookDbId}
+                      bookId={bookDbId}
+                      type="book"
+                      price={bookPrice}
+                      className="global_btn rounded_full bg_primary w-full"
+                      label={`Buy Complete Series - KSH ${bookPrice.toFixed(2)}`}
+                      onSuccess={goToCart}
+                    />
+                  )
+                ) : !isAuthenticated ? (
+                  <Button
+                    className="global_btn rounded_full bg_primary w-full"
+                    onPress={() => openLogin('cart', 'chapter')}
+                    startContent={<ShoppingCart className="h-4 w-4" />}
+                  >
+                    Add to Cart - KSH {chapter?.price?.toFixed(2) ?? '0.00'}
+                  </Button>
+                ) : chapter?.isCart ? (
+                  <Button className="global_btn rounded_full bg_primary w-full" onPress={goToCart} startContent={<ShoppingCart className="h-4 w-4" />}>
+                    Go to Cart
+                  </Button>
+                ) : (
+                  <AddToCartButton
+                    chapterId={chapter?.id}
+                    bookId={bookDbId}
+                    type={chapter?.type}
+                    price={chapter?.price}
+                    className="global_btn rounded_full bg_primary w-full"
+                    label={`Add to Cart - KSH ${chapter?.price?.toFixed(2) ?? '0.00'}`}
+                    onSuccess={goToCart}
+                  />
+                )}
+              </div>
+            </>
           )}
         </ModalFooter>
       </ModalContent>

@@ -26,7 +26,7 @@ export default function MentorCardReveal({ name, avatar, bio, social }: MentorCa
             onClick={(e) => e.stopPropagation()}
         >
             {avatar ? (
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 shrink-0">
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-white/50 shrink-0">
                     <ImageComponent src={avatar ?? ''} alt={name ?? ''} object_cover={true} />
                 </div>
             ) : (

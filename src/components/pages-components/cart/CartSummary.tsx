@@ -43,7 +43,7 @@ export default function CartSummary({
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 lg:sticky lg:top-24">
+    <div className="rounded-md border border-border bg-white p-4 sm:p-6 lg:sticky lg:top-24">
       <h2 className="mb-4 text-lg font-bold sm:mb-6 sm:text-xl">Order Summary</h2>
 
       <div className="space-y-3 mb-6 pb-6 border-b">

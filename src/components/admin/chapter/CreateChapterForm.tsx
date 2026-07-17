@@ -21,7 +21,7 @@ import {
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
-import { getAdminSectionRoutePath, getPolicyBySlugRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getAdminSectionRoutePath, getBlueprintRoutePath, getPolicyBySlugRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
@@ -119,7 +119,7 @@ export function CreateChapterForm() {
       vals.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
       formData.append('slug', vals.slug);
       const baseUrl = APP_SITE_URL.replace(/\/$/, '');
-      formData.append('shareable_link', `${baseUrl}${getReadChapterRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
+      formData.append('shareable_link', `${baseUrl}${getBlueprintRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
       await appendUserIpToFormData(formData);
       try {
         const res = await addChapter(formData).unwrap();

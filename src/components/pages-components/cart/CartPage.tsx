@@ -16,7 +16,7 @@ import CartSummary from './CartSummary';
 import PaymentConfirmed from './PaymentConfirmed';
 import { VISIBLE } from '@/constants/contentMode';
 import Link from 'next/link';
-import { getReadBookRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
 import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
 import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
@@ -57,6 +57,7 @@ export default function CartDetailsComponent() {
     getAmount,
     cartID,
     onSuccess: onMpesaSuccess,
+    type: 'cart',
   });
 
   const onRemoveFromCart = (itemId: string, chapterTitle: string) => {
@@ -102,7 +103,7 @@ export default function CartDetailsComponent() {
                 return (
                   <div
                     key={item._id}
-                    className="bg-white rounded-2xl border border-border p-4 shadow-sm sm:rounded-3xl sm:p-6"
+                    className="bg-white rounded-md border border-border p-4 sm:p-6"
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                       {/* Cover Image */}
@@ -110,8 +111,8 @@ export default function CartDetailsComponent() {
                         <Link
                           href={
                             isBookItem
-                              ? getReadBookRoutePath(item.book?._id ?? '')
-                              : getReadChapterRoutePath(item.chapter?._id ?? '')
+                              ? getSeriesRoutePath(item.book?.slug ?? '')
+                              : getBlueprintRoutePath(item.chapter?.slug ?? '')
                           }
                           className="block w-full overflow-hidden rounded-sm sm:h-32 sm:w-24 sm:rounded-2xl"
                         >

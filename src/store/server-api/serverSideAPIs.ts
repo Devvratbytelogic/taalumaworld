@@ -51,9 +51,9 @@ export async function getGlobalSettingsServerAPI() {
   return serverFetch<IGlobalSettingsAPIResponse>(`/user/get-global`);
 }
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
-  return serverFetch<ISingleChapterAPIResponse>(`/user/content/chapter/${encodeURIComponent(slug)}`);
+  return serverFetch<ISingleChapterAPIResponse>(`/user/content/blueprint/${encodeURIComponent(slug)}`);
 }
 
 export async function getSingleSeriesServerAPI({ slug }: { slug: string }) {
-  return serverFetch<ISingleBookAPIResponse>(`/user/content/book/${encodeURIComponent(slug)}`);
+  return serverFetch<ISingleBookAPIResponse>(`/user/content/series/${encodeURIComponent(slug)}`);
 }

@@ -64,19 +64,3 @@ export interface IHomeAllChaptersMentor {
 
 /** @deprecated use IHomeAllChaptersItemsEntity */
 export type IHomeAllContentItem = IHomeAllChaptersItemsEntity;
-
-/** Minimal chapter shape used by the read-chapter purchase flow */
-export interface IChapterItem {
-  _id?: string;
-  id: string;
-  number?: number;
-  chapterNumber?: number;
-  title: string;
-  description?: string;
-  content?: string;
-  isFree?: boolean;
-  price: number;
-  coverImage?: string;
-  type: string;
-  status?: string;
-}

@@ -171,6 +171,7 @@ export const rtkQuerieSetup = createApi({
         'SingleChapter',
         'AllChapters',
         'Cart',
+        'Wishlist',
         'UserProfile',
         'AdminProfile',
         'MyChapters',

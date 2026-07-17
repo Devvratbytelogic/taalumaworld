@@ -8,7 +8,7 @@ import { useGetReadingHistoryQuery } from '@/store/rtkQueries/userGetAPI';
 import type { IMyReadingHistoryAPIResponseItemsEntity } from '@/types/user/readingHistory';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { cn } from '@/components/ui/utils';
-import { getHomeRoutePath, getReadChapterRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 export function ReadingHistory() {
@@ -225,7 +225,7 @@ export function ReadingHistory() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getReadChapterRoutePath(item.chapterId))}
+                          onPress={() => router.push(getBlueprintRoutePath(item.chapterId))}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readAction.label}

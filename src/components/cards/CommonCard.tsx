@@ -7,6 +7,7 @@ import { BookOpen } from 'lucide-react'
 import { openModal } from '@/store/slices/allModalSlice'
 import { VISIBLE } from '@/constants/contentMode'
 import MentorCardReveal from './MentorCardReveal'
+import WishlistButton from '@/components/ui/WishlistButton'
 import { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters'
 
 interface CommonCardProps {
@@ -23,7 +24,7 @@ export default function CommonCard({ data }: CommonCardProps) {
 
     return (
         <Card
-            className="group/card overflow-hidden cursor-pointer hover-lift transition-all hover:border-primary/50 rounded-3xl flex flex-col h-full"
+            className="group/card overflow-hidden cursor-pointer hover-lift transition-all hover:border-primary/50 rounded-md flex flex-col h-full"
             onClick={() =>
                 dispatch(
                     openModal({
@@ -47,6 +48,14 @@ export default function CommonCard({ data }: CommonCardProps) {
                         social={{ linkedin: data?.mentor?.linkedin ?? '', facebook: data?.mentor?.facebook ?? '' }}
                     />
                 )}
+
+                {/* Wishlist */}
+                <WishlistButton
+                    chapterId={!isBook ? data?.id : undefined}
+                    bookId={isBook ? data?.id : data?.bookId}
+                    type={data?.legacyType}
+                    isWishlisted={data?.isWishlisted}
+                />
 
                 {/* Top-right badge */}
                 <div className="absolute top-3.5 right-3.5 z-2">

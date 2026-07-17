@@ -32,6 +32,7 @@ export interface IHomeAllChaptersItemsEntity {
   mentor: IHomeAllChaptersMentor;
   /** Original 'book' | 'chapter' value (see VISIBLE) — kept for backward compatibility since `type` can now also be 'series' */
   legacyType: string;
+  series: IHomeAllChaptersSeries;
 
   /** Present when the item is a standalone blueprint (viewMode: "chapter") */
   chapterNumber?: number;
@@ -64,3 +65,9 @@ export interface IHomeAllChaptersMentor {
 
 /** @deprecated use IHomeAllChaptersItemsEntity */
 export type IHomeAllContentItem = IHomeAllChaptersItemsEntity;
+export interface IHomeAllChaptersSeries {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string;
+}

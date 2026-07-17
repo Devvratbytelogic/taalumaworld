@@ -17,7 +17,6 @@ interface CommonCardProps {
 export default function CommonCard({ data }: CommonCardProps) {
     const dispatch = useDispatch()
     const isBook = data?.type === 'series'
-    console.log('isBook', isBook);
 
     const isChapterPriced = isBook && (data?.pricingModel === VISIBLE.CHAPTER)
     const displayPrice = data?.effectivePrice
@@ -69,6 +68,13 @@ export default function CommonCard({ data }: CommonCardProps) {
                             Free
                         </Badge>
                     ) : null}
+
+                    {!isBook && data?.seriesTitle && (
+                        <Badge variant="outline" className="backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs max-w-40">
+                            <BookOpen className="h-3 w-3 mr-1 shrink-0" />
+                            <span className="truncate">{data?.seriesTitle}</span>
+                        </Badge>
+                    )}
                 </div>
 
                 {/* Title */}

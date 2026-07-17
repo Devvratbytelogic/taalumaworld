@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getBlueprintRoutePath, getCartRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
+import { VISIBLE } from '@/constants/contentMode';
 
 const modalClassNames = {
   base: 'max-w-xl rounded-3xl overflow-hidden',
@@ -31,9 +32,10 @@ export default function ChapterDetailsModal() {
 
   const onClose = () => dispatch(closeModal());
   const bookData = chapter?.bookId;
-  const isBookPricing = bookData?.pricingModel === 'book';
-  const bookPrice = bookData?.price ?? 0;
-  const bookDbId = bookData?._id ?? '';
+  const isBook = data?.type === 'series'
+
+  const isChapterPriced = isBook && (data?.pricingModel === VISIBLE.CHAPTER)
+  const displayPrice = data?.effectivePrice
 
   const openLogin = (action: string, itemType: string) => {
     dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType } }));

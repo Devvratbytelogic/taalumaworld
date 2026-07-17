@@ -16,10 +16,15 @@ interface CommonCardProps {
 
 export default function CommonCard({ data }: CommonCardProps) {
     const dispatch = useDispatch()
-    const isBook = data?.type === 'series'
 
-    const isChapterPriced = isBook && (data?.pricingModel === VISIBLE.CHAPTER)
-    const displayPrice = data?.effectivePrice
+    const isBook = data?.type === 'series'
+    const isPricingModelChapter = isBook
+        ? (data?.pricingModel === VISIBLE.CHAPTER)
+        : (data?.series?.pricingModel === VISIBLE.CHAPTER)
+        
+    const displayPrice = isBook
+        ? (data?.effectivePrice)
+        : (isPricingModelChapter ? data?.effectivePrice : data?.series?.effectivePrice)
 
     return (
         <Card
@@ -59,11 +64,11 @@ export default function CommonCard({ data }: CommonCardProps) {
 
             <CardContent className="last:pb-4 px-4 space-y-1.5 flex flex-col flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                    {isBook ? (
-                        <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs text-primary border-primary/20`}>
-                            {!isChapterPriced ? 'Full Series' : 'By Blueprint'}
-                        </Badge>
-                    ) : data?.isFree ? (
+
+                    <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs text-primary border-primary/20`}>
+                        {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                    </Badge>
+                    {data?.isFree ? (
                         <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs">
                             Free
                         </Badge>

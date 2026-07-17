@@ -7,20 +7,17 @@ import { useAddChapterToCartMutation } from '@/store/rtkQueries/userPostAPI';
 import { VISIBLE } from '@/constants/contentMode';
 
 interface AddToCartButtonProps {
-    chapterId?: string;
+    id?: string;
     bookId?: string;
     type?: string;
-    price?: number;
     className?: string;
     label?: string;
     onSuccess?: () => void;
 }
 
 export default function AddToCartButton({
-    chapterId,
-    bookId,
-    type = 'book',
-    price,
+    id,
+    type,
     className = 'global_btn rounded_full outline_primary w-full',
     label = 'Add to Cart',
     onSuccess,
@@ -30,20 +27,16 @@ export default function AddToCartButton({
     const handleAddToCart = async () => {
         try {
             const res = await addChapterToCart({
-                ...(type !== VISIBLE.BOOK && chapterId && { chapter_id: chapterId }),
-                ...(bookId && { book_id: bookId }),
+                ...(id && type === VISIBLE.CHAPTER ? { chapter_id: id } : { book_id: id }),
                 type,
-                ...(price !== undefined && { price: String(price) }),
             }).unwrap();
 
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 toast.success(res.message ?? 'Added to cart!');
                 onSuccess?.();
             }
-        } catch {
-            // toast.error('Failed to add to cart', {
-            //     description: 'Please try again or contact support.',
-            // });
+        } catch (error) {
+           console.log('error adding to cart', error);
         }
     };
 

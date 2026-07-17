@@ -70,4 +70,6 @@ export interface IHomeAllChaptersSeries {
   title: string;
   description: string;
   coverImage: string;
+  effectivePrice: number;
+  pricingModel: string;
 }

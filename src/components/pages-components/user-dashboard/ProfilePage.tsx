@@ -108,8 +108,8 @@ export function ProfilePage() {
             setIsEditing(false);
             toast.success(res.message ?? 'Profile updated successfully!');
           }
-        } catch {
-          toast.error('Failed to update profile. Please try again.');
+        } catch(error) {
+          console.error('Failed to update profile. Please try again.', error);
         }
       },
     });

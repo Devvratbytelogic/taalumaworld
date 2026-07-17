@@ -1,5 +1,9 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
+export interface IUpdateReadingProgressPayload {
+    chapter_id: string;
+    percentage: number;
+}
 
 export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -85,6 +89,15 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
         }),
+        /** update reading progress for a chapter (PDF page / content scroll position) */
+        updateReadingProgress: builder.mutation<void, IUpdateReadingProgressPayload>({
+            query: (body) => ({
+                url: `/user/content/reading-progress`,
+                method: 'PUT',
+                body,
+            }),
+            invalidatesTags: ['MyChapters', 'ReadingHistory'],
+        }),
         // mpesaPaymentCallback: builder.mutation({
         //     query: (body) => ({
         //         url: `/user/mpaisa/callback`,
@@ -108,4 +121,5 @@ export const {
     useSubscribeToNewsletterMutation,
     useMpesaPaymentMutation,
     // useMpesaPaymentCallbackMutation,
+    useUpdateReadingProgressMutation,
 } = clientSidePostApis;

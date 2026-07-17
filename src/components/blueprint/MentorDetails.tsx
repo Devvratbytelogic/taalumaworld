@@ -29,7 +29,6 @@ function SocialLink({ href, label, icon: Icon, }: {
 }
 
 export default function MentorDetails({ data }: MentorDetailsProps) {
-    console.log('data', data);
     // if (!data) {
     //     return (
     //         <div className="rounded-2xl border border-[#ECECEC] bg-[#FAFAFA] px-5 py-8 text-center">

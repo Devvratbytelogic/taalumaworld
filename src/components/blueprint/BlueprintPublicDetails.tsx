@@ -43,22 +43,6 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
                   </p>
                 </div>
 
-                {data?.pdf && (
-                  <div>
-                    <PdfReader url={data.pdf} title={data?.title ?? ''} />
-                  </div>
-                )}
-
-                {data?.pdf && data?.content && (
-                  <div className="flex items-center gap-4 px-6 py-4 sm:px-8">
-                    <div className="h-px flex-1 bg-[#ECECEC]" />
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
-                      Additional Notes
-                    </p>
-                    <div className="h-px flex-1 bg-[#ECECEC]" />
-                  </div>
-                )}
-
                 {data?.content && (
                   <div className="p-6">
                     <MarkdownContent
@@ -68,6 +52,21 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
                     />
                   </div>
                 )}
+                {data?.pdf && (
+                  <div className="flex items-center gap-4 px-6 py-4 sm:px-8">
+                    <div className="h-px flex-1 bg-[#ECECEC]" />
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
+                      Additional Document
+                    </p>
+                    <div className="h-px flex-1 bg-[#ECECEC]" />
+                  </div>
+                )}
+                {data?.pdf && (
+                  <div>
+                    <PdfReader url={data.pdf} title={data?.title ?? ''} />
+                  </div>
+                )}
+
               </div>
             </div>
           </div>

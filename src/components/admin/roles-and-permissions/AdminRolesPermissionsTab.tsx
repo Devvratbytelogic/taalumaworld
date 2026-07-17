@@ -2,15 +2,12 @@
 
 import { useState } from 'react';
 import { Shield, Grid3X3, UserCog, Users } from 'lucide-react';
-import { useGetAllRolesQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { RolesRegistryTab } from './RolesRegistryTab';
 import { PermissionsMatrixTab } from './PermissionsMatrixTab';
 import { StaffAssignmentsTab } from './StaffAssignmentsTab';
-import { UserSegmentsTab } from './UserSegmentsTab';
 import { AdminPage, AdminPageHeader, adminPanelClass } from '@/components/admin/layout/AdminContent';
-import { useDebounce } from '@/hooks/useDebounce';
 
-type Tab = 'roles' | 'permissions' | 'staff' | 'segments';
+type Tab = 'roles' | 'permissions' | 'staff';
 
 const TABS: { id: Tab; label: string; icon: React.ElementType; description: string }[] = [
   {
@@ -30,12 +27,6 @@ const TABS: { id: Tab; label: string; icon: React.ElementType; description: stri
     label: 'Staff Assignments',
     icon: UserCog,
     description: 'Assign roles to administrators and mentors',
-  },
-  {
-    id: 'segments',
-    label: 'User Segments',
-    icon: Users,
-    description: 'Career Architects, Mentors, and Administrators',
   },
 ];
 
@@ -84,7 +75,7 @@ export function AdminRolesPermissionsTab() {
       {activeTab === 'roles' && <RolesRegistryTab />}
       {activeTab === 'permissions' && <PermissionsMatrixTab />}
       {activeTab === 'staff' && <StaffAssignmentsTab />}
-      {activeTab === 'segments' && <UserSegmentsTab />}
+      {/* {activeTab === 'segments' && <UserSegmentsTab />} */}
     </AdminPage>
   );
 }

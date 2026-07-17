@@ -2,303 +2,319 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@heroui/react';
-import { RotateCcw, Save, Search, Shield, Lock } from 'lucide-react';
-import { useGetPermissionsMatrixQuery } from '@/store/rtkQueries/rolesPermissionsApi';
-import type { IPermission } from '@/types/rolesPermissions';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { adminPanelClass } from '@/components/admin/layout/AdminContent';
+import { Save, RotateCcw, ShieldCheck, Grid3X3, Loader2 } from 'lucide-react';
+import {
+    useGetAllRolesQuery,
+    useGetAllModelsQuery,
+    useGetAllPermissionsQuery,
+    useGetRolePermissionsQuery,
+    useAddUpdateRolePermissionsMutation,
+} from '@/store/rtkQueries/rolesPermissionsApi';
+import type { IAllRolesEntity } from '@/types/rolesPermissions';
+import { AdminSearchInput, adminPanelClass } from '@/components/admin/layout/AdminContent';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
+import { useDebounce } from '@/hooks/useDebounce';
+
+type PermissionMatrix = Record<string, string[]>;
+
+function formatLabel(value: string): string {
+    return value
+        .replace(/[_-]+/g, ' ')
+        .trim()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function matrixKey(matrix: PermissionMatrix): string {
+    return JSON.stringify(
+        Object.keys(matrix)
+            .sort()
+            .map((model) => [model, [...matrix[model]].sort()]),
+    );
+}
 
 export function PermissionsMatrixTab() {
-    const { data, isLoading, isFetching } = useGetPermissionsMatrixQuery();
-
-    const matrixData = data?.data;
-    const roles = matrixData?.roles ?? [];
-    const permissions = matrixData?.permissions ?? [];
-
-    const [localMatrix, setLocalMatrix] = useState<Record<string, string[]>>({});
-    const [dirty, setDirty] = useState(false);
-    const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+    const [selectedRoleId, setSelectedRoleId] = useState('');
     const [roleSearch, setRoleSearch] = useState('');
-    const [permSearch, setPermSearch] = useState('');
+    const [modelSearch, setModelSearch] = useState('');
+    const [matrix, setMatrix] = useState<PermissionMatrix>({});
+    const [originalMatrix, setOriginalMatrix] = useState<PermissionMatrix>({});
+    const debouncedRoleSearch = useDebounce(roleSearch, 500);
+
+    const { data: rolesRes, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useGetAllRolesQuery({
+        limit: 100,
+        search: debouncedRoleSearch,
+    });
+    const { data: modelsRes, isLoading: isLoadingModels } = useGetAllModelsQuery();
+    const { data: permissionsRes, isLoading: isLoadingPermissions } = useGetAllPermissionsQuery();
+    const { data: rolePermissionsRes, isFetching: isFetchingRolePermissions } = useGetRolePermissionsQuery(
+        selectedRoleId,
+        { skip: !selectedRoleId },
+    );
+    const [saveRolePermissions, { isLoading: isSaving }] = useAddUpdateRolePermissionsMutation();
+
+    const roles: IAllRolesEntity[] = rolesRes?.data?.data ?? [];
+    const models = modelsRes?.data ?? [];
+    const permissions = permissionsRes?.data ?? [];
+
+    const filteredModels = useMemo(() => {
+        const q = modelSearch.trim().toLowerCase();
+        if (!q) return models;
+        return models.filter((model) => model.toLowerCase().includes(q));
+    }, [models, modelSearch]);
+
+    const viewPermission = useMemo(
+        () => permissions.find((p) => p.toLowerCase() === 'view'),
+        [permissions],
+    );
+
+    // Any permission beyond "view" implies the ability to view, so keep it in sync.
+    const withViewDependency = (list: string[]): string[] => {
+        if (!viewPermission || list.includes(viewPermission)) return list;
+        const hasOtherPermission = list.some((p) => p !== viewPermission);
+        return hasOtherPermission ? [...list, viewPermission] : list;
+    };
+
+    const selectedRole: IAllRolesEntity | null = roles.find((role) => role._id === selectedRoleId) ?? null;
 
     useEffect(() => {
-        if (matrixData?.matrix) {
-            setLocalMatrix(matrixData.matrix);
-            setDirty(false);
-        }
-    }, [matrixData]);
+        if (!roles.length || selectedRoleId) return;
+        setSelectedRoleId(roles[0]._id);
+    }, [roles]);
 
     useEffect(() => {
-        if (roles.length && !selectedRoleId) {
-            setSelectedRoleId(roles[0].id);
-        }
-    }, [roles, selectedRoleId]);
+        if (!selectedRoleId || isFetchingRolePermissions) return;
+        const built: PermissionMatrix = {};
+        (rolePermissionsRes?.data ?? []).forEach((entry) => {
+            built[entry.model] = entry.permission ?? [];
+        });
+        setMatrix(built);
+        setOriginalMatrix(built);
+    }, [selectedRoleId, rolePermissionsRes, isFetchingRolePermissions]);
 
-    const permissionsByCategory = useMemo(() => {
-        const grouped: Record<string, IPermission[]> = {};
-        for (const p of permissions) {
-            if (!grouped[p.category]) grouped[p.category] = [];
-            grouped[p.category].push(p);
-        }
-        return grouped;
-    }, [permissions]);
+    const isDirty = matrixKey(matrix) !== matrixKey(originalMatrix);
 
-    const filteredRoles = useMemo(() => {
-        const q = roleSearch.trim().toLowerCase();
-        if (!q) return roles;
-        return roles.filter((r) => r.name.toLowerCase().includes(q));
-    }, [roles, roleSearch]);
-
-    const selectedRole = roles.find((r) => r.id === selectedRoleId);
-    const rolePermissions = localMatrix[selectedRoleId] ?? [];
-
-    const filteredPermissionsByCategory = useMemo(() => {
-        const q = permSearch.trim().toLowerCase();
-        if (!q) return permissionsByCategory;
-
-        const filtered: Record<string, IPermission[]> = {};
-        for (const [category, perms] of Object.entries(permissionsByCategory)) {
-            const matches = perms.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(q) ||
-                    p.description.toLowerCase().includes(q) ||
-                    category.toLowerCase().includes(q)
-            );
-            if (matches.length) filtered[category] = matches;
-        }
-        return filtered;
-    }, [permissionsByCategory, permSearch]);
-
-    const toggle = (permissionId: string) => {
-        if (!selectedRoleId) return;
-        setDirty(true);
-        setLocalMatrix((prev) => {
-            const current = prev[selectedRoleId] ?? [];
-            const next = current.includes(permissionId)
-                ? current.filter((id) => id !== permissionId)
-                : [...current, permissionId];
-            return { ...prev, [selectedRoleId]: next };
+    const toggleCell = (model: string, permission: string) => {
+        setMatrix((prev) => {
+            const current = prev[model] ?? [];
+            const next = current.includes(permission)
+                ? current.filter((p) => p !== permission)
+                : withViewDependency([...current, permission]);
+            return { ...prev, [model]: next };
         });
     };
 
-    const toggleCategory = (categoryPerms: IPermission[], enable: boolean) => {
-        if (!selectedRoleId) return;
-        setDirty(true);
-        const ids = categoryPerms.map((p) => p.id);
-        setLocalMatrix((prev) => {
-            const current = prev[selectedRoleId] ?? [];
-            const next = enable
-                ? [...new Set([...current, ...ids])]
-                : current.filter((id) => !ids.includes(id));
-            return { ...prev, [selectedRoleId]: next };
+    const toggleRow = (model: string) => {
+        setMatrix((prev) => {
+            const current = prev[model] ?? [];
+            const allGranted = permissions.every((p) => current.includes(p));
+            return { ...prev, [model]: allGranted ? [] : [...permissions] };
         });
     };
 
-    const handleSave = () => {
-        toast.success('Permissions updated (preview only — API not connected)');
-        setDirty(false);
+    const toggleColumn = (permission: string) => {
+        setMatrix((prev) => {
+            const allGranted = models.every((model) => (prev[model] ?? []).includes(permission));
+            const next: PermissionMatrix = { ...prev };
+            models.forEach((model) => {
+                const current = next[model] ?? [];
+                if (allGranted) {
+                    next[model] = current.filter((p) => p !== permission);
+                } else if (!current.includes(permission)) {
+                    next[model] = withViewDependency([...current, permission]);
+                }
+            });
+            return next;
+        });
     };
 
-    const handleReset = () => {
-        if (matrixData?.matrix) {
-            setLocalMatrix(matrixData.matrix);
-            setDirty(false);
+    const handleSelectRole = (roleId: string) => {
+        if (roleId === selectedRoleId) return;
+        setSelectedRoleId(roleId);
+        setModelSearch('');
+    };
+
+    const handleDiscard = () => setMatrix(originalMatrix);
+
+    const handleSave = async () => {
+        if (!selectedRoleId || !isDirty) return;
+        try {
+            const data = models.map((model) => ({ model, permissions: matrix[model] ?? [] }));
+            const res = await saveRolePermissions({ roleId: selectedRoleId, data }).unwrap();
+            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                toast.success(res?.message ?? 'Permissions updated successfully');
+                setOriginalMatrix(matrix);
+            }
+        } catch (error) {
+            console.error('Error saving role permissions', error);
         }
     };
 
-    const loading = isLoading || isFetching;
+    const isInitialLoading = isLoadingRoles || isLoadingModels || isLoadingPermissions;
 
-    if (loading) {
+    if (isInitialLoading) {
         return (
-            <div className="admin-surface p-8 space-y-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />
-                ))}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="space-y-2 lg:col-span-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+                <div className="lg:col-span-3 h-96 bg-gray-100 rounded-xl animate-pulse" />
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Select a role, then toggle permissions. Works cleanly with any number of roles.
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        {roles.length} roles · {permissions.length} permissions
-                    </p>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                    <Button
-                        variant="bordered"
-                        className="rounded-xl"
-                        startContent={<RotateCcw className="h-4 w-4" />}
-                        onPress={handleReset}
-                        isDisabled={!dirty}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        color="primary"
-                        className="rounded-xl"
-                        startContent={<Save className="h-4 w-4" />}
-                        onPress={handleSave}
-                        isDisabled={!dirty}
-                    >
-                        Save Changes
-                    </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className={cn(adminPanelClass, 'lg:col-span-1 p-4 space-y-3 h-fit')}>
+                <p className="text-sm font-semibold text-slate-700">Select Role</p>
+                <AdminSearchInput value={roleSearch} onChange={setRoleSearch} placeholder="Search roles..." />
+                <div className="space-y-1.5 max-h-[520px] overflow-y-auto pr-1">
+                    {isFetchingRoles ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="h-14 bg-gray-100 rounded-lg animate-pulse" />
+                        ))
+                    ) : roles.length === 0 ? (
+                        <p className="text-sm text-muted-foreground py-4 text-center">No roles found.</p>
+                    ) : (
+                        roles.map((role) => (
+                            <button
+                                key={role._id}
+                                type="button"
+                                onClick={() => handleSelectRole(role._id)}
+                                className={cn(
+                                    'w-full text-left px-3.5 py-2.5 rounded-lg border transition-all',
+                                    selectedRoleId === role._id
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-transparent hover:border-slate-200 hover:bg-slate-50',
+                                )}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
+                                    <span className="text-sm font-medium truncate">{role.name}</span>
+                                </div>
+                                {role.description ? (
+                                    <p className="text-xs text-muted-foreground truncate mt-0.5 ml-6">{role.description}</p>
+                                ) : null}
+                            </button>
+                        ))
+                    )}
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-4 min-h-[520px]">
-                {/* Role list */}
-                <div className={cn(adminPanelClass, 'lg:w-72 shrink-0 flex flex-col overflow-hidden')}>
-                    <div className="border-b border-slate-200 p-4 space-y-3">
-                        <p className="text-sm font-semibold text-slate-900">Roles</p>
-                        <div className="admin-search-input relative">
-                            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                            <Input
-                                placeholder="Search roles..."
-                                value={roleSearch}
-                                onChange={(e) => setRoleSearch(e.target.value)}
-                            />
-                        </div>
+            <div className={cn(adminPanelClass, 'lg:col-span-3 p-4 space-y-4')}>
+                {!selectedRole ? (
+                    <div className="flex flex-col items-center justify-center h-64 text-center gap-3">
+                        <Grid3X3 className="h-12 w-12 text-gray-300" />
+                        <p className="text-muted-foreground text-sm">Select a role to configure its permissions</p>
                     </div>
-                    <div className="flex-1 overflow-y-auto max-h-[420px] lg:max-h-none p-2 space-y-1">
-                        {filteredRoles.length === 0 ? (
-                            <p className="text-sm text-muted-foreground text-center py-8">No roles found</p>
-                        ) : (
-                            filteredRoles.map((role) => {
-                                const count = (localMatrix[role.id] ?? []).length;
-                                const isSelected = role.id === selectedRoleId;
-                                return (
-                                    <button
-                                        key={role.id}
-                                        type="button"
-                                        onClick={() => setSelectedRoleId(role.id)}
-                                        className={`w-full text-left rounded-xl px-3 py-2.5 transition-colors ${
-                                            isSelected
-                                                ? 'bg-primary/10 border border-primary/20'
-                                                : 'hover:bg-gray-50 border border-transparent'
-                                        }`}
+                ) : (
+                    <>
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p className="font-semibold text-slate-900">{selectedRole.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {models.length} models &middot; {permissions.length} permission types
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {isDirty ? (
+                                    <Button
+                                        variant="light"
+                                        size="sm"
+                                        onPress={handleDiscard}
+                                        isDisabled={isSaving}
+                                        startContent={<RotateCcw className="h-3.5 w-3.5" />}
                                     >
-                                        <div className="flex items-start gap-2">
-                                            {role.is_system ? (
-                                                <Lock className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                                            ) : (
-                                                <Shield className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                                            )}
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-medium text-gray-900 leading-snug truncate">
-                                                    {role.name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground mt-0.5">
-                                                    {count} of {permissions.length} enabled
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </button>
-                                );
-                            })
-                        )}
-                    </div>
-                </div>
-
-                {/* Permission editor */}
-                <div className={cn(adminPanelClass, 'flex-1 min-w-0 flex flex-col overflow-hidden')}>
-                    {!selectedRole ? (
-                        <div className="flex flex-1 items-center justify-center p-8 text-sm text-slate-500">
-                            Select a role to manage its permissions
+                                        Discard
+                                    </Button>
+                                ) : null}
+                                <Button
+                                    color="primary"
+                                    size="sm"
+                                    onPress={handleSave}
+                                    isDisabled={!isDirty || isSaving}
+                                    isLoading={isSaving}
+                                    startContent={<Save className="h-3.5 w-3.5" />}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
                         </div>
-                    ) : (
-                        <>
-                            <div className="space-y-3 border-b border-slate-200 p-4 sm:p-5">
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <h3 className="text-lg font-semibold text-slate-900">{selectedRole.name}</h3>
-                                    {selectedRole.is_system && (
-                                        <Badge variant="secondary" className="text-xs">System</Badge>
+
+                        <AdminSearchInput value={modelSearch} onChange={setModelSearch} placeholder="Search models..." />
+
+                        <div className="relative border border-gray-200 rounded-md overflow-auto max-h-[520px]">
+                            {isFetchingRolePermissions ? (
+                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+                                    <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                                </div>
+                            ) : null}
+                            <table className="w-full text-sm border-collapse">
+                                <thead className="sticky top-0 z-1 bg-slate-50">
+                                    <tr>
+                                        <th className="sticky left-0 z-2 bg-slate-50 text-left px-4 py-2.5 font-semibold text-slate-600 border-b border-gray-200 min-w-[180px]">
+                                            Model
+                                        </th>
+                                        {permissions.map((permission) => (
+                                            <th
+                                                key={permission}
+                                                className="px-3 py-2.5 text-center font-semibold text-slate-600 border-b border-l border-gray-200 whitespace-nowrap"
+                                            >
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleColumn(permission)}
+                                                    className="hover:text-primary transition-colors"
+                                                    title={`Toggle ${formatLabel(permission)} for all models`}
+                                                >
+                                                    {formatLabel(permission)}
+                                                </button>
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredModels.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={permissions.length + 1} className="text-center text-muted-foreground py-8">
+                                                No models match your search.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredModels.map((model, idx) => {
+                                            const granted = matrix[model] ?? [];
+                                            return (
+                                                <tr key={model} className={idx % 2 === 1 ? 'bg-slate-50/50' : undefined}>
+                                                    <td className="sticky left-0 z-1 bg-white px-4 py-2 border-b border-gray-100 font-medium text-slate-800 whitespace-nowrap">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleRow(model)}
+                                                            className="hover:text-primary transition-colors text-left"
+                                                            title={`Toggle all permissions for ${formatLabel(model)}`}
+                                                        >
+                                                            {formatLabel(model)}
+                                                        </button>
+                                                    </td>
+                                                    {permissions.map((permission) => (
+                                                        <td key={permission} className="text-center px-3 py-2 border-b border-l border-gray-100">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40 cursor-pointer"
+                                                                checked={granted.includes(permission)}
+                                                                onChange={() => toggleCell(model, permission)}
+                                                            />
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })
                                     )}
-                                    <Badge variant="outline" className="ml-auto text-xs">
-                                        {rolePermissions.length} / {permissions.length} permissions
-                                    </Badge>
-                                </div>
-                                <div className="admin-search-input relative">
-                                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                                    <Input
-                                        placeholder="Filter permissions..."
-                                        value={permSearch}
-                                        onChange={(e) => setPermSearch(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
-                                {Object.keys(filteredPermissionsByCategory).length === 0 ? (
-                                    <p className="text-sm text-muted-foreground text-center py-8">
-                                        No permissions match your search
-                                    </p>
-                                ) : (
-                                    Object.entries(filteredPermissionsByCategory).map(([category, perms]) => {
-                                        const enabledInCategory = perms.filter((p) =>
-                                            rolePermissions.includes(p.id)
-                                        ).length;
-                                        const allEnabled = enabledInCategory === perms.length;
-
-                                        return (
-                                            <div key={category}>
-                                                <div className="flex items-center justify-between gap-3 mb-2">
-                                                    <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-                                                        {category}
-                                                        <span className="ml-2 font-normal normal-case">
-                                                            ({enabledInCategory}/{perms.length})
-                                                        </span>
-                                                    </p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => toggleCategory(perms, !allEnabled)}
-                                                        className="text-xs text-primary hover:underline shrink-0"
-                                                    >
-                                                        {allEnabled ? 'Clear all' : 'Enable all'}
-                                                    </button>
-                                                </div>
-                                                <div className="rounded-md border border-gray-100 divide-y divide-gray-50">
-                                                    {perms.map((perm) => {
-                                                        const checked = rolePermissions.includes(perm.id);
-                                                        return (
-                                                            <label
-                                                                key={perm.id}
-                                                                className="flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50/60 transition-colors"
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={checked}
-                                                                    onChange={() => toggle(perm.id)}
-                                                                    className="h-4 w-4 mt-0.5 rounded border-gray-300 text-primary focus:ring-primary shrink-0"
-                                                                />
-                                                                <div className="min-w-0">
-                                                                    <p className="text-sm font-medium text-gray-800">
-                                                                        {perm.name}
-                                                                    </p>
-                                                                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                                                                        {perm.description}
-                                                                    </p>
-                                                                </div>
-                                                            </label>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
-                        </>
-                    )}
-                </div>
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

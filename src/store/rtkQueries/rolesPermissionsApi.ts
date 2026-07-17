@@ -1,10 +1,10 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type {
+    IAllModelsAPIResponse,
+    IAllPermissionsAPIResponse,
+    IAllRolePermissionsAPIResponse,
     IAllRolesAPIResponse,
-    IPermissionsMatrixAPIResponse,
     IAllUsersAPIResponse,
-    IAllUserSegmentsAPIResponse,
-    IMutationAPIResponse,
 } from '@/types/rolesPermissions';
 
 export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
@@ -47,12 +47,6 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                 }),
             invalidatesTags: ['AdminRoles'],
         }),
-
-        getPermissionsMatrix: builder.query<IPermissionsMatrixAPIResponse, void>({
-            query: () => ({ url: `/admin/roles/permissions-matrix`, method: 'GET' }),
-            providesTags: ['AdminPermissions'],
-        }),
-
         getAllUsers: builder.query<IAllUsersAPIResponse, { page?: number; limit?: number; search?: string, user_type?: string } | void>({
             query: (params) => ({
                 url: `/admin/get-all-users`,
@@ -86,16 +80,27 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminStaff'],
         }),
 
-        getUserSegments: builder.query<IAllUserSegmentsAPIResponse, void>({
-            query: () => ({ url: `/admin/user-segments`, method: 'GET' }),
-            providesTags: ['AdminRoles'],
+        getRolePermissions: builder.query<IAllRolePermissionsAPIResponse, string>({
+            query: (roleId) => ({ url: `/admin/roles/${roleId}/permissions`, method: 'GET' }),
+            providesTags: ['AdminPermissions'],
         }),
 
-        updateRolePermissions: builder.mutation<IMutationAPIResponse, { roleId: string; permissionIds: string[] }>({
-            query: ({ roleId, permissionIds }) => ({ url: `/admin/roles/${roleId}/permissions`, method: 'PUT', body: { permissionIds } }),
+        addUpdateRolePermissions: builder.mutation({
+            query: ({ roleId, data }) => ({ url: `/admin/roles/${roleId}/permissions`, method: 'POST', body: { data } }),
+            invalidatesTags: ['AdminPermissions', 'AdminRoles'],
         }),
 
-        assignStaffRole: builder.mutation<IMutationAPIResponse, { staffId: string; roleId: string }>({
+        getAllPermissions: builder.query<IAllPermissionsAPIResponse, void>({
+            query: () => ({ url: `/admin/permissions`, method: 'GET' }),
+            providesTags: ['AdminPermissions'],
+        }),
+
+        getAllModels: builder.query<IAllModelsAPIResponse, void>({
+            query: () => ({ url: `/admin/models`, method: 'GET' }),
+            providesTags: ['AdminPermissions'],
+        }),
+
+        assignStaffRole: builder.mutation({
             query: ({ staffId, roleId }) => ({ url: `/admin/staff/${staffId}/role`, method: 'PUT', body: { roleId } }),
         }),
 
@@ -105,13 +110,14 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
 
 export const {
     useGetAllRolesQuery,
-    useGetPermissionsMatrixQuery,
     useGetAllUsersQuery,
-    useGetUserSegmentsQuery,
     useAddRoleMutation,
     useUpdateRoleMutation,
     useDeleteRoleMutation,
-    useUpdateRolePermissionsMutation,
+    useGetRolePermissionsQuery,
+    useAddUpdateRolePermissionsMutation,
+    useGetAllPermissionsQuery,
+    useGetAllModelsQuery,
     useAddStaffMutation,
     useUpdateStaffMutation,
     useUpdateStaffStatusMutation,

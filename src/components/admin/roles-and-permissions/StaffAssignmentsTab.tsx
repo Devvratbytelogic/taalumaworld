@@ -39,6 +39,7 @@ export function StaffAssignmentsTab() {
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
         search: debouncedSearch,
+        user_type: 'staff',
     });
     const staff = staffData?.data?.data ?? [];
     const totalStaff = staffData?.data?.total ?? 0;

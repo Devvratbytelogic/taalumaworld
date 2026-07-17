@@ -86,20 +86,21 @@ export function RolesRegistryTab() {
                 </p>
             ),
         },
-        {
-            field: 'permissions',
-            headerName: 'Permissions',
-            width: 100,
-            sortable: false,
-            valueGetter: (value: string[]) => value?.length ?? 0,
-            renderCell: (params) => (
-                <span className="text-sm font-medium">{params.value}</span>
-            ),
-        },
+        // {
+        //     field: 'permissions',
+        //     headerName: 'Permissions',
+        //     width: 100,
+        //     sortable: false,
+        //     valueGetter: (value: string[]) => value?.length ?? 0,
+        //     renderCell: (params) => (
+        //         <span className="text-sm font-medium">{params.value}</span>
+        //     ),
+        // },
         {
             field: 'number_of_users',
-            headerName: 'Assigned',
+            headerName: 'Number of Users',
             width: 100,
+            flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <span className="text-sm font-medium">{params.value}</span>

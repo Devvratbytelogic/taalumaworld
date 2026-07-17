@@ -29,6 +29,7 @@ export interface IHomeAllChaptersItemsEntity {
   isPurchased: boolean;
   isCart: boolean;
   isWishlisted: boolean;
+  shareable_link?: string;
   mentor: IHomeAllChaptersMentor;
   /** Original 'book' | 'chapter' value (see VISIBLE) — kept for backward compatibility since `type` can now also be 'series' */
   legacyType: string;

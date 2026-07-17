@@ -243,7 +243,7 @@ export default function ChapterDetailsModal() {
                   />)
                 : <Button
                   className="global_btn rounded_full bg_primary w-full"
-                  onPress={() => openLogin('cart', VISIBLE.CHAPTER)}
+                  onPress={() => openLogin('cart', isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK)}
                   startContent={<ShoppingCart className="h-4 w-4" />}
                 >
                   Add to Cart - KSH {displayPrice?.toFixed(2) ?? '0.00'}

@@ -1,75 +1,53 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Book, BookOpen, TrendingUp, CheckCircle, Play, User, FileDown } from 'lucide-react';
+import {
+  Book,
+  BookOpen,
+  TrendingUp,
+  CheckCircle,
+  CircleDashed,
+  Play,
+  User,
+  FileDown,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useGetMyBooksQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
-import { cn } from '@/components/ui/utils';
-import type { IMyBookItem } from '@/types/user/myBooks';
-import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
-import { getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { cn } from '@/components/ui/utils';
+import { useGetMySeriesQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
+import type { ItemsEntity } from '@/types/user/mySeries';
+import { getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
-type FilterType = 'all' | 'reading' | 'completed' | 'unread';
+type FilterType = 'all' | 'inProgress' | 'completed' | 'unread';
+
+const PAGE_LIMIT = 10;
 
 export function MyBooksPage() {
   const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [filter, setFilter] = useState<FilterType>('all');
+  const [page, setPage] = useState(1);
   const [invoiceDownloadingOrderId, setInvoiceDownloadingOrderId] = useState<string | null>(null);
 
-  const { data: myBooksData, isLoading } = useGetMyBooksQuery();
+  const { data: mySeriesData, isLoading, isFetching } = useGetMySeriesQuery({
+    page,
+    limit: PAGE_LIMIT,
+    inProgress: filter === 'inProgress',
+    completed: filter === 'completed',
+    unread: filter === 'unread',
+  });
   const [fetchTransactionInvoice] = useLazyGetTransactionInvoiceQuery();
-  const books: IMyBookItem[] = myBooksData?.data?.items ?? [];
 
-  const stats = useMemo(
-    () => ({
-      total: books.length,
-      reading: books.filter((b) => b.progressPercent > 0 && !b.completed).length,
-      completed: books.filter((b) => b.completed).length,
-      unread: books.filter((b) => b.progressPercent === 0 && !b.completed).length,
-    }),
-    [books]
-  );
+  const series: ItemsEntity[] = mySeriesData?.data?.items ?? [];
+  const summary = mySeriesData?.data?.summary;
+  const pagination = mySeriesData?.data?.pagination;
 
-  const filteredBooks = useMemo(() => {
-    switch (activeFilter) {
-      case 'reading':
-        return books.filter((b) => b.progressPercent > 0 && !b.completed);
-      case 'completed':
-        return books.filter((b) => b.completed);
-      case 'unread':
-        return books.filter((b) => b.progressPercent === 0 && !b.completed);
-      default:
-        return books;
-    }
-  }, [books, activeFilter]);
-
-  const getProgressStatus = (progressPercent: number, completed: boolean) => {
-    if (completed || progressPercent >= 100) return { label: 'Completed', color: 'text-green-600' };
-    if (progressPercent > 0) return { label: 'In progress', color: 'text-primary' };
-    return { label: 'Not started', color: 'text-gray-500' };
-  };
-
-  const normalizeProgress = (value?: number) => Math.min(100, Math.max(0, value ?? 0));
-
-  const getReadAction = (progressPercent: number, completed: boolean) => {
-    const progress = normalizeProgress(progressPercent);
-    const isCompleted = completed || progress >= 100;
-
-    if (isCompleted) {
-      return { label: 'Read again', icon: BookOpen };
-    }
-    if (progress > 0) {
-      return { label: 'Continue reading', icon: BookOpen };
-    }
-    return { label: 'Start reading', icon: Play };
-  };
-
-  const shouldShowDescription = (title?: string, description?: string) => {
-    const normalizedTitle = title?.trim().toLowerCase();
-    const normalizedDescription = description?.trim().toLowerCase();
-    return Boolean(normalizedDescription && normalizedDescription !== normalizedTitle);
+  const handleFilterChange = (nextFilter: FilterType) => {
+    setFilter(nextFilter);
+    setPage(1);
   };
 
   const handleDownloadInvoice = async (orderId: string) => {
@@ -95,17 +73,44 @@ export function MyBooksPage() {
   }
 
   const statItems = [
-    { icon: Book, label: 'Total series', value: stats.total, iconClass: 'text-primary' },
-    { icon: TrendingUp, label: 'In progress', value: stats.reading, iconClass: 'text-primary' },
-    { icon: CheckCircle, label: 'Completed', value: stats.completed, iconClass: 'text-green-600' },
+    { icon: Book, label: 'Total series', value: summary?.totalSeries ?? 0, iconClass: 'text-primary' },
+    { icon: TrendingUp, label: 'In progress', value: summary?.inProgress ?? 0, iconClass: 'text-primary' },
+    { icon: CheckCircle, label: 'Completed', value: summary?.completed ?? 0, iconClass: 'text-green-600' },
+    { icon: CircleDashed, label: 'Unread', value: summary?.unread ?? 0, iconClass: 'text-gray-500' },
   ] as const;
+
+  const filterTabs: { key: FilterType; label: string }[] = [
+    { key: 'all', label: `All (${summary?.totalSeries ?? 0})` },
+    { key: 'inProgress', label: `In progress (${summary?.inProgress ?? 0})` },
+    { key: 'completed', label: `Completed (${summary?.completed ?? 0})` },
+    { key: 'unread', label: `Unread (${summary?.unread ?? 0})` },
+  ];
+
+  const emptyStateCopy: Record<FilterType, { title: string; description: string }> = {
+    all: {
+      title: 'No series yet',
+      description: "You haven't purchased any series yet. Start exploring and build your collection.",
+    },
+    inProgress: {
+      title: 'No series in progress',
+      description: 'Series you start reading will show up here.',
+    },
+    completed: {
+      title: 'No completed series',
+      description: 'Series you finish reading will show up here.',
+    },
+    unread: {
+      title: 'No unread series',
+      description: "You've started reading all of your series.",
+    },
+  };
 
   return (
     <div className="space-y-6">
       <UserDashboardPageHeader title="My Series" description="Your personal collection of purchased series" />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {statItems.map(({ icon: Icon, label, value, iconClass }) => (
             <div key={label} className="flex items-center gap-3 px-5 py-4 sm:px-6">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
@@ -121,51 +126,59 @@ export function MyBooksPage() {
 
         <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-            {(
-              [
-                { key: 'all', label: `All (${stats.total})` },
-                { key: 'reading', label: `Reading (${stats.reading})` },
-                { key: 'completed', label: `Completed (${stats.completed})` },
-                { key: 'unread', label: `Unread (${stats.unread})` },
-              ] as { key: FilterType; label: string }[]
-            ).map(({ key, label }) => (
+            {filterTabs.map(({ key, label }) => (
               <Button
                 key={key}
                 type="button"
-                className={cn('global_btn shrink-0 rounded_full', activeFilter === key ? 'bg_primary' : 'outline_primary')}
-                onPress={() => setActiveFilter(key)}
+                className={cn('global_btn shrink-0 rounded_full', filter === key ? 'bg_primary' : 'outline_primary')}
+                isDisabled={isFetching}
+                onPress={() => handleFilterChange(key)}
               >
                 {label}
               </Button>
             ))}
           </div>
-          <p className="text-sm text-gray-500">{filteredBooks.length} series</p>
+          <p className="text-sm text-gray-500">
+            {pagination?.totalItems ?? 0} series
+          </p>
         </div>
 
-        <div className="p-4 sm:p-6">
-          {filteredBooks.length > 0 ? (
+        <div className={cn('p-4 sm:p-6 transition-opacity', isFetching ? 'opacity-60' : '')}>
+          {series.length > 0 ? (
             <div className="flex flex-col gap-4">
-              {filteredBooks.map((book, index) => {
-                const progress = normalizeProgress(book.progressPercent);
-                const isCompleted = book.completed || progress >= 100;
-                const status = getProgressStatus(progress, book.completed);
-                const readAction = getReadAction(progress, book.completed);
-                const ReadIcon = readAction.icon;
-                const showDescription = shouldShowDescription(book.title, book.description);
+              {series.map((item) => {
+                const { totalChapters, completedChapters } = item.progress;
+                const progress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+                const isCompleted = item.readStatus === 'completed' || (totalChapters > 0 && completedChapters >= totalChapters);
+
+                let statusLabel = 'Not started';
+                let statusColor = 'text-gray-500';
+                if (isCompleted) {
+                  statusLabel = 'Completed';
+                  statusColor = 'text-green-600';
+                } else if (progress > 0) {
+                  statusLabel = 'In progress';
+                  statusColor = 'text-primary';
+                }
+
+                let readLabel = 'Start reading';
+                let ReadIcon = Play;
+                if (isCompleted) {
+                  readLabel = 'Read again';
+                  ReadIcon = BookOpen;
+                } else if (progress > 0) {
+                  readLabel = 'Continue reading';
+                  ReadIcon = BookOpen;
+                }
 
                 return (
                   <article
-                    key={book.bookId ?? index}
+                    key={item.id}
                     className="group flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300 sm:flex-row"
                   >
                     <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-gray-100 sm:aspect-auto sm:w-40 sm:min-h-[168px] md:w-44">
                       <div className="h-full w-full transition-transform duration-300 group-hover:scale-[1.02]">
-                        <ImageComponent
-                          key={book.bookId ?? index}
-                          src={book.coverImage}
-                          alt={book.title}
-                          object_cover={true}
-                        />
+                        <ImageComponent src={item.coverImage || ''} alt={item.title} object_cover={true} />
                       </div>
 
                       {isCompleted ? (
@@ -185,25 +198,23 @@ export function MyBooksPage() {
                         <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                           <span className="inline-flex min-w-0 items-center gap-1.5">
                             <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                            <span className="truncate">{book.author}</span>
+                            <span className="truncate">{item.mentor?.name}</span>
                           </span>
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
-                          <span>{book.chapterCount} blueprints</span>
+                          <span>{item.chapterCount} blueprints</span>
                         </div>
 
-                        <h3 className="line-clamp-2 text-base font-medium text-gray-900">{book.title}</h3>
+                        <h3 className="line-clamp-2 text-base font-medium text-gray-900">{item.title}</h3>
 
-                        {showDescription ? (
-                          <p className="mt-1.5 line-clamp-2 text-sm text-gray-500">{book.description}</p>
-                        ) : null}
+                        <p className="mt-1.5 line-clamp-2 text-sm text-gray-500">{item.description}</p>
 
                         <div className="mt-4 max-w-md">
                           <div className="mb-1.5 flex items-center justify-between text-xs text-gray-500">
                             <span>Progress</span>
                             <div className="flex items-center gap-2">
-                              <span className={status.color}>{status.label}</span>
+                              <span className={statusColor}>{statusLabel}</span>
                               <span className="font-medium tabular-nums text-gray-700">{Math.round(progress)}%</span>
                             </div>
                           </div>
@@ -223,21 +234,21 @@ export function MyBooksPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getSeriesRoutePath(book?.id ?? ''))}
+                          onPress={() => router.push(getSeriesRoutePath(item.id))}
                         >
                           <ReadIcon className="h-4 w-4" />
-                          {readAction.label}
+                          {readLabel}
                         </Button>
 
-                        {book.order_id ? (
+                        {item.order_id ? (
                           <Button
                             type="button"
                             className="global_btn rounded_full outline_primary w-full"
-                            isDisabled={invoiceDownloadingOrderId === book.order_id}
-                            onPress={() => handleDownloadInvoice(book.order_id)}
+                            isDisabled={invoiceDownloadingOrderId === item.order_id}
+                            onPress={() => handleDownloadInvoice(item.order_id as string)}
                           >
                             <FileDown className="h-4 w-4" />
-                            {invoiceDownloadingOrderId === book.order_id ? 'Downloading…' : 'Invoice'}
+                            {invoiceDownloadingOrderId === item.order_id ? 'Downloading…' : 'Invoice'}
                           </Button>
                         ) : null}
                       </div>
@@ -252,17 +263,9 @@ export function MyBooksPage() {
                 <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white">
                   <Book className="h-5 w-5 text-primary" aria-hidden />
                 </span>
-                <h3 className="mb-2 text-base font-semibold text-gray-900">
-                  {activeFilter === 'all'
-                    ? 'No series yet'
-                    : `No ${activeFilter === 'reading' ? 'in progress' : activeFilter === 'completed' ? 'completed' : 'unread'} series`}
-                </h3>
-                <p className="mb-6 text-sm text-gray-500">
-                  {activeFilter === 'all'
-                    ? "You haven't purchased any series yet. Start exploring and build your collection."
-                    : 'No series match this filter.'}
-                </p>
-                {activeFilter === 'all' ? (
+                <h3 className="mb-2 text-base font-semibold text-gray-900">{emptyStateCopy[filter].title}</h3>
+                <p className="mb-6 text-sm text-gray-500">{emptyStateCopy[filter].description}</p>
+                {filter === 'all' ? (
                   <Button
                     type="button"
                     onPress={() => router.push(getHomeRoutePath())}
@@ -273,7 +276,7 @@ export function MyBooksPage() {
                 ) : (
                   <Button
                     type="button"
-                    onPress={() => setActiveFilter('all')}
+                    onPress={() => handleFilterChange('all')}
                     className="global_btn rounded_full outline_primary"
                   >
                     Show All Series
@@ -283,6 +286,35 @@ export function MyBooksPage() {
             </div>
           )}
         </div>
+
+        {pagination && pagination.totalPages > 1 ? (
+          <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p className="text-sm text-gray-500">
+              Page <span className="font-medium text-gray-700">{pagination.currentPage}</span> of{' '}
+              <span className="font-medium text-gray-700">{pagination.totalPages}</span>
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                className="global_btn rounded_full outline_primary"
+                isDisabled={pagination.currentPage <= 1 || isFetching}
+                onPress={() => setPage((prev) => Math.max(1, prev - 1))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <Button
+                type="button"
+                className="global_btn rounded_full outline_primary"
+                isDisabled={pagination.currentPage >= pagination.totalPages || isFetching}
+                onPress={() => setPage((prev) => Math.min(pagination.totalPages, prev + 1))}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

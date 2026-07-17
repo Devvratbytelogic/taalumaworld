@@ -12,7 +12,7 @@ import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
 import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
-import { IMyBooksAPIResponse } from '@/types/user/myBooks';
+import { IMySeriesAPIResponse } from '@/types/user/mySeries';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
 import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
@@ -34,6 +34,14 @@ export interface IGetAllChaptersParams {
 }
 
 export interface IGetMyChaptersParams {
+    page?: number;
+    limit?: number;
+    inProgress?: boolean;
+    completed?: boolean;
+    unread?: boolean;
+}
+
+export interface IGetMySeriesParams {
     page?: number;
     limit?: number;
     inProgress?: boolean;
@@ -142,11 +150,18 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['MyChapters'],
         }),
-        /** get my books */
-        getMyBooks: builder.query<IMyBooksAPIResponse, void>({
-            query: () => ({
-                url: `/user/my-books`,
+        /** get my series */
+        getMySeries: builder.query<IMySeriesAPIResponse, IGetMySeriesParams | void>({
+            query: (params) => ({
+                url: `/user/my-series`,
                 method: 'GET',
+                params: {
+                    page: params?.page ?? 1,
+                    limit: params?.limit ?? 10,
+                    ...(params?.inProgress ? { inProgress: true } : {}),
+                    ...(params?.completed ? { completed: true } : {}),
+                    ...(params?.unread ? { unread: true } : {}),
+                },
             }),
             providesTags: ['MyChapters'],
         }),
@@ -245,7 +260,7 @@ export const {
     useGetAllCouponsQuery,
     useGetUserProfileQuery,
     useGetMyChaptersQuery,
-    useGetMyBooksQuery,
+    useGetMySeriesQuery,
     useGetReadingHistoryQuery,
     useGetTestimonialsQuery,
     useGetFAQQuery,

@@ -24,7 +24,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import {
-  useGetMyBooksQuery,
+  useGetMySeriesQuery,
   useGetMyChaptersQuery,
   useGetReadingHistoryQuery,
   useGetUserProfileQuery,
@@ -45,19 +45,19 @@ export function ProfilePage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const { data: profileData, isLoading } = useGetUserProfileQuery();
-  const { data: booksData, isLoading: isBooksLoading } = useGetMyBooksQuery();
+  const { data: seriesData, isLoading: isSeriesLoading } = useGetMySeriesQuery();
   const { data: chaptersData, isLoading: isChaptersLoading } = useGetMyChaptersQuery();
   const { data: historyData, isLoading: isHistoryLoading } = useGetReadingHistoryQuery();
   const [updateProfile] = useUserUpdateProfileMutation();
   const profile = profileData?.data;
 
-  const isKpisLoading = isBooksLoading || isChaptersLoading || isHistoryLoading;
+  const isKpisLoading = isSeriesLoading || isChaptersLoading || isHistoryLoading;
 
   const kpiItems = useMemo(
     () => [
       {
         label: 'Series owned',
-        value: booksData?.data?.summary?.totalBooks ?? 0,
+        value: seriesData?.data?.summary?.totalSeries ?? 0,
         icon: BookOpen,
         iconClass: 'text-primary',
         href: getUserDashboardMyBooksRoutePath(),
@@ -73,7 +73,7 @@ export function ProfilePage() {
         label: 'In progress',
         value:
           historyData?.data?.summary?.inProgress ??
-          (booksData?.data?.summary?.inProgress ?? 0) + (chaptersData?.data?.summary?.inProgress ?? 0),
+          (seriesData?.data?.summary?.inProgress ?? 0) + (chaptersData?.data?.summary?.inProgress ?? 0),
         icon: TrendingUp,
         iconClass: 'text-primary',
         href: getUserDashboardHistoryRoutePath(),
@@ -82,13 +82,13 @@ export function ProfilePage() {
         label: 'Completed',
         value:
           historyData?.data?.summary?.completed ??
-          (booksData?.data?.summary?.completed ?? 0) + (chaptersData?.data?.summary?.completed ?? 0),
+          (seriesData?.data?.summary?.completed ?? 0) + (chaptersData?.data?.summary?.completed ?? 0),
         icon: CheckCircle,
         iconClass: 'text-green-600',
         href: getUserDashboardHistoryRoutePath(),
       },
     ],
-    [booksData, chaptersData, historyData]
+    [seriesData, chaptersData, historyData]
   );
 
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } =

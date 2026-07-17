@@ -18,6 +18,21 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['Cart'],
         }),
+        applyCoupon: builder.mutation({
+            query: (body) => ({
+                url: `/user/apply-coupon`,
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['Cart'],
+        }),
+        removeCoupon: builder.mutation({
+            query: () => ({
+                url: `/user/remove-coupon`,
+                method: 'GET',
+            }),
+            invalidatesTags: ['Cart'],
+        }),
         addToWishlist: builder.mutation({
             query: (body) => ({
                 url: `/user/add-wishlist`,
@@ -83,6 +98,8 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
 export const {
     useAddChapterToCartMutation,
     useRemoveCartItemMutation,
+    useApplyCouponMutation,
+    useRemoveCouponMutation,
     useAddToWishlistMutation,
     useRemoveFromWishlistMutation,
     useDirectPurchaseChapterMutation,

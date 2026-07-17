@@ -1,4 +1,5 @@
 import { ICartAPIResponse } from '@/types/user/cart';
+import { IAllCouponsAPIResponse } from '@/types/user/coupon';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export type MpesaPaymentStatusResponse = {
@@ -98,6 +99,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         getCart: builder.query<ICartAPIResponse, void>({
             query: () => ({
                 url: `/user/get-cart`,
+                method: 'GET',
+            }),
+            providesTags: ['Cart'],
+        }),
+        /** get all coupons available to apply on the cart */
+        getAllCoupons: builder.query<IAllCouponsAPIResponse, void>({
+            query: () => ({
+                url: `/user/coupons`,
                 method: 'GET',
             }),
             providesTags: ['Cart'],
@@ -218,6 +227,7 @@ export const {
     useGetUserAllAuthorsQuery,
     useGetAllTagsQuery,
     useGetCartQuery,
+    useGetAllCouponsQuery,
     useGetUserProfileQuery,
     useGetMyChaptersQuery,
     useGetMyBooksQuery,

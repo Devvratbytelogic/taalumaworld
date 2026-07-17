@@ -2,10 +2,18 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { addToast } from '@heroui/react';
+import { ArrowRight, Loader2, Tag, TicketPercent } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { Input } from '@/components/ui/input';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
-import { getRefundPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
+import { getPolicyBySlugRoutePath } from '@/routes/routes';
+import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
+import { useGetAllCouponsQuery } from '@/store/rtkQueries/userGetAPI';
+import { useApplyCouponMutation, useRemoveCouponMutation } from '@/store/rtkQueries/userPostAPI';
+import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { getUserRole } from '@/utils/authCookies';
+import { USER_TYPE } from '@/constants/common';
 
 interface CartSummaryProps {
   subtotal: number;
@@ -15,6 +23,7 @@ interface CartSummaryProps {
   taxAmount: number;
   onCheckout: () => void;
   isLoading?: boolean;
+  couponCode?: string | null;
 }
 
 export default function CartSummary({
@@ -25,21 +34,81 @@ export default function CartSummary({
   taxAmount,
   onCheckout,
   isLoading = false,
+  couponCode = null,
 }: CartSummaryProps) {
-  const [agreeDigitalPurchase, setAgreeDigitalPurchase] = useState(false);
+  const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const [agreementTouched, setAgreementTouched] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponError, setCouponError] = useState<string | undefined>();
+  const [showAllCoupons, setShowAllCoupons] = useState(false);
+
+  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
+    touchPoint: AGREEMENT_TOUCHPOINTS.CHECKOUT,
+    userType: getUserRole() === USER_TYPE.CAREER_ARCHITECT ? AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT : AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA,
+  });
+  const [applyCoupon, { isLoading: isApplyingCoupon }] = useApplyCouponMutation();
+  const [removeCoupon, { isLoading: isRemovingCoupon }] = useRemoveCouponMutation();
+  const { data: allCouponsResponse, isFetching: isFetchingCoupons } = useGetAllCouponsQuery(undefined, {
+    skip: !showAllCoupons,
+  });
+
+  const checkoutAgreements = agreementsResponse?.data ?? [];
+  // Only agreements the API marks as `is_required` must be accepted before checkout.
+  const requiredAgreementIds = checkoutAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
+  const allRequiredAccepted = requiredAgreementIds.every((id) => acceptedAgreementIds.includes(id));
+  const availableCoupons = allCouponsResponse?.data ?? [];
 
   const agreementError =
-    agreementTouched && !agreeDigitalPurchase
-      ? 'You must acknowledge the digital purchase terms before checkout'
+    agreementTouched && !allRequiredAccepted
+      ? 'You must accept all required agreements before checkout'
       : undefined;
 
   const handleCheckout = () => {
-    if (!agreeDigitalPurchase) {
+    if (!allRequiredAccepted) {
       setAgreementTouched(true);
       return;
     }
     onCheckout();
+  };
+
+  const handleApplyCoupon = async (code: string) => {
+    const trimmedCode = code.trim();
+    if (!trimmedCode) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+    try {
+      const res = await applyCoupon({ coupon_code: trimmedCode }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        addToast({
+          title: 'Coupon applied',
+          description: res?.message ?? 'Coupon applied successfully.',
+          color: 'success',
+          timeout: 2000,
+        });
+        setCouponInput('');
+        setCouponError(undefined);
+        setShowAllCoupons(false);
+      }
+    } catch {
+      // error toast handled globally in rtkQuerieSetup
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    try {
+      const res = await removeCoupon({}).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        addToast({
+          title: 'Coupon removed',
+          description: res?.message ?? 'Coupon removed from cart.',
+          color: 'success',
+          timeout: 2000,
+        });
+      }
+    } catch {
+      // error toast handled globally in rtkQuerieSetup
+    }
   };
 
   return (
@@ -71,6 +140,95 @@ export default function CartSummary({
         )}
       </div>
 
+      <div className="mb-6 space-y-2">
+        {couponCode ? (
+          <div className="flex items-center justify-between gap-2 rounded-md border border-success/30 bg-success/5 px-3 py-2.5">
+            <div className="flex items-center gap-2 text-sm min-w-0">
+              <TicketPercent className="h-4 w-4 shrink-0 text-success" />
+              <span className="truncate font-semibold text-success">{couponCode}</span>
+              <span className="text-muted-foreground">applied</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveCoupon}
+              disabled={isRemovingCoupon || isLoading}
+              className="shrink-0 text-sm font-medium text-danger transition-colors hover:underline disabled:opacity-50"
+            >
+              {isRemovingCoupon ? 'Removing…' : 'Remove'}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-2">
+              <Input
+                value={couponInput}
+                onChange={(e) => {
+                  setCouponInput(e.target.value.toUpperCase());
+                  if (couponError) setCouponError(undefined);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyCoupon(couponInput);
+                  }
+                }}
+                placeholder="Enter coupon code"
+                disabled={isApplyingCoupon || isLoading}
+                aria-invalid={!!couponError}
+                className="h-10 flex-1"
+              />
+              <Button
+                className="global_btn rounded_full outline_primary w_fit shrink-0 px-5"
+                onPress={() => handleApplyCoupon(couponInput)}
+                isLoading={isApplyingCoupon}
+                isDisabled={isApplyingCoupon || isLoading}
+              >
+                Apply
+              </Button>
+            </div>
+            {couponError && <p className="text-xs text-danger">{couponError}</p>}
+
+            <button
+              type="button"
+              onClick={() => setShowAllCoupons((prev) => !prev)}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              <Tag className="h-3.5 w-3.5" />
+              {showAllCoupons ? 'Hide available offers' : 'View available offers'}
+            </button>
+
+            {showAllCoupons && (
+              <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3">
+                {isFetchingCoupons ? (
+                  <p className="text-sm text-muted-foreground">Loading offers…</p>
+                ) :  (
+                  availableCoupons && availableCoupons?.length > 0 ? availableCoupons?.map((coupon) => (
+                    <div
+                      key={coupon.code}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-white px-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold">{coupon.code}</p>
+                        <p className="truncate text-xs text-muted-foreground capitalize">{coupon.type}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyCoupon(coupon.code)}
+                        disabled={isApplyingCoupon || isLoading}
+                        className="shrink-0 text-sm font-medium text-primary transition-colors hover:underline disabled:opacity-50"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  )):
+                  <p className="text-sm text-muted-foreground">No offers available right now.</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
       <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b pb-6">
         <span className="text-base font-bold sm:text-lg">Total</span>
         <span className="text-xl font-bold text-primary sm:text-2xl">
@@ -78,48 +236,41 @@ export default function CartSummary({
         </span>
       </div>
 
-      <div className="mb-4">
-        <AgreementCheckbox
-          id="agreeDigitalPurchase"
-          checked={agreeDigitalPurchase}
-          error={agreementError}
-          touched={agreementTouched}
-          onCheckedChange={(checked) => {
-            setAgreeDigitalPurchase(checked);
-            setAgreementTouched(true);
-          }}
-          onBlur={() => setAgreementTouched(true)}
-          disabled={isLoading}
-        >
-          I understand this is a digital purchase and refund restrictions may apply. See the{' '}
-          <Link
-            href={getRefundPolicyRoutePath()}
-            target="_blank"
-            className={`font-semibold transition-colors ${
-              agreementError
-                ? 'text-red-600 hover:text-red-700'
-                : 'text-primary hover:text-primary/80'
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            Refund Policy
-          </Link>{' '}
-          and{' '}
-          <Link
-            href={getTermsOfServiceRoutePath()}
-            target="_blank"
-            className={`font-semibold transition-colors ${
-              agreementError
-                ? 'text-red-600 hover:text-red-700'
-                : 'text-primary hover:text-primary/80'
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            Terms of Service
-          </Link>
-          .
-        </AgreementCheckbox>
-      </div>
+      {checkoutAgreements.length > 0 && (
+        <div className="mb-4 space-y-3">
+          {checkoutAgreements.map((agreement) => (
+            <AgreementCheckbox
+              key={agreement._id}
+              id={agreement._id}
+              checked={acceptedAgreementIds.includes(agreement._id)}
+              error={agreementError}
+              touched={agreementTouched}
+              onCheckedChange={(checked) => {
+                setAcceptedAgreementIds((prev) =>
+                  checked ? [...prev, agreement._id] : prev.filter((id) => id !== agreement._id)
+                );
+                setAgreementTouched(true);
+              }}
+              onBlur={() => setAgreementTouched(true)}
+              disabled={isLoading}
+            >
+              {agreement.text}{' '}
+              <Link
+                href={getPolicyBySlugRoutePath(agreement.slug ?? '')}
+                target="_blank"
+                className={`font-semibold transition-colors ${agreementError
+                    ? 'text-red-600 hover:text-red-700'
+                    : 'text-primary hover:text-primary/80'
+                  }`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {agreement.title}
+              </Link>
+              {agreement.is_required && <span className="text-red-500"> *</span>}
+            </AgreementCheckbox>
+          ))}
+        </div>
+      )}
 
       <Button
         size="lg"

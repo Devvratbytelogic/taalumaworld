@@ -2,29 +2,30 @@ export interface ICartAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data?: (ICartAPIResponseDataEntity)[] | null;
+  data?: (ICartDataEntity)[] | null;
   message: string;
   timestamp: string;
 }
-export interface ICartAPIResponseDataEntity {
+export interface ICartDataEntity {
   _id: string;
   user_id: string;
   guest_user?: null;
   city?: null;
   item_count: number;
-  coupon_code?: null;
-  coupon_type?: null;
+  coupon_code?: string | null;
+  coupon_type?: string | null;
   discount_amount: number;
-  coupon_discount?: null;
+  coupon_discount?: number | null;
   tax_amount: number;
+  subtotal_amount: number;
   total_amount: number;
   createdAt: string;
   updatedAt: string;
   id: number;
   __v: number;
-  cart_item?: (CartItemEntity)[] | null;
+  cart_item?: (ICartItemEntity)[] | null;
 }
-export interface CartItemEntity {
+export interface ICartItemEntity {
   _id: string;
   cart_id: string;
   user_id: string;
@@ -42,49 +43,63 @@ export interface CartItemEntity {
   updatedAt: string;
   id: number;
   __v: number;
-  chapter?: Chapter | null;
-  book?: CartBook | null;
+  current_price: number;
+  pricing_access_type: string;
+  price_changed: boolean;
+  legacyType: string;
+  series_id?: string | null;
+  series?: ISeries | null;
+  blueprint_id?: string | null;
+  blueprint?: IBlueprint | null;
 }
-export interface Chapter {
+export interface ISeries {
   _id: string;
-  slug: string;
-  book: Book;
-  number: number;
-  page: number;
   title: string;
+  slug: string;
   description: string;
-  content: string;
-  isFree: boolean;
   coverImage: string;
-  pdf: string;
-  price: number;
   status: string;
-  createdBy: string;
+  pricingModel: string;
+  price: number;
+  tags?: (string)[] | null;
+  deletedAt?: null;
   createdAt: string;
   updatedAt: string;
   __v: number;
+  json_ld: string;
+  meta_description: string;
+  meta_title: string;
+  og_description: string;
+  og_image: string;
+  og_title: string;
 }
-export interface Book {
+export interface IBlueprint {
   _id: string;
+  number: number;
   title: string;
   slug: string;
-  thoughtLeader: ThoughtLeader;
-  category: string;
-  subcategory?: null;
-}
-export interface CartBook {
-  _id: string;
-  title: string;
-  slug: string;
-  coverImage: string;
   description: string;
+  isFree: boolean;
+  coverImage: string;
+  page: number;
   price: number;
-  pricingModel: string;
-  thoughtLeader?: ThoughtLeader | null;
-  category?: string | null;
+  status: string;
+  deletedAt?: null;
+  meta_title: string;
+  meta_description: string;
+  og_title: string;
+  og_description: string;
+  og_image: string;
+  json_ld: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  short_code: string;
+  series: ISeries1;
 }
-export interface ThoughtLeader {
+export interface ISeries1 {
   _id: string;
-  fullName: string;
-  avatar?: null;
+  title: string;
+  coverImage: string;
+  pricingModel: string;
 }

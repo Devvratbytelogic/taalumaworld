@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useFormik } from 'formik';
 import { Avatar } from '@heroui/react';
 import {
+  ArrowUpCircle,
   BadgeCheck,
   Ban,
   Calendar,
@@ -12,6 +13,7 @@ import {
   Check,
   CheckCircle2,
   CircleAlert,
+  Clock,
   ExternalLink,
   Facebook,
   FileSignature,
@@ -31,10 +33,12 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
 import { AdminEmptyState, AdminPage, AdminPageHeader, AdminPanel, AdminSectionHeader, adminPanelClass, } from '@/components/admin/layout/AdminContent';
+import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
 import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/store/rtkQueries/adminPostApi';
 import { useAcceptAgreementMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
+import { useGetMyMentorTierUpgradeApplicationQuery } from '@/store/rtkQueries/mentorApis';
 import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
 import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
@@ -107,7 +111,14 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const [isEditing, setIsEditing] = useState(false);
   const [tempPhoto, setTempPhoto] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [isTierModalOpen, setIsTierModalOpen] = useState(false);
   const [updateAdminProfile] = useUpdateAdminProfileMutation();
+  const { data: tierUpgradeData } = useGetMyMentorTierUpgradeApplicationQuery();
+
+  const tierUpgradeApplication = tierUpgradeData?.data;
+  const isTierUpgradePending = tierUpgradeApplication?.status === 'pending_review';
+  const requestedTier = tierUpgradeApplication?.requested_tier_id;
+  const requestedTierCode = typeof requestedTier === 'object' && requestedTier ? (requestedTier).code : undefined;
 
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
     enableReinitialize: true,
@@ -263,6 +274,21 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
             <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Mentor tier</p>
               <p className="mt-1 text-sm font-semibold text-slate-900">{profile?.mentor_economy?.tier?.code ?? '—'}</p>
+              {isTierUpgradePending ? (
+                <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  {requestedTierCode ? `Upgrade to ${requestedTierCode} pending` : 'Upgrade pending review'}
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsTierModalOpen(true)}
+                  className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                >
+                  <ArrowUpCircle className="h-3.5 w-3.5 shrink-0" />
+                  Request upgrade
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -443,6 +469,12 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
           )}
         </div>
       </AdminPanel>
+
+      <MentorTierUpgradeModal
+        open={isTierModalOpen}
+        currentTierId={profile?.mentor_economy?.tier?.id}
+        onOpenChange={setIsTierModalOpen}
+      />
     </>
   );
 }

@@ -61,7 +61,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     items: [
       { id: 'books', label: 'Series', href: getMentorBooksRoutePath(), icon: Book },
       { id: 'chapters', label: 'Blueprints', href: getMentorChaptersRoutePath(), icon: FileText },
-      { id: 'categories', label: 'Categories', href: getMentorCategoriesRoutePath(), icon: FolderTree },
+      // { id: 'categories', label: 'Categories', href: getMentorCategoriesRoutePath(), icon: FolderTree },
     ],
   },
   {

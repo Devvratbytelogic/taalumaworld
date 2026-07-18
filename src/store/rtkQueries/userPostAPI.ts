@@ -46,8 +46,8 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['Wishlist', 'AllChapters'],
         }),
         removeFromWishlist: builder.mutation({
-            query: (wishlistItemId) => ({
-                url: `/user/wishlist/${wishlistItemId}`,
+            query: ({wishlistItemId, type}) => ({
+                url: `/user/wishlist/${wishlistItemId}/${type}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['Wishlist', 'AllChapters'],

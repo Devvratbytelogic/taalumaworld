@@ -242,6 +242,10 @@ export function getUserDashboardMyBooksRoutePath(): string {
   return '/user-dashboard/my-books';
 }
 
+export function getUserDashboardMyWishlistRoutePath(): string {
+  return '/user-dashboard/my-wishlist';
+}
+
 export function getUserDashboardHistoryRoutePath(): string {
   return '/user-dashboard/history';
 }

@@ -57,7 +57,7 @@ export function ProfilePage() {
     () => [
       {
         label: 'Series owned',
-        value: seriesData?.data?.summary?.totalSeries ?? 0,
+        value: seriesData?.data?.summary?.totalBooks ?? 0,
         icon: BookOpen,
         iconClass: 'text-primary',
         href: getUserDashboardMyBooksRoutePath(),

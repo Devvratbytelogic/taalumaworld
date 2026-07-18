@@ -13,6 +13,7 @@ import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
 import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
 import { IMySeriesAPIResponse } from '@/types/user/mySeries';
+import { IWishlistAPIResponse } from '@/types/user/wishlist';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
 import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
@@ -47,6 +48,12 @@ export interface IGetMySeriesParams {
     inProgress?: boolean;
     completed?: boolean;
     unread?: boolean;
+}
+
+export interface IGetWishlistParams {
+    page?: number;
+    limit?: number;
+    type?: 'book' | 'chapter';
 }
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -165,6 +172,19 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['MyChapters'],
         }),
+        /** get wishlisted books & chapters */
+        getWishlist: builder.query<IWishlistAPIResponse, IGetWishlistParams | void>({
+            query: (params) => ({
+                url: `/user/wishlist`,
+                method: 'GET',
+                params: {
+                    page: params?.page ?? 1,
+                    limit: params?.limit ?? 12,
+                    ...(params?.type ? { type: params.type } : {}),
+                },
+            }),
+            providesTags: ['Wishlist'],
+        }),
         /** get reading history */
         getReadingHistory: builder.query<IMyReadingHistoryAPIResponse, void>({
             query: () => ({
@@ -261,6 +281,7 @@ export const {
     useGetUserProfileQuery,
     useGetMyChaptersQuery,
     useGetMySeriesQuery,
+    useGetWishlistQuery,
     useGetReadingHistoryQuery,
     useGetTestimonialsQuery,
     useGetFAQQuery,

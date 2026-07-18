@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Book, Clock, User, Settings, GraduationCap } from 'lucide-react';
+import { BookOpen, Book, Clock, User, Settings, GraduationCap, Heart } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
@@ -13,6 +13,7 @@ import {
   getUserDashboardHistoryRoutePath,
   getUserDashboardMyBooksRoutePath,
   getUserDashboardMyChaptersRoutePath,
+  getUserDashboardMyWishlistRoutePath,
   getUserDashboardProfileRoutePath,
   getUserDashboardSettingsRoutePath,
 } from '@/routes/routes';
@@ -30,6 +31,7 @@ const NAV_GROUPS = [
     items: [
       { href: getUserDashboardMyChaptersRoutePath(), label: 'My Blueprints', icon: BookOpen },
       { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
+      { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
       // { href: getUserDashboardHistoryRoutePath(), label: 'Reading History', icon: Clock },
     ],
   },

@@ -44,7 +44,7 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
               Overview
             </p>
-            <MentorDetails data={data?.createdBy ?? null} />
+            <MentorDetails data={data?.createdBy ?? undefined} />
           </aside>
 
           <div className="min-w-0">

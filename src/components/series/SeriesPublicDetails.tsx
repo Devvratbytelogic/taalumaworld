@@ -5,7 +5,6 @@ import { ChevronRight } from 'lucide-react';
 import ImageComponent from '@/components/ui/ImageComponent';
 import MentorDetails from '@/components/blueprint/MentorDetails';
 import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
-import type { IMentor } from '@/types/user/singleChapter';
 import { getBlueprintRoutePath } from '@/routes/routes';
 
 interface SeriesPublicDetailsProps {
@@ -16,18 +15,6 @@ export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) 
   const bookDetails = data?.bookDetails ?? null;
   const chapters = data?.chapters?.data ?? [];
 
-  const mentor: IMentor | null = bookDetails?.mentor
-    ? {
-        name: bookDetails.mentor.name,
-        profilePicture: bookDetails.mentor.profile_pic,
-        email: bookDetails.mentor.email,
-        phone: '',
-        bio: '',
-        linkedin: bookDetails.mentor.linkedin,
-        facebook: bookDetails.mentor.facebook,
-      }
-    : null;
-
   return (
     <section className="container">
       <div className="grid gap-14 lg:grid-cols-[minmax(220px,280px)_1fr] lg:gap-20">
@@ -35,7 +22,7 @@ export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) 
           <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
             Overview
           </p>
-          <MentorDetails data={mentor} />
+          <MentorDetails data={bookDetails?.mentor} />
         </aside>
 
         <div className="min-w-0">

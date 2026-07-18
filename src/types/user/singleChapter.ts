@@ -1,3 +1,5 @@
+import { IMentor } from "./singleBook";
+
 export interface ISingleChapterAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -34,7 +36,7 @@ export interface ISingleChapterAPIResponseData {
   percentage: number;
   completed: boolean;
   readStatus: string;
-  createdBy: CreatedBy;
+  createdBy: IMentor;
   meta_title: string;
   meta_description: string;
   og_title: string;
@@ -78,15 +80,4 @@ export interface Mentor {
   is_mentor_verified: boolean;
   linkedin: string;
   facebook: string;
-}
-export interface CreatedBy {
-  id: string;
-  name: string;
-  email: string;
-  profile_pic: string;
-  linkedin: string;
-  facebook: string;
-  is_verified_mentor: boolean;
-  professionalBio: string;
-  short_code?: string | null;
 }

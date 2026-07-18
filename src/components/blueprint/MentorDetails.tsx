@@ -2,11 +2,11 @@
 
 import ImageComponent from '@/components/ui/ImageComponent';
 import NameInitials from '@/components/ui/NameInitials';
-import type { IMentor } from '@/types/user/singleChapter';
+import { IMentor } from '@/types/user/singleBook';
 import { Facebook, Globe, Linkedin, Mail, Phone } from 'lucide-react';
 
 interface MentorDetailsProps {
-    data: IMentor | null;
+    data: IMentor | undefined;
 }
 
 
@@ -44,9 +44,9 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
         <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_32px_-24px_rgba(0,0,0,0.18)]">
             <div className="border-b border-[#ECECEC] bg-[#FAFAFA] px-5 py-6 text-center">
                 <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.2)]">
-                    {data?.profilePicture ? (
+                    {data?.profile_pic ? (
                         <ImageComponent
-                            src={data?.profilePicture}
+                            src={data?.profile_pic}
                             alt={data?.name}
                             object_cover
                         />
@@ -67,8 +67,8 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
             </div>
 
             <div className="space-y-5 px-5 py-6">
-                {data?.bio ? (
-                    <p className="text-sm leading-7 text-[#4A4A4A]">{data?.bio}</p>
+                {data?.professionalBio ? (
+                    <p className="text-sm leading-7 text-[#4A4A4A]">{data?.professionalBio}</p>
                 ) : (
                     <p className="text-sm leading-7 text-[#6B6B6B]">
                         This mentor guides learners through practical, real-world Blueprint content.

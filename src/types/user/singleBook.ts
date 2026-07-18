@@ -29,7 +29,7 @@ export interface IBookDetails {
     isChapterPricing: boolean;
     priceLabel: string;
     fromPrice: number;
-    mentor: Mentor;
+    mentor: IMentor;
     isPurchased: boolean;
     purchasedDirectly: boolean;
     purchasedViaChapter: boolean;
@@ -45,12 +45,14 @@ export interface IBookDetails {
     legacyType: string;
     blueprintNumbers?: (number)[] | null;
 }
-export interface Mentor {
+export interface IMentor {
     name: string;
     email: string;
     profile_pic: string;
     is_verified: boolean;
+    phone: string;
     is_mentor_verified: boolean;
+    professionalBio: string;
     linkedin: string;
     facebook: string;
     short_code?: string | null;

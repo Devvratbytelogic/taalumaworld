@@ -58,12 +58,12 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
 
   const navLinkClass = (path: string) =>
     cn(
-      'rounded-full px-4 py-2 text-sm font-medium transition-colors',
-      isActive(path) ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+      'relative px-1 py-2 text-sm font-medium whitespace-nowrap transition-colors',
+      isActive(path) ? 'text-primary' : 'text-gray-600 hover:text-gray-900'
     );
 
   const iconButtonClass =
-    'relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary';
+    'relative inline-flex h-10 w-10 items-center justify-center rounded-full! text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary';
 
   const menuItemClass =
     'flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-primary';
@@ -102,6 +102,19 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
     };
   }, [isSearchOpen]);
 
+  // Close search panel on scroll
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const handleScroll = () => setIsSearchOpen(false);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isSearchOpen]);
+
   // Close transient UI (search panel, user menu) on route change
   useEffect(() => {
     setIsSearchOpen(false);
@@ -123,19 +136,26 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
     <>
       <HeaderToolbar />
 
-      <header ref={headerRef} className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-md">
+      <header ref={headerRef} className="sticky top-0 z-50 border-b border-gray-200 bg-white/60 backdrop-blur-md">
         <div className="container">
-          <div className="flex h-16 items-center justify-between gap-3">
+          <div className="relative flex h-16 items-center justify-between gap-3">
             <Link href={getHomeRoutePath()} className="flex shrink-0 items-center">
               <div className="h-9 w-[136px] sm:h-10 sm:w-[152px]">
                 <ImageComponent src={logo || '/images/logo.png'} alt={brandName} object_cover={false} />
               </div>
             </Link>
 
-            <nav className="hidden items-center gap-1 lg:flex">
+            <nav className="hidden items-center gap-8 lg:absolute lg:left-1/2 lg:flex lg:-translate-x-1/2">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} className={navLinkClass(item.href)}>
                   {item.label}
+                  <span
+                    className={cn(
+                      'absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-primary transition-opacity',
+                      isActive(item.href) ? 'opacity-100' : 'opacity-0'
+                    )}
+                    aria-hidden
+                  />
                 </Link>
               ))}
             </nav>
@@ -261,11 +281,21 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
             </div>
           </div>
 
-          {isSearchOpen && (
-            <div className="animate-fade-in pb-4">
+          <div
+            className={cn(
+              'grid transition-[grid-template-rows] duration-300 ease-in-out',
+              isSearchOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+            )}
+          >
+            <div
+              className={cn(
+                'overflow-hidden transition-opacity duration-300 ease-in-out',
+                isSearchOpen ? 'opacity-100 delay-100' : 'opacity-0'
+              )}
+            >
               <GlobalSearchBar onSelect={() => setIsSearchOpen(false)} />
             </div>
-          )}
+          </div>
         </div>
       </header>
 

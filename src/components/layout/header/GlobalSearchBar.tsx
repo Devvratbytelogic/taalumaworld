@@ -138,7 +138,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   };
 
   return (
-    <div ref={containerRef} className="group/search relative w-full">
+    <div ref={containerRef} className="group/search relative w-full pb-4">
       <form onSubmit={handleSubmit} className="relative">
         <Search
           className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 transition-colors group-focus-within/search:text-primary"

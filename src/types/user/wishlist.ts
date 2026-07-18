@@ -2,28 +2,28 @@ export interface IWishlistAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data: IWishlistAPIResponseData;
+  data: IWishlistData;
   message: string;
   timestamp: string;
 }
-export interface IWishlistAPIResponseData {
-  data?: (IWishlistAPIResponseDataEntity)[] | null;
+export interface IWishlistData {
+  data?: (IWishlistItem)[] | null;
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
-export interface IWishlistAPIResponseDataEntity {
+export interface IWishlistItem {
   _id: string;
   type: string;
   item_id: string;
   chapter?: null;
   is_purchased: boolean;
   createdAt: string;
-  series: ISeriesEntity;
-  blueprint?: IBlueprintEntity | null;
+  series: ISeries;
+  blueprint?: IBlueprint | null;
 }
-export interface ISeriesEntity {
+export interface ISeries {
   _id: string;
   title: string;
   slug?: string | null;
@@ -32,7 +32,7 @@ export interface ISeriesEntity {
   status?: string | null;
   pricingModel: string;
   price: number;
-  tags?: (string)[] | null;
+  tags?: (null)[] | null;
   deletedAt?: null;
   meta_title?: string | null;
   meta_description?: string | null;
@@ -44,12 +44,11 @@ export interface ISeriesEntity {
   updatedAt?: string | null;
   __v?: number | null;
 }
-export interface IBlueprintEntity {
+export interface IBlueprint {
   _id: string;
   number: number;
   title: string;
   slug: string;
-  short_code: string;
   description: string;
   content: string;
   isFree: boolean;
@@ -68,9 +67,10 @@ export interface IBlueprintEntity {
   createdAt: string;
   updatedAt: string;
   __v: number;
-  series: ISeriesEntity;
+  short_code: string;
+  series: ISeries;
 }
-export interface ISeriesEntity {
+export interface ISeries {
   _id: string;
   title: string;
   coverImage: string;

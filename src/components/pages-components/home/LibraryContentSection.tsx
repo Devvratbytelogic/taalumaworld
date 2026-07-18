@@ -19,7 +19,7 @@ export default function LibraryContentSection() {
     const total = data?.data?.total ?? 0;
     const viewMode = data?.data?.viewMode;
 
-    if (isLoading || isFetching) {
+    if (isLoading) {
         return <LibraryContentSectionSkeleton />;
     }
 
@@ -38,7 +38,7 @@ export default function LibraryContentSection() {
                         : <NoDataFound
                             title="No content found"
                             description="Try adjusting your filters or check back later."
-                          />
+                        />
                     }
                 </div>
             </section>

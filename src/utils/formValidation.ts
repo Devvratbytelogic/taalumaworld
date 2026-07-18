@@ -372,6 +372,10 @@ export const mentorConversionApplicationSchema = Yup.object({
   careerSummary: Yup.string()
     .trim()
     .required('Career summary is required')
+    .test('min-words', 'Minimum 10 words required', (value) => {
+      if (!value) return true;
+      return value.split(/\s+/).filter(Boolean).length >= 10;
+    })
     .test('max-words', 'Maximum 300 words', (value) => {
       if (!value) return true;
       return value.split(/\s+/).filter(Boolean).length <= 300;

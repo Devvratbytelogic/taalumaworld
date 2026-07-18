@@ -62,7 +62,7 @@ export function ProfilePage() {
   const latestMentorApplication = mentorApplication?.latest_application ?? null;
   const mentorApplicationStatus = latestMentorApplication?.status;
   const canApplyForMentor = mentorApplication?.can_apply ?? true;
-  const goToBecomeMentor = () => router.push(getUserDashboardBecomeMentorRoutePath());
+  
   const isKpisLoading = isSeriesLoading || isChaptersLoading || isHistoryLoading;
 
   const mentorDecisionBanner =
@@ -208,58 +208,71 @@ export function ProfilePage() {
     <div className="space-y-6">
       <UserDashboardPageHeader title="Profile" description="View and update your account details">
         {!isEditing ? (
-          <>
+          <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-start sm:justify-end">
             {mentorApplicationStatus === 'pending_review' ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
-                <Clock className="h-4 w-4" />
+              <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-center text-sm font-medium text-amber-700">
+                <Clock className="h-4 w-4 shrink-0" />
                 Mentor Application Pending Review
               </span>
             ) : mentorApplicationStatus === 'approved' ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200! bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
-                <ShieldCheck className="h-4 w-4" />
+              <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-emerald-200! bg-emerald-50 px-4 py-2 text-center text-sm font-medium text-emerald-700">
+                <ShieldCheck className="h-4 w-4 shrink-0" />
                 Mentor Application Approved
               </span>
             ) : mentorApplicationStatus === 'rejected' ? (
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200! bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
-                  <ShieldX className="h-4 w-4" />
+              <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200! bg-red-50 px-4 py-2 text-center text-sm font-medium text-red-700">
+                  <ShieldX className="h-4 w-4 shrink-0" />
                   Mentor Application Rejected
                 </span>
                 <Button
                   type="button"
-                  className="global_btn rounded_full bg_primary"
+                  className="global_btn w-full rounded_full bg_primary sm:w-auto"
                   startContent={<GraduationCap className="h-4 w-4" />}
-                  onPress={goToBecomeMentor}
+                  onPress={() => router.push(getUserDashboardBecomeMentorRoutePath())}
                 >
                   Re-apply
                 </Button>
               </div>
             ) : (
-              <Button
-                type="button"
-                className="global_btn rounded_full bg_primary"
-                startContent={<GraduationCap className="h-4 w-4" />}
-                onPress={goToBecomeMentor}
-                disabled={!canApplyForMentor}
-                title={!canApplyForMentor ? mentorApplication?.eligibility_reason : undefined}
-              >
-                Become a Mentor
-              </Button>
+              <div className="flex flex-col items-stretch gap-1 sm:items-end">
+                {/* the title tooltip is put on this wrapping span, not the button itself,
+                    because a disabled button never receives hover events so its own title never shows */}
+                <span
+                  title={!canApplyForMentor ? mentorApplication?.eligibility_reason : undefined}
+                  className="inline-block w-full sm:w-auto"
+                >
+                  <Button
+                    type="button"
+                    className="global_btn w-full rounded_full bg_primary sm:w-auto"
+                    startContent={<GraduationCap className="h-4 w-4" />}
+                    onPress={() => router.push(getUserDashboardBecomeMentorRoutePath())}
+                    isDisabled={!canApplyForMentor}
+                  >
+                    Become a Mentor
+                  </Button>
+                </span>
+                {!canApplyForMentor && mentorApplication?.eligibility_reason ? (
+                  <p className="max-w-full text-xs text-gray-500 sm:max-w-56 sm:text-right">
+                    {mentorApplication.eligibility_reason}
+                  </p>
+                ) : null}
+              </div>
             )}
             <Button
               type="button"
-              className="global_btn rounded_full outline_primary"
+              className="global_btn w-full rounded_full outline_primary sm:w-auto"
               onPress={() => queueMicrotask(() => setIsEditing(true))}
             >
               <Pencil className="h-4 w-4" />
               Edit profile
             </Button>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row">
             <Button
               type="button"
-              className="global_btn rounded_full bg_primary"
+              className="global_btn w-full rounded_full bg_primary sm:w-auto"
               disabled={isSubmitting}
               isLoading={isSubmitting}
               onPress={() => handleSubmit()}
@@ -273,13 +286,13 @@ export function ProfilePage() {
             </Button>
             <Button
               type="button"
-              className="global_btn rounded_full outline_primary"
+              className="global_btn w-full rounded_full outline_primary sm:w-auto"
               onPress={handleCancel}
               disabled={isSubmitting}
             >
               Cancel
             </Button>
-          </>
+          </div>
         )}
       </UserDashboardPageHeader>
 

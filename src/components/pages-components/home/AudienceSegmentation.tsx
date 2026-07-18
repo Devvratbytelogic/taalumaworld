@@ -39,7 +39,7 @@ const audiences = [
 export default function AudienceSegmentation() {
     return (
         <section className="bg-accent/30">
-            <div className="container mx-auto sm:px-4 pt-6">
+            <div className="container pt-6">
                 <div className="text-center mb-10">
                     <h2 className="text-2xl md:text-3xl font-bold mb-2">Taaluma is Built for Everyone</h2>
                     <p className="text-muted-foreground text-lg">

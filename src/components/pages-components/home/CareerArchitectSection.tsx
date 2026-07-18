@@ -41,7 +41,7 @@ export default function CareerArchitectSection() {
 
     return (
         <section className="bg-accent/30">
-            <div className="container mx-auto sm:px-4">
+            <div className="container">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left: Identity Block */}

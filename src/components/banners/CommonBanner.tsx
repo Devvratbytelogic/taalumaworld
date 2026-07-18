@@ -6,15 +6,14 @@ import { bannerProps } from '@/data/data';
 import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI';
 import { useDispatch } from 'react-redux';
 import { openModal } from '@/store/slices/allModalSlice';
+import ActiveReadersSkeleton from '@/components/skeleton-loader/ActiveReadersSkeleton';
 
 interface CommonBannerProps {
     data: bannerProps;
 }
 export default function CommonBanner({ data }: CommonBannerProps) {
-    const { data: activeReadersData } = useGetActiveReadersQuery();
     const dispatch = useDispatch();
-    // const { data: globalSettings } = useGetGlobalSettingsQuery();
-    // const displayMode = globalSettings?.data?.visible === VISIBLE.BOOK ? 'books' : 'chapters';
+    const { data: activeReadersData, isLoading: isActiveReadersLoading } = useGetActiveReadersQuery();
 
 
     // Function to scroll to content section
@@ -25,11 +24,10 @@ export default function CommonBanner({ data }: CommonBannerProps) {
         }
     };
 
-
     return (
         <>
             <section className="relative py-12 sm:py-12 md:py-16 overflow-hidden">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="grid lg:grid-cols-2 gap-10 items-center" style={{ maxHeight: '900px' }}>
                         {/* Left Column - Text Content */}
                         <div className="space-y-6 animate-fade-in">
@@ -50,7 +48,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                     </span>
                                     {data?.heading?.suffix}
                                 </h1>
-                                <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
+                                <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
                                     {data?.description}
                                 </p>
                                 {data?.tagline && (
@@ -79,7 +77,8 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                             </div>)}
 
                             {/* Active Readers Stats */}
-                            {activeReadersData?.data && activeReadersData.data.totalReaders > 0 && (() => {
+                            {isActiveReadersLoading && <ActiveReadersSkeleton />}
+                            {!isActiveReadersLoading && activeReadersData?.data && activeReadersData.data.totalReaders > 0 && (() => {
                                 const avatarColors = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed'];
                                 const users = activeReadersData.data.users ?? [];
                                 const total = activeReadersData.data.totalReaders;

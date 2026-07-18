@@ -13,7 +13,7 @@ export default function BlueprintShowcase() {
 
     return (
         <section className="pt-8 sm:pt-16 bg-accent/30 overflow-hidden">
-            <div className="container mx-auto sm:px-4">
+            <div className="container">
                 <div className="max-w-6xl mx-auto">
 
                     {/* Header */}

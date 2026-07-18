@@ -34,7 +34,7 @@ const placeCards = [
 export default function WhyTaalumaExists() {
     return (
         <section className="bg-accent/30 overflow-hidden">
-            <div className="container mx-auto sm:px-4">
+            <div className="container">
                 <div className="max-w-5xl mx-auto space-y-6">
 
                     {/* Section Header */}

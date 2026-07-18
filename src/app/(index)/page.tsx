@@ -2,8 +2,7 @@ import React, { Suspense } from 'react'
 import LibraryContentSection from '@/components/pages-components/home/LibraryContentSection';
 import ReaderTestimonials from '@/components/pages-components/home/ReaderTestimonials';
 import FAQ from '@/components/pages-components/home/FAQ';
-import CommonBanner from '@/components/banners/CommonBanner';
-import { homeBannerData } from '@/data/data';
+import HeroBanner from '@/components/pages-components/home/HeroBanner';
 import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryContentSectionSkeleton';
 import AudienceSegmentation from '@/components/pages-components/home/AudienceSegmentation';
 import WhatIsABlueprint from '@/components/pages-components/home/WhatIsABlueprint';
@@ -13,9 +12,9 @@ import HomeMentorShowcase from '@/components/pages-components/home/HomeMentorSho
 export default function HomePage() {
   return (
     <>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Hero Section */}
-        <CommonBanner data={homeBannerData} />
+        <HeroBanner />
 
        <div className='space-y-16'>
           {/* Who is Taaluma for — immediately below hero */}

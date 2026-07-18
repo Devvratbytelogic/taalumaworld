@@ -10,7 +10,7 @@ export default function NormalBanner({ data }: NormalBannerProps) {
 
     return (
         <>
-            <div className="container mx-auto sm:px-4">
+            <div className="container">
                 <div className="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
 
                     {/* Badge */}

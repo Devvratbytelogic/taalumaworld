@@ -5,9 +5,9 @@ import { getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/
 
 export default function InstitutionalAccessTermsPage() {
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen">
             <section className="relative pt-10 md:py-10 overflow-hidden bg-accent/30">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="max-w-4xl mx-auto text-center space-y-6">
                         <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full">
                             <GraduationCap className="w-4 h-4 text-primary" />
@@ -22,7 +22,7 @@ export default function InstitutionalAccessTermsPage() {
             </section>
 
             <section className="py-12 bg-background">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="max-w-4xl mx-auto space-y-8">
                         <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6">
                             <div className="flex items-start gap-4">
@@ -77,7 +77,7 @@ export default function InstitutionalAccessTermsPage() {
             </section>
 
             <section className="py-16 bg-accent/30">
-                <div className="container mx-auto sm:px-4 max-w-3xl text-center">
+                <div className="container max-w-3xl text-center">
                     <Shield className="w-7 h-7 text-primary mx-auto mb-4" />
                     <div className="flex flex-wrap justify-center gap-4 text-sm">
                         <Link href={getTermsOfServiceRoutePath()} className="text-primary font-semibold">

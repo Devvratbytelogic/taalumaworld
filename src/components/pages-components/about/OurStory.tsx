@@ -46,7 +46,7 @@ const phases = [
 export default function OurStory() {
     return (
         <section className="bg-background overflow-hidden">
-            <div className="container mx-auto sm:px-4">
+            <div className="container">
                 <div className="max-w-6xl mx-auto">
 
                     {/* Section Header */}

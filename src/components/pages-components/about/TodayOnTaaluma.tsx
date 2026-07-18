@@ -45,7 +45,7 @@ export default function TodayOnTaaluma() {
 
     return (
         <section className="bg-accent/30">
-            <div className="container mx-auto sm:px-4">
+            <div className="container">
                 <div className="max-w-5xl mx-auto space-y-8">
                     <div className="text-center">
                         <h3 className="text-2xl md:text-3xl font-bold text-foreground">Today on Taaluma</h3>

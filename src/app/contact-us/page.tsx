@@ -49,7 +49,7 @@ export default function ContactUsPage() {
 
             {/* Info Cards */}
             <section className="pt-4 sm:pt-8 bg-background">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
                         {/* Email Us */}
                         <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow text-center">
@@ -131,7 +131,7 @@ export default function ContactUsPage() {
 
             {/* Additional Contact Methods */}
             <section className="pt-4 sm:pt-8 bg-accent/30">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">Other Ways to Reach Us</h2>
                         <p className="text-lg text-muted-foreground">
@@ -230,7 +230,7 @@ export default function ContactUsPage() {
 
             {/* Partner With Taaluma */}
             <section className="pt-4 sm:pt-8 bg-background">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-primary rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
                             <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center shrink-0">
@@ -255,7 +255,7 @@ export default function ContactUsPage() {
 
             {/* FAQ Preview */}
             <section className="pt-4 sm:py-8 bg-accent/30">
-                <div className="container mx-auto sm:px-4">
+                <div className="container">
                     <div className="max-w-3xl mx-auto text-center space-y-4">
                         <h2 className="text-3xl md:text-4xl font-bold">Have Questions?</h2>
                         <p className="text-lg text-muted-foreground">

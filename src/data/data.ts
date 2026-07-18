@@ -32,38 +32,6 @@ export interface bannerProps {
 }
 
 
-export const homeBannerData: bannerProps = {
-    badgeText: 'Learn. Mentor. Grow.',
-    heading: {
-        prefix: 'Learn From Someone Ahead. Mentor Someone ',
-        highlight: 'Behind',
-        suffix: '.',
-    },
-    description: 'Connect with mentors, discover practical blueprints, and build the skills needed to thrive in a rapidly changing world.',
-    primaryCta: {
-        title: 'Start Learning',
-        button_status: true,
-    },
-    secondaryCta: {
-        title: 'Become a Mentor',
-        button_status: true,
-    },
-    stats: {
-        status: true,
-        avatars: [
-            { label: 'A', bgColor: '#0A66C2' },
-            { label: 'B', bgColor: '#8B5CF6' },
-            { label: 'C', bgColor: '#10B981' },
-            { label: '+5', bgColor: '#004182' },
-        ],
-        description: '500+ active readers',
-    },
-    image: {
-        src: '/images/banner/home-banner2.jpg',
-        alt: 'Teen reading on laptop',
-    },
-};
-
 export const aboutBannerData: bannerProps = {
     badgeText: 'About Taaluma.World',
     heading: {

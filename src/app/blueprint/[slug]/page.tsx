@@ -22,17 +22,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
-    const title = data?.metaTitle || data?.title || 'TaalumaWorld';
-    const description = data?.metaDescription || data?.description || '';
+    const title = data?.meta_title || data?.title || 'TaalumaWorld';
+    const description = data?.meta_description || data?.description || '';
+    console.log('title', title);
 
     return {
         title,
         description,
         openGraph: {
-            title: data?.ogTitle || title,
-            description: data?.ogDescription || description,
-            ...(data?.ogImage || data?.coverImage
-                ? { images: [{ url: data?.ogImage || data?.coverImage }] }
+            title: data?.og_title || title,
+            description: data?.og_description || description,
+            ...(data?.og_image || data?.coverImage
+                ? { images: [{ url: data?.og_image || data?.coverImage }] }
                 : {}),
         },
     };
@@ -49,10 +50,10 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
 
     return (
         <>
-            {data?.jsonLd && (
+            {data?.json_ld && (
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: data.jsonLd }}
+                    dangerouslySetInnerHTML={{ __html: data.json_ld }}
                 />
             )}
 

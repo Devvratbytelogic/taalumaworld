@@ -8,44 +8,84 @@ export interface ISingleChapterAPIResponse {
 }
 export interface ISingleChapterAPIResponseData {
   id: string;
-  chapterId: string;
+  slug: string;
   type: string;
   chapterNumber: number;
-  title: string;
   shareable_link: string;
+  title: string;
   description: string;
   pageCount: number;
   content: string;
-  pdf?: string | null;
+  pdf: string;
   price: number;
+  effectivePrice: number;
+  pricingAccessType: string;
   isFree: boolean;
   coverImage: string;
   bookId: string;
   bookTitle: string;
-  author: string;
-  authorAvatar?: string | null;
-  createdBy: IMentor | null;
-  category: Category;
-  subcategory?: null;
+  series: Series;
+  tags?: (string)[] | null;
+  mentor: string;
   canRead: boolean;
-  metaTitle?: string;
-  metaDescription?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  jsonLd?: string;
+  isPurchased: boolean;
+  isCart: boolean;
+  isWishlisted: boolean;
+  percentage: number;
+  completed: boolean;
+  readStatus: string;
+  createdBy: CreatedBy;
+  meta_title: string;
+  meta_description: string;
+  og_title: string;
+  og_description: string;
+  og_image: string;
+  json_ld: string;
+  legacyType: string;
+  seriesId: string;
+  seriesTitle: string;
+  blueprintNumber: number;
 }
-export interface Category {
-  _id: string;
-  name: string;
+export interface Series {
+  id: string;
+  type: string;
   slug: string;
+  title: string;
+  description: string;
+  coverImage: string;
+  price: number;
+  effectivePrice: number;
+  pricingAccessType: string;
+  pricingModel: string;
+  tags?: (string)[] | null;
+  totalPages: number;
+  chapterCount: number;
+  isChapterPricing: boolean;
+  priceLabel: string;
+  fromPrice: number;
+  mentor: Mentor;
+  isPurchased: boolean;
+  canRead: boolean;
+  isCart: boolean;
+  isWishlisted: boolean;
+  legacyType: string;
 }
-export interface IMentor {
+export interface Mentor {
   name: string;
-  profilePicture: string;
   email: string;
-  phone: string;
-  bio: string;
+  profile_pic: string;
+  is_verified: boolean;
+  is_mentor_verified: boolean;
   linkedin: string;
   facebook: string;
+}
+export interface CreatedBy {
+  id: string;
+  name: string;
+  email: string;
+  profile_pic: string;
+  linkedin: string;
+  facebook: string;
+  is_verified_mentor: boolean;
+  professionalBio: string;
 }

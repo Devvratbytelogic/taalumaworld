@@ -3,7 +3,7 @@
 import type { ComponentType } from 'react';
 import Link from 'next/link';
 import { useFormik } from 'formik';
-import { Briefcase, CreditCard, FileCheck, Send } from 'lucide-react';
+import { Briefcase, CreditCard, FileCheck, Send, Share2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -52,6 +52,8 @@ export function BecomeMentorPage() {
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched } =
     useFormik({
       initialValues: {
+        linkedinUrl: '',
+        facebookUrl: '',
         careerSummary: '',
         paymentFrequency: '',
         bankName: '',
@@ -67,6 +69,8 @@ export function BecomeMentorPage() {
       onSubmit: async (formValues, { resetForm: rf }) => {
         try {
           const formData = new FormData();
+          if (formValues.linkedinUrl.trim()) formData.append('linkedin_url', formValues.linkedinUrl.trim());
+          if (formValues.facebookUrl.trim()) formData.append('facebook_url', formValues.facebookUrl.trim());
           formData.append('professional_summary', formValues.careerSummary.trim());
           formData.append('bank_name', formValues.bankName.trim());
           formData.append('bank_number', formValues.accountNumber.trim());
@@ -98,6 +102,54 @@ export function BecomeMentorPage() {
       />
 
       <form noValidate onSubmit={handleSubmit} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+        <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
+          <SectionHeader
+            icon={Share2}
+            title="Social profiles"
+            description="Optional links to help verify your professional background."
+          />
+
+          <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50/60 p-4 sm:p-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label htmlFor="linkedinUrl" className={labelClassName}>
+                  LinkedIn <span className="text-gray-400">(optional)</span>
+                </label>
+                <Input
+                  id="linkedinUrl"
+                  name="linkedinUrl"
+                  value={values.linkedinUrl}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="https://linkedin.com/in/you"
+                  className={fieldError('linkedinUrl')}
+                />
+                {touched.linkedinUrl && errors.linkedinUrl ? (
+                  <p className="mt-1 text-sm text-red-600">{errors.linkedinUrl}</p>
+                ) : null}
+              </div>
+
+              <div>
+                <label htmlFor="facebookUrl" className={labelClassName}>
+                  Facebook <span className="text-gray-400">(optional)</span>
+                </label>
+                <Input
+                  id="facebookUrl"
+                  name="facebookUrl"
+                  value={values.facebookUrl}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="https://facebook.com/you"
+                  className={fieldError('facebookUrl')}
+                />
+                {touched.facebookUrl && errors.facebookUrl ? (
+                  <p className="mt-1 text-sm text-red-600">{errors.facebookUrl}</p>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={Briefcase}

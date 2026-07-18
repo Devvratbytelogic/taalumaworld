@@ -358,8 +358,16 @@ export const authorSchema = Yup.object({
     ),
 });
 
+const optionalUrl = Yup.string()
+  .trim()
+  .transform((v) => (v === '' ? undefined : v))
+  .url('Enter a valid URL')
+  .optional();
+
 // Career Architect → Mentor conversion application
 export const mentorConversionApplicationSchema = Yup.object({
+  linkedinUrl: optionalUrl,
+  facebookUrl: optionalUrl,
   careerSummary: Yup.string()
     .trim()
     .required('Career summary is required')

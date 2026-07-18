@@ -25,11 +25,11 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                 {/* <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                   Blueprint {data?.chapterNumber}
                 </span> */}
-                {data?.category?.name && (
+                {/* {data?.category?.name && (
                   <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
                     {data?.category?.name}
                   </span>
-                )}
+                )} */}
                 <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
                   {priceLabel}
                 </span>
@@ -44,25 +44,25 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
               )}
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-border py-4 text-sm">
-                {data?.author && (
+                {data?.createdBy && (
                   <div className="flex items-center gap-2.5">
-                    {data?.authorAvatar ? (
+                    {data?.createdBy?.profile_pic ? (
                       <div className="h-9 w-9 overflow-hidden rounded-full border border-border">
-                        <ImageComponent src={data?.authorAvatar} alt={data?.author} object_cover />
+                        <ImageComponent src={data?.createdBy?.profile_pic} alt={data?.createdBy?.name} object_cover />
                       </div>
                     ) : (
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase text-foreground">
-                        {data?.author?.slice(0, 2)}
+                        {data?.createdBy?.name?.slice(0, 2)}
                       </div>
                     )}
                     <div>
                       <p className="text-xs text-muted-foreground">Author</p>
-                      <p className="font-medium text-foreground">{data?.author}</p>
+                      <p className="font-medium text-foreground">{data?.createdBy?.name}</p>
                     </div>
                   </div>
                 )}
 
-                {data?.bookTitle && (
+                {data?.seriesTitle && (
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                       <BookOpen className="h-4 w-4 text-muted-foreground" />

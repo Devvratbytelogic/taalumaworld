@@ -12,8 +12,9 @@ import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
-import { getHomeRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath } from '@/routes/routes';
+import { getAdminDashboardRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath } from '@/routes/routes';
 import usePreventRefresh from '@/hooks/preventRefresh';
+import { setAuthCookies } from '@/utils/authCookies';
 
 type StaffSignInVariant = 'mentor' | 'admin';
 
@@ -39,11 +40,20 @@ export function SignInForm({ variant }: SignInFormProps) {
         onSubmit: async (vals) => {
             try {
                 const res = await adminLogin({ email: vals.email, password: vals.password }).unwrap();
+                console.log('res', res);
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     if (res?.message === LOGIN_OTP_MESSAGE) {
                         setShowOtp(true);
                         toast.success(res.message);
                         return;
+                    } else {
+                        toast.success(res.message ?? 'Verification successful!');
+                        setAuthCookies({
+                            token: res?.data?.token ?? '',
+                            user: { id: res?.data?.id, email: res?.data?.email },
+                            role: res?.data?.userRole?.name ?? '',
+                        })
+                        router.push(isAdmin ? getAdminDashboardRoutePath() : getMentorDashboardRoutePath());
                     }
                 }
             } catch (error) {

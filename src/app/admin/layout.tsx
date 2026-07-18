@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, UserCircle, Users, Award } from 'lucide-react';
+import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, Tag, UserCircle, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -26,6 +26,15 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { model: 'Transaction', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
             { model: 'Order', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
+            { model: 'Coupon', id: 'coupons', label: 'Coupons', href: getAdminSectionRoutePath('coupons'), icon: Tag },
+            { model: 'Withdrawal Request', id: 'withdrawal_requests', label: 'Withdrawal Requests', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
+        ],
+    },
+    {
+        title: 'User Management',
+        items: [
+            { model: 'User', id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
+            { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
     },
     {
@@ -34,6 +43,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Mentor', id: 'mentors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
             { model: 'Mentor Application', id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
             { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
+            { model: 'Affiliate Application', id: 'affiliate_applications', label: 'Affiliate Applications', href: getAdminSectionRoutePath('affiliate_applications'), icon: Handshake },
         ],
     },
     {
@@ -49,13 +59,6 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { model: 'Agreement Type', id: 'agreement_types', label: 'Agreement Types', href: getAdminSectionRoutePath('agreement_types'), icon: FolderTree },
             { model: 'Agreement', id: 'agreements', label: 'Agreements', href: getAdminSectionRoutePath('agreements'), icon: FileSignature },
-        ],
-    },
-    {
-        title: 'User Management',
-        items: [
-            { model: 'User', id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
-            { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
     },
     {

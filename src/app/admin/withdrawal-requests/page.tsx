@@ -1,7 +1,9 @@
 import React from 'react'
 
-export default function page() {
+export default function WithdrawalRequestsPage() {
   return (
-    <div>page</div>
+    <>
+      <h1>Withdrawal Requests</h1>
+    </>
   )
 }

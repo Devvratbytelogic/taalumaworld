@@ -1,7 +1,9 @@
 import React from 'react'
 
-export default function page() {
+export default function AffiliateApplicationsPage() {
   return (
-    <div>page</div>
+    <>
+      <h1>Affiliate Applications</h1>
+    </>
   )
 }

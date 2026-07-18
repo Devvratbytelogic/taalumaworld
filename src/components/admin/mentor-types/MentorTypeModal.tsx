@@ -76,8 +76,8 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
           onOpenChange(false);
           onSuccess?.();
         }
-      } catch {
-        toast.error(isEditing ? 'Failed to update mentor tier' : 'Failed to create mentor tier');
+      } catch(error) {
+        console.error(isEditing ? 'Failed to update mentor tier' : 'Failed to create mentor tier', error);
       }
     },
   });

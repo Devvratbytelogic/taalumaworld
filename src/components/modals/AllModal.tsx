@@ -20,6 +20,7 @@ import RestoreConfirmation from '../admin/RestoreConfirmation';
 import { AddEditStaffModal } from '../admin/roles-and-permissions/AddEditStaffModal';
 import { UpdateStaffStatusModal } from '../admin/roles-and-permissions/UpdateStaffStatusModal';
 import ChapterPurchaseModal from '../pages-components/chapter/ChapterPurchaseModal';
+import ApplyVerifiedMentorModal from '../admin/mentor/dashboard/ApplyVerifiedMentorModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -68,6 +69,8 @@ export default function AllModal() {
                 return <DeleteConfirmation />;
             case "RestoreConfirmation":
                 return <RestoreConfirmation />;
+            case "ApplyVerifiedMentorModal":
+                return <ApplyVerifiedMentorModal />;
             default:
                 return null;
         }

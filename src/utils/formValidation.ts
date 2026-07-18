@@ -388,6 +388,19 @@ export const mentorConversionApplicationSchema = Yup.object({
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
+// Verified Mentor application (existing Mentor applying for verified status)
+export const verifiedMentorApplicationSchema = Yup.object({
+  applicationStatement: Yup.string()
+    .trim()
+    .required('Application statement is required')
+    .test('max-words', 'Maximum 300 words', (value) => {
+      if (!value) return true;
+      return value.split(/\s+/).filter(Boolean).length <= 300;
+    }),
+  portfolioUrl: optionalUrl,
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
+});
+
 // Add / Edit Institution Modal Validation Schema
 export const institutionSchema = Yup.object({
   name: Yup.string().trim().required('Institution name is required'),

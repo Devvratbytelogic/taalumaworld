@@ -25,13 +25,6 @@ export default function CommonBanner({ data }: CommonBannerProps) {
         }
     };
 
-    // Function to scroll to categories section
-    const scrollToCategories = () => {
-        const categoriesSection = document.getElementById('categories-section');
-        if (categoriesSection) {
-            categoriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    };
 
     return (
         <>
@@ -99,7 +92,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                                     user.profilePic ? (
                                                         <div
                                                             key={user.id}
-                                                            className="w-8 h-8 rounded-full border-2 overflow-hidden border-background"
+                                                            className="w-8 h-8 rounded-full border border-gray-200 overflow-hidden"
                                                         >
                                                             <ImageComponent
                                                                 src={user.profilePic}
@@ -110,7 +103,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                                     ) : (
                                                         <div
                                                             key={user.id}
-                                                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background"
+                                                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border border-gray-200"
                                                             style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
                                                         >
                                                             {user.name.charAt(0).toUpperCase()}

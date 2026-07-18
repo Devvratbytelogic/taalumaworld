@@ -35,7 +35,7 @@ export default function ImageComponent({
   // If already errored OR url is invalid → show initials
   if (hasError) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100 text-sky-600 text-xl font-semibold uppercase">
+      <div className="w-full h-full flex items-center justify-center bg-gray-100 text-sky-600 text-sm font-semibold uppercase">
         {getInitials(alt)}
       </div>
     );

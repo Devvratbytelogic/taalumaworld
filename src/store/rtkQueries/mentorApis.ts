@@ -47,6 +47,14 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminMentorApplications'],
         }),
+        reviewMentorApplication: builder.mutation({
+            query: ({ id, values }) => ({
+                url: `/admin/mentor-applications/${id}/review`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminMentorApplications'],
+        }),
     }),
 });
 
@@ -56,4 +64,5 @@ export const {
     useAddMentorTierMutation,
     useUpdateMentorTierMutation,
     useGetAllMentorApplicationsQuery,
+    useReviewMentorApplicationMutation,
 } = mentorApis;

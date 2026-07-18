@@ -68,17 +68,16 @@ export function BecomeMentorPage() {
       },
       onSubmit: async (formValues, { resetForm: rf }) => {
         try {
-          const formData = new FormData();
-          if (formValues.linkedinUrl.trim()) formData.append('linkedin_url', formValues.linkedinUrl.trim());
-          if (formValues.facebookUrl.trim()) formData.append('facebook_url', formValues.facebookUrl.trim());
-          formData.append('professional_summary', formValues.careerSummary.trim());
-          formData.append('bank_name', formValues.bankName.trim());
-          formData.append('bank_number', formValues.accountNumber.trim());
-          formData.append('mpesa_number', formValues.mpesaNumber.trim());
-          formData.append('preferred_payment_frequency', formValues.paymentFrequency);
-          formValues.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
-
-          const res = await submitMentorApplication(formData).unwrap();
+          const res = await submitMentorApplication({
+            ...(formValues.linkedinUrl.trim() ? { linkedin_url: formValues.linkedinUrl.trim() } : {}),
+            ...(formValues.facebookUrl.trim() ? { facebook_url: formValues.facebookUrl.trim() } : {}),
+            professional_summary: formValues.careerSummary.trim(),
+            bank_name: formValues.bankName.trim(),
+            bank_number: formValues.accountNumber.trim(),
+            mpesa_number: formValues.mpesaNumber.trim(),
+            preferred_payment_frequency: formValues.paymentFrequency,
+            accepted_agreement_ids: formValues.accepted_agreement_ids,
+          }).unwrap();
           rf();
           toast.success(res?.message ?? 'Application submitted for review.');
         } catch(error) {

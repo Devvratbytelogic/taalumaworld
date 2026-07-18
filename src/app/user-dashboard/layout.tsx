@@ -8,6 +8,8 @@ import { cn } from '@/components/ui/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
+import { getUserRole } from '@/utils/authCookies';
+import { USER_TYPE, UserTypeValue } from '@/constants/common';
 import {
   getUserDashboardBecomeMentorRoutePath,
   getUserDashboardHistoryRoutePath,
@@ -18,7 +20,10 @@ import {
   getUserDashboardSettingsRoutePath,
 } from '@/routes/routes';
 
-const NAV_GROUPS = [
+const NAV_GROUPS: {
+  title: string;
+  items: { href: string; label: string; icon: typeof User; roles?: UserTypeValue[] }[];
+}[] = [
   {
     title: 'Account',
     items: [
@@ -32,13 +37,17 @@ const NAV_GROUPS = [
       { href: getUserDashboardMyChaptersRoutePath(), label: 'My Blueprints', icon: BookOpen },
       { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
       { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
-      // { href: getUserDashboardHistoryRoutePath(), label: 'Reading History', icon: Clock },
     ],
   },
   {
     title: 'Growth',
     items: [
-      { href: getUserDashboardBecomeMentorRoutePath(), label: 'Become a Mentor', icon: GraduationCap },
+      {
+        href: getUserDashboardBecomeMentorRoutePath(),
+        label: 'Become a Mentor',
+        icon: GraduationCap,
+        roles: [USER_TYPE.CAREER_ARCHITECT],
+      },
     ],
   },
 ];
@@ -48,6 +57,12 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
   const { data: profileData } = useGetUserProfileQuery();
   const userName = profileData?.data?.name ?? 'User';
   const userPhoto = profileData?.data?.profile_pic ?? '';
+  const userRole = getUserRole();
+
+  const navGroups = NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.roles || item.roles.includes(userRole as UserTypeValue)),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <div className="min-h-screen bg-white">
@@ -68,7 +83,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
               </div>
 
               <nav className="space-y-5 p-4">
-                {NAV_GROUPS.map((group) => (
+                {navGroups.map((group) => (
                   <div key={group.title}>
                     <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       {group.title}

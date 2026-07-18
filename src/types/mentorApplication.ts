@@ -1,41 +1,3 @@
-export interface IMentorApplicationApplicant {
-  _id: string;
-  name?: string | null;
-  email?: string | null;
-  profile_pic?: string | null;
-}
-
-export interface IMentorApplicationEntity {
-  _id: string;
-  user?: IMentorApplicationApplicant | string | null;
-  name?: string | null;
-  email?: string | null;
-  linkedin_url?: string | null;
-  facebook_url?: string | null;
-  x_url?: string | null;
-  personal_website?: string | null;
-  career_summary?: string | null;
-  years_of_experience?: number | null;
-  payment_frequency?: string | null;
-  bank_name?: string | null;
-  account_name?: string | null;
-  account_number?: string | null;
-  mpesa_number?: string | null;
-  tax_id?: string | null;
-  status: string;
-  admin_notes?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface IAllMentorApplicationsAPIResponseData {
-  data?: IMentorApplicationEntity[] | null;
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
 export interface IAllMentorApplicationsAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -43,4 +5,53 @@ export interface IAllMentorApplicationsAPIResponse {
   data: IAllMentorApplicationsAPIResponseData;
   message: string;
   timestamp: string;
+}
+export interface IAllMentorApplicationsAPIResponseData {
+  applications?: (ApplicationsEntity)[] | null;
+  pagination: Pagination;
+}
+export interface ApplicationsEntity {
+  _id: string;
+  user_id: UserId;
+  previous_role: string;
+  status: string;
+  professional_summary: string;
+  linkedin?: null;
+  facebook?: null;
+  bank_name: string;
+  bank_number: string;
+  bank_branch?: null;
+  mpesa_number: string;
+  tax_id?: null;
+  preferred_payment_frequency: string;
+  admin_notes?: string | null;
+  decision_reason?: string | null;
+  reviewed_by?: ReviewedBy | string | null;
+  reviewed_at?: string | null;
+  submitted_at: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  summary_word_count: number;
+  can_withdraw: boolean;
+  valid_statuses?: (string)[] | null;
+}
+export interface UserId {
+  _id: string;
+  name: string;
+  profile_pic: string;
+  email: string;
+  status: string;
+  institution_id?: null;
+}
+export interface ReviewedBy {
+  _id: string;
+  name: string;
+  email: string;
+}
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }

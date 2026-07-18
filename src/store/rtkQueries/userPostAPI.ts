@@ -98,7 +98,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['MyChapters', 'ReadingHistory'],
         }),
-        /** Career Architect → Mentor conversion request (POST /user/mentor-applications, form-data) */
+        /** Career Architect → Mentor conversion request (POST /user/mentor-applications) */
         submitMentorApplication: builder.mutation({
             query: (body) => ({
                 url: `/user/mentor-applications`,

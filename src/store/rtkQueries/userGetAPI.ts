@@ -26,6 +26,7 @@ import { IActiveReadersAPIResponse } from '@/types/activeReaders';
 import { IAllAgreementsDataAPIResponse } from './allAgreements';
 import { UserTypeValue } from '@/constants/common';
 import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
+import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -53,7 +54,7 @@ export interface IGetMySeriesParams {
 export interface IGetWishlistParams {
     page?: number;
     limit?: number;
-    type?: 'book' | 'chapter';
+    type?: 'Book' | 'Chapter';
 }
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -263,6 +264,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+         
+        /** mentor-applications */
+        getMentorApplications: builder.query<IMyMentorApplicationAPIResponse, void>({
+            query: () => ({
+                url: `/user/mentor-applications/my`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -297,4 +306,5 @@ export const {
     useGetAllAgreementsDataQuery,
     useGetPartnerInstitutionsQuery,
     useGetInstituteMessageQuery,
+    useGetMentorApplicationsQuery,
 } = clientSideGetApis;

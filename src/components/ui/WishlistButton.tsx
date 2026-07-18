@@ -37,7 +37,7 @@ export default function WishlistButton({
 
         try {
             if (wishlisted) {
-                await removeFromWishlist(itemId).unwrap();
+                await removeFromWishlist({wishlistItemId: itemId, type}).unwrap();
                 setWishlisted(false);
                 toast.success('Removed from wishlist');
             } else {

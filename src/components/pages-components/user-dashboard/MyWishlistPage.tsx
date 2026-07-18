@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Heart, Book, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import CommonCard from '@/components/cards/CommonCard';
+import WishlistItemCard from '@/components/cards/WishlistItemCard';
 import { cn } from '@/components/ui/utils';
 import { useGetWishlistQuery } from '@/store/rtkQueries/userGetAPI';
 import { getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
-type FilterType = 'all' | 'book' | 'chapter';
+type FilterType = 'all' | 'Book' | 'Chapter';
 
 const PAGE_LIMIT = 12;
 
@@ -24,8 +24,10 @@ export function MyWishlistPage() {
     ...(filter !== 'all' ? { type: filter } : {}),
   });
 
-  const items = wishlistData?.data?.items ?? [];
-  const pagination = wishlistData?.data?.pagination;
+  const items = wishlistData?.data?.data ?? [];
+  const totalItems = wishlistData?.data?.total ?? 0;
+  const currentPage = wishlistData?.data?.page ?? page;
+  const totalPages = wishlistData?.data?.totalPages ?? 1;
 
   const handleFilterChange = (nextFilter: FilterType) => {
     setFilter(nextFilter);
@@ -34,8 +36,8 @@ export function MyWishlistPage() {
 
   const filterTabs: { key: FilterType; label: string }[] = [
     { key: 'all', label: 'All' },
-    { key: 'book', label: 'Series' },
-    { key: 'chapter', label: 'Blueprints' },
+    { key: 'Book', label: 'Series' },
+    { key: 'Chapter', label: 'Blueprints' },
   ];
 
   const emptyStateCopy: Record<FilterType, { title: string; description: string }> = {
@@ -43,11 +45,11 @@ export function MyWishlistPage() {
       title: 'Your wishlist is empty',
       description: 'Save series and blueprints you love by tapping the heart icon, and they will show up here.',
     },
-    book: {
+    Book: {
       title: 'No series wishlisted',
       description: 'Series you wishlist will show up here.',
     },
-    chapter: {
+    Chapter: {
       title: 'No blueprints wishlisted',
       description: 'Blueprints you wishlist will show up here.',
     },
@@ -100,15 +102,15 @@ export function MyWishlistPage() {
             ))}
           </div>
           <p className="text-sm text-gray-500">
-            {pagination?.totalItems ?? 0} item{(pagination?.totalItems ?? 0) !== 1 ? 's' : ''}
+            {totalItems} item{totalItems !== 1 ? 's' : ''}
           </p>
         </div>
 
         <div className={cn('p-4 sm:p-6 transition-opacity', isFetching ? 'opacity-60' : '')}>
           {items.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item, index) => (
-                <CommonCard key={item.id ?? index} data={item} />
+                <WishlistItemCard key={item._id ?? index} item={item} />
               ))}
             </div>
           ) : (
@@ -143,17 +145,17 @@ export function MyWishlistPage() {
           )}
         </div>
 
-        {pagination && pagination.totalPages > 1 ? (
+        {totalPages > 1 ? (
           <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <p className="text-sm text-gray-500">
-              Page <span className="font-medium text-gray-700">{pagination.currentPage}</span> of{' '}
-              <span className="font-medium text-gray-700">{pagination.totalPages}</span>
+              Page <span className="font-medium text-gray-700">{currentPage}</span> of{' '}
+              <span className="font-medium text-gray-700">{totalPages}</span>
             </p>
             <div className="flex items-center gap-2">
               <Button
                 type="button"
                 className="global_btn rounded_full outline_primary"
-                isDisabled={pagination.currentPage <= 1 || isFetching}
+                isDisabled={currentPage <= 1 || isFetching}
                 onPress={() => setPage((prev) => Math.max(1, prev - 1))}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -162,8 +164,8 @@ export function MyWishlistPage() {
               <Button
                 type="button"
                 className="global_btn rounded_full outline_primary"
-                isDisabled={pagination.currentPage >= pagination.totalPages || isFetching}
-                onPress={() => setPage((prev) => Math.min(pagination.totalPages, prev + 1))}
+                isDisabled={currentPage >= totalPages || isFetching}
+                onPress={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               >
                 Next
                 <ChevronRight className="h-4 w-4" />

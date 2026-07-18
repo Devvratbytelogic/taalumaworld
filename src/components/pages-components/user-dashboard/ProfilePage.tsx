@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import {
@@ -12,6 +13,9 @@ import {
   Calendar,
   UserRound,
   ShieldCheck,
+  ShieldX,
+  Clock,
+  GraduationCap,
   BookOpen,
   BookMarked,
   TrendingUp,
@@ -28,11 +32,13 @@ import {
   useGetMyChaptersQuery,
   useGetReadingHistoryQuery,
   useGetUserProfileQuery,
+  useGetMentorApplicationsQuery,
 } from '@/store/rtkQueries/userGetAPI';
 import { useUserUpdateProfileMutation } from '@/store/rtkQueries/userAuthApi';
 import { updateProfileSchema } from '@/utils/formValidation';
 import moment from 'moment';
 import {
+  getUserDashboardBecomeMentorRoutePath,
   getUserDashboardHistoryRoutePath,
   getUserDashboardMyBooksRoutePath,
   getUserDashboardMyChaptersRoutePath,
@@ -40,6 +46,7 @@ import {
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 export function ProfilePage() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [tempPhoto, setTempPhoto] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -48,10 +55,38 @@ export function ProfilePage() {
   const { data: seriesData, isLoading: isSeriesLoading } = useGetMySeriesQuery();
   const { data: chaptersData, isLoading: isChaptersLoading } = useGetMyChaptersQuery();
   const { data: historyData, isLoading: isHistoryLoading } = useGetReadingHistoryQuery();
+  const { data: mentorApplicationsData } = useGetMentorApplicationsQuery();
   const [updateProfile] = useUserUpdateProfileMutation();
   const profile = profileData?.data;
-
+  const mentorApplication = mentorApplicationsData?.data;
+  const latestMentorApplication = mentorApplication?.latest_application ?? null;
+  const mentorApplicationStatus = latestMentorApplication?.status;
+  const canApplyForMentor = mentorApplication?.can_apply ?? true;
+  const goToBecomeMentor = () => router.push(getUserDashboardBecomeMentorRoutePath());
   const isKpisLoading = isSeriesLoading || isChaptersLoading || isHistoryLoading;
+
+  const mentorDecisionBanner =
+    mentorApplicationStatus === 'approved'
+      ? {
+          label: 'Approval note',
+          Icon: ShieldCheck,
+          border: 'border-emerald-200/80!',
+          bg: 'bg-emerald-50/50',
+          iconBg: 'bg-emerald-100',
+          iconColor: 'text-emerald-600',
+          titleColor: 'text-emerald-900',
+          textColor: 'text-emerald-700',
+        }
+      : {
+          label: 'Reason for rejection',
+          Icon: ShieldX,
+          border: 'border-red-200/80!',
+          bg: 'bg-red-50/50',
+          iconBg: 'bg-red-100',
+          iconColor: 'text-red-600',
+          titleColor: 'text-red-900',
+          textColor: 'text-red-700',
+        };
 
   const kpiItems = useMemo(
     () => [
@@ -108,7 +143,7 @@ export function ProfilePage() {
             setIsEditing(false);
             toast.success(res.message ?? 'Profile updated successfully!');
           }
-        } catch(error) {
+        } catch (error) {
           console.error('Failed to update profile. Please try again.', error);
         }
       },
@@ -173,14 +208,53 @@ export function ProfilePage() {
     <div className="space-y-6">
       <UserDashboardPageHeader title="Profile" description="View and update your account details">
         {!isEditing ? (
-          <Button
-            type="button"
-            className="global_btn rounded_full outline_primary"
-            onPress={() => queueMicrotask(() => setIsEditing(true))}
-          >
-            <Pencil className="h-4 w-4" />
-            Edit profile
-          </Button>
+          <>
+            {mentorApplicationStatus === 'pending_review' ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
+                <Clock className="h-4 w-4" />
+                Mentor Application Pending Review
+              </span>
+            ) : mentorApplicationStatus === 'approved' ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200! bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+                <ShieldCheck className="h-4 w-4" />
+                Mentor Application Approved
+              </span>
+            ) : mentorApplicationStatus === 'rejected' ? (
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200! bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+                  <ShieldX className="h-4 w-4" />
+                  Mentor Application Rejected
+                </span>
+                <Button
+                  type="button"
+                  className="global_btn rounded_full bg_primary"
+                  startContent={<GraduationCap className="h-4 w-4" />}
+                  onPress={goToBecomeMentor}
+                >
+                  Re-apply
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                className="global_btn rounded_full bg_primary"
+                startContent={<GraduationCap className="h-4 w-4" />}
+                onPress={goToBecomeMentor}
+                disabled={!canApplyForMentor}
+                title={!canApplyForMentor ? mentorApplication?.eligibility_reason : undefined}
+              >
+                Become a Mentor
+              </Button>
+            )}
+            <Button
+              type="button"
+              className="global_btn rounded_full outline_primary"
+              onPress={() => queueMicrotask(() => setIsEditing(true))}
+            >
+              <Pencil className="h-4 w-4" />
+              Edit profile
+            </Button>
+          </>
         ) : (
           <>
             <Button
@@ -208,6 +282,26 @@ export function ProfilePage() {
           </>
         )}
       </UserDashboardPageHeader>
+
+      {latestMentorApplication?.decision_reason ? (
+        <div
+          className={cn(
+            'flex items-start gap-3.5 rounded-md border p-4',
+            mentorDecisionBanner.border,
+            mentorDecisionBanner.bg
+          )}
+        >
+          <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg', mentorDecisionBanner.iconBg)}>
+            <mentorDecisionBanner.Icon className={cn('h-5 w-5', mentorDecisionBanner.iconColor)} />
+          </div>
+          <div className="min-w-0 flex-1 pt-0.5">
+            <p className={cn('text-sm font-semibold', mentorDecisionBanner.titleColor)}>{mentorDecisionBanner.label}</p>
+            <p className={cn('mt-0.5 text-sm leading-relaxed', mentorDecisionBanner.textColor)}>
+              {latestMentorApplication.decision_reason}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         {/* Mobile profile banner — stacked, no overlap */}

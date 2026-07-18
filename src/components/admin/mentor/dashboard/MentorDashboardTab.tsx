@@ -73,7 +73,7 @@ export function MentorDashboardTab() {
     ? {
         label: 'Approval note',
         Icon: ShieldCheck,
-        border: 'border-emerald-200/80',
+        border: 'border-emerald-200/!',
         bg: 'bg-emerald-50/50',
         iconBg: 'bg-emerald-100',
         iconColor: 'text-emerald-600',
@@ -83,7 +83,7 @@ export function MentorDashboardTab() {
     : {
         label: 'Reason for rejection',
         Icon: ShieldX,
-        border: 'border-red-200/80',
+        border: 'border-red-200/80!',
         bg: 'bg-red-50/50',
         iconBg: 'bg-red-100',
         iconColor: 'text-red-600',
@@ -138,7 +138,7 @@ export function MentorDashboardTab() {
       {verifiedMentorApplication?.decision_reason ? (
         <div
           className={cn(
-            'flex items-start gap-3.5 rounded-xl border p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]',
+            'flex items-start gap-3.5 rounded-md border p-4',
             decisionBanner.border,
             decisionBanner.bg
           )}

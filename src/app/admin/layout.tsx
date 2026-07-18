@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShoppingBag, Tag, UserCircle, Users, Award } from 'lucide-react';
+import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -43,6 +43,8 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Mentor', id: 'mentors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
             { model: 'Mentor Application', id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
             { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
+            { model: 'Mentor Verification', id: 'mentor_verification', label: 'Mentor Verification', href: getAdminSectionRoutePath('mentor_verification'), icon: ShieldCheck },
+            { model: 'Mentor Tier Upgrade', id: 'mentor_tier_upgrades', label: 'Mentor Tier Upgrade', href: getAdminSectionRoutePath('mentor_tier_upgrades'), icon: TrendingUp },
             { model: 'Affiliate Application', id: 'affiliate_applications', label: 'Affiliate Applications', href: getAdminSectionRoutePath('affiliate_applications'), icon: Handshake },
         ],
     },

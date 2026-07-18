@@ -1,4 +1,7 @@
-import { IMyVerifiedMentorApplicationAPIResponse } from '@/types/verifiedMentorApplication';
+import {
+  IAllVerifiedMentorApplicationsAPIResponse,
+  IMyVerifiedMentorApplicationAPIResponse,
+} from '@/types/verifiedMentorApplication';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const verifiedMentorApplicationApis = rtkQuerieSetup.injectEndpoints({
@@ -33,7 +36,7 @@ export const verifiedMentorApplicationApis = rtkQuerieSetup.injectEndpoints({
     }),
 
     /** All verification applications — Admin */
-    getAllVerifiedMentorApplications: builder.query<any, {page?: number; limit?: number; status?: string; search?: string} | void>({
+    getAllVerifiedMentorApplications: builder.query<IAllVerifiedMentorApplicationsAPIResponse, {page?: number; limit?: number; status?: string; search?: string} | void>({
       query: (params) => ({
         url: `/admin/verified-mentor-applications`,
         method: 'GET',

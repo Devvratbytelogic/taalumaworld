@@ -5,5 +5,8 @@ export const VERIFIED_MENTOR_APPLICATION_STATUS = {
   REJECTED: 'rejected',
 } as const;
 
-export type VerifiedMentorApplicationStatus =
-  (typeof VERIFIED_MENTOR_APPLICATION_STATUS)[keyof typeof VERIFIED_MENTOR_APPLICATION_STATUS];
+/** Values accepted by the `action` field when reviewing an application */
+export const VERIFIED_MENTOR_APPLICATION_ACTION = {
+  APPROVE: 'approve',
+  REJECT: 'reject',
+} as const;

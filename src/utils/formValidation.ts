@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { COUPON_SCOPES, COUPON_TYPES } from '@/constants/coupon';
 
 
 const passwordRules = Yup.string()
@@ -477,6 +478,44 @@ export const mentorTierSchema = Yup.object({
     .nullable()
     .optional()
     .test('badge', 'Badge must be an image file', (v) => !v || v instanceof File || typeof v === 'string'),
+});
+
+// Add / Edit Coupon Modal Validation Schema (matches API: coupon_code, coupon_type, coupon_for, institutions, books, chapters, value, expiry_date, minimum_cart_value, usage_limit, status)
+export const couponSchema = Yup.object({
+  coupon_code: Yup.string()
+    .trim()
+    .min(3, 'Coupon code must be at least 3 characters')
+    .max(30, 'Coupon code must be at most 30 characters')
+    .matches(/^[A-Za-z0-9_-]+$/, 'Only letters, numbers, hyphens and underscores are allowed')
+    .required('Coupon code is required'),
+  coupon_type: Yup.string().oneOf(COUPON_TYPES, 'Select a valid coupon type').required('Coupon type is required'),
+  coupon_for: Yup.string().oneOf(COUPON_SCOPES, 'Select a valid scope').required('Coupon scope is required'),
+  institutions: Yup.array().of(Yup.string().required()).default([]),
+  books: Yup.array().of(Yup.string().required()).default([]),
+  chapters: Yup.array().of(Yup.string().required()).default([]),
+  value: Yup.number()
+    .transform((v) => (v === '' || v == null ? undefined : Number(v)))
+    .when('coupon_type', {
+      is: 'Free',
+      then: (schema) => schema.min(0).optional(),
+      otherwise: (schema) =>
+        schema
+          .min(1, 'Value must be greater than 0')
+          .required('Value is required')
+          .when('coupon_type', {
+            is: 'Percentage',
+            then: (percentSchema) => percentSchema.max(100, 'Percentage cannot exceed 100'),
+          }),
+    }),
+  expiry_date: Yup.string().required('Expiry date is required'),
+  minimum_cart_value: Yup.number()
+    .transform((v) => (v === '' || v == null ? 0 : Number(v)))
+    .min(0, 'Minimum cart value cannot be negative'),
+  usage_limit: Yup.number()
+    .transform((v) => (v === '' || v == null ? 0 : Number(v)))
+    .min(0, 'Usage limit cannot be negative')
+    .integer('Must be a whole number'),
+  status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
 });
 
 // Add / Edit Agreement Modal Validation Schema

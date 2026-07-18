@@ -2,7 +2,7 @@ import { IAllCategoriesAPIResponse } from '@/types/categories';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IAllAuthorLeadersAPIResponse } from '@/types/authleaders';
 import { IAllBooksAPIResponse } from '@/types/books';
-import { IAllChaptersAPIResponse } from '@/types/chapter';
+import { IAllChaptersAPIResponse, IBlueprintsByBookIdsAPIResponse } from '@/types/chapter';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
 import { IAllFaqsAPIResponse } from '@/types/faqs';
@@ -58,6 +58,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             query: (id) => ({
                 url: `/admin/blueprints/${id}`,
                 method: 'GET',
+            }),
+            providesTags: ['AdminChapters'],
+        }),
+        /** Blueprints filtered by their parent book (series) ids, e.g. for coupon applicability pickers */
+        getBlueprintsByBookIds: builder.query<IBlueprintsByBookIdsAPIResponse, { bookids: string }>({
+            query: ({ bookids }) => ({
+                url: `/admin/get-blueprints`,
+                method: 'GET',
+                params: { bookids },
             }),
             providesTags: ['AdminChapters'],
         }),
@@ -154,6 +163,7 @@ export const {
     useGetAllBooksQuery,
     useGetAllAdminChaptersQuery,
     useGetChapterByIdQuery,
+    useGetBlueprintsByBookIdsQuery,
     useGetAdminGlobalSettingsQuery,
     useGetAllTestimonialsQuery,
     useGetAllFaqsQuery,

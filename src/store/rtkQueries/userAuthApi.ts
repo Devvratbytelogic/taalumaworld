@@ -55,7 +55,7 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
         }),
         userUpdateProfile: builder.mutation({
             query: (userData) => ({
-                url: `/user/update-profile`,
+                url: `/admin/update-profile`,
                 method: "POST",
                 body: userData,
             }),

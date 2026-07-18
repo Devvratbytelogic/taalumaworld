@@ -57,3 +57,19 @@ export interface ICreatedBy {
   email: string;
   id: string;
 }
+
+/** Lean blueprint lookup, filtered by book ids (used to populate blueprint pickers) */
+export interface IBlueprintsByBookIdsAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IBlueprintLookupEntity[];
+  message: string;
+  timestamp: string;
+}
+export interface IBlueprintLookupEntity {
+  _id: string;
+  title: string;
+  slug: string;
+  short_code: string;
+}

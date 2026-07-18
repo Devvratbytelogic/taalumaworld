@@ -42,7 +42,7 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
     const data = await res.json();
     return data as T;
   } catch (error) {
-    console.error(`Error fetching data from ${path}`, error);
+    // console.error(`Error fetching data from ${path}`, error);
     return null;
   }
 }

@@ -73,14 +73,14 @@ export function MyBooksPage() {
   }
 
   const statItems = [
-    { icon: Book, label: 'Total series', value: summary?.totalSeries ?? 0, iconClass: 'text-primary' },
+    { icon: Book, label: 'Total series', value: summary?.totalBooks ?? 0, iconClass: 'text-primary' },
     { icon: TrendingUp, label: 'In progress', value: summary?.inProgress ?? 0, iconClass: 'text-primary' },
     { icon: CheckCircle, label: 'Completed', value: summary?.completed ?? 0, iconClass: 'text-green-600' },
     { icon: CircleDashed, label: 'Unread', value: summary?.unread ?? 0, iconClass: 'text-gray-500' },
   ] as const;
 
   const filterTabs: { key: FilterType; label: string }[] = [
-    { key: 'all', label: `All (${summary?.totalSeries ?? 0})` },
+    { key: 'all', label: `All (${summary?.totalBooks ?? 0})` },
     { key: 'inProgress', label: `In progress (${summary?.inProgress ?? 0})` },
     { key: 'completed', label: `Completed (${summary?.completed ?? 0})` },
     { key: 'unread', label: `Unread (${summary?.unread ?? 0})` },

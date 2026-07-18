@@ -12,7 +12,7 @@ export interface IMySeriesAPIResponseData {
   pagination: Pagination;
 }
 export interface ISummary {
-  totalSeries: number;
+  totalBooks: number;
   inProgress: number;
   completed: number;
   unread: number;

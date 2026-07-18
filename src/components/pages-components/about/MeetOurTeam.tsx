@@ -24,7 +24,6 @@ export default function MeetOurTeam() {
                                             src="/images/common/about-img3.png"
                                             alt="Daniel Muchika"
                                             object_cover={false}
-                                            priority={true}
                                         />
                                     </div>
                                 </div>

@@ -6,14 +6,12 @@ interface ImageComponentProps {
   src: string | undefined;
   alt: string | undefined;
   object_cover: boolean;
-  priority?: boolean;
 }
 
 export default function ImageComponent({
   src,
   alt,
   object_cover,
-  priority
 }: ImageComponentProps) {
 
   const [hasError, setHasError] = useState(false);
@@ -49,9 +47,6 @@ export default function ImageComponent({
       alt={alt || 'image'}
       title={alt || 'image'}
       className={`w-full h-full ${object_cover ? 'object-cover' : 'object-contain'}`}
-      priority={priority}
-      loading={priority ? "eager" : "lazy"}
-      fetchPriority={priority ? "high" : "auto"}
       onError={() => setHasError(true)}
     />
   )

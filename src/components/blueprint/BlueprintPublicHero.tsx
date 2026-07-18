@@ -91,7 +91,7 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
             <div className="mx-auto w-48 shrink-0 sm:w-52 md:mx-0 md:w-56">
               <div className="aspect-3/4 overflow-hidden rounded-2xl border border-border bg-muted shadow-[0_20px_40px_-24px_rgba(0,0,0,0.18)]">
                 {data?.coverImage ? (
-                  <ImageComponent src={data?.coverImage} alt={data?.title} object_cover={false} priority />
+                  <ImageComponent src={data?.coverImage} alt={data?.title} object_cover={false} />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-3 bg-muted p-6 text-center">
                     <FileText className="h-10 w-10 text-muted-foreground/40" />

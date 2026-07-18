@@ -95,3 +95,9 @@
 {"timestamp":"2026-07-18T05:15:21.226Z","event":"POLL_TICK","level":"info","checkoutId":"13647-20848253-1","status":"completed"}
 {"timestamp":"2026-07-18T05:15:21.227Z","event":"POLL_COMPLETED","level":"info","checkoutId":"13647-20848253-1"}
 {"timestamp":"2026-07-18T05:15:22.230Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"13647-20848253-1"}
+{"timestamp":"2026-07-18T05:16:50.198Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-18T05:16:53.014Z","event":"PAYMENT_INITIATED","level":"info","phone":254724409796}
+{"timestamp":"2026-07-18T05:16:54.441Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"44674-47268980-1","responseCode":"0","phone":254724409796,"meta":{"merchantRequestId":"44674-47268980-1","checkoutRequestId":"ws_CO_18072026104653042300"}}
+{"timestamp":"2026-07-18T05:16:57.163Z","event":"POLL_TICK","level":"info","checkoutId":"44674-47268980-1","status":"completed"}
+{"timestamp":"2026-07-18T05:16:57.164Z","event":"POLL_COMPLETED","level":"info","checkoutId":"44674-47268980-1"}
+{"timestamp":"2026-07-18T05:16:58.170Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"44674-47268980-1"}

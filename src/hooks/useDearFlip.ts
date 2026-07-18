@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 const DFLIP_BASE = '/dflip/';
 
@@ -23,9 +23,21 @@ declare global {
   }
 }
 
+interface DearFlipTarget {
+  activePage?: () => number;
+  pageCount?: number;
+}
+
 interface DearFlipInstance {
   dispose?: () => void;
   resize?: () => void;
+  target?: DearFlipTarget;
+}
+
+export interface FlipProgressInfo {
+  currentPage: number;
+  totalPages: number;
+  percentage: number;
 }
 
 interface UseDearFlipOptions {
@@ -33,6 +45,7 @@ interface UseDearFlipOptions {
   title?: string;
   height?: number | string;
   onReady?: () => void;
+  onFlip?: (info: FlipProgressInfo) => void;
 }
 
 const SCRIPT_ATTR = 'data-dearflip-script';
@@ -159,10 +172,15 @@ async function ensureDearFlipAssets() {
   return dearFlipAssetsPromise;
 }
 
-function getDearFlipOptions(title?: string, height: number | string = 720) {
+function getDearFlipOptions(
+  title?: string,
+  height: number | string = 720,
+  onFlip?: (app: DearFlipInstance) => void,
+) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return {
+    onFlip,
     webgl: true,
     height,
     backgroundColor: 'rgb(229, 229, 229)',
@@ -311,13 +329,25 @@ function watchFlipbookReady(container: HTMLElement, onReady?: () => void): () =>
 
 export function useDearFlip(
   containerRef: React.RefObject<HTMLDivElement | null>,
-  { pdfUrl, title, height = 720, onReady }: UseDearFlipOptions,
+  { pdfUrl, title, height = 720, onReady, onFlip }: UseDearFlipOptions,
 ) {
   const flipbookRef = useRef<DearFlipInstance | null>(null);
   const onReadyRef = useRef(onReady);
+  const onFlipRef = useRef(onFlip);
   const initIdRef = useRef(0);
 
   onReadyRef.current = onReady;
+  onFlipRef.current = onFlip;
+
+  const handleFlip = useCallback((app: DearFlipInstance) => {
+    const target = app?.target;
+    const totalPages = target?.pageCount ?? 0;
+    const currentPage = target?.activePage?.() ?? 0;
+    if (!totalPages || !currentPage) return;
+
+    const percentage = Math.min(100, Math.max(0, Math.round((currentPage / totalPages) * 100)));
+    onFlipRef.current?.({ currentPage, totalPages, percentage });
+  }, []);
 
   useEffect(() => {
     if (!pdfUrl || !containerRef.current) return;
@@ -347,7 +377,7 @@ export function useDearFlip(
 
         flipbookRef.current = window
           .jQuery(container)
-          .flipBook(pdfUrl, getDearFlipOptions(title, height));
+          .flipBook(pdfUrl, getDearFlipOptions(title, height, handleFlip));
 
         disconnectLayoutSync = setupFlipbookLayoutSync(flipbookRef.current, container);
 
@@ -376,7 +406,7 @@ export function useDearFlip(
       }
       container.innerHTML = '';
     };
-  }, [containerRef, pdfUrl, title, height]);
+  }, [containerRef, pdfUrl, title, height, handleFlip]);
 
   return flipbookRef;
 }

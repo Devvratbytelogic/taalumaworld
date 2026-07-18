@@ -4,6 +4,9 @@ import type { ISingleChapterAPIResponseData } from '@/types/user/singleChapter';
 import MentorDetails from './MentorDetails';
 import dynamic from 'next/dynamic';
 import PdfViewerSkeleton from '@/components/skeleton-loader/PdfViewerSkeleton';
+import { useReadingProgress } from '@/hooks/useReadingProgress';
+import { useSyncReadingProgress } from '@/hooks/useSyncReadingProgress';
+import { useMemo, useState } from 'react';
 
 const PdfReader = dynamic(() => import('./PdfReader'), {
   ssr: false,
@@ -14,6 +17,25 @@ interface BlueprintPublicDetailsProps {
 }
 
 export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsProps) {
+  const hasContent = Boolean(data?.content);
+  const hasPdf = Boolean(data?.pdf);
+
+  const { ref: contentRef, progress: contentReadingProgress } = useReadingProgress({
+    enabled: hasContent,
+    debounceMs: 150,
+  });
+  const [pdfReadingProgress, setPdfReadingProgress] = useState(0);
+
+  // Overall progress blends both sources, weighted only by the sections that actually exist.
+  const readingProgress = useMemo(() => {
+    if (hasContent && hasPdf) return Math.round((contentReadingProgress + pdfReadingProgress) / 2);
+    if (hasPdf) return pdfReadingProgress;
+    if (hasContent) return contentReadingProgress;
+    return 0;
+  }, [hasContent, hasPdf, contentReadingProgress, pdfReadingProgress]);
+
+  useSyncReadingProgress(data?.id, readingProgress);
+
   return (
     <>
       <section className="container">
@@ -35,16 +57,32 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
               </div>
 
               <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white">
+                {(hasContent || hasPdf) && (
+                  <div className="h-1 w-full bg-[#ECECEC]">
+                    <div
+                      className="h-full bg-primary transition-[width] duration-150 ease-out"
+                      style={{ width: `${readingProgress}%` }}
+                    />
+                  </div>
+                )}
                 <div className="border-b border-[#ECECEC] px-6 py-4 sm:px-8">
-                  <p className="text-sm font-medium text-[#1A1A1A]">{data?.title}</p>
-                  <p className="mt-1 text-xs text-[#6B6B6B]">
-                    Blueprint {data?.chapterNumber}
-                    {/* {data?.pageCount ? ` · ${data?.pageCount} pages` : ''} */}
-                  </p>
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1A1A1A]">{data?.title}</p>
+                      <p className="mt-1 text-xs text-[#6B6B6B]">
+                        Blueprint {data?.chapterNumber}
+                      </p>
+                    </div>
+                    {(hasContent || hasPdf) && (
+                      <p className="shrink-0 text-xs font-medium tracking-[0.06em] text-[#6B6B6B]">
+                        {readingProgress}% viewed
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {data?.content && (
-                  <div className="p-6">
+                  <div ref={contentRef} className="p-6">
                     <MarkdownContent
                       content={data?.content ?? ''}
                       emptyMessage="No content available for this blueprint."
@@ -63,7 +101,11 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
                 )}
                 {data?.pdf && (
                   <div>
-                    <PdfReader url={data.pdf} title={data?.title ?? ''} />
+                    <PdfReader
+                      url={data.pdf}
+                      title={data?.title ?? ''}
+                      onProgressChange={setPdfReadingProgress}
+                    />
                   </div>
                 )}
 

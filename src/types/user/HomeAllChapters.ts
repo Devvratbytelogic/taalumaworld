@@ -62,6 +62,7 @@ export interface IHomeAllChaptersMentor {
   is_mentor_verified: boolean;
   linkedin?: string | null;
   facebook?: string | null;
+  short_code?: string | null;
 }
 
 /** @deprecated use IHomeAllChaptersItemsEntity */

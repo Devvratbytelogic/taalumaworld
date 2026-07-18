@@ -152,9 +152,9 @@ export default function BookDetailsModal() {
                     <div className="border-t pt-3">
                         <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Series</h3>
                         <ShareButtons
-                            shareableLink={book?.shareable_link ?? ''}
-                            title={book?.title ?? ''}
-                            description={book?.description}
+                            referralCode={book?.mentor?.short_code ?? ''}
+                            slug={book?.slug ?? ''}
+                            type={VISIBLE.BOOK}
                             size="sm"
                             showCopyLink={true}
                         />

@@ -88,4 +88,5 @@ export interface CreatedBy {
   facebook: string;
   is_verified_mentor: boolean;
   professionalBio: string;
+  short_code?: string | null;
 }

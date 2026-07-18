@@ -221,9 +221,9 @@ export default function ChapterPurchaseModal() {
             <div className="border-t pt-3">
               <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Blueprint</h3>
               <ShareButtons
-                shareableLink={chapter?.shareable_link ?? ''}
-                title={chapter?.title}
-                description={chapter?.description}
+                referralCode={chapter?.createdBy?.short_code ?? ''}
+                slug={chapter?.slug ?? ''}
+                type={VISIBLE.CHAPTER}
                 size="sm"
                 showCopyLink={true}
               />

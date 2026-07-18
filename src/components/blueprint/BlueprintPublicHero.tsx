@@ -6,6 +6,7 @@ import ShareButtons from '@/components/blueprint/ShareButtons';
 import { ISingleChapterAPIResponseData } from '@/types/user/singleChapter';
 import { getSeriesRoutePath } from '@/routes/routes';
 import Link from 'next/link';
+import { VISIBLE } from '@/constants/contentMode';
 
 interface BlueprintPublicHeroProps {
   data: ISingleChapterAPIResponseData | null;
@@ -78,9 +79,9 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
               <div>
                 <p className="mb-3 text-sm font-medium text-foreground">Share this blueprint</p>
                 <ShareButtons
-                  shareableLink={data?.shareable_link ?? ''}
-                  title={data?.title ?? ''}
-                  description={data?.description ?? ''}
+                  referralCode={data?.createdBy?.short_code ?? ''}
+                  slug={data?.slug ?? ''}
+                  type={VISIBLE.CHAPTER}
                   size="md"
                 />
               </div>

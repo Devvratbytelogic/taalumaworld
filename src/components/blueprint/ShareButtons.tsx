@@ -4,11 +4,14 @@ import { useState } from 'react';
 import { Check, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { FacebookIcon, LinkedinIcon, TwitterIcon, WhatsAppIcon } from '@/components/ui/AllSVG';
+import { VISIBLE } from '@/constants/contentMode';
+import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { APP_SITE_URL } from '@/utils/config';
 
 interface ShareButtonsProps {
-    shareableLink: string;
-    title: string;
-    description?: string;
+    referralCode?: string | null;
+    type: string;
+    slug: string;
     size?: 'sm' | 'md' | 'lg';
     showCopyLink?: boolean;
 }
@@ -20,12 +23,15 @@ const sizeClasses = {
 };
 
 export default function ShareButtons({
-    shareableLink,
-    title,
+    referralCode,
+    type,
     size = 'md',
+    slug,
     showCopyLink = true,
 }: ShareButtonsProps) {
     const [copied, setCopied] = useState(false);
+    const basePath = type === VISIBLE.BOOK ? getSeriesRoutePath(slug) : getBlueprintRoutePath(slug);
+    const shareableLink = referralCode ? `${APP_SITE_URL}${basePath}?referralCode=${referralCode}` : `${APP_SITE_URL}${basePath}`;
 
     const shareLinks = [
         {
@@ -41,12 +47,12 @@ export default function ShareButtons({
         {
             label: 'WhatsApp',
             icon: WhatsAppIcon,
-            href: `https://wa.me/?text=${encodeURIComponent(`${title} ${shareableLink}`)}`,
+            href: `https://wa.me/?text=${encodeURIComponent(`${shareableLink}`)}`,
         },
         {
             label: 'X',
             icon: TwitterIcon,
-            href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareableLink)}&text=${encodeURIComponent(title)}`,
+            href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareableLink)}`,
         },
     ];
 

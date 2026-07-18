@@ -53,6 +53,7 @@ export interface Mentor {
     is_mentor_verified: boolean;
     linkedin: string;
     facebook: string;
+    short_code?: string | null;
 }
 export interface IChapters {
     data?: (IChapterEntity)[] | null;

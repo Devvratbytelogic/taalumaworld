@@ -4,6 +4,7 @@ import { BookOpen, FileText } from 'lucide-react';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons'; 
 import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
+import { VISIBLE } from '@/constants/contentMode';
 
 interface SeriesPublicHeroProps {
   data: ISingleBookAPIResponseData | null;
@@ -72,9 +73,9 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
             <div>
               <p className="mb-3 text-sm font-medium text-foreground">Share this series</p>
               <ShareButtons
-                shareableLink={bookDetails?.shareable_link ?? ''}
-                title={bookDetails?.title ?? ''}
-                description={bookDetails?.description ?? ''}
+                referralCode={mentor?.short_code ?? ''}
+                slug={slug ?? ''}
+                type={VISIBLE.BOOK}
                 size="md"
               />
             </div>

@@ -12,7 +12,6 @@ import {
     type RefObject,
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import type { LucideIcon } from 'lucide-react';
 import {
     ArrowUpRight,
     Search,
@@ -30,7 +29,16 @@ import {
     Settings,
     Award,
     UserCircle,
+    BarChart3,
+    ShoppingCart,
+    Wallet,
+    History,
+    Download,
+    TrendingUp,
+    Link2,
+    Tag,
 } from 'lucide-react';
+import { KshIcon } from '@/components/ui/AllSVG';
 import { cn } from '@/components/ui/utils';
 import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
 import {
@@ -38,13 +46,29 @@ import {
     getAdminProfileRoutePath,
     getAdminMentorTypesRoutePath,
     getCreateChapterRoutePath,
+    getMentorRoutePath,
+    getMentorDashboardRoutePath,
+    getMentorBooksRoutePath,
+    getMentorChaptersRoutePath,
+    getMentorBlueprintPerformanceRoutePath,
+    getMentorSalesVolumeRoutePath,
+    getMentorRevenueEarnedRoutePath,
+    getMentorRevenuePendingRoutePath,
+    getMentorRevenueByBlueprintRoutePath,
+    getMentorWalletRoutePath,
+    getMentorPaymentHistoryRoutePath,
+    getMentorStatementsRoutePath,
+    getMentorReferralsRoutePath,
+    getMentorCouponsRoutePath,
+    getMentorUsersRoutePath,
+    getMentorProfileRoutePath,
 } from '@/routes/routes';
 
 export type AdminNavRoute = {
     label: string;
     description: string;
     path: string;
-    icon: LucideIcon;
+    icon: React.ElementType;
     keywords: string[];
 };
 
@@ -64,6 +88,25 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Subscribers', description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'), icon: Mail, keywords: ['subscriber', 'newsletter', 'email'] },
     { label: 'Settings', description: 'Platform settings', path: getAdminSectionRoutePath('settings'), icon: Settings, keywords: ['setting', 'config', 'logo'] },
     { label: 'My Profile', description: 'Edit your admin profile', path: getAdminProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
+];
+
+const MENTOR_ROUTES: AdminNavRoute[] = [
+    { label: 'Dashboard', description: 'Overview & stats', path: getMentorDashboardRoutePath(), icon: LayoutDashboard, keywords: ['home', 'overview', 'stats'] },
+    { label: 'Series', description: 'Manage your series', path: getMentorBooksRoutePath(), icon: Book, keywords: ['book', 'series', 'publish'] },
+    { label: 'Blueprints', description: 'Manage your blueprints', path: getMentorChaptersRoutePath(), icon: FileText, keywords: ['blueprint', 'content'] },
+    { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(true), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
+    { label: 'Blueprint Performance', description: 'Track blueprint performance', path: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3, keywords: ['performance', 'analytics'] },
+    { label: 'Sales Volume', description: 'View sales volume', path: getMentorSalesVolumeRoutePath(), icon: ShoppingCart, keywords: ['sales', 'volume'] },
+    { label: 'Revenue Earned', description: 'View revenue earned', path: getMentorRevenueEarnedRoutePath(), icon: KshIcon, keywords: ['revenue', 'earnings', 'money'] },
+    { label: 'Revenue Pending Payment', description: 'View pending revenue', path: getMentorRevenuePendingRoutePath(), icon: Wallet, keywords: ['revenue', 'pending', 'payment'] },
+    { label: 'Revenue by Blueprint', description: 'Revenue breakdown by blueprint', path: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp, keywords: ['revenue', 'blueprint'] },
+    { label: 'Wallet & Payouts', description: 'Manage wallet and payouts', path: getMentorWalletRoutePath(), icon: Wallet, keywords: ['wallet', 'payout', 'withdraw'] },
+    { label: 'Payment History', description: 'View payment history', path: getMentorPaymentHistoryRoutePath(), icon: History, keywords: ['payment', 'history'] },
+    { label: 'Downloadable Statements', description: 'Download statements', path: getMentorStatementsRoutePath(), icon: Download, keywords: ['statement', 'download'] },
+    { label: 'Referral Performance', description: 'Track referral performance', path: getMentorReferralsRoutePath(), icon: Link2, keywords: ['referral', 'growth'] },
+    { label: 'Coupons & Promos', description: 'Manage coupons and promos', path: getMentorCouponsRoutePath(), icon: Tag, keywords: ['coupon', 'promo', 'discount'] },
+    { label: 'Users', description: 'Manage your users', path: getMentorUsersRoutePath(), icon: UserCircle, keywords: ['user', 'member', 'account'] },
+    { label: 'My Profile', description: 'Edit your mentor profile', path: getMentorProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];
 
 type AdminHeaderSearchContextValue = {
@@ -107,16 +150,18 @@ function useAdminHeaderSearchState(): AdminHeaderSearchContextValue {
     const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
     const isSearchActive = searchQuery.trim().length >= 1;
+    const isMentor = pathname.startsWith(getMentorRoutePath());
+    const routes = isMentor ? MENTOR_ROUTES : ADMIN_ROUTES;
 
     const searchResults = useMemo(() => {
-        if (!isSearchActive) return ADMIN_ROUTES;
+        if (!isSearchActive) return routes;
         const q = searchQuery.toLowerCase().trim();
-        return ADMIN_ROUTES.filter(route =>
+        return routes.filter(route =>
             route.label.toLowerCase().includes(q) ||
             route.description.toLowerCase().includes(q) ||
             route.keywords.some(k => k.includes(q)),
         );
-    }, [isSearchActive, searchQuery]);
+    }, [isSearchActive, searchQuery, routes]);
 
     useEffect(() => {
         setActiveIndex(0);

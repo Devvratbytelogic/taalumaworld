@@ -116,11 +116,11 @@ export function getMentorCouponsRoutePath(): string {
 }
 
 export function getMentorBooksRoutePath(): string {
-  return '/admin/mentor/books';
+  return '/admin/mentor/series';
 }
 
 export function getMentorChaptersRoutePath(): string {
-  return '/admin/mentor/chapters';
+  return '/admin/mentor/blueprints';
 }
 
 export function getMentorCategoriesRoutePath(): string {
@@ -206,16 +206,21 @@ export function getAdminSectionRoutePath(section: string): string {
   return map[section] ?? '/admin/dashboard';
 }
 
-export function getCreateChapterRoutePath(): string {
-  return '/admin/blueprints/create';
+export function getCreateChapterRoutePath(isMentor: boolean = false): string {
+  return isMentor ? '/admin/mentor/blueprints/create' : '/admin/blueprints/create';
 }
 
-export function getEditChapterRoutePath(chapterId: string): string {
-  return `/admin/blueprints/edit/${chapterId}`;
+export function getEditChapterRoutePath(chapterId: string, isMentor: boolean = false): string {
+  return isMentor ? `/admin/mentor/blueprints/edit/${chapterId}` : `/admin/blueprints/edit/${chapterId}`;
 }
 
-export function getViewChapterRoutePath(chapterId: string): string {
-  return `/admin/blueprints/view/${chapterId}`;
+export function getViewChapterRoutePath(chapterId: string, isMentor: boolean = false): string {
+  return isMentor ? `/admin/mentor/blueprints/view/${chapterId}` : `/admin/blueprints/view/${chapterId}`;
+}
+
+/** List/back destination for blueprints — mentor panel vs admin panel. */
+export function getChaptersListRoutePath(isMentor: boolean = false): string {
+  return isMentor ? getMentorChaptersRoutePath() : getAdminSectionRoutePath('chapters');
 }
 
 export function getViewOrderRoutePath(orderId: string): string {

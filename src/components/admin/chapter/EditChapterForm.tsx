@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Save, X, Upload, FileText } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
 import { useUpdateChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import { useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
-import { getAdminSectionRoutePath, getBlueprintRoutePath, getPolicyBySlugRoutePath } from '@/routes/routes';
+import { getChaptersListRoutePath, getBlueprintRoutePath, getPolicyBySlugRoutePath, getMentorRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
@@ -39,6 +39,8 @@ interface EditChapterFormProps {
 }
 export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isMentor = pathname.startsWith(getMentorRoutePath());
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [featuredImagePreviewUrl, setFeaturedImagePreviewUrl] = useState<string | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
@@ -132,7 +134,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           resetForm({ values: initialFormValues });
           slugManuallyEdited.current = false;
           toast.success(res.message ?? 'Blueprint updated successfully');
-          router.push(getAdminSectionRoutePath('chapters'));
+          router.push(getChaptersListRoutePath(isMentor));
         }
       } catch (err) {
         console.error('error during update chapter', err);
@@ -567,7 +569,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         >
           Update Blueprint
         </Button>
-        <Link href={getAdminSectionRoutePath('chapters')}>
+        <Link href={getChaptersListRoutePath(isMentor)}>
           <Button
             type="button"
             className="global_btn rounded_full outline_primary"

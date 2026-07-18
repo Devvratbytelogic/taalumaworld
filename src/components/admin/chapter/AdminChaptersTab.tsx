@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2 } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
@@ -27,7 +27,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getEditChapterRoutePath, getViewChapterRoutePath } from '@/routes/routes';
+import { getEditChapterRoutePath, getViewChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
@@ -48,6 +48,8 @@ const STATUSES = ['Published', 'Draft'] as const;
 export function AdminChaptersTab() {
     const dispatch = useDispatch();
     const router = useRouter();
+    const pathname = usePathname();
+    const isMentor = pathname.startsWith(getMentorRoutePath());
     const [search, setSearch] = useState('');
     const [filterByBook, setFilterByBook] = useState('');
     const [filterByStatus, setFilterByStatus] = useState('');
@@ -261,7 +263,7 @@ export function AdminChaptersTab() {
                         type="button"
                         className="active_button"
                         title="View blueprint"
-                        onClick={() => router.push(getViewChapterRoutePath(params.row.id))}
+                        onClick={() => router.push(getViewChapterRoutePath(params.row.id, isMentor))}
                     >
                         <Eye className="h-4 w-4" />
                     </button>
@@ -285,7 +287,7 @@ export function AdminChaptersTab() {
                             <button
                                 type="button"
                                 className="edit_button"
-                                onClick={() => router.push(getEditChapterRoutePath(params.row.id))}
+                                onClick={() => router.push(getEditChapterRoutePath(params.row.id, isMentor))}
                             >
                                 <Edit2 className="h-4 w-4" />
                             </button>

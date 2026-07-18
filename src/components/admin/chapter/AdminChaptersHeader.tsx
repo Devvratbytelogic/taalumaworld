@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
-import { getCreateChapterRoutePath } from '@/routes/routes';
+import { getCreateChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import { cn } from '@/components/ui/utils';
 
@@ -11,6 +12,9 @@ interface AdminChaptersHeaderProps {
 }
 
 export function AdminChaptersHeader({ isTrashView, onToggleTrash }: AdminChaptersHeaderProps) {
+  const pathname = usePathname();
+  const isMentor = pathname.startsWith(getMentorRoutePath());
+
   return (
     <AdminPageHeader
       title={isTrashView ? 'Trash' : 'Blueprints management'}
@@ -24,7 +28,7 @@ export function AdminChaptersHeader({ isTrashView, onToggleTrash }: AdminChapter
         {isTrashView ? 'Back to blueprints' : 'Trash'}
       </Button>
       {!isTrashView ? (
-        <Button as={Link} href={getCreateChapterRoutePath()} className="global_btn rounded_full bg_primary">
+        <Button as={Link} href={getCreateChapterRoutePath(isMentor)} className="global_btn rounded_full bg_primary">
           <Plus className="h-4 w-4" />
           Create new blueprint
         </Button>

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ArrowLeft, Edit2, FileText, BookOpen } from 'lucide-react';
 import moment from 'moment';
 import Button from '@/components/ui/Button';
@@ -15,7 +16,7 @@ import {
   AdminSectionHeader,
 } from '@/components/admin/layout/AdminContent';
 import { useGetChapterByIdQuery } from '@/store/rtkQueries/adminGetApi';
-import { getAdminSectionRoutePath, getEditChapterRoutePath } from '@/routes/routes';
+import { getChaptersListRoutePath, getEditChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   Published: 'bg-green-50 text-green-700 border-green-200',
@@ -38,6 +39,8 @@ interface ChapterDetailViewProps {
 }
 
 export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
+  const pathname = usePathname();
+  const isMentor = pathname.startsWith(getMentorRoutePath());
   const { data, isLoading } = useGetChapterByIdQuery(chapterId);
   const chapter = data?.data;
 
@@ -60,7 +63,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   return (
     <AdminPage>
       <Link
-        href={getAdminSectionRoutePath('chapters')}
+        href={getChaptersListRoutePath(isMentor)}
         className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -68,7 +71,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
       </Link>
 
       <AdminPageHeader title="Blueprint details" description="Full details for this blueprint.">
-        <Link href={getEditChapterRoutePath(chapter.id)}>
+        <Link href={getEditChapterRoutePath(chapter.id, isMentor)}>
           <Button type="button" className="global_btn rounded_full bg_primary" startContent={<Edit2 className="h-4 w-4" />}>
             Edit Blueprint
           </Button>

@@ -14,7 +14,7 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
 import toast from '@/utils/toast'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getMentorSignupRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes'
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs'
@@ -97,6 +97,8 @@ const UNIVERSITY_SELECT_STYLES: StylesConfig<UniversityOption, false> = {
 export default function SignUp() {
     const dispatch = useDispatch()
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const referralCodeFromParams = searchParams.get('referralCode') ?? ''
     const { isOpen, componentName, data } = useSelector((state: RootState) => state.allModal)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -145,9 +147,10 @@ export default function SignUp() {
             confirmPassword: '',
             isPartnerStudent: false,
             university: '',
-            referralCode: '',
+            referralCode: referralCodeFromParams,
             accepted_agreement_ids: [] as string[],
         },
+        enableReinitialize: true,
         validationSchema: careerArchitectSignUpSchema,
         validate: (vals) => {
             const validationErrors: Record<string, string> = {}
@@ -200,6 +203,7 @@ export default function SignUp() {
             }
         },
     })
+
 
     const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
         touchPoint: values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION,
@@ -528,13 +532,15 @@ export default function SignUp() {
                                         type="text"
                                         placeholder="Enter referral code"
                                         className={`user_input_style ${errors.referralCode && touched.referralCode && 'border-red-500'}`}
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || Boolean(referralCodeFromParams)}
                                         value={values.referralCode}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                     />
                                 </div>
-                                {errors.referralCode && touched.referralCode && (
+                                {referralCodeFromParams ? (
+                                    <p className="text-xs text-muted-foreground">Referral code applied.</p>
+                                ) : errors.referralCode && touched.referralCode && (
                                     <p className="text-sm text-red-600">{errors.referralCode}</p>
                                 )}
                             </div>

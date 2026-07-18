@@ -98,6 +98,14 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['MyChapters', 'ReadingHistory'],
         }),
+        /** Career Architect → Mentor conversion request (POST /user/mentor-applications, form-data) */
+        submitMentorApplication: builder.mutation({
+            query: (body) => ({
+                url: `/user/mentor-applications`,
+                method: 'POST',
+                body,
+            }),
+        }),
         // mpesaPaymentCallback: builder.mutation({
         //     query: (body) => ({
         //         url: `/user/mpaisa/callback`,
@@ -122,4 +130,5 @@ export const {
     useMpesaPaymentMutation,
     // useMpesaPaymentCallbackMutation,
     useUpdateReadingProgressMutation,
+    useSubmitMentorApplicationMutation,
 } = clientSidePostApis;

@@ -358,18 +358,8 @@ export const authorSchema = Yup.object({
     ),
 });
 
-const optionalUrl = Yup.string()
-  .trim()
-  .transform((v) => (v === '' ? undefined : v))
-  .url('Enter a valid URL')
-  .optional();
-
 // Career Architect → Mentor conversion application
 export const mentorConversionApplicationSchema = Yup.object({
-  linkedinUrl: optionalUrl,
-  facebookUrl: optionalUrl,
-  xUrl: optionalUrl,
-  personalWebsite: optionalUrl,
   careerSummary: Yup.string()
     .trim()
     .required('Career summary is required')
@@ -377,26 +367,16 @@ export const mentorConversionApplicationSchema = Yup.object({
       if (!value) return true;
       return value.split(/\s+/).filter(Boolean).length <= 300;
     }),
-  yearsOfExperience: Yup.number()
-    .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-    .min(0, 'Must be 0 or more')
-    .required('Years of experience is required'),
   paymentFrequency: Yup.string()
     .oneOf(['monthly', 'quarterly', 'annually'], 'Select payment frequency')
     .required('Select payment frequency'),
   bankName: Yup.string().trim().required('Bank name is required'),
-  accountName: Yup.string().trim().required('Account name is required'),
   accountNumber: Yup.string().trim().required('Account number is required'),
   mpesaNumber: Yup.string()
     .trim()
     .required('M-Pesa number is required')
     .matches(/^\+?[0-9]{9,15}$/, 'Enter a valid phone number'),
-  taxId: Yup.string().trim(),
-  agreeMentorAgreement: Yup.boolean().oneOf([true], 'You must accept the Mentor Agreement'),
-  agreeRevenueShare: Yup.boolean().oneOf([true], 'You must accept the Revenue Share Agreement'),
-}).test('social-profiles', 'At least one of LinkedIn, Facebook, or X is required', function (values) {
-  if (values?.linkedinUrl || values?.facebookUrl || values?.xUrl) return true;
-  return this.createError({ path: 'linkedinUrl', message: 'At least one of LinkedIn, Facebook, or X is required' });
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
 // Add / Edit Institution Modal Validation Schema

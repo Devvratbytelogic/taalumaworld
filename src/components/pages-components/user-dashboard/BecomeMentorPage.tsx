@@ -3,7 +3,7 @@
 import type { ComponentType } from 'react';
 import Link from 'next/link';
 import { useFormik } from 'formik';
-import { Briefcase, CreditCard, FileCheck, Send, Share2 } from 'lucide-react';
+import { Briefcase, CreditCard, FileCheck, Send } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,7 +11,10 @@ import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { cn } from '@/components/ui/utils';
 import { fieldInvalidClassName, nativeSelectClassName } from '@/components/ui/field-styles';
 import { mentorConversionApplicationSchema } from '@/utils/formValidation';
-import { getMentorAgreementRoutePath, getRevenueShareAgreementRoutePath } from '@/routes/routes';
+import { getPolicyBySlugRoutePath } from '@/routes/routes';
+import { useSubmitMentorApplicationMutation } from '@/store/rtkQueries/userPostAPI';
+import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
+import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 import toast from '@/utils/toast';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
@@ -38,27 +41,45 @@ function SectionHeader({ icon: Icon, title, description }: SectionHeaderProps) {
 }
 
 export function BecomeMentorPage() {
+  const [submitMentorApplication] = useSubmitMentorApplicationMutation();
+  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
+    touchPoint: AGREEMENT_TOUCHPOINTS.VERIFIED_MENTOR_APPLICATION,
+    userType: AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT,
+  });
+  const agreements = agreementsResponse?.data ?? [];
+  const requiredAgreementIds = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
+
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched } =
     useFormik({
       initialValues: {
-        linkedinUrl: '',
-        facebookUrl: '',
-        xUrl: '',
-        personalWebsite: '',
         careerSummary: '',
-        yearsOfExperience: '',
         paymentFrequency: '',
         bankName: '',
-        accountName: '',
         accountNumber: '',
         mpesaNumber: '',
-        taxId: '',
-        agreeMentorAgreement: false,
-        agreeRevenueShare: false,
+        accepted_agreement_ids: [] as string[],
       },
       validationSchema: mentorConversionApplicationSchema,
-      onSubmit: () => {
-        toast.success('Application submitted for review.');
+      validate: (vals) => {
+        const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
+        return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+      },
+      onSubmit: async (formValues, { resetForm: rf }) => {
+        try {
+          const formData = new FormData();
+          formData.append('professional_summary', formValues.careerSummary.trim());
+          formData.append('bank_name', formValues.bankName.trim());
+          formData.append('bank_number', formValues.accountNumber.trim());
+          formData.append('mpesa_number', formValues.mpesaNumber.trim());
+          formData.append('preferred_payment_frequency', formValues.paymentFrequency);
+          formValues.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
+
+          const res = await submitMentorApplication(formData).unwrap();
+          rf();
+          toast.success(res?.message ?? 'Application submitted for review.');
+        } catch(error) {
+          console.error('Failed to submit application. Please try again.', error);
+        }
       },
     });
 
@@ -66,6 +87,8 @@ export function BecomeMentorPage() {
 
   const fieldError = (name: keyof typeof errors) =>
     touched[name] && errors[name] ? fieldInvalidClassName : '';
+
+  const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
   return (
     <div className="space-y-6">
@@ -75,86 +98,6 @@ export function BecomeMentorPage() {
       />
 
       <form noValidate onSubmit={handleSubmit} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
-          <SectionHeader
-            icon={Share2}
-            title="Social profiles"
-            description="At least one of LinkedIn, Facebook, or X is required."
-          />
-
-          <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50/60 p-4 sm:p-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label htmlFor="linkedinUrl" className={labelClassName}>
-                  LinkedIn
-                </label>
-                <Input
-                  id="linkedinUrl"
-                  name="linkedinUrl"
-                  value={values.linkedinUrl}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="https://linkedin.com/in/you"
-                  className={fieldError('linkedinUrl')}
-                />
-                {touched.linkedinUrl && errors.linkedinUrl ? (
-                  <p className="mt-1 text-sm text-red-600">{errors.linkedinUrl}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="facebookUrl" className={labelClassName}>
-                  Facebook
-                </label>
-                <Input
-                  id="facebookUrl"
-                  name="facebookUrl"
-                  value={values.facebookUrl}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="https://facebook.com/you"
-                  className={fieldError('facebookUrl')}
-                />
-                {touched.facebookUrl && errors.facebookUrl ? (
-                  <p className="mt-1 text-sm text-red-600">{errors.facebookUrl}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="xUrl" className={labelClassName}>
-                  X
-                </label>
-                <Input
-                  id="xUrl"
-                  name="xUrl"
-                  value={values.xUrl}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="https://x.com/you"
-                  className={fieldError('xUrl')}
-                />
-                {touched.xUrl && errors.xUrl ? (
-                  <p className="mt-1 text-sm text-red-600">{errors.xUrl}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="personalWebsite" className={labelClassName}>
-                  Personal website <span className="text-gray-400">(optional)</span>
-                </label>
-                <Input
-                  id="personalWebsite"
-                  name="personalWebsite"
-                  value={values.personalWebsite}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="https://yoursite.com"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={Briefcase}
@@ -188,26 +131,6 @@ export function BecomeMentorPage() {
                 </p>
               </div>
             </div>
-
-            <div className="max-w-xs">
-              <label htmlFor="yearsOfExperience" className={labelClassName}>
-                Years of experience since high school
-              </label>
-              <Input
-                id="yearsOfExperience"
-                name="yearsOfExperience"
-                type="number"
-                min={0}
-                value={values.yearsOfExperience}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="e.g. 10"
-                className={fieldError('yearsOfExperience')}
-              />
-              {touched.yearsOfExperience && errors.yearsOfExperience ? (
-                <p className="mt-1 text-sm text-red-600">{errors.yearsOfExperience}</p>
-              ) : null}
-            </div>
           </div>
         </section>
 
@@ -235,24 +158,6 @@ export function BecomeMentorPage() {
                 />
                 {touched.bankName && errors.bankName ? (
                   <p className="mt-1 text-sm text-red-600">{errors.bankName}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="accountName" className={labelClassName}>
-                  Account name
-                </label>
-                <Input
-                  id="accountName"
-                  name="accountName"
-                  value={values.accountName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Name on account"
-                  className={fieldError('accountName')}
-                />
-                {touched.accountName && errors.accountName ? (
-                  <p className="mt-1 text-sm text-red-600">{errors.accountName}</p>
                 ) : null}
               </div>
 
@@ -293,20 +198,6 @@ export function BecomeMentorPage() {
               </div>
 
               <div>
-                <label htmlFor="taxId" className={labelClassName}>
-                  Tax ID / KRA PIN <span className="text-gray-400">(optional)</span>
-                </label>
-                <Input
-                  id="taxId"
-                  name="taxId"
-                  value={values.taxId}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Optional"
-                />
-              </div>
-
-              <div>
                 <label htmlFor="paymentFrequency" className={labelClassName}>
                   Preferred payment frequency
                 </label>
@@ -339,41 +230,37 @@ export function BecomeMentorPage() {
           />
 
           <div className="mt-5 space-y-3 rounded-lg border border-gray-200 bg-gray-50/60 p-4 sm:p-5">
-            <AgreementCheckbox
-              id="agreeMentorAgreement"
-              checked={values.agreeMentorAgreement}
-              onCheckedChange={(checked) => setFieldValue('agreeMentorAgreement', checked)}
-              onBlur={() => setFieldTouched('agreeMentorAgreement', true)}
-              error={errors.agreeMentorAgreement}
-              touched={touched.agreeMentorAgreement}
-            >
-              I accept the{' '}
-              <Link
-                href={getMentorAgreementRoutePath()}
-                className="font-medium text-primary hover:underline"
-                target="_blank"
-              >
-                Mentor Agreement
-              </Link>
-            </AgreementCheckbox>
-
-            <AgreementCheckbox
-              id="agreeRevenueShare"
-              checked={values.agreeRevenueShare}
-              onCheckedChange={(checked) => setFieldValue('agreeRevenueShare', checked)}
-              onBlur={() => setFieldTouched('agreeRevenueShare', true)}
-              error={errors.agreeRevenueShare}
-              touched={touched.agreeRevenueShare}
-            >
-              I accept the{' '}
-              <Link
-                href={getRevenueShareAgreementRoutePath()}
-                className="font-medium text-primary hover:underline"
-                target="_blank"
-              >
-                Revenue Share Agreement
-              </Link>
-            </AgreementCheckbox>
+            {agreements.length > 0 ? (
+              agreements.map((agreement) => (
+                <AgreementCheckbox
+                  key={agreement._id}
+                  id={agreement._id}
+                  checked={values.accepted_agreement_ids.includes(agreement._id)}
+                  onCheckedChange={(checked) => {
+                    const ids = checked
+                      ? [...values.accepted_agreement_ids, agreement._id]
+                      : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
+                    setFieldValue('accepted_agreement_ids', ids);
+                  }}
+                  onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+                  error={agreementsError}
+                  touched={touched.accepted_agreement_ids as boolean | undefined}
+                >
+                  I accept the{' '}
+                  <Link
+                    href={getPolicyBySlugRoutePath(agreement.slug)}
+                    className="font-medium text-primary hover:underline"
+                    target="_blank"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {agreement.title}
+                  </Link>
+                  {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
+                </AgreementCheckbox>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No agreements to review at this time.</p>
+            )}
           </div>
 
           <div className="mt-6 flex justify-end border-t border-gray-100 pt-5">

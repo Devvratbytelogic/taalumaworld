@@ -41,7 +41,7 @@ export default function SignIn() {
                         setAuthCookies({
                             token: res?.data?.token ?? '',
                             user: { id: res?.data?.id, email: res?.data?.email },
-                            role: res?.data?.userRole?.name ?? '',
+                            role: res?.data?.role?.name ?? '',
                         })
                         router.refresh()
                         dispatch(closeModal())

@@ -39,7 +39,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
         }),
         addToWishlist: builder.mutation({
             query: (body) => ({
-                url: `/user/add-wishlist`,
+                url: `/user/wishlist`,
                 method: 'POST',
                 body,
             }),
@@ -47,8 +47,8 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
         }),
         removeFromWishlist: builder.mutation({
             query: (wishlistItemId) => ({
-                url: `/user/remove-wishlist/${wishlistItemId}`,
-                method: 'GET',
+                url: `/user/wishlist/${wishlistItemId}`,
+                method: 'DELETE',
             }),
             invalidatesTags: ['Wishlist', 'AllChapters'],
         }),

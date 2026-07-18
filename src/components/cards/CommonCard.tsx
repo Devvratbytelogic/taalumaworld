@@ -55,9 +55,8 @@ export default function CommonCard({ data }: CommonCardProps) {
 
                 {/* Wishlist */}
                 <WishlistButton
-                    chapterId={!isBook ? data?.id : undefined}
-                    bookId={isBook ? data?.id : data?.bookId}
-                    type={data?.legacyType}
+                    itemId={data?.id}
+                    type={isBook ? VISIBLE.BOOK : VISIBLE.CHAPTER}
                     isWishlisted={data?.isWishlisted}
                 />
             </div>

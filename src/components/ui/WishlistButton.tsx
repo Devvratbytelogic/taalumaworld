@@ -11,16 +11,14 @@ import { openModal } from '@/store/slices/allModalSlice';
 import { VISIBLE } from '@/constants/contentMode';
 
 interface WishlistButtonProps {
-    chapterId?: string;
-    bookId?: string;
+    itemId: string;
     type?: string;
     isWishlisted?: boolean;
     className?: string;
 }
 
 export default function WishlistButton({
-    chapterId,
-    bookId,
+    itemId,
     type = 'book',
     isWishlisted = false,
     className = 'absolute top-3.5 left-3.5 z-2 backdrop-blur-sm bg-white/90 rounded-full h-9! w-9! min-w-9! p-0!',
@@ -30,8 +28,6 @@ export default function WishlistButton({
     const [wishlisted, setWishlisted] = useState(isWishlisted);
     const [addToWishlist, { isLoading: isAdding }] = useAddToWishlistMutation();
     const [removeFromWishlist, { isLoading: isRemoving }] = useRemoveFromWishlistMutation();
-
-    const itemId = type !== VISIBLE.BOOK ? chapterId : bookId;
 
     const handleToggle = async () => {
         if (!isAuthenticated) {
@@ -46,9 +42,8 @@ export default function WishlistButton({
                 toast.success('Removed from wishlist');
             } else {
                 await addToWishlist({
-                    ...(type !== VISIBLE.BOOK && chapterId && { chapter_id: chapterId }),
-                    ...(bookId && { book_id: bookId }),
                     type,
+                    item_id: itemId,
                 }).unwrap();
                 setWishlisted(true);
                 toast.success('Added to wishlist');

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import BlueprintPublicHero from '@/components/blueprint/BlueprintPublicHero';
 import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetails';
 import LoginRequiredGate from '@/components/auth/LoginRequiredGate';
+import ChapterPurchaseGate from '@/components/pages-components/chapter/ChapterPurchaseGate';
 import { getSingleBlueprintServerAPI } from '@/store/server-api/serverSideAPIs';
 
 
@@ -58,6 +59,7 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
             )}
 
             <LoginRequiredGate isAuthenticated={isAuthenticated} action="view" itemType="chapter" />
+            <ChapterPurchaseGate isAuthenticated={isAuthenticated} chapter={data ?? null} />
 
             <div className="space-y-10 space_top">
                 <BlueprintPublicHero data={data ?? null} />

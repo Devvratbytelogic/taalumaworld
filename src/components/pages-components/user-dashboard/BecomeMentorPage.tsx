@@ -160,7 +160,7 @@ export function BecomeMentorPage() {
           <div className="mt-5 space-y-4 rounded-lg border border-gray-200 bg-gray-50/60 p-4 sm:p-5">
             <div>
               <label htmlFor="careerSummary" className={labelClassName}>
-                Career summary
+                Career summary<span className="text-red-500">*</span>
               </label>
               <Textarea
                 id="careerSummary"
@@ -197,7 +197,7 @@ export function BecomeMentorPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label htmlFor="bankName" className={labelClassName}>
-                  Bank name
+                  Bank name<span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="bankName"
@@ -215,7 +215,7 @@ export function BecomeMentorPage() {
 
               <div>
                 <label htmlFor="accountNumber" className={labelClassName}>
-                  Account number
+                  Account number<span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="accountNumber"
@@ -233,7 +233,7 @@ export function BecomeMentorPage() {
 
               <div>
                 <label htmlFor="mpesaNumber" className={labelClassName}>
-                  M-Pesa phone number
+                  M-Pesa phone number<span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="mpesaNumber"
@@ -251,7 +251,7 @@ export function BecomeMentorPage() {
 
               <div>
                 <label htmlFor="paymentFrequency" className={labelClassName}>
-                  Preferred payment frequency
+                  Preferred payment frequency<span className="text-red-500">*</span>
                 </label>
                 <select
                   id="paymentFrequency"

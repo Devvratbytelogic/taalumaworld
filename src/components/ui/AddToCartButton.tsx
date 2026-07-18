@@ -2,16 +2,22 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { useAddChapterToCartMutation } from '@/store/rtkQueries/userPostAPI';
+import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
+import { closeModal } from '@/store/slices/allModalSlice';
+import { useAuth } from '@/hooks/useAuth';
+import { getCartRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
 
 interface AddToCartButtonProps {
     id?: string;
-    bookId?: string;
     type?: string;
     className?: string;
     label?: string;
+    goToCartLabel?: string;
     onSuccess?: () => void;
 }
 
@@ -20,9 +26,24 @@ export default function AddToCartButton({
     type,
     className = 'global_btn rounded_full outline_primary w-full',
     label = 'Add to Cart',
+    goToCartLabel = 'Go to Cart',
     onSuccess,
 }: AddToCartButtonProps) {
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
     const [addChapterToCart, { isLoading }] = useAddChapterToCartMutation();
+    const { data: cartResponse } = useGetCartQuery(undefined, { skip: !isAuthenticated });
+
+    const cartItems = cartResponse?.data?.[0]?.cart_item ?? [];
+    const isInCart = !!id && cartItems.some((item) =>
+        type === VISIBLE.CHAPTER ? item.chapter_id === id : item.book_id === id
+    );
+
+    const handleGoToCart = () => {
+        dispatch(closeModal());
+        router.push(getCartRoutePath());
+    };
 
     const handleAddToCart = async () => {
         try {
@@ -39,6 +60,18 @@ export default function AddToCartButton({
            console.log('error adding to cart', error);
         }
     };
+
+    if (isInCart) {
+        return (
+            <Button
+                onPress={handleGoToCart}
+                className={className}
+                startContent={<ShoppingCart className="h-5 w-5" />}
+            >
+                {goToCartLabel}
+            </Button>
+        );
+    }
 
     return (
         <Button

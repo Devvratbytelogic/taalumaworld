@@ -6,6 +6,7 @@ import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { useAppDispatch } from '@/store/hooks';
 import { mpesaLog } from '@/utils/mpesaLogger';
 import { useRouter } from 'next/navigation';
+import { VISIBLE } from '@/constants/contentMode';
 
 const DEFAULT_WAIT_SECONDS = 300;
 const STATUS_POLL_MS = 2_000;
@@ -140,7 +141,7 @@ export function useMpesaPaymentFlow({
         const res = (await mpesaPayment({
           phone,
           cart_id: cartID,
-          chapter_id: chapterID,
+          ...(chapterID && type === VISIBLE.BOOK ? { book_id: chapterID } : { chapter_id: chapterID }),
           type: type,
           accepted_agreement_ids: acceptedAgreementIds,
         }).unwrap()) as MpesaPayResult;

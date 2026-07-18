@@ -12,7 +12,7 @@ import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
 import { useAuth } from '@/hooks/useAuth';
 import { VISIBLE } from '@/constants/contentMode';
-import { getCartRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { getSeriesRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 
@@ -39,11 +39,6 @@ export default function BookDetailsModal() {
 
     const openLogin = (action: string, itemType: string) => {
         dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType } }));
-    };
-
-    const goToCart = () => {
-        dispatch(closeModal());
-        router.push(getCartRoutePath());
     };
 
     const viewFullDetails = () => {
@@ -182,21 +177,12 @@ export default function BookDetailsModal() {
                             </Button>
 
                             {isAuthenticated
-                                ? (book?.isCart
-                                    ? <Button
-                                        className="global_btn rounded_full bg_primary w-full"
-                                        onPress={goToCart}
-                                        startContent={<ShoppingCart className="h-4 w-4" />}
-                                    >
-                                        Go to Cart
-                                    </Button>
-                                    : <AddToCartButton
-                                        id={book?.id}
-                                        type={VISIBLE.BOOK}
-                                        className="global_btn rounded_full bg_primary w-full"
-                                        label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
-                                        onSuccess={goToCart}
-                                    />)
+                                ? <AddToCartButton
+                                    id={book?.id}
+                                    type={VISIBLE.BOOK}
+                                    className="global_btn rounded_full bg_primary w-full"
+                                    label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                                />
                                 : <Button
                                     className="global_btn rounded_full bg_primary w-full"
                                     onPress={() => openLogin('cart', VISIBLE.BOOK)}

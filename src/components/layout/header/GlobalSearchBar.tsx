@@ -41,10 +41,10 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   const hasResults = series.length > 0 || blueprints.length > 0 || mentors.length > 0;
 
   return (
-    <div className="w-full pb-4">
-      <div className="group/search relative">
+    <div className="w-full">
+      <div className="group/search flex items-center gap-3 border-b border-gray-100 px-4 py-3.5 sm:px-5">
         <Search
-          className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 transition-colors group-focus-within/search:text-primary"
+          className="h-5 w-5 shrink-0 text-gray-400 transition-colors group-focus-within/search:text-primary"
           aria-hidden
         />
         <input
@@ -54,22 +54,25 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && onSelect()}
           placeholder="Search series, blueprints, mentors..."
-          className="h-11 w-full rounded-full border border-gray-200 bg-gray-50 pl-10 pr-10 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-primary/40 focus:bg-white"
+          className="h-6 w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
         />
         {query && (
           <button
             type="button"
             onClick={() => setQuery('')}
             aria-label="Clear search"
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 transition-colors hover:text-gray-600"
+            className="shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
           >
             <X className="h-4 w-4" />
           </button>
         )}
+        <kbd className="hidden shrink-0 items-center rounded-md border border-gray-200 bg-gray-50 px-1.5 py-1 text-[10px] font-medium text-gray-400 sm:inline-flex">
+          ESC
+        </kbd>
       </div>
 
       {isSearchable && (
-        <div className="custom_scrollbar mt-3 max-h-[60vh] overflow-y-auto rounded-md border bg-white">
+        <div className="custom_scrollbar max-h-[60vh] overflow-y-auto">
           {isFetching ? (
             <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-gray-500">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -90,7 +93,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                 label="Series"
                 items={series}
                 onSelect={onSelect}
-                getHref={(item) => getSeriesRoutePath(item.id)}
+                getHref={(item) => getSeriesRoutePath(item?.slug ?? item?.id ?? '')}
                 renderItem={(item) => <SeriesResultRow item={item} />}
               />
               <SearchResultSection
@@ -98,7 +101,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                 label="Blueprints"
                 items={blueprints}
                 onSelect={onSelect}
-                getHref={(item) => getBlueprintRoutePath(item.id)}
+                getHref={(item) => getBlueprintRoutePath(item?.slug ?? item?.id ?? '')}
                 renderItem={(item) => <BlueprintResultRow item={item} />}
               />
               <SearchResultSection
@@ -106,7 +109,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                 label="Mentors"
                 items={mentors}
                 onSelect={onSelect}
-                getHref={(item) => getAuthorsRoutePath({ id: item.id })}
+                getHref={(item) => getAuthorsRoutePath({ id: item?.id ?? '' })}
                 renderItem={(item) => <MentorResultRow item={item} />}
               />
             </>
@@ -134,7 +137,7 @@ function SearchResultSection<T extends { id: string }>({
   getHref,
   renderItem,
 }: SearchResultSectionProps<T>) {
-  if (items.length === 0) return null;
+  if (items?.length === 0) return null;
 
   return (
     <div className="border-b border-gray-100 p-2 last:border-b-0">
@@ -142,9 +145,9 @@ function SearchResultSection<T extends { id: string }>({
         <Icon className="h-4 w-4 text-primary" aria-hidden />
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</span>
       </div>
-      {items.slice(0, MAX_RESULTS_PER_SECTION).map((item) => (
+      {items?.map((item) => (
         <Link
-          key={item.id}
+          key={item?.id}
           href={getHref(item)}
           onClick={onSelect}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-gray-50"

@@ -13,6 +13,7 @@ export interface ISearchResultsDataEntity {
 }
 export interface SeriesEntity {
     id: string;
+    slug: string;
     type: string;
     title: string;
     coverImage: string;
@@ -29,6 +30,7 @@ export interface SeriesEntity {
 export interface BlueprintsEntity {
     id: string;
     type: string;
+    slug: string;
     chapterNumber: number;
     title: string;
     coverImage: string;

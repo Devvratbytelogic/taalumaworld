@@ -102,16 +102,30 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
     };
   }, [isSearchOpen]);
 
-  // Close search panel on scroll
+  // Close search overlay on Escape key
   useEffect(() => {
     if (!isSearchOpen) return;
 
-    const handleScroll = () => setIsSearchOpen(false);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsSearchOpen(false);
+    };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchOpen]);
+
+  // Lock body scroll while the search overlay is open
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
     };
   }, [isSearchOpen]);
 
@@ -135,6 +149,15 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
   return (
     <>
       <HeaderToolbar />
+
+      <div
+        className={cn(
+          'fixed inset-0 z-40 bg-black/50 backdrop-blur-xs transition-opacity duration-300 ease-out',
+          isSearchOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        )}
+        onClick={() => setIsSearchOpen(false)}
+        aria-hidden="true"
+      />
 
       <header ref={headerRef} className="sticky top-0 z-50 border-b border-gray-200 bg-white/60 backdrop-blur-md">
         <div className="container">
@@ -280,21 +303,16 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               </button>
             </div>
           </div>
+        </div>
 
-          <div
-            className={cn(
-              'grid transition-[grid-template-rows] duration-300 ease-in-out',
-              isSearchOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-            )}
-          >
-            <div
-              className={cn(
-                'overflow-hidden transition-opacity duration-300 ease-in-out',
-                isSearchOpen ? 'opacity-100 delay-100' : 'opacity-0'
-              )}
-            >
-              <GlobalSearchBar onSelect={() => setIsSearchOpen(false)} />
-            </div>
+        <div
+          className={cn(
+            'absolute inset-x-0 top-full z-50 flex justify-center px-4 pt-2 pb-10 origin-top transition-all duration-300 ease-out sm:px-6',
+            isSearchOpen ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0 pointer-events-none'
+          )}
+        >
+          <div className="w-full max-w-2xl overflow-hidden rounded-md bg-white">
+            <GlobalSearchBar onSelect={() => setIsSearchOpen(false)} />
           </div>
         </div>
       </header>

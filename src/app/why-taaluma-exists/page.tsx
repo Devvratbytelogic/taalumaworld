@@ -8,8 +8,12 @@ import CoreValues from '@/components/pages-components/about/CoreValues';
 import BlueprintShowcase from '@/components/pages-components/about/BlueprintShowcase';
 import CommonCTA from '@/components/cta/CommonCTA';
 import HomeMentorShowcase from '@/components/pages-components/home/HomeMentorShowcase';
+import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
 
-export default function AboutUsPage() {
+export default async function AboutUsPage() {
+    const response = await getAllMentorsServerAPI({ limit: 4, page: 1 });
+    const mentors = response?.data?.data ?? [];
+
     return (
         <>
             {/* Why Taaluma Exists Banner */}
@@ -29,7 +33,7 @@ export default function AboutUsPage() {
                 <CoreValues />
 
                 {/* Meet Some of Our Mentors */}
-                <HomeMentorShowcase />
+                <HomeMentorShowcase mentors={mentors} />
 
                 {/* Featured Blueprints */}
                 <BlueprintShowcase />

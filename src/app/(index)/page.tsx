@@ -11,8 +11,8 @@ import HomeMentorShowcase from '@/components/pages-components/home/HomeMentorSho
 import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
 
 export default async function HomePage() {
-  const response = await getAllMentorsServerAPI()
-  const mentors = response?.data?.data?.slice(0, 4) ?? []
+  const response = await getAllMentorsServerAPI({ limit: 4, page: 1 })
+  const mentors = response?.data?.data ?? []
 
   return (
     <>

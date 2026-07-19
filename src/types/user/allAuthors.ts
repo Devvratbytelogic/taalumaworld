@@ -19,5 +19,9 @@ export interface IUserAllAuthorsDataEntity {
   profile_pic: string;
   email: string;
   status: string;
+  is_verified_mentor: boolean;
+  professionalBio: string;
+  linkedin: string;
+  facebook: string;
   id: string;
 }

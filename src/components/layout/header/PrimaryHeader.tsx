@@ -237,7 +237,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                   </button>
 
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+                    <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-md border bg-white shadow-xl">
                       <div className="border-b border-gray-100 bg-gray-50/70 px-4 py-3">
                         <p className="truncate text-sm font-medium text-gray-900">{userName || 'My Account'}</p>
                         {userEmail ? (
@@ -270,14 +270,6 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                 </div>
               ) : (
                 <>
-                  <Button
-                    className="global_btn rounded_full bg_primary h-10! max-h-10! min-w-10! w-10! max-w-10! p-0! lg:hidden"
-                    isIconOnly
-                    aria-label="Sign in"
-                    onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
-                  >
-                    <User className="h-5 w-5" />
-                  </Button>
                   <Button
                     className="global_btn rounded_full outline_primary hidden lg:flex"
                     onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}

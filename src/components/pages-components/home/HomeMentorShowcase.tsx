@@ -1,20 +1,17 @@
 'use client'
-import { useGetUserAllAuthorsQuery } from '@/store/rtkQueries/userGetAPI'
-import { useRouter } from 'next/navigation'
 import { Users } from 'lucide-react'
+import Link from 'next/link'
 import ImageComponent from '@/components/ui/ImageComponent'
 import Button from '@/components/ui/Button'
-import { getMentorSignupRoutePath } from '@/routes/routes'
-import React from 'react'
+import { getAllAuthorsRoutePath, getMentorSignupRoutePath } from '@/routes/routes'
+import { IUserAllAuthorsDataEntity } from '@/types/user/allAuthors'
 
 const avatarColors = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626']
 
-export default function HomeMentorShowcase() {
-    const router = useRouter()
-    const { data: response, isLoading } = useGetUserAllAuthorsQuery()
-    const mentors = response?.data?.data?.slice(0, 4) ?? []
-
-    if (!isLoading && mentors.length === 0) return null
+interface HomeMentorShowcaseProps {
+    mentors: IUserAllAuthorsDataEntity[]
+}
+export default function HomeMentorShowcase({ mentors }: HomeMentorShowcaseProps) {
 
     return (
         <>
@@ -31,56 +28,44 @@ export default function HomeMentorShowcase() {
                     </p>
                 </div>
 
-                {/* Mentor Cards */}
-                {isLoading ? (
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="bg-white rounded-3xl p-6 shadow-sm animate-pulse">
-                                <div className="w-16 h-16 rounded-full bg-muted mb-4" />
-                                <div className="h-4 bg-muted rounded-full w-2/3 mb-2" />
-                                <div className="h-3 bg-muted rounded-full w-full mb-1" />
-                                <div className="h-3 bg-muted rounded-full w-4/5" />
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {mentors?.map((mentor, index) => (
-                            <div
-                                key={index}
-                                className="bg-white rounded-md p-6 border transition-shadow flex flex-col items-center text-center gap-3"
-                            >
-                                {mentor?.profile_pic ? (
-                                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
-                                        <ImageComponent src={mentor?.profile_pic} alt={mentor?.name} object_cover={true} />
-                                    </div>
-                                ) : (
-                                    <div
-                                        className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
-                                        style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
-                                    >
-                                        {mentor?.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
-                                <div className="space-y-1">
-                                    <h3 className="font-semibold text-foreground leading-tight">{mentor?.name}</h3>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    {mentors?.map((mentor, index) => (
+                        <div
+                            key={index}
+                            className="bg-white rounded-md p-6 border transition-shadow flex flex-col items-center text-center gap-3"
+                        >
+                            {mentor?.profile_pic ? (
+                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
+                                    <ImageComponent src={mentor?.profile_pic} alt={mentor?.name} object_cover={true} />
                                 </div>
+                            ) : (
+                                <div
+                                    className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
+                                    style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
+                                >
+                                    {mentor?.name?.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                            <div className="space-y-1">
+                                <h3 className="font-semibold text-foreground leading-tight">{mentor?.name}</h3>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        </div>
+                    ))}
+                </div>
 
                 {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center mt-10">
                     <Button
                         className="global_btn rounded_full outline_primary"
-                        onPress={() => router.push('/authors')}
+                        as={Link}
+                        href={getAllAuthorsRoutePath()}
                     >
                         View All Mentors
                     </Button>
                     <Button
                         className="global_btn rounded_full bg_primary"
-                        onPress={() => router.push(getMentorSignupRoutePath())}
+                        as={Link}
+                        href={getMentorSignupRoutePath()}
                     >
                         Become a Mentor
                     </Button>

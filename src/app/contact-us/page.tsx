@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button'
 import NormalBanner from '@/components/banners/NormalBanner'
 import { contactUsBannerData } from '@/data/data'
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI'
-import { getFAQRoutePath, getAuthorsRoutePath, getMentorSignupRoutePath } from '@/routes/routes'
+import { getFAQRoutePath, getMentorSignupRoutePath } from '@/routes/routes'
 import {
     InstagramIcon,
     YoutubeIcon,

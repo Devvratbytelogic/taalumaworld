@@ -4,6 +4,7 @@ import { API_BASE_URL } from '@/utils/config';
 import type { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
 import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
+import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -53,7 +54,9 @@ export async function getGlobalSettingsServerAPI() {
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
   return serverFetch<ISingleChapterAPIResponse>(`/user/content/blueprint/${encodeURIComponent(slug)}`);
 }
-
 export async function getSingleSeriesServerAPI({ slug }: { slug: string }) {
   return serverFetch<ISingleBookAPIResponse>(`/user/content/series/${encodeURIComponent(slug)}`);
+}
+export async function getAllMentorsServerAPI() {
+  return serverFetch<IUserAllAuthorsAPIResponse>(`/user/mentor-list`);
 }

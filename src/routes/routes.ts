@@ -275,12 +275,12 @@ export function getCategoriesRoutePath(): string {
   return '/categories';
 }
 
-export function getAuthorsRoutePath(params?: { id?: string }): string {
-  const base = '/authors';
-  if (params?.id) {
-    return `${base}?id=${encodeURIComponent(params.id)}`;
-  }
-  return base;
+export function getAllAuthorsRoutePath(): string {
+  return '/mentor';
+}
+
+export function getSingleAuthorRoutePath(id: string): string {
+  return `/mentor/${id}`;
 }
 
 export function getMyChaptersRoutePath(): string {

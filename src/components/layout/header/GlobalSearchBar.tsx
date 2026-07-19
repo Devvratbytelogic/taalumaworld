@@ -8,7 +8,7 @@ import type { BlueprintsEntity, MentorsEntity, SeriesEntity } from '@/types/user
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/components/ui/utils';
 import ImageComponent from '@/components/ui/ImageComponent';
-import { getAuthorsRoutePath, getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
 
 interface GlobalSearchBarProps {
   onSelect: () => void;
@@ -109,7 +109,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                 label="Mentors"
                 items={mentors}
                 onSelect={onSelect}
-                getHref={(item) => getAuthorsRoutePath({ id: item?.id ?? '' })}
+                getHref={(item) => getSingleAuthorRoutePath(item?.id ?? '')}
                 renderItem={(item) => <MentorResultRow item={item} />}
               />
             </>

@@ -94,31 +94,6 @@ export default function PrimaryFooter() {
                                         Home
                                     </Link>
                                 </li>
-                                {/* {contentMode === 'books' ? (
-                                    <>
-                                        <li>
-                                            <Link href={getBooksRoutePath()} className="hover:text-primary transition-colors">
-                                                Browse Series
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link href={getCategoriesRoutePath()} className="hover:text-primary transition-colors">
-                                                Categories
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link href={getAuthorsRoutePath()} className="hover:text-primary transition-colors">
-                                                Mentors
-                                            </Link>
-                                        </li>
-                                    </>
-                                ) : (
-                                    <li>
-                                        <Link href={getAuthorsRoutePath()} className="hover:text-primary transition-colors">
-                                            Mentors
-                                        </Link>
-                                    </li>
-                                )} */}
                                 <li>
                                     <Link href={getAboutUsRoutePath()} className="hover:text-primary transition-colors">
                                         Why Taaluma Exists

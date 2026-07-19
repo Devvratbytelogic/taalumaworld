@@ -11,8 +11,7 @@ export default function FAQ() {
 
     return (
         <>
-            <section className="bg-background">
-                <div className="container max-w-4xl">
+                <div className="container mb-12">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">Frequently Asked Questions</h2>
                         <p className="text-lg text-muted-foreground">
@@ -33,7 +32,6 @@ export default function FAQ() {
                         }
                     </div>
                 </div>
-            </section>
         </>
     )
 }
@@ -42,7 +40,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="border border-border rounded-3xl overflow-hidden bg-white hover:border-primary/30 transition-colors">
+        <div className="border border-border rounded-md overflow-hidden bg-white hover:border-primary/30 transition-colors">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex items-center justify-between p-5 text-left hover:bg-accent/30 transition-colors"

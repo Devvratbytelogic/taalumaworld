@@ -40,7 +40,7 @@ export default function CareerArchitectSection() {
     const dispatch = useDispatch()
 
     return (
-        <section className="bg-accent/30">
+        <>
             <div className="container">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
 
@@ -82,7 +82,7 @@ export default function CareerArchitectSection() {
                     {/* Right: Trait Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {traits.map(({ icon: Icon, title, description, iconBg, iconColor }) => (
-                            <div key={title} className="bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow space-y-3">
+                            <div key={title} className="bg-white rounded-md border p-5 space-y-3">
                                 <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center`}>
                                     <Icon className={`w-5 h-5 ${iconColor}`} />
                                 </div>
@@ -95,6 +95,6 @@ export default function CareerArchitectSection() {
                     </div>
                 </div>
             </div>
-        </section>
+        </>
     )
 }

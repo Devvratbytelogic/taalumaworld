@@ -38,8 +38,8 @@ const audiences = [
 
 export default function AudienceSegmentation() {
     return (
-        <section className="bg-accent/30">
-            <div className="container pt-6">
+        <>
+            <div className="container">
                 <div className="text-center mb-10">
                     <h2 className="text-2xl md:text-3xl font-bold mb-2">Taaluma is Built for Everyone</h2>
                     <p className="text-muted-foreground text-lg">
@@ -51,7 +51,7 @@ export default function AudienceSegmentation() {
                     {audiences.map(({ icon: Icon, title, description, iconBg, iconColor, border }) => (
                         <div
                             key={title}
-                            className={`bg-white rounded-3xl p-6 shadow-sm hover:shadow-md transition-all border border-transparent ${border} flex flex-col gap-4`}
+                            className={`bg-white rounded-md p-6 transition-all border ${border} flex flex-col gap-4`}
                         >
                             <div className={`w-12 h-12 rounded-full ${iconBg} flex items-center justify-center`}>
                                 <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -64,6 +64,6 @@ export default function AudienceSegmentation() {
                     ))}
                 </div>
             </div>
-        </section>
+        </>
     )
 }

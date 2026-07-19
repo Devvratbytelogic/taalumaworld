@@ -32,41 +32,6 @@ export interface bannerProps {
 }
 
 
-export const aboutBannerData: bannerProps = {
-    badgeText: 'About Taaluma.World',
-    heading: {
-        prefix: 'The Global Marketplace for Mentorship, Learning & Career',
-        highlight: 'Architecture',
-        suffix: '.',
-    },
-    description:
-        'We help people learn from those ahead of them, mentor those behind them, and build the capacity needed to thrive in the AI Economy.',
-    tagline: 'Learn From Someone Ahead. Mentor Someone Behind.',
-    primaryCta: {
-        title: 'Explore Blueprints',
-        button_status: false,
-    },
-    secondaryCta: {
-        title: 'Browse Categories',
-        button_status: false,
-    },
-    stats: {
-        status: false,
-        avatars: [
-            { label: 'A', bgColor: '#0A66C2' },
-            { label: 'B', bgColor: '#8B5CF6' },
-            { label: 'C', bgColor: '#10B981' },
-            { label: '+5', bgColor: '#004182' },
-        ],
-        description: '500+ active readers',
-    },
-    image: {
-        src: '/images/common/about-img1.jpg',
-        alt: 'Why Taaluma Exists Banner',
-    },
-
-};
-
 export interface normalBannerData {
     badge: {
         text: string

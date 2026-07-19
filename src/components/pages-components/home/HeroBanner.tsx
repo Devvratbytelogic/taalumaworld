@@ -43,10 +43,9 @@ export default function HeroBanner() {
                                     Learn From Someone Ahead.
                                     Mentor Someone{' '}
                                     <span className="relative inline-block">
-                                        <span className="relative z-10">Behind</span>
-                                        <span className="absolute bottom-1 left-0 w-full h-3 bg-primary/30 -rotate-1 rounded-sm" />
+                                        <span className="relative z-10 gradient_text">Behind.</span>
+                                        {/* <span className="absolute bottom-1 left-0 w-full h-3 bg-primary/30 -rotate-1 rounded-sm" /> */}
                                     </span>
-                                    .
                                 </h1>
                                 <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
                                     Connect with mentors, discover practical blueprints, and build the skills needed to thrive in a rapidly changing world.

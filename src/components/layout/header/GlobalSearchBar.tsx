@@ -1,333 +1,237 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'nextjs-toploader/app';
-import { getAuthorsRoutePath } from '@/routes/routes';
-import { Search, X, BookOpen, FileText, User, Clock } from 'lucide-react';
-import { useGetSearchResultsQuery, useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
-import { Input } from '@/components/ui/input';
-import Button from '@/components/ui/Button';
-import { VISIBLE } from '@/constants/contentMode';
-import { useAppDispatch } from '@/store/hooks';
-import { openModal } from '@/store/slices/allModalSlice';
-import { BooksEntity, ChaptersEntity } from '@/types/user/saech';
 
-function mapBookToContentItem(book: BooksEntity) {
-  return {
-    type: 'book',
-    id: book.id,
-    title: book.title,
-    description: book.description,
-    coverImage: book.coverImage,
-    price: book.price,
-    pricingModel: book.pricingModel,
-    totalPages: 0,
-    chapterCount: 0,
-    author: book.author,
-    authorAvatar: book.authorAvatar ?? null,
-    category: book.category,
-    subcategory: book.subcategory ?? null,
-    isPurchased: false,
-    canRead: false,
-    isCart: false,
-    chapters: [],
-  };
-}
-
-function mapChapterToContentItem(chapter: ChaptersEntity) {
-  return {
-    type: 'chapter',
-    id: chapter.id,
-    chapterNumber: chapter.chapterNumber,
-    title: chapter.title,
-    description: chapter.description,
-    pageCount: chapter.pageCount,
-    price: chapter.price,
-    isFree: chapter.isFree,
-    coverImage: chapter.coverImage,
-    bookId: chapter.bookId as any,
-    bookTitle: chapter.bookTitle,
-    author: chapter.author,
-    authorAvatar: chapter.authorAvatar ?? null,
-    category: chapter.category,
-    subcategory: chapter.subcategory ?? null,
-    canRead: false,
-    isCart: false,
-  };
-}
-
-const RECENT_SEARCHES_KEY = 'taaluma_recent_searches';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
+import Link from 'next/link';
+import { BadgeCheck, BookOpen, CheckCircle2, FileText, Loader2, Search, Users, X } from 'lucide-react';
+import { useGetSearchResultsQuery } from '@/store/rtkQueries/userGetAPI';
+import type { BlueprintsEntity, MentorsEntity, SeriesEntity } from '@/types/user/saech';
+import { useDebounce } from '@/hooks/useDebounce';
+import { cn } from '@/components/ui/utils';
+import ImageComponent from '@/components/ui/ImageComponent';
+import { getAuthorsRoutePath, getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
 
 interface GlobalSearchBarProps {
-  onSelect?: () => void;
+  onSelect: () => void;
+}
+
+const MIN_QUERY_LENGTH = 2;
+const MAX_RESULTS_PER_SECTION = 5;
+
+function formatPrice(price: number) {
+  return price > 0 ? `KSH ${price.toFixed(2)}` : 'FREE';
 }
 
 export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const dispatch = useAppDispatch();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debouncedQuery = useDebounce(query.trim(), 350);
+  const isSearchable = debouncedQuery.length >= MIN_QUERY_LENGTH;
 
-  const { data: globalSettings } = useGetGlobalSettingsQuery();
-  const contentMode = globalSettings?.data?.visible;
-
-  // Load recent searches from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
-    if (saved) {
-      try {
-        setRecentSearches(JSON.parse(saved));
-      } catch {
-        setRecentSearches([]);
-      }
-    }
-  }, []);
-
-  // Debounce query by 350ms
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query.trim());
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  const { data: searchData, isFetching } = useGetSearchResultsQuery(debouncedQuery, {
-    skip: debouncedQuery.length < 2,
+  const { data, isFetching, isError, error } = useGetSearchResultsQuery(debouncedQuery, {
+    skip: !isSearchable,
   });
 
-  const books = contentMode === VISIBLE.BOOK ? (searchData?.data?.books ?? []) : [];
-  const chapters = contentMode === VISIBLE.CHAPTER ? (searchData?.data?.chapters ?? []) : [];
-  const authors = contentMode === VISIBLE.BOOK ? (searchData?.data?.authors ?? []) : [];
-  const hasResults = books.length > 0 || chapters.length > 0 || authors.length > 0;
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
-  const showResults = isOpen && debouncedQuery.length >= 2;
-  const showRecent = isOpen && !query && recentSearches.length > 0;
-
-  const saveSearch = (term: string) => {
-    if (!term.trim()) return;
-    const updated = [term, ...recentSearches.filter((s) => s !== term)].slice(0, 5);
-    setRecentSearches(updated);
-    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
-  };
-
-  const clearAndClose = () => {
-    setQuery('');
-    setDebouncedQuery('');
-    setIsOpen(false);
-    onSelect?.();
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    saveSearch(query.trim());
-    // router.push(getSearchRoutePath(query.trim()));
-    // clearAndClose();
-  };
+  const series = data?.data?.series ?? [];
+  const blueprints = data?.data?.blueprints ?? [];
+  const mentors = data?.data?.mentors ?? [];
+  const hasResults = series.length > 0 || blueprints.length > 0 || mentors.length > 0;
 
   return (
-    <div ref={containerRef} className="group/search relative w-full pb-4">
-      <form onSubmit={handleSubmit} className="relative">
+    <div className="w-full pb-4">
+      <div className="group/search relative">
         <Search
-          className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 transition-colors group-focus-within/search:text-primary"
+          className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 transition-colors group-focus-within/search:text-primary"
           aria-hidden
         />
-        <Input
+        <input
+          ref={inputRef}
           type="text"
-          placeholder="Search mentors, blueprints, topics..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setIsOpen(true)}
-          className="h-10 w-full rounded-full py-2 pl-10 pr-10"
+          onKeyDown={(e) => e.key === 'Escape' && onSelect()}
+          placeholder="Search series, blueprints, mentors..."
+          className="h-11 w-full rounded-full border border-gray-200 bg-gray-50 pl-10 pr-10 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-primary/40 focus:bg-white"
         />
         {query && (
           <button
             type="button"
-            onClick={clearAndClose}
-            className="absolute right-3 top-1/2 -translate-y-1/2"
+            onClick={() => setQuery('')}
+            aria-label="Clear search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 transition-colors hover:text-gray-600"
           >
-            <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            <X className="h-4 w-4" />
           </button>
         )}
-      </form>
+      </div>
 
-      {/* Backdrop */}
-      {(showResults || showRecent) && (
-        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-      )}
-
-      {/* Recent Searches Dropdown */}
-      {showRecent && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border z-50 max-h-96 overflow-y-auto">
-          <div className="p-3">
-            <div className="flex items-center justify-between px-2 mb-2">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                  Recent Searches
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onPress={() => {
-                  setRecentSearches([]);
-                  localStorage.removeItem(RECENT_SEARCHES_KEY);
-                }}
-                className="h-auto py-1 px-2 text-sm rounded-full hover:bg-gray-100"
-              >
-                Clear
-              </Button>
+      {isSearchable && (
+        <div className="custom_scrollbar mt-3 max-h-[60vh] overflow-y-auto rounded-md border bg-white">
+          {isFetching ? (
+            <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-gray-500">
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Searching...
             </div>
-            <div className="space-y-1">
-              {recentSearches.map((term, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setQuery(term);
-                    setIsOpen(true);
-                  }}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
-                >
-                  <Search className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <span className="font-medium text-sm">{term}</span>
-                </button>
-              ))}
+          ) : isError ? (
+            <div className="px-4 py-10 text-center text-sm text-gray-500">
+              {(error as any)?.data?.message || 'Something went wrong while searching. Please try again.'}
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Search Results Dropdown */}
-      {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border z-50 max-h-96 overflow-y-auto">
-
-          {/* Loading */}
-          {isFetching && (
-            <div className="px-4 py-3 text-sm text-gray-500 text-center">Searching...</div>
-          )}
-
-          {/* Results */}
-          {!isFetching && hasResults && (
-            <>
-              {books.length > 0 && (
-                <div className="p-2">
-                  <div className="flex items-center gap-2 px-3 py-2">
-                    <BookOpen className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                      Series
-                    </span>
-                  </div>
-                  {books.slice(0, 4).map((book) => (
-                    <button
-                      key={book.id}
-                      onClick={() => {
-                        saveSearch(book.title);
-                        dispatch(openModal({ componentName: 'BookDetailsModal', data: { chapter: mapBookToContentItem(book) } }));
-                        clearAndClose();
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <div className="font-medium line-clamp-1">{book.title}</div>
-                      <div className="text-sm text-gray-500">{book.author}</div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {chapters.length > 0 && (
-                <div className="p-2 border-t">
-                  <div className="flex items-center gap-2 px-3 py-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                      Blueprints
-                    </span>
-                  </div>
-                  {chapters.slice(0, 4).map((chapter) => (
-                    <button
-                      key={chapter.id}
-                      onClick={() => {
-                        saveSearch(chapter.title);
-                        dispatch(openModal({ componentName: 'ChapterDetailsModal', data: { chapter: mapChapterToContentItem(chapter) } }));
-                        clearAndClose();
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <div className="font-medium line-clamp-1">{chapter.title}</div>
-                      <div className="text-sm text-gray-500">
-                        Bp. {chapter.chapterNumber} · {chapter.bookTitle}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {authors.length > 0 && (
-                <div className="p-2 border-t">
-                  <div className="flex items-center gap-2 px-3 py-2">
-                    <User className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                      Mentors
-                    </span>
-                  </div>
-                  {authors.slice(0, 3).map((author) => (
-                    <button
-                      key={author.id}
-                      onClick={() => {
-                        saveSearch(author.fullName);
-                        router.push(getAuthorsRoutePath({ id: author.id }));
-                        clearAndClose();
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <div className="font-medium">{author.fullName}</div>
-                      <div className="text-sm text-gray-500">
-                        {author.followersCount ?? 0} followers
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* View all results */}
-              {/* <div className="p-2 border-t">
-                <button
-                  onClick={() => {
-                    saveSearch(debouncedQuery);
-                    router.push(getSearchRoutePath(debouncedQuery));
-                    clearAndClose();
-                  }}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 text-primary"
-                >
-                  <Search className="h-4 w-4" />
-                  <span className="text-sm font-medium">
-                    See all results for &quot;{debouncedQuery}&quot;
-                  </span>
-                </button>
-              </div> */}
-            </>
-          )}
-
-          {/* No results */}
-          {!isFetching && !hasResults && (
-            <div className="px-4 py-3 text-sm text-gray-500 text-center">
+          ) : !hasResults ? (
+            <div className="px-4 py-10 text-center text-sm text-gray-500">
               No results found for &quot;{debouncedQuery}&quot;
             </div>
+          ) : (
+            <>
+              <SearchResultSection
+                icon={BookOpen}
+                label="Series"
+                items={series}
+                onSelect={onSelect}
+                getHref={(item) => getSeriesRoutePath(item.id)}
+                renderItem={(item) => <SeriesResultRow item={item} />}
+              />
+              <SearchResultSection
+                icon={FileText}
+                label="Blueprints"
+                items={blueprints}
+                onSelect={onSelect}
+                getHref={(item) => getBlueprintRoutePath(item.id)}
+                renderItem={(item) => <BlueprintResultRow item={item} />}
+              />
+              <SearchResultSection
+                icon={Users}
+                label="Mentors"
+                items={mentors}
+                onSelect={onSelect}
+                getHref={(item) => getAuthorsRoutePath({ id: item.id })}
+                renderItem={(item) => <MentorResultRow item={item} />}
+              />
+            </>
           )}
         </div>
       )}
     </div>
+  );
+}
+
+interface SearchResultSectionProps<T extends { id: string }> {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  items: T[];
+  onSelect: () => void;
+  getHref: (item: T) => string;
+  renderItem: (item: T) => React.ReactNode;
+}
+
+function SearchResultSection<T extends { id: string }>({
+  icon: Icon,
+  label,
+  items,
+  onSelect,
+  getHref,
+  renderItem,
+}: SearchResultSectionProps<T>) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="border-b border-gray-100 p-2 last:border-b-0">
+      <div className="flex items-center gap-2 px-3 py-2">
+        <Icon className="h-4 w-4 text-primary" aria-hidden />
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</span>
+      </div>
+      {items.slice(0, MAX_RESULTS_PER_SECTION).map((item) => (
+        <Link
+          key={item.id}
+          href={getHref(item)}
+          onClick={onSelect}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-gray-50"
+        >
+          {renderItem(item)}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function SearchResultThumbnail({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+      <ImageComponent src={src} alt={alt} object_cover />
+    </div>
+  );
+}
+
+function SearchResultPriceBadge({ isPurchased, price }: { isPurchased: boolean; price: number }) {
+  if (isPurchased) {
+    return (
+      <span className="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">
+        <CheckCircle2 className="h-3 w-3" aria-hidden />
+        Owned
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={cn(
+        'shrink-0 rounded-full px-2 py-1 text-[11px] font-medium',
+        price > 0 ? 'bg-gray-100 text-gray-600' : 'bg-emerald-50 text-emerald-600'
+      )}
+    >
+      {formatPrice(price)}
+    </span>
+  );
+}
+
+function SeriesResultRow({ item }: { item: SeriesEntity }) {
+  return (
+    <>
+      <SearchResultThumbnail src={item.coverImage} alt={item.title} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-gray-900">{item.title}</p>
+        <p className="truncate text-xs text-gray-500">Series</p>
+      </div>
+      <SearchResultPriceBadge isPurchased={item.isPurchased} price={item.effectivePrice} />
+    </>
+  );
+}
+
+function BlueprintResultRow({ item }: { item: BlueprintsEntity }) {
+  return (
+    <>
+      <SearchResultThumbnail src={item.coverImage} alt={item.title} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-gray-900">{item.title}</p>
+        <p className="truncate text-xs text-gray-500">
+          Bp. {item.blueprintNumber} · {item.seriesTitle}
+        </p>
+      </div>
+      <SearchResultPriceBadge
+        isPurchased={item.isPurchased}
+        price={item.isFree ? 0 : item.effectivePrice}
+      />
+    </>
+  );
+}
+
+function MentorResultRow({ item }: { item: MentorsEntity }) {
+  return (
+    <>
+      <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-gray-100">
+        <ImageComponent src={item.profile_pic ?? undefined} alt={item.name} object_cover />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
+          {item.is_verified_mentor && (
+            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+          )}
+        </div>
+        <p className="truncate text-xs text-gray-500">{item.professionalBio || 'Mentor'}</p>
+      </div>
+    </>
   );
 }

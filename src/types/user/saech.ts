@@ -2,66 +2,57 @@ export interface ISearchResultsAPIResponse {
     http_status_code: number;
     http_status_msg: string;
     success: boolean;
-    data: ISearchResultsAPIResponseData;
+    data: ISearchResultsDataEntity;
     message: string;
     timestamp: string;
-  }
-  export interface ISearchResultsAPIResponseData {
-    books?: (BooksEntity)[] | null;
-    chapters?: (ChaptersEntity)[] | null;
-    authors?: (AuthorsEntity)[] | null;
-  }
-  export interface BooksEntity {
+}
+export interface ISearchResultsDataEntity {
+    series?: (SeriesEntity)[] | null;
+    blueprints?: (BlueprintsEntity)[] | null;
+    mentors?: (MentorsEntity)[] | null;
+}
+export interface SeriesEntity {
     id: string;
     type: string;
     title: string;
-    description: string;
     coverImage: string;
     price: number;
+    effectivePrice: number;
+    pricingAccessType: string;
     pricingModel: string;
-    author: string;
-    authorAvatar?: string | null;
-    category: CategoryOrSubcategory;
-    subcategory?: CategoryOrSubcategory1 | null;
-  }
-  export interface CategoryOrSubcategory {
-    _id: string;
-    name: string;
-    slug: string;
-  }
-  export interface CategoryOrSubcategory1 {
-    _id: string;
-    name: string;
-    slug: string;
-  }
-  export interface ChaptersEntity {
+    isPurchased: boolean;
+    canRead: boolean;
+    isCart: boolean;
+    isWishlisted: boolean;
+    legacyType: string;
+}
+export interface BlueprintsEntity {
     id: string;
     type: string;
     chapterNumber: number;
     title: string;
-    description: string;
-    pageCount: number;
-    price: number;
-    isFree: boolean;
     coverImage: string;
-    bookId: string;
-    bookTitle: string;
-    author: string;
-    authorAvatar?: string | null;
-    category: CategoryOrSubcategory;
-    subcategory?: CategoryOrSubcategory2 | null;
-  }
-  export interface CategoryOrSubcategory2 {
-    _id: string;
-    name: string;
-    slug: string;
-  }
-  export interface AuthorsEntity {
+    price: number;
+    effectivePrice: number;
+    pricingAccessType: string;
+    isFree: boolean;
+    seriesId: string;
+    seriesTitle: string;
+    isPurchased: boolean;
+    canRead: boolean;
+    isCart: boolean;
+    isWishlisted: boolean;
+    legacyType: string;
+    blueprintNumber: number;
+}
+export interface MentorsEntity {
     id: string;
     type: string;
-    fullName: string;
-    avatar?: string | null;
+    name: string;
+    email: string;
+    profile_pic?: string | null;
+    is_verified: boolean;
+    is_verified_mentor: boolean;
     professionalBio: string;
-    followersCount: number;
-  }
-  
+    legacyType: string;
+}

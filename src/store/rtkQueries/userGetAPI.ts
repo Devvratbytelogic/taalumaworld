@@ -216,7 +216,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             query: (query) => ({
                 url: `/user/content/search`,
                 method: 'GET',
-                params: { query },
+                params: { q: query },
             }),
         }),
         getTransactionInvoice: builder.query<Blob, { orderId: string }>({

@@ -26,3 +26,6 @@
         }
     }
 }
+.gradient_text {
+    @apply bg-linear-to-r from-primary via-primary-light to-secondary-accent bg-clip-text text-transparent;
+}

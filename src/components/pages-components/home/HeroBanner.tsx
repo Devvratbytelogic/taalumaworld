@@ -32,7 +32,7 @@ export default function HeroBanner() {
                             {/* Badge */}
                             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-3 sm:px-4 py-1.5 rounded-full">
                                 <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-primary" />
-                                <span className="text-xs sm:text-sm font-medium text-primary">
+                                <span className="text-xs font-medium text-primary">
                                     Learn. Mentor. Grow.
                                 </span>
                             </div>

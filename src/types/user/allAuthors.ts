@@ -24,4 +24,5 @@ export interface IUserAllAuthorsDataEntity {
   linkedin: string;
   facebook: string;
   id: string;
+  short_code: string;
 }

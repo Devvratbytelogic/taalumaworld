@@ -163,7 +163,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
         <div className="container">
           <div className="relative flex h-16 items-center justify-between gap-3">
             <Link href={getHomeRoutePath()} className="flex shrink-0 items-center">
-              <div className="h-9 w-[136px] sm:h-10 sm:w-[152px]">
+              <div className="h-9 w-[136px] sm:h-10 sm:w-[200px]">
                 <ImageComponent src={logo || '/images/logo.png'} alt={brandName} object_cover={false} />
               </div>
             </Link>

@@ -109,7 +109,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
                 label="Mentors"
                 items={mentors}
                 onSelect={onSelect}
-                getHref={(item) => getSingleAuthorRoutePath(item?.id ?? '')}
+                getHref={(item) => getSingleAuthorRoutePath(item?.short_code ?? item?.id ?? '')}
                 renderItem={(item) => <MentorResultRow item={item} />}
               />
             </>

@@ -53,10 +53,7 @@ export default function CareerArchitectSection() {
                         <div className="space-y-3">
                             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                                 What is a{' '}
-                                <span className="relative inline-block">
-                                    <span className="relative z-10">Career Architect?</span>
-                                    <span className="absolute bottom-2 left-0 w-full h-4 bg-primary/30 -rotate-1" />
-                                </span>
+                                <span className="gradient_text">Career Architect?</span>
                             </h2>
                             <p className="text-lg text-muted-foreground leading-relaxed">
                                 A Career Architect is someone who takes deliberate ownership of designing their future.

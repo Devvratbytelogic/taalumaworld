@@ -25,7 +25,7 @@ interface MentorCardProps {
 }
 
 export default function MentorCard({ mentor, index }: MentorCardProps) {
-    const mentorId = mentor?.id || mentor?._id;
+    const mentorId = mentor?.short_code || mentor?.id || '';
     const gradient = AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length];
 
     return (

@@ -50,6 +50,7 @@ export interface BlueprintsEntity {
 export interface MentorsEntity {
     id: string;
     type: string;
+    short_code: string;
     name: string;
     email: string;
     profile_pic?: string | null;

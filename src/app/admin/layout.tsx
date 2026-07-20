@@ -27,7 +27,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Transaction', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
             { model: 'Order', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
             { model: 'Coupon', id: 'coupons', label: 'Coupons', href: getAdminSectionRoutePath('coupons'), icon: Tag },
-            { model: 'Withdrawal Request', id: 'withdrawal_requests', label: 'Withdrawal Requests', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
+            // { model: 'Withdrawal Request', id: 'withdrawal_requests', label: 'Withdrawal Requests', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
         ],
     },
     {
@@ -45,7 +45,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
             { model: 'Mentor Verification', id: 'mentor_verification', label: 'Mentor Verification', href: getAdminSectionRoutePath('mentor_verification'), icon: ShieldCheck },
             { model: 'Mentor Tier Upgrade', id: 'mentor_tier_upgrades', label: 'Mentor Tier Upgrade', href: getAdminSectionRoutePath('mentor_tier_upgrades'), icon: TrendingUp },
-            { model: 'Affiliate Application', id: 'affiliate_applications', label: 'Affiliate Applications', href: getAdminSectionRoutePath('affiliate_applications'), icon: Handshake },
+            // { model: 'Affiliate Application', id: 'affiliate_applications', label: 'Affiliate Applications', href: getAdminSectionRoutePath('affiliate_applications'), icon: Handshake },
         ],
     },
     {

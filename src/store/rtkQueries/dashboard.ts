@@ -26,6 +26,15 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        /** Mentor economy revenue — Admin only */
+        getMentorEconomyRevenue: builder.query<any, { page?: number; limit?: number } | void>({
+            query: (params) => ({
+                url: `/admin/mentor-economy/revenue`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
     }),
 });
 
@@ -33,4 +42,5 @@ export const {
     useGetBlueprintPerformanceQuery,
     useGetSalesVolumeQuery,
     useGetBlueprintRevenueQuery,
+    useGetMentorEconomyRevenueQuery,
 } = dashboardApi;

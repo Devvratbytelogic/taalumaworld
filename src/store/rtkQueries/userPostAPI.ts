@@ -113,7 +113,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['Address'],
+            invalidatesTags: ['Address', 'Cart'],
         }),
         /** edit an existing address */
         editUserAddress: builder.mutation({
@@ -122,7 +122,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'PUT',
                 body,
             }),
-            invalidatesTags: ['Address'],
+            invalidatesTags: ['Address', 'Cart'],
         }),
         /** mark an address as the default one */
         setDefaultUserAddress: builder.mutation({

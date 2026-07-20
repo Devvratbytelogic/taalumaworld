@@ -503,6 +503,23 @@ export const agreementTypeSchema = Yup.object({
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
 });
 
+// Add / Edit Tax Modal Validation Schema
+export const taxSchema = Yup.object({
+  country: Yup.string().trim().min(2, 'Country is required').required('Country is required'),
+  country_code: Yup.string()
+    .trim()
+    .uppercase()
+    .matches(/^[A-Z]{2}$/, 'Country code must be a 2-letter ISO code')
+    .required('Country code is required'),
+  tax_name: Yup.string().trim().min(2, 'Tax name is required').required('Tax name is required'),
+  tax_percent: Yup.number()
+    .typeError('Tax percent must be a number')
+    .min(0, 'Tax percent must be 0 or more')
+    .max(100, 'Tax percent cannot exceed 100')
+    .required('Tax percent is required'),
+  status: Yup.string().oneOf(['Active', 'Inactive'], 'Status must be Active or Inactive').required('Status is required'),
+});
+
 // Add / Edit Mentor Tier Modal Validation Schema
 const optionalNonNegativeNumber = Yup.number()
   .transform((v) => (v === '' || v == null ? undefined : Number(v)))

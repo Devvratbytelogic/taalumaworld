@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, Users, Award } from 'lucide-react';
+import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Percent, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -27,6 +27,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Transaction', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
             { model: 'Order', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
             { model: 'Coupon', id: 'coupons', label: 'Coupons', href: getAdminSectionRoutePath('coupons'), icon: Tag },
+            { model: 'Tax', id: 'taxes', label: 'Taxes', href: getAdminSectionRoutePath('taxes'), icon: Percent },
             // { model: 'Withdrawal Request', id: 'withdrawal_requests', label: 'Withdrawal Requests', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
         ],
     },

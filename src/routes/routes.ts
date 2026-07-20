@@ -200,6 +200,7 @@ export function getAdminSectionRoutePath(section: string): string {
     agreements: '/admin/agreements',
     agreement_types: '/admin/agreements/agreement-types',
     coupons: '/admin/coupons',
+    taxes: '/admin/taxes',
     withdrawal_requests: '/admin/withdrawal-requests',
     affiliate_applications: '/admin/affiliate-applications',
   };

@@ -16,6 +16,7 @@ import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
 import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
 import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import ChapterPurchaseAddresses from '@/components/pages-components/chapter/ChapterPurchaseAddresses';
 import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
@@ -25,6 +26,7 @@ import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 import { getUserRole } from '@/utils/authCookies';
 import { USER_TYPE } from '@/constants/common';
+import { useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
 
 const modalClassNames = {
   base: 'max-w-xl rounded-3xl overflow-hidden',
@@ -42,6 +44,9 @@ export default function ChapterPurchaseModal() {
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const chapter = data?.chapter;
   const isBook = data?.type === 'series';
+  const { data: addressData, isLoading } = useGetUserAddressesQuery();
+  const isAddressAvailable = addressData?.data && addressData?.data?.length > 0 ? true : false;
+
   const isPricingModelChapter = isBook
     ? (chapter?.pricingModel === VISIBLE.CHAPTER)
     : (chapter?.series?.pricingModel === VISIBLE.CHAPTER);
@@ -238,6 +243,8 @@ export default function ChapterPurchaseModal() {
               </span>
             </div>
 
+            <ChapterPurchaseAddresses addressData={addressData} isLoading={isLoading} />
+
             {checkoutAgreements.length > 0 && (
               <div className="space-y-3 border-t pt-3">
                 {checkoutAgreements.map((agreement) => (
@@ -280,6 +287,7 @@ export default function ChapterPurchaseModal() {
               className="global_btn rounded_full bg_primary w-full"
               onPress={handleBuyNow}
               isLoading={isInitiating}
+              isDisabled={!isAddressAvailable}
               startContent={!isInitiating && <Wallet className="h-4 w-4" />}
             >
               Buy Now - KSH {displayPrice?.toFixed(2) ?? '0.00'}

@@ -4,14 +4,23 @@ import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { closeModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import Button from '@/components/ui/Button';
 
 export default function DeleteConfirmation() {
     const dispatch = useDispatch();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
+    const returnTo = data?.returnTo as { componentName: string; data?: unknown } | undefined;
     const [isLoading, setIsLoading] = useState(false);
+
+    const onClose = () => {
+        if (returnTo?.componentName) {
+            dispatch(openModal({ componentName: returnTo.componentName, data: returnTo.data }));
+            return;
+        }
+        dispatch(closeModal());
+    };
 
     const handleDelete = async () => {
         if (!data?.onDelete) return;
@@ -27,7 +36,7 @@ export default function DeleteConfirmation() {
     return (
         <Modal
             isOpen={isOpen}
-            onClose={() => dispatch(closeModal())}
+            onClose={onClose}
             size="sm"
             classNames={{
                 base: 'rounded-3xl',
@@ -58,7 +67,7 @@ export default function DeleteConfirmation() {
                 <ModalFooter className="flex gap-3 mt-4">
                     <Button
                         className="global_btn rounded_full outline_primary flex-1"
-                        onPress={() => dispatch(closeModal())}
+                        onPress={onClose}
                         disabled={isLoading}
                     >
                         Cancel

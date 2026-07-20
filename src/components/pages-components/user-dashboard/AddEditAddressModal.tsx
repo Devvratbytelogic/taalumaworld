@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { fieldInvalidClassName } from '@/components/ui/field-styles';
 import { SELECT_STYLES, SelectOption } from '@/constants/selectStyle';
-import { closeModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { useAddUserAddressMutation, useEditUserAddressMutation } from '@/store/rtkQueries/userPostAPI';
 import { addressSchema } from '@/utils/formValidation';
@@ -24,12 +24,19 @@ export function AddEditAddressModal() {
   const dispatch = useDispatch();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const address: IAddress | null = data?.address ?? null;
+  const returnTo = data?.returnTo as { componentName: string; data?: unknown } | undefined;
   const isEdit = !!address;
 
   const [addAddress, { isLoading: isAdding }] = useAddUserAddressMutation();
   const [editAddress, { isLoading: isEditingAddress }] = useEditUserAddressMutation();
 
-  const onClose = () => dispatch(closeModal());
+  const onClose = () => {
+    if (returnTo?.componentName) {
+      dispatch(openModal({ componentName: returnTo.componentName, data: returnTo.data }));
+      return;
+    }
+    dispatch(closeModal());
+  };
 
   const {
     values,

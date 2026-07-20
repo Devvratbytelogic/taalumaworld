@@ -275,7 +275,11 @@ export const updateProfileSchema = Yup.object({
 // Mentor Profile Tab — Profile details (name, bio, social links) Validation Schema
 export const mentorProfileDetailsSchema = Yup.object({
   name: Yup.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be at most 60 characters').required('Name is required'),
-  professionalBio: Yup.string().trim().max(500, 'Bio must be at most 500 characters').optional(),
+  professionalBio: Yup.string()
+    .trim()
+    .min(2, 'Bio must be at least 2 characters')
+    .max(500, 'Bio must be at most 500 characters')
+    .required('Professional bio is required'),
   facebook: Yup.string().trim().url('Enter a valid URL').optional(),
   linkedin: Yup.string().trim().url('Enter a valid URL').optional(),
 });

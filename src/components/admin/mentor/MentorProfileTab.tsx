@@ -458,7 +458,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                   required={false}
                 />
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="professionalBio">Bio</Label>
+                  <Label htmlFor="professionalBio">
+                    Bio<span className="text-red-500">*</span>
+                  </Label>
                   <textarea
                     id="professionalBio"
                     name="professionalBio"

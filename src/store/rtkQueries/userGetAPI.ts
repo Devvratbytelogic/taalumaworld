@@ -8,6 +8,7 @@ export type MpesaPaymentStatusResponse = {
         status?: 'pending' | 'completed' | 'cancel' | 'failed';
     };
 };
+import { IAddressListAPIResponse, IAddressAPIResponse } from '@/types/user/address';
 import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
@@ -272,6 +273,22 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        /** get all saved addresses */
+        getUserAddresses: builder.query<IAddressListAPIResponse, void>({
+            query: () => ({
+                url: `/user/addresses`,
+                method: 'GET',
+            }),
+            providesTags: ['Address'],
+        }),
+        /** get a single saved address */
+        getUserAddressById: builder.query<IAddressAPIResponse, string>({
+            query: (id) => ({
+                url: `/user/addresses/${id}`,
+                method: 'GET',
+            }),
+            providesTags: (_, __, id) => [{ type: 'Address', id }],
+        }),
     }),
 });
 
@@ -307,4 +324,6 @@ export const {
     useGetPartnerInstitutionsQuery,
     useGetInstituteMessageQuery,
     useGetMentorApplicationsQuery,
+    useGetUserAddressesQuery,
+    useGetUserAddressByIdQuery,
 } = clientSideGetApis;

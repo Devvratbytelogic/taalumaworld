@@ -21,6 +21,7 @@ import { AddEditStaffModal } from '../admin/roles-and-permissions/AddEditStaffMo
 import { UpdateStaffStatusModal } from '../admin/roles-and-permissions/UpdateStaffStatusModal';
 import ChapterPurchaseModal from '../pages-components/chapter/ChapterPurchaseModal';
 import ApplyVerifiedMentorModal from '../admin/mentor/dashboard/ApplyVerifiedMentorModal';
+import { AddEditAddressModal } from '../pages-components/user-dashboard/AddEditAddressModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -71,6 +72,8 @@ export default function AllModal() {
                 return <RestoreConfirmation />;
             case "ApplyVerifiedMentorModal":
                 return <ApplyVerifiedMentorModal />;
+            case "AddEditAddressModal":
+                return <AddEditAddressModal />;
             default:
                 return null;
         }

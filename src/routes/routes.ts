@@ -263,6 +263,10 @@ export function getUserDashboardSettingsRoutePath(): string {
   return '/user-dashboard/settings';
 }
 
+export function getUserDashboardAddressRoutePath(): string {
+  return '/user-dashboard/address';
+}
+
 export function getCartRoutePath(): string {
   return '/cart';
 }

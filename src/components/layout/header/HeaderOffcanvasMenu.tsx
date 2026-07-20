@@ -15,6 +15,7 @@ import {
   Home,
   Info,
   LogOut,
+  MapPin,
   Phone,
   Settings,
   Shield,
@@ -38,6 +39,7 @@ import {
   getHomeRoutePath,
   getPrivacyPolicyRoutePath,
   getTermsOfServiceRoutePath,
+  getUserDashboardAddressRoutePath,
   getUserDashboardBecomeMentorRoutePath,
   getUserDashboardHistoryRoutePath,
   getUserDashboardMyBooksRoutePath,
@@ -57,6 +59,7 @@ const mainLinks = [
 
 const accountLinks = [
   { label: 'Profile', href: getUserDashboardProfileRoutePath(), icon: User },
+  { label: 'Address', href: getUserDashboardAddressRoutePath(), icon: MapPin },
   { label: 'Settings', href: getUserDashboardSettingsRoutePath(), icon: Settings },
   { label: 'My Blueprints', href: getUserDashboardMyChaptersRoutePath(), icon: BookOpen },
   { label: 'My Series', href: getUserDashboardMyBooksRoutePath(), icon: Book },

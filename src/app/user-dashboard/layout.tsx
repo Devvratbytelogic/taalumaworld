@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Book, Clock, User, Settings, GraduationCap, Heart } from 'lucide-react';
+import { BookOpen, Book, Clock, User, Settings, GraduationCap, Heart, MapPin } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
@@ -11,6 +11,7 @@ import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import { getUserRole } from '@/utils/authCookies';
 import { USER_TYPE, UserTypeValue } from '@/constants/common';
 import {
+  getUserDashboardAddressRoutePath,
   getUserDashboardBecomeMentorRoutePath,
   getUserDashboardHistoryRoutePath,
   getUserDashboardMyBooksRoutePath,
@@ -28,6 +29,7 @@ const NAV_GROUPS: {
     title: 'Account',
     items: [
       { href: getUserDashboardProfileRoutePath(), label: 'Profile', icon: User },
+      { href: getUserDashboardAddressRoutePath(), label: 'Address', icon: MapPin },
       { href: getUserDashboardSettingsRoutePath(), label: 'Settings', icon: Settings },
     ],
   },

@@ -201,6 +201,7 @@ export const rtkQuerieSetup = createApi({
         'AdminVerifiedMentorApplications',
         'MyVerifiedMentorApplication',
         'AdminCoupons',
+        'Address',
     ],
     endpoints: () => ({}),
 });

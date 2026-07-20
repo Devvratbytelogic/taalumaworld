@@ -106,6 +106,40 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
         }),
+        /** add a new address */
+        addUserAddress: builder.mutation({
+            query: (body) => ({
+                url: `/user/addresses`,
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['Address'],
+        }),
+        /** edit an existing address */
+        editUserAddress: builder.mutation({
+            query: ({ id, body }) => ({
+                url: `/user/addresses/${id}`,
+                method: 'PUT',
+                body,
+            }),
+            invalidatesTags: ['Address'],
+        }),
+        /** mark an address as the default one */
+        setDefaultUserAddress: builder.mutation({
+            query: (id) => ({
+                url: `/user/addresses/${id}/set-default`,
+                method: 'PUT',
+            }),
+            invalidatesTags: ['Address'],
+        }),
+        /** delete an address */
+        deleteUserAddress: builder.mutation({
+            query: (id) => ({
+                url: `/user/addresses/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Address'],
+        }),
         // mpesaPaymentCallback: builder.mutation({
         //     query: (body) => ({
         //         url: `/user/mpaisa/callback`,
@@ -131,4 +165,8 @@ export const {
     // useMpesaPaymentCallbackMutation,
     useUpdateReadingProgressMutation,
     useSubmitMentorApplicationMutation,
+    useAddUserAddressMutation,
+    useEditUserAddressMutation,
+    useSetDefaultUserAddressMutation,
+    useDeleteUserAddressMutation,
 } = clientSidePostApis;

@@ -244,6 +244,26 @@ export const categorySchema = Yup.object({
   subcategories: Yup.array().of(Yup.string().trim().required()),
 });
 
+// Add / Edit Address Modal Validation Schema (matches API: full_name, phone, address_line1, address_line2, landmark, city, state, country, postal_code, isDefault)
+export const addressSchema = Yup.object({
+  full_name: Yup.string()
+    .trim()
+    .min(2, 'Name must be at least 2 characters')
+    .required('Full name is required'),
+  phone: Yup.string()
+    .trim()
+    .matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid phone number')
+    .required('Phone number is required'),
+  address_line1: Yup.string().trim().required('Address line 1 is required'),
+  address_line2: Yup.string().trim().optional(),
+  landmark: Yup.string().trim().optional(),
+  city: Yup.string().trim().optional(),
+  state: Yup.string().trim().required('State is required'),
+  country: Yup.string().trim().required('Country is required'),
+  postal_code: Yup.string().trim().required('Postal / ZIP code is required'),
+  isDefault: Yup.boolean(),
+});
+
 // Update Profile Validation Schema
 export const updateProfileSchema = Yup.object({
   fullName: Yup.string()

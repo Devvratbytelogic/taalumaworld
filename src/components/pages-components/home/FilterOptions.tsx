@@ -22,20 +22,18 @@ export default function FilterOptions({ total = 0, viewMode }: FilterOptionsProp
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
 
-    const categoryId = parseArrayParam(searchParams.get('categoryId'));
     const thoughtLeaderId = parseArrayParam(searchParams.get('thoughtLeaderId'));
     const tags = parseArrayParam(searchParams.get('tags'));
     const readingProgress = parseArrayParam(searchParams.get('readingProgress'));
-    const activeFilterCount = categoryId.length + thoughtLeaderId.length + tags.length + readingProgress.length;
+    const activeFilterCount = thoughtLeaderId.length + tags.length + readingProgress.length;
 
-    const displayMode = viewMode === VISIBLE.BOOK ? 'books' : 'chapters';
     const contentLabel = viewMode === VISIBLE.BOOK ? 'series' : 'blueprints';
 
     return (
         <>
             <div className="flex items-center gap-4">
                 <Button
-                    onPress={() => dispatch(openModal({ componentName: 'FilterModal', data: { displayMode } }))}
+                    onPress={() => dispatch(openModal({ componentName: 'FilterModal' }))}
                     className="global_btn rounded_full outline_primary"
                     startContent={<SlidersHorizontal className="h-5 w-5" />}
                 >

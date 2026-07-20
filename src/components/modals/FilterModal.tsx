@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ComponentType, type ReactNode } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { X, SlidersHorizontal, BookOpen, BookMarked, Gift, CheckCircle, FileText, Sparkles } from 'lucide-react';
+import { SlidersHorizontal, Gift, ShoppingBag, Check, Search, X } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
 import Button from '@/components/ui/Button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Divider } from '@heroui/react';
+import { Input } from '@/components/ui/input';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import {
-  useGetUserAllCategoriesQuery,
-  useGetUserAllAuthorsQuery,
-  useGetAllTagsQuery,
-} from '@/store/rtkQueries/userGetAPI';
+import { useGetUserAllAuthorsQuery, useGetAllTagsQuery } from '@/store/rtkQueries/userGetAPI';
 import FilterModalSkeleton from '@/components/skeleton-loader/FilterModalSkeleton';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/components/ui/utils';
 
 const PARAM_KEYS = {
-  categoryId: 'categoryId',
   thoughtLeaderId: 'thoughtLeaderId',
   tags: 'tags',
   readingProgress: 'readingProgress',
 } as const;
+
+const FREE_FILTER = 'freeToRead';
+const PURCHASED_FILTER = 'purchased';
 
 function parseArrayParam(value: string | null): string[] {
   if (!value) return [];
@@ -30,7 +30,7 @@ function parseArrayParam(value: string | null): string[] {
 
 function buildSearchParams(
   params: URLSearchParams,
-  updates: { categoryId?: string[]; thoughtLeaderId?: string[]; tags?: string[]; readingProgress?: string[] }
+  updates: { thoughtLeaderId?: string[]; tags?: string[]; readingProgress?: string[] }
 ): URLSearchParams {
   const next = new URLSearchParams(params);
   Object.entries(updates).forEach(([key, values]) => {
@@ -43,8 +43,97 @@ function buildSearchParams(
   return next;
 }
 
-interface FilterModalData {
-  displayMode?: 'chapters' | 'books';
+function SectionLabel({
+  children,
+  count,
+}: {
+  children: ReactNode;
+  count?: number;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <h3 className="text-[13px] font-semibold text-foreground tracking-tight">{children}</h3>
+      {typeof count === 'number' && count > 0 && (
+        <span className="text-xs font-medium text-primary tabular-nums">{count} selected</span>
+      )}
+    </div>
+  );
+}
+
+function AvailabilityToggle({
+  active,
+  onClick,
+  icon: Icon,
+  label,
+  description,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  description: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex flex-1 min-w-0 items-start gap-3 rounded-2xl border px-3.5 py-3 text-left transition-colors',
+        active
+          ? 'border-primary/40 bg-primary/6'
+          : 'border-transparent bg-muted/50 hover:bg-muted'
+      )}
+    >
+      <span
+        className={cn(
+          'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+          active ? 'bg-primary text-white' : 'bg-background text-muted-foreground'
+        )}
+      >
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center justify-between gap-2">
+          <span className="text-sm font-medium tracking-tight">{label}</span>
+          <span
+            className={cn(
+              'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
+              active ? 'border-primary bg-primary text-white' : 'border-border bg-background'
+            )}
+          >
+            {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+          </span>
+        </span>
+        <span className="mt-0.5 block text-xs text-muted-foreground leading-snug">{description}</span>
+      </span>
+    </button>
+  );
+}
+
+function TopicChip({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm capitalize transition-colors',
+        selected
+          ? 'bg-primary text-white shadow-sm'
+          : 'bg-background text-foreground ring-1 ring-inset ring-border hover:ring-primary/30 hover:bg-primary/3'
+      )}
+    >
+      {selected && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} />}
+      <span className="truncate max-w-48">{label}</span>
+    </button>
+  );
 }
 
 export default function FilterModal() {
@@ -52,52 +141,44 @@ export default function FilterModal() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isOpen, data } = useSelector((state: RootState) => state.allModal);
+  const { isOpen } = useSelector((state: RootState) => state.allModal);
+  const { isAuthenticated } = useAuth();
 
-  const modalData = (data || {}) as FilterModalData;
-  const displayMode = modalData.displayMode ?? 'chapters';
-
-  const [tempCategories, setTempCategories] = useState<string[]>([]);
   const [tempAuthors, setTempAuthors] = useState<string[]>([]);
   const [tempTags, setTempTags] = useState<string[]>([]);
-  const [tempProgressFilters, setTempProgressFilters] = useState<string[]>([]);
+  const [isFree, setIsFree] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(false);
+  const [mentorSearch, setMentorSearch] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
-    setTempCategories(parseArrayParam(searchParams.get(PARAM_KEYS.categoryId)));
     setTempAuthors(parseArrayParam(searchParams.get(PARAM_KEYS.thoughtLeaderId)));
     setTempTags(parseArrayParam(searchParams.get(PARAM_KEYS.tags)));
-    setTempProgressFilters(parseArrayParam(searchParams.get(PARAM_KEYS.readingProgress)));
-  }, [isOpen, searchParams]);
+    const progress = parseArrayParam(searchParams.get(PARAM_KEYS.readingProgress));
+    setIsFree(progress.includes(FREE_FILTER));
+    setIsPurchased(isAuthenticated && progress.includes(PURCHASED_FILTER));
+    setMentorSearch('');
+  }, [isOpen, searchParams, isAuthenticated]);
 
-  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetUserAllCategoriesQuery();
   const { data: authorsResponse, isLoading: isLoadingAuthors } = useGetUserAllAuthorsQuery();
   const { data: tagsResponse, isLoading: isLoadingTags } = useGetAllTagsQuery();
 
-  const isLoadingFilters = isLoadingCategories || isLoadingAuthors || isLoadingTags;
-
-  const categories = categoriesResponse?.data ?? [];
+  const isLoadingFilters = isLoadingAuthors || isLoadingTags;
   const authors = authorsResponse?.data?.data ?? [];
-  const allTags = tagsResponse?.data?.tags ?? [];
+  const allTags = tagsResponse?.data ?? [];
 
-  const progressFilters = [
-    { id: 'continueReading', label: 'Continue Reading', icon: BookOpen, description: 'Blueprints you started' },
-    { id: 'unread', label: 'Unread Blueprints', icon: BookMarked, description: 'New blueprints to explore' },
-    { id: 'freeToRead', label: 'Free to Read', icon: Gift, description: 'Free blueprints available' },
-    { id: 'purchased', label: 'Purchased', icon: CheckCircle, description: 'Blueprints you own' },
-  ];
+  const mentorQuery = mentorSearch.trim().toLowerCase();
+  const filteredAuthors = (mentorQuery
+    ? authors.filter((author) => author.name.toLowerCase().includes(mentorQuery))
+    : authors
+  ).slice().sort((a, b) => {
+    const aSelected = tempAuthors.includes(a.id) ? 0 : 1;
+    const bSelected = tempAuthors.includes(b.id) ? 0 : 1;
+    if (aSelected !== bSelected) return aSelected - bSelected;
+    return a.name.localeCompare(b.name);
+  });
 
-  const handleProgressFilterToggle = (filterId: string) => {
-    setTempProgressFilters((prev) =>
-      prev.includes(filterId) ? prev.filter((id) => id !== filterId) : [...prev, filterId]
-    );
-  };
-
-  const handleCategoryToggle = (categoryId: string) => {
-    setTempCategories((prev) =>
-      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
-    );
-  };
+  const selectedMentors = authors.filter((author) => tempAuthors.includes(author.id));
 
   const handleAuthorToggle = (authorId: string) => {
     setTempAuthors((prev) =>
@@ -111,215 +192,245 @@ export default function FilterModal() {
     );
   };
 
+  const buildProgressFilters = (free: boolean, purchased: boolean) => {
+    const filters: string[] = [];
+    if (free) filters.push(FREE_FILTER);
+    if (isAuthenticated && purchased) filters.push(PURCHASED_FILTER);
+    return filters;
+  };
+
   const handleApply = () => {
     const next = buildSearchParams(searchParams, {
-      categoryId: tempCategories,
       thoughtLeaderId: tempAuthors,
       tags: tempTags,
-      readingProgress: tempProgressFilters,
+      readingProgress: buildProgressFilters(isFree, isPurchased),
     });
+    next.delete('categoryId');
     router.replace(`${pathname}${next.toString() ? `?${next.toString()}` : ''}`);
     dispatch(closeModal());
   };
 
   const handleReset = () => {
-    setTempCategories([]);
     setTempAuthors([]);
     setTempTags([]);
-    setTempProgressFilters([]);
+    setIsFree(false);
+    setIsPurchased(false);
+    setMentorSearch('');
     const next = buildSearchParams(searchParams, {
-      categoryId: [],
       thoughtLeaderId: [],
       tags: [],
       readingProgress: [],
     });
+    next.delete('categoryId');
     router.replace(`${pathname}${next.toString() ? `?${next.toString()}` : ''}`);
   };
 
   const activeFilterCount =
-    displayMode === 'chapters'
-      ? tempProgressFilters.length
-      : tempCategories.length + tempAuthors.length + tempTags.length;
+    tempAuthors.length +
+    tempTags.length +
+    (isFree ? 1 : 0) +
+    (isAuthenticated && isPurchased ? 1 : 0);
 
   return (
-    <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container" size="2xl">
-      <ModalContent className="max-h-[min(90dvh,900px)] w-[min(100vw-1.5rem,42rem)] max-w-full mx-auto overflow-hidden flex flex-col">
-        <ModalHeader className="flex flex-row items-center justify-between gap-3 p-4 sm:p-6 border-b shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 p-2 rounded-full">
-              <SlidersHorizontal className="h-5 w-5 text-primary" />
+    <Modal
+      isOpen={isOpen}
+      onClose={() => dispatch(closeModal())}
+      className="modal_container"
+      size="lg"
+      scrollBehavior="inside"
+    >
+      <ModalContent className="max-h-[min(90dvh,760px)] w-[min(100vw-1.5rem,32rem)] max-w-full mx-auto overflow-hidden flex flex-col">
+        <ModalHeader className="flex flex-row items-center gap-3 px-5 py-4 border-b shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 shrink-0">
+            <SlidersHorizontal className="h-4 w-4 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold tracking-tight leading-none">Filters</h2>
+              {activeFilterCount > 0 && (
+                <Badge className="bg-primary/10 text-primary border-0 rounded-full h-5 min-w-5 px-1.5">
+                  {activeFilterCount}
+                </Badge>
+              )}
             </div>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">
-                Filter {displayMode === 'chapters' ? 'Blueprints' : 'Series'}
-              </h2>
-              <div className="text-sm font-normal text-muted-foreground">
-                {activeFilterCount > 0 && (
-                  <p>{activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active</p>
-                )}
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground mt-1.5 font-normal">
+              Refine by availability, mentors, and topics
+            </p>
           </div>
         </ModalHeader>
 
-        <ModalBody className="overflow-y-auto flex-1 min-h-0 p-4 sm:p-6 max-h-[calc(90dvh-11rem)] sm:max-h-[calc(90dvh-12rem)]">
+        <ModalBody className="overflow-y-auto flex-1 min-h-0 px-5 py-5 gap-0">
           {isLoadingFilters ? (
-            <FilterModalSkeleton displayMode={displayMode === 'chapters' ? 'chapters' : 'books'} />
-          ) : displayMode === 'chapters' ? (
-            <div className="space-y-4">
-              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <FileText className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-sm text-primary tracking-tight">Reading Progress</span>
-                </div>
-                <p className="text-sm text-muted-foreground tracking-tight">
-                  Filter blueprints based on your reading journey
-                </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {progressFilters.map((filter) => {
-                  const Icon = filter.icon;
-                  return (
-                    <div
-                      key={filter.id}
-                      className={`flex items-start space-x-3 p-4 rounded-2xl border-2 transition-all cursor-pointer ${tempProgressFilters.includes(filter.id)
-                        ? 'bg-primary/5 border-primary/30'
-                        : 'bg-background border-border hover:border-primary/20'
-                        }`}
-                      onClick={() => handleProgressFilterToggle(filter.id)}
-                    >
-                      <Checkbox
-                        id={`readingProgress-${filter.id}`}
-                        checked={tempProgressFilters.includes(filter.id)}
-                        onCheckedChange={() => handleProgressFilterToggle(filter.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-md mt-0.5"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Icon className="h-4 w-4 text-primary" />
-                          <label htmlFor={`readingProgress-${filter.id}`} className="text-sm font-medium cursor-pointer tracking-tight">
-                            {filter.label}
-                          </label>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1 tracking-tight">{filter.description}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <FilterModalSkeleton />
           ) : (
             <div className="space-y-6">
-              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-sm text-primary tracking-tight">Discover & Explore</span>
+              <section className="space-y-2.5">
+                <SectionLabel>Availability</SectionLabel>
+                <div className={cn('grid gap-2.5', isAuthenticated ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1')}>
+                  <AvailabilityToggle
+                    active={isFree}
+                    onClick={() => setIsFree((v) => !v)}
+                    icon={Gift}
+                    label="Free"
+                    description="Only free content"
+                  />
+                  {isAuthenticated && (
+                    <AvailabilityToggle
+                      active={isPurchased}
+                      onClick={() => setIsPurchased((v) => !v)}
+                      icon={ShoppingBag}
+                      label="Purchased"
+                      description="Content you own"
+                    />
+                  )}
                 </div>
-                <p className="text-sm text-muted-foreground tracking-tight">
-                  Find series by category, mentor, or genre
-                </p>
-              </div>
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempCategories.length}</span>
-                  Categories
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {categories.map((category) => (
-                    <div
-                      key={category.id}
-                      className={`flex items-center space-x-2 p-3 rounded-xl border transition-all cursor-pointer ${tempCategories.includes(category.id) ? 'bg-primary/5 border-primary/30' : 'border-border hover:border-primary/20'
-                        }`}
-                      onClick={() => handleCategoryToggle(category.id)}
-                    >
-                      <Checkbox
-                        checked={tempCategories.includes(category.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-md pointer-events-none"
+              </section>
+
+              <section className="space-y-2.5">
+                <SectionLabel count={tempAuthors.length}>Mentors</SectionLabel>
+
+                {authors.length > 0 ? (
+                  <div className="rounded-2xl border border-border/80 bg-background overflow-hidden">
+                    <div className="relative border-b border-border/70">
+                      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={mentorSearch}
+                        onChange={(e) => setMentorSearch(e.target.value)}
+                        placeholder="Search mentors..."
+                        className="h-11 rounded-none border-0 shadow-none pl-10 pr-10 focus-visible:ring-0"
+                        aria-label="Search mentors"
                       />
-                      <span className="text-sm cursor-pointer tracking-tight flex-1">
-                        {category.name}
-                      </span>
+                      {mentorSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setMentorSearch('')}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                          aria-label="Clear mentor search"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-              <Divider />
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempAuthors.length}</span>
-                  Mentors
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                  {authors.map((author) => (
-                    <div
-                      key={author.id}
-                      className={`flex items-center space-x-2 p-3 rounded-xl border transition-all cursor-pointer ${tempAuthors.includes(author.id) ? 'bg-primary/5 border-primary/30' : 'border-border hover:border-primary/20'
-                        }`}
-                      onClick={() => handleAuthorToggle(author.id)}
-                    >
-                      <Checkbox
-                        checked={tempAuthors.includes(author.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-md pointer-events-none"
+
+                    {selectedMentors.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 px-3 py-2.5 border-b border-border/70 bg-muted/30">
+                        {selectedMentors.map((author) => (
+                          <button
+                            key={author.id}
+                            type="button"
+                            onClick={() => handleAuthorToggle(author.id)}
+                            className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary pl-2.5 pr-1.5 py-1 text-xs font-medium capitalize"
+                          >
+                            <span className="truncate max-w-36">{author.name}</span>
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-primary/15">
+                              <X className="h-3 w-3" />
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {filteredAuthors.length > 0 ? (
+                      <ul className="max-h-52 overflow-y-auto divide-y divide-border/60">
+                        {filteredAuthors.map((author) => {
+                          const selected = tempAuthors.includes(author.id);
+                          return (
+                            <li key={author.id}>
+                              <button
+                                type="button"
+                                onClick={() => handleAuthorToggle(author.id)}
+                                className={cn(
+                                  'flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-colors',
+                                  selected ? 'bg-primary/4' : 'hover:bg-muted/50'
+                                )}
+                              >
+                                <UserAvatar
+                                  userName={author.name}
+                                  userPhoto={author.profile_pic}
+                                  size="sm"
+                                />
+                                <span className="min-w-0 flex-1 text-sm font-medium capitalize truncate">
+                                  {author.name}
+                                </span>
+                                <span
+                                  className={cn(
+                                    'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors',
+                                    selected
+                                      ? 'border-primary bg-primary text-white'
+                                      : 'border-border bg-background'
+                                  )}
+                                >
+                                  {selected && <Check className="h-3 w-3" strokeWidth={3} />}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="px-4 py-6 text-sm text-center text-muted-foreground">
+                        No mentors match “{mentorSearch.trim()}”
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground rounded-2xl border border-dashed border-border px-4 py-6 text-center">
+                    No mentors available
+                  </p>
+                )}
+              </section>
+
+              <section className="space-y-2.5">
+                <SectionLabel count={tempTags.length}>Genres & topics</SectionLabel>
+                {allTags.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {allTags.map((tag) => (
+                      <TopicChip
+                        key={tag}
+                        label={tag}
+                        selected={tempTags.includes(tag)}
+                        onClick={() => handleTagToggle(tag)}
                       />
-                      <span className="text-sm cursor-pointer tracking-tight flex-1">
-                        {author.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <Divider />
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm tracking-tight flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-sm">{tempTags.length}</span>
-                  Genres & Topics
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {allTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => handleTagToggle(tag)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all tracking-tight ${tempTags.includes(tag) ? 'bg-primary text-white' : 'bg-accent hover:bg-accent/80 border border-border'
-                        }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground rounded-2xl border border-dashed border-border px-4 py-6 text-center">
+                    No genres available yet
+                  </p>
+                )}
+              </section>
             </div>
           )}
         </ModalBody>
-        <ModalFooter className="flex flex-col gap-3 p-4 sm:p-6 border-t bg-gray-50 w-full min-w-0 shrink-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+
+        <ModalFooter className="gap-2 px-5 py-4 border-t bg-background w-full min-w-0 shrink-0">
           <Button
             onPress={handleReset}
             disabled={activeFilterCount === 0}
-            className="global_btn outline_primary rounded_full w-full sm:w-auto shrink-0 order-2 sm:order-1"
+            className="global_btn outline_primary rounded_full flex-1 sm:flex-initial"
           >
-            Reset All
+            Reset
           </Button>
-          <div className="flex gap-2 w-full min-w-0 sm:w-auto sm:justify-end order-1 sm:order-2">
-            <Button
-              onPress={() => dispatch(closeModal())}
-              className="global_btn outline_primary rounded_full flex-1 sm:flex-initial min-w-0"
-            >
-              Cancel
-            </Button>
-            <Button
-              onPress={handleApply}
-              className="global_btn bg_primary rounded_full flex-1 sm:flex-initial min-w-0 [&>span]:min-w-0"
-            >
-              <span className="inline-flex items-center justify-center gap-2 min-w-0">
-                <span className="truncate">Apply Filters</span>
-                {activeFilterCount > 0 && (
-                  <Badge className="shrink-0 bg-white text-primary rounded-full">{activeFilterCount}</Badge>
-                )}
-              </span>
-            </Button>
-          </div>
+          <div className="flex-1 hidden sm:block" />
+          <Button
+            onPress={() => dispatch(closeModal())}
+            className="global_btn outline_primary rounded_full flex-1 sm:flex-initial"
+          >
+            Cancel
+          </Button>
+          <Button
+            onPress={handleApply}
+            className="global_btn bg_primary rounded_full flex-[1.4] sm:flex-initial min-w-0"
+          >
+            <span className="inline-flex items-center justify-center gap-2">
+              Apply
+              {activeFilterCount > 0 && (
+                <Badge className="shrink-0 bg-white text-primary rounded-full h-5 min-w-5 px-1.5">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </span>
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

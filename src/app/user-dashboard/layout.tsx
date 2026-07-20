@@ -48,7 +48,7 @@ const NAV_GROUPS: {
         href: getUserDashboardBecomeMentorRoutePath(),
         label: 'Become a Mentor',
         icon: GraduationCap,
-        roles: [USER_TYPE.CAREER_ARCHITECT],
+        roles: [USER_TYPE.CAREER_ARCHITECT, USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT],
       },
     ],
   },

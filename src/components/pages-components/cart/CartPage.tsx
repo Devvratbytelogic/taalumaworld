@@ -1,115 +1,68 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
-import { ArrowLeft, BookOpen, Eye, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Check, Lock, MapPin, ShoppingBag } from 'lucide-react';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
-import { openModal } from '@/store/slices/allModalSlice';
-import { ICartItemEntity } from '@/types/user/cart';
-import { VISIBLE } from '@/constants/contentMode';
-import { getBlueprintRoutePath, getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
-import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
-import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
-import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
-import ImageComponent from '@/components/ui/ImageComponent';
-import { Badge } from '@/components/ui/badge';
+import { getCartCheckoutRoutePath, getCartRoutePath, getHomeRoutePath } from '@/routes/routes';
 import CartPageSkeleton from '@/components/skeleton-loader/CartPageSkeleton';
+import CartCheckoutAddresses from './CartCheckoutAddresses';
+import CartItemCard from './CartItemCard';
 import CartNoData from './CartNoData';
 import CartSummary from './CartSummary';
 import PaymentConfirmed from './PaymentConfirmed';
 
-function CartItemCard({ item }: { item: ICartItemEntity }) {
-  const dispatch = useDispatch();
-  const router = useRouter();
-
-  const isBlueprint = Boolean(item.blueprint) || item.type === VISIBLE.CHAPTER || item.legacyType === VISIBLE.CHAPTER;
-  const title = (isBlueprint ? item.blueprint?.title : item.series?.title) ?? 'Untitled item';
-  const coverImage = isBlueprint ? item.blueprint?.coverImage : item.series?.coverImage;
-  const slug = isBlueprint ? item.blueprint?.slug : item.series?.slug;
-  const parentSeriesTitle = isBlueprint ? item.blueprint?.series?.title : undefined;
-
-  const handleViewDetails = () => {
-    if (!slug) return;
-    router.push(isBlueprint ? getBlueprintRoutePath(slug) : getSeriesRoutePath(slug));
-  };
-
-  const handleRemove = () => {
-    dispatch(
-      openModal({
-        componentName: 'ConfirmRemoveCartModal',
-        data: { itemId: item._id, chapterTitle: title },
-      })
-    );
-  };
+function CheckoutSteps({ current }: { current: 'cart' | 'checkout' }) {
+  const steps = [
+    { id: 'cart' as const, label: 'Cart', href: getCartRoutePath() },
+    { id: 'checkout' as const, label: 'Checkout', href: getCartCheckoutRoutePath() },
+  ];
 
   return (
-    <div className="rounded-md border border-border bg-white p-4 transition-colors hover:border-primary/30 sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <button
-          type="button"
-          onClick={handleViewDetails}
-          className="mx-auto aspect-3/4 w-24 shrink-0 overflow-hidden rounded-sm bg-muted sm:mx-0"
-        >
-          <ImageComponent src={coverImage} alt={title} object_cover={true} />
-        </button>
+    <ol className="mt-4 flex items-center gap-2 text-sm sm:mt-5">
+      {steps.map((step, index) => {
+        const isActive = step.id === current;
+        const isComplete = current === 'checkout' && step.id === 'cart';
 
-        <div className="min-w-0 w-full flex-1">
-          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge className="rounded-full border-primary/20 bg-primary/10 px-3 py-0.5 text-xs text-primary">
-                  {isBlueprint ? 'Blueprint' : 'Full Series'}
-                </Badge>
-              </div>
-
-              <button type="button" onClick={handleViewDetails} className="block text-left">
-                <h3 className="line-clamp-2 font-semibold tracking-tight transition-colors hover:text-primary">
-                  {title}
-                </h3>
-              </button>
-
-              {isBlueprint && parentSeriesTitle && (
-                <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <BookOpen className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{parentSeriesTitle}</span>
-                </p>
-              )}
-            </div>
-
-            <div className="shrink-0 text-right">
-              <p className="text-lg font-bold text-primary">KSH {item.selling_price?.toFixed(2)}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 border-t pt-3">
-            {/* <button
-              type="button"
-              onClick={handleViewDetails}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        return (
+          <li key={step.id} className="flex items-center gap-2">
+            {index > 0 && <span className="h-px w-6 bg-border sm:w-10" aria-hidden />}
+            <Link
+              href={step.href}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors ${
+                isActive
+                  ? 'bg-primary text-white'
+                  : isComplete
+                    ? 'bg-primary/10 text-primary hover:bg-primary/15'
+                    : 'bg-muted text-muted-foreground hover:text-foreground'
+              }`}
             >
-              <Eye className="h-4 w-4" />
-              View Details
-            </button> */}
-
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="text-sm font-medium text-red-500 transition-colors hover:underline"
-            >
-              Remove
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              <span
+                className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${
+                  isActive
+                    ? 'bg-white/20 text-white'
+                    : isComplete
+                      ? 'bg-primary text-white'
+                      : 'bg-background text-muted-foreground'
+                }`}
+              >
+                {isComplete ? <Check className="h-3 w-3" /> : index + 1}
+              </span>
+              {step.label}
+            </Link>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
 export default function CartPage() {
+  const pathname = usePathname();
+  const isCheckoutPage = pathname === getCartCheckoutRoutePath();
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
-  const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const { data: cartResponse, isLoading } = useGetCartQuery();
 
   const cartData = cartResponse?.data?.[0];
@@ -124,19 +77,6 @@ export default function CartPage() {
   const total = cartData?.total_amount ?? Math.max(subtotal - discountAmount + taxAmount, 0);
   const itemCount = cartData?.item_count ?? cartItems.length;
 
-  // Hooks must run unconditionally, so this is declared before the early returns below.
-  const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
-    cartID: cartData?._id,
-    type: 'cart',
-    acceptedAgreementIds,
-    onSuccess: () => setIsPaymentConfirmed(true),
-  });
-
-  const handleCheckout = (ids: string[]) => {
-    setAcceptedAgreementIds(ids);
-    startPayment();
-  };
-
   if (isPaymentConfirmed) {
     return <PaymentConfirmed />;
   }
@@ -150,33 +90,81 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen py-6 sm:py-8">
+    <div className="min-h-screen sm:py-10">
       <div className="container mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-6 flex flex-wrap items-start justify-between gap-3 sm:mb-8">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4 sm:mb-8">
           <div>
-            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-              <ShoppingBag className="h-6 w-6 text-primary sm:h-7 sm:w-7" />
-              Your Cart
+            <h1 className="flex items-center gap-2.5 text-2xl font-bold tracking-tight sm:text-3xl">
+              {isCheckoutPage ? (
+                <>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Lock className="h-5 w-5" />
+                  </span>
+                  Checkout
+                </>
+              ) : (
+                <>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <ShoppingBag className="h-5 w-5" />
+                  </span>
+                  Your Cart
+                </>
+              )}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-              {itemCount} {itemCount === 1 ? 'item' : 'items'} ready for checkout
+            <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
+              {isCheckoutPage
+                ? 'Confirm your billing address and complete payment securely'
+                : `${itemCount} ${itemCount === 1 ? 'item' : 'items'} ready for checkout`}
             </p>
+            <CheckoutSteps current={isCheckoutPage ? 'checkout' : 'cart'} />
           </div>
 
           <Link
-            href={getHomeRoutePath()}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            href={isCheckoutPage ? getCartRoutePath() : getHomeRoutePath()}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:text-primary"
           >
             <ArrowLeft className="h-4 w-4" />
-            Continue Shopping
+            {isCheckoutPage ? 'Back to Cart' : 'Continue Shopping'}
           </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
-          <div className="space-y-3 sm:space-y-4 lg:col-span-2">
-            {cartItems.map((item) => (
-              <CartItemCard key={item._id} item={item} />
-            ))}
+          <div className="space-y-5 sm:space-y-6 lg:col-span-2">
+            {isCheckoutPage && (
+              <section className="rounded-md border border-border bg-white p-4 sm:p-5">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <MapPin className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h2 className="text-base font-bold sm:text-lg">Billing Address</h2>
+                    <p className="text-xs text-muted-foreground sm:text-sm">
+                      Select an address for this order
+                    </p>
+                  </div>
+                </div>
+                <CartCheckoutAddresses
+                  selectedAddressId={selectedAddressId}
+                  onSelectAddress={setSelectedAddressId}
+                />
+              </section>
+            )}
+
+            <section className={isCheckoutPage ? 'rounded-md border border-border bg-white p-4 sm:p-5' : undefined}>
+              {isCheckoutPage && (
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h2 className="text-base font-bold sm:text-lg">
+                    Order Items
+                    <span className="ml-2 text-sm font-medium text-muted-foreground">({itemCount})</span>
+                  </h2>
+                </div>
+              )}
+              <div className="space-y-3 sm:space-y-4">
+                {cartItems.map((item) => (
+                  <CartItemCard key={item._id} item={item} compact={isCheckoutPage} />
+                ))}
+              </div>
+            </section>
           </div>
 
           <div className="lg:col-span-1 lg:min-w-0">
@@ -186,16 +174,15 @@ export default function CartPage() {
               itemCount={itemCount}
               discountAmount={discountAmount}
               taxAmount={taxAmount}
-              onCheckout={handleCheckout}
-              isLoading={isInitiating}
+              cartId={cartData?._id}
+              selectedAddressId={selectedAddressId}
+              onPaymentSuccess={() => setIsPaymentConfirmed(true)}
               couponCode={cartData?.coupon_code}
+              isCheckoutPage={isCheckoutPage}
             />
           </div>
         </div>
       </div>
-
-      <MpesaPhoneModal {...phoneModalProps} />
-      <MpesaWaitModal {...waitModalProps} />
     </div>
   );
 }

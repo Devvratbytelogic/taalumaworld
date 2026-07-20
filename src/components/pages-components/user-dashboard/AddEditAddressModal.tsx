@@ -64,8 +64,9 @@ export function AddEditAddressModal() {
         address_line2: formValues.address_line2?.trim() || undefined,
         landmark: formValues.landmark?.trim() || undefined,
         city: formValues.city.trim(),
-        state: formValues.state?.toLowerCase().trim(),
-        country: formValues.country?.toLowerCase().trim(),
+        // Persist lowercase so API storage stays consistent; UI match is case-insensitive.
+        state: formValues.state.trim().toLowerCase(),
+        country: formValues.country.trim().toLowerCase(),
         postal_code: formValues.postal_code.trim(),
         isDefault: formValues.isDefault,
       };
@@ -92,10 +93,12 @@ export function AddEditAddressModal() {
     () => countries.map((c) => ({ value: c.isoCode, label: c.name })),
     [countries]
   );
-  const selectedCountry = useMemo(
-    () => countries.find((c) => c.name === values.country) ?? null,
-    [countries, values.country]
-  );
+  
+  const selectedCountry = useMemo(() => {
+    const saved = values.country.trim().toLowerCase();
+    if (!saved) return null;
+    return countries.find((c) => c.name.toLowerCase() === saved) ?? null;
+  }, [countries, values.country]);
   const selectedCountryOption: SelectOption | null = selectedCountry
     ? { value: selectedCountry.isoCode, label: selectedCountry.name }
     : null;
@@ -108,10 +111,11 @@ export function AddEditAddressModal() {
     () => states.map((s) => ({ value: s.isoCode, label: s.name })),
     [states]
   );
-  const selectedState = useMemo(
-    () => states.find((s) => s.name === values.state) ?? null,
-    [states, values.state]
-  );
+  const selectedState = useMemo(() => {
+    const saved = values.state.trim().toLowerCase();
+    if (!saved) return null;
+    return states.find((s) => s.name.toLowerCase() === saved) ?? null;
+  }, [states, values.state]);
   const selectedStateOption: SelectOption | null = selectedState
     ? { value: selectedState.isoCode, label: selectedState.name }
     : null;

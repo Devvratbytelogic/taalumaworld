@@ -1,6 +1,6 @@
 
-import { CheckoutPage } from '@/components/pages-components/cart/CheckoutPage';
+import CartPage from '../page';
 
 export default function CheckoutRoute() {
-  return <CheckoutPage />;
+  return <CartPage />;
 }

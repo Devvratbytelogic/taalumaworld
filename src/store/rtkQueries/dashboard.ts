@@ -1,4 +1,4 @@
-import { IBlueprintPerformanceAPIResponse, IBlueprintRevenueAPIResponse, IMentorEconomyRevenueAPIResponse, ISalesVolumeAPIResponse } from '@/types/dashboard';
+import { IBlueprintPerformanceAPIResponse, IBlueprintRevenueAPIResponse, IMentorEconomyRevenueAPIResponse, IMentorReferralsAPIResponse, ISalesVolumeAPIResponse } from '@/types/dashboard';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const dashboardApi = rtkQuerieSetup.injectEndpoints({
@@ -38,6 +38,15 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
                 params: params ? { ...params } : {},
             }),
         }),
+
+        /** Logged-in mentor's own referrals, filterable by status — Mentor only */
+        getMyMentorReferrals: builder.query<IMentorReferralsAPIResponse, { page?: number; limit?: number; status?: string } | void>({
+            query: (params) => ({
+                url: `/admin/mentor-referrals/my`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
     }),
 });
 
@@ -46,4 +55,5 @@ export const {
     useGetSalesVolumeQuery,
     useGetBlueprintRevenueQuery,
     useGetMentorEconomyRevenueQuery,
+    useGetMyMentorReferralsQuery,
 } = dashboardApi;

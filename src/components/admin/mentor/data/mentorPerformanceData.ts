@@ -149,13 +149,6 @@ export const REVENUE_BY_BLUEPRINT = [
   { title: 'Strategic Decision Making', sales: 13, earned: 29_250, pending: 4_387 },
 ];
 
-export const REFERRAL_LINKS = [
-  { label: 'Global mentor link', clicks: 420, registrations: 38, conversions: 12, revenue: 27_000 },
-  { label: 'Leading Through Change', clicks: 210, registrations: 18, conversions: 8, revenue: 18_000 },
-  { label: 'Building Resilient Teams', clicks: 145, registrations: 11, conversions: 5, revenue: 11_250 },
-  { label: 'Campaign: CAREERDAY2026', clicks: 88, registrations: 9, conversions: 3, revenue: 6_750 },
-];
-
 export const COUPON_PERFORMANCE = [
   { code: 'MENTOR10', type: '10% discount', redemptions: 14, revenueGenerated: 31_500, revenueWaived: 3_500, conversionRate: '4.2%' },
   { code: 'LAUNCH2026', type: 'Fixed KES 500 off', redemptions: 8, revenueGenerated: 18_000, revenueWaived: 4_000, conversionRate: '3.1%' },

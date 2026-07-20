@@ -148,3 +148,63 @@ export interface IMentorEconomyRevenueAPIResponseDataEntity {
   platformShare: number;
   yourShare: number;
 }
+
+
+
+
+
+
+export type MentorReferralStatus = 'registered' | 'purchased' | 'pending';
+
+export interface IMentorReferralsAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IMentorReferralsAPIResponseData;
+  message: string;
+  timestamp: string;
+}
+export interface IMentorReferralsAPIResponseData {
+  summary: Summary;
+  data: IMentorReferralsAPIResponseDataData;
+}
+export interface Summary {
+  total_referrals: number;
+  total_registered: number;
+  total_purchased: number;
+  total_pending: number;
+  total_commission_earned: number;
+  conversion_rate: number;
+}
+export interface IMentorReferralsAPIResponseDataData {
+  data?: (IMentorReferralsAPIResponseDataEntity)[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+export interface IMentorReferralsAPIResponseDataEntity {
+  _id: string;
+  user_name: string;
+  commission_type: string;
+  commission_value: number;
+  isRegistered: boolean;
+  registered_user: IMentorReferralsAPIResponseDataRegisteredUser;
+  isFirstPurchaseDone: boolean;
+  order: IMentorReferralsAPIResponseDataOrder;
+  commission_amount: number;
+  is_credited: boolean;
+  credited_at: string;
+  referral_code: string;
+  createdAt: string;
+}
+export interface IMentorReferralsAPIResponseDataRegisteredUser {
+  _id: string;
+  name: string;
+  email: string;
+}
+export interface IMentorReferralsAPIResponseDataOrder {
+  _id: string;
+  order_number: number;
+  total_amount: number;
+}

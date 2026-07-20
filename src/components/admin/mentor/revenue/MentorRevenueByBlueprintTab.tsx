@@ -1,21 +1,62 @@
 'use client';
 
+import { useState } from 'react';
+import { type GridColDef } from '@mui/x-data-grid';
 import { FileText, TrendingUp, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPageHeader,
+  AdminSearchInput,
+  AdminSearchPanel,
   AdminStatCard,
-  AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
-import {
-  formatKes,
-  MENTOR_OVERVIEW,
-  REVENUE_BY_BLUEPRINT,
-} from '@/components/admin/mentor/data/mentorPerformanceData';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useGetBlueprintRevenueQuery } from '@/store/rtkQueries/dashboard';
 
-const totalEarned = REVENUE_BY_BLUEPRINT.reduce((sum, row) => sum + row.earned, 0);
+const columns: GridColDef[] = [
+  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 200, sortable: false },
+  { field: 'status', headerName: 'Status', width: 130, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
+  {
+    field: 'earned',
+    headerName: 'Earned',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'pending',
+    headerName: 'Pending',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
 
 export function MentorRevenueByBlueprintTab() {
+  const [search, setSearch] = useState('');
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data, isLoading, isFetching } = useGetBlueprintRevenueQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  });
+
+  const summary = data?.data?.summary;
+  const listData = data?.data?.data;
+  const blueprints = listData?.data ?? [];
+  const total = listData?.total ?? 0;
+  const loading = isLoading || isFetching;
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  };
+
   return (
     <AdminPage>
       <AdminPageHeader
@@ -24,41 +65,33 @@ export function MentorRevenueByBlueprintTab() {
         description="Earned and pending revenue broken down per blueprint."
       />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AdminStatCard label="Blueprints" value={REVENUE_BY_BLUEPRINT.length} icon={FileText} tone="purple" />
-        <AdminStatCard label="Total earned" value={formatKes(totalEarned)} icon={TrendingUp} tone="green" />
-        <AdminStatCard
-          label="Total pending"
-          value={formatKes(MENTOR_OVERVIEW.revenuePending)}
-          icon={Wallet}
-          tone="orange"
-        />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <AdminStatCard label="Blueprints" value={summary?.blueprints ?? 0} icon={FileText} tone="purple" />
+        <AdminStatCard label="Total sales" value={summary?.totalSales ?? 0} icon={TrendingUp} tone="blue" />
+        <AdminStatCard label="Total earned" value={formatKes(summary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
+        <AdminStatCard label="Total pending" value={formatKes(summary?.totalPending ?? 0)} icon={Wallet} tone="orange" />
       </div>
 
-      <AdminTableShell>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
-                <th className="px-5 py-3 font-medium">Blueprint</th>
-                <th className="px-5 py-3 font-medium">Sales</th>
-                <th className="px-5 py-3 font-medium">Earned</th>
-                <th className="px-5 py-3 font-medium text-right">Pending</th>
-              </tr>
-            </thead>
-            <tbody>
-              {REVENUE_BY_BLUEPRINT.map((row) => (
-                <tr key={row.title} className="border-b border-slate-50 last:border-0">
-                  <td className="px-5 py-4 font-medium text-slate-900">{row.title}</td>
-                  <td className="px-5 py-4 text-slate-600">{row.sales}</td>
-                  <td className="px-5 py-4 text-slate-900">{formatKes(row.earned)}</td>
-                  <td className="px-5 py-4 text-right text-slate-600">{formatKes(row.pending)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AdminTableShell>
+      <AdminSearchPanel>
+        <AdminSearchInput
+          value={search}
+          onChange={handleSearchChange}
+          placeholder="Search by blueprint title…"
+        />
+      </AdminSearchPanel>
+
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={blueprints}
+          columns={columns}
+          getRowId={(row) => row.id}
+          loading={loading}
+          paginationMode="server"
+          rowCount={total}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
     </AdminPage>
   );
 }

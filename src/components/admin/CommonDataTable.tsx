@@ -26,7 +26,7 @@ export default function CommonDataTable({ rows, columns, getRowId, loading, pagi
                 pageSizeOptions={[2, 25, 50]}
                 // disableRowSelectionOnClick
                 // autoHeight
-                // getRowHeight={() => 'auto'}
+                getRowHeight={() => 'auto'}
                 sx={{
                     border: 'none',
                     '& .MuiDataGrid-cell:not(.MuiDataGrid-cellEmpty)': {

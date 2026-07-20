@@ -1,19 +1,54 @@
 'use client';
 
-import { CalendarDays, ShoppingCart, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { type GridColDef } from '@mui/x-data-grid';
+import { CalendarDays, ShoppingCart, TrendingUp, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPageHeader,
+  AdminSearchInput,
+  AdminSearchPanel,
   AdminStatCard,
-  AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
-import { formatKes, SALES_BY_MONTH } from '@/components/admin/mentor/data/mentorPerformanceData';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useGetSalesVolumeQuery } from '@/store/rtkQueries/dashboard';
 
-const thisMonth = SALES_BY_MONTH[0];
-const lastMonth = SALES_BY_MONTH[1];
-const totalSales = SALES_BY_MONTH.reduce((sum, row) => sum + row.sales, 0);
+const columns: GridColDef[] = [
+  { field: 'month', headerName: 'Month', flex: 1, minWidth: 160, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 120, sortable: false },
+  {
+    field: 'revenue',
+    headerName: 'Gross revenue',
+    width: 160,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
 
 export function MentorSalesVolumeTab() {
+  const [search, setSearch] = useState('');
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data, isLoading, isFetching } = useGetSalesVolumeQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  });
+
+  const summary = data?.data?.summary;
+  const listData = data?.data?.data;
+  const rows = (listData?.data ?? []).map((row, idx) => ({ ...row, id: `${row.month}-${idx}` }));
+  const total = listData?.total ?? 0;
+  const loading = isLoading || isFetching;
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  };
+
   return (
     <AdminPage>
       <AdminPageHeader
@@ -22,34 +57,33 @@ export function MentorSalesVolumeTab() {
         description="Blueprint purchases over time."
       />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AdminStatCard label="This month" value={thisMonth.sales} icon={CalendarDays} tone="blue" />
-        <AdminStatCard label="Last month" value={lastMonth.sales} icon={ShoppingCart} tone="green" />
-        <AdminStatCard label="Total sales" value={totalSales} icon={TrendingUp} tone="purple" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <AdminStatCard label="This month" value={summary?.thisMonth ?? 0} icon={CalendarDays} tone="blue" />
+        <AdminStatCard label="Last month" value={summary?.lastMonth ?? 0} icon={ShoppingCart} tone="green" />
+        <AdminStatCard label="Total sales" value={summary?.totalSales ?? 0} icon={TrendingUp} tone="purple" />
+        <AdminStatCard label="Total revenue" value={formatKes(summary?.totalRevenue ?? 0)} icon={Wallet} tone="orange" />
       </div>
 
-      <AdminTableShell>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
-                <th className="px-5 py-3 font-medium">Month</th>
-                <th className="px-5 py-3 font-medium">Sales</th>
-                <th className="px-5 py-3 font-medium text-right">Gross revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {SALES_BY_MONTH.map((row) => (
-                <tr key={row.month} className="border-b border-slate-50 last:border-0">
-                  <td className="px-5 py-4 font-medium text-slate-900">{row.month}</td>
-                  <td className="px-5 py-4 text-slate-600">{row.sales}</td>
-                  <td className="px-5 py-4 text-right text-slate-900">{formatKes(row.revenue)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AdminTableShell>
+      <AdminSearchPanel>
+        <AdminSearchInput
+          value={search}
+          onChange={handleSearchChange}
+          placeholder="Search by month, e.g. Jul 2026…"
+        />
+      </AdminSearchPanel>
+
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={rows}
+          columns={columns}
+          getRowId={(row) => row.id}
+          loading={loading}
+          paginationMode="server"
+          rowCount={total}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
     </AdminPage>
   );
 }

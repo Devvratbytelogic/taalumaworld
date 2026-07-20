@@ -28,8 +28,8 @@ import {
 } from '@/store/rtkQueries/dashboard';
 import {
   getMentorBlueprintPerformanceRoutePath,
+  getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
-  getMentorRevenuePendingRoutePath,
   getMentorSalesVolumeRoutePath,
 } from '@/routes/routes';
 
@@ -224,7 +224,7 @@ export function MentorDashboardTab() {
         <AdminPanel>
           <AdminSectionHeader
             title="Blueprint revenue"
-            action={<AdminTextLink href={getMentorRevenueEarnedRoutePath()}>View all</AdminTextLink>}
+            action={<AdminTextLink href={getMentorRevenueByBlueprintRoutePath()}>View all</AdminTextLink>}
           />
           <div className="mb-5 grid grid-cols-2 gap-4">
             <AdminStatCard label="Earned" value={formatKes(revenueEarnedSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
@@ -254,7 +254,7 @@ export function MentorDashboardTab() {
       <AdminPanel>
         <AdminSectionHeader
           title="Mentor economy revenue"
-          action={<AdminTextLink href={getMentorRevenuePendingRoutePath()}>View all</AdminTextLink>}
+          action={<AdminTextLink href={getMentorRevenueEarnedRoutePath()}>View all</AdminTextLink>}
         />
         <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
           <AdminStatCard label="Total earned" value={formatKes(revenuePendingSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />

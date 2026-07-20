@@ -1,66 +1,110 @@
 'use client';
 
-import { CalendarDays, TrendingUp, Wallet } from 'lucide-react';
+import { useState } from 'react';
+import { type GridColDef } from '@mui/x-data-grid';
+import { CalendarDays, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPageHeader,
+  AdminSearchInput,
+  AdminSearchPanel,
   AdminStatCard,
-  AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
-import {
-  formatKes,
-  MENTOR_OVERVIEW,
-  REVENUE_BY_MONTH,
-} from '@/components/admin/mentor/data/mentorPerformanceData';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useGetMentorEconomyRevenueQuery } from '@/store/rtkQueries/dashboard';
 
-const thisMonth = REVENUE_BY_MONTH[0];
-const totalPlatformShare = REVENUE_BY_MONTH.reduce((sum, row) => sum + row.platformShare, 0);
-const totalRefunds = REVENUE_BY_MONTH.reduce((sum, row) => sum + row.refunds, 0);
+const columns: GridColDef[] = [
+  { field: 'month', headerName: 'Month', flex: 1, minWidth: 160, sortable: false },
+  {
+    field: 'gross',
+    headerName: 'Gross',
+    width: 130,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'discount',
+    headerName: 'Discount',
+    width: 130,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'platformShare',
+    headerName: 'Platform share',
+    width: 150,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'yourShare',
+    headerName: 'Your share',
+    width: 150,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
 
 export function MentorRevenueEarnedTab() {
+  const [search, setSearch] = useState('');
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data, isLoading, isFetching } = useGetMentorEconomyRevenueQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+  });
+
+  const summary = data?.data?.summary;
+  const listData = data?.data?.data;
+  const rows = (listData?.data ?? []).map((row, idx) => ({ ...row, id: `${row.month}-${idx}` }));
+  const total = listData?.total ?? 0;
+  const loading = isLoading || isFetching;
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+  };
+
   return (
     <AdminPage>
       <AdminPageHeader
         eyebrow="Performance & Revenue"
         title="Revenue Earned"
-        description="Total earnings after platform share, discounts, and refunds."
+        description="Total earnings after platform share and discounts, by month."
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <AdminStatCard label="Total earned" value={formatKes(MENTOR_OVERVIEW.revenueEarned)} icon={TrendingUp} tone="green" />
-        <AdminStatCard label="This month" value={formatKes(thisMonth.earned)} icon={CalendarDays} tone="blue" />
-        <AdminStatCard label="Platform share" value={formatKes(totalPlatformShare)} icon={Wallet} tone="slate" />
-        <AdminStatCard label="Refunds (total)" value={formatKes(totalRefunds)} icon={Wallet} tone="orange" />
+        <AdminStatCard label="Total earned" value={formatKes(summary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
+        <AdminStatCard label="This month" value={formatKes(summary?.thisMonth ?? 0)} icon={CalendarDays} tone="blue" />
+        <AdminStatCard label="Total gross" value={formatKes(summary?.totalGross ?? 0)} icon={TrendingUp} tone="purple" />
+        <AdminStatCard label="Total discount" value={formatKes(summary?.totalDiscount ?? 0)} icon={TrendingDown} tone="orange" />
+        <AdminStatCard label="Platform share" value={formatKes(summary?.platformShare ?? 0)} icon={Percent} tone="slate" />
       </div>
 
-      <AdminTableShell>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
-                <th className="px-5 py-3 font-medium">Month</th>
-                <th className="px-5 py-3 font-medium">Gross</th>
-                <th className="px-5 py-3 font-medium">Discounts</th>
-                <th className="px-5 py-3 font-medium">Refunds</th>
-                <th className="px-5 py-3 font-medium">Platform share</th>
-                <th className="px-5 py-3 font-medium text-right">Your share</th>
-              </tr>
-            </thead>
-            <tbody>
-              {REVENUE_BY_MONTH.map((row) => (
-                <tr key={row.month} className="border-b border-slate-50 last:border-0">
-                  <td className="px-5 py-4 font-medium text-slate-900">{row.month}</td>
-                  <td className="px-5 py-4 text-slate-600">{formatKes(row.gross)}</td>
-                  <td className="px-5 py-4 text-slate-600">{formatKes(row.discounts)}</td>
-                  <td className="px-5 py-4 text-slate-600">{formatKes(row.refunds)}</td>
-                  <td className="px-5 py-4 text-slate-600">{formatKes(row.platformShare)}</td>
-                  <td className="px-5 py-4 text-right font-medium text-slate-900">{formatKes(row.earned)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AdminTableShell>
+      <AdminSearchPanel>
+        <AdminSearchInput
+          value={search}
+          onChange={handleSearchChange}
+          placeholder="Search by month, e.g. Jul 2026…"
+        />
+      </AdminSearchPanel>
+
+      <div className="border border-gray-200 rounded-md overflow-hidden">
+        <CommonDataTable
+          rows={rows}
+          columns={columns}
+          getRowId={(row) => row.id}
+          loading={loading}
+          paginationMode="server"
+          rowCount={total}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+        />
+      </div>
     </AdminPage>
   );
 }

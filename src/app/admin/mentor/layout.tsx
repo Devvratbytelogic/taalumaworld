@@ -79,15 +79,15 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     title: 'Growth',
     items: [
       { id: 'referrals', label: 'Referral Performance', href: getMentorReferralsRoutePath(), icon: Link2 },
-      { id: 'coupons', label: 'Coupons & Promos', href: getMentorCouponsRoutePath(), icon: Tag },
+      // { id: 'coupons', label: 'Coupons & Promos', href: getMentorCouponsRoutePath(), icon: Tag },
     ],
   },
-  {
-    title: 'User Management',
-    items: [
-      { id: 'users', label: 'Users', href: getMentorUsersRoutePath(), icon: UserCircle },
-    ],
-  },
+  // {
+  //   title: 'User Management',
+  //   items: [
+  //     { id: 'users', label: 'Users', href: getMentorUsersRoutePath(), icon: UserCircle },
+  //   ],
+  // },
 ];
 
 export default function MentorLayout({ children }: { children: React.ReactNode }) {

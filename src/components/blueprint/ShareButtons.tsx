@@ -60,7 +60,7 @@ export default function ShareButtons({
         try {
             await navigator.clipboard.writeText(shareableLink);
             setCopied(true);
-            toast.success('Link copied to clipboard');
+            toast.success('Link copied to clipboard', { description: shareableLink });
             setTimeout(() => setCopied(false), 2000);
         } catch {
             toast.error('Failed to copy link');

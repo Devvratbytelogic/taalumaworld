@@ -115,3 +115,36 @@ export interface IBlueprintRevenueEntity {
 }
 
 
+export interface IMentorEconomyRevenueAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IMentorEconomyRevenueAPIResponseData;
+  message: string;
+  timestamp: string;
+}
+export interface IMentorEconomyRevenueAPIResponseData {
+  summary: IMentorEconomyRevenueAPIResponseSummary;
+  data: IMentorEconomyRevenueAPIResponseDataData;
+}
+export interface IMentorEconomyRevenueAPIResponseSummary {
+  totalEarned: number;
+  thisMonth: number;
+  platformShare: number;
+  totalGross: number;
+  totalDiscount: number;
+}
+export interface IMentorEconomyRevenueAPIResponseDataData {
+  data?: (IMentorEconomyRevenueAPIResponseDataEntity)[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+export interface IMentorEconomyRevenueAPIResponseDataEntity {
+  month: string;
+  gross: number;
+  discount: number;
+  platformShare: number;
+  yourShare: number;
+}

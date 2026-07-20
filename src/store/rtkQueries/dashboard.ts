@@ -1,34 +1,37 @@
-import { IBlueprintPerformanceAPIResponse, IBlueprintRevenueAPIResponse, ISalesVolumeAPIResponse } from '@/types/dashboard';
+import { IBlueprintPerformanceAPIResponse, IBlueprintRevenueAPIResponse, IMentorEconomyRevenueAPIResponse, ISalesVolumeAPIResponse } from '@/types/dashboard';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const dashboardApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         /** Blueprint performance — accessible to Admin and Mentor */
-        getBlueprintPerformance: builder.query<IBlueprintPerformanceAPIResponse, void>({
-            query: () => ({
+        getBlueprintPerformance: builder.query<IBlueprintPerformanceAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/blueprints/performance`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
         }),
 
         /** Blueprint sales volume — accessible to Admin and Mentor */
-        getSalesVolume: builder.query<ISalesVolumeAPIResponse, void>({
-            query: () => ({
+        getSalesVolume: builder.query<ISalesVolumeAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/blueprints/sales-volume`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
         }),
 
         /** Blueprint revenue — accessible to Admin and Mentor */
-        getBlueprintRevenue: builder.query<IBlueprintRevenueAPIResponse, void>({
-            query: () => ({
+        getBlueprintRevenue: builder.query<IBlueprintRevenueAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
                 url: `/admin/blueprints/revenue`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
         }),
 
         /** Mentor economy revenue — Admin only */
-        getMentorEconomyRevenue: builder.query<any, { page?: number; limit?: number } | void>({
+        getMentorEconomyRevenue: builder.query<IMentorEconomyRevenueAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
                 url: `/admin/mentor-economy/revenue`,
                 method: 'GET',

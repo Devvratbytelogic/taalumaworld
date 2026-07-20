@@ -1,366 +1,286 @@
 'use client';
-
-import Link from 'next/link';
+import { type GridColDef } from '@mui/x-data-grid';
 import {
-  Award,
-  BarChart3,
-  CheckCircle2,
-  Clock,
-  FileText,
-  History,
-  Link2,
-  ShieldCheck,
-  ShieldX,
+  CalendarDays,
+  Percent,
   ShoppingCart,
-  Tag,
+  Sparkles,
+  TrendingDown,
   TrendingUp,
   Wallet,
 } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import Button from '@/components/ui/Button';
-import { cn } from '@/components/ui/utils';
 import {
   AdminPage,
-  AdminPageHeader,
   AdminPanel,
   AdminSectionHeader,
   AdminStatCard,
+  AdminTableShell,
   AdminTextLink,
 } from '@/components/admin/layout/AdminContent';
-import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
+import CommonDataTable from '@/components/admin/CommonDataTable';
+import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
+import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import {
+  useGetBlueprintPerformanceQuery,
+  useGetBlueprintRevenueQuery,
+  useGetMentorEconomyRevenueQuery,
+  useGetSalesVolumeQuery,
+} from '@/store/rtkQueries/dashboard';
 import {
   getMentorBlueprintPerformanceRoutePath,
-  getMentorCouponsRoutePath,
-  getMentorPaymentHistoryRoutePath,
-  getMentorReferralsRoutePath,
   getMentorRevenueEarnedRoutePath,
   getMentorRevenuePendingRoutePath,
   getMentorSalesVolumeRoutePath,
-  getMentorWalletRoutePath,
 } from '@/routes/routes';
-import {
-  AGREEMENTS,
-  formatKes,
-  FOUNDING_MENTOR,
-  MENTOR_OVERVIEW,
-  RECENT_PAYMENTS,
-  TOP_BLUEPRINTS,
-} from '@/components/admin/mentor/data/mentorPerformanceData';
-import { openModal } from '@/store/slices/allModalSlice';
-import { useGetMyVerifiedMentorApplicationQuery } from '@/store/rtkQueries/verifiedMentorApplicationApis';
-import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorApplication';
+
+/** Dashboard previews are static (no in-grid paging) — "View all" links to the full, paginated list. */
+const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
+const noopPaginationChange = () => {};
+
+const performanceColumns: GridColDef[] = [
+  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'status', headerName: 'Status', width: 130, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
+  {
+    field: 'conversion',
+    headerName: 'Conversion',
+    width: 110,
+    sortable: false,
+    renderCell: (params) => `${params.value}%`,
+  },
+  { field: 'classification', headerName: 'Classification', width: 160, sortable: false },
+];
+
+const salesVolumeColumns: GridColDef[] = [
+  { field: 'month', headerName: 'Month', flex: 1, minWidth: 140, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 100, sortable: false },
+  {
+    field: 'revenue',
+    headerName: 'Revenue',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
+
+const blueprintRevenueColumns: GridColDef[] = [
+  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
+  {
+    field: 'earned',
+    headerName: 'Earned',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
+
+const mentorEconomyRevenueColumns: GridColDef[] = [
+  { field: 'month', headerName: 'Month', flex: 1, minWidth: 140, sortable: false },
+  {
+    field: 'gross',
+    headerName: 'Gross',
+    width: 130,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'discount',
+    headerName: 'Discount',
+    width: 130,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'platformShare',
+    headerName: 'Platform share',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'yourShare',
+    headerName: 'Your share',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
 
 export function MentorDashboardTab() {
-  const dispatch = useDispatch();
-  const { data: profileData } = useGetAdminProfileQuery();
-  const mentorName = profileData?.data?.name ?? 'Mentor';
-  const { data: verifiedMentorApplicationData } = useGetMyVerifiedMentorApplicationQuery();
-  const verifiedMentorApplication = verifiedMentorApplicationData?.data ?? null;
-  const verificationStatus = verifiedMentorApplication?.status;
-  const openApplyModal = () => dispatch(openModal({ componentName: 'ApplyVerifiedMentorModal' }));
+  const {
+    data: blueprintPerformanceData,
+    isLoading: performanceLoading,
+    isError: performanceError,
+  } = useGetBlueprintPerformanceQuery({ page: 1, limit: 5 });
+  const {
+    data: salesVolumeData,
+    isLoading: salesVolumeLoading,
+    isError: salesVolumeError,
+  } = useGetSalesVolumeQuery({ page: 1, limit: 5 });
+  const {
+    data: revenueEarnedData,
+    isLoading: revenueEarnedLoading,
+    isError: revenueEarnedError,
+  } = useGetBlueprintRevenueQuery({ page: 1, limit: 5 });
+  const {
+    data: revenuePendingData,
+    isLoading: revenuePendingLoading,
+    isError: revenuePendingError,
+  } = useGetMentorEconomyRevenueQuery({ page: 1, limit: 5 });
 
-  const verificationDisplay =
-    verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.APPROVED
-      ? { label: 'Verified', className: 'text-emerald-700', Icon: ShieldCheck }
-      : verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW
-        ? { label: 'Pending Review', className: 'text-amber-700', Icon: Clock }
-        : verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED
-          ? { label: 'Rejected', className: 'text-red-700', Icon: ShieldX }
-          : { label: 'Not Applied', className: 'text-slate-500', Icon: Clock };
+  const performanceSummary = blueprintPerformanceData?.data?.summary;
+  const topBlueprints = blueprintPerformanceData?.data?.data?.data ?? [];
 
-  const isApprovedDecision = verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.APPROVED;
-  const decisionBanner = isApprovedDecision
-    ? {
-        label: 'Approval note',
-        Icon: ShieldCheck,
-        border: 'border-emerald-200/!',
-        bg: 'bg-emerald-50/50',
-        iconBg: 'bg-emerald-100',
-        iconColor: 'text-emerald-600',
-        titleColor: 'text-emerald-900',
-        textColor: 'text-emerald-700',
-      }
-    : {
-        label: 'Reason for rejection',
-        Icon: ShieldX,
-        border: 'border-red-200/80!',
-        bg: 'bg-red-50/50',
-        iconBg: 'bg-red-100',
-        iconColor: 'text-red-600',
-        titleColor: 'text-red-900',
-        textColor: 'text-red-700',
-      };
+  const salesVolumeSummary = salesVolumeData?.data?.summary;
+  const salesByMonth = (salesVolumeData?.data?.data?.data ?? []).map((row, idx) => ({
+    ...row,
+    id: `${row.month}-${idx}`,
+  }));
+
+  const revenueEarnedSummary = revenueEarnedData?.data?.summary;
+  const topEarningBlueprints = revenueEarnedData?.data?.data?.data ?? [];
+
+  const revenuePendingSummary = revenuePendingData?.data?.summary;
+  const revenueByMonth = (revenuePendingData?.data?.data?.data ?? []).map((row, idx) => ({
+    ...row,
+    id: `${row.month}-${idx}`,
+  }));
 
   return (
     <AdminPage>
-      <AdminPageHeader
-        eyebrow="Overview"
-        title={`Welcome back, ${mentorName}`}
-        description="Track blueprint performance, sales, revenue, payouts, referrals, and compliance."
-      >
-        {verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
-            <Clock className="h-4 w-4" />
-            Verification Pending Review
-          </span>
-        ) : verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.APPROVED ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200! bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
-            <ShieldCheck className="h-4 w-4" />
-            Verified Mentor
-          </span>
-        ) : verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED ? (
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200! bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
-              <ShieldX className="h-4 w-4" />
-              Application Rejected
-            </span>
-            <Button
-              type="button"
-              className="global_btn rounded_full bg_primary"
-              startContent={<ShieldCheck className="h-4 w-4" />}
-              onPress={openApplyModal}
-            >
-              Re-apply
-            </Button>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            className="global_btn rounded_full bg_primary"
-            startContent={<ShieldCheck className="h-4 w-4" />}
-            onPress={openApplyModal}
-          >
-            Apply for Verified Mentor
-          </Button>
-        )}
-      </AdminPageHeader>
+      <MentorVerificationHeader />
 
-      {verifiedMentorApplication?.decision_reason ? (
-        <div
-          className={cn(
-            'flex items-start gap-3.5 rounded-md border p-4',
-            decisionBanner.border,
-            decisionBanner.bg
+      <AdminPanel>
+        <AdminSectionHeader
+          title="Blueprint performance"
+          action={<AdminTextLink href={getMentorBlueprintPerformanceRoutePath()}>View all</AdminTextLink>}
+        />
+        <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-3">
+          <AdminStatCard label="Total sales" value={performanceSummary?.totalSales ?? 0} icon={ShoppingCart} tone="green" />
+          <AdminStatCard
+            label="Avg. conversion"
+            value={`${performanceSummary?.avgConversion ?? 0}%`}
+            icon={TrendingUp}
+            tone="purple"
+          />
+          <AdminStatCard
+            label="High Value blueprints"
+            value={performanceSummary?.highValueBlueprints ?? 0}
+            icon={Sparkles}
+            tone="orange"
+          />
+        </div>
+        <AdminTableShell>
+          {performanceError ? (
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint performance right now.</p>
+          ) : !performanceLoading && topBlueprints.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-500">No performance data available yet.</p>
+          ) : (
+            <CommonDataTable
+              rows={topBlueprints}
+              columns={performanceColumns}
+              getRowId={(row) => row.id}
+              loading={performanceLoading}
+              paginationMode="client"
+              rowCount={topBlueprints.length}
+              paginationModel={PREVIEW_PAGINATION_MODEL}
+              onPaginationModelChange={noopPaginationChange}
+            />
           )}
-        >
-          <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg', decisionBanner.iconBg)}>
-            <decisionBanner.Icon className={cn('h-5 w-5', decisionBanner.iconColor)} />
-          </div>
-          <div className="min-w-0 flex-1 pt-0.5">
-            <p className={cn('text-sm font-semibold', decisionBanner.titleColor)}>{decisionBanner.label}</p>
-            <p className={cn('mt-0.5 text-sm leading-relaxed', decisionBanner.textColor)}>
-              {verifiedMentorApplication.decision_reason}
-            </p>
-          </div>
-        </div>
-      ) : null}
-
-      <AdminPanel>
-        <AdminSectionHeader title="Account status" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <p className="text-sm text-slate-500">Profile completion</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">{MENTOR_OVERVIEW.profileCompletion}%</p>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${MENTOR_OVERVIEW.profileCompletion}%` }} />
-            </div>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Verification</p>
-            <p className={`mt-1 flex items-center gap-1.5 text-lg font-semibold ${verificationDisplay.className}`}>
-              <verificationDisplay.Icon className="h-4 w-4" />
-              {verificationDisplay.label}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Mentor type</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">{MENTOR_OVERVIEW.mentorType}</p>
-            <p className="mt-0.5 text-xs text-slate-500">{MENTOR_OVERVIEW.revenueShare}</p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Wallet balance</p>
-            <p className="mt-1 flex items-center gap-1.5 text-lg font-semibold text-emerald-700">
-              <Wallet className="h-4 w-4" />
-              {formatKes(MENTOR_OVERVIEW.walletBalance)}
-            </p>
-          </div>
-        </div>
+        </AdminTableShell>
       </AdminPanel>
-
-      <AdminPanel>
-        <AdminSectionHeader title="Agreement acceptance" />
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-left text-slate-500">
-                <th className="pb-3 font-medium">Agreement</th>
-                <th className="pb-3 font-medium">Version</th>
-                <th className="pb-3 font-medium">Accepted</th>
-                <th className="pb-3 font-medium text-right">Required</th>
-              </tr>
-            </thead>
-            <tbody>
-              {AGREEMENTS.map((row) => (
-                <tr key={row.name} className="border-b border-slate-50 last:border-0">
-                  <td className="py-3 font-medium text-slate-900">{row.name}</td>
-                  <td className="py-3 text-slate-600">{row.version}</td>
-                  <td className="py-3 text-slate-600">{row.acceptedAt}</td>
-                  <td className="py-3 text-right">
-                    {row.required ? (
-                      <CheckCircle2 className="ml-auto h-4 w-4 text-emerald-600" />
-                    ) : (
-                      'Optional'
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AdminPanel>
-
-      {MENTOR_OVERVIEW.isFoundingMentor ? (
-        <AdminPanel>
-          <AdminSectionHeader title="Founding Mentor program" />
-          <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <p className="text-sm text-slate-500">Badge</p>
-              <p className="mt-1 flex items-center gap-1.5 font-semibold text-primary">
-                <Award className="h-4 w-4" />
-                {FOUNDING_MENTOR.badgeActive ? 'Active' : 'Inactive'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Program period</p>
-              <p className="mt-1 text-sm font-medium text-slate-900">{FOUNDING_MENTOR.startDate} → {FOUNDING_MENTOR.expiryDate}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">High Value Blueprints</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">{FOUNDING_MENTOR.highValueAchieved} / {FOUNDING_MENTOR.highValueTarget}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Equity eligibility</p>
-              <p className="mt-1 text-sm font-medium text-emerald-700">{FOUNDING_MENTOR.equityEligibility}</p>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 text-left text-slate-500">
-                  <th className="pb-3 font-medium">Blueprint</th>
-                  <th className="pb-3 font-medium">HV status</th>
-                  <th className="pb-3 font-medium text-right">Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {FOUNDING_MENTOR.hvBlueprints.map((row) => (
-                  <tr key={row.title} className="border-b border-slate-50 last:border-0">
-                    <td className="py-3 font-medium text-slate-900">{row.title}</td>
-                    <td className="py-3 text-slate-600">{row.status}</td>
-                    <td className="py-3 text-right text-slate-500">{row.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </AdminPanel>
-      ) : null}
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Link href={getMentorSalesVolumeRoutePath()} className="block transition-opacity hover:opacity-90">
-          <AdminStatCard label="Total sales" value={MENTOR_OVERVIEW.totalSales} icon={ShoppingCart} tone="blue" />
-        </Link>
-        <Link href={getMentorRevenueEarnedRoutePath()} className="block transition-opacity hover:opacity-90">
-          <AdminStatCard label="Revenue earned" value={formatKes(MENTOR_OVERVIEW.revenueEarned)} icon={TrendingUp} tone="green" />
-        </Link>
-        <Link href={getMentorRevenuePendingRoutePath()} className="block transition-opacity hover:opacity-90">
-          <AdminStatCard label="Pending payout" value={formatKes(MENTOR_OVERVIEW.revenuePending)} icon={Wallet} tone="orange" />
-        </Link>
-        <Link href={getMentorBlueprintPerformanceRoutePath()} className="block transition-opacity hover:opacity-90">
-          <AdminStatCard label="Published blueprints" value={MENTOR_OVERVIEW.publishedBlueprints} icon={FileText} tone="purple" />
-        </Link>
-      </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <AdminPanel>
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="text-base font-semibold text-slate-900">Top blueprints</h2>
-            <AdminTextLink href={getMentorBlueprintPerformanceRoutePath()}>View all</AdminTextLink>
+          <AdminSectionHeader
+            title="Sales volume"
+            action={<AdminTextLink href={getMentorSalesVolumeRoutePath()}>View all</AdminTextLink>}
+          />
+          <div className="mb-5 grid grid-cols-2 gap-4">
+            <AdminStatCard label="This month" value={salesVolumeSummary?.thisMonth ?? 0} icon={CalendarDays} tone="blue" />
+            <AdminStatCard label="Last month" value={salesVolumeSummary?.lastMonth ?? 0} icon={ShoppingCart} tone="green" />
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 text-left text-slate-500">
-                  <th className="pb-3 font-medium">Blueprint</th>
-                  <th className="pb-3 font-medium">Sales</th>
-                  <th className="pb-3 font-medium text-right">Revenue</th>
-                </tr>
-              </thead>
-              <tbody>
-                {TOP_BLUEPRINTS.map((row) => (
-                  <tr key={row.title} className="border-b border-slate-50 last:border-0">
-                    <td className="py-3 font-medium text-slate-900">{row.title}</td>
-                    <td className="py-3 text-slate-600">{row.sales}</td>
-                    <td className="py-3 text-right text-slate-900">{formatKes(row.revenue)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-4 text-xs text-slate-500">
-            {MENTOR_OVERVIEW.draftSubmissions} draft · {MENTOR_OVERVIEW.pendingReview} pending review ·{' '}
-            {MENTOR_OVERVIEW.suspendedBlueprints} suspended · {MENTOR_OVERVIEW.unpublishedBlueprints} unpublished
-          </p>
+          {salesVolumeError ? (
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load sales volume right now.</p>
+          ) : !salesVolumeLoading && salesByMonth.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-500">No sales data available yet.</p>
+          ) : (
+            <AdminTableShell>
+              <CommonDataTable
+                rows={salesByMonth}
+                columns={salesVolumeColumns}
+                getRowId={(row) => row.id}
+                loading={salesVolumeLoading}
+                paginationMode="client"
+                rowCount={salesByMonth.length}
+                paginationModel={PREVIEW_PAGINATION_MODEL}
+                onPaginationModelChange={noopPaginationChange}
+              />
+            </AdminTableShell>
+          )}
         </AdminPanel>
 
         <AdminPanel>
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="text-base font-semibold text-slate-900">Recent payments</h2>
-            <AdminTextLink href={getMentorPaymentHistoryRoutePath()}>View history</AdminTextLink>
+          <AdminSectionHeader
+            title="Blueprint revenue"
+            action={<AdminTextLink href={getMentorRevenueEarnedRoutePath()}>View all</AdminTextLink>}
+          />
+          <div className="mb-5 grid grid-cols-2 gap-4">
+            <AdminStatCard label="Earned" value={formatKes(revenueEarnedSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
+            <AdminStatCard label="Pending" value={formatKes(revenueEarnedSummary?.totalPending ?? 0)} icon={TrendingUp} tone="orange" />
           </div>
-          <div className="space-y-3">
-            {RECENT_PAYMENTS.map((payment) => (
-              <div key={payment.date} className="flex items-center justify-between rounded-lg border border-slate-100 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-                    <History className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-900">{formatKes(payment.amount)}</p>
-                    <p className="text-xs text-slate-500">{payment.date}</p>
-                  </div>
-                </div>
-                <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">{payment.status}</span>
-              </div>
-            ))}
-          </div>
+          {revenueEarnedError ? (
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint revenue right now.</p>
+          ) : !revenueEarnedLoading && topEarningBlueprints.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-500">No revenue data available yet.</p>
+          ) : (
+            <AdminTableShell>
+              <CommonDataTable
+                rows={topEarningBlueprints}
+                columns={blueprintRevenueColumns}
+                getRowId={(row) => row.id}
+                loading={revenueEarnedLoading}
+                paginationMode="client"
+                rowCount={topEarningBlueprints.length}
+                paginationModel={PREVIEW_PAGINATION_MODEL}
+                onPaginationModelChange={noopPaginationChange}
+              />
+            </AdminTableShell>
+          )}
         </AdminPanel>
       </div>
 
       <AdminPanel>
-        <AdminSectionHeader title="Quick links" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { label: 'Blueprint performance', href: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3 },
-            { label: 'Wallet & payouts', href: getMentorWalletRoutePath(), icon: Wallet },
-            { label: 'Referrals', href: getMentorReferralsRoutePath(), icon: Link2 },
-            { label: 'Coupons & promos', href: getMentorCouponsRoutePath(), icon: Tag },
-            { label: 'Sales volume', href: getMentorSalesVolumeRoutePath(), icon: ShoppingCart },
-            { label: 'Revenue earned', href: getMentorRevenueEarnedRoutePath(), icon: TrendingUp },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 rounded-lg border border-slate-100 px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                {item.label}
-              </Link>
-            );
-          })}
+        <AdminSectionHeader
+          title="Mentor economy revenue"
+          action={<AdminTextLink href={getMentorRevenuePendingRoutePath()}>View all</AdminTextLink>}
+        />
+        <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <AdminStatCard label="Total earned" value={formatKes(revenuePendingSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
+          <AdminStatCard label="This month" value={formatKes(revenuePendingSummary?.thisMonth ?? 0)} icon={CalendarDays} tone="blue" />
+          <AdminStatCard label="Total gross" value={formatKes(revenuePendingSummary?.totalGross ?? 0)} icon={TrendingUp} tone="purple" />
+          <AdminStatCard label="Total discount" value={formatKes(revenuePendingSummary?.totalDiscount ?? 0)} icon={TrendingDown} tone="orange" />
+          <AdminStatCard label="Platform share" value={formatKes(revenuePendingSummary?.platformShare ?? 0)} icon={Percent} tone="slate" />
         </div>
+        <AdminTableShell>
+          {revenuePendingError ? (
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load mentor economy revenue right now.</p>
+          ) : !revenuePendingLoading && revenueByMonth.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-500">No revenue data available yet.</p>
+          ) : (
+            <CommonDataTable
+              rows={revenueByMonth}
+              columns={mentorEconomyRevenueColumns}
+              getRowId={(row) => row.id}
+              loading={revenuePendingLoading}
+              paginationMode="client"
+              rowCount={revenueByMonth.length}
+              paginationModel={PREVIEW_PAGINATION_MODEL}
+              onPaginationModelChange={noopPaginationChange}
+            />
+          )}
+        </AdminTableShell>
       </AdminPanel>
     </AdminPage>
   );

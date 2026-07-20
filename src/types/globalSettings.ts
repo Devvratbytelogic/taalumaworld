@@ -47,6 +47,7 @@ export interface IGlobalSettingsAPIResponse {
     platformName: string;
     platformDescription: string;
     supportEmail: string;
+    default_tax_rate: number;
     emailNotificationsNewUsers: boolean;
     emailNotificationsPurchases: boolean;
     dailySummaryReports: boolean;

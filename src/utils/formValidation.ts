@@ -289,6 +289,10 @@ export const globalSettingsSchema = Yup.object({
   alt_phone: Yup.string().matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid alternate phone number'),
   address: Yup.string().trim(),
   copy_right_text: Yup.string().trim(),
+  default_tax_rate: Yup.number()
+    .typeError('Default tax rate must be a number')
+    .min(0, 'Default tax rate cannot be negative')
+    .max(100, 'Default tax rate cannot exceed 100'),
   // Header
   header_text: Yup.string().trim(),
   header_text_status: Yup.boolean(),

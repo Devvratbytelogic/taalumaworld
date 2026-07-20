@@ -1,6 +1,7 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type { IAllMentorTiersAPIResponse, IGetMentorTierByIdAPIResponse } from '@/types/mentorTier';
 import type { IAllMentorApplicationsAPIResponse } from '@/types/mentorApplication';
+import { IAllMentorTierUpgradeApplicationsAPIResponse, IGetMyMentorTierUpgradeApplicationAPIResponse } from '@/types/mentorTierUpgradeApplication';
 
 
 export const mentorApis = rtkQuerieSetup.injectEndpoints({
@@ -67,7 +68,7 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication'],
         }),
 
-        getMyMentorTierUpgradeApplication: builder.query<any, void>({
+        getMyMentorTierUpgradeApplication: builder.query<IGetMyMentorTierUpgradeApplicationAPIResponse, void>({
             query: () => ({
                 url: `/admin/mentor-tier-upgrade-applications/my`,
                 method: 'GET',
@@ -75,7 +76,7 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['MyMentorTierUpgradeApplication'],
         }),
 
-        getAllMentorTierUpgradeApplications: builder.query<any, { status?: string; page?: number; limit?: number; search?: string } | void>({
+        getAllMentorTierUpgradeApplications: builder.query<IAllMentorTierUpgradeApplicationsAPIResponse, { status?: string; page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
                 url: `/admin/mentor-tier-upgrade-applications`,
                 method: 'GET',

@@ -1,9 +1,5 @@
-import React from 'react';
+import { AdminMentorTierUpgradeApplicationsTab } from '@/components/admin/mentor/AdminMentorTierUpgradeApplicationsTab';
 
 export default function MentorTierUpgradesPage() {
-  return (
-    <>
-      <h1>Mentor Tier Upgrades</h1>
-    </>
-  )
+  return <AdminMentorTierUpgradeApplicationsTab />;
 }

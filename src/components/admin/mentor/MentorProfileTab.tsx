@@ -17,6 +17,7 @@ import {
   ExternalLink,
   Facebook,
   FileSignature,
+  Info,
   Landmark,
   Linkedin,
   Mail,
@@ -32,6 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { AdminEmptyState, AdminPage, AdminPageHeader, AdminPanel, AdminSectionHeader, adminPanelClass, } from '@/components/admin/layout/AdminContent';
 import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
 import { getPolicyBySlugRoutePath } from '@/routes/routes';
@@ -39,6 +41,7 @@ import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/store/rtkQueries/adminPostApi';
 import { useAcceptAgreementMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
 import { useGetMyMentorTierUpgradeApplicationQuery } from '@/store/rtkQueries/mentorApis';
+import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorApplication';
 import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
 import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
@@ -116,9 +119,8 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const { data: tierUpgradeData } = useGetMyMentorTierUpgradeApplicationQuery();
 
   const tierUpgradeApplication = tierUpgradeData?.data;
-  const isTierUpgradePending = tierUpgradeApplication?.status === 'pending_review';
-  const requestedTier = tierUpgradeApplication?.requested_tier_id;
-  const requestedTierCode = typeof requestedTier === 'object' && requestedTier ? (requestedTier).code : undefined;
+  const isTierUpgradePending = tierUpgradeApplication?.status === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW;
+  const isTierUpgradeRejected = tierUpgradeApplication?.status === VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED;
 
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
     enableReinitialize: true,
@@ -275,15 +277,40 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Mentor tier</p>
               <p className="mt-1 text-sm font-semibold text-slate-900">{profile?.mentor_economy?.tier?.code ?? '—'}</p>
               {isTierUpgradePending ? (
-                <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+                <p className="mt-1.5 flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-amber-700">
                   <Clock className="h-3.5 w-3.5 shrink-0" />
-                  {requestedTierCode ? `Upgrade to ${requestedTierCode} pending` : 'Upgrade pending review'}
+                  Upgrade pending
                 </p>
+              ) : isTierUpgradeRejected ? (
+                <div className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-xs font-medium text-red-600">
+                  <button
+                    type="button"
+                    onClick={() => setIsTierModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 hover:underline"
+                  >
+                    <Ban className="h-3.5 w-3.5 shrink-0" />
+                    Rejected · Retry
+                  </button>
+                  {tierUpgradeApplication?.decision_reason ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span
+                          tabIndex={0}
+                          aria-label="Rejection reason"
+                          className="inline-flex shrink-0 cursor-help items-center text-red-400 hover:text-red-600"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>{tierUpgradeApplication.decision_reason}</TooltipContent>
+                    </Tooltip>
+                  ) : null}
+                </div>
               ) : (
                 <button
                   type="button"
                   onClick={() => setIsTierModalOpen(true)}
-                  className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                  className="mt-1.5 inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-primary hover:underline"
                 >
                   <ArrowUpCircle className="h-3.5 w-3.5 shrink-0" />
                   Request upgrade

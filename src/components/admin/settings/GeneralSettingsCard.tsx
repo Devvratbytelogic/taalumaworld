@@ -25,6 +25,7 @@ const defaultValues = {
   alt_phone: '',
   address: '',
   copy_right_text: '',
+  default_tax_rate: 0,
   header_text: '',
   header_text_status: false,
   visible: 'chapter',
@@ -110,6 +111,7 @@ export function GeneralSettingsCard() {
     alt_phone: data?.alt_phone ?? '',
     address: data?.address ?? '',
     copy_right_text: data?.copy_right_text ?? '',
+    default_tax_rate: data?.default_tax_rate ?? 0,
     header_text: data?.header_text ?? '',
     header_text_status: data?.header_text_status ?? false,
     visible: data?.visible ?? 'chapter',
@@ -284,6 +286,11 @@ export function GeneralSettingsCard() {
                 <Label htmlFor="copy_right_text">Copyright Text</Label>
                 <Input {...field('copy_right_text')} />
                 <FieldError msg={touched.copy_right_text ? errors.copy_right_text : ''} />
+              </div>
+              <div>
+                <Label htmlFor="default_tax_rate">Default Tax Rate (%)</Label>
+                <Input type="number" min={0} max={100} step="0.01" {...field('default_tax_rate')} />
+                <FieldError msg={touched.default_tax_rate ? errors.default_tax_rate : ''} />
               </div>
 
               {/* Logo upload */}

@@ -35,7 +35,7 @@ import {
 
 /** Dashboard previews are static (no in-grid paging) — "View all" links to the full, paginated list. */
 const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
-const noopPaginationChange = () => {};
+const noopPaginationChange = () => { };
 
 const performanceColumns: GridColDef[] = [
   { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
@@ -124,9 +124,9 @@ export function MentorDashboardTab() {
     isError: revenueEarnedError,
   } = useGetBlueprintRevenueQuery({ page: 1, limit: 5 });
   const {
-    data: revenuePendingData,
-    isLoading: revenuePendingLoading,
-    isError: revenuePendingError,
+    data: economyRevenueData,
+    isLoading: economyRevenueLoading,
+    isError: economyRevenueError,
   } = useGetMentorEconomyRevenueQuery({ page: 1, limit: 5 });
 
   const performanceSummary = blueprintPerformanceData?.data?.summary;
@@ -141,8 +141,8 @@ export function MentorDashboardTab() {
   const revenueEarnedSummary = revenueEarnedData?.data?.summary;
   const topEarningBlueprints = revenueEarnedData?.data?.data?.data ?? [];
 
-  const revenuePendingSummary = revenuePendingData?.data?.summary;
-  const revenueByMonth = (revenuePendingData?.data?.data?.data ?? []).map((row, idx) => ({
+  const economyRevenueSummary = economyRevenueData?.data?.summary;
+  const revenueByMonth = (economyRevenueData?.data?.data?.data ?? []).map((row, idx) => ({
     ...row,
     id: `${row.month}-${idx}`,
   }));
@@ -257,23 +257,23 @@ export function MentorDashboardTab() {
           action={<AdminTextLink href={getMentorRevenueEarnedRoutePath()}>View all</AdminTextLink>}
         />
         <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <AdminStatCard label="Total earned" value={formatKes(revenuePendingSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
-          <AdminStatCard label="This month" value={formatKes(revenuePendingSummary?.thisMonth ?? 0)} icon={CalendarDays} tone="blue" />
-          <AdminStatCard label="Total gross" value={formatKes(revenuePendingSummary?.totalGross ?? 0)} icon={TrendingUp} tone="purple" />
-          <AdminStatCard label="Total discount" value={formatKes(revenuePendingSummary?.totalDiscount ?? 0)} icon={TrendingDown} tone="orange" />
-          <AdminStatCard label="Platform share" value={formatKes(revenuePendingSummary?.platformShare ?? 0)} icon={Percent} tone="slate" />
+          <AdminStatCard label="Total earned" value={formatKes(economyRevenueSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
+          <AdminStatCard label="This month" value={formatKes(economyRevenueSummary?.thisMonth ?? 0)} icon={CalendarDays} tone="blue" />
+          <AdminStatCard label="Total gross" value={formatKes(economyRevenueSummary?.totalGross ?? 0)} icon={TrendingUp} tone="purple" />
+          <AdminStatCard label="Total discount" value={formatKes(economyRevenueSummary?.totalDiscount ?? 0)} icon={TrendingDown} tone="orange" />
+          <AdminStatCard label="Platform share" value={formatKes(economyRevenueSummary?.platformShare ?? 0)} icon={Percent} tone="slate" />
         </div>
         <AdminTableShell>
-          {revenuePendingError ? (
+          {economyRevenueError ? (
             <p className="py-8 text-center text-sm text-slate-500">Unable to load mentor economy revenue right now.</p>
-          ) : !revenuePendingLoading && revenueByMonth.length === 0 ? (
+          ) : !economyRevenueLoading && revenueByMonth.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No revenue data available yet.</p>
           ) : (
             <CommonDataTable
               rows={revenueByMonth}
               columns={mentorEconomyRevenueColumns}
               getRowId={(row) => row.id}
-              loading={revenuePendingLoading}
+              loading={economyRevenueLoading}
               paginationMode="client"
               rowCount={revenueByMonth.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}

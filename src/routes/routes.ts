@@ -87,18 +87,6 @@ export function getMentorRevenueEarnedRoutePath(): string {
   return '/admin/mentor/revenue-earned';
 }
 
-export function getMentorRevenuePendingRoutePath(): string {
-  return '/admin/mentor/revenue-pending';
-}
-
-export function getMentorPaymentHistoryRoutePath(): string {
-  return '/admin/mentor/payment-history';
-}
-
-export function getMentorStatementsRoutePath(): string {
-  return '/admin/mentor/statements';
-}
-
 export function getMentorRevenueByBlueprintRoutePath(): string {
   return '/admin/mentor/revenue-by-blueprint';
 }
@@ -109,10 +97,6 @@ export function getMentorWalletRoutePath(): string {
 
 export function getMentorReferralsRoutePath(): string {
   return '/admin/mentor/referrals';
-}
-
-export function getMentorCouponsRoutePath(): string {
-  return '/admin/mentor/coupons';
 }
 
 export function getMentorBooksRoutePath(): string {

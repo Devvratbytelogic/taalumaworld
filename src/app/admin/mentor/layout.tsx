@@ -7,23 +7,19 @@ import {
   ArrowRight,
   BarChart3,
   Book,
-  Download,
   FileText,
-  History,
   LayoutDashboard,
   Link2,
   ShieldAlert,
   ShoppingCart,
-  Tag,
   TrendingUp,
-  UserCircle,
   Wallet,
 } from 'lucide-react';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
 import { useAdminResendOtpMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
@@ -31,17 +27,12 @@ import {
   getMentorBlueprintPerformanceRoutePath,
   getMentorBooksRoutePath,
   getMentorChaptersRoutePath,
-  getMentorCouponsRoutePath,
   getMentorDashboardRoutePath,
-  getMentorPaymentHistoryRoutePath,
   getMentorProfileRoutePath,
   getMentorReferralsRoutePath,
   getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
-  getMentorRevenuePendingRoutePath,
   getMentorSalesVolumeRoutePath,
-  getMentorStatementsRoutePath,
-  getMentorUsersRoutePath,
   getMentorWalletRoutePath,
 } from '@/routes/routes';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
@@ -59,7 +50,6 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     items: [
       { id: 'books', label: 'Series', href: getMentorBooksRoutePath(), icon: Book },
       { id: 'chapters', label: 'Blueprints', href: getMentorChaptersRoutePath(), icon: FileText },
-      // { id: 'categories', label: 'Categories', href: getMentorCategoriesRoutePath(), icon: FolderTree },
     ],
   },
   {
@@ -68,26 +58,16 @@ const NAV_GROUPS: SidebarNavGroup[] = [
       { id: 'blueprint_performance', label: 'Blueprint Performance', href: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3 },
       { id: 'sales_volume', label: 'Sales Volume', href: getMentorSalesVolumeRoutePath(), icon: ShoppingCart },
       { id: 'revenue_earned', label: 'Revenue Earned', href: getMentorRevenueEarnedRoutePath(), icon: KshIcon },
-      // { id: 'revenue_pending', label: 'Revenue Pending Payment', href: getMentorRevenuePendingRoutePath(), icon: Wallet },
       { id: 'revenue_by_blueprint', label: 'Revenue by Blueprint', href: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp },
       { id: 'wallet', label: 'Wallet & Payouts', href: getMentorWalletRoutePath(), icon: Wallet },
-      // { id: 'payment_history', label: 'Payment History', href: getMentorPaymentHistoryRoutePath(), icon: History },
-      // { id: 'statements', label: 'Downloadable Statements', href: getMentorStatementsRoutePath(), icon: Download },
     ],
   },
   {
     title: 'Growth',
     items: [
       { id: 'referrals', label: 'Referral Performance', href: getMentorReferralsRoutePath(), icon: Link2 },
-      // { id: 'coupons', label: 'Coupons & Promos', href: getMentorCouponsRoutePath(), icon: Tag },
     ],
   },
-  // {
-  //   title: 'User Management',
-  //   items: [
-  //     { id: 'users', label: 'Users', href: getMentorUsersRoutePath(), icon: UserCircle },
-  //   ],
-  // },
 ];
 
 export default function MentorLayout({ children }: { children: React.ReactNode }) {

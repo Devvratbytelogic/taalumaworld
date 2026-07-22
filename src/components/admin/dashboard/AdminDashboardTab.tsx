@@ -26,10 +26,9 @@ import {
   useGetSalesVolumeQuery,
 } from '@/store/rtkQueries/dashboard';
 import { getAdminSectionRoutePath } from '@/routes/routes';
+import { formatKes } from '@/constants/common';
 
-function formatKsh(amount: number): string {
-  return `KSh ${amount.toLocaleString()}`;
-}
+
 
 const MS_30D = 30 * 24 * 60 * 60 * 1000;
 
@@ -280,7 +279,7 @@ export default function AdminDashboardTab() {
                     <tr key={row.month} className="border-b border-slate-50 last:border-0">
                       <td className="py-3 font-medium text-slate-900">{row.month}</td>
                       <td className="py-3 text-slate-600">{row.sales}</td>
-                      <td className="py-3 text-right text-slate-900">{formatKsh(row.revenue)}</td>
+                      <td className="py-3 text-right text-slate-900">{formatKes(row.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -292,8 +291,8 @@ export default function AdminDashboardTab() {
         <AdminPanel>
           <AdminSectionHeader title="Blueprint revenue" />
           <div className="mb-5 grid grid-cols-2 gap-4">
-            <AdminStatCard label="Earned" value={formatKsh(revenueSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
-            <AdminStatCard label="Pending" value={formatKsh(revenueSummary?.totalPending ?? 0)} icon={TrendingUp} tone="orange" />
+            <AdminStatCard label="Earned" value={formatKes(revenueSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
+            <AdminStatCard label="Pending" value={formatKes(revenueSummary?.totalPending ?? 0)} icon={TrendingUp} tone="orange" />
           </div>
           {revenueLoading ? (
             <TableSkeleton columns={3} />
@@ -316,7 +315,7 @@ export default function AdminDashboardTab() {
                     <tr key={row.id} className="border-b border-slate-50 last:border-0">
                       <td className="py-3 font-medium text-slate-900">{row.title}</td>
                       <td className="py-3 text-slate-600">{row.sales}</td>
-                      <td className="py-3 text-right text-slate-900">{formatKsh(row.earned)}</td>
+                      <td className="py-3 text-right text-slate-900">{formatKes(row.earned)}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -71,8 +71,8 @@ const NAV_GROUPS: SidebarNavGroup[] = [
       // { id: 'revenue_pending', label: 'Revenue Pending Payment', href: getMentorRevenuePendingRoutePath(), icon: Wallet },
       { id: 'revenue_by_blueprint', label: 'Revenue by Blueprint', href: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp },
       { id: 'wallet', label: 'Wallet & Payouts', href: getMentorWalletRoutePath(), icon: Wallet },
-      { id: 'payment_history', label: 'Payment History', href: getMentorPaymentHistoryRoutePath(), icon: History },
-      { id: 'statements', label: 'Downloadable Statements', href: getMentorStatementsRoutePath(), icon: Download },
+      // { id: 'payment_history', label: 'Payment History', href: getMentorPaymentHistoryRoutePath(), icon: History },
+      // { id: 'statements', label: 'Downloadable Statements', href: getMentorStatementsRoutePath(), icon: Download },
     ],
   },
   {

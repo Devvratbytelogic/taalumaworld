@@ -21,7 +21,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/transactions', models: ['Transaction'] },
   { path: '/admin/orders', models: ['Order'] },
   { path: '/admin/coupons', models: ['Coupon'] },
-  { path: '/admin/withdrawal-requests', models: ['Withdrawal Request'] },
+  { path: '/admin/withdrawal-requests', models: ['Withdrawal'] },
   { path: '/admin/users', models: ['User'] },
   {
     path: '/admin/institutions',

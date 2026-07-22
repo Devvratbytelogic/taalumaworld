@@ -203,6 +203,9 @@ export const rtkQuerieSetup = createApi({
         'AdminCoupons',
         'AdminTaxes',
         'Address',
+        'WithdrawalLedger',
+        'WithdrawalRequests',
+        'AdminWithdrawals',
     ],
     endpoints: () => ({}),
 });

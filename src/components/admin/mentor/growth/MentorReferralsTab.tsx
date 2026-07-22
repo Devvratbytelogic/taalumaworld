@@ -12,7 +12,7 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { Badge } from '@/components/ui/badge';
-import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 import { useGetMyMentorReferralsQuery } from '@/store/rtkQueries/dashboard';
 import { IMentorReferralsAPIResponseDataEntity, MentorReferralStatus } from '@/types/dashboard';
 

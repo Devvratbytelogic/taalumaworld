@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   CircleAlert,
   Clock,
+  Copy,
   ExternalLink,
   Facebook,
   FileSignature,
@@ -180,6 +181,17 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
 
   const displayPhoto = tempPhoto || profile?.profile_pic || '';
   const displayName = values.name || profile?.name || 'Mentor';
+  const referralCode = profile?.short_code?.trim() || '';
+
+  const copyReferralCode = async () => {
+    if (!referralCode) return;
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      toast.success('Referral code copied', { description: referralCode });
+    } catch {
+      toast.error('Failed to copy referral code');
+    }
+  };
 
   return (
     <>
@@ -204,6 +216,18 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                   <Shield className="h-3.5 w-3.5" />
                   Mentor
                 </span>
+                {referralCode ? (
+                  <button
+                    type="button"
+                    onClick={copyReferralCode}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:border-primary/30 hover:text-primary transition-colors"
+                    title="Copy referral code"
+                  >
+                    <span className="text-slate-500 font-normal">Referral code</span>
+                    <span className="font-mono">{referralCode}</span>
+                    <Copy className="h-3.5 w-3.5 shrink-0" />
+                  </button>
+                ) : null}
                 {profile?.createdAt ? (
                   <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
                     <Calendar className="h-3.5 w-3.5" />

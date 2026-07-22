@@ -19,7 +19,7 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
-import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 import {
   useGetBlueprintPerformanceQuery,
   useGetBlueprintRevenueQuery,

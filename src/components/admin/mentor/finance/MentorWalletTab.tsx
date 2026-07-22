@@ -1,83 +1,229 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, ArrowDownToLine, RotateCcw, Wallet, X } from 'lucide-react';
-import {
-  AdminPage,
-  AdminPageHeader,
-  AdminPanel,
-  AdminStatCard,
-  AdminTableShell,
-} from '@/components/admin/layout/AdminContent';
+import { type GridColDef } from '@mui/x-data-grid';
+import { ArrowDownToLine, Wallet } from 'lucide-react';
+import { AdminPage, AdminPageHeader, AdminPanel, AdminStatCard } from '@/components/admin/layout/AdminContent';
+import CommonDataTable from '@/components/admin/CommonDataTable';
 import Button from '@/components/ui/Button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  formatKes,
-  MENTOR_OVERVIEW,
-  PAYOUT_SETTINGS,
-  REFUNDS_CHARGEBACKS,
-  WITHDRAWAL_FREQUENCIES,
-} from '@/components/admin/mentor/data/mentorPerformanceData';
-import toast from '@/utils/toast';
+import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
+import { useGetWithdrawalLedgerQuery } from '@/store/rtkQueries/walletAPIs';
+import { formatKes } from '@/constants/common';
+import type { IMentorLedgerWalletDataEntity } from '@/types/wallet';
+import MentorWithdrawalModal from './MentorWithdrawalModal';
+import { MentorWalletSearch } from './MentorWalletSearch';
+import moment from 'moment';
+
+function displayValue(value?: string | null) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : '—';
+}
+
+const DEBIT_ENTRY_TYPES = new Set(['refund_debit', 'payout_debit', 'withdrawal']);
+const CREDIT_ENTRY_TYPES = new Set(['sale_credit', 'referral_topup']);
+
+const ENTRY_TYPE_LABELS: Record<string, string> = {
+  refund_debit: 'Refund debit',
+  payout_debit: 'Payout debit',
+  withdrawal: 'Withdrawal',
+  sale_credit: 'Sale credit',
+  referral_topup: 'Referral top-up',
+};
+
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  pending: 'bg-amber-50 text-amber-700 border border-amber-200!',
+  approved: 'bg-emerald-50 text-emerald-700 border border-emerald-200!',
+  completed: 'bg-emerald-50 text-emerald-700 border border-emerald-200!',
+  rejected: 'bg-red-50 text-red-700 border border-red-200!',
+};
+
+function getEntryTypeLabel(entryType?: string | null) {
+  if (!entryType) return '—';
+  return ENTRY_TYPE_LABELS[entryType] ?? entryType.replaceAll('_', ' ');
+}
+
+function isDebitEntry(entryType?: string | null) {
+  return DEBIT_ENTRY_TYPES.has(String(entryType ?? '').toLowerCase());
+}
+
+function isCreditEntry(entryType?: string | null) {
+  return CREDIT_ENTRY_TYPES.has(String(entryType ?? '').toLowerCase());
+}
+
 
 export function MentorWalletTab() {
+  const { data: profileData, isLoading: isProfileLoading } = useGetAdminProfileQuery();
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [amount, setAmount] = useState('');
-  const [withdrawalMethod, setWithdrawalMethod] = useState(PAYOUT_SETTINGS.withdrawalMethod);
-  const [payoutFrequency, setPayoutFrequency] = useState(MENTOR_OVERVIEW.payoutFrequency);
-  const [amountError, setAmountError] = useState('');
+  const [entryType, setEntryType] = useState('');
+  const [status, setStatus] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
-  const canRequestWithdrawal = MENTOR_OVERVIEW.walletBalance >= MENTOR_OVERVIEW.payoutThreshold;
+  const { data: ledgerData, isLoading: isLedgerLoading, isFetching } = useGetWithdrawalLedgerQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    ...(entryType ? { type: entryType as 'credit' | 'debit' } : {}),
+    ...(status ? { status: status as 'pending' | 'completed' | 'rejected' } : {}),
+    ...(fromDate ? { fromDate } : {}),
+    ...(toDate ? { toDate } : {}),
+  });
 
-  const resetWithdrawForm = () => {
-    setAmount('');
-    setAmountError('');
-    setWithdrawalMethod(PAYOUT_SETTINGS.withdrawalMethod);
-    setPayoutFrequency(MENTOR_OVERVIEW.payoutFrequency);
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleEntryTypeChange = (value: string) => {
+    setEntryType(value);
+    resetToFirstPage();
   };
 
-  const handleWithdrawOpenChange = (open: boolean) => {
-    setWithdrawOpen(open);
-    if (!open) resetWithdrawForm();
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    resetToFirstPage();
   };
 
-  const handleSubmitWithdrawal = () => {
-    const value = Number(amount.replace(/,/g, ''));
-
-    if (!amount.trim() || Number.isNaN(value) || value <= 0) {
-      setAmountError('Enter a valid withdrawal amount.');
-      return;
-    }
-    if (value < MENTOR_OVERVIEW.payoutThreshold) {
-      setAmountError(`Minimum withdrawal is ${formatKes(MENTOR_OVERVIEW.payoutThreshold)}.`);
-      return;
-    }
-    if (value > MENTOR_OVERVIEW.walletBalance) {
-      setAmountError(`Amount cannot exceed your wallet balance of ${formatKes(MENTOR_OVERVIEW.walletBalance)}.`);
-      return;
-    }
-
-    toast.success(
-      `Withdrawal of ${formatKes(value)} via ${withdrawalMethod} submitted for Finance Admin review.`,
-    );
-    handleWithdrawOpenChange(false);
+  const handleFromDateChange = (value: string) => {
+    setFromDate(value);
+    resetToFirstPage();
   };
+
+  const handleToDateChange = (value: string) => {
+    setToDate(value);
+    resetToFirstPage();
+  };
+
+  const profile = profileData?.data;
+  const mentorInfo = profile?.mentor_info;
+  const bankName = mentorInfo?.bank_name;
+  const accountName = profile?.name;
+  const accountNumber = mentorInfo?.bank_number;
+  const mpesaNumber = mentorInfo?.mpesa_number;
+  const taxId = mentorInfo?.tax_id;
+  const currency = profile?.mentor_economy?.wallet?.currency || 'KES';
+  const preferredFrequency = mentorInfo?.preferred_payment_frequency || '';
+
+  const walletSummary = ledgerData?.data?.summary;
+  const rows = ledgerData?.data?.data ?? [];
+  const total = ledgerData?.data?.total ?? 0;
+  const loading = isLedgerLoading || isFetching;
+
+  const columns: GridColDef<IMentorLedgerWalletDataEntity>[] = [
+    {
+      field: 'index',
+      headerName: '#',
+      width: 60,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
+        const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+        return (
+          <span className="text-sm text-muted-foreground">
+            {paginationModel.page * paginationModel.pageSize + rowIndex + 1}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'date',
+      headerName: 'Date',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => (params.value ? moment(params.value).format('DD MMM YYYY hh:mm A') : '-'),
+    },
+    {
+      field: 'entry_type',
+      headerName: 'Entry',
+      width: 140,
+      sortable: false,
+      renderCell: (params) => {
+        const rowEntryType = String(params.value ?? '').toLowerCase();
+        const isDebit = isDebitEntry(rowEntryType);
+        const isCredit = isCreditEntry(rowEntryType);
+        return (
+          <span
+            className={
+              isDebit
+                ? 'text-red-700'
+                : isCredit
+                  ? 'text-emerald-700'
+                  : 'text-slate-700'
+            }
+          >
+            {getEntryTypeLabel(rowEntryType)}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      flex: 1,
+      minWidth: 180,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="truncate text-sm text-slate-700">{displayValue(params.value)}</span>
+      ),
+    },
+    {
+      field: 'transaction_id',
+      headerName: 'Transaction',
+      width: 150,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="font-mono text-xs text-slate-600">{displayValue(params.value)}</span>
+      ),
+    },
+    {
+      field: 'order_id',
+      headerName: 'Order',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="font-mono text-xs text-slate-600">{displayValue(params.value)}</span>
+      ),
+    },
+    {
+      field: 'amount',
+      headerName: 'Amount',
+      width: 130,
+      sortable: false,
+      renderCell: (params) => {
+        const entryType = String(params.row.entry_type ?? '').toLowerCase();
+        const isDebit = isDebitEntry(entryType);
+        return (
+          <span className={isDebit ? 'font-medium text-red-600' : 'font-medium text-emerald-700'}>
+            {isDebit ? '-' : '+'}
+            {formatKes(Math.abs(params.value ?? 0))}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'payout_method',
+      headerName: 'Payout method',
+      width: 140,
+      sortable: false,
+      renderCell: (params) => <span className="capitalize">{displayValue(params.value)}</span>,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => {
+        const status = String(params.value ?? '').toLowerCase();
+        return (
+          <span
+            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
+              STATUS_BADGE_CLASS[status] ?? 'bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            {displayValue(params.value)}
+          </span>
+        );
+      },
+    },
+  ];
 
   return (
     <AdminPage>
@@ -90,7 +236,6 @@ export function MentorWalletTab() {
           type="button"
           className="global_btn rounded_full bg_primary"
           startContent={<ArrowDownToLine className="h-4 w-4" />}
-          isDisabled={!canRequestWithdrawal}
           onPress={() => setWithdrawOpen(true)}
         >
           Request withdrawal
@@ -98,156 +243,85 @@ export function MentorWalletTab() {
       </AdminPageHeader>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AdminStatCard label="Wallet balance" value={formatKes(MENTOR_OVERVIEW.walletBalance)} icon={Wallet} tone="green" />
-        <AdminStatCard label="Payout threshold" value={formatKes(MENTOR_OVERVIEW.payoutThreshold)} icon={Wallet} tone="blue" />
-        <AdminStatCard label="Payout frequency" value={payoutFrequency} icon={Wallet} tone="purple" />
+        <AdminStatCard label="Total earnings" value={formatKes(walletSummary?.lifetime_earnings ?? 0)} icon={Wallet} tone="green" />
+        <AdminStatCard label="Wallet balance" value={formatKes(walletSummary?.balance ?? 0)} icon={Wallet} tone="green" />
+        <AdminStatCard label="Available balance" value={formatKes(walletSummary?.available_balance ?? 0)} icon={Wallet} tone="blue" />
+        <AdminStatCard label="Total withdrawals" value={formatKes(walletSummary?.total_withdrawn ?? 0)} icon={Wallet} tone="purple" />
+        <AdminStatCard label="Pending withdrawals" value={formatKes(walletSummary?.pending_withdrawals ?? 0)} icon={Wallet} tone="purple" />
       </div>
-
-      {!canRequestWithdrawal ? (
-        <p className="text-sm text-amber-700">
-          Your balance is below the minimum withdrawal amount of {formatKes(MENTOR_OVERVIEW.payoutThreshold)}.
-        </p>
-      ) : null}
 
       <AdminPanel>
         <h2 className="mb-4 text-base font-semibold text-slate-900">Payment details</h2>
-        <dl className="grid gap-3 sm:grid-cols-2 text-sm">
-          <div><dt className="text-slate-500">Bank</dt><dd className="font-medium text-slate-900">{PAYOUT_SETTINGS.bankName}</dd></div>
-          <div><dt className="text-slate-500">Account name</dt><dd className="font-medium text-slate-900">{PAYOUT_SETTINGS.accountName}</dd></div>
-          <div><dt className="text-slate-500">Account number</dt><dd className="font-medium text-slate-900">{PAYOUT_SETTINGS.accountNumber}</dd></div>
-          <div><dt className="text-slate-500">M-Pesa</dt><dd className="font-medium text-slate-900">{PAYOUT_SETTINGS.mpesaNumber}</dd></div>
-          <div><dt className="text-slate-500">Tax ID (KRA PIN)</dt><dd className="font-medium text-slate-900">{PAYOUT_SETTINGS.taxId}</dd></div>
-          <div><dt className="text-slate-500">Country / currency</dt><dd className="font-medium text-slate-900">{PAYOUT_SETTINGS.country} · {PAYOUT_SETTINGS.preferredCurrency}</dd></div>
-        </dl>
+        {isProfileLoading ? (
+          <div className="grid gap-3 sm:grid-cols-2 animate-pulse">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-3 w-20 rounded bg-slate-100" />
+                <div className="h-4 w-36 rounded bg-slate-100" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <dl className="grid gap-3 sm:grid-cols-2 text-sm">
+            <div>
+              <dt className="text-slate-500">Bank</dt>
+              <dd className="font-medium text-slate-900">{displayValue(bankName)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Account name</dt>
+              <dd className="font-medium text-slate-900">{displayValue(accountName)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Account number</dt>
+              <dd className="font-medium text-slate-900">{displayValue(accountNumber)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">M-Pesa</dt>
+              <dd className="font-medium text-slate-900">{displayValue(mpesaNumber)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Tax ID (KRA PIN)</dt>
+              <dd className="font-medium text-slate-900">{displayValue(taxId)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Currency</dt>
+              <dd className="font-medium text-slate-900">{displayValue(currency)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Preferred payment frequency</dt>
+              <dd className="font-medium text-slate-900 capitalize">{displayValue(preferredFrequency)}</dd>
+            </div>
+          </dl>
+        )}
       </AdminPanel>
 
-      <AdminTableShell>
-        <div className="border-b border-slate-100 px-5 py-3">
-          <h2 className="text-base font-semibold text-slate-900">Refunds & chargebacks</h2>
+      <div className="space-y-4">
+        <MentorWalletSearch
+          entryType={entryType}
+          onEntryTypeChange={handleEntryTypeChange}
+          status={status}
+          onStatusChange={handleStatusChange}
+          fromDate={fromDate}
+          onFromDateChange={handleFromDateChange}
+          toDate={toDate}
+          onToDateChange={handleToDateChange}
+        />
+
+        <div className="overflow-hidden rounded-md border border-gray-200">
+          <CommonDataTable
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.id}
+            loading={loading}
+            paginationMode="server"
+            rowCount={total}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+          />
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
-                <th className="px-5 py-3 font-medium">Date</th>
-                <th className="px-5 py-3 font-medium">Blueprint</th>
-                <th className="px-5 py-3 font-medium">Type</th>
-                <th className="px-5 py-3 font-medium">Amount</th>
-                <th className="px-5 py-3 font-medium text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {REFUNDS_CHARGEBACKS.map((row) => (
-                <tr key={`${row.date}-${row.blueprint}`} className="border-b border-slate-50 last:border-0">
-                  <td className="px-5 py-4 text-slate-600">{row.date}</td>
-                  <td className="px-5 py-4 font-medium text-slate-900">{row.blueprint}</td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex items-center gap-1 text-slate-700">
-                      {row.type === 'Refund' ? <RotateCcw className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
-                      {row.type}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-red-600">-{formatKes(row.amount)}</td>
-                  <td className="px-5 py-4 text-right text-slate-600">{row.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </AdminTableShell>
+      </div>
 
-      <Dialog open={withdrawOpen} onOpenChange={handleWithdrawOpenChange}>
-        <DialogContent size="md" className="admin_panel max-w-md">
-          <DialogHeader>
-            <DialogTitle>Request withdrawal</DialogTitle>
-            <DialogDescription>
-              Enter the amount you want to withdraw. Finance Admin will review and process approved requests.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmitWithdrawal();
-            }}
-            className="admin_panel flex min-h-0 flex-col"
-          >
-            <div className="space-y-4 py-4">
-              <div className="rounded-lg border border-sky-100 bg-sky-50/80 px-3 py-2.5 text-sm text-sky-900">
-                Available balance: {formatKes(MENTOR_OVERVIEW.walletBalance)} · Minimum:{' '}
-                {formatKes(MENTOR_OVERVIEW.payoutThreshold)}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="withdraw-amount">
-                  Amount (KES)<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="withdraw-amount"
-                  type="number"
-                  min={MENTOR_OVERVIEW.payoutThreshold}
-                  max={MENTOR_OVERVIEW.walletBalance}
-                  placeholder="Enter amount"
-                  value={amount}
-                  onChange={(e) => {
-                    setAmount(e.target.value);
-                    setAmountError('');
-                  }}
-                  className={amountError ? 'border-red-500' : ''}
-                />
-                {amountError ? <p className="text-sm text-red-600">{amountError}</p> : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="withdraw-method">Withdrawal method</Label>
-                <Select value={withdrawalMethod} onValueChange={(v) => setWithdrawalMethod(v as typeof withdrawalMethod)}>
-                  <SelectTrigger id="withdraw-method">
-                    <SelectValue placeholder="Select method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="M-Pesa">M-Pesa ({PAYOUT_SETTINGS.mpesaNumber})</SelectItem>
-                    <SelectItem value="Bank transfer">Bank transfer ({PAYOUT_SETTINGS.accountNumber})</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="withdraw-frequency">Payout frequency</Label>
-                <Select value={payoutFrequency} onValueChange={setPayoutFrequency}>
-                  <SelectTrigger id="withdraw-frequency">
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {WITHDRAWAL_FREQUENCIES.map((freq) => (
-                      <SelectItem key={freq} value={freq}>
-                        {freq}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                className="global_btn rounded_full outline_primary"
-                onPress={() => handleWithdrawOpenChange(false)}
-                startContent={<X className="h-4 w-4" />}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="global_btn rounded_full bg_primary"
-                startContent={<ArrowDownToLine className="h-4 w-4" />}
-              >
-                Submit request
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <MentorWithdrawalModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
     </AdminPage>
   );
 }

@@ -7,7 +7,8 @@ import {
   AdminStatCard,
   AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
-import { COUPON_PERFORMANCE, formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { COUPON_PERFORMANCE } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 
 const totalRedemptions = COUPON_PERFORMANCE.reduce((s, r) => s + r.redemptions, 0);
 const totalGenerated = COUPON_PERFORMANCE.reduce((s, r) => s + r.revenueGenerated, 0);

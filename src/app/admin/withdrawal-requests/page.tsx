@@ -1,9 +1,7 @@
-import React from 'react'
+'use client';
+
+import { AdminWithdrawalsTab } from '@/components/admin/withdrawals/AdminWithdrawalsTab';
 
 export default function WithdrawalRequestsPage() {
-  return (
-    <>
-      <h1>Withdrawal Requests</h1>
-    </>
-  )
+  return <AdminWithdrawalsTab />;
 }

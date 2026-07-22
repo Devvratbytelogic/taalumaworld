@@ -11,7 +11,7 @@ import {
   AdminStatCard,
 } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
-import { formatKes } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetBlueprintRevenueQuery } from '@/store/rtkQueries/dashboard';
 

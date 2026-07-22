@@ -8,7 +8,8 @@ import {
   AdminStatCard,
 } from '@/components/admin/layout/AdminContent';
 import Button from '@/components/ui/Button';
-import { formatKes, STATEMENTS } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { STATEMENTS } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 import toast from '@/utils/toast';
 
 export function MentorStatementsTab() {

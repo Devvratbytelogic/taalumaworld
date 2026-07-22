@@ -1,7 +1,3 @@
-export function formatKes(amount: number) {
-  return `KES ${amount.toLocaleString()}`;
-}
-
 export const MENTOR_OVERVIEW = {
   profileCompletion: 85,
   verificationStatus: 'Not Applied' as const,

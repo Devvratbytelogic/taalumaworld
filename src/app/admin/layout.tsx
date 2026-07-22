@@ -28,7 +28,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Order', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
             { model: 'Coupon', id: 'coupons', label: 'Coupons', href: getAdminSectionRoutePath('coupons'), icon: Tag },
             { model: 'Tax', id: 'taxes', label: 'Taxes', href: getAdminSectionRoutePath('taxes'), icon: Percent },
-            // { model: 'Withdrawal Request', id: 'withdrawal_requests', label: 'Withdrawal Requests', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
+            { model: 'Withdrawal', id: 'withdrawal_requests', label: 'Withdrawals', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
         ],
     },
     {
@@ -107,7 +107,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
             />
 
             <main className="min-w-0 lg:ml-(--admin-sidebar-width)">
-                <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:py-7">{children}</div>
+                <div className="mx-auto w-full max-w-360 px-4 py-6 sm:px-6 lg:py-7">{children}</div>
             </main>
         </div>
     );

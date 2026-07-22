@@ -7,7 +7,8 @@ import {
   AdminStatCard,
   AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
-import { formatKes, PAYMENT_HISTORY } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { PAYMENT_HISTORY } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 
 const paidTotal = PAYMENT_HISTORY.filter((row) => row.status === 'Paid').reduce(
   (sum, row) => sum + row.amount,

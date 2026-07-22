@@ -8,10 +8,10 @@ import {
   AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
 import {
-  formatKes,
   MENTOR_OVERVIEW,
   PENDING_PAYOUTS,
 } from '@/components/admin/mentor/data/mentorPerformanceData';
+import { formatKes } from '@/constants/common';
 
 const nextPayoutDate = PENDING_PAYOUTS[0]?.payoutDate ?? '—';
 

@@ -1,5 +1,3 @@
-import type { BlueprintStatus } from '@/constants/blueprint';
-
 export interface IAllChaptersAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -16,23 +14,36 @@ export interface IAllChaptersAPIResponseData {
   totalPages: number;
 }
 export interface IChapter {
+  aiCriteria: AiCriteria;
   _id: string;
   number: number;
   title: string;
   slug: string;
+  short_code: string;
   description: string;
   content: string;
   isFree: boolean;
   coverImage: string;
-  pdf: string;
+  pdf?: string | null;
   page: number;
   price: number;
-  status: BlueprintStatus;
+  status: string;
+  createdBy: CreatedBy;
   deletedAt?: null;
+  isPublishAllowed: boolean;
+  aiReview?: string | null;
+  aiScore?: number | null;
+  aiClassification?: string | null;
+  aiWordCount?: number | null;
+  aiScoredAt?: string | null;
+  aiScoringStatus: string;
+  isContentFlagged: boolean;
+  contentFlagTypes?: (string | null)[] | null;
+  contentFlagDetails?: string | null;
+  contentFlaggedAt?: string | null;
   meta_title: string;
   meta_description: string;
   og_title: string;
-  createdBy: ICreatedBy;
   og_description: string;
   og_image: string;
   json_ld: string;
@@ -40,9 +51,25 @@ export interface IChapter {
   updatedAt: string;
   __v: number;
   id: string;
-  series: ISeries;
+  series: Series;
 }
-export interface ISeries {
+export interface AiCriteria {
+  authenticity?: number | null;
+  storytelling?: number | null;
+  educational_value?: number | null;
+  career_insight?: number | null;
+  actionability?: number | null;
+  originality?: number | null;
+  taaluma_fit?: number | null;
+}
+export interface CreatedBy {
+  _id: string;
+  name: string;
+  email: string;
+  profile_pic?: string | null;
+  id: string;
+}
+export interface Series {
   _id: string;
   title: string;
   slug: string;
@@ -52,13 +79,6 @@ export interface ISeries {
   id: string;
 }
 
-export interface ICreatedBy {
-  _id: string;
-  name: string;
-  profile_pic: string;
-  email: string;
-  id: string;
-}
 
 /** Lean blueprint lookup, filtered by book ids (used to populate blueprint pickers) */
 export interface IBlueprintsByBookIdsAPIResponse {

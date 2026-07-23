@@ -74,7 +74,7 @@ export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps
                   isPositive ? 'text-emerald-600' : 'text-red-600',
                 )}
               >
-                {isPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                {/* {isPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />} */}
                 <span>{Math.abs(stat.change)}%</span>
               </div>
             </div>

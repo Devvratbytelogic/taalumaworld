@@ -21,8 +21,8 @@ import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQu
 import { useDebounce } from '@/hooks/useDebounce';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  active: 'bg-green-50 text-green-700 border-green-200',
-  suspended: 'bg-red-50 text-red-700 border-red-200',
+  active: 'bg-green-50 text-green-700 border-green-200!',
+  suspended: 'bg-red-50 text-red-700 border-red-200!',
 };
 
 export function AdminUsersTab() {

@@ -174,6 +174,9 @@ export default function CartPage() {
               itemCount={itemCount}
               discountAmount={discountAmount}
               taxAmount={taxAmount}
+              taxPercent={cartData?.tax_percent}
+              couponType={cartData?.coupon_type}
+              couponValue={cartData?.coupon_value}
               cartId={cartData?._id}
               selectedAddressId={selectedAddressId}
               onPaymentSuccess={() => setIsPaymentConfirmed(true)}

@@ -62,38 +62,42 @@ export interface ISingleOrderAPIResponse {
     http_status_code: number;
     http_status_msg: string;
     success: boolean;
-    data: ISingleOrderData;
+    data: IOrder;
     message: string;
     timestamp: string;
-}
-export interface ISingleOrderData {
+  }
+  export interface IOrder {
     id: string;
     orderId: number;
     invoiceNumber: number;
     itemCount: number;
     item: string;
+    type: string;
     paymentType: string;
     totalAmount: number;
     discountAmount: number;
-    couponCode: string | null;
-    couponDiscount: number | null;
+    couponCode: string;
+    couponDiscount: number;
+    coupon_value: number;
+    couponType: string;
     taxAmount: number;
     status: string;
     paymentStatus: string;
     paymentMethod: string;
     transactionId: string;
-    paidAt: string | null;
+    tax_percent: number;
+    paidAt: string;
     createdAt: string;
-    customer: IOrderCustomer;
-    items: IOrderLineItem[];
-}
-export interface IOrderCustomer {
+    customer: Customer;
+    items?: (IOrderItem)[] | null;
+  }
+  export interface Customer {
     id: string;
     name: string;
     email: string;
     phone: string;
-}
-export interface IOrderLineItem {
+  }
+  export interface IOrderItem {
     id: string;
     type: string;
     title: string;
@@ -101,4 +105,5 @@ export interface IOrderLineItem {
     price: number;
     total: number;
     legacyType: string;
-}
+  }
+  

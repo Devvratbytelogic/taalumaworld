@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import moment from 'moment';
-import { ArrowLeft, Download, ShoppingBag, User } from 'lucide-react';
+import { ArrowLeft, Download, ShoppingBag, TicketPercent, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
@@ -18,6 +18,12 @@ import {
 import { useGetOrderByIdQuery } from '@/store/rtkQueries/adminGetApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import { API_BASE_URL } from '@/utils/config';
+
+function isPercentCouponType(couponType?: string | null) {
+  const normalized = (couponType ?? '').toLowerCase();
+  return normalized === 'percent' || normalized === 'percentage';
+}
+
 
 const PAYMENT_STATUS_BADGE_CLASS: Record<string, string> = {
   paid: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -112,8 +118,15 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
     );
   }
 
-  const statusKey = (order.status || '').toLowerCase();
   const paymentStatusKey = (order.paymentStatus || '').toLowerCase();
+  const couponTypeLabel = order.couponType;
+  const isPercentCoupon = isPercentCouponType(order.couponType);
+  const couponValueLabel =
+    order.coupon_value != null
+      ? isPercentCoupon
+        ? `${Number(order.coupon_value)}%`
+        : `KSH ${Number(order.coupon_value).toFixed(2)}`
+      : null;
 
   return (
     <AdminPage>
@@ -186,9 +199,15 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
           <DetailRow label="Transaction ID" value={order.transactionId} />
           <DetailRow label="Payment Method" value={order.paymentMethod} />
           <DetailRow label="Coupon Code" value={order.couponCode} />
+          <DetailRow label="Coupon Type" value={couponTypeLabel} />
+          <DetailRow label="Coupon Value" value={couponValueLabel} />
           <DetailRow
             label="Coupon Discount"
             value={order.couponDiscount != null ? `KSH ${Number(order.couponDiscount).toFixed(2)}` : null}
+          />
+          <DetailRow
+            label="Tax Percent"
+            value={order.tax_percent != null ? `${Number(order.tax_percent)}%` : null}
           />
           <DetailRow
             label="Paid At"
@@ -212,7 +231,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-primary">KSH {(item.total ?? 0).toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">KSH {(item.price ?? 0).toFixed(2)} each</p>
+                {/* <p className="text-xs text-muted-foreground">KSH {(item.price ?? 0).toFixed(2)} each</p> */}
               </div>
             </div>
           ))}
@@ -221,21 +240,52 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
       {/* Totals */}
       <AdminPanel className="p-6">
-        <AdminSectionHeader title="Totals" />
+        <AdminSectionHeader title="Order Summary" />
         <dl className="space-y-2.5">
           <div className="flex items-center justify-between text-sm">
-            <dt className="text-muted-foreground">Discount</dt>
-            <dd className="font-medium">KSH {(order.discountAmount ?? 0).toFixed(2)}</dd>
+            <dt className="text-muted-foreground">Items</dt>
+            <dd className="font-medium">{order.itemCount ?? order.items?.length ?? 0}</dd>
           </div>
+          {(order.discountAmount ?? 0) > 0 || (order.couponDiscount ?? 0) > 0 ? (
+            <div className="flex items-center justify-between text-sm">
+              <dt className="text-muted-foreground">
+                Discount
+                {isPercentCoupon && order.coupon_value != null
+                  ? ` (${Number(order.coupon_value)}%)`
+                  : ''}
+              </dt>
+              <dd className="font-medium text-success">
+                -KSH {Number(order.couponDiscount ?? order.discountAmount ?? 0).toFixed(2)}
+              </dd>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between text-sm">
-            <dt className="text-muted-foreground">Tax</dt>
+            <dt className="text-muted-foreground">
+              Tax{order.tax_percent != null ? ` (${Number(order.tax_percent)}%)` : ''}
+            </dt>
             <dd className="font-medium">KSH {(order.taxAmount ?? 0).toFixed(2)}</dd>
           </div>
-          <div className="flex items-center justify-between text-base pt-2.5 border-t border-border">
-            <dt className="font-semibold">Total</dt>
-            <dd className="font-bold text-primary">KSH {(order.totalAmount ?? 0).toFixed(2)}</dd>
-          </div>
         </dl>
+
+        {order.couponCode ? (
+          <div className="mt-4 flex items-center justify-between gap-2 rounded-md border border-success/30! bg-success/5 px-3 py-2.5">
+            <div className="flex items-center gap-2 text-sm min-w-0">
+              <TicketPercent className="h-4 w-4 shrink-0 text-success" />
+              <span className="truncate font-semibold text-success">{order.couponCode}</span>
+              <span className="text-muted-foreground">applied</span>
+              {couponTypeLabel || couponValueLabel ? (
+                <span className="text-muted-foreground truncate">
+                  ({[couponTypeLabel, couponValueLabel].filter(Boolean).join(' · ')})
+                </span>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-4 flex items-center justify-between text-base pt-2.5 border-t border-border">
+          <span className="font-semibold">Total</span>
+          <span className="font-bold text-primary">KSH {(order.totalAmount ?? 0).toFixed(2)}</span>
+        </div>
       </AdminPanel>
     </AdminPage>
   );

@@ -21,13 +21,13 @@ import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
+import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { BLUEPRINT_STATUSES, DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
+import { BLUEPRINT_STATUSES, DEFAULT_BLUEPRINT_STATUS, type BlueprintStatus } from '@/constants/blueprint';
 
 
 
@@ -65,7 +65,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const requiredAgreementIds = blueprintAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
   const chapterData = chapterResponse?.data;
+  const canPublish = chapterData?.isPublishAllowed ?? false;
 
+  const isStatusBlocked = (status: string) => {
+    if (status === 'Published' && !canPublish) return true;
+    if (canPublish && (status === 'Pending' || status === 'Review')) return true;
+    return false;
+  };
 
   const initialFormValues = {
     bookId: chapterData?.series?.id ?? '',
@@ -95,6 +101,15 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
     },
     onSubmit: async (vals) => {
+      if (isStatusBlocked(vals.status)) {
+        toast.error(
+          vals.status === 'Published'
+            ? 'This blueprint cannot be published yet'
+            : 'Pending and Review are unavailable once publishing is allowed',
+        );
+        return;
+      }
+
       const formData = new FormData();
       formData.append('book', vals.bookId);
       formData.append('number', String(vals.sequence));
@@ -437,23 +452,32 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             </div>
           )}
           <div className="space-y-2 max-w-xs">
-            <Label>Status <span className="text-red-500">*</span></Label>
-            <Select
+            <Label htmlFor="chapter-status">Status <span className="text-red-500">*</span></Label>
+            <select
+              id="chapter-status"
+              name="status"
               value={values.status}
-              onValueChange={(value) => {
+              onChange={(e) => {
+                const value = e.target.value as BlueprintStatus;
+                if (isStatusBlocked(value)) return;
                 setFieldValue('status', value);
                 setFieldTouched('status', true);
               }}
+              onBlur={handleBlur}
+              disabled={isSubmittingState}
+              className={cn(nativeSelectClassName, errors.status && touched.status && 'border-red-500')}
             >
-              <SelectTrigger className={errors.status && touched.status ? 'border-red-500' : undefined}>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                {BLUEPRINT_STATUSES.map((status) => (
-                  <SelectItem key={status} value={status}>{status}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {BLUEPRINT_STATUSES.map((status) => (
+                <option key={status} value={status} disabled={isStatusBlocked(status)}>
+                  {status}
+                </option>
+              ))}
+            </select>
+            {!canPublish ? (
+              <p className="text-xs text-amber-600">Publishing not allowed yet</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">Pending and Review unavailable</p>
+            )}
             {errors.status && touched.status && (
               <p className="text-sm text-red-600">{errors.status}</p>
             )}

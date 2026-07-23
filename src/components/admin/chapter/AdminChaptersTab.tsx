@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter, usePathname } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2 } from 'lucide-react';
+import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2, Flag } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
 import {
     useDeleteChapterMutation,
@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getEditChapterRoutePath, getViewChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
-import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG } from '@/constants/blueprint';
+import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 
 const STATUS_CONFIG = BLUEPRINT_STATUS_CONFIG;
 const STATUSES = BLUEPRINT_STATUSES;
@@ -63,7 +63,6 @@ export function AdminChaptersTab() {
     const bookOptions = (booksResponse?.data?.data ?? []).map((b) => ({ id: b._id ?? b.id, title: b.title }));
 
     const chaptersData = chaptersResponse?.data;
-    
     const chapters = chaptersData?.data ?? [];
     const totalChapters = chaptersData?.total ?? 0;
 
@@ -99,8 +98,16 @@ export function AdminChaptersTab() {
         }
     };
 
-    const handleStatusChange = async (chapter: IChapter, status: string) => {
+    const handleStatusChange = async (chapter: IChapter, status: BlueprintStatus) => {
         if (status === chapter.status || updatingId) return;
+        if (status === 'Published' && !chapter.isPublishAllowed) {
+            toast.error('This blueprint cannot be published yet');
+            return;
+        }
+        if (chapter.isPublishAllowed && (status === 'Pending' || status === 'Review')) {
+            toast.error('Pending and Review are unavailable once publishing is allowed');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('status', status);
@@ -118,7 +125,7 @@ export function AdminChaptersTab() {
         }
     };
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef<IChapter>[] = [
         {
             field: 'index',
             headerName: '#',
@@ -153,13 +160,23 @@ export function AdminChaptersTab() {
                         ) : null}
                     </div>
                     <div className="min-w-0">
-                        <p className="font-medium text-sm whitespace-nowrap">{params.row.title}</p>
+                        <p className="font-medium text-sm whitespace-nowrap flex items-center gap-1.5">
+                            {params.row.title}
+                            {params.row.isContentFlagged ? (
+                                <span title={params.row.contentFlagDetails ?? 'Content flagged'}>
+                                    <Flag className="h-3.5 w-3.5 text-red-500 shrink-0" />
+                                </span>
+                            ) : null}
+                        </p>
+                        {params.row.short_code ? (
+                            <p className="text-xs text-muted-foreground font-mono">{params.row.short_code}</p>
+                        ) : null}
                     </div>
                 </div>
             ),
         },
         {
-            field: 'book',
+            field: 'series',
             headerName: 'Series',
             minWidth: 160,
             sortable: false,
@@ -169,7 +186,7 @@ export function AdminChaptersTab() {
             ),
         },
         {
-            field: 'mentor',
+            field: 'createdBy',
             headerName: 'Mentor',
             minWidth: 160,
             sortable: false,
@@ -185,9 +202,36 @@ export function AdminChaptersTab() {
             sortable: false,
             renderCell: (params) => (
                 <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                    KSH {Number(params.value).toFixed(2)}
+                    {params.row.isFree ? 'Free' : `KSH ${Number(params.row.price ?? 0).toFixed(2)}`}
                 </span>
             ),
+        },
+        {
+            field: 'aiScore',
+            headerName: 'AI Score',
+            width: 110,
+            sortable: false,
+            renderCell: (params) => {
+                const score = params.row.aiScore;
+                const scoringStatus = params.row.aiScoringStatus;
+                if (score == null) {
+                    return (
+                        <span className="text-sm text-muted-foreground whitespace-nowrap">
+                            {scoringStatus && scoringStatus !== 'completed' ? scoringStatus : '—'}
+                        </span>
+                    );
+                }
+                return (
+                    <span className="text-sm font-medium whitespace-nowrap" title={params.row.aiClassification ?? undefined}>
+                        {score}
+                        {params.row.aiClassification ? (
+                            <span className="block text-xs text-muted-foreground font-normal truncate max-w-24">
+                                {params.row.aiClassification}
+                            </span>
+                        ) : null}
+                    </span>
+                );
+            },
         },
         {
             field: 'status',
@@ -195,8 +239,9 @@ export function AdminChaptersTab() {
             width: 150,
             sortable: false,
             renderCell: (params) => {
-                const chapter = params.row ;
-                const config = STATUS_CONFIG[chapter.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.Draft;
+                const chapter = params.row;
+                const config = STATUS_CONFIG[chapter.status as BlueprintStatus] ?? STATUS_CONFIG.Draft;
+                const canPublish = chapter.isPublishAllowed;
 
                 return (
                     <DropdownMenu>
@@ -216,25 +261,38 @@ export function AdminChaptersTab() {
                                 </Badge>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-44">
+                        <DropdownMenuContent align="start" className="w-48">
                             <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
                                 Change status
                             </DropdownMenuLabel>
+                            {!canPublish ? (
+                                <p className="px-2 pb-1 text-[11px] text-amber-600">
+                                    Publishing not allowed yet
+                                </p>
+                            ) : (
+                                <p className="px-2 pb-1 text-[11px] text-muted-foreground">
+                                    Pending and Review unavailable
+                                </p>
+                            )}
                             <DropdownMenuSeparator />
-                            {STATUSES.map((s) => (
-                                <DropdownMenuItem
-                                    key={s}
-                                    onSelect={() => handleStatusChange(chapter, s)}
-                                    className="flex items-center gap-2"
-                                    disabled={chapter.status === s}
-                                >
-                                    <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[s].dot}`} />
-                                    {STATUS_CONFIG[s].label}
-                                    {chapter.status === s ? (
-                                        <span className="ml-auto text-xs text-muted-foreground">current</span>
-                                    ) : null}
-                                </DropdownMenuItem>
-                            ))}
+                            {STATUSES.map((s) => {
+                                const publishBlocked = s === 'Published' && !canPublish;
+                                const reviewBlocked = canPublish && (s === 'Pending' || s === 'Review');
+                                return (
+                                    <DropdownMenuItem
+                                        key={s}
+                                        onSelect={() => handleStatusChange(chapter, s)}
+                                        className="flex items-center gap-2"
+                                        disabled={chapter.status === s || publishBlocked || reviewBlocked}
+                                    >
+                                        <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[s].dot}`} />
+                                        {STATUS_CONFIG[s].label}
+                                        {chapter.status === s ? (
+                                            <span className="ml-auto text-xs text-muted-foreground">current</span>
+                                        ) : null}
+                                    </DropdownMenuItem>
+                                );
+                            })}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );

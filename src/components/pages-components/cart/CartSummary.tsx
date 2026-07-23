@@ -19,6 +19,11 @@ function formatCouponValue(coupon: IAllCouponsDataEntity): string {
   return `KSH ${coupon.value?.toLocaleString?.() ?? coupon.value} off`;
 }
 
+function isPercentCouponType(couponType?: string | null) {
+  const normalized = (couponType ?? '').toLowerCase();
+  return normalized === 'percent' || normalized === 'percentage';
+}
+
 interface CartSummaryProps {
   isCheckoutPage?: boolean;
   cartId?: string;
@@ -28,6 +33,9 @@ interface CartSummaryProps {
   itemCount: number;
   discountAmount: number;
   taxAmount: number;
+  taxPercent?: number | null;
+  couponType?: string | null;
+  couponValue?: number | null;
   onPaymentSuccess: () => void;
   isLoading?: boolean;
   couponCode?: string | null;
@@ -42,6 +50,9 @@ export default function CartSummary({
   itemCount,
   discountAmount,
   taxAmount,
+  taxPercent = null,
+  couponType = null,
+  couponValue = null,
   onPaymentSuccess,
   isLoading = false,
   couponCode = null,
@@ -57,6 +68,12 @@ export default function CartSummary({
   });
 
   const availableCoupons = allCouponsResponse?.data?.data ?? [];
+  const isPercentCoupon = isPercentCouponType(couponType);
+  const couponPercentLabel =
+    isPercentCoupon && couponValue != null ? `${Number(couponValue)}%` : null;
+  const couponTypeLabel = couponType
+    ? COUPON_TYPE_LABELS[couponType as keyof typeof COUPON_TYPE_LABELS] ?? couponType
+    : null;
 
   const handleApplyCoupon = async (code: string) => {
     const trimmedCode = code.trim();
@@ -113,7 +130,9 @@ export default function CartSummary({
         </div>
         {discountAmount > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Discount</span>
+            <span className="text-muted-foreground">
+              Discount{couponPercentLabel ? ` (${couponPercentLabel})` : ''}
+            </span>
             <span className="font-medium text-success">
               -KSH {discountAmount.toFixed(2)}
             </span>
@@ -121,7 +140,9 @@ export default function CartSummary({
         )}
         {taxAmount > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Tax</span>
+            <span className="text-muted-foreground">
+              Tax{taxPercent != null ? ` (${Number(taxPercent)}%)` : ''}
+            </span>
             <span className="font-medium">KSH {taxAmount.toFixed(2)}</span>
           </div>
         )}
@@ -134,6 +155,21 @@ export default function CartSummary({
               <TicketPercent className="h-4 w-4 shrink-0 text-success" />
               <span className="truncate font-semibold text-success">{couponCode}</span>
               <span className="text-muted-foreground">applied</span>
+              {couponTypeLabel || couponPercentLabel || (!isPercentCoupon && couponValue != null) ? (
+                <span className="text-muted-foreground truncate">
+                  (
+                  {[
+                    couponTypeLabel,
+                    couponPercentLabel
+                      ?? (!isPercentCoupon && couponValue != null
+                        ? `KSH ${Number(couponValue).toFixed(2)}`
+                        : null),
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                  )
+                </span>
+              ) : null}
             </div>
             <button
               type="button"

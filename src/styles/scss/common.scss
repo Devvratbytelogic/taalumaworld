@@ -25,6 +25,12 @@
             @apply bg-green-600 text-white;
         }
     }
+    .warning_button {
+        @apply border border-amber-500 rounded-sm p-2 text-amber-500 hover:bg-amber-500 hover:text-white cursor-pointer;
+        &:hover {
+            @apply bg-amber-500 text-white;
+        }
+    }
 }
 .gradient_text {
     @apply bg-linear-to-r from-primary via-primary-light to-secondary-accent bg-clip-text text-transparent;

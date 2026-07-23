@@ -17,13 +17,13 @@ import moment from 'moment';
 function StatusBadge({ status }: { status: string }) {
     if (status === 'active') {
         return (
-            <Badge className="bg-green-100 text-green-700 border-green-200 gap-1 capitalize whitespace-nowrap">
+            <Badge className="bg-green-100 text-green-700 border-green-200! gap-1 capitalize whitespace-nowrap">
                 <CheckCircle className="h-3 w-3 shrink-0" /> Active
             </Badge>
         );
     }
     return (
-        <Badge className="bg-amber-100 text-amber-700 border-amber-200 gap-1 capitalize whitespace-nowrap">
+        <Badge className="bg-amber-100 text-amber-700 border-amber-200! gap-1 capitalize whitespace-nowrap">
             <AlertCircle className="h-3 w-3 shrink-0" /> Suspended
         </Badge>
     );

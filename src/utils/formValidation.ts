@@ -501,6 +501,27 @@ export const staffStatusSchema = Yup.object({
   status_reason: Yup.string().trim().required('Reason is required'),
 });
 
+// Edit platform user (admin users module) — PUT /admin/update-users/:id (form-data)
+export const editUserSchema = Yup.object({
+  name: Yup.string().trim().required('Full name is required'),
+  email: emailRules.label('Email'),
+  phone: Yup.string()
+    .trim()
+    .test(
+      'phone-or-empty',
+      'Enter a valid phone number',
+      (value) => !value || /^\+?[0-9\s\-().]{7,15}$/.test(value),
+    ),
+  facebook: Yup.string()
+    .trim()
+    .test('url-or-empty', 'Enter a valid Facebook URL', (value) => !value || /^https?:\/\/.+/i.test(value)),
+  linkedin: Yup.string()
+    .trim()
+    .test('url-or-empty', 'Enter a valid LinkedIn URL', (value) => !value || /^https?:\/\/.+/i.test(value)),
+  professionalBio: Yup.string().trim(),
+  profile_pic: Yup.mixed().nullable(),
+});
+
 // Add / Edit Agreement Type Modal Validation Schema
 export const agreementTypeSchema = Yup.object({
   name: Yup.string().trim().min(2, 'Name is required').required('Name is required'),

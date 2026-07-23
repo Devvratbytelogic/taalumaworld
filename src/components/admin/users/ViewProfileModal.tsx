@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail, Ban, CircleCheck, X } from 'lucide-react';
+import { Ban, CircleCheck, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,6 @@ interface ViewProfileModalProps {
   user: IAllUsersEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSendEmail?: (user: IAllUsersEntity) => void;
   onSuspend?: (user: IAllUsersEntity) => void;
 }
 
@@ -26,7 +25,6 @@ export function ViewProfileModal({
   user,
   open,
   onOpenChange,
-  onSendEmail,
   onSuspend,
 }: ViewProfileModalProps) {
   if (!user) return null;
@@ -80,6 +78,10 @@ export function ViewProfileModal({
               <dd className="mt-1 text-sm capitalize text-slate-700">{user.user_type ?? '-'}</dd>
             </div>
             <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Phone</dt>
+              <dd className="mt-1 text-sm text-slate-700">{user.phone || user.phone_number || '-'}</dd>
+            </div>
+            <div>
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Join date</dt>
               <dd className="mt-1 text-sm text-slate-700">
                 {user.createdAt
@@ -118,16 +120,6 @@ export function ViewProfileModal({
           >
             Close
           </Button>
-          {onSendEmail && (
-            <Button
-              type="button"
-              onPress={() => onSendEmail(user)}
-              className="global_btn rounded_full bg_primary"
-              startContent={<Mail className="h-4 w-4" />}
-            >
-              Send Email
-            </Button>
-          )}
           {onSuspend && (
             <Button
               type="button"

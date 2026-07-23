@@ -71,6 +71,14 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminStaff'],
         }),
+        updateUser: builder.mutation({
+            query: ({ id, payload }: { id: string; payload: FormData }) => ({
+                url: `/admin/update-users/${id}`,
+                method: 'PUT',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminStaff'],
+        }),
         updateStaffStatus: builder.mutation({
             query: ({ id, payload }) => ({
                 url: `/admin/update-user-status/${id}`,
@@ -78,6 +86,12 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                 body: payload,
             }),
             invalidatesTags: ['AdminStaff'],
+        }),
+        generatePasswordResetLink: builder.mutation({
+            query: (id: string) => ({
+                url: `/admin/generate-pasword-reset-link/${id}`,
+                method: 'POST',
+            }),
         }),
 
         getRolePermissions: builder.query<IAllRolePermissionsAPIResponse, string>({
@@ -120,5 +134,7 @@ export const {
     useGetAllModelsQuery,
     useAddStaffMutation,
     useUpdateStaffMutation,
+    useUpdateUserMutation,
     useUpdateStaffStatusMutation,
+    useGeneratePasswordResetLinkMutation,
 } = rolesPermissionsApi;

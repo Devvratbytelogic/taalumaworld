@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Mail, Ban, CircleCheck } from 'lucide-react';
+import { Eye, Ban, CircleCheck, Edit2, KeyRound, Loader2 } from 'lucide-react';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,8 +16,13 @@ import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminUsersHeader } from './AdminUsersHeader';
 import { AdminUsersSearch } from './AdminUsersSearch';
 import { ViewProfileModal } from './ViewProfileModal';
+import { EditUserModal } from './EditUserModal';
 import { SuspendUserDialog } from './SuspendUserDialog';
-import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
+import {
+  useGetAllUsersQuery,
+  useUpdateStaffStatusMutation,
+  useGeneratePasswordResetLinkMutation,
+} from '@/store/rtkQueries/rolesPermissionsApi';
 import { useDebounce } from '@/hooks/useDebounce';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -28,8 +33,10 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
 export function AdminUsersTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [profileUser, setProfileUser] = useState<IAllUsersEntity | null>(null);
+  const [editUser, setEditUser] = useState<IAllUsersEntity | null>(null);
   const [suspendUser, setSuspendUser] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -40,6 +47,7 @@ export function AdminUsersTab() {
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
   });
   const [updateUserStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
+  const [generatePasswordResetLink] = useGeneratePasswordResetLinkMutation();
 
   const users = usersResponse?.data?.data ?? [];
   const totalUsers = usersResponse?.data?.total ?? 0;
@@ -55,8 +63,23 @@ export function AdminUsersTab() {
     setProfileUser(user);
   };
 
-  const handleSendEmail = (user: IAllUsersEntity) => {
-    window.location.href = `mailto:${user.email}`;
+  const handleEditUser = (user: IAllUsersEntity) => {
+    setEditUser(user);
+  };
+
+  const handleResetPassword = async (user: IAllUsersEntity) => {
+    if (resettingPasswordId) return;
+    setResettingPasswordId(user._id);
+    try {
+      const res = await generatePasswordResetLink(user._id).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? `Password reset link sent for "${user.name}"`);
+      }
+    } catch {
+      toast.error(`Failed to generate password reset link for "${user.name}"`);
+    } finally {
+      setResettingPasswordId(null);
+    }
   };
 
   const handleSuspend = (user: IAllUsersEntity) => {
@@ -130,6 +153,17 @@ export function AdminUsersTab() {
       renderCell: (params) => <span className="text-sm text-slate-700 truncate">{params.row.email}</span>,
     },
     {
+      field: 'phone_number',
+      headerName: 'Phone',
+      minWidth: 140,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-700 truncate">
+          {params.row.phone || params.row.phone_number || '-'}
+        </span>
+      ),
+    },
+    {
       field: 'role',
       headerName: 'Role',
       minWidth: 200,
@@ -175,10 +209,11 @@ export function AdminUsersTab() {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 200,
       sortable: false,
       renderCell: (params) => {
         const isSuspended = params.row.status === 'suspended';
+        const isResetting = resettingPasswordId === params.row._id;
         return (
           <div className="action_buttons">
             <button
@@ -192,10 +227,23 @@ export function AdminUsersTab() {
             <button
               type="button"
               className="edit_button"
-              title="Send email"
-              onClick={() => handleSendEmail(params.row)}
+              title="Edit user"
+              onClick={() => handleEditUser(params.row)}
             >
-              <Mail className="h-4 w-4" />
+              <Edit2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="warning_button"
+              title="Reset password"
+              disabled={!!resettingPasswordId}
+              onClick={() => handleResetPassword(params.row)}
+            >
+              {isResetting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="h-4 w-4" />
+              )}
             </button>
             <button
               type="button"
@@ -234,8 +282,13 @@ export function AdminUsersTab() {
         user={profileUser}
         open={!!profileUser}
         onOpenChange={(open) => !open && setProfileUser(null)}
-        onSendEmail={handleSendEmail}
         onSuspend={handleSuspendFromProfile}
+      />
+
+      <EditUserModal
+        user={editUser}
+        open={!!editUser}
+        onOpenChange={(open) => !open && setEditUser(null)}
       />
 
       <SuspendUserDialog

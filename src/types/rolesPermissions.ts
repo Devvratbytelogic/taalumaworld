@@ -48,6 +48,8 @@ export interface IAllUsersEntity {
   _id: string;
   name: string;
   email: string;
+  phone?: string | null;
+  phone_number?: string | null;
   is_verified: boolean;
   status: string;
   linkedin?: string | null;

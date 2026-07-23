@@ -17,8 +17,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  active: 'bg-green-50 text-green-700 border-green-200',
-  suspended: 'bg-red-50 text-red-700 border-red-200',
+  active: 'bg-green-50 text-green-700 border-green-200!',
+  suspended: 'bg-red-50 text-red-700 border-red-200!',
 };
 
 const formatWalletBalance = (balance?: number | null, currency?: string | null) => {
@@ -142,11 +142,11 @@ export function AdminAuthorsTab() {
       sortable: false,
       renderCell: (params) =>
         params.row.mentor_economy?.is_verified_mentor ? (
-          <Badge variant="outline" className="gap-1 bg-blue-50 text-blue-700 border-blue-200">
+          <Badge variant="outline" className="gap-1 bg-blue-50 text-blue-700 border-blue-200!">
             <BadgeCheck className="h-3 w-3" /> Verified
           </Badge>
         ) : (
-          <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200">
+          <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200!">
             Unverified
           </Badge>
         ),

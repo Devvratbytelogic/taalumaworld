@@ -11,6 +11,10 @@ export interface IAdminProfileAPIResponseData {
   name: string;
   profile_pic?: string | null;
   email: string;
+  phone?: string | null;
+  isEmailPrivate?: boolean;
+  isNamePrivate?: boolean;
+  isPhonePrivate?: boolean;
   is_verified: boolean;
   status: string;
   isSuspended?: boolean;

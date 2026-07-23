@@ -55,7 +55,7 @@ export function SuspendUserDialog({
       <DialogContent className="admin_panel max-w-sm">
         <form noValidate onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isSuspended ? 'Activate User' : 'Suspend User'}</DialogTitle>
+            <DialogTitle>{isSuspended ? 'Activate Customer' : 'Suspend Customer'}</DialogTitle>
             <DialogDescription>
               {user
                 ? isSuspended

@@ -276,6 +276,13 @@ export const updateProfileSchema = Yup.object({
 // Mentor Profile Tab — Profile details (name, bio, social links) Validation Schema
 export const mentorProfileDetailsSchema = Yup.object({
   name: Yup.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be at most 60 characters').required('Name is required'),
+  phone: Yup.string()
+    .trim()
+    .test(
+      'phone-or-empty',
+      'Enter a valid phone number',
+      (value) => !value || /^\+?[0-9\s\-().]{7,15}$/.test(value),
+    ),
   professionalBio: Yup.string()
     .trim()
     .min(2, 'Bio must be at least 2 characters')
@@ -283,6 +290,9 @@ export const mentorProfileDetailsSchema = Yup.object({
     .required('Professional bio is required'),
   facebook: Yup.string().trim().url('Enter a valid URL').optional(),
   linkedin: Yup.string().trim().url('Enter a valid URL').optional(),
+  isEmailPrivate: Yup.boolean(),
+  isNamePrivate: Yup.boolean(),
+  isPhonePrivate: Yup.boolean(),
 });
 
 // Mentor Profile Tab — Payout details (bank / M-Pesa / tax) Validation Schema

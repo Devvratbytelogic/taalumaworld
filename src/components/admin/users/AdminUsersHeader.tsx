@@ -8,11 +8,11 @@ interface AdminUsersHeaderProps {
 export function AdminUsersHeader({ totalCount }: AdminUsersHeaderProps) {
   return (
     <AdminPageHeader
-      title="User management"
-      description="View and manage all users on the platform"
+      title="Customer management"
+      description="View and manage all customers on the platform"
     >
       <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
-        Total users: {totalCount}
+        Total customers: {totalCount}
       </Badge>
     </AdminPageHeader>
   );

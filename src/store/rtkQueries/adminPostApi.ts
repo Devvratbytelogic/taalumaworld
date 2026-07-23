@@ -174,6 +174,14 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminProfile'],
         }),
+        updateProfilePic: builder.mutation({
+            query: (payload: FormData) => ({
+                url: `/admin/update-profile-pic`,
+                method: 'PUT',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminProfile'],
+        }),
         updateMentorInfo: builder.mutation({
             query: (payload) => ({
                 url: `/admin/update-mentor-info`,
@@ -251,5 +259,6 @@ export const {
 
     // Admin Profile
     useUpdateAdminProfileMutation,
+    useUpdateProfilePicMutation,
     useUpdateMentorInfoMutation,
 } = adminPostApi;

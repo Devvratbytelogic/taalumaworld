@@ -61,7 +61,7 @@ export function UpdateStaffStatusModal() {
                 <form noValidate onSubmit={handleSubmit}>
                     <ModalHeader className="flex flex-col gap-1">
                         <p className="text-xl font-bold">
-                            {isSuspending ? 'Suspend Staff Member' : 'Activate Staff Member'}
+                            {isSuspending ? 'Suspend Institutional Staff' : 'Activate Institutional Staff'}
                         </p>
                         <p className="text-sm font-normal text-muted-foreground">
                             {isSuspending

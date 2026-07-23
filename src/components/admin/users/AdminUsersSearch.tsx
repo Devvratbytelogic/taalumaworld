@@ -13,7 +13,7 @@ export function AdminUsersSearch({ searchQuery, onSearchChange }: AdminUsersSear
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search users by name or email..."
+          placeholder="Search customers by name or email..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10"

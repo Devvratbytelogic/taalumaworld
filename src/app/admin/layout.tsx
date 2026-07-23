@@ -35,7 +35,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'User Management',
         items: [
             { model: 'User', id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
-            { model: 'Staff', id: 'staff', label: 'Staff', href: getAdminSectionRoutePath('staff'), icon: UserCog },
+            { model: 'Staff', id: 'staff', label: 'Institutional Staff', href: getAdminSectionRoutePath('staff'), icon: UserCog },
             { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
     },

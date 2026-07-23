@@ -36,7 +36,7 @@ export function ViewProfileModal({
       <DialogContent className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
           <DialogTitle>{user.name}</DialogTitle>
-          <DialogDescription>Read-only view of the user&apos;s profile.</DialogDescription>
+          <DialogDescription>Read-only view of the customer&apos;s profile.</DialogDescription>
         </DialogHeader>
 
         <div className="custom_scrollbar flex-1 space-y-5 overflow-y-auto p-6!">
@@ -74,7 +74,7 @@ export function ViewProfileModal({
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">User type</dt>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Customer type</dt>
               <dd className="mt-1 text-sm capitalize text-slate-700">{user.user_type ?? '-'}</dd>
             </div>
             <div>
@@ -127,7 +127,7 @@ export function ViewProfileModal({
               className={`global_btn rounded_full ${isSuspended ? 'success_btn' : 'danger_btn'}`}
               startContent={isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
             >
-              {isSuspended ? 'Activate User' : 'Suspend User'}
+              {isSuspended ? 'Activate Customer' : 'Suspend Customer'}
             </Button>
           )}
         </DialogFooter>

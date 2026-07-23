@@ -28,9 +28,9 @@ const TABS: { model: string; id: Tab; label: string; icon: React.ElementType; de
   {
     model: 'Staff',
     id: 'staff',
-    label: 'Staff Assignments',
+    label: 'Institutional Staff',
     icon: UserCog,
-    description: 'Assign roles to administrators and mentors',
+    description: 'Assign roles to institutional staff members',
   },
 ];
 

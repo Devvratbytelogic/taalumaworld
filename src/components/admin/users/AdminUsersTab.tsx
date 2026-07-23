@@ -1,6 +1,6 @@
 /**
- * Admin Users Tab
- * View and manage platform users
+ * Admin Customers Tab
+ * View and manage platform customers
  */
 
 'use client';
@@ -130,7 +130,7 @@ export function AdminUsersTab() {
     },
     {
       field: 'name',
-      headerName: 'User',
+      headerName: 'Customer',
       minWidth: 220,
       flex: 1,
       sortable: false,
@@ -165,7 +165,7 @@ export function AdminUsersTab() {
     },
     {
       field: 'role',
-      headerName: 'Role',
+      headerName: 'Customer Type',
       minWidth: 200,
       flex: 1,
       sortable: false,
@@ -220,7 +220,7 @@ export function AdminUsersTab() {
             <button
               type="button"
               className="edit_button"
-              title="Edit user"
+              title="Edit customer"
               onClick={() => handleEditUser(params.row)}
             >
               <Edit2 className="h-4 w-4" />
@@ -241,7 +241,7 @@ export function AdminUsersTab() {
             <button
               type="button"
               className={isSuspended ? 'active_button' : 'delete_button'}
-              title={isSuspended ? 'Activate user' : 'Suspend user'}
+              title={isSuspended ? 'Activate customer' : 'Suspend customer'}
               onClick={() => handleSuspend(params.row)}
             >
               {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}

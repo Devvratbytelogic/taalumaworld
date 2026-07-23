@@ -4,11 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useFormik } from 'formik';
 import { Avatar } from '@heroui/react';
-import { Ban, Calendar, Camera, Check, CheckCircle2, Facebook, Linkedin, Lock, Mail, Pencil, Shield, User, X } from 'lucide-react';
+import { Ban, Calendar, Camera, Check, CheckCircle2, Facebook, Linkedin, Lock, Mail, Pencil, Phone, Shield, User, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   AdminPage,
   AdminPageHeader,
@@ -20,10 +21,50 @@ import { useUpdateAdminProfileMutation } from '@/store/rtkQueries/adminPostApi';
 import { mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
+import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function PrivacyBadge({ isPrivate }: { isPrivate?: boolean }) {
+  return (
+    <span
+      className={cn(
+        'ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide',
+        isPrivate ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700',
+      )}
+    >
+      {isPrivate ? 'Private' : 'Public'}
+    </span>
+  );
+}
+
+function PrivacyToggle({
+  id,
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  disabled,
+}: {
+  id: string;
+  label: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 px-3.5 py-2.5">
+      <div>
+        <p className="text-sm font-medium text-slate-900">{label}</p>
+        <p className="text-xs text-slate-500">{description}</p>
+      </div>
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
+    </div>
+  );
 }
 
 function ProfileSkeleton() {
@@ -44,13 +85,17 @@ export function AdminProfileTab() {
   const [updateAdminProfile] = useUpdateAdminProfileMutation();
   const profile = profileData?.data;
 
-  const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
+  const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm, setFieldValue } = useFormik({
     enableReinitialize: true,
     initialValues: {
       name: profile?.name ?? '',
+      phone: profile?.phone ?? '',
       professionalBio: profile?.professionalBio ?? '',
       facebook: profile?.facebook ?? '',
       linkedin: profile?.linkedin ?? '',
+      isEmailPrivate: profile?.isEmailPrivate ?? false,
+      isNamePrivate: profile?.isNamePrivate ?? false,
+      isPhonePrivate: profile?.isPhonePrivate ?? false,
     },
     validationSchema: mentorProfileDetailsSchema,
     onSubmit: async (formValues) => {
@@ -58,9 +103,13 @@ export function AdminProfileTab() {
         const formData = new FormData();
         formData.append('name', formValues.name.trim());
         formData.append('email', profile?.email ?? '');
+        formData.append('phone', formValues.phone.trim());
         formData.append('professionalBio', formValues.professionalBio?.trim() ?? '');
         formData.append('facebook', formValues.facebook?.trim() ?? '');
         formData.append('linkedin', formValues.linkedin?.trim() ?? '');
+        formData.append('isEmailPrivate', String(formValues.isEmailPrivate));
+        formData.append('isNamePrivate', String(formValues.isNamePrivate));
+        formData.append('isPhonePrivate', String(formValues.isPhonePrivate));
         if (photoFile) formData.append('profile_pic', photoFile);
 
         const res = await updateAdminProfile(formData).unwrap();
@@ -129,7 +178,7 @@ export function AdminProfileTab() {
       <AdminPanel padding={false} className="overflow-hidden">
         <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-6 py-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <Avatar src={displayPhoto} name={displayName} className="h-24 w-24 text-2xl ring-4 ring-white shadow-md" />
+            <ProfileAvatarUpload src={profile?.profile_pic ?? ''} name={displayName} />
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-semibold text-slate-900">{profile?.name ?? '—'}</h2>
               <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
@@ -137,7 +186,7 @@ export function AdminProfileTab() {
                 {profile?.email ?? '—'}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20! bg-primary/10! px-3 py-1 text-xs font-medium text-primary">
                   <Shield className="h-3.5 w-3.5" />
                   {roleName}
                 </span>
@@ -145,8 +194,8 @@ export function AdminProfileTab() {
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium capitalize',
                     isSuspended
-                      ? 'border-red-200 bg-red-50 text-red-700'
-                      : 'border-emerald-200 bg-emerald-50 text-emerald-700',
+                      ? 'border-red-200! bg-red-50 text-red-700'
+                      : 'border-emerald-200! bg-emerald-50 text-emerald-700',
                   )}
                 >
                   {isSuspended ? <Ban className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
@@ -167,13 +216,29 @@ export function AdminProfileTab() {
           {!isEditing ? (
             <dl className="grid gap-6 sm:grid-cols-2">
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Full name</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Full name
+                  <PrivacyBadge isPrivate={profile?.isNamePrivate} />
+                </dt>
                 <dd className="mt-1 text-sm font-medium text-slate-900">{profile?.name ?? '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Email</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Email
+                  <PrivacyBadge isPrivate={profile?.isEmailPrivate} />
+                </dt>
                 <dd className="mt-1 text-sm font-medium text-slate-900">{profile?.email ?? '—'}</dd>
                 <p className="mt-1 text-xs text-slate-400">Email cannot be changed</p>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Phone number
+                  <PrivacyBadge isPrivate={profile?.isPhonePrivate} />
+                </dt>
+                <dd className="mt-1 flex items-center gap-1.5 text-sm font-medium text-slate-900">
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  {profile?.phone || '—'}
+                </dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Role</dt>
@@ -294,6 +359,23 @@ export function AdminProfileTab() {
                   <p className="text-xs text-slate-400">Email cannot be changed</p>
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="phone">Phone number</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={values.phone}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    placeholder="e.g. +254712345678"
+                    className={errors.phone && touched.phone ? 'border-red-500' : ''}
+                  />
+                  {errors.phone && touched.phone ? (
+                    <p className="text-sm text-red-600">{errors.phone}</p>
+                  ) : null}
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="facebook">Facebook URL</Label>
                   <Input
                     id="facebook"
@@ -320,6 +402,36 @@ export function AdminProfileTab() {
                     className={errors.linkedin && touched.linkedin ? 'border-red-500' : ''}
                   />
                   {errors.linkedin && touched.linkedin ? <p className="text-sm text-red-600">{errors.linkedin}</p> : null}
+                </div>
+                <div className="space-y-3 sm:col-span-2">
+                  <p className="text-sm font-medium text-slate-900">Privacy</p>
+                  <p className="text-xs text-slate-500">Control what others can see on your public profile.</p>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <PrivacyToggle
+                      id="isNamePrivate"
+                      label="Hide name"
+                      description="Keep your name private"
+                      checked={values.isNamePrivate}
+                      onCheckedChange={(checked) => setFieldValue('isNamePrivate', checked)}
+                      disabled={isSubmitting}
+                    />
+                    <PrivacyToggle
+                      id="isEmailPrivate"
+                      label="Hide email"
+                      description="Keep your email private"
+                      checked={values.isEmailPrivate}
+                      onCheckedChange={(checked) => setFieldValue('isEmailPrivate', checked)}
+                      disabled={isSubmitting}
+                    />
+                    <PrivacyToggle
+                      id="isPhonePrivate"
+                      label="Hide phone"
+                      description="Keep your phone private"
+                      checked={values.isPhonePrivate}
+                      onCheckedChange={(checked) => setFieldValue('isPhonePrivate', checked)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="professionalBio">Bio</Label>

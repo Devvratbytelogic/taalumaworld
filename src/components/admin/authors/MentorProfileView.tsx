@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
-  Mail,
   Ban,
   CircleCheck,
   Linkedin,
@@ -138,10 +137,6 @@ export function MentorProfileView() {
 
   const mentor = mentorsResponse?.data?.data?.find((item) => item._id === mentorId) ?? null;
 
-  const handleSendEmail = () => {
-    if (mentor) window.location.href = `mailto:${mentor.email}`;
-  };
-
   const handleSuspendClick = () => {
     if (mentor) setSuspendMentor(mentor);
   };
@@ -211,13 +206,6 @@ export function MentorProfileView() {
       {backLink}
 
       <AdminPageHeader eyebrow="Mentor Management" title={mentor.name} description={mentor.email}>
-        <Button
-          onPress={handleSendEmail}
-          className="global_btn rounded_full outline_primary"
-          startContent={<Mail className="h-4 w-4" />}
-        >
-          Send Email
-        </Button>
         <Button
           onPress={handleSuspendClick}
           className={`global_btn rounded_full ${isSuspended ? 'success_btn' : 'danger_btn'}`}

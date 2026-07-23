@@ -23,6 +23,7 @@ import {
   Linkedin,
   Mail,
   Pencil,
+  Phone,
   Receipt,
   Shield,
   ShieldCheck,
@@ -47,6 +48,7 @@ import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
 import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
+import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import moment from 'moment';
 
 const PAYOUT_FREQUENCIES = ["monthly", "quarterly", "annually"] as const;
@@ -81,6 +83,45 @@ function FormField({ id, label, value, onChange, onBlur, error, disabled, placeh
         className={error ? 'border-red-500' : ''}
       />
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+    </div>
+  );
+}
+
+function PrivacyBadge({ isPrivate }: { isPrivate?: boolean }) {
+  return (
+    <span
+      className={cn(
+        'ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide',
+        isPrivate ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700',
+      )}
+    >
+      {isPrivate ? 'Private' : 'Public'}
+    </span>
+  );
+}
+
+function PrivacyToggle({
+  id,
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  disabled,
+}: {
+  id: string;
+  label: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3.5 py-2.5">
+      <div>
+        <p className="text-sm font-medium text-slate-900">{label}</p>
+        <p className="text-xs text-slate-500">{description}</p>
+      </div>
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
     </div>
   );
 }
@@ -123,13 +164,17 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const isTierUpgradePending = tierUpgradeApplication?.status === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW;
   const isTierUpgradeRejected = tierUpgradeApplication?.status === VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED;
 
-  const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } = useFormik({
+  const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm, setFieldValue } = useFormik({
     enableReinitialize: true,
     initialValues: {
       name: profile?.name ?? '',
+      phone: profile?.phone ?? '',
       professionalBio: profile?.professionalBio ?? '',
       facebook: profile?.facebook ?? '',
       linkedin: profile?.linkedin ?? '',
+      isEmailPrivate: profile?.isEmailPrivate ?? false,
+      isNamePrivate: profile?.isNamePrivate ?? false,
+      isPhonePrivate: profile?.isPhonePrivate ?? false,
     },
     validationSchema: mentorProfileDetailsSchema,
     onSubmit: async (formValues) => {
@@ -137,9 +182,13 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
         const formData = new FormData();
         formData.append('name', formValues.name.trim());
         formData.append('email', profile?.email ?? '');
+        formData.append('phone', formValues.phone.trim());
         formData.append('professionalBio', formValues.professionalBio?.trim() ?? '');
         formData.append('facebook', formValues.facebook?.trim() ?? '');
         formData.append('linkedin', formValues.linkedin?.trim() ?? '');
+        formData.append('isEmailPrivate', String(formValues.isEmailPrivate));
+        formData.append('isNamePrivate', String(formValues.isNamePrivate));
+        formData.append('isPhonePrivate', String(formValues.isPhonePrivate));
         if (photoFile) formData.append('profile_pic', photoFile);
 
         const res = await updateAdminProfile(formData).unwrap();
@@ -204,7 +253,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
       <AdminPanel padding={false} className="overflow-hidden">
         <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-6 py-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <Avatar src={displayPhoto} name={displayName} className="h-24 w-24 text-2xl ring-4 ring-white shadow-md" />
+            <ProfileAvatarUpload src={profile?.profile_pic ?? ''} name={displayName} />
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-semibold text-slate-900">{profile?.name ?? '—'}</h2>
               <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
@@ -212,7 +261,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                 {profile?.email ?? '—'}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20! bg-primary/10! px-3 py-1 text-xs font-medium text-primary">
                   <Shield className="h-3.5 w-3.5" />
                   Mentor
                 </span>
@@ -363,13 +412,29 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
           {!isEditing ? (
             <dl className="grid gap-6 sm:grid-cols-2">
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Full name</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Full name
+                  <PrivacyBadge isPrivate={profile?.isNamePrivate} />
+                </dt>
                 <dd className="mt-1 text-sm font-medium text-slate-900">{profile?.name ?? '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Email</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Email
+                  <PrivacyBadge isPrivate={profile?.isEmailPrivate} />
+                </dt>
                 <dd className="mt-1 text-sm font-medium text-slate-900">{profile?.email ?? '—'}</dd>
                 <p className="mt-1 text-xs text-slate-400">Email cannot be changed</p>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Phone number
+                  <PrivacyBadge isPrivate={profile?.isPhonePrivate} />
+                </dt>
+                <dd className="mt-1 flex items-center gap-1.5 text-sm font-medium text-slate-900">
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  {profile?.phone || '—'}
+                </dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Facebook</dt>
@@ -460,6 +525,17 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                   <p className="text-xs text-slate-400">Email cannot be changed</p>
                 </div>
                 <FormField
+                  id="phone"
+                  label="Phone number"
+                  placeholder="e.g. +254712345678"
+                  value={values.phone}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  error={touched.phone ? errors.phone : undefined}
+                  required={false}
+                />
+                <FormField
                   id="facebook"
                   label="Facebook URL"
                   placeholder="https://facebook.com/yourprofile"
@@ -481,6 +557,36 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                   error={touched.linkedin ? errors.linkedin : undefined}
                   required={false}
                 />
+                <div className="space-y-3 sm:col-span-2">
+                  <p className="text-sm font-medium text-slate-900">Privacy</p>
+                  <p className="text-xs text-slate-500">Control what others can see on your public profile.</p>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <PrivacyToggle
+                      id="isNamePrivate"
+                      label="Hide name"
+                      description="Keep your name private"
+                      checked={values.isNamePrivate}
+                      onCheckedChange={(checked) => setFieldValue('isNamePrivate', checked)}
+                      disabled={isSubmitting}
+                    />
+                    <PrivacyToggle
+                      id="isEmailPrivate"
+                      label="Hide email"
+                      description="Keep your email private"
+                      checked={values.isEmailPrivate}
+                      onCheckedChange={(checked) => setFieldValue('isEmailPrivate', checked)}
+                      disabled={isSubmitting}
+                    />
+                    <PrivacyToggle
+                      id="isPhonePrivate"
+                      label="Hide phone"
+                      description="Keep your phone private"
+                      checked={values.isPhonePrivate}
+                      onCheckedChange={(checked) => setFieldValue('isPhonePrivate', checked)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="professionalBio">
                     Bio<span className="text-red-500">*</span>
@@ -730,7 +836,7 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 ) : null}
               </div>
 
-              <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3.5 py-2.5 sm:col-span-2">
+              <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 px-3.5 py-2.5 sm:col-span-2">
                 <div className="flex items-center gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                     <Receipt className="h-4 w-4" />

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Mail, Ban, CircleCheck, BadgeCheck } from 'lucide-react';
+import { Eye, Ban, CircleCheck, BadgeCheck, Edit2, KeyRound, Loader2 } from 'lucide-react';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,7 +12,12 @@ import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminAuthorsHeader } from './AdminAuthorsHeader';
 import { AdminAuthorsSearch } from './AdminAuthorsSearch';
 import { SuspendUserDialog } from '@/components/admin/users/SuspendUserDialog';
-import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
+import { EditUserModal } from '@/components/admin/users/EditUserModal';
+import {
+  useGetAllUsersQuery,
+  useUpdateStaffStatusMutation,
+  useGeneratePasswordResetLinkMutation,
+} from '@/store/rtkQueries/rolesPermissionsApi';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 
@@ -33,8 +38,10 @@ const formatWalletBalance = (balance?: number | null, currency?: string | null) 
 export function AdminAuthorsTab() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [editAuthor, setEditAuthor] = useState<IAllUsersEntity | null>(null);
   const [suspendAuthor, setSuspendAuthor] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -45,6 +52,7 @@ export function AdminAuthorsTab() {
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
   });
   const [updateAuthorStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
+  const [generatePasswordResetLink] = useGeneratePasswordResetLinkMutation();
 
   const authors = authorsResponse?.data?.data ?? [];
   const totalAuthors = authorsResponse?.data?.total ?? 0;
@@ -60,8 +68,23 @@ export function AdminAuthorsTab() {
     router.push(getAdminMentorDetailRoutePath(author._id));
   };
 
-  const handleSendEmail = (author: IAllUsersEntity) => {
-    window.location.href = `mailto:${author.email}`;
+  const handleEditAuthor = (author: IAllUsersEntity) => {
+    setEditAuthor(author);
+  };
+
+  const handleResetPassword = async (author: IAllUsersEntity) => {
+    if (resettingPasswordId) return;
+    setResettingPasswordId(author._id);
+    try {
+      const res = await generatePasswordResetLink(author._id).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? `Password reset link sent for "${author.name}"`);
+      }
+    } catch {
+      toast.error(`Failed to generate password reset link for "${author.name}"`);
+    } finally {
+      setResettingPasswordId(null);
+    }
   };
 
   const handleSuspend = (author: IAllUsersEntity) => {
@@ -193,10 +216,11 @@ export function AdminAuthorsTab() {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 200,
       sortable: false,
       renderCell: (params) => {
         const isSuspended = params.row.status === 'suspended';
+        const isResetting = resettingPasswordId === params.row._id;
         return (
           <div className="action_buttons">
             <button
@@ -210,10 +234,23 @@ export function AdminAuthorsTab() {
             <button
               type="button"
               className="edit_button"
-              title="Send email"
-              onClick={() => handleSendEmail(params.row)}
+              title="Edit mentor"
+              onClick={() => handleEditAuthor(params.row)}
             >
-              <Mail className="h-4 w-4" />
+              <Edit2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="warning_button"
+              title="Reset password"
+              disabled={!!resettingPasswordId}
+              onClick={() => handleResetPassword(params.row)}
+            >
+              {isResetting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="h-4 w-4" />
+              )}
             </button>
             <button
               type="button"
@@ -247,6 +284,12 @@ export function AdminAuthorsTab() {
           onPaginationModelChange={setPaginationModel}
         />
       </div>
+
+      <EditUserModal
+        user={editAuthor}
+        open={!!editAuthor}
+        onOpenChange={(open) => !open && setEditAuthor(null)}
+      />
 
       <SuspendUserDialog
         user={suspendAuthor}

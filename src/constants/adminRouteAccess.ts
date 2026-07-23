@@ -23,6 +23,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/coupons', models: ['Coupon'] },
   { path: '/admin/withdrawal-requests', models: ['Withdrawal'] },
   { path: '/admin/users', models: ['User'] },
+  { path: '/admin/staff', models: ['Staff'] },
   {
     path: '/admin/institutions',
     models: ['Institutions', 'Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'],

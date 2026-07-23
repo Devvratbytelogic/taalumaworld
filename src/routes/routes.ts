@@ -167,6 +167,7 @@ export function getAdminSectionRoutePath(section: string): string {
     mentor_verification: '/admin/application-mentor-verification',
     mentor_tier_upgrades: '/admin/application-mentor-tier-upgrades',
     users: '/admin/users',
+    staff: '/admin/staff',
     activity_logs: '/admin/activity-logs',
     payments: '/admin/payments',
     transactions: '/admin/transactions',

@@ -490,13 +490,6 @@ export const roleSchema = Yup.object({
     .min(0, 'Number of users cannot be negative'),
 });
 
-// Add Staff Modal Validation Schema
-export const staffSchema = Yup.object({
-  name: Yup.string().trim().required('Full name is required'),
-  email: emailRules.label('Email'),
-  role_id: Yup.string().required('Role is required'),
-});
-
 export const staffStatusSchema = Yup.object({
   status_reason: Yup.string().trim().required('Reason is required'),
 });
@@ -521,6 +514,13 @@ export const editUserSchema = Yup.object({
   professionalBio: Yup.string().trim(),
   profile_pic: Yup.mixed().nullable(),
 });
+
+// Add / Edit staff — Edit User fields + role assignment
+export const staffSchema = editUserSchema.shape({
+  role_id: Yup.string().required('Role is required'),
+});
+
+export const editStaffSchema = staffSchema;
 
 // Add / Edit Agreement Type Modal Validation Schema
 export const agreementTypeSchema = Yup.object({

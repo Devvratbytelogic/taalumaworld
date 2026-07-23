@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Shield, Grid3X3, UserCog, Users, Lock } from 'lucide-react';
+import { Shield, Grid3X3, UserCog, Lock } from 'lucide-react';
 import { RolesRegistryTab } from './RolesRegistryTab';
 import { PermissionsMatrixTab } from './PermissionsMatrixTab';
 import { StaffAssignmentsTab } from './StaffAssignmentsTab';
@@ -44,15 +44,12 @@ export function AdminRolesPermissionsTab() {
     if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
   }, [isLoading, visibleTabs, activeTab]);
 
-  const activeTabMeta = visibleTabs.find((t) => t.id === activeTab);
-
   return (
     <AdminPage>
       <AdminPageHeader
         title="Roles & Permissions"
         description="Central RBAC — manage roles, permissions, and user segments across the platform"
       />
-       
 
       {visibleTabs.length === 0 && !isLoading ? (
         <AdminEmptyState
@@ -72,10 +69,11 @@ export function AdminRolesPermissionsTab() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`inline-flex flex-1 sm:flex-none items-center justify-center sm:justify-start gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isActive
+                    className={`inline-flex flex-1 sm:flex-none items-center justify-center sm:justify-start gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                      isActive
                         ? 'bg-primary text-white shadow-sm'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                      }`}
+                    }`}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -88,7 +86,7 @@ export function AdminRolesPermissionsTab() {
 
           {activeTab === 'roles' && <RolesRegistryTab />}
           {activeTab === 'permissions' && <PermissionsMatrixTab />}
-          {activeTab === 'staff' && <StaffAssignmentsTab />}
+          {activeTab === 'staff' && <StaffAssignmentsTab embedded />}
         </>
       )}
     </AdminPage>

@@ -172,13 +172,6 @@ export function AdminUsersTab() {
       renderCell: (params) => <Badge>{params.row.role?.name ?? '-'}</Badge>,
     },
     {
-      field: 'user_type',
-      headerName: 'User Type',
-      width: 140,
-      sortable: false,
-      renderCell: (params) => <span className="text-sm capitalize text-slate-700">{params.row.user_type ?? '-'}</span>,
-    },
-    {
       field: 'createdAt',
       headerName: 'Join Date',
       width: 130,
@@ -187,10 +180,10 @@ export function AdminUsersTab() {
         <span className="text-sm text-slate-700">
           {params.row.createdAt
             ? new Date(params.row.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })
             : '-'}
         </span>
       ),

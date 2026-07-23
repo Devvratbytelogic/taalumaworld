@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Percent, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, Users, Award } from 'lucide-react';
+import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Percent, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, UserCog, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -35,6 +35,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'User Management',
         items: [
             { model: 'User', id: 'users', label: 'Users', href: getAdminSectionRoutePath('users'), icon: UserCircle },
+            { model: 'Staff', id: 'staff', label: 'Staff', href: getAdminSectionRoutePath('staff'), icon: UserCog },
             { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
     },

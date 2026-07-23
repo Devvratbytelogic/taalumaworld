@@ -1,3 +1,23 @@
+/** ── GET /admin/dashboard — Admin overview stats ───────────────────────────── */
+
+export interface IAdminDashboardAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IAdminDashboardStats;
+  message: string;
+  timestamp: string;
+}
+
+export interface IAdminDashboardStats {
+  total_users: number;
+  total_mentors: number;
+  institutional_staff: number;
+  total_blueprints: number;
+  total_series: number;
+  flagged_content: number;
+}
+
 /** Lean series reference embedded on performance/revenue rows */
 export interface IBlueprintSeriesRef {
   id: string;

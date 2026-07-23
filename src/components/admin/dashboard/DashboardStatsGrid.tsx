@@ -1,12 +1,11 @@
 import Link from 'next/link';
-import { TrendingDown, TrendingUp } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import { adminPanelClass } from '@/components/admin/layout/AdminContent';
 
 export interface StatCard {
   title: string;
   value: string | number;
-  change: number;
+  change?: number;
   icon: React.ElementType;
   color: 'blue' | 'green' | 'purple' | 'orange';
   href?: string;
@@ -42,8 +41,8 @@ function StatCardSkeleton() {
 export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
           <StatCardSkeleton key={i} />
         ))}
       </div>
@@ -51,10 +50,10 @@ export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {stats.map((stat) => {
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {      stats.map((stat) => {
         const Icon = stat.icon;
-        const isPositive = stat.change >= 0;
+
 
         const card = (
           <div
@@ -66,17 +65,9 @@ export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', colorClasses[stat.color])}>
-                <Icon className="h-[18px] w-[18px]" />
+                <Icon className="h-4.5 w-4.5" />
               </div>
-              <div
-                className={cn(
-                  'flex items-center gap-1 text-xs font-medium',
-                  isPositive ? 'text-emerald-600' : 'text-red-600',
-                )}
-              >
-                {/* {isPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />} */}
-                <span>{Math.abs(stat.change)}%</span>
-              </div>
+             
             </div>
             <p className="text-sm text-slate-500">{stat.title}</p>
             <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">{stat.value}</p>

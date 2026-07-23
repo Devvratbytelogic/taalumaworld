@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, CalendarDays, Eye, FileText, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react';
+import { Book, CalendarDays, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPanel,
@@ -10,56 +10,21 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import { DashboardWelcomeHeader } from './DashboardWelcomeHeader';
 import { DashboardStatsGrid, type StatCard } from './DashboardStatsGrid';
-import { DashboardRecentActivity, type ActivityItem } from './DashboardRecentActivity';
-import { DashboardTopContent, type TopContentItem } from './DashboardTopContent';
+import { DashboardRecentActivity } from './DashboardRecentActivity';
+import { DashboardTopContent } from './DashboardTopContent';
 import type { ContentMode } from '@/types/admin';
 import {
   useGetAdminGlobalSettingsQuery,
   useGetAdminProfileQuery,
-  useGetAllAdminChaptersQuery,
-  useGetAllBooksQuery,
 } from '@/store/rtkQueries/adminGetApi';
-import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import {
+  useGetAdminDashboardQuery,
   useGetBlueprintPerformanceQuery,
   useGetBlueprintRevenueQuery,
   useGetSalesVolumeQuery,
 } from '@/store/rtkQueries/dashboard';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import { formatKes } from '@/constants/common';
-
-
-
-const MS_30D = 30 * 24 * 60 * 60 * 1000;
-
-function timeAgo(dateStr: string): string {
-  const diffMs = Date.now() - new Date(dateStr).getTime();
-  const diffMins = Math.floor(diffMs / 60_000);
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-}
-
-/** Count of dates within the last 30 days — used as the "change" indicator on stat cards. */
-function countRecent(dates: string[]): number {
-  const now = Date.now();
-  return dates.filter((d) => now - new Date(d).getTime() < MS_30D).length;
-}
-
-/** Percent change: dates in the last 30d vs the 30d before that. */
-function calcGrowthPercent(dates: string[]): number {
-  const now = Date.now();
-  const recent = dates.filter((d) => now - new Date(d).getTime() < MS_30D).length;
-  const previous = dates.filter((d) => {
-    const age = now - new Date(d).getTime();
-    return age >= MS_30D && age < 2 * MS_30D;
-  }).length;
-  if (previous === 0) return recent > 0 ? 100 : 0;
-  return Math.round(((recent - previous) / previous) * 1000) / 10;
-}
 
 function TableSkeleton({ columns }: { columns: number }) {
   return (
@@ -82,11 +47,8 @@ export default function AdminDashboardTab() {
   const { data: globalSettingsData } = useGetAdminGlobalSettingsQuery();
   const contentMode: ContentMode = globalSettingsData?.data?.visible === 'book' ? 'books' : 'chapters';
 
-  const { data: usersData, isLoading: usersLoading } = useGetAllUsersQuery({ user_type: 'user' });
-  const { data: mentorsData, isLoading: mentorsLoading } = useGetAllUsersQuery({ user_type: 'mentor' });
-  const { data: staffData, isLoading: staffLoading } = useGetAllUsersQuery({ user_type: 'staff' });
-  const { data: booksData, isLoading: booksLoading } = useGetAllBooksQuery();
-  const { data: chaptersData, isLoading: chaptersLoading } = useGetAllAdminChaptersQuery();
+  const { data: dashboardData, isLoading: dashboardLoading } = useGetAdminDashboardQuery();
+  const statsData = dashboardData?.data;
 
   /** Admin & Mentor shared metrics */
   const {
@@ -105,91 +67,54 @@ export default function AdminDashboardTab() {
     isError: revenueError,
   } = useGetBlueprintRevenueQuery();
 
-  const isLoading = usersLoading || mentorsLoading || staffLoading || booksLoading || chaptersLoading;
-
-  const allUsers = usersData?.data?.data ?? [];
-  const allMentors = mentorsData?.data?.data ?? [];
-  const allStaff = staffData?.data?.data ?? [];
-  const allBooks = booksData?.data?.data ?? [];
-  const allChapters = chaptersData?.data?.data ?? [];
-
-  const totalUsers = usersData?.data?.total ?? allUsers.length;
-  const totalMentors = mentorsData?.data?.total ?? allMentors.length;
-  const totalStaff = staffData?.data?.total ?? allStaff.length;
-  const totalBooks = booksData?.data?.total ?? allBooks.length;
-  const totalChapters = chaptersData?.data?.total ?? allChapters.length;
-
-  const userGrowth = calcGrowthPercent(allUsers.map((u) => u.createdAt));
-  const mentorGrowth = calcGrowthPercent(allMentors.map((m) => m.createdAt));
-  const staffGrowth = calcGrowthPercent(allStaff.map((s) => s.createdAt));
-  const recentChapters = countRecent(allChapters.map((c) => c.createdAt));
-  const recentBooks = countRecent(allBooks.map((b) => b.createdAt));
-
   const stats: StatCard[] = [
     {
       title: 'Total users',
-      value: totalUsers.toLocaleString(),
-      change: userGrowth,
+      value: (statsData?.total_users ?? 0).toLocaleString(),
       icon: Users,
       color: 'blue',
       href: getAdminSectionRoutePath('users'),
     },
     {
       title: 'Total mentors',
-      value: totalMentors.toLocaleString(),
-      change: mentorGrowth,
+      value: (statsData?.total_mentors ?? 0).toLocaleString(),
       icon: GraduationCap,
       color: 'green',
       href: getAdminSectionRoutePath('authors'),
     },
     {
       title: 'Institutional staff',
-      value: totalStaff.toLocaleString(),
-      change: staffGrowth,
+      value: (statsData?.institutional_staff ?? 0).toLocaleString(),
       icon: Shield,
       color: 'purple',
       href: getAdminSectionRoutePath('roles_permissions'),
     },
     {
       title: contentMode === 'chapters' ? 'Total blueprints' : 'Total series',
-      value: contentMode === 'chapters' ? totalChapters : totalBooks,
-      change: contentMode === 'chapters' ? recentChapters : recentBooks,
+      value: contentMode === 'chapters'
+        ? (statsData?.total_blueprints ?? 0).toLocaleString()
+        : (statsData?.total_series ?? 0).toLocaleString(),
       icon: contentMode === 'chapters' ? FileText : Book,
       color: 'orange',
       href: getAdminSectionRoutePath(contentMode === 'chapters' ? 'chapters' : 'books'),
     },
     {
       title: contentMode === 'chapters' ? 'Total series' : 'Total blueprints',
-      value: contentMode === 'chapters' ? totalBooks : totalChapters,
-      change: contentMode === 'chapters' ? recentBooks : recentChapters,
+      value: contentMode === 'chapters'
+        ? (statsData?.total_series ?? 0).toLocaleString()
+        : (statsData?.total_blueprints ?? 0).toLocaleString(),
       icon: contentMode === 'chapters' ? Book : FileText,
       color: 'blue',
       href: getAdminSectionRoutePath(contentMode === 'chapters' ? 'books' : 'chapters'),
     },
+    {
+      title: 'Flagged content',
+      value: (statsData?.flagged_content ?? 0).toLocaleString(),
+      icon: Flag,
+      color: 'orange',
+      href: `${getAdminSectionRoutePath('chapters')}?isContentFlagged=true`,
+    },
   ];
-
-  const recentActivity: ActivityItem[] = [...allUsers]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 5)
-    .map((user, idx) => ({
-      id: idx + 1,
-      user: user.name,
-      action: 'registered',
-      item: '',
-      time: timeAgo(user.createdAt),
-    }));
-
-  const topContentSource = contentMode === 'chapters' ? allChapters : allBooks;
-  const topContent: TopContentItem[] = [...topContentSource]
-    .sort((a, b) => b.price - a.price)
-    .slice(0, 5)
-    .map((item, idx) => ({
-      id: idx + 1,
-      title: item.title,
-      sales: 0,
-      revenue: item.price,
-      trend: 0,
-    }));
 
   const performanceSummary = performanceData?.data?.summary;
   const topPerformingBlueprints = performanceData?.data?.data?.data ?? [];
@@ -203,7 +128,7 @@ export default function AdminDashboardTab() {
   return (
     <AdminPage>
       <DashboardWelcomeHeader userName={userName} contentMode={contentMode} />
-      <DashboardStatsGrid stats={stats} isLoading={isLoading} />
+      <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
 
       <AdminPanel>
         <AdminSectionHeader title="Blueprint performance" />
@@ -325,12 +250,8 @@ export default function AdminDashboardTab() {
         </AdminPanel>
       </div>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <DashboardRecentActivity items={recentActivity} isLoading={usersLoading} />
-        <DashboardTopContent
-          items={topContent}
-          contentMode={contentMode}
-          isLoading={chaptersLoading || booksLoading}
-        />
+        <DashboardRecentActivity items={[]} />
+        <DashboardTopContent items={[]} contentMode={contentMode} />
       </div>
     </AdminPage>
   );

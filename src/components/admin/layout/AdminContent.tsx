@@ -201,7 +201,7 @@ export function AdminStatCard({
     <div className={cn(adminPanelClass, 'p-5')}>
       <div className="flex items-center gap-3">
         <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg', tones[tone])}>
-          <Icon className="h-[18px] w-[18px]" />
+          <Icon className="h-4.5 w-4.5" />
         </div>
         <div>
           <p className="text-sm text-slate-500">{label}</p>

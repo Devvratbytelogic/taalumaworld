@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2, Flag } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
@@ -38,16 +38,36 @@ export function AdminChaptersTab() {
     const dispatch = useDispatch();
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const isMentor = pathname.startsWith(getMentorRoutePath());
     const [search, setSearch] = useState('');
     const [filterByBook, setFilterByBook] = useState('');
     const [filterByStatus, setFilterByStatus] = useState('');
     const [isTrashView, setIsTrashView] = useState(false);
     const [filterByIsMine, setFilterByIsMine] = useState(false);
+    const [filterByContentFlagged, setFilterByContentFlagged] = useState(
+        () => searchParams.get('isContentFlagged') === 'true',
+    );
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const debouncedSearch = useDebounce(search, 500);
+
+    useEffect(() => {
+        setFilterByContentFlagged(searchParams.get('isContentFlagged') === 'true');
+    }, [searchParams]);
+
+    const handleContentFlaggedChange = (value: boolean) => {
+        setFilterByContentFlagged(value);
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+            params.set('isContentFlagged', 'true');
+        } else {
+            params.delete('isContentFlagged');
+        }
+        const query = params.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    };
 
     const { data: chaptersResponse, isLoading } = useGetAllAdminChaptersQuery({
         page: paginationModel.page + 1,
@@ -57,6 +77,7 @@ export function AdminChaptersTab() {
         ...(filterByStatus ? { status: filterByStatus } : {}),
         ...(isTrashView ? { isDeleted: true } : {}),
         ...(filterByIsMine ? { isMine: true } : {}),
+        ...(filterByContentFlagged ? { isContentFlagged: true } : {}),
     });
 
     const { data: booksResponse } = useGetAllBooksQuery();
@@ -72,7 +93,7 @@ export function AdminChaptersTab() {
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine]);
+    }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine, filterByContentFlagged]);
 
     const onDeleteChapter = async (id: string) => {
         try {
@@ -374,6 +395,8 @@ export function AdminChaptersTab() {
                 onStatusChange={setFilterByStatus}
                 isMine={filterByIsMine}
                 onIsMineChange={setFilterByIsMine}
+                isContentFlagged={filterByContentFlagged}
+                onContentFlaggedChange={handleContentFlaggedChange}
             />
 
             <div className="border border-gray-200 rounded-md overflow-hidden">

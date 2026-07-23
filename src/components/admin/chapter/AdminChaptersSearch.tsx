@@ -23,6 +23,8 @@ interface AdminChaptersSearchProps {
   onStatusChange: (value: string) => void;
   isMine: boolean;
   onIsMineChange: (value: boolean) => void;
+  isContentFlagged: boolean;
+  onContentFlaggedChange: (value: boolean) => void;
 }
 
 const STATUS_OPTIONS = BLUEPRINT_STATUSES;
@@ -37,13 +39,16 @@ export function AdminChaptersSearch({
   onStatusChange,
   isMine,
   onIsMineChange,
+  isContentFlagged,
+  onContentFlaggedChange,
 }: AdminChaptersSearchProps) {
-  const hasActiveFilters = selectedBook || selectedStatus || isMine;
+  const hasActiveFilters = selectedBook || selectedStatus || isMine || isContentFlagged;
 
   const clearAll = () => {
     onBookChange('');
     onStatusChange('');
     onIsMineChange(false);
+    onContentFlaggedChange(false);
   };
 
   return (
@@ -94,11 +99,27 @@ export function AdminChaptersSearch({
             <span className="font-normal">My blueprints</span>
           </div>
 
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => onContentFlaggedChange(!isContentFlagged)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onContentFlaggedChange(!isContentFlagged);
+              }
+            }}
+            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+          >
+            <Checkbox checked={isContentFlagged} tabIndex={-1} className="pointer-events-none" />
+            <span className="font-normal">Flagged content</span>
+          </div>
+
           {hasActiveFilters ? (
             <button
               type="button"
               onClick={clearAll}
-              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200! px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
             >
               <X className="h-3.5 w-3.5" />
               Clear
@@ -129,6 +150,14 @@ export function AdminChaptersSearch({
             <span className={adminFilterPillClass}>
               My blueprints
               <button type="button" onClick={() => onIsMineChange(false)} className="hover:text-primary/70">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ) : null}
+          {isContentFlagged ? (
+            <span className={adminFilterPillClass}>
+              Flagged content
+              <button type="button" onClick={() => onContentFlaggedChange(false)} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
             </span>

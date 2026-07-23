@@ -1,8 +1,23 @@
-import { IBlueprintPerformanceAPIResponse, IBlueprintRevenueAPIResponse, IMentorEconomyRevenueAPIResponse, IMentorReferralsAPIResponse, ISalesVolumeAPIResponse } from '@/types/dashboard';
+import {
+    IAdminDashboardAPIResponse,
+    IBlueprintPerformanceAPIResponse,
+    IBlueprintRevenueAPIResponse,
+    IMentorEconomyRevenueAPIResponse,
+    IMentorReferralsAPIResponse,
+    ISalesVolumeAPIResponse,
+} from '@/types/dashboard';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const dashboardApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
+        /** Admin overview dashboard stats */
+        getAdminDashboard: builder.query<IAdminDashboardAPIResponse, void>({
+            query: () => ({
+                url: `/admin/dashboard`,
+                method: 'GET',
+            }),
+        }),
+
         /** Blueprint performance — accessible to Admin and Mentor */
         getBlueprintPerformance: builder.query<IBlueprintPerformanceAPIResponse, { page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
@@ -51,6 +66,7 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
 });
 
 export const {
+    useGetAdminDashboardQuery,
     useGetBlueprintPerformanceQuery,
     useGetSalesVolumeQuery,
     useGetBlueprintRevenueQuery,

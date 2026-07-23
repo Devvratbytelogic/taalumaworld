@@ -21,15 +21,15 @@ import { IAdminCouponEntity } from '@/types/coupon';
 import { CouponModal } from './CouponModal';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  inactive: 'bg-slate-100 text-slate-600 border-slate-200',
+  active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
+  inactive: 'bg-slate-100 text-slate-600 border-slate-200!',
 };
 
 const SCOPE_BADGE_CLASS: Record<string, string> = {
-  university: 'bg-sky-50 text-sky-700 border-sky-200',
-  event: 'bg-violet-50 text-violet-700 border-violet-200',
-  campaign: 'bg-amber-50 text-amber-700 border-amber-200',
-  normal: 'bg-slate-100 text-slate-600 border-slate-200',
+  university: 'bg-sky-50 text-sky-700 border-sky-200!',
+  event: 'bg-violet-50 text-violet-700 border-violet-200!',
+  campaign: 'bg-amber-50 text-amber-700 border-amber-200!',
+  normal: 'bg-slate-100 text-slate-600 border-slate-200!',
 };
 
 function formatCouponValue(coupon: IAdminCouponEntity): string {
@@ -42,6 +42,7 @@ export function AdminCouponsTab() {
   const dispatch = useDispatch();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [scopeFilter, setScopeFilter] = useState('');
   const [isTrashView, setIsTrashView] = useState(false);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,6 +55,7 @@ export function AdminCouponsTab() {
     limit: paginationModel.pageSize,
     search: debouncedSearch,
     ...(statusFilter ? { status: statusFilter } : {}),
+    ...(scopeFilter ? { type: scopeFilter } : {}),
     ...(isTrashView ? { isDeleted: true } : {}),
   });
 
@@ -73,6 +75,11 @@ export function AdminCouponsTab() {
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value);
+    resetToFirstPage();
+  };
+
+  const handleScopeChange = (value: string) => {
+    setScopeFilter(value);
     resetToFirstPage();
   };
 
@@ -167,8 +174,9 @@ export function AdminCouponsTab() {
       sortable: false,
       renderCell: (params) => (
         <span className="text-sm text-slate-600">
-          {params.row.used_count ?? 0}
-          {params.row.usage_limit ? ` / ${params.row.usage_limit}` : ''}
+          {params.row.coupon_for === 'university'
+            ? 'Unlimited'
+            : `${params.row.used_count ?? 0}${params.row.usage_limit ? ` / ${params.row.usage_limit}` : ''}`}
         </span>
       ),
     },
@@ -276,6 +284,8 @@ export function AdminCouponsTab() {
         onSearchChange={handleSearchChange}
         selectedStatus={statusFilter}
         onStatusChange={handleStatusChange}
+        selectedScope={scopeFilter}
+        onScopeChange={handleScopeChange}
       />
 
       <div className="border border-gray-200 rounded-md overflow-hidden">

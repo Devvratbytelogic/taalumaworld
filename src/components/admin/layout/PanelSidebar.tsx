@@ -73,7 +73,7 @@ export function SidebarNavLink({
     >
       <Icon
         className={cn(
-          'h-[18px] w-[18px] shrink-0 transition-colors',
+          'h-4.5 w-4.5 shrink-0 transition-colors',
           isActive ? 'text-primary' : 'text-slate-400 group-hover:text-slate-600',
         )}
         strokeWidth={isActive ? 2.25 : 2}

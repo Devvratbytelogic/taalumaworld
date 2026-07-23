@@ -17,7 +17,6 @@ import {
 import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
 import { COUPON_SCOPE_LABELS, COUPON_SCOPES, COUPON_TYPE_LABELS, COUPON_TYPES } from '@/constants/coupon';
 import { couponSchema } from '@/utils/formValidation';
-import { useGetAllInstitutionsQuery } from '@/store/rtkQueries/institutionApi';
 import { useGetAllBooksQuery, useGetBlueprintsByBookIdsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useAddCouponMutation, useUpdateCouponMutation } from '@/store/rtkQueries/couponApis';
 import toast from '@/utils/toast';
@@ -71,10 +70,23 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
     enableReinitialize: true,
     onSubmit: async (formValues) => {
       const id = coupon?._id;
+      const isUniversityScope = formValues.coupon_for === 'university';
+      const payload = isUniversityScope
+        ? {
+            ...formValues,
+            coupon_type: 'Percentage',
+            expiry_date: '',
+            minimum_cart_value: 0,
+            usage_limit: 0,
+            institutions: [],
+            books: [],
+            chapters: [],
+          }
+        : formValues;
       try {
         const res = id
-          ? await updateCoupon({ id, values: formValues }).unwrap()
-          : await addCoupon(formValues).unwrap();
+          ? await updateCoupon({ id, values: payload }).unwrap()
+          : await addCoupon(payload).unwrap();
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
           toast.success(res.message ?? (id ? 'Coupon updated successfully' : 'Coupon created successfully'));
           resetForm();
@@ -86,22 +98,17 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
     },
   });
 
-  const needsInstitutions = values.coupon_for === 'university';
+  const isUniversity = values.coupon_for === 'university';
   const needsBooksAndChapters = values.coupon_for === 'event' || values.coupon_for === 'campaign';
 
   const bookIds = values.books.join(',');
 
-  const { data: institutionsRes } = useGetAllInstitutionsQuery(undefined, { skip: !open || !needsInstitutions });
   const { data: booksRes } = useGetAllBooksQuery(undefined, { skip: !open || !needsBooksAndChapters });
   const { data: blueprintsRes } = useGetBlueprintsByBookIdsQuery(
     { bookids: bookIds },
     { skip: !open || !needsBooksAndChapters || !bookIds },
   );
 
-  const institutionOptions: SelectOption[] = useMemo(
-    () => (institutionsRes?.data?.data ?? []).map((institution) => ({ value: institution._id, label: institution.name })),
-    [institutionsRes],
-  );
   const bookOptions: SelectOption[] = useMemo(
     () => (booksRes?.data?.data ?? []).map((book) => ({ value: book._id, label: book.title })),
     [booksRes],
@@ -118,6 +125,11 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
     if (filtered.length !== values.chapters.length) setFieldValue('chapters', filtered);
   }, [bookIds]);
 
+  useEffect(() => {
+    if (!isUniversity) return;
+    if (values.coupon_type !== 'Percentage') setFieldValue('coupon_type', 'Percentage');
+    if (values.institutions.length > 0) setFieldValue('institutions', []);
+  }, [isUniversity, values.coupon_type, values.institutions.length, setFieldValue]);
 
   const closeModal = () => {
     resetForm();
@@ -127,13 +139,17 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
   const isFree = values.coupon_type === 'Free';
   const isPercentage = values.coupon_type === 'Percentage';
 
-  const showInstitutions = needsInstitutions;
-  const showBooksAndChapters = needsBooksAndChapters;
-  const showApplicability = showInstitutions || showBooksAndChapters;
+  const showApplicability = needsBooksAndChapters;
 
   const handleScopeChange = (nextScope: string) => {
     setFieldValue('coupon_for', nextScope);
-    if (nextScope !== 'university') setFieldValue('institutions', []);
+    setFieldValue('institutions', []);
+    if (nextScope === 'university') {
+      setFieldValue('coupon_type', 'Percentage');
+      setFieldValue('expiry_date', '');
+      setFieldValue('minimum_cart_value', 0);
+      setFieldValue('usage_limit', 0);
+    }
     if (nextScope !== 'event' && nextScope !== 'campaign') {
       setFieldValue('books', []);
       setFieldValue('chapters', []);
@@ -214,7 +230,7 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
                     if (nextType === 'Free') setFieldValue('value', 0);
                   }}
                   onBlur={handleBlur}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUniversity}
                   className="admin-form-trigger w-full"
                 >
                   {COUPON_TYPES.map((type) => (
@@ -250,27 +266,48 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="expiry_date">
-                  Expiry Date <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="expiry_date"
-                  name="expiry_date"
-                  type="date"
-                  value={values.expiry_date}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting}
-                  min={new Date().toISOString().substring(0, 10)}
-                  className={touched.expiry_date && errors.expiry_date ? 'border-red-500' : ''}
-                />
-                {touched.expiry_date && errors.expiry_date ? (
-                  <p className="text-sm text-red-600">{errors.expiry_date}</p>
-                ) : null}
-              </div>
+            {!isUniversity ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="expiry_date">
+                    Expiry Date <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="expiry_date"
+                    name="expiry_date"
+                    type="date"
+                    value={values.expiry_date}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    min={new Date().toISOString().substring(0, 10)}
+                    className={touched.expiry_date && errors.expiry_date ? 'border-red-500' : ''}
+                  />
+                  {touched.expiry_date && errors.expiry_date ? (
+                    <p className="text-sm text-red-600">{errors.expiry_date}</p>
+                  ) : null}
+                </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="status">
+                    Status <span className="text-red-500">*</span>
+                  </Label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={values.status}
+                    onChange={(e) => setFieldValue('status', e.target.value)}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    className="admin-form-trigger w-full"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  {touched.status && errors.status ? <p className="text-sm text-red-600">{errors.status}</p> : null}
+                </div>
+              </div>
+            ) : (
               <div className="space-y-2">
                 <Label htmlFor="status">
                   Status <span className="text-red-500">*</span>
@@ -289,129 +326,104 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
                 </select>
                 {touched.status && errors.status ? <p className="text-sm text-red-600">{errors.status}</p> : null}
               </div>
-            </div>
+            )}
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="minimum_cart_value">Minimum Cart Value (KES)</Label>
-                <Input
-                  id="minimum_cart_value"
-                  name="minimum_cart_value"
-                  type="number"
-                  min={0}
-                  value={values.minimum_cart_value}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting}
-                  placeholder="0"
-                  className={touched.minimum_cart_value && errors.minimum_cart_value ? 'border-red-500' : ''}
-                />
-                {touched.minimum_cart_value && errors.minimum_cart_value ? (
-                  <p className="text-sm text-red-600">{errors.minimum_cart_value}</p>
-                ) : null}
-                <p className="text-xs text-slate-500">Minimum order total for this coupon to apply.</p>
-              </div>
+            {!isUniversity ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="minimum_cart_value">Minimum Cart Value (KES)</Label>
+                  <Input
+                    id="minimum_cart_value"
+                    name="minimum_cart_value"
+                    type="number"
+                    min={0}
+                    value={values.minimum_cart_value}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    placeholder="0"
+                    className={touched.minimum_cart_value && errors.minimum_cart_value ? 'border-red-500' : ''}
+                  />
+                  {touched.minimum_cart_value && errors.minimum_cart_value ? (
+                    <p className="text-sm text-red-600">{errors.minimum_cart_value}</p>
+                  ) : null}
+                  <p className="text-xs text-slate-500">Minimum order total for this coupon to apply.</p>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="usage_limit">Usage Limit</Label>
-                <Input
-                  id="usage_limit"
-                  name="usage_limit"
-                  type="number"
-                  min={0}
-                  value={values.usage_limit}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting}
-                  placeholder="e.g. 500"
-                  className={touched.usage_limit && errors.usage_limit ? 'border-red-500' : ''}
-                />
-                {touched.usage_limit && errors.usage_limit ? (
-                  <p className="text-sm text-red-600">{errors.usage_limit}</p>
-                ) : null}
-                <p className="text-xs text-slate-500">Total number of times this coupon can be redeemed. 0 = unlimited.</p>
+                <div className="space-y-2">
+                  <Label htmlFor="usage_limit">Usage Limit</Label>
+                  <Input
+                    id="usage_limit"
+                    name="usage_limit"
+                    type="number"
+                    min={0}
+                    value={values.usage_limit}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    placeholder="e.g. 500"
+                    className={touched.usage_limit && errors.usage_limit ? 'border-red-500' : ''}
+                  />
+                  {touched.usage_limit && errors.usage_limit ? (
+                    <p className="text-sm text-red-600">{errors.usage_limit}</p>
+                  ) : null}
+                  <p className="text-xs text-slate-500">Total number of times this coupon can be redeemed. 0 = unlimited.</p>
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {showApplicability ? (
               <div className="space-y-3 rounded-lg border border-slate-100 bg-slate-50/60 p-4">
                 <div>
                   <Label>Applicability (optional)</Label>
                   <p className="text-xs text-slate-500">
-                    {showInstitutions
-                      ? 'Restrict this university coupon to specific institutions. Leave empty to apply to all universities.'
-                      : 'Restrict this coupon to specific series or blueprints. Leave empty to apply to all.'}
+                    Restrict this coupon to specific series or blueprints. Leave empty to apply to all.
                   </p>
                 </div>
 
-                {showInstitutions ? (
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="institutions" className="text-xs text-slate-500">
-                      Universities / Institutions
+                    <Label htmlFor="books" className="text-xs text-slate-500">
+                      Series
                     </Label>
                     <ReactSelect
-                      inputId="institutions"
-                      name="institutions"
+                      inputId="books"
+                      name="books"
                       isMulti
                       classNamePrefix="react-select"
-                      options={institutionOptions}
-                      value={institutionOptions.filter((option) => values.institutions.includes(option.value))}
-                      onChange={(selected) => setFieldValue('institutions', selected.map((option) => option.value))}
-                      onBlur={() => setFieldTouched('institutions', true)}
-                      placeholder="All institutions"
+                      options={bookOptions}
+                      value={bookOptions.filter((option) => values.books.includes(option.value))}
+                      onChange={(selected) => setFieldValue('books', selected.map((option) => option.value))}
+                      onBlur={() => setFieldTouched('books', true)}
+                      placeholder="All series"
                       isDisabled={isSubmitting}
                       menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                       menuPosition="fixed"
                       styles={MULTI_SELECT_STYLES}
                     />
                   </div>
-                ) : null}
 
-                {showBooksAndChapters ? (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="books" className="text-xs text-slate-500">
-                        Series
-                      </Label>
-                      <ReactSelect
-                        inputId="books"
-                        name="books"
-                        isMulti
-                        classNamePrefix="react-select"
-                        options={bookOptions}
-                        value={bookOptions.filter((option) => values.books.includes(option.value))}
-                        onChange={(selected) => setFieldValue('books', selected.map((option) => option.value))}
-                        onBlur={() => setFieldTouched('books', true)}
-                        placeholder="All series"
-                        isDisabled={isSubmitting}
-                        menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-                        menuPosition="fixed"
-                        styles={MULTI_SELECT_STYLES}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="chapters" className="text-xs text-slate-500">
-                        Blueprints
-                      </Label>
-                      <ReactSelect
-                        inputId="chapters"
-                        name="chapters"
-                        isMulti
-                        classNamePrefix="react-select"
-                        options={chapterOptions}
-                        value={chapterOptions.filter((option) => values.chapters.includes(option.value))}
-                        onChange={(selected) => setFieldValue('chapters', selected.map((option) => option.value))}
-                        onBlur={() => setFieldTouched('chapters', true)}
-                        placeholder={values.books.length ? 'All blueprints in selected series' : 'Select series first'}
-                        isDisabled={isSubmitting || values.books.length === 0}
-                        menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-                        menuPosition="fixed"
-                        styles={MULTI_SELECT_STYLES}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="chapters" className="text-xs text-slate-500">
+                      Blueprints
+                    </Label>
+                    <ReactSelect
+                      inputId="chapters"
+                      name="chapters"
+                      isMulti
+                      classNamePrefix="react-select"
+                      options={chapterOptions}
+                      value={chapterOptions.filter((option) => values.chapters.includes(option.value))}
+                      onChange={(selected) => setFieldValue('chapters', selected.map((option) => option.value))}
+                      onBlur={() => setFieldTouched('chapters', true)}
+                      placeholder={values.books.length ? 'All blueprints in selected series' : 'Select series first'}
+                      isDisabled={isSubmitting || values.books.length === 0}
+                      menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                      menuPosition="fixed"
+                      styles={MULTI_SELECT_STYLES}
+                    />
                   </div>
-                ) : null}
+                </div>
               </div>
             ) : null}
           </div>

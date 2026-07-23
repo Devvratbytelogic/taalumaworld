@@ -5,13 +5,15 @@ import {
   adminFilterPillClass,
   adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
-import { COUPON_STATUS_OPTIONS } from '@/constants/coupon';
+import { COUPON_SCOPE_LABELS, COUPON_SCOPES, COUPON_STATUS_OPTIONS } from '@/constants/coupon';
 
 interface AdminCouponsSearchProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   selectedStatus: string;
   onStatusChange: (value: string) => void;
+  selectedScope: string;
+  onScopeChange: (value: string) => void;
 }
 
 export function AdminCouponsSearch({
@@ -19,8 +21,15 @@ export function AdminCouponsSearch({
   onSearchChange,
   selectedStatus,
   onStatusChange,
+  selectedScope,
+  onScopeChange,
 }: AdminCouponsSearchProps) {
-  const hasActiveFilters = !!selectedStatus;
+  const hasActiveFilters = !!selectedStatus || !!selectedScope;
+
+  const clearAll = () => {
+    onStatusChange('');
+    onScopeChange('');
+  };
 
   return (
     <AdminSearchPanel>
@@ -32,6 +41,19 @@ export function AdminCouponsSearch({
         />
 
         <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+          <select
+            value={selectedScope}
+            onChange={(e) => onScopeChange(e.target.value)}
+            className={adminSelectClass}
+          >
+            <option value="">All types</option>
+            {COUPON_SCOPES.map((scope) => (
+              <option key={scope} value={scope}>
+                {COUPON_SCOPE_LABELS[scope as keyof typeof COUPON_SCOPE_LABELS]}
+              </option>
+            ))}
+          </select>
+
           <select
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value)}
@@ -48,7 +70,7 @@ export function AdminCouponsSearch({
           {hasActiveFilters ? (
             <button
               type="button"
-              onClick={() => onStatusChange('')}
+              onClick={clearAll}
               className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
             >
               <X className="h-3.5 w-3.5" />
@@ -60,12 +82,22 @@ export function AdminCouponsSearch({
 
       {hasActiveFilters ? (
         <div className="flex flex-wrap gap-2">
-          <span className={adminFilterPillClass}>
-            {selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}
-            <button type="button" onClick={() => onStatusChange('')} className="hover:text-primary/70">
-              <X className="h-3 w-3" />
-            </button>
-          </span>
+          {selectedScope ? (
+            <span className={adminFilterPillClass}>
+              {COUPON_SCOPE_LABELS[selectedScope as keyof typeof COUPON_SCOPE_LABELS] ?? selectedScope}
+              <button type="button" onClick={() => onScopeChange('')} className="hover:text-primary/70">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ) : null}
+          {selectedStatus ? (
+            <span className={adminFilterPillClass}>
+              {selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}
+              <button type="button" onClick={() => onStatusChange('')} className="hover:text-primary/70">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ) : null}
         </div>
       ) : null}
     </AdminSearchPanel>

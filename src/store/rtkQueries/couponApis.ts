@@ -14,7 +14,7 @@ export const couponApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminCoupons'],
         }),
-        getAdminAllCoupons: builder.query<IAllCouponsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; isDeleted?: boolean } | void>({
+        getAdminAllCoupons: builder.query<IAllCouponsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; type?: string; isDeleted?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/coupons`,
                 method: 'GET',

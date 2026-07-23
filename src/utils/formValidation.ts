@@ -605,7 +605,11 @@ export const couponSchema = Yup.object({
             then: (percentSchema) => percentSchema.max(100, 'Percentage cannot exceed 100'),
           }),
     }),
-  expiry_date: Yup.string().required('Expiry date is required'),
+  expiry_date: Yup.string().when('coupon_for', {
+    is: 'university',
+    then: (schema) => schema.optional().nullable(),
+    otherwise: (schema) => schema.required('Expiry date is required'),
+  }),
   minimum_cart_value: Yup.number()
     .transform((v) => (v === '' || v == null ? 0 : Number(v)))
     .min(0, 'Minimum cart value cannot be negative'),

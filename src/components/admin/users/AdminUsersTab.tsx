@@ -173,7 +173,7 @@ export function AdminUsersTab() {
     },
     {
       field: 'createdAt',
-      headerName: 'Join Date',
+      headerName: 'Joining Date',
       width: 130,
       sortable: false,
       renderCell: (params) => (

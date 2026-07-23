@@ -36,27 +36,41 @@ import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQu
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
+import moment from 'moment';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  active: 'bg-green-50 text-green-700 border-green-200',
-  suspended: 'bg-red-50 text-red-700 border-red-200',
+  active: 'bg-green-50 text-green-700 border-green-200!',
+  suspended: 'bg-red-50 text-red-700 border-red-200!',
 };
 
-const formatDate = (value?: string | null) =>
-  value
-    ? new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-    : '-';
+const COMPLETION_FIELD_LABELS: Record<string, string> = {
+  'account.name': 'Full name',
+  'account.email': 'Email',
+  'account.phone': 'Phone number',
+  'profile.professionalBio': 'Professional bio',
+  'profile.facebook': 'Facebook',
+  'profile.linkedin': 'LinkedIn',
+  'profile.profile_pic': 'Profile picture',
+  'payment.bank_name': 'Bank name',
+  'payment.bank_number': 'Account number',
+  'payment.bank_branch': 'Bank branch',
+  'payment.mpesa_number': 'M-Pesa number',
+  'payment.tax_id': 'Tax ID',
+  'payment.preferred_payment_frequency': 'Preferred payout frequency',
+  'payment.is_vat_registered': 'VAT registered',
+  'payment.vat_number': 'VAT number',
+};
 
-const formatDateTime = (value?: string | null) =>
-  value
-    ? new Date(value).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '-';
+function formatCompletionFieldLabel(section: string, field: string) {
+  const key = `${section}.${field}`;
+  if (COMPLETION_FIELD_LABELS[key]) return COMPLETION_FIELD_LABELS[key];
+
+  return field
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 
 const formatCurrency = (value?: number | null, currency?: string | null) => {
   if (value === undefined || value === null) return '-';
@@ -232,7 +246,7 @@ export function MentorProfileView() {
                 ) : null}
               </div>
               <div className="flex flex-wrap items-center justify-center gap-2">
-                <Badge>{mentor.role?.name ?? 'Mentor'}</Badge>
+                <Badge variant="default">{mentor.role?.name ?? 'Mentor'}</Badge>
                 <Badge
                   variant="outline"
                   className={STATUS_BADGE_CLASS[mentor.status] ?? STATUS_BADGE_CLASS.active}
@@ -241,7 +255,7 @@ export function MentorProfileView() {
                 </Badge>
                 {economy?.tier?.code && <Badge variant="outline">{economy.tier.code}</Badge>}
                 {economy?.is_verified_mentor && (
-                  <Badge variant="outline" className="gap-1 bg-blue-50 text-blue-700 border-blue-200">
+                  <Badge variant="outline" className="gap-1 bg-blue-50 text-blue-700 border-blue-200!">
                     <BadgeCheck className="h-3 w-3" /> Verified Mentor
                   </Badge>
                 )}
@@ -249,8 +263,8 @@ export function MentorProfileView() {
             </div>
 
             <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-slate-100 pt-5">
-              <InfoRow label="Join Date" value={formatDate(mentor.createdAt)} />
-              <InfoRow label="Last Updated" value={formatDate(mentor.updatedAt)} />
+              <InfoRow label="Joining Date" value={mentor.createdAt ? moment(mentor.createdAt).format('DD MMM YYYY hh:mm A') : '-'} />
+              <InfoRow label="Last Updated" value={mentor.updatedAt ? moment(mentor.updatedAt).format('DD MMM YYYY hh:mm A') : '-'} />
               <InfoRow
                 label="Account Verified"
                 value={
@@ -258,8 +272,8 @@ export function MentorProfileView() {
                     variant="outline"
                     className={
                       mentor.is_verified
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                        ? 'bg-green-50 text-green-700 border-green-200!'
+                        : 'bg-slate-100 text-slate-600 border-slate-200!'
                     }
                   >
                     {mentor.is_verified ? 'Yes' : 'No'}
@@ -269,7 +283,7 @@ export function MentorProfileView() {
               <InfoRow label="User Type" value={<span className="capitalize">{mentor.user_type ?? '-'}</span>} />
               {mentor.status_reason ? (
                 <>
-                  <InfoRow label="Status Changed At" value={formatDateTime(mentor.status_changed_at)} fullWidth />
+                  <InfoRow label="Status Changed At" value={mentor.status_changed_at ? moment(mentor.status_changed_at).format('DD MMM YYYY hh:mm A') : '-'} fullWidth />
                   <InfoRow label="Status Reason" value={mentor.status_reason} fullWidth />
                 </>
               ) : null}
@@ -327,10 +341,10 @@ export function MentorProfileView() {
                   <Badge
                     key={`${field.section}-${field.field}-${index}`}
                     variant="outline"
-                    className="gap-1 bg-green-50 text-green-700 border-green-200"
+                    className="gap-1 bg-green-50 text-green-700 border-green-200!"
                   >
                     <CheckCircle2 className="h-3 w-3" />
-                    {field.section}.{field.field}
+                    {formatCompletionFieldLabel(field.section, field.field)}
                   </Badge>
                 ))}
               </div>
@@ -342,10 +356,10 @@ export function MentorProfileView() {
                   <Badge
                     key={`${field.section}-${field.field}-${index}`}
                     variant="outline"
-                    className="gap-1 bg-amber-50 text-amber-700 border-amber-200"
+                    className="gap-1 bg-amber-50 text-amber-700 border-amber-200!"
                   >
                     <Circle className="h-3 w-3" />
-                    {field.section}.{field.field}
+                    {formatCompletionFieldLabel(field.section, field.field)}
                   </Badge>
                 ))}
               </div>
@@ -375,7 +389,7 @@ export function MentorProfileView() {
                   label="Payment Frequency"
                   value={<span className="capitalize">{mentorInfo.preferred_payment_frequency}</span>}
                 />
-                <InfoRow label="Tier Assigned At" value={formatDateTime(mentorInfo.tier_assigned_at)} />
+                <InfoRow label="Tier Assigned At" value={mentorInfo.tier_assigned_at ? moment(mentorInfo.tier_assigned_at).format('DD MMM YYYY hh:mm A') : '-'} />
                 <InfoRow
                   label="Mentor Verified"
                   value={
@@ -383,8 +397,8 @@ export function MentorProfileView() {
                       variant="outline"
                       className={
                         mentorInfo.is_verified_mentor
-                          ? 'bg-green-50 text-green-700 border-green-200'
-                          : 'bg-slate-100 text-slate-600 border-slate-200'
+                          ? 'bg-green-50 text-green-700 border-green-200!'
+                          : 'bg-slate-100 text-slate-600 border-slate-200!'
                       }
                     >
                       {mentorInfo.is_verified_mentor ? 'Yes' : 'No'}
@@ -392,7 +406,7 @@ export function MentorProfileView() {
                   }
                 />
                 {mentorInfo.verified_mentor_at ? (
-                  <InfoRow label="Verified At" value={formatDateTime(mentorInfo.verified_mentor_at)} />
+                  <InfoRow label="Verified At" value={mentorInfo.verified_mentor_at ? moment(mentorInfo.verified_mentor_at).format('DD MMM YYYY hh:mm A') : '-'} />
                 ) : null}
                 {mentorInfo.verified_mentor_by ? (
                   <InfoRow label="Verified By" value={mentorInfo.verified_mentor_by} />
@@ -438,8 +452,8 @@ export function MentorProfileView() {
                       variant="outline"
                       className={
                         economy.wallet?.enabled
-                          ? 'bg-green-50 text-green-700 border-green-200'
-                          : 'bg-slate-100 text-slate-600 border-slate-200'
+                          ? 'bg-green-50 text-green-700 border-green-200!'
+                          : 'bg-slate-100 text-slate-600 border-slate-200!'
                       }
                     >
                       {economy.wallet?.enabled ? 'Enabled' : 'Disabled'} · {economy.wallet?.currency ?? '-'}
@@ -485,8 +499,8 @@ export function MentorProfileView() {
                 variant="outline"
                 className={
                   agreement?.all_mandatory_accepted
-                    ? 'bg-green-50 text-green-700 border-green-200'
-                    : 'bg-red-50 text-red-700 border-red-200'
+                    ? 'bg-green-50 text-green-700 border-green-200!'
+                    : 'bg-red-50 text-red-700 border-red-200!'
                 }
               >
                 Mandatory {agreement?.all_mandatory_accepted ? 'Accepted' : 'Pending'}
@@ -495,8 +509,8 @@ export function MentorProfileView() {
                 variant="outline"
                 className={
                   agreement?.all_blocking_accepted
-                    ? 'bg-green-50 text-green-700 border-green-200'
-                    : 'bg-red-50 text-red-700 border-red-200'
+                    ? 'bg-green-50 text-green-700 border-green-200!'
+                    : 'bg-red-50 text-red-700 border-red-200!'
                 }
               >
                 Blocking {agreement?.all_blocking_accepted ? 'Accepted' : 'Pending'}
@@ -514,14 +528,14 @@ export function MentorProfileView() {
                       <p className="text-sm font-medium text-slate-800 truncate">
                         {item.title} <span className="text-xs text-slate-400">v{item.version}</span>
                       </p>
-                      <p className="text-xs text-slate-500">Accepted {formatDateTime(item.accepted_at)}</p>
+                      <p className="text-xs text-slate-500">Accepted {item.accepted_at ? moment(item.accepted_at).format('DD MMM YYYY hh:mm A') : '-'}</p>
                     </div>
                     <Badge
                       variant="outline"
                       className={
                         item.is_accepted
-                          ? 'bg-green-50 text-green-700 border-green-200 shrink-0'
-                          : 'bg-slate-100 text-slate-600 border-slate-200 shrink-0'
+                          ? 'bg-green-50 text-green-700 border-green-200! shrink-0'
+                          : 'bg-slate-100 text-slate-600 border-slate-200! shrink-0'
                       }
                     >
                       {item.is_accepted ? 'Accepted' : 'Pending'}

@@ -107,7 +107,7 @@ export function AdminSubscribersTab() {
         },
         {
             field: 'createdAt',
-            headerName: 'Joined',
+            headerName: 'Joining Date',
             minWidth: 140,
             sortable: false,
             renderCell: (params) => (

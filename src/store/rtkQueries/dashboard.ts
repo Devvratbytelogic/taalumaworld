@@ -57,7 +57,7 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
         /** Logged-in mentor's own referrals, filterable by status — Mentor only */
         getMyMentorReferrals: builder.query<IMentorReferralsAPIResponse, { page?: number; limit?: number; status?: string } | void>({
             query: (params) => ({
-                url: `/admin/mentor-referrals/my`,
+                url: `/admin/referrals/my`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),

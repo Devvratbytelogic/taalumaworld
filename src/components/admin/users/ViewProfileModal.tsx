@@ -82,7 +82,7 @@ export function ViewProfileModal({
               <dd className="mt-1 text-sm text-slate-700">{user.phone || user.phone_number || '-'}</dd>
             </div>
             <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Join date</dt>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Joining date</dt>
               <dd className="mt-1 text-sm text-slate-700">
                 {user.createdAt
                   ? new Date(user.createdAt).toLocaleDateString('en-US', {

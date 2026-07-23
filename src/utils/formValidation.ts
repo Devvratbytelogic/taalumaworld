@@ -462,10 +462,10 @@ export const institutionSchema = Yup.object({
       return value >= start;
     }),
   status: Yup.string().oneOf(['Active', 'Inactive']),
-  books_pricing_type: Yup.string().oneOf(['Market Price', 'Discounted Price']),
-  discount_percentage: Yup.number().when('books_pricing_type', {
-    is: 'Discounted Price',
-    then: (schema) => schema.min(1, 'Min 1%').max(100, 'Max 100%').required('Discount is required'),
+  books_pricing_type: Yup.string().oneOf(['Market Price', 'Discount']),
+  coupon: Yup.string().when('books_pricing_type', {
+    is: 'Discounted',
+    then: (schema) => schema.required('Coupon is required'),
     otherwise: (schema) => schema.optional(),
   }),
   // accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),

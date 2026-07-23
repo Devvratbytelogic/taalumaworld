@@ -1,8 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
+import ReactSelect from 'react-select';
 import { Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -22,12 +24,20 @@ import {
   useAddInstitutionMutation,
   useUpdateInstitutionMutation,
 } from '@/store/rtkQueries/institutionApi';
+import { useGetAdminAllCouponsQuery } from '@/store/rtkQueries/couponApis';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
 import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import type { IAllInstitutionsDataEntity } from '@/types/institution';
 import toast from '@/utils/toast';
 import { institutionSchema } from '@/utils/formValidation';
+import { COUPON_SCOPE_LABELS } from '@/constants/coupon';
+
+function getCouponId(coupon?: string | { _id: string } | null): string {
+  if (!coupon) return '';
+  return typeof coupon === 'string' ? coupon : coupon._id;
+}
 
 export function AddEditInstitutionModal() {
   const dispatch = useDispatch();
@@ -42,10 +52,28 @@ export function AddEditInstitutionModal() {
     touchPoint: "",
     userType: AGREEMENT_VISIBLE_USER_TYPES.SUPER_ADMIN,
   });
+  const { data: couponsResponse, isLoading: isCouponsLoading } = useGetAdminAllCouponsQuery(
+    { type: COUPON_SCOPE_LABELS?.university?.toLowerCase() },
+    { skip: !isOpen },
+  );
 
   const institutionAgreements = agreementsResponse?.data ?? [];
   // Only agreements the API marks as `is_required` must be accepted before submitting.
   const requiredAgreementIds = institutionAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
+
+  const couponOptions: SelectOption[] = useMemo(
+    () =>
+      (couponsResponse?.data?.data ?? []).map((coupon) => ({
+        value: coupon._id,
+        label:
+          coupon.coupon_type === 'Percentage'
+            ? `${coupon.coupon_code} (${coupon.value}%)`
+            : coupon.coupon_type === 'Free'
+              ? `${coupon.coupon_code} (Free)`
+              : `${coupon.coupon_code} (KES ${coupon.value})`,
+      })),
+    [couponsResponse],
+  );
 
   const onClose = () => dispatch(closeModal());
 
@@ -59,7 +87,7 @@ export function AddEditInstitutionModal() {
       promo_end: institution?.promo_end?.substring(0, 10) ?? '',
       status: institution?.status ?? 'Active',
       books_pricing_type: institution?.books_pricing_type ?? 'Market Price',
-      discount_percentage: institution?.discount_percentage ?? 0,
+      coupon: getCouponId(institution?.coupon),
       accepted_agreement_ids: [] as string[],
     },
     validationSchema: institutionSchema,
@@ -79,8 +107,7 @@ export function AddEditInstitutionModal() {
         status: formValues.status,
         contact_email: formValues.contact_email.trim(),
         books_pricing_type: formValues.books_pricing_type,
-        discount_percentage:
-          formValues.books_pricing_type === 'Discounted Price' ? Number(formValues.discount_percentage) : 0,
+        coupon: formValues.books_pricing_type === 'Discount' ? formValues.coupon : '',
         accepted_agreement_ids: formValues.accepted_agreement_ids,
       };
 
@@ -92,7 +119,7 @@ export function AddEditInstitutionModal() {
           toast.success(res.message ?? (isEdit ? 'Institution updated' : 'Institution added'));
           onClose();
         }
-      } catch(error) {
+      } catch (error) {
         console.error('Failed to add/update institution', error);
       }
     },
@@ -100,6 +127,7 @@ export function AddEditInstitutionModal() {
 
   const isLoading = isAdding || isUpdating || isSubmitting;
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
+  const selectedCouponOption = couponOptions.find((option) => option.value === values.coupon) ?? null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -238,32 +266,40 @@ export function AddEditInstitutionModal() {
                     id="books_pricing_type"
                     name="books_pricing_type"
                     value={values.books_pricing_type}
-                    onChange={(e) => setFieldValue('books_pricing_type', e.target.value)}
+                    onChange={(e) => {
+                      setFieldValue('books_pricing_type', e.target.value);
+                      if (e.target.value !== 'Discount') setFieldValue('coupon', '');
+                    }}
                     onBlur={handleBlur}
                     className="w-full"
                   >
                     <option value="Market Price">Market Price</option>
-                    <option value="Discounted Price">Discounted Price</option>
+                    <option value="Discount">Discounted Price</option>
                   </select>
                 </div>
-                {values.books_pricing_type === 'Discounted Price' ? (
+                {values.books_pricing_type === 'Discount' ? (
                   <div className="space-y-2">
-                    <Label htmlFor="discount_percentage" className="text-xs text-slate-500">
-                      Discount Percentage
+                    <Label htmlFor="coupon" className="text-xs text-slate-500">
+                      Coupon <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      id="discount_percentage"
-                      name="discount_percentage"
-                      type="number"
-                      min={1}
-                      max={100}
-                      value={values.discount_percentage}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="e.g. 30"
+                    <ReactSelect
+                      inputId="coupon"
+                      name="coupon"
+                      classNamePrefix="react-select"
+                      options={couponOptions}
+                      value={selectedCouponOption}
+                      onChange={(option) => setFieldValue('coupon', option?.value ?? '')}
+                      onBlur={() => setFieldTouched('coupon', true)}
+                      placeholder={isCouponsLoading ? 'Loading coupons...' : 'Select a university coupon'}
+                      isClearable
+                      isLoading={isCouponsLoading}
+                      isDisabled={isLoading || isCouponsLoading}
+                      menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                      menuPosition="fixed"
+                      styles={SELECT_STYLES}
                     />
-                    {touched.discount_percentage && errors.discount_percentage ? (
-                      <p className="text-sm text-red-600">{errors.discount_percentage}</p>
+                    {touched.coupon && errors.coupon ? (
+                      <p className="text-sm text-red-600">{errors.coupon}</p>
                     ) : null}
                   </div>
                 ) : null}

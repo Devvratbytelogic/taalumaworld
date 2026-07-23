@@ -30,7 +30,8 @@ export interface IAllInstitutionsDataEntity {
   status: string;
   updatedAt: string;
   books_pricing_type: string;
-  discount_percentage: number;
+  discount_percentage?: number;
+  coupon?: string | null;
   promo_reminders_sent: IInstitutionPromoRemindersSent;
 }
 export interface IInstitutionPromoRemindersSent {
@@ -67,7 +68,8 @@ export interface ISingleInstitutionData {
   status: string;
   updatedAt: string;
   books_pricing_type: string;
-  discount_percentage: number;
+  discount_percentage?: number;
+  coupon?: string | { _id: string; coupon_code?: string } | null;
   promo_reminders_sent: ISingleInstitutionPromoRemindersSent;
   promo_active: boolean;
   blueprint_access?: (ISingleInstitutionBlueprintAccessEntity)[] | null;

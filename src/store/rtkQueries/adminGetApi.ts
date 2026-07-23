@@ -138,8 +138,16 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminSubscribers'],
         }),
 
-        /** Orders (single endpoint, filtered client-side by `type`: 'books' | 'chapter') */
-        getAllOrders: builder.query<IAllOrdersAPIResponse, { type: 'books' | 'chapter'; page?: number; limit?: number; search?: string }>({
+        /** Orders (optional `type`: 'books' | 'chapter'; omit for all) */
+        getAllOrders: builder.query<IAllOrdersAPIResponse, {
+            type?: 'books' | 'chapter';
+            page?: number;
+            limit?: number;
+            search?: string;
+            payment_status?: string;
+            fromDate?: string;
+            toDate?: string;
+        }>({
             query: (params) => ({
                 url: `/admin/orders`,
                 method: 'GET',

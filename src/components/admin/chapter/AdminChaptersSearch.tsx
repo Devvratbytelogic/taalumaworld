@@ -6,6 +6,7 @@ import {
   adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
 import { Checkbox } from '@/components/ui/checkbox';
+import { BLUEPRINT_STATUSES } from '@/constants/blueprint';
 
 interface BookOption {
   id: string;
@@ -24,7 +25,7 @@ interface AdminChaptersSearchProps {
   onIsMineChange: (value: boolean) => void;
 }
 
-const STATUS_OPTIONS = ['Published', 'Draft'];
+const STATUS_OPTIONS = BLUEPRINT_STATUSES;
 
 export function AdminChaptersSearch({
   searchQuery,

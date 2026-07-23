@@ -18,10 +18,7 @@ import {
 import { useGetChapterByIdQuery } from '@/store/rtkQueries/adminGetApi';
 import { getChaptersListRoutePath, getEditChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 
-const STATUS_BADGE_CLASS: Record<string, string> = {
-  Published: 'bg-green-50 text-green-700 border-green-200',
-  Draft: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-};
+import { BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 
 function DetailRow({ label, value }: { label: string; value?: ReactNode }) {
   return (
@@ -95,7 +92,10 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
             <div className="flex items-start justify-between gap-2">
               <h3 className="text-xl font-semibold leading-tight">{chapter.title}</h3>
               {chapter.status && (
-                <Badge variant="outline" className={`${STATUS_BADGE_CLASS[chapter.status] ?? ''} shrink-0`}>
+                <Badge
+                  variant="outline"
+                  className={`${BLUEPRINT_STATUS_CONFIG[chapter.status as BlueprintStatus]?.badge ?? ''} shrink-0`}
+                >
                   {chapter.status}
                 </Badge>
               )}

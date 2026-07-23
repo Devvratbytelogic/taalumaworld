@@ -161,9 +161,9 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
 
       <header ref={headerRef} className="sticky top-0 z-50 border-b border-gray-200 bg-white/60 backdrop-blur-md">
         <div className="container">
-          <div className="relative flex h-16 items-center justify-between gap-3">
-            <Link href={getHomeRoutePath()} className="flex shrink-0 items-center">
-              <div className="h-9 w-[136px] sm:h-10 sm:w-[200px]">
+          <div className="relative flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3">
+            <Link href={getHomeRoutePath()} className="flex min-w-0 shrink items-center">
+              <div className="h-8 w-[120px] sm:h-10 sm:w-[200px]">
                 <ImageComponent src={logo || '/images/logo.png'} alt={brandName} object_cover={false} />
               </div>
             </Link>
@@ -183,11 +183,11 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               ))}
             </nav>
 
-            <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+            <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
               <button
                 type="button"
                 onClick={() => setIsSearchOpen((prev) => !prev)}
-                className={cn(iconButtonClass, isSearchOpen && 'bg-primary/10 text-primary')}
+                className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10', isSearchOpen && 'bg-primary/10 text-primary')}
                 aria-label={isSearchOpen ? 'Close search' : 'Open search'}
                 aria-expanded={isSearchOpen}
               >
@@ -205,7 +205,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               )}
 
               {isAuthenticated && (
-                <Link href={getCartRoutePath()} className={iconButtonClass} aria-label="Shopping cart">
+                <Link href={getCartRoutePath()} className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10')} aria-label="Shopping cart">
                   <ShoppingCart className="h-[18px] w-[18px]" />
                   {cartCount > 0 && (
                     <span className="absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-white">
@@ -269,26 +269,26 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                   )}
                 </div>
               ) : (
-                <>
+                <div className="hidden items-center gap-1.5 lg:flex">
                   <Button
-                    className="global_btn rounded_full outline_primary hidden lg:flex"
+                    className="global_btn rounded_full outline_primary"
                     onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                   >
                     Sign In
                   </Button>
                   <Button
-                    className="global_btn rounded_full bg_primary hidden lg:flex"
+                    className="global_btn rounded_full bg_primary"
                     onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                   >
                     Join Taaluma
                   </Button>
-                </>
+                </div>
               )}
 
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(true)}
-                className={cn(iconButtonClass, 'lg:hidden')}
+                className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10 lg:hidden')}
                 aria-label="Open menu"
               >
                 <Menu className="h-[18px] w-[18px]" />

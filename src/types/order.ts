@@ -8,7 +8,7 @@ export interface IAllOrdersAPIResponse {
 }
 export interface IAllOrdersAPIResponseData {
     summary: Summary;
-    data: IAllOrdersAPIResponseDataEntity;
+    data: IAllOrdersAPIResponseDataEntityItem;
 }
 export interface Summary {
     totalRevenue: number;
@@ -24,25 +24,38 @@ export interface StatusCounts {
 export interface PaymentStatusCounts {
     Paid: number;
 }
-export interface IAllOrdersAPIResponseDataEntity {
-    data?: (IAllOrdersAPIResponseDataEntityItem)[] | null;
+export interface IAllOrdersAPIResponseDataEntityItem {
+    data?: (IAllOrdersAPIResponseDataEntityItemEntityItem)[] | null;
     total: number;
     page: number;
     limit: number;
     totalPages: number;
 }
-export interface IAllOrdersAPIResponseDataEntityItem {
+export interface IAllOrdersAPIResponseDataEntityItemEntityItem {
     id: string;
     orderId: number;
     transactionId: string;
     userName: string;
     userEmail: string;
     itemCount: number;
+    type: string;
     amount: number;
     date: string;
     paymentMethod: string;
     status: string;
+    items?: (IAllOrdersAPIResponseDataEntityItemEntityItemItems)[] | null;
+    legacyType?: string | null;
 }
+export interface IAllOrdersAPIResponseDataEntityItemEntityItemItems {
+    type: string;
+    name: string;
+    image: string;
+    legacyType: string;
+}
+
+
+
+
 
 /** GET /admin/orders/:id */
 export interface ISingleOrderAPIResponse {

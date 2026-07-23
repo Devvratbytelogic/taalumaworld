@@ -27,6 +27,7 @@ import { cn } from '@/components/ui/utils';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { BLUEPRINT_STATUSES, DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
 
 
 
@@ -75,7 +76,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     sequence: chapterData?.number ?? 1,
     isFree: chapterData?.isFree ?? false,
     price: chapterData?.price ?? 0 as number | undefined,
-    status: chapterData?.status ?? 'Published',
+    status: chapterData?.status ?? DEFAULT_BLUEPRINT_STATUS,
     cover_image: chapterData?.coverImage ?? null as File | null,
     accepted_agreement_ids: [] as string[],
     meta_title: chapterData?.meta_title ?? '',
@@ -448,8 +449,9 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Published">Published</SelectItem>
-                <SelectItem value="Draft">Draft</SelectItem>
+                {BLUEPRINT_STATUSES.map((status) => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.status && touched.status && (

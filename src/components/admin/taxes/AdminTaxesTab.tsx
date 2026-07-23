@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminTaxesHeader } from './AdminTaxesHeader';
 import { AdminTaxesSearch } from './AdminTaxesSearch';
+import { DefaultTaxRateCard } from './DefaultTaxRateCard';
 import { TaxModal, type TaxFormValues } from './TaxModal';
 import toast from '@/utils/toast';
 
@@ -226,6 +227,8 @@ export function AdminTaxesTab() {
           setIsModalOpen(true);
         }}
       />
+
+      <DefaultTaxRateCard />
 
       <AdminTaxesSearch
         searchQuery={search}

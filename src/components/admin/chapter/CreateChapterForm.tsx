@@ -26,18 +26,12 @@ import Link from 'next/link';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
 
 const initialFormValues = {
   bookId: '',
@@ -48,7 +42,6 @@ const initialFormValues = {
   sequence: 1,
   isFree: false,
   price: 0 as number | undefined,
-  status: 'Published',
   cover_image: null as File | null,
   meta_title: '',
   meta_description: '',
@@ -106,7 +99,7 @@ export function CreateChapterForm() {
         formData.append('isFree', String(vals.isFree));
         formData.append('price', String(!vals.isFree ? (vals.price ?? 0) : 0));
       }
-      formData.append('status', vals.status);
+      formData.append('status', DEFAULT_BLUEPRINT_STATUS);
       // formData.append('page', String(vals.page ?? 1));
       if (featuredImageFile) formData.append('cover_image', featuredImageFile);
       if (pdfFile) {
@@ -364,7 +357,7 @@ export function CreateChapterForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
           {chapterPricingEnabled ? (
             <>
               <div className="space-y-2 flex flex-col justify-end">
@@ -418,27 +411,6 @@ export function CreateChapterForm() {
               <span>Pricing is set at series level; this blueprint has no separate price.</span>
             </div>
           )}
-          <div className="space-y-2 max-w-xs">
-            <Label>Status <span className="text-red-500">*</span></Label>
-            <Select
-              value={values.status}
-              onValueChange={(value) => {
-                setFieldValue('status', value);
-                setFieldTouched('status', true);
-              }}
-            >
-              <SelectTrigger className={errors.status && touched.status ? 'border-red-500' : undefined}>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Published">Published</SelectItem>
-                <SelectItem value="Draft">Draft</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.status && touched.status && (
-              <p className="text-sm text-red-600">{errors.status}</p>
-            )}
-          </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="space-y-2 flex-1 ">

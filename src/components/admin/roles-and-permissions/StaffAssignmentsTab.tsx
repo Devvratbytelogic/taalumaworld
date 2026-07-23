@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
 import { AlertCircle, Ban, CheckCircle, Edit2, Plus } from 'lucide-react';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { openModal } from '@/store/slices/allModalSlice';
-import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
+import { AdminSearchInput, AdminSearchPanel } from '@/components/admin/layout/AdminContent';
+import Button from '@/components/ui/Button';
 import { useDebounce } from '@/hooks/useDebounce';
 import CommonDataTable from '../CommonDataTable';
 import { Badge } from '@/components/ui/badge';
@@ -135,23 +135,24 @@ export function StaffAssignmentsTab() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-3">
-                <AdminSearchInput
-                    placeholder="Search by name, email, or role..."
-                    value={search}
-                    onChange={setSearch}
-                />
-                <Button
-                    color="primary"
-                    className="rounded-xl"
-                    onPress={() => dispatch(openModal({ componentName: 'AddEditStaffModal', }))}
-                    startContent={<Plus className="h-4 w-4" />}
-                >
-                    Add Staff
-                </Button>
-            </div>
+            <AdminSearchPanel>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <AdminSearchInput
+                        placeholder="Search by name, email, or role..."
+                        value={search}
+                        onChange={setSearch}
+                    />
+                    <Button
+                        className="global_btn rounded_full bg_primary lg:shrink-0"
+                        onPress={() => dispatch(openModal({ componentName: 'AddEditStaffModal' }))}
+                        startContent={<Plus className="h-4 w-4" />}
+                    >
+                        Add Staff
+                    </Button>
+                </div>
+            </AdminSearchPanel>
 
-            <div className="border border-gray-200 rounded-md overflow-hidden">
+            <div className="overflow-hidden rounded-md border border-gray-200">
                 <CommonDataTable
                     rows={staff}
                     columns={columns}

@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { COUPON_SCOPES, COUPON_TYPES } from '@/constants/coupon';
+import { BLUEPRINT_STATUSES } from '@/constants/blueprint';
 
 
 const passwordRules = Yup.string()
@@ -212,7 +213,7 @@ export const editBookSchema = Yup.object({
   ...openGraphFieldsSchema,
 });
 
-// Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, status, cover_image, page)
+// Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, cover_image, page)
 export const addChapterSchema = Yup.object({
   bookId: Yup.string().required('Please select a series'),
   title: Yup.string()
@@ -230,7 +231,7 @@ export const addChapterSchema = Yup.object({
           .min(1, 'Price must be greater than 0 for paid blueprints')
           .required('Price is required when blueprint is not free'),
     }),
-  status: Yup.string().required('Status is required'),
+  status: Yup.string().oneOf([...BLUEPRINT_STATUSES], 'Select a valid status'),
   cover_image: Yup.mixed().required('Cover image is required'),
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
   ...openGraphFieldsSchema,

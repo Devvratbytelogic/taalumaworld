@@ -2,17 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Plus, Edit2, Trash2, Shield } from 'lucide-react';
-import { useGetAllRolesQuery, } from '@/store/rtkQueries/rolesPermissionsApi';
-import { closeModal, openModal } from '@/store/slices/allModalSlice';
-import { AdminSearchInput } from '@/components/admin/layout/AdminContent';
+import { Plus, Edit2, Shield } from 'lucide-react';
+import { useGetAllRolesQuery } from '@/store/rtkQueries/rolesPermissionsApi';
+import { openModal } from '@/store/slices/allModalSlice';
+import { AdminSearchInput, AdminSearchPanel } from '@/components/admin/layout/AdminContent';
+import Button from '@/components/ui/Button';
+import { USER_TYPE } from '@/constants/common';
 import { useDebounce } from '@/hooks/useDebounce';
+import { cn } from '@/components/ui/utils';
 import CommonDataTable from '../CommonDataTable';
-import { useDeleteRoleMutation } from '@/store/rtkQueries/rolesPermissionsApi';
-import toast from '@/utils/toast'
 
+const PROTECTED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
+
+function isProtectedRole(name?: string | null) {
+    return PROTECTED_ROLE_NAMES.has(String(name ?? '').trim());
+}
 
 export function RolesRegistryTab() {
     const dispatch = useDispatch();
@@ -26,24 +31,11 @@ export function RolesRegistryTab() {
     });
     const roles = res?.data?.data ?? [];
     const totalRoles = res?.data?.total ?? 0;
-    const [deleteRole] = useDeleteRoleMutation();
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
     }, [debouncedSearch]);
 
-    // const onDeleteRole = async (id: string) => {
-    //     try {
-    //         const res = await deleteRole({ id }).unwrap();
-    //         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-    //             toast.success(res?.message ?? 'Role deleted successfully');
-    //             dispatch(closeModal());
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting role', error);
-    //     }
-    // }
-    
     const columns: GridColDef[] = [
         {
             field: 'index',
@@ -64,15 +56,23 @@ export function RolesRegistryTab() {
         {
             field: 'name',
             headerName: 'Role',
-            minWidth: 200,
-            flex: 1,
+            minWidth: 250,
+            flex: 1.5,
             sortable: false,
-            renderCell: (params) => (
-                <div className="flex items-center gap-2 whitespace-nowrap">
-                    <Shield className="h-4 w-4 text-primary shrink-0" />
-                    <span className="font-medium text-sm">{params.value}</span>
-                </div>
-            ),
+            renderCell: (params) => {
+                const protectedRole = isProtectedRole(params.row.name);
+                return (
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                        <Shield className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="text-sm font-medium">{params.value}</span>
+                        {protectedRole ? (
+                            <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                                System
+                            </span>
+                        ) : null}
+                    </div>
+                );
+            },
         },
         {
             field: 'description',
@@ -111,50 +111,51 @@ export function RolesRegistryTab() {
             headerName: 'Actions',
             width: 150,
             sortable: false,
-            renderCell: (params) => (
-                <div className='action_buttons'>
-                    <button
-                        className="edit_button"
-                        onClick={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: params.row, isEdit: true } }))}
-                    >
-                        <Edit2 className="h-4 w-4" />
-                    </button>
-                    {/* <button
-                        className="delete_button"
-                        onClick={() => dispatch(openModal({
-                            componentName: 'DeleteConfirmation',
-                            data: {
-                                itemName: params.row.name,
-                                onDelete: () => onDeleteRole(params.row._id),
-                            },
-                        }))}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </button> */}
-                </div>
-            ),
+            renderCell: (params) => {
+                const protectedRole = isProtectedRole(params.row.name);
+                return (
+                    <div className="action_buttons">
+                        <button
+                            type="button"
+                            className={cn('edit_button', protectedRole && 'pointer-events-none opacity-40')}
+                            title={protectedRole ? 'System roles cannot be edited' : 'Edit role'}
+                            disabled={protectedRole}
+                            onClick={() => {
+                                if (protectedRole) return;
+                                dispatch(openModal({
+                                    componentName: 'AddEditRoleModal',
+                                    data: { role: params.row, isEdit: true },
+                                }));
+                            }}
+                        >
+                            <Edit2 className="h-4 w-4" />
+                        </button>
+                    </div>
+                );
+            },
         },
-    ]
+    ];
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-3">
-                <AdminSearchInput
-                    placeholder="Search roles..."
-                    value={search}
-                    onChange={setSearch}
-                />
-                <Button
-                    color="primary"
-                    className="rounded-xl"
-                    onPress={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: null } }))}
-                    startContent={<Plus className="h-4 w-4" />}
-                >
-                    Create Role
-                </Button>
-            </div>
+            <AdminSearchPanel>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <AdminSearchInput
+                        placeholder="Search roles..."
+                        value={search}
+                        onChange={setSearch}
+                    />
+                    <Button
+                        className="global_btn rounded_full bg_primary lg:shrink-0"
+                        onPress={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: null } }))}
+                        startContent={<Plus className="h-4 w-4" />}
+                    >
+                        Create Role
+                    </Button>
+                </div>
+            </AdminSearchPanel>
 
-            <div className='border border-gray-200 rounded-md overflow-hidden'>
+            <div className="overflow-hidden rounded-md border border-gray-200">
                 <CommonDataTable
                     rows={roles}
                     columns={columns}

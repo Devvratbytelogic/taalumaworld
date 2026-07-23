@@ -86,10 +86,6 @@ export function AdminRolesPermissionsTab() {
             </div>
           </div>
 
-          {activeTabMeta ? (
-            <p className="text-sm text-slate-500">{activeTabMeta.description}</p>
-          ) : null}
-
           {activeTab === 'roles' && <RolesRegistryTab />}
           {activeTab === 'permissions' && <PermissionsMatrixTab />}
           {activeTab === 'staff' && <StaffAssignmentsTab />}

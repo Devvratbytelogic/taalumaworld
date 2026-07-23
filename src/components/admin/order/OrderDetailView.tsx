@@ -20,16 +20,11 @@ import { getAdminSectionRoutePath } from '@/routes/routes';
 import { API_BASE_URL } from '@/utils/config';
 
 const PAYMENT_STATUS_BADGE_CLASS: Record<string, string> = {
-  paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  unpaid: 'bg-red-50 text-red-700 border-red-200',
-  partial: 'bg-amber-50 text-amber-700 border-amber-200',
+  paid: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
+  unpaid: 'bg-red-50 text-red-700 border-red-200!',
+  partial: 'bg-amber-50 text-amber-700 border-amber-200!',
 };
 
-const ORDER_STATUS_BADGE_CLASS: Record<string, string> = {
-  completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  pending: 'bg-amber-50 text-amber-700 border-amber-200',
-  cancelled: 'bg-red-50 text-red-700 border-red-200',
-};
 
 function DetailRow({ label, value }: { label: string; value?: ReactNode }) {
   return (
@@ -147,12 +142,12 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge
+            {/* <Badge
               variant="outline"
               className={cn('capitalize', ORDER_STATUS_BADGE_CLASS[statusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200')}
             >
               {order.status || '—'}
-            </Badge>
+            </Badge> */}
             <Badge
               variant="outline"
               className={cn('capitalize', PAYMENT_STATUS_BADGE_CLASS[paymentStatusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200')}

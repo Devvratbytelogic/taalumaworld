@@ -29,21 +29,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getEditChapterRoutePath, getViewChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
+import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG } from '@/constants/blueprint';
 
-const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
-    Published: {
-        badge: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
-        dot: 'bg-green-500',
-        label: 'Published',
-    },
-    Draft: {
-        badge: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
-        dot: 'bg-yellow-500',
-        label: 'Draft',
-    },
-};
-
-const STATUSES = ['Published', 'Draft'] as const;
+const STATUS_CONFIG = BLUEPRINT_STATUS_CONFIG;
+const STATUSES = BLUEPRINT_STATUSES;
 
 export function AdminChaptersTab() {
     const dispatch = useDispatch();
@@ -76,7 +65,6 @@ export function AdminChaptersTab() {
     const chaptersData = chaptersResponse?.data;
     
     const chapters = chaptersData?.data ?? [];
-    console.log('chapters', chapters);
     const totalChapters = chaptersData?.total ?? 0;
 
     const [deleteChapter] = useDeleteChapterMutation();
@@ -208,7 +196,7 @@ export function AdminChaptersTab() {
             sortable: false,
             renderCell: (params) => {
                 const chapter = params.row ;
-                const config = STATUS_CONFIG[chapter.status] ?? STATUS_CONFIG.Draft;
+                const config = STATUS_CONFIG[chapter.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.Draft;
 
                 return (
                     <DropdownMenu>
@@ -228,7 +216,7 @@ export function AdminChaptersTab() {
                                 </Badge>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-40">
+                        <DropdownMenuContent align="start" className="w-44">
                             <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
                                 Change status
                             </DropdownMenuLabel>

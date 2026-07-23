@@ -1,3 +1,5 @@
+import type { BlueprintStatus } from '@/constants/blueprint';
+
 export interface IAllChaptersAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -25,7 +27,7 @@ export interface IChapter {
   pdf: string;
   page: number;
   price: number;
-  status: string;
+  status: BlueprintStatus;
   deletedAt?: null;
   meta_title: string;
   meta_description: string;

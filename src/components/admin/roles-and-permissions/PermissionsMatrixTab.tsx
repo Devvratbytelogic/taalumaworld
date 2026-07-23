@@ -12,11 +12,18 @@ import {
 } from '@/store/rtkQueries/rolesPermissionsApi';
 import type { IAllRolesEntity } from '@/types/rolesPermissions';
 import { AdminSearchInput, adminPanelClass } from '@/components/admin/layout/AdminContent';
+import { USER_TYPE } from '@/constants/common';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import { useDebounce } from '@/hooks/useDebounce';
 
 type PermissionMatrix = Record<string, string[]>;
+
+const EXCLUDED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
+
+function isExcludedRole(name?: string | null) {
+    return EXCLUDED_ROLE_NAMES.has(String(name ?? '').trim());
+}
 
 function formatLabel(value: string): string {
     return value
@@ -53,7 +60,10 @@ export function PermissionsMatrixTab() {
     );
     const [saveRolePermissions, { isLoading: isSaving }] = useAddUpdateRolePermissionsMutation();
 
-    const roles: IAllRolesEntity[] = rolesRes?.data?.data ?? [];
+    const roles: IAllRolesEntity[] = useMemo(
+        () => (rolesRes?.data?.data ?? []).filter((role) => !isExcludedRole(role.name)),
+        [rolesRes?.data?.data],
+    );
     const models = modelsRes?.data ?? [];
     const permissions = permissionsRes?.data ?? [];
 
@@ -68,38 +78,57 @@ export function PermissionsMatrixTab() {
         [permissions],
     );
 
-    // Any permission beyond "view" implies the ability to view, so keep it in sync.
+    const hasNonViewPermission = (list: string[]) =>
+        list.some((p) => p.toLowerCase() !== 'view');
+
+    // Any permission beyond "view" implies view — keep it selected.
     const withViewDependency = (list: string[]): string[] => {
         if (!viewPermission || list.includes(viewPermission)) return list;
-        const hasOtherPermission = list.some((p) => p !== viewPermission);
-        return hasOtherPermission ? [...list, viewPermission] : list;
+        return hasNonViewPermission(list) ? [...list, viewPermission] : list;
     };
+
+    const isViewLocked = (list: string[]) =>
+        Boolean(viewPermission && hasNonViewPermission(list));
 
     const selectedRole: IAllRolesEntity | null = roles.find((role) => role._id === selectedRoleId) ?? null;
 
     useEffect(() => {
-        if (!roles.length || selectedRoleId) return;
-        setSelectedRoleId(roles[0]._id);
-    }, [roles]);
+        if (!roles.length) {
+            if (selectedRoleId) setSelectedRoleId('');
+            return;
+        }
+        if (!selectedRoleId || !roles.some((role) => role._id === selectedRoleId)) {
+            setSelectedRoleId(roles[0]._id);
+        }
+    }, [roles, selectedRoleId]);
 
     useEffect(() => {
         if (!selectedRoleId || isFetchingRolePermissions) return;
         const built: PermissionMatrix = {};
         (rolePermissionsRes?.data ?? []).forEach((entry) => {
-            built[entry.model] = entry.permission ?? [];
+            built[entry.model] = withViewDependency(entry.permission ?? []);
         });
         setMatrix(built);
         setOriginalMatrix(built);
-    }, [selectedRoleId, rolePermissionsRes, isFetchingRolePermissions]);
+    }, [selectedRoleId, rolePermissionsRes, isFetchingRolePermissions, viewPermission]);
 
     const isDirty = matrixKey(matrix) !== matrixKey(originalMatrix);
 
     const toggleCell = (model: string, permission: string) => {
         setMatrix((prev) => {
             const current = prev[model] ?? [];
-            const next = current.includes(permission)
+            const isChecked = current.includes(permission);
+            const isView = permission.toLowerCase() === 'view';
+
+            // View cannot be unchecked while any other permission is selected.
+            if (isChecked && isView && isViewLocked(current)) {
+                return prev;
+            }
+
+            const next = isChecked
                 ? current.filter((p) => p !== permission)
                 : withViewDependency([...current, permission]);
+
             return { ...prev, [model]: next };
         });
     };
@@ -113,12 +142,15 @@ export function PermissionsMatrixTab() {
     };
 
     const toggleColumn = (permission: string) => {
+        const isView = permission.toLowerCase() === 'view';
         setMatrix((prev) => {
             const allGranted = models.every((model) => (prev[model] ?? []).includes(permission));
             const next: PermissionMatrix = { ...prev };
             models.forEach((model) => {
                 const current = next[model] ?? [];
                 if (allGranted) {
+                    // Don't strip View from rows that still have other permissions.
+                    if (isView && isViewLocked(current)) return;
                     next[model] = current.filter((p) => p !== permission);
                 } else if (!current.includes(permission)) {
                     next[model] = withViewDependency([...current, permission]);
@@ -170,7 +202,7 @@ export function PermissionsMatrixTab() {
             <div className={cn(adminPanelClass, 'lg:col-span-1 p-4 space-y-3 h-fit')}>
                 <p className="text-sm font-semibold text-slate-700">Select Role</p>
                 <AdminSearchInput value={roleSearch} onChange={setRoleSearch} placeholder="Search roles..." />
-                <div className="space-y-1.5 max-h-[520px] overflow-y-auto pr-1">
+                <div className="space-y-1.5 max-h-130 overflow-y-auto pr-1">
                     {isFetchingRoles ? (
                         Array.from({ length: 3 }).map((_, i) => (
                             <div key={i} className="h-14 bg-gray-100 rounded-lg animate-pulse" />
@@ -245,7 +277,7 @@ export function PermissionsMatrixTab() {
 
                         <AdminSearchInput value={modelSearch} onChange={setModelSearch} placeholder="Search models..." />
 
-                        <div className="relative border border-gray-200 rounded-md overflow-auto max-h-[520px]">
+                        <div className="relative border border-gray-200 rounded-md overflow-auto max-h-130">
                             {isFetchingRolePermissions ? (
                                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
                                     <Loader2 className="h-6 w-6 text-primary animate-spin" />
@@ -254,7 +286,7 @@ export function PermissionsMatrixTab() {
                             <table className="w-full text-sm border-collapse">
                                 <thead className="sticky top-0 z-1 bg-slate-50">
                                     <tr>
-                                        <th className="sticky left-0 z-2 bg-slate-50 text-left px-4 py-2.5 font-semibold text-slate-600 border-b border-gray-200 min-w-[180px]">
+                                        <th className="sticky left-0 z-2 bg-slate-50 text-left px-4 py-2.5 font-semibold text-slate-600 border-b border-gray-200 min-w-45">
                                             Model
                                         </th>
                                         {permissions.map((permission) => (
@@ -296,16 +328,32 @@ export function PermissionsMatrixTab() {
                                                             {formatLabel(model)}
                                                         </button>
                                                     </td>
-                                                    {permissions.map((permission) => (
-                                                        <td key={permission} className="text-center px-3 py-2 border-b border-l border-gray-100">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40 cursor-pointer"
-                                                                checked={granted.includes(permission)}
-                                                                onChange={() => toggleCell(model, permission)}
-                                                            />
-                                                        </td>
-                                                    ))}
+                                                    {permissions.map((permission) => {
+                                                        const checked = granted.includes(permission);
+                                                        const lockedView =
+                                                            permission.toLowerCase() === 'view' &&
+                                                            checked &&
+                                                            isViewLocked(granted);
+                                                        return (
+                                                            <td key={permission} className="border-b border-l border-gray-100 px-3 py-2 text-center">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className={cn(
+                                                                        'h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40',
+                                                                        lockedView ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+                                                                    )}
+                                                                    checked={checked}
+                                                                    disabled={lockedView}
+                                                                    title={
+                                                                        lockedView
+                                                                            ? 'View is required while other permissions are selected'
+                                                                            : undefined
+                                                                    }
+                                                                    onChange={() => toggleCell(model, permission)}
+                                                                />
+                                                            </td>
+                                                        );
+                                                    })}
                                                 </tr>
                                             );
                                         })

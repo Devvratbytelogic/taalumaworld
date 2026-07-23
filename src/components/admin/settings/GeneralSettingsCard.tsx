@@ -287,11 +287,6 @@ export function GeneralSettingsCard() {
                 <Input {...field('copy_right_text')} />
                 <FieldError msg={touched.copy_right_text ? errors.copy_right_text : ''} />
               </div>
-              <div>
-                <Label htmlFor="default_tax_rate">Default Tax Rate (%)</Label>
-                <Input type="number" min={0} max={100} step="0.01" {...field('default_tax_rate')} />
-                <FieldError msg={touched.default_tax_rate ? errors.default_tax_rate : ''} />
-              </div>
 
               {/* Logo upload */}
               <div>

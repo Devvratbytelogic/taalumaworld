@@ -20,6 +20,7 @@ import {
   TrendingUp,
   CheckCircle,
   Phone,
+  Hash,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -426,6 +427,18 @@ export function ProfilePage() {
                   <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
                     <dt className="flex items-center gap-3 text-sm font-normal text-gray-600">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                        <Hash className="h-4 w-4 text-primary" aria-hidden />
+                      </span>
+                      Short code
+                    </dt>
+                    <dd className="text-base font-medium text-gray-900 sm:text-right">
+                      {profile?.short_code || '—'}
+                    </dd>
+                  </div>
+
+                  <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
+                    <dt className="flex items-center gap-3 text-sm font-normal text-gray-600">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <Calendar className="h-4 w-4 text-primary" aria-hidden />
                       </span>
                       Member since
@@ -507,6 +520,18 @@ export function ProfilePage() {
                         <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
                       ) : null}
                     </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
+                    <p className="flex items-center gap-3 text-sm font-normal text-gray-600">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                        <Hash className="h-4 w-4 text-primary" aria-hidden />
+                      </span>
+                      Short code
+                    </p>
+                    <p className="text-base font-normal text-gray-900 sm:text-right">
+                      {profile?.short_code || '—'}
+                    </p>
                   </div>
 
                   <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">

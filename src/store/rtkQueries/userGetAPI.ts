@@ -34,6 +34,8 @@ export interface IGetAllChaptersParams {
     thoughtLeaderId?: string | null;
     tags?: string | null;
     readingProgress?: string | null;
+    page?: number;
+    limit?: number;
 }
 
 export interface IGetMyChaptersParams {

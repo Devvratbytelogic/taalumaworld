@@ -190,7 +190,7 @@ export function AdminChaptersTab() {
                             ) : null}
                         </p>
                         {params.row.short_code ? (
-                            <p className="text-xs text-muted-foreground font-mono">{params.row.short_code}</p>
+                            <p className="text-xs text-muted-foreground font-mono">{params.row.slug}</p>
                         ) : null}
                     </div>
                 </div>

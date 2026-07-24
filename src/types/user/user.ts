@@ -1,12 +1,12 @@
-export interface UserProfile {
+export interface IUserProfileAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data: UserProfileData;
+  data: IUserProfileAPIResponseData;
   message: string;
   timestamp: string;
 }
-export interface UserProfileData {
+export interface IUserProfileAPIResponseData {
   _id: string;
   name: string;
   isNamePrivate: boolean;

@@ -6,6 +6,7 @@ import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
 import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
+import { IAgreementAPIResponse } from '@/types/user/agreement';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -32,6 +33,7 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
       headers: await getHeaders(),
     };
     const res = await fetch(urlString, fetchOptions);
+    // console.log('res.status', res.status);
 
     if (!res.ok) {
       if (res.status === 404) notFound();
@@ -88,4 +90,7 @@ export async function getMentorDetailsServerAPI(
   return serverFetch<IUserMentorDetailsAPIResponse>(
     `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`
   );
+}
+export async function getAgreementBySlugServerAPI({ slug }: { slug: string }) {
+  return serverFetch<IAgreementAPIResponse>(`/user/agreements/${encodeURIComponent(slug)}`);
 }

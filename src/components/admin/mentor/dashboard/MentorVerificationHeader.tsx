@@ -10,8 +10,19 @@ import { openModal } from '@/store/slices/allModalSlice';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useGetMyVerifiedMentorApplicationQuery } from '@/store/rtkQueries/verifiedMentorApplicationApis';
 
+type MentorVerificationHeaderProps = {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  showAccountStatus?: boolean;
+};
 
-export function MentorVerificationHeader() {
+export function MentorVerificationHeader({
+  eyebrow,
+  title,
+  description,
+  showAccountStatus = true,
+}: MentorVerificationHeaderProps) {
   const dispatch = useDispatch();
   const { data: profileData } = useGetAdminProfileQuery();
   const profile = profileData?.data;
@@ -28,7 +39,7 @@ export function MentorVerificationHeader() {
     ? {
       label: 'Approval note',
       Icon: ShieldCheck,
-      border: 'border-emerald-200/!',
+      border: 'border-emerald-200/80!',
       bg: 'bg-emerald-50/50',
       iconBg: 'bg-emerald-100',
       iconColor: 'text-emerald-600',
@@ -62,9 +73,11 @@ export function MentorVerificationHeader() {
   return (
     <>
       <AdminPageHeader
-        eyebrow="Overview"
-        title={`Welcome back, ${mentorName}`}
-        description="Track blueprint performance, sales, revenue, payouts, referrals, and compliance."
+        eyebrow={eyebrow ?? 'Overview'}
+        title={title ?? `Welcome back, ${mentorName}`}
+        description={
+          description ?? 'Track blueprint performance, sales, revenue, payouts, referrals, and compliance.'
+        }
       >
         {verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW ? (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
@@ -123,39 +136,41 @@ export function MentorVerificationHeader() {
         </div>
       ) : null}
 
-      <AdminPanel>
-        <AdminSectionHeader title="Account status" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <p className="text-sm text-slate-500">Profile completion</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">{profileCompletion}%</p>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${profileCompletion}%` }} />
+      {showAccountStatus ? (
+        <AdminPanel>
+          <AdminSectionHeader title="Account status" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <p className="text-sm text-slate-500">Profile completion</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900">{profileCompletion}%</p>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${profileCompletion}%` }} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Verification</p>
+              <p className={`mt-1 flex items-center gap-1.5 text-lg font-semibold ${verificationDisplay.className}`}>
+                <verificationDisplay.Icon className="h-4 w-4" />
+                {verificationDisplay.label}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Mentor tier</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900">{tier?.code ?? '—'}</p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Wallet balance</p>
+              <p className="mt-1 flex items-center gap-1.5 text-lg font-semibold text-emerald-700">
+                <Wallet className="h-4 w-4" />
+                {`${wallet?.currency ?? ''} ${wallet?.balance ?? 0}`.trim()}
+              </p>
             </div>
           </div>
-          <div>
-            <p className="text-sm text-slate-500">Verification</p>
-            <p className={`mt-1 flex items-center gap-1.5 text-lg font-semibold ${verificationDisplay.className}`}>
-              <verificationDisplay.Icon className="h-4 w-4" />
-              {verificationDisplay.label}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Mentor tier</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">{tier?.code ?? '—'}</p>
-            <p className="mt-0.5 text-xs text-slate-500">
-              {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">Wallet balance</p>
-            <p className="mt-1 flex items-center gap-1.5 text-lg font-semibold text-emerald-700">
-              <Wallet className="h-4 w-4" />
-              {`${wallet?.currency ?? ''} ${wallet?.balance ?? 0}`.trim()}
-            </p>
-          </div>
-        </div>
-      </AdminPanel>
+        </AdminPanel>
+      ) : null}
     </>
   );
 }

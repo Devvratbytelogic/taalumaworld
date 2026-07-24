@@ -36,8 +36,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { AdminEmptyState, AdminPage, AdminPageHeader, AdminPanel, AdminSectionHeader, adminPanelClass, } from '@/components/admin/layout/AdminContent';
+import { AdminEmptyState, AdminPage, AdminPanel, AdminSectionHeader, adminPanelClass, } from '@/components/admin/layout/AdminContent';
 import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
+import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
 import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/store/rtkQueries/adminPostApi';
@@ -244,12 +245,6 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
 
   return (
     <>
-      <AdminPageHeader
-        eyebrow="Account"
-        title="My Profile"
-        description="Manage your mentor profile, bio, and public information."
-      />
-
       <AdminPanel padding={false} className="overflow-hidden">
         <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-6 py-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
@@ -999,6 +994,12 @@ export function MentorProfileTab() {
 
   return (
     <AdminPage>
+      <MentorVerificationHeader
+        eyebrow="Account"
+        title="My Profile"
+        description="Manage your mentor profile, bio, and public information."
+        showAccountStatus={false}
+      />
       <ProfileDetailsCard profile={profile} />
       <div className="grid gap-6 lg:grid-cols-2">
         <PayoutDetailsCard mentorInfo={profile?.mentor_info} />

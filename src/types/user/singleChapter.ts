@@ -73,6 +73,7 @@ export interface Series {
   legacyType: string;
 }
 export interface Mentor {
+  id: string;
   name: string;
   email: string;
   profile_pic: string;

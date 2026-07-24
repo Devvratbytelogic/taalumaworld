@@ -279,8 +279,11 @@ export const addressSchema = Yup.object({
     .required('Full name is required'),
   phone: Yup.string()
     .trim()
-    .matches(/^\+?[0-9\s\-().]{7,15}$/, 'Enter a valid phone number')
-    .required('Phone number is required'),
+    .test(
+      'phone-or-empty',
+      'Enter a valid phone number',
+      (value) => !value || /^\+?[0-9\s\-().]{7,15}$/.test(value),
+    ),
   address_line1: Yup.string().trim().required('Address line 1 is required'),
   address_line2: Yup.string().trim().optional(),
   landmark: Yup.string().trim().optional(),

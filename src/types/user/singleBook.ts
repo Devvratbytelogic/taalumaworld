@@ -46,6 +46,7 @@ export interface IBookDetails {
     blueprintNumbers?: (number)[] | null;
 }
 export interface IMentor {
+    id: string;
     name: string;
     email: string;
     profile_pic: string;

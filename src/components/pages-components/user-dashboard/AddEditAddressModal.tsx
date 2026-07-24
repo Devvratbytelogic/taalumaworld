@@ -16,6 +16,7 @@ import { SELECT_STYLES, SelectOption } from '@/constants/selectStyle';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { useAddUserAddressMutation, useEditUserAddressMutation } from '@/store/rtkQueries/userPostAPI';
+import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import { addressSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { IAddress } from '@/types/user/address';
@@ -26,6 +27,9 @@ export function AddEditAddressModal() {
   const address: IAddress | null = data?.address ?? null;
   const returnTo = data?.returnTo as { componentName: string; data?: unknown } | undefined;
   const isEdit = !!address;
+
+  const { data: profileRes } = useGetUserProfileQuery();
+  const profile = profileRes?.data;
 
   const [addAddress, { isLoading: isAdding }] = useAddUserAddressMutation();
   const [editAddress, { isLoading: isEditingAddress }] = useEditUserAddressMutation();
@@ -51,8 +55,8 @@ export function AddEditAddressModal() {
   } = useFormik({
     enableReinitialize: true,
     initialValues: {
-      full_name: address?.full_name ?? '',
-      phone: address?.phone ?? '',
+      full_name: address?.full_name ?? profile?.name ?? '',
+      phone: address?.phone ?? profile?.phone ?? '',
       address_line1: address?.address_line1 ?? '',
       address_line2: address?.address_line2 ?? '',
       landmark: address?.landmark ?? '',
@@ -66,7 +70,7 @@ export function AddEditAddressModal() {
     onSubmit: async (formValues) => {
       const payload = {
         full_name: formValues.full_name.trim(),
-        phone: formValues.phone.trim(),
+        phone: formValues.phone.trim() || undefined,
         address_line1: formValues.address_line1.trim(),
         address_line2: formValues.address_line2?.trim() || undefined,
         landmark: formValues.landmark?.trim() || undefined,
@@ -173,13 +177,11 @@ export function AddEditAddressModal() {
               </div>
 
               <div className="space-y-2 sm:col-span-1">
-                <Label htmlFor="phone">
-                  Phone number<span className="text-red-500">*</span>
-                </Label>
+                <Label htmlFor="phone">Phone number</Label>
                 <Input
                   id="phone"
                   name="phone"
-                  placeholder="e.g., 919876543210"
+                  placeholder="e.g., 919876543210 (optional)"
                   value={values.phone}
                   onChange={handleChange}
                   onBlur={handleBlur}

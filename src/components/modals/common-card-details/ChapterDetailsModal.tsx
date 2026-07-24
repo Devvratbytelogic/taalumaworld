@@ -55,7 +55,7 @@ export default function ChapterDetailsModal() {
 
   const viewSeriesDetails = () => {
     dispatch(closeModal());
-    router.push(getSeriesRoutePath(chapter?.series?.id));
+    router.push(getSeriesRoutePath(chapter?.series?.slug ?? chapter?.series?.id ?? ''));
   };
 
   return (

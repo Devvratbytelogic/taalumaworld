@@ -35,7 +35,7 @@ export interface IAddressAPIResponse {
 
 export interface IAddressPayload {
   full_name: string;
-  phone: string;
+  phone?: string;
   address_line1: string;
   address_line2?: string;
   landmark?: string;

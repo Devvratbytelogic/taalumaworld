@@ -1,24 +1,17 @@
 'use client';
-import React, { useState } from 'react'
+import React from 'react'
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon, PinterestIcon, WhatsAppIcon, TikTokIcon } from '@/components/ui/AllSVG';
-import { Input } from '@/components/ui/input';
-import { Button } from '@heroui/react';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import FooterSubscribe from '@/components/layout/footer/FooterSubscribe';
 import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
-import { useSubscribeToNewsletterMutation } from '@/store/rtkQueries/userPostAPI';
 import ImageComponent from '@/components/ui/ImageComponent';
-import toast from '@/utils/toast';
 
 export default function PrimaryFooter() {
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
-    const [newsletterEmail, setNewsletterEmail] = useState('');
-    const [sendUpdates, setSendUpdates] = useState(false);
-    const [subscribeToNewsletter, { isLoading: isSubscribing }] = useSubscribeToNewsletterMutation();
 
     const { data: globalSettings } = useGetGlobalSettingsQuery();
     const settings = globalSettings?.data;
@@ -55,7 +48,7 @@ export default function PrimaryFooter() {
                         <div>
                             <div className="mb-4">
                                 {logo ? (
-                                    <div className="h-10 w-[160px]">
+                                    <div className="h-10 w-40">
                                         <ImageComponent src={logo} alt={brandName} object_cover={false} />
                                     </div>
                                 ) : (
@@ -165,58 +158,7 @@ export default function PrimaryFooter() {
                                     </li>
                                 )}
                             </ul>
-                            <div className="space-y-3">
-                                <p className="text-sm font-medium text-white">Subscribe to The Taaluma Signal</p>
-                                <div className="flex gap-2">
-                                    <Input
-                                        placeholder="Your email"
-                                        type="email"
-                                        value={newsletterEmail}
-                                        onChange={(e) => setNewsletterEmail(e.target.value)}
-                                        className="bg-gray-800 h-auto border-gray-700 text-white placeholder:text-gray-500"
-                                    />
-                                    <Button
-                                        className='global_btn rounded_full bg_primary'
-                                        disabled={isSubscribing || !newsletterEmail}
-                                        onPress={async () => {
-                                            try {
-                                                const res = await subscribeToNewsletter({
-                                                    email: newsletterEmail,
-                                                    send_updates: sendUpdates,
-                                                }).unwrap();
-                                                if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-                                                    toast.success(res.message ?? 'Subscribed successfully!');
-                                                    setNewsletterEmail('');
-                                                    setSendUpdates(false);
-                                                }
-                                            } catch {
-                                                toast.error('Failed to subscribe. Please try again.');
-                                            }
-                                        }}
-                                    >
-                                        {isSubscribing ? 'Subscribing...' : 'Subscribe'}
-                                    </Button>
-                                </div>
-                                <div className="[&_label]:text-gray-300 [&_label_.text-muted-foreground]:text-gray-500">
-                                    <AgreementCheckbox
-                                        id="footerSendUpdates"
-                                        checked={sendUpdates}
-                                        onCheckedChange={setSendUpdates}
-                                        disabled={isSubscribing}
-                                    >
-                                        Send me updates and promotional communications. See the{' '}
-                                        <Link
-                                            href={getPrivacyPolicyRoutePath()}
-                                            target="_blank"
-                                            className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Privacy Policy
-                                        </Link>
-                                        .
-                                    </AgreementCheckbox>
-                                </div>
-                            </div>
+                            <FooterSubscribe />
                         </div>
                     </div>
                 </div>

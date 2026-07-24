@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
@@ -232,6 +232,24 @@ export function EditBookModal({
     setFieldTouched('og_image', true);
   };
 
+  const handleOgImagePrefill = useCallback(
+    ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      if (file) {
+        setOgImageFile(file);
+        setOgImagePreviewUrl(URL.createObjectURL(file));
+        ogImageIsObjectUrlRef.current = true;
+        setFieldValue('og_image', file);
+        return;
+      }
+      setOgImageFile(null);
+      setOgImagePreviewUrl(previewUrl);
+      ogImageIsObjectUrlRef.current = false;
+      setFieldValue('og_image', previewUrl);
+    },
+    [ogImagePreviewUrl, setFieldValue],
+  );
+
   const closeModal = () => {
     if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -443,11 +461,18 @@ export function EditBookModal({
               touched={touched}
               handleChange={handleChange}
               handleBlur={handleBlur}
+              setFieldValue={setFieldValue}
+              sourceTitle={values.title}
+              sourceDescription={values.description}
+              sourceImageFile={coverFile}
+              sourceImagePreviewUrl={coverPreviewUrl}
+              schemaType="Book"
               disabled={isSubmitting}
               ogImagePreviewUrl={ogImagePreviewUrl}
               ogImageFileName={ogImageFile?.name ?? null}
               onOgImageChange={handleOgImageChange}
               onOgImageClear={clearOgImage}
+              onOgImagePrefill={handleOgImagePrefill}
             />
           </div>
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
@@ -171,6 +171,19 @@ export function AddBookModal({
     setFieldValue('og_image', null);
     setFieldTouched('og_image', true);
   };
+
+  const handleOgImagePrefill = useCallback(
+    ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      setOgImagePreviewUrl((current) => {
+        if (current) URL.revokeObjectURL(current);
+        if (file) return URL.createObjectURL(file);
+        return previewUrl;
+      });
+      setOgImageFile(file);
+      setFieldValue('og_image', file ?? previewUrl);
+    },
+    [setFieldValue],
+  );
 
   const closeModal = () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -430,11 +443,18 @@ export function AddBookModal({
               touched={touched}
               handleChange={handleChange}
               handleBlur={handleBlur}
+              setFieldValue={setFieldValue}
+              sourceTitle={values.title}
+              sourceDescription={values.description}
+              sourceImageFile={coverFile}
+              sourceImagePreviewUrl={coverPreviewUrl}
+              schemaType="Book"
               disabled={isSubmitting}
               ogImagePreviewUrl={ogImagePreviewUrl}
               ogImageFileName={ogImageFile?.name ?? null}
               onOgImageChange={handleOgImageChange}
               onOgImageClear={clearOgImage}
+              onOgImagePrefill={handleOgImagePrefill}
             />
           </div>
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

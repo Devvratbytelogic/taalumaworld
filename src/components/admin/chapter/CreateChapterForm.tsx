@@ -43,6 +43,7 @@ const initialFormValues = {
   isFree: false,
   price: 0 as number | undefined,
   cover_image: null as File | null,
+  pdf_file: null as File | string | null,
   meta_title: '',
   meta_description: '',
   og_title: '',
@@ -144,9 +145,14 @@ export function CreateChapterForm() {
   useEffect(() => {
     return () => {
       if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
+    };
+  }, [featuredImagePreviewUrl]);
+
+  useEffect(() => {
+    return () => {
       if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     };
-  }, [featuredImagePreviewUrl, ogImagePreviewUrl]);
+  }, [ogImagePreviewUrl]);
 
   const handleFeaturedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -180,6 +186,8 @@ export function CreateChapterForm() {
         return;
       }
       setPdfFile(file);
+      setFieldValue('pdf_file', file);
+      setFieldTouched('pdf_file', true);
     }
     e.target.value = '';
   };
@@ -220,13 +228,33 @@ export function CreateChapterForm() {
     setFieldTouched('og_image', true);
   };
 
-  const clearPdf = () => setPdfFile(null);
+  const handleOgImagePrefill = useCallback(
+    ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      setOgImagePreviewUrl((current) => {
+        if (current) URL.revokeObjectURL(current);
+        if (file) return URL.createObjectURL(file);
+        return previewUrl;
+      });
+      setOgImageFile(file);
+      setFieldValue('og_image', file ?? previewUrl);
+    },
+    [setFieldValue],
+  );
+
+  const clearPdf = () => {
+    setPdfFile(null);
+    setFieldValue('pdf_file', null);
+    setFieldTouched('pdf_file', true);
+  };
 
   const isSubmittingState = isSubmitting || isAdding;
 
   const handleContentChange = useCallback(
-    (html: string) => setFieldValue('content', html),
-    [setFieldValue]
+    (html: string) => {
+      setFieldValue('content', html);
+      setFieldTouched('content', true, false);
+    },
+    [setFieldValue, setFieldTouched]
   );
 
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
@@ -309,7 +337,7 @@ export function CreateChapterForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="chapter-desc">Description</Label>
+          <Label htmlFor="chapter-desc">Description <span className="text-red-500">*</span></Label>
           <Textarea
             id="chapter-desc"
             name="description"
@@ -319,27 +347,45 @@ export function CreateChapterForm() {
             onBlur={handleBlur}
             disabled={isSubmittingState}
             rows={3}
-
+            className={errors.description && touched.description ? 'border-red-500' : undefined}
           />
+          {errors.description && touched.description ? (
+            <p className="text-sm text-red-600">{errors.description}</p>
+          ) : null}
         </div>
 
         <div className="space-y-2">
-          <Label>Blueprint content</Label>
+          <Label>
+            Blueprint content <span className="text-red-500">*</span>
+          </Label>
+          <p className="text-sm text-slate-500">Required if no PDF is uploaded.</p>
           <RichTextEditor
             value={values.content}
             onChange={handleContentChange}
             placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
             disabled={isSubmittingState}
           />
+          {errors.content && touched.content ? (
+            <p className="text-sm text-red-600">{errors.content}</p>
+          ) : null}
         </div>
 
         <div className="blueprint-form-section">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Upload PDF (optional)</h3>
-            <p className="mt-1 text-sm text-slate-500">Attach a PDF file for this blueprint (max 5MB).</p>
+            <h3 className="text-sm font-semibold text-slate-900">
+              Upload PDF <span className="text-red-500">*</span>
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Required if blueprint content is empty (max 5MB). Provide content or a PDF (or both).
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="blueprint-file-picker w-fit">
+            <label
+              className={cn(
+                'blueprint-file-picker w-fit',
+                errors.content && touched.content && !pdfFile && 'border-red-500',
+              )}
+            >
               <Upload className="h-4 w-4 shrink-0" />
               <input type="file" accept="application/pdf" onChange={handlePdfChange} className="sr-only" />
               {pdfFile ? pdfFile.name : 'Choose PDF...'}
@@ -354,6 +400,9 @@ export function CreateChapterForm() {
               </Button>
             ) : null}
           </div>
+          {errors.content && touched.content && !pdfFile ? (
+            <p className="text-sm text-red-600">{errors.content}</p>
+          ) : null}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
@@ -473,11 +522,18 @@ export function CreateChapterForm() {
           touched={touched}
           handleChange={handleChange}
           handleBlur={handleBlur}
+          setFieldValue={setFieldValue}
+          sourceTitle={values.title}
+          sourceDescription={values.description}
+          sourceImageFile={featuredImageFile}
+          sourceImagePreviewUrl={featuredImagePreviewUrl}
+          schemaType="Article"
           disabled={isSubmittingState}
           ogImagePreviewUrl={ogImagePreviewUrl}
           ogImageFileName={ogImageFile?.name ?? null}
           onOgImageChange={handleOgImageChange}
           onOgImageClear={clearOgImage}
+          onOgImagePrefill={handleOgImagePrefill}
         />
 
       </div>

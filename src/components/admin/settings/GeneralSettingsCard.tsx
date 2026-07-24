@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ImagePlus, Loader2, Save, Settings, X } from 'lucide-react';
 import { useFormik } from 'formik';
 import { Card } from '../../ui/card';
@@ -199,6 +199,24 @@ export function GeneralSettingsCard() {
     setFieldValue('og_image', existingOgImage);
     setFieldTouched('og_image', true);
   };
+
+  const handleOgImagePrefill = useCallback(
+    ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      if (file) {
+        setOgImageFile(file);
+        setOgImagePreviewUrl(URL.createObjectURL(file));
+        ogImageIsObjectUrlRef.current = true;
+        setFieldValue('og_image', file);
+        return;
+      }
+      setOgImageFile(null);
+      setOgImagePreviewUrl(previewUrl);
+      ogImageIsObjectUrlRef.current = false;
+      setFieldValue('og_image', previewUrl);
+    },
+    [ogImagePreviewUrl, setFieldValue],
+  );
 
   const field = (name: keyof FormValues) => ({
     id: name as string,
@@ -460,11 +478,18 @@ export function GeneralSettingsCard() {
             touched={touched}
             handleChange={handleChange}
             handleBlur={handleBlur}
+            setFieldValue={setFieldValue}
+            sourceTitle={values.marketplace_name || values.platformName}
+            sourceDescription={values.platformDescription}
+            sourceImageFile={logoFile}
+            sourceImagePreviewUrl={typeof data?.logo === 'string' ? data.logo : null}
+            schemaType="WebSite"
             disabled={isUpdating || formik.isSubmitting}
             ogImagePreviewUrl={ogImagePreviewUrl ?? existingOgImage}
             ogImageFileName={ogImageFile?.name ?? null}
             onOgImageChange={handleOgImageChange}
             onOgImageClear={clearOgImage}
+            onOgImagePrefill={handleOgImagePrefill}
           />
 
           <div className="flex justify-end pt-2">

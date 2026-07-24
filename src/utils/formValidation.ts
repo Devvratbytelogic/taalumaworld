@@ -214,13 +214,31 @@ export const editBookSchema = Yup.object({
 });
 
 // Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, cover_image, page)
+function isRichTextEmpty(html: string | undefined | null): boolean {
+  if (!html) return true;
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .length === 0;
+}
+
 export const addChapterSchema = Yup.object({
   bookId: Yup.string().required('Please select a series'),
   title: Yup.string()
     .trim()
     .required('Please enter a blueprint title'),
-  description: Yup.string(),
+  description: Yup.string()
+    .trim()
+    .required('Please enter a blueprint description'),
   content: Yup.string(),
+  pdf_file: Yup.mixed()
+    .nullable()
+    .optional()
+    .test('is-file-or-string-or-null', 'Please select a valid PDF file', (v) =>
+      v == null || v instanceof File || typeof v === 'string'
+    ),
   isFree: Yup.boolean(),
   price: Yup.number()
     .when('isFree', {
@@ -235,6 +253,14 @@ export const addChapterSchema = Yup.object({
   cover_image: Yup.mixed().required('Cover image is required'),
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
   ...openGraphFieldsSchema,
+}).test('content-or-pdf', 'Add blueprint content or upload a PDF', function (value) {
+  const hasContent = !isRichTextEmpty(value?.content);
+  const hasPdf = value?.pdf_file != null && value.pdf_file !== '';
+  if (hasContent || hasPdf) return true;
+  return this.createError({
+    path: 'content',
+    message: 'Add blueprint content or upload a PDF',
+  });
 });
 
 // Add / Edit Category Modal Validation Schema

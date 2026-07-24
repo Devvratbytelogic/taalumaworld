@@ -15,10 +15,11 @@ const PdfReader = dynamic(() => import('./PdfReader'), {
   loading: () => <PdfViewerSkeleton />,
 });
 interface BlueprintPublicDetailsProps {
-  data: ISingleChapterAPIResponseData | null;
+  data?: Partial<ISingleChapterAPIResponseData> | null;
+  hideMentorDetails?: boolean;
 }
 
-export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsProps) {
+export default function BlueprintPublicDetails({ data, hideMentorDetails = false }: BlueprintPublicDetailsProps) {
 
   const hasContent = Boolean(data?.content);
   const hasPdf = Boolean(data?.pdf);
@@ -45,14 +46,14 @@ export default function BlueprintPublicDetails({ data }: BlueprintPublicDetailsP
     <>
       <section className="container mb-10">
         <div className="grid gap-14 lg:grid-cols-[minmax(220px,280px)_1fr] lg:gap-20">
-          <aside className="lg:sticky lg:top-28 lg:self-start">
+          {!hideMentorDetails && <aside className="lg:sticky lg:top-28 lg:self-start">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
               Overview
             </p>
             <MentorDetails data={data?.createdBy ?? undefined} />
-          </aside>
+          </aside>}
 
-          <div className="min-w-0">
+          <div className={`min-w-0 ${hideMentorDetails ? 'col-span-full' : ''}`}>
             <div>
               <div className="mb-8 flex items-center gap-4">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">

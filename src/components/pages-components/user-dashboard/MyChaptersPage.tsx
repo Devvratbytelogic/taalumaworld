@@ -17,8 +17,9 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { cn } from '@/components/ui/utils';
 import { useGetMyChaptersQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
 import type { ItemsEntity } from '@/types/user/myChapters';
-import { getBlueprintRoutePath, getHomeRoutePath } from '@/routes/routes';
+import { getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import MyBlueprintReader from './MyBlueprintReader';
 import moment from 'moment';
 
 type FilterType = 'all' | 'inProgress' | 'completed' | 'unread';
@@ -30,6 +31,7 @@ export function MyChaptersPage() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
   const [invoiceDownloadingOrderId, setInvoiceDownloadingOrderId] = useState<string | null>(null);
+  const [selectedChapter, setSelectedChapter] = useState<ItemsEntity | null>(null);
 
   const { data: myChaptersData, isLoading, isFetching } = useGetMyChaptersQuery({
     page,
@@ -66,6 +68,15 @@ export function MyChaptersPage() {
       setInvoiceDownloadingOrderId(null);
     }
   };
+
+  if (selectedChapter) {
+    return (
+      <MyBlueprintReader
+        chapter={selectedChapter}
+        onBack={() => setSelectedChapter(null)}
+      />
+    );
+  }
 
   if (isLoading) {
     return (
@@ -204,8 +215,6 @@ export function MyChaptersPage() {
                   ReadIcon = BookOpen;
                 }
 
-                const description = chapter.description?.trim();
-
                 return (
                   <article
                     key={chapter.chapterId}
@@ -238,11 +247,11 @@ export function MyChaptersPage() {
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
-                          <span>Blueprint {chapter.blueprintNumber || chapter.chapterNumber}</span>
+                          {/* <span>Blueprint {chapter.blueprintNumber || chapter.chapterNumber}</span>
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
-                          </span>
-                          <span>{chapter.pageCount} pages</span>
+                          </span> */}
+                          {/* <span>{chapter.pageCount} pages</span> */}
                         </div>
 
                         <h3 className="line-clamp-2 text-base font-medium text-gray-900">{chapter.title}</h3>
@@ -278,7 +287,7 @@ export function MyChaptersPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getBlueprintRoutePath(chapter.slug ?? chapter.chapterId ?? ''))}
+                          onPress={() => setSelectedChapter(chapter)}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readLabel}

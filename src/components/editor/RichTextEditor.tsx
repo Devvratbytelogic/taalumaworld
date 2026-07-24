@@ -17,7 +17,6 @@ import {
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { memo, useRef, useEffect, useMemo } from 'react';
-import { cn } from '@/components/ui/utils';
 
 function createEditorPlugins(imageUploadHandler: (file: File) => Promise<string>) {
   return [
@@ -44,6 +43,7 @@ export interface RichTextEditorProps {
   onChange: (markdown: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  /** Minimum content-area height. Editor grows with content beyond this (like Textarea). */
   minHeight?: string;
   className?: string;
   /** Optional: custom image upload. If not provided, images are embedded as base64 data URLs. */
@@ -64,7 +64,8 @@ function RichTextEditorComponent({
   onChange,
   placeholder = 'Write your blueprint content here...',
   disabled = false,
-  minHeight = '280px',
+  // Match Textarea `min-h-28` so the empty state feels like a normal multi-line field.
+  minHeight = '10rem',
   className,
   onImageUpload,
 }: RichTextEditorProps) {
@@ -105,8 +106,10 @@ function RichTextEditorComponent({
   return (
     <div
       data-slot="rich-text-editor"
-      className={cn('overflow-hidden border border-slate-200 bg-white', className)}
-      style={{ minHeight }}
+      className={`${className} resize-y overflow-auto border border-slate-200 bg-white`}
+      // style={{
+      //   minHeight,
+      // }}
     >
       <MDXEditor
         ref={ref}
@@ -118,7 +121,7 @@ function RichTextEditorComponent({
         placeholder={placeholder}
         readOnly={disabled}
         plugins={editorPlugins}
-        contentEditableClassName="min-h-[200px] px-4 py-3 text-base text-foreground focus:outline-none prose prose-sm max-w-none [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:text-xl [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-2"
+        contentEditableClassName="rte-content px-4 py-3 text-base text-foreground focus:outline-none prose prose-sm max-w-none [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:text-xl [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-2"
       />
     </div>
   );

@@ -330,7 +330,6 @@ export function CreateChapterForm() {
             onChange={handleContentChange}
             placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
             disabled={isSubmittingState}
-            minHeight="320px"
           />
         </div>
 

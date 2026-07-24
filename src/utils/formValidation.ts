@@ -304,18 +304,47 @@ export const mentorProfileDetailsSchema = Yup.object({
 
 // Mentor Profile Tab — Payout details (bank / M-Pesa / tax) Validation Schema
 export const mentorPayoutDetailsSchema = Yup.object({
-  bank_name: Yup.string().trim().max(120, 'Too long').required('Bank name is required'),
-  bank_number: Yup.string().trim().max(40, 'Too long').required('Account number is required'),
-  bank_branch: Yup.string().trim().max(120, 'Too long').required('Bank branch is required'),
-  mpesa_number: Yup.string().trim().max(20, 'Too long').required('M-Pesa number is required'),
-  tax_id: Yup.string().trim().max(40, 'Too long').required('Tax ID is required'),
-  preferred_payment_frequency: Yup.string().trim().required('Preferred payout frequency is required'),
+  bank_name: Yup.string()
+    .trim()
+    .min(2, 'Bank name must be at least 2 characters')
+    .max(120, 'Too long')
+    .required('Bank name is required'),
+  bank_number: Yup.string()
+    .trim()
+    .matches(/^[0-9]+$/, 'Account number must contain only digits')
+    .min(6, 'Account number must be at least 6 digits')
+    .max(20, 'Account number must be at most 20 digits')
+    .required('Account number is required'),
+  bank_branch: Yup.string()
+    .trim()
+    .min(2, 'Bank branch must be at least 2 characters')
+    .max(120, 'Too long')
+    .required('Bank branch is required'),
+  mpesa_number: Yup.string()
+    .trim()
+    .required('M-Pesa number is required')
+    .matches(/^\+?[0-9]{9,15}$/, 'Enter a valid M-Pesa number (9–15 digits)'),
+  tax_id: Yup.string()
+    .trim()
+    .test(
+      'kra-pin-or-empty',
+      'Enter a valid KRA PIN (e.g. A123456789Z)',
+      (value) => !value || /^[A-Za-z]\d{9}[A-Za-z]$/.test(value),
+    ),
+  preferred_payment_frequency: Yup.string()
+    .oneOf(['monthly', 'quarterly', 'annually'], 'Select a valid payout frequency')
+    .required('Preferred payout frequency is required'),
   is_vat_registered: Yup.boolean().required(),
-  vat_number: Yup.string().trim().max(40, 'Too long').when('is_vat_registered', {
-    is: true,
-    then: (schema) => schema.required('VAT number is required'),
-    otherwise: (schema) => schema.optional(),
-  }),
+  vat_number: Yup.string()
+    .trim()
+    .when('is_vat_registered', {
+      is: true,
+      then: (schema) =>
+        schema
+          .required('VAT number is required')
+          .matches(/^[0-9]{9,14}$/, 'Enter a valid VAT number (9–14 digits)'),
+      otherwise: (schema) => schema.optional(),
+    }),
 });
 
 // Global Settings Validation Schema

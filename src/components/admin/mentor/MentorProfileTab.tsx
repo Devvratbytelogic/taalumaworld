@@ -797,6 +797,7 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 disabled={isSubmitting}
+                required={false}
                 error={touched.tax_id ? errors.tax_id : undefined}
               />
               <div className="space-y-2">
@@ -843,7 +844,13 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 </div>
                 <Switch
                   checked={values.is_vat_registered}
-                  onCheckedChange={(checked) => setFieldValue('is_vat_registered', checked)}
+                  onCheckedChange={(checked) => {
+                    setFieldValue('is_vat_registered', checked);
+                    if (!checked) {
+                      setFieldValue('vat_number', '');
+                      setFieldTouched('vat_number', false);
+                    }
+                  }}
                   disabled={isSubmitting}
                 />
               </div>

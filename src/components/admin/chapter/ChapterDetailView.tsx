@@ -214,7 +214,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
         />
         <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           <DetailRow label="AI score" value={chapter.aiScore ?? undefined} />
-          <DetailRow label="Classification" value={chapter.aiClassification} />
+          {/* <DetailRow label="Classification" value={chapter.aiClassification} /> */}
           <DetailRow label="Scoring status" value={chapter.aiScoringStatus} />
           <DetailRow label="Word count" value={chapter.aiWordCount ?? undefined} />
           <DetailRow label="Scored at" value={formatDate(chapter.aiScoredAt)} />

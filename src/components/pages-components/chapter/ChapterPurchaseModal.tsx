@@ -47,6 +47,8 @@ export default function ChapterPurchaseModal() {
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = addressData?.data && addressData?.data?.length > 0 ? true : false;
 
+  const onClose = () => dispatch(closeModal());
+
   const isPricingModelChapter = isBook
     ? (chapter?.pricingModel === VISIBLE.CHAPTER)
     : (chapter?.series?.pricingModel === VISIBLE.CHAPTER);
@@ -100,7 +102,7 @@ export default function ChapterPurchaseModal() {
 
   return (
     <>
-      <Modal isOpen={isOpen} className="modal_container" size="xl" hideCloseButton={true} classNames={modalClassNames}>
+      <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="xl" classNames={modalClassNames}>
         <ModalContent>
           {chapter?.coverImage && (
             <div className="relative shrink-0 bg-muted flex justify-center py-6">

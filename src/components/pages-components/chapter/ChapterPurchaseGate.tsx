@@ -17,7 +17,7 @@ export default function ChapterPurchaseGate({ isAuthenticated, chapter }: Chapte
 
   useEffect(() => {
     if (isAuthenticated && chapter && !canRead) {
-      dispatch(openModal({ componentName: 'ChapterPurchaseModal', data: { chapter, closeBehavior: 'dismiss' } }));
+      dispatch(openModal({ componentName: 'ChapterPurchaseModal', data: { chapter } }));
     }
   }, [isAuthenticated, canRead, chapter, dispatch]);
 

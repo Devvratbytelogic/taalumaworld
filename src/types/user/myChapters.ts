@@ -24,6 +24,8 @@ export interface ItemsEntity {
   chapterNumber: number;
   title: string;
   description: string;
+  content: string;
+  pdf: string;
   bookId: string;
   bookTitle: string;
   coverImage: string;

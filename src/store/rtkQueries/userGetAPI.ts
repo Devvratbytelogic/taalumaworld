@@ -98,7 +98,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         /** single chapter */
         getSingleChapter: builder.query<ISingleChapterAPIResponse, string>({
             query: (id) => ({
-                url: `/user/content/chapter/${id}`,
+                url: `/user/content/blueprint/${id}`,
                 method: 'GET',
             }),
             providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],

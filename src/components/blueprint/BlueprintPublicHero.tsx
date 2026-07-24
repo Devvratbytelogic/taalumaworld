@@ -20,7 +20,6 @@ interface BlueprintPublicHeroProps {
 export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) {
   const dispatch = useDispatch();
   const { isAuthenticated } = useAuth();
-  console.log('data', data);
 
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
   const displayPrice = isPricingModelChapter

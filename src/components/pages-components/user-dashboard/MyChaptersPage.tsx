@@ -89,7 +89,7 @@ export function MyChaptersPage() {
           <div className="space-y-4 p-5 sm:p-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 sm:flex-row">
-                <div className="aspect-16/10 w-full bg-gray-200 sm:w-40 sm:min-h-[168px]" />
+                <div className="aspect-16/10 w-full bg-gray-200 sm:w-40 sm:min-h-42" />
                 <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
                   <div className="h-3 w-32 rounded bg-gray-100" />
                   <div className="h-5 w-3/4 rounded bg-gray-200" />
@@ -211,7 +211,7 @@ export function MyChaptersPage() {
                     key={chapter.chapterId}
                     className="group flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300 sm:flex-row"
                   >
-                    <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-gray-100 sm:aspect-auto sm:w-40 sm:min-h-[168px] md:w-44">
+                    <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-gray-100 sm:aspect-auto sm:w-40 sm:min-h-42 md:w-44">
                       <div className="h-full w-full transition-transform duration-300 group-hover:scale-[1.02]">
                         <ImageComponent src={chapter.coverImage || ''} alt={chapter.title} object_cover={true} />
                       </div>

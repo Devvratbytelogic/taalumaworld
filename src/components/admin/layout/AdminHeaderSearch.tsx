@@ -76,7 +76,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Mentors', description: 'Manage mentors', path: getAdminSectionRoutePath('authors'), icon: Users, keywords: ['author', 'leader', 'thought', 'mentor'] },
     { label: 'Mentor Types', description: 'Configure mentor categories and revenue share', path: getAdminMentorTypesRoutePath(), icon: Award, keywords: ['mentor type', 'mentor category', 'founding', 'revenue share', 'badge'] },
     { label: 'Users', description: 'Manage registered users', path: getAdminSectionRoutePath('users'), icon: UserCircle, keywords: ['user', 'member', 'account'] },
-    { label: 'Institutional Staff', description: 'Manage institutional staff members and roles', path: getAdminSectionRoutePath('staff'), icon: UserCog, keywords: ['staff', 'institutional', 'admin', 'role'] },
+    { label: 'Staff', description: 'Manage staff members and roles', path: getAdminSectionRoutePath('staff'), icon: UserCog, keywords: ['staff', 'institutional', 'admin', 'role'] },
     { label: 'Transactions', description: 'View payment transactions', path: getAdminSectionRoutePath('transactions'), icon: Receipt, keywords: ['payment', 'transaction', 'money'] },
     { label: 'Orders', description: 'View series & blueprint orders', path: getAdminSectionRoutePath('orders'), icon: ShoppingBag, keywords: ['order', 'book order', 'series order', 'blueprint order', 'purchase'] },
     { label: 'Taxes', description: 'Manage country tax rates', path: getAdminSectionRoutePath('taxes'), icon: Percent, keywords: ['tax', 'gst', 'vat', 'rate'] },

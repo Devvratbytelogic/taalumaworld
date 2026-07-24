@@ -83,7 +83,7 @@ export default function AdminDashboardTab() {
       href: getAdminSectionRoutePath('authors'),
     },
     {
-      title: 'Institutional staff',
+      title: 'Staff',
       value: (statsData?.institutional_staff ?? 0).toLocaleString(),
       icon: Shield,
       color: 'purple',

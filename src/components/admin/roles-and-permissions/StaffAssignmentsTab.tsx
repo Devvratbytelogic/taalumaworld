@@ -95,7 +95,7 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
     },
     {
       field: 'name',
-      headerName: 'Institutional Staff',
+      headerName: 'Staff',
       minWidth: 220,
       flex: 1,
       sortable: false,
@@ -185,7 +185,7 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
             <button
               type="button"
               className="edit_button"
-              title="Edit institutional staff"
+              title="Edit staff"
               onClick={() =>
                 dispatch(
                   openModal({
@@ -213,7 +213,7 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
             <button
               type="button"
               className={isSuspended ? 'active_button' : 'delete_button'}
-              title={isSuspended ? 'Activate institutional staff' : 'Suspend institutional staff'}
+              title={isSuspended ? 'Activate staff' : 'Suspend staff'}
               onClick={() =>
                 dispatch(
                   openModal({
@@ -235,11 +235,11 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
     <div className="space-y-6">
       {!embedded ? (
         <AdminPageHeader
-          title="Institutional Staff management"
-          description="View and manage institutional staff members and role assignments"
+          title="Staff management"
+          description="View and manage staff members and role assignments"
         >
           <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
-            Total institutional staff: {totalStaff}
+            Total staff: {totalStaff}
           </Badge>
         </AdminPageHeader>
       ) : null}
@@ -256,7 +256,7 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
             onPress={() => dispatch(openModal({ componentName: 'AddEditStaffModal' }))}
             startContent={<Plus className="h-4 w-4" />}
           >
-            Add Institutional Staff
+            Add Staff
           </Button>
         </div>
       </AdminSearchPanel>

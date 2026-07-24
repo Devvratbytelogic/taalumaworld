@@ -101,7 +101,7 @@ export function AddEditStaffModal() {
           if (isEdit) {
             const res = await updateUser({ id: data?.staff._id, payload: formData }).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-              toast.success(res?.message ?? 'Institutional staff member updated successfully');
+              toast.success(res?.message ?? 'Staff member updated successfully');
               resetForm();
               setProfilePicFile(null);
               setProfilePicPreview(null);
@@ -110,7 +110,7 @@ export function AddEditStaffModal() {
           } else {
             const res = await addStaff(formData).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-              toast.success(res?.message ?? 'Institutional staff member added successfully');
+              toast.success(res?.message ?? 'Staff member added successfully');
               resetForm();
               setProfilePicFile(null);
               setProfilePicPreview(null);
@@ -156,18 +156,18 @@ export function AddEditStaffModal() {
       <ModalContent className="admin_panel max-h-[90vh]">
         <form noValidate onSubmit={handleSubmit} className="flex max-h-[90vh] flex-col overflow-hidden">
           <ModalHeader className="flex shrink-0 flex-col gap-1">
-            <p className="text-xl font-bold">{isEdit ? 'Edit Institutional Staff' : 'Add Institutional Staff'}</p>
+            <p className="text-xl font-bold">{isEdit ? 'Edit Staff' : 'Add Staff'}</p>
             <p className="text-sm font-normal text-muted-foreground">
               {isEdit
-                ? 'Update institutional staff profile details and role assignment.'
-                : 'Add a new institutional staff member with profile details and role assignment.'}
+                ? 'Update staff profile details and role assignment.'
+                : 'Add a new staff member with profile details and role assignment.'}
             </p>
           </ModalHeader>
 
           <ModalBody className="min-h-0 flex-1 overflow-y-auto py-2 p-6!">
             <div className="flex items-center gap-4">
               <Avatar className="border h-16 w-16 shrink-0">
-                <AvatarImage src={previewSrc} alt={values.name || 'Institutional Staff'} />
+                <AvatarImage src={previewSrc} alt={values.name || 'Staff'} />
                 <AvatarFallback>{values.name?.[0]?.toUpperCase() ?? 'S'}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1 space-y-2">
@@ -341,7 +341,7 @@ export function AddEditStaffModal() {
               isLoading={isLoading}
               isDisabled={isLoading}
             >
-              {isEdit ? 'Update Institutional Staff' : 'Add Institutional Staff'}
+              {isEdit ? 'Update Staff' : 'Add Staff'}
             </Button>
           </ModalFooter>
         </form>

@@ -135,3 +135,15 @@
 {"timestamp":"2026-07-24T08:29:26.733Z","event":"POLL_TICK","level":"info","checkoutId":"55853-83396797-1","status":"completed"}
 {"timestamp":"2026-07-24T08:29:26.733Z","event":"POLL_COMPLETED","level":"info","checkoutId":"55853-83396797-1"}
 {"timestamp":"2026-07-24T08:29:27.735Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"55853-83396797-1"}
+{"timestamp":"2026-07-24T09:11:36.960Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-24T09:11:47.259Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-24T09:11:48.463Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"22411-48335738-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"22411-48335738-1","checkoutRequestId":"ws_CO_24072026144148474217"}}
+{"timestamp":"2026-07-24T09:11:50.535Z","event":"POLL_TICK","level":"info","checkoutId":"22411-48335738-1","status":"completed"}
+{"timestamp":"2026-07-24T09:11:50.537Z","event":"POLL_COMPLETED","level":"info","checkoutId":"22411-48335738-1"}
+{"timestamp":"2026-07-24T09:11:51.540Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"22411-48335738-1"}
+{"timestamp":"2026-07-24T09:21:35.778Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-24T09:21:41.312Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-24T09:21:42.577Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"64442-64542263-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"64442-64542263-1","checkoutRequestId":"ws_CO_24072026145142174856"}}
+{"timestamp":"2026-07-24T09:21:44.782Z","event":"POLL_TICK","level":"info","checkoutId":"64442-64542263-1","status":"completed"}
+{"timestamp":"2026-07-24T09:21:44.783Z","event":"POLL_COMPLETED","level":"info","checkoutId":"64442-64542263-1","meta":{"transactionId":"64442-64542263-1"}}
+{"timestamp":"2026-07-24T09:21:44.786Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"64442-64542263-1","meta":{"transactionId":"64442-64542263-1"}}

@@ -31,6 +31,10 @@ export type MpesaErrorState = {
   description: string;
 };
 
+export type MpesaPaymentSuccessResult = {
+  transactionId?: string;
+};
+
 export type UseMpesaPaymentFlowOptions = {
   cartID?: string;
   chapterID?: string;
@@ -40,7 +44,7 @@ export type UseMpesaPaymentFlowOptions = {
   getPhone?: () => number;
   waitSeconds?: number;
   /** Called once after the payment status becomes 'completed'. */
-  onSuccess: () => void | Promise<void>;
+  onSuccess: (result?: MpesaPaymentSuccessResult) => void | Promise<void>;
 };
 
 const SKIP_MPESA = process.env.NEXT_PUBLIC_SKIP_MPESA === 'true';
@@ -243,15 +247,19 @@ export function useMpesaPaymentFlow({
         if (status === 'completed') {
           finalizedRef.current = true;
           stopPolling();
-          mpesaLog('POLL_COMPLETED', 'info', { checkoutId });
+          const paymentData = result?.data?.data;
+          const transactionId =
+            paymentData?.transaction_id
+            ?? paymentData?.receipt_number
+            ?? paymentData?.invoice_number
+            ?? undefined;
+          mpesaLog('POLL_COMPLETED', 'info', { checkoutId, meta: { transactionId } });
           checkoutIdRef.current = null;
-          setShowPaymentSuccessMessage(true);
           dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
-          await new Promise(resolve => setTimeout(resolve, 1000));
           setShowPaymentSuccessMessage(false);
           setIsWaiting(false);
-          mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId });
-          await Promise.resolve(onSuccessRef.current());
+          mpesaLog('CHECKOUT_SUCCESS', 'info', { checkoutId, meta: { transactionId } });
+          await Promise.resolve(onSuccessRef.current({ transactionId }));
         } else if (status === 'cancel') {
           finalizedRef.current = true;
           stopPolling();

@@ -36,7 +36,7 @@ interface CartSummaryProps {
   taxPercent?: number | null;
   couponType?: string | null;
   couponValue?: number | null;
-  onPaymentSuccess: () => void;
+  onPaymentSuccess: (result?: { transactionId?: string }) => void;
   isLoading?: boolean;
   couponCode?: string | null;
 }
@@ -263,11 +263,17 @@ export default function CartSummary({
         )}
       </div>
 
-      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2 border-t border-border/70 pt-4">
-        <span className="text-base font-bold sm:text-lg">Total</span>
-        <span className="text-xl font-bold text-primary sm:text-2xl">
-          KSH {total.toFixed(2)}
-        </span>
+      <div className="mb-5 flex items-baseline justify-between gap-3 border-t border-border/70 pt-4">
+        <span className="shrink-0 text-base font-bold sm:text-lg">Total</span>
+        {total > 0 ? (
+          <span className="text-right text-xl font-bold text-primary sm:text-2xl">
+            KSH {total.toFixed(2)}
+          </span>
+        ) : (
+          <span className="text-right text-xl font-bold text-primary sm:text-2xl">
+            FREE
+          </span>
+        )}
       </div>
 
       {isCheckoutPage ? (
@@ -281,18 +287,18 @@ export default function CartSummary({
         <Link
           href={getCartCheckoutRoutePath()}
           aria-disabled={itemCount === 0 || isLoading}
-          className={`global_btn rounded_full bg_primary mb-2 h-12 w-full justify-center gap-3 text-base font-medium ${
+          className={`global_btn rounded_full bg_primary mb-2 h-12 w-full justify-center gap-2 whitespace-nowrap px-4 text-sm font-medium sm:gap-3 sm:px-6 sm:text-base ${
             itemCount === 0 || isLoading ? 'pointer-events-none opacity-50' : ''
           }`}
         >
-          Proceed to Checkout
-          <ArrowRight className="h-5 w-5" />
+          <span>Proceed to Checkout</span>
+          <ArrowRight className="h-5 w-5 shrink-0" />
         </Link>
       )}
 
       <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-        <Lock className="h-3.5 w-3.5" />
-        Secure M-Pesa checkout
+        <Lock className="h-3.5 w-3.5 shrink-0" />
+        {total > 0 ? 'Secure M-Pesa checkout' : 'No payment required'}
       </p>
     </div>
   );

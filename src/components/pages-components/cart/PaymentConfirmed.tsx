@@ -1,43 +1,44 @@
-import React from 'react'
-import { CheckCircle } from 'lucide-react'
-import Button from '@/components/ui/Button'
-import { useRouter } from 'next/navigation'
-import { getUserDashboardRoutePath } from '@/routes/routes'
+'use client';
+
+import { CheckCircle } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import { useRouter } from 'next/navigation';
+import { getUserDashboardRoutePath } from '@/routes/routes';
 
 interface PaymentConfirmedProps {
-  orderId?: string | number | null;
+  transactionId?: string | null;
 }
 
-export default function PaymentConfirmed({ orderId }: PaymentConfirmedProps) {
-    const router = useRouter();
-    return (
-        <>
-            <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
-                <div className="mx-auto sm:px-4 max-w-lg">
-                    <div className="rounded-md border border-border bg-white p-8 text-center md:p-12">
-                        <div className="bg-success/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle className="h-12 w-12 text-success" />
-                        </div>
-                        <h1 className="text-3xl font-bold mb-3">Order Confirmed!</h1>
-                        {orderId && (
-                            <p className="text-sm font-medium text-muted-foreground mb-3">
-                                Order <span className="text-foreground font-semibold">#{orderId}</span>
-                            </p>
-                        )}
-                        <p className="text-muted-foreground mb-8">
-                            Your blueprints are now unlocked and ready to read. Head to your
-                            dashboard to start exploring.
-                        </p>
-                        <Button
-                            size="lg"
-                            className="global_btn rounded_full bg_primary w-full"
-                            onPress={() => router.push(getUserDashboardRoutePath())}
-                        >
-                            Go to Dashboard
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
+export default function PaymentConfirmed({ transactionId }: PaymentConfirmedProps) {
+  const router = useRouter();
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12">
+      <div className="mx-auto max-w-lg sm:px-4">
+        <div className="rounded-md border border-border bg-white p-8 text-center md:p-12">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success/10">
+            <CheckCircle className="h-12 w-12 text-success" />
+          </div>
+          <h1 className="mb-3 text-3xl font-bold">Order Confirmed!</h1>
+          {transactionId && (
+            <p className="mb-3 text-sm font-medium text-muted-foreground">
+              Transaction ID{' '}
+              <span className="font-semibold text-foreground">{transactionId}</span>
+            </p>
+          )}
+          <p className="mb-8 text-muted-foreground">
+            Your blueprints are now unlocked and ready to read. Head to your dashboard to start
+            exploring.
+          </p>
+          <Button
+            size="lg"
+            className="global_btn rounded_full bg_primary w-full"
+            onPress={() => router.push(getUserDashboardRoutePath())}
+          >
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }

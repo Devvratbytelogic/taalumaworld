@@ -18,7 +18,7 @@ interface CartPaymentProps {
   cartId?: string;
   itemCount: number;
   selectedAddressId?: string | null;
-  onPaymentSuccess: () => void;
+  onPaymentSuccess: (result?: { transactionId?: string }) => void;
 }
 
 export default function CartPayment({

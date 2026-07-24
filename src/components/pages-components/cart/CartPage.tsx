@@ -63,6 +63,7 @@ export default function CartPage() {
   const isCheckoutPage = pathname === getCartCheckoutRoutePath();
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
   const { data: cartResponse, isLoading } = useGetCartQuery();
 
   const cartData = cartResponse?.data?.[0];
@@ -78,7 +79,7 @@ export default function CartPage() {
   const itemCount = cartData?.item_count ?? cartItems.length;
 
   if (isPaymentConfirmed) {
-    return <PaymentConfirmed />;
+    return <PaymentConfirmed transactionId={transactionId} />;
   }
 
   if (isLoading) {
@@ -91,7 +92,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen sm:py-10">
-      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="container">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4 sm:mb-8">
           <div>
             <h1 className="flex items-center gap-2.5 text-2xl font-bold tracking-tight sm:text-3xl">
@@ -179,7 +180,10 @@ export default function CartPage() {
               couponValue={cartData?.coupon_value}
               cartId={cartData?._id}
               selectedAddressId={selectedAddressId}
-              onPaymentSuccess={() => setIsPaymentConfirmed(true)}
+              onPaymentSuccess={(result) => {
+                setTransactionId(result?.transactionId ?? null);
+                setIsPaymentConfirmed(true);
+              }}
               couponCode={cartData?.coupon_code}
               isCheckoutPage={isCheckoutPage}
             />

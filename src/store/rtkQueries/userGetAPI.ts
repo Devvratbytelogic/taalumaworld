@@ -3,9 +3,18 @@ import { IAllCouponsAPIResponse } from '@/types/user/coupon';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export type MpesaPaymentStatusResponse = {
+    http_status_code?: number;
+    http_status_msg?: string;
     success?: boolean;
+    message?: string;
     data?: {
         status?: 'pending' | 'completed' | 'cancel' | 'failed';
+        payment_status?: string;
+        transaction_id?: string | null;
+        receipt_number?: string | null;
+        invoice_number?: string | null;
+        order_id?: string | null;
+        amount?: number | null;
     };
 };
 import { IAddressListAPIResponse, IAddressAPIResponse } from '@/types/user/address';

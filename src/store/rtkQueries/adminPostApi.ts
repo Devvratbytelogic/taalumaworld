@@ -180,7 +180,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
                 method: 'PUT',
                 body: payload,
             }),
-            invalidatesTags: ['AdminProfile'],
+            invalidatesTags: ['AdminProfile', 'UserProfile'],
         }),
         updateMentorInfo: builder.mutation({
             query: (payload) => ({

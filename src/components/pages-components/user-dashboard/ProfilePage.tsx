@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import {
   Mail,
-  Camera,
   Check,
   Pencil,
   Calendar,
@@ -20,11 +19,11 @@ import {
   BookMarked,
   TrendingUp,
   CheckCircle,
+  Phone,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { fieldInvalidClassName } from '@/components/ui/field-styles';
-import { UserAvatar } from '@/components/ui/UserAvatar';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import {
@@ -44,12 +43,11 @@ import {
   getUserDashboardMyChaptersRoutePath,
 } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 
 export function ProfilePage() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [tempPhoto, setTempPhoto] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const { data: profileData, isLoading } = useGetUserProfileQuery();
   const { data: seriesData, isLoading: isSeriesLoading } = useGetMySeriesQuery();
@@ -62,6 +60,8 @@ export function ProfilePage() {
   const latestMentorApplication = mentorApplication?.latest_application ?? null;
   const mentorApplicationStatus = latestMentorApplication?.status;
   const canApplyForMentor = mentorApplication?.can_apply ?? true;
+  const displayName = profile?.name || 'User';
+  const displayPhoto = profile?.profile_pic || '';
   
   const isKpisLoading = isSeriesLoading || isChaptersLoading || isHistoryLoading;
 
@@ -129,17 +129,18 @@ export function ProfilePage() {
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } =
     useFormik({
       enableReinitialize: true,
-      initialValues: { fullName: profile?.name ?? '' },
+      initialValues: {
+        fullName: profile?.name ?? '',
+        phone: profile?.phone ?? '',
+      },
       validationSchema: updateProfileSchema,
       onSubmit: async (formValues) => {
         try {
           const formData = new FormData();
           formData.append('name', formValues.fullName.trim());
-          if (photoFile) formData.append('profile_pic', photoFile);
+          formData.append('phone', formValues.phone.trim());
           const res = await updateProfile(formData).unwrap();
           if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-            setTempPhoto('');
-            setPhotoFile(null);
             setIsEditing(false);
             toast.success(res.message ?? 'Profile updated successfully!');
           }
@@ -149,29 +150,8 @@ export function ProfilePage() {
       },
     });
 
-  const displayPhoto = tempPhoto || profile?.profile_pic || '';
-
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Photo must be less than 2MB');
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload a valid image file');
-      return;
-    }
-    setPhotoFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setTempPhoto(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
   const handleCancel = () => {
     resetForm();
-    setTempPhoto('');
-    setPhotoFile(null);
     setIsEditing(false);
   };
 
@@ -323,48 +303,24 @@ export function ProfilePage() {
           <div className="relative px-4 pb-1 pt-0">
             <div className="-mt-8 rounded-lg border border-primary/20 bg-white p-4 shadow-none">
               <div className="flex items-start gap-3">
-                <label className={isEditing ? 'relative shrink-0 cursor-pointer' : 'relative shrink-0'}>
-                  <div className="rounded-full border ring-2 ring-white">
-                    <UserAvatar
-                      userName={values.fullName || profile?.name || ''}
-                      userPhoto={displayPhoto}
-                      size="lg"
-                    />
-                  </div>
-                  {isEditing && (
-                    <>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoUpload}
-                        className="hidden"
-                        disabled={isSubmitting}
-                      />
-                      <span className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/45 text-white">
-                        <Camera className="h-4 w-4" aria-hidden />
-                        <span className="mt-0.5 text-[10px] font-medium leading-none">Change</span>
-                      </span>
-                    </>
-                  )}
-                </label>
+                <ProfileAvatarUpload
+                  src={displayPhoto}
+                  name={values.fullName || displayName}
+                  size="md"
+                  ringClassName="ring-2 ring-white"
+                />
                 <div className="min-w-0 flex-1">
                   <h2 className="text-base font-medium text-gray-900">{profile?.name ?? '—'}</h2>
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
                     <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
                     <span className="break-all">{profile?.email ?? '—'}</span>
                   </p>
-                  {isEditing ? (
-                    <p className="mt-2 text-xs text-primary">Tap your photo to upload a new image</p>
-                  ) : null}
                 </div>
               </div>
               <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                Career Architect
+                {profile?.role?.name ?? 'User'}
               </span>
-              {isEditing ? (
-                <p className="mt-2 text-[11px] text-gray-500">Max photo size: 2MB</p>
-              ) : null}
             </div>
           </div>
         </div>
@@ -373,39 +329,16 @@ export function ProfilePage() {
         <div className="relative hidden h-24 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90 sm:block">
           <span className="absolute right-6 bottom-0 inline-flex translate-y-1/2 items-center gap-1.5 rounded-full border border-primary/20 bg-white/95 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-primary backdrop-blur-sm sm:right-8">
             <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Career Architect
+            {profile?.role?.name ?? 'User'}
           </span>
 
-          <div className="absolute left-6 bottom-0 flex max-w-[calc(100%-10rem)] translate-y-1/2 items-end gap-4 rounded-2xl border border-primary/20 bg-white/75 py-2.5 pl-2.5 pr-4 ring-1 ring-white/80 ring-inset backdrop-blur-sm sm:left-8 sm:max-w-[calc(100%-12rem)] sm:gap-5 sm:pr-5">
-            <div className="flex shrink-0 flex-col items-center">
-              <label className={isEditing ? 'relative cursor-pointer' : 'relative'}>
-                <div className="rounded-full border ring-4 ring-white">
-                  <UserAvatar
-                    userName={values.fullName || profile?.name || ''}
-                    userPhoto={displayPhoto}
-                    size="xl"
-                  />
-                </div>
-                {isEditing && (
-                  <>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                      disabled={isSubmitting}
-                    />
-                    <span className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/45 text-white">
-                      <Camera className="h-4 w-4" aria-hidden />
-                      <span className="mt-0.5 text-[10px] font-medium leading-none">Change</span>
-                    </span>
-                  </>
-                )}
-              </label>
-              {isEditing ? (
-                <p className="mt-1.5 max-w-16 text-center text-[10px] leading-tight text-gray-500">Max 2MB</p>
-              ) : null}
-            </div>
+          <div className="absolute left-6 bottom-0 z-10 flex max-w-[calc(100%-10rem)] translate-y-1/2 items-end gap-4 rounded-2xl border border-primary/20 bg-white/75 py-2.5 pl-2.5 pr-4 ring-1 ring-white/80 ring-inset backdrop-blur-sm sm:left-8 sm:max-w-[calc(100%-12rem)] sm:gap-5 sm:pr-5">
+            <ProfileAvatarUpload
+              src={displayPhoto}
+              name={values.fullName || displayName}
+              size="md"
+              ringClassName="ring-4 ring-white"
+            />
 
             <div className="min-w-0 pb-0.5">
               <h2 className="truncate text-lg font-medium tracking-tight text-gray-900 sm:text-xl">
@@ -415,9 +348,6 @@ export function ProfilePage() {
                 <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
                 {profile?.email ?? '—'}
               </p>
-              {isEditing ? (
-                <p className="mt-2 text-xs text-primary">Tap your photo to upload a new image</p>
-              ) : null}
             </div>
           </div>
         </div>
@@ -484,6 +414,18 @@ export function ProfilePage() {
                   <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
                     <dt className="flex items-center gap-3 text-sm font-normal text-gray-600">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                        <Phone className="h-4 w-4 text-primary" aria-hidden />
+                      </span>
+                      Phone number
+                    </dt>
+                    <dd className="text-base font-medium text-gray-900 sm:text-right">
+                      {profile?.phone || '—'}
+                    </dd>
+                  </div>
+
+                  <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">
+                    <dt className="flex items-center gap-3 text-sm font-normal text-gray-600">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <Calendar className="h-4 w-4 text-primary" aria-hidden />
                       </span>
                       Member since
@@ -536,6 +478,34 @@ export function ProfilePage() {
                     <div className="sm:text-right">
                       <p className="text-base font-normal text-gray-900">{profile?.email ?? '—'}</p>
                       <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
+                    </div>
+                  </div>
+
+                  <div className="px-5 py-4">
+                    <label
+                      htmlFor="phone"
+                      className="mb-2 flex items-center gap-3 text-sm font-normal text-gray-600"
+                    >
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                        <Phone className="h-4 w-4 text-primary" aria-hidden />
+                      </span>
+                      Phone number
+                    </label>
+                    <div className="sm:max-w-md">
+                      <Input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value={values.phone}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="e.g. +254 712 345 678"
+                        disabled={isSubmitting}
+                        className={errors.phone && touched.phone ? fieldInvalidClassName : undefined}
+                      />
+                      {errors.phone && touched.phone ? (
+                        <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                      ) : null}
                     </div>
                   </div>
 

@@ -77,8 +77,8 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                   <UserAvatar userName={userName} userPhoto={userPhoto} size="md" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-gray-900">{userName}</p>
-                    <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      Career Architect
+                    <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                      {profileData?.data?.role?.name ?? 'User'}
                     </span>
                   </div>
                 </div>

@@ -1,21 +1,38 @@
 'use client';
 
 import { useRef } from 'react';
-import { Avatar } from '@heroui/react';
 import { Camera, Loader2 } from 'lucide-react';
 import { useUpdateProfilePicMutation } from '@/store/rtkQueries/adminPostApi';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
+
+type AvatarSize = 'md' | 'lg' | 'xl';
 
 interface ProfileAvatarUploadProps {
   src?: string;
   name: string;
+  size?: AvatarSize;
   className?: string;
+  ringClassName?: string;
 }
 
-export function ProfileAvatarUpload({ src = '', name, className }: ProfileAvatarUploadProps) {
+const SIZE_CLASSES: Record<AvatarSize, { wrap: string; icon: string; showLabel: boolean }> = {
+  md: { wrap: 'h-14 w-14', icon: 'h-4 w-4', showLabel: true },
+  lg: { wrap: 'h-16 w-16', icon: 'h-4 w-4', showLabel: true },
+  xl: { wrap: 'h-24 w-24', icon: 'h-5 w-5', showLabel: true },
+};
+
+export function ProfileAvatarUpload({
+  src = '',
+  name,
+  size = 'xl',
+  className,
+  ringClassName = 'ring-4 ring-white',
+}: ProfileAvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [updateProfilePic, { isLoading }] = useUpdateProfilePicMutation();
+  const sizeConfig = SIZE_CLASSES[size];
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,32 +61,40 @@ export function ProfileAvatarUpload({ src = '', name, className }: ProfileAvatar
   };
 
   return (
-    <div className="relative h-24 w-24 shrink-0 rounded-full overflow-hidden">
+    <div className={cn('relative z-10 shrink-0 rounded-full overflow-hidden border bg-white', sizeConfig.wrap, className)}>
       <button
         type="button"
         onClick={() => !isLoading && inputRef.current?.click()}
         disabled={isLoading}
         className={cn(
-          'group relative block h-full w-full overflow-hidden rounded-full ring-4 ring-white shadow-md outline-none',
+          'group relative block h-full w-full overflow-hidden rounded-full shadow-md outline-none',
+          ringClassName,
           'focus-visible:ring-primary/40',
           isLoading ? 'cursor-wait' : 'cursor-pointer',
         )}
         title="Change profile picture"
         aria-label="Change profile picture"
       >
-        <Avatar src={src} name={name} className={cn('h-24 w-24 text-2xl', className)} />
+        <UserAvatar
+          userName={name}
+          userPhoto={src}
+          size="xl"
+          className="h-full! w-full! text-2xl"
+        />
         <span
           className={cn(
-            'absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 text-white transition-opacity',
+            'pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-0.5 rounded-full bg-black/50 text-white transition-opacity',
             isLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
           )}
         >
           {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className={cn('animate-spin', sizeConfig.icon)} />
           ) : (
             <>
-              <Camera className="h-5 w-5" />
-              <span className="text-[10px] font-medium">Change</span>
+              <Camera className={sizeConfig.icon} />
+              {sizeConfig.showLabel ? (
+                <span className="text-[10px] font-medium">Change</span>
+              ) : null}
             </>
           )}
         </span>

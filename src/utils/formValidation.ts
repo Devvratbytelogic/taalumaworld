@@ -271,6 +271,13 @@ export const updateProfileSchema = Yup.object({
     .trim()
     .min(2, 'Name must be at least 2 characters')
     .required('Name is required'),
+  phone: Yup.string()
+    .trim()
+    .test(
+      'phone-or-empty',
+      'Enter a valid phone number',
+      (value) => !value || /^\+?[0-9\s\-().]{7,15}$/.test(value),
+    ),
 });
 
 // Mentor Profile Tab — Profile details (name, bio, social links) Validation Schema

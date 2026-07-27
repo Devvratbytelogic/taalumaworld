@@ -11,6 +11,7 @@ import {
   FileDown,
   ChevronLeft,
   ChevronRight,
+  Star,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ImageComponent from '@/components/ui/ImageComponent';
@@ -21,6 +22,8 @@ import { getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 import MyBlueprintReader from './MyBlueprintReader';
 import moment from 'moment';
+import { useDispatch } from 'react-redux';
+import { openModal } from '@/store/slices/allModalSlice';
 
 type FilterType = 'all' | 'inProgress' | 'completed' | 'unread';
 
@@ -28,6 +31,7 @@ const PAGE_LIMIT = 10;
 
 export function MyChaptersPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
   const [invoiceDownloadingOrderId, setInvoiceDownloadingOrderId] = useState<string | null>(null);
@@ -302,6 +306,24 @@ export function MyChaptersPage() {
                           >
                             <FileDown className="h-4 w-4" />
                             {invoiceDownloadingOrderId === chapter.order_id ? 'Downloading…' : 'Invoice'}
+                          </Button>
+                        ) : null}
+
+                        {!chapter.isReviewed ? (
+                          <Button
+                            type="button"
+                            className="global_btn rounded_full outline_primary w-full"
+                            onPress={() =>
+                              dispatch(
+                                openModal({
+                                  componentName: 'AddReviewModal',
+                                  data: { itemId: chapter.chapterId, itemTitle: chapter.title, type: 'Chapter' },
+                                }),
+                              )
+                            }
+                          >
+                            <Star className="h-4 w-4" />
+                            Add review
                           </Button>
                         ) : null}
                       </div>

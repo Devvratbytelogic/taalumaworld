@@ -34,6 +34,7 @@ export interface ItemsEntity {
   isFree: boolean;
   accessType: string;
   isWishlisted: boolean;
+  isReviewed: boolean;
   readStatus: string;
   percentage: number;
   completed: boolean;

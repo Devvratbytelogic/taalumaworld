@@ -153,3 +153,15 @@
 {"timestamp":"2026-07-27T08:25:23.605Z","event":"POLL_TICK","level":"info","checkoutId":"98000-31550684-1","status":"completed"}
 {"timestamp":"2026-07-27T08:25:23.605Z","event":"POLL_COMPLETED","level":"info","checkoutId":"98000-31550684-1","meta":{"transactionId":"98000-31550684-1"}}
 {"timestamp":"2026-07-27T08:25:23.607Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"98000-31550684-1","meta":{"transactionId":"98000-31550684-1"}}
+{"timestamp":"2026-07-27T09:54:57.021Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-27T09:55:02.304Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-27T09:55:03.312Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"13978-29682095-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"13978-29682095-1","checkoutRequestId":"ws_CO_27072026152503056070"}}
+{"timestamp":"2026-07-27T09:55:04.963Z","event":"POLL_TICK","level":"info","checkoutId":"13978-29682095-1","status":"completed"}
+{"timestamp":"2026-07-27T09:55:04.964Z","event":"POLL_COMPLETED","level":"info","checkoutId":"13978-29682095-1","meta":{"transactionId":"13978-29682095-1"}}
+{"timestamp":"2026-07-27T09:55:04.966Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"13978-29682095-1","meta":{"transactionId":"13978-29682095-1"}}
+{"timestamp":"2026-07-27T10:01:32.198Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-27T10:01:37.798Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-27T10:01:38.283Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"06740-66729512-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"06740-66729512-1","checkoutRequestId":"ws_CO_27072026100138767270"}}
+{"timestamp":"2026-07-27T10:01:38.716Z","event":"POLL_TICK","level":"info","checkoutId":"06740-66729512-1","status":"completed"}
+{"timestamp":"2026-07-27T10:01:38.716Z","event":"POLL_COMPLETED","level":"info","checkoutId":"06740-66729512-1","meta":{"transactionId":"06740-66729512-1"}}
+{"timestamp":"2026-07-27T10:01:38.717Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"06740-66729512-1","meta":{"transactionId":"06740-66729512-1"}}

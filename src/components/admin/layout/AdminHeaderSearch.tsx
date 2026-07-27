@@ -36,6 +36,7 @@ import {
     TrendingUp,
     Link2,
     Percent,
+    Star,
 } from 'lucide-react';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { cn } from '@/components/ui/utils';
@@ -80,6 +81,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Transactions', description: 'View payment transactions', path: getAdminSectionRoutePath('transactions'), icon: Receipt, keywords: ['payment', 'transaction', 'money'] },
     { label: 'Orders', description: 'View series & blueprint orders', path: getAdminSectionRoutePath('orders'), icon: ShoppingBag, keywords: ['order', 'book order', 'series order', 'blueprint order', 'purchase'] },
     { label: 'Taxes', description: 'Manage country tax rates', path: getAdminSectionRoutePath('taxes'), icon: Percent, keywords: ['tax', 'gst', 'vat', 'rate'] },
+    { label: 'Reviews', description: 'Monitor and moderate user reviews', path: getAdminSectionRoutePath('reviews'), icon: Star, keywords: ['review', 'rating', 'feedback', 'moderate'] },
     { label: 'Testimonials', description: 'Manage testimonials', path: getAdminSectionRoutePath('testimonials'), icon: MessageSquare, keywords: ['testimonial', 'review', 'feedback'] },
     { label: 'FAQs', description: 'Manage FAQ entries', path: getAdminSectionRoutePath('faqs'), icon: FileEdit, keywords: ['faq', 'question', 'answer'] },
     { label: 'Subscribers', description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'), icon: Mail, keywords: ['subscriber', 'newsletter', 'email'] },

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import BlueprintPublicHero from '@/components/blueprint/BlueprintPublicHero';
 import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetails';
+import BlueprintReviews from '@/components/blueprint/BlueprintReviews';
 import LoginRequiredGate from '@/components/auth/LoginRequiredGate';
 import ChapterPurchaseGate from '@/components/pages-components/chapter/ChapterPurchaseGate';
 import { getSingleBlueprintServerAPI } from '@/store/server-api/serverSideAPIs';
@@ -47,6 +48,7 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
     const authToken = cookieStore.get('auth_token')?.value;
     const isAuthenticated = !!authToken;
 
+
     return (
         <>
             {data?.json_ld && (
@@ -63,6 +65,14 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
                 <BlueprintPublicHero data={data ?? null} />
 
                 <BlueprintPublicDetails data={data ?? null} />
+
+                <BlueprintReviews
+                    itemId={data?.id}
+                    itemTitle={data?.title}
+                    type="Chapter"
+                    isPurchased={Boolean(data?.isPurchased)}
+                    isReviewed={Boolean(data?.isReviewed)}
+                />
             </div>
         </>
     );

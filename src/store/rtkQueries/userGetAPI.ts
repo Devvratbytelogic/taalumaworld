@@ -38,7 +38,7 @@ import { UserTypeValue } from '@/constants/common';
 import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
 import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
 import { IFollowedMentorsAPIResponse } from '@/types/follows';
-import { IReviewsAPIResponse } from '@/types/user/reviews';
+import { IUserReviewsAPIResponse } from '@/types/user/reviews';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -327,7 +327,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['FollowedMentors'],
         }),
         /** get reviews for a chapter/book (GET /user/reviews/:type/:id) */
-        getContentReviews: builder.query<IReviewsAPIResponse, IGetContentReviewsParams>({
+        getContentReviews: builder.query<IUserReviewsAPIResponse, IGetContentReviewsParams>({
             query: ({ type, id, page, limit }) => ({
                 url: `/user/reviews/${type}/${id}`,
                 method: 'GET',

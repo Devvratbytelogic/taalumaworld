@@ -93,6 +93,11 @@ export function SidebarNavLink({
   );
 }
 
+/** A link is a match for the current path if it's an exact match, or the path is a child route of it (e.g. `/admin/orders/123` for `/admin/orders`). */
+function isPathMatch(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function SidebarNavGroups({
   groups,
   pathname,
@@ -102,6 +107,13 @@ export function SidebarNavGroups({
   pathname: string;
   onNavigate?: () => void;
 }) {
+  // Some hrefs are nested under others (e.g. agreement-types under agreements), so pick the
+  // longest matching href across all items to decide which single nav link is active.
+  const activeItemId = groups
+    .flatMap((group) => group.items)
+    .filter((item) => isPathMatch(pathname, item.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.id;
+
   return (
     <nav className="space-y-5 pt-4">
       {groups.map((group) => (
@@ -114,7 +126,7 @@ export function SidebarNavGroups({
               <SidebarNavLink
                 key={item.id}
                 item={item}
-                isActive={pathname === item.href}
+                isActive={item.id === activeItemId}
                 onClick={onNavigate}
               />
             ))}

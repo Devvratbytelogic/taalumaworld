@@ -8,18 +8,24 @@ import {
 } from '@/types/dashboard';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
+export interface IDashboardDateRangeParams {
+    fromDate?: string;
+    toDate?: string;
+}
+
 export const dashboardApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         /** Admin overview dashboard stats */
-        getAdminDashboard: builder.query<IAdminDashboardAPIResponse, void>({
-            query: () => ({
+        getAdminDashboard: builder.query<IAdminDashboardAPIResponse, IDashboardDateRangeParams | void>({
+            query: (params) => ({
                 url: `/admin/dashboard`,
                 method: 'GET',
+                params: params ? { ...params } : {},
             }),
         }),
 
         /** Blueprint performance — accessible to Admin and Mentor */
-        getBlueprintPerformance: builder.query<IBlueprintPerformanceAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getBlueprintPerformance: builder.query<IBlueprintPerformanceAPIResponse, { page?: number; limit?: number; search?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/blueprints/performance`,
                 method: 'GET',
@@ -28,7 +34,7 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Blueprint sales volume — accessible to Admin and Mentor */
-        getSalesVolume: builder.query<ISalesVolumeAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getSalesVolume: builder.query<ISalesVolumeAPIResponse, { page?: number; limit?: number; search?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/blueprints/sales-volume`,
                 method: 'GET',
@@ -37,7 +43,7 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Blueprint revenue — accessible to Admin and Mentor */
-        getBlueprintRevenue: builder.query<IBlueprintRevenueAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getBlueprintRevenue: builder.query<IBlueprintRevenueAPIResponse, { page?: number; limit?: number; search?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/blueprints/revenue`,
                 method: 'GET',
@@ -46,7 +52,7 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Mentor economy revenue — Admin only */
-        getMentorEconomyRevenue: builder.query<IMentorEconomyRevenueAPIResponse, { page?: number; limit?: number; search?: string } | void>({
+        getMentorEconomyRevenue: builder.query<IMentorEconomyRevenueAPIResponse, { page?: number; limit?: number; search?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/mentor-economy/revenue`,
                 method: 'GET',
@@ -55,7 +61,7 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Logged-in mentor's own referrals, filterable by status — Mentor only */
-        getMyMentorReferrals: builder.query<IMentorReferralsAPIResponse, { page?: number; limit?: number; status?: string } | void>({
+        getMyMentorReferrals: builder.query<IMentorReferralsAPIResponse, { page?: number; limit?: number; status?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/referrals/my`,
                 method: 'GET',

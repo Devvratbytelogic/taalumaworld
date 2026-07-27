@@ -1,13 +1,16 @@
 'use client';
 
-import { Book, CalendarDays, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react';
+import { useState } from 'react';
+import { Book, CalendarDays, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet, X } from 'lucide-react';
 import {
   AdminPage,
   AdminPanel,
+  AdminSearchPanel,
   AdminSectionHeader,
   AdminStatCard,
   AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
+import { Input } from '@/components/ui/input';
 import { DashboardWelcomeHeader } from './DashboardWelcomeHeader';
 import { DashboardStatsGrid, type StatCard } from './DashboardStatsGrid';
 import { DashboardRecentActivity } from './DashboardRecentActivity';
@@ -47,7 +50,19 @@ export default function AdminDashboardTab() {
   const { data: globalSettingsData } = useGetAdminGlobalSettingsQuery();
   const contentMode: ContentMode = globalSettingsData?.data?.visible === 'book' ? 'books' : 'chapters';
 
-  const { data: dashboardData, isLoading: dashboardLoading } = useGetAdminDashboardQuery();
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const dateRangeParams = {
+    ...(fromDate ? { fromDate } : {}),
+    ...(toDate ? { toDate } : {}),
+  };
+  const hasDateFilter = !!fromDate || !!toDate;
+  const clearDateFilter = () => {
+    setFromDate('');
+    setToDate('');
+  };
+
+  const { data: dashboardData, isLoading: dashboardLoading } = useGetAdminDashboardQuery(dateRangeParams);
   const statsData = dashboardData?.data;
 
   /** Admin & Mentor shared metrics */
@@ -55,17 +70,17 @@ export default function AdminDashboardTab() {
     data: performanceData,
     isLoading: performanceLoading,
     isError: performanceError,
-  } = useGetBlueprintPerformanceQuery();
+  } = useGetBlueprintPerformanceQuery(dateRangeParams);
   const {
     data: salesVolumeData,
     isLoading: salesVolumeLoading,
     isError: salesVolumeError,
-  } = useGetSalesVolumeQuery();
+  } = useGetSalesVolumeQuery(dateRangeParams);
   const {
     data: revenueData,
     isLoading: revenueLoading,
     isError: revenueError,
-  } = useGetBlueprintRevenueQuery();
+  } = useGetBlueprintRevenueQuery(dateRangeParams);
 
   const stats: StatCard[] = [
     {
@@ -128,6 +143,39 @@ export default function AdminDashboardTab() {
   return (
     <AdminPage>
       <DashboardWelcomeHeader userName={userName} contentMode={contentMode} />
+      <div className="flex flex-wrap items-end justify-end gap-3">
+        <div className="flex min-w-0 flex-col gap-1 sm:w-40">
+          <label className="text-xs font-medium text-slate-500">From</label>
+          <Input
+            type="date"
+            value={fromDate}
+            max={toDate || undefined}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="h-9 w-full text-sm"
+          />
+        </div>
+        <div className="flex min-w-0 flex-col gap-1 sm:w-40">
+          <label className="text-xs font-medium text-slate-500">To</label>
+          <Input
+            type="date"
+            value={toDate}
+            min={fromDate || undefined}
+            onChange={(e) => setToDate(e.target.value)}
+            className="h-9 w-full text-sm"
+          />
+        </div>
+        {hasDateFilter ? (
+          <button
+            type="button"
+            onClick={clearDateFilter}
+            className="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200! px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+          >
+            <X className="h-3.5 w-3.5" />
+            Clear
+          </button>
+        ) : null}
+      </div>
+
       <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
 
       <AdminPanel>

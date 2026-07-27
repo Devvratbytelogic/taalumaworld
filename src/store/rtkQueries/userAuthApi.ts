@@ -9,6 +9,14 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
                 body: userData,
             }),
         }),
+        /** Sign in / sign up with Google (frontend sends the Google ID token it gets from the Sign in with Google button) */
+        userGoogleLogin: builder.mutation({
+            query: (body) => ({
+                url: `/user/auth/google`,
+                method: "POST",
+                body: body,
+            }),
+        }),
         userRegister: builder.mutation({
             query: (userData) => ({
                 url: `/user/register`,
@@ -66,6 +74,7 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
 
 export const {
     useUserLoginMutation,
+    useUserGoogleLoginMutation,
     useUserRegisterMutation,
     useUserForgotPasswordMutation,
     useUserResetPasswordMutation,

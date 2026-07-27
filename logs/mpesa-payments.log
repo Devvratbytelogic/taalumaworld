@@ -147,3 +147,9 @@
 {"timestamp":"2026-07-24T09:21:44.782Z","event":"POLL_TICK","level":"info","checkoutId":"64442-64542263-1","status":"completed"}
 {"timestamp":"2026-07-24T09:21:44.783Z","event":"POLL_COMPLETED","level":"info","checkoutId":"64442-64542263-1","meta":{"transactionId":"64442-64542263-1"}}
 {"timestamp":"2026-07-24T09:21:44.786Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"64442-64542263-1","meta":{"transactionId":"64442-64542263-1"}}
+{"timestamp":"2026-07-27T08:25:10.086Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-27T08:25:21.181Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-27T08:25:22.248Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"98000-31550684-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"98000-31550684-1","checkoutRequestId":"ws_CO_27072026135522941091"}}
+{"timestamp":"2026-07-27T08:25:23.605Z","event":"POLL_TICK","level":"info","checkoutId":"98000-31550684-1","status":"completed"}
+{"timestamp":"2026-07-27T08:25:23.605Z","event":"POLL_COMPLETED","level":"info","checkoutId":"98000-31550684-1","meta":{"transactionId":"98000-31550684-1"}}
+{"timestamp":"2026-07-27T08:25:23.607Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"98000-31550684-1","meta":{"transactionId":"98000-31550684-1"}}

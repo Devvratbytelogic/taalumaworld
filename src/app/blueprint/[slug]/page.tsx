@@ -43,7 +43,6 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
     const { slug } = await params;
     const response = await getSingleBlueprintServerAPI({ slug });
     const data = response?.data;
-
     const cookieStore = await cookies();
     const authToken = cookieStore.get('auth_token')?.value;
     const isAuthenticated = !!authToken;

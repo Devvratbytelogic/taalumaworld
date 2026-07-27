@@ -31,6 +31,7 @@ export interface ISingleChapterAPIResponseData {
   mentor: string;
   canRead: boolean;
   isPurchased: boolean;
+  isReviewed: boolean;
   isCart: boolean;
   isWishlisted: boolean;
   percentage: number;

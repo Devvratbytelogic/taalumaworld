@@ -38,6 +38,7 @@ import { UserTypeValue } from '@/constants/common';
 import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
 import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
 import { IFollowedMentorsAPIResponse } from '@/types/follows';
+import { IReviewsAPIResponse } from '@/types/user/reviews';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -76,6 +77,13 @@ export interface IGetFollowedMentorsParams {
     search?: string;
     fromDate?: string;
     toDate?: string;
+}
+
+export interface IGetContentReviewsParams {
+    type?: 'Book' | 'Chapter';
+    id: string;
+    page?: number;
+    limit?: number;
 }
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -318,6 +326,18 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['FollowedMentors'],
         }),
+        /** get reviews for a chapter/book (GET /user/reviews/:type/:id) */
+        getContentReviews: builder.query<IReviewsAPIResponse, IGetContentReviewsParams>({
+            query: ({ type, id, page, limit }) => ({
+                url: `/user/reviews/${type}/${id}`,
+                method: 'GET',
+                params: {
+                    ...(page != null ? { page } : {}),
+                    ...(limit != null ? { limit } : {}),
+                },
+            }),
+            providesTags: ['Reviews'],
+        }),
     }),
 });
 
@@ -356,4 +376,5 @@ export const {
     useGetUserAddressesQuery,
     useGetUserAddressByIdQuery,
     useGetFollowedMentorsQuery,
+    useGetContentReviewsQuery,
 } = clientSideGetApis;

@@ -21,40 +21,41 @@ import {
   getUserDashboardProfileRoutePath,
   getUserDashboardSettingsRoutePath,
 } from '@/routes/routes';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 const NAV_GROUPS: {
   title: string;
   items: { href: string; label: string; icon: typeof User; roles?: UserTypeValue[] }[];
 }[] = [
-  {
-    title: 'Account',
-    items: [
-      { href: getUserDashboardProfileRoutePath(), label: 'Profile', icon: User },
-      { href: getUserDashboardAddressRoutePath(), label: 'Address', icon: MapPin },
-      { href: getUserDashboardSettingsRoutePath(), label: 'Settings', icon: Settings },
-    ],
-  },
-  {
-    title: 'Library',
-    items: [
-      { href: getUserDashboardMyChaptersRoutePath(), label: 'My Blueprints', icon: BookOpen },
-      { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
-      { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
-      { href: getUserDashboardFollowedMentorsRoutePath(), label: 'Followed Mentors', icon: Users },
-    ],
-  },
-  {
-    title: 'Growth',
-    items: [
-      {
-        href: getUserDashboardBecomeMentorRoutePath(),
-        label: 'Become a Mentor',
-        icon: GraduationCap,
-        roles: [USER_TYPE.CAREER_ARCHITECT, USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT],
-      },
-    ],
-  },
-];
+    {
+      title: 'Account',
+      items: [
+        { href: getUserDashboardProfileRoutePath(), label: 'Profile', icon: User },
+        { href: getUserDashboardAddressRoutePath(), label: 'Address', icon: MapPin },
+        { href: getUserDashboardSettingsRoutePath(), label: 'Settings', icon: Settings },
+      ],
+    },
+    {
+      title: 'Library',
+      items: [
+        { href: getUserDashboardMyChaptersRoutePath(), label: 'My Blueprints', icon: BookOpen },
+        { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
+        { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
+        { href: getUserDashboardFollowedMentorsRoutePath(), label: 'Followed Mentors', icon: Users },
+      ],
+    },
+    {
+      title: 'Growth',
+      items: [
+        {
+          href: getUserDashboardBecomeMentorRoutePath(),
+          label: 'Become a Mentor',
+          icon: GraduationCap,
+          roles: [USER_TYPE.CAREER_ARCHITECT, USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT],
+        },
+      ],
+    },
+  ];
 
 export default function UserDashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -76,7 +77,9 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white lg:sticky lg:top-24">
               <div className="border-b border-gray-100 bg-linear-to-br from-primary/8 via-primary/4 to-white px-5 py-5">
                 <div className="flex items-center gap-3">
-                  <UserAvatar userName={userName} userPhoto={userPhoto} size="md" />
+                  <div className="h-14 w-14 overflow-hidden rounded-full border border-gray-200">
+                    <ImageComponent src={userPhoto} alt={userName} object_cover />
+                  </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-gray-900">{userName}</p>
                     <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">

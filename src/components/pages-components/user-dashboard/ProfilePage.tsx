@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Phone,
   Hash,
+  Copy,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -65,9 +66,20 @@ export function ProfilePage() {
   const canApplyForMentor = mentorApplication?.can_apply ?? true;
   const displayName = profile?.name || 'User';
   const displayPhoto = profile?.profile_pic || '';
+  const shortCode = profile?.short_code?.trim() || '';
   const agreementUserType = profile?.institution_id
     ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA
     : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT;
+
+  const copyShortCode = async () => {
+    if (!shortCode) return;
+    try {
+      await navigator.clipboard.writeText(shortCode);
+      toast.success('Short code copied', { description: shortCode });
+    } catch {
+      toast.error('Failed to copy short code');
+    }
+  };
 
   const isKpisLoading = isSeriesLoading || isChaptersLoading || isHistoryLoading;
 
@@ -436,8 +448,20 @@ export function ProfilePage() {
                       </span>
                       Short code
                     </dt>
-                    <dd className="text-base font-medium text-gray-900 sm:text-right">
-                      {profile?.short_code || '—'}
+                    <dd className="sm:text-right">
+                      {shortCode ? (
+                        <button
+                          type="button"
+                          onClick={copyShortCode}
+                          className="inline-flex items-center gap-2 text-base font-medium text-gray-900 transition-colors hover:text-primary"
+                          title="Copy short code"
+                        >
+                          <span className="font-mono">{shortCode}</span>
+                          <Copy className="h-4 w-4 shrink-0 text-gray-500" />
+                        </button>
+                      ) : (
+                        <span className="text-base font-medium text-gray-900">—</span>
+                      )}
                     </dd>
                   </div>
 
@@ -534,9 +558,21 @@ export function ProfilePage() {
                       </span>
                       Short code
                     </p>
-                    <p className="text-base font-normal text-gray-900 sm:text-right">
-                      {profile?.short_code || '—'}
-                    </p>
+                    <div className="sm:text-right">
+                      {shortCode ? (
+                        <button
+                          type="button"
+                          onClick={copyShortCode}
+                          className="inline-flex items-center gap-2 text-base font-normal text-gray-900 transition-colors hover:text-primary"
+                          title="Copy short code"
+                        >
+                          <span className="font-mono">{shortCode}</span>
+                          <Copy className="h-4 w-4 shrink-0 text-gray-500" />
+                        </button>
+                      ) : (
+                        <span className="text-base font-normal text-gray-900">—</span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-5">

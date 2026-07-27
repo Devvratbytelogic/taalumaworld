@@ -148,6 +148,15 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['Address'],
         }),
+        /** create a review for a chapter/book (POST /user/reviews) */
+        createReview: builder.mutation({
+            query: (body) => ({
+                url: `/user/reviews`,
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['Reviews', 'SingleChapter', 'MyChapters'],
+        }),
         // mpesaPaymentCallback: builder.mutation({
         //     query: (body) => ({
         //         url: `/user/mpaisa/callback`,
@@ -178,4 +187,5 @@ export const {
     useEditUserAddressMutation,
     useSetDefaultUserAddressMutation,
     useDeleteUserAddressMutation,
+    useCreateReviewMutation,
 } = clientSidePostApis;

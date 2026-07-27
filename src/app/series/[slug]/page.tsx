@@ -11,7 +11,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const response = await getSingleSeriesServerAPI({ slug });
   const bookDetails = response?.data?.bookDetails;
-
   if (!bookDetails) {
     return {
       title: 'Series Not Found | TaalumaWorld',

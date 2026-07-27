@@ -124,14 +124,14 @@ export function AuditLogDetailView({ auditLogId }: AuditLogDetailViewProps) {
               </div>
             ) : null}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {log.old_value ? (
+              {/* {log.old_value ? (
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-1">Before</p>
                   <pre className="overflow-x-auto rounded-lg bg-slate-50 p-4 text-xs text-slate-700">
                     {JSON.stringify(log.old_value, null, 2)}
                   </pre>
                 </div>
-              ) : null}
+              ) : null} */}
               {log.new_value ? (
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-1">After</p>

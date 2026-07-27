@@ -17,15 +17,16 @@ export interface IAllAuditLogsAPIResponseDataEntity {
   _id: string;
   action: string;
   action_label: string;
+  message: string;
   actor_id: IAllAuditLogsAPIResponseDataEntityActorId;
   actor_email: string;
   actor_name: string;
   actor_role: string;
   entity_type: string;
-  entity_id?: null;
-  entity_label?: null;
+  entity_id: string;
+  entity_label: string;
   old_value?: null;
-  new_value?: IAllAuditLogsAPIResponseDataEntityNewValue | null;
+  new_value: IAllAuditLogsAPIResponseDataEntityNewValue;
   reason?: null;
   metadata: IAllAuditLogsAPIResponseDataEntityMetadata;
   ip_address: string;
@@ -40,17 +41,37 @@ export interface IAllAuditLogsAPIResponseDataEntityActorId {
   role_id: string;
 }
 export interface IAllAuditLogsAPIResponseDataEntityNewValue {
-  query: IAllAuditLogsAPIResponseDataEntityNewValueQuery;
+  params: IAllAuditLogsAPIResponseDataEntityNewValueParams;
+  body: IAllAuditLogsAPIResponseDataEntityNewValueBody;
 }
-export interface IAllAuditLogsAPIResponseDataEntityNewValueQuery {
-  page: string;
-  limit: string;
-  search: string;
+export interface IAllAuditLogsAPIResponseDataEntityNewValueParams {
+  id: string;
+}
+export interface IAllAuditLogsAPIResponseDataEntityNewValueBody {
+  book: string;
+  number: string;
+  title: string;
+  description: string;
+  content: string;
+  isFree: string;
+  price: string;
+  meta_title: string;
+  meta_description: string;
+  og_title: string;
+  og_description: string;
+  json_ld: string;
+  accepted_agreement_ids?: (string)[] | null;
+  slug: string;
+  shareable_link: string;
+  user_ip: string;
 }
 export interface IAllAuditLogsAPIResponseDataEntityMetadata {
   status_code: number;
   original_url: string;
+  http_method: string;
+  message: string;
 }
+
 
 
 
@@ -71,13 +92,14 @@ export interface ISingleAuditLogAPIResponseData {
   _id: string;
   action: string;
   action_label: string;
+  message: string;
   actor_id: ISingleAuditLogAPIResponseDataActorId;
   actor_email: string;
   actor_name: string;
   actor_role: string;
   entity_type: string;
-  entity_id?: null;
-  entity_label?: null;
+  entity_id: string;
+  entity_label: string;
   old_value?: null;
   new_value: ISingleAuditLogAPIResponseDataNewValue;
   reason?: null;
@@ -95,14 +117,33 @@ export interface ISingleAuditLogAPIResponseDataActorId {
   role_id: string;
 }
 export interface ISingleAuditLogAPIResponseDataNewValue {
-  query: ISingleAuditLogAPIResponseDataNewValueQuery;
+  params: ISingleAuditLogAPIResponseDataNewValueParams;
+  body: ISingleAuditLogAPIResponseDataNewValueBody;
 }
-export interface ISingleAuditLogAPIResponseDataNewValueQuery {
-  page: string;
-  limit: string;
-  search: string;
+export interface ISingleAuditLogAPIResponseDataNewValueParams {
+  id: string;
+}
+export interface ISingleAuditLogAPIResponseDataNewValueBody {
+  book: string;
+  number: string;
+  title: string;
+  description: string;
+  content: string;
+  isFree: string;
+  price: string;
+  meta_title: string;
+  meta_description: string;
+  og_title: string;
+  og_description: string;
+  json_ld: string;
+  accepted_agreement_ids?: (string)[] | null;
+  slug: string;
+  shareable_link: string;
+  user_ip: string;
 }
 export interface ISingleAuditLogAPIResponseDataMetadata {
   status_code: number;
   original_url: string;
+  http_method: string;
+  message: string;
 }

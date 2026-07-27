@@ -14,6 +14,15 @@ import type { IAllAuditLogsAPIResponseDataEntity } from '@/types/auditLog';
 import { getViewAuditLogRoutePath } from '@/routes/routes';
 import { AdminAuditLogsSearch } from './AdminAuditLogsSearch';
 
+const ENTITY_TYPE_LABELS: Record<string, string> = {
+  chapter: 'blueprints',
+  book: 'series',
+};
+
+function formatEntityType(entityType: string) {
+  return ENTITY_TYPE_LABELS[entityType.toLowerCase()] ?? entityType;
+}
+
 export function AdminAuditLogsTab() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,31 +46,49 @@ export function AdminAuditLogsTab() {
 
   const columns: GridColDef<IAllAuditLogsAPIResponseDataEntity>[] = [
     {
-      field: 'action',
+      field: 'action_label',
       headerName: 'Action',
       minWidth: 200,
       flex: 1,
       sortable: false,
       renderCell: (params) => (
         <div className="min-w-0">
-          <p className="text-sm font-medium truncate">{params.row.action_label || params.row.action}</p>
-          <p className="text-xs text-muted-foreground truncate font-mono">{params.row.action}</p>
+          <p className="text-sm font-medium truncate">{params.row.action_label || params.row.action || '—'}</p>
+          <p className="text-xs text-muted-foreground truncate font-mono">{params.row.action || '—'}</p>
         </div>
+      ),
+    },
+    {
+      field: 'message',
+      headerName: 'Message',
+      minWidth: 220,
+      flex: 1.2,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-muted-foreground truncate" title={params.row.message}>
+          {params.row.message || '—'}
+        </span>
       ),
     },
     {
       field: 'entity_type',
       headerName: 'Entity',
-      minWidth: 150,
+      minWidth: 170,
       sortable: false,
       renderCell: (params) => (
         params.row.entity_type ? (
           <div className="min-w-0">
             <Badge variant="outline" className="capitalize border-slate-200 bg-slate-50 text-slate-700">
-              {params.row.entity_type}
+              {formatEntityType(params.row.entity_type)}
             </Badge>
             {params.row.entity_label ? (
-              <p className="mt-1 text-xs text-muted-foreground truncate">{params.row.entity_label}</p>
+              <p className="mt-1 text-xs text-muted-foreground truncate" title={params.row.entity_label}>
+                {params.row.entity_label}
+              </p>
+            ) : params.row.entity_id ? (
+              <p className="mt-1 text-xs text-muted-foreground truncate font-mono" title={params.row.entity_id}>
+                {params.row.entity_id}
+              </p>
             ) : null}
           </div>
         ) : <span className="text-sm text-muted-foreground">—</span>
@@ -75,15 +102,19 @@ export function AdminAuditLogsTab() {
       sortable: false,
       renderCell: (params) => (
         <div className="min-w-0">
-          <p className="text-sm font-medium truncate">{params.row.actor_name || params.row.actor_id?.name || 'System'}</p>
-          <p className="text-xs text-muted-foreground truncate">{params.row.actor_email || params.row.actor_id?.email}</p>
+          <p className="text-sm font-medium truncate">
+            {params.row.actor_name || params.row.actor_id?.name || 'System'}
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
+            {params.row.actor_email || params.row.actor_id?.email || '—'}
+          </p>
         </div>
       ),
     },
     {
       field: 'actor_role',
       headerName: 'Role',
-      minWidth: 130,
+      minWidth: 120,
       sortable: false,
       renderCell: (params) => (
         params.row.actor_role ? (
@@ -94,12 +125,50 @@ export function AdminAuditLogsTab() {
       ),
     },
     {
+      field: 'http_method',
+      headerName: 'Method',
+      minWidth: 100,
+      sortable: false,
+      valueGetter: (_value, row) => row.metadata?.http_method ?? '',
+      renderCell: (params) => (
+        params.row.metadata?.http_method ? (
+          <Badge variant="outline" className="uppercase border-slate-200 bg-slate-50 text-slate-700">
+            {params.row.metadata.http_method}
+          </Badge>
+        ) : <span className="text-sm text-muted-foreground">—</span>
+      ),
+    },
+    {
+      field: 'status_code',
+      headerName: 'Status',
+      minWidth: 90,
+      sortable: false,
+      valueGetter: (_value, row) => row.metadata?.status_code ?? '',
+      renderCell: (params) => {
+        const status = params.row.metadata?.status_code;
+        if (status == null) return <span className="text-sm text-muted-foreground">—</span>;
+        const isSuccess = status >= 200 && status < 300;
+        return (
+          <Badge
+            variant="outline"
+            className={
+              isSuccess
+                ? 'border-green-200 bg-green-50 text-green-700'
+                : 'border-red-200 bg-red-50 text-red-700'
+            }
+          >
+            {status}
+          </Badge>
+        );
+      },
+    },
+    {
       field: 'ip_address',
       headerName: 'IP Address',
       minWidth: 130,
       sortable: false,
       renderCell: (params) => (
-        <span className="text-sm text-muted-foreground whitespace-nowrap">{params.row.ip_address ?? '—'}</span>
+        <span className="text-sm text-muted-foreground whitespace-nowrap">{params.row.ip_address || '—'}</span>
       ),
     },
     {

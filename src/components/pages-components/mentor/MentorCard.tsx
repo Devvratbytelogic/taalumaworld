@@ -61,6 +61,15 @@ export default function MentorCard({ mentor, index }: MentorCardProps) {
                 <span className="mt-1 text-xs font-medium tracking-wide text-primary uppercase">
                     {mentor?.is_verified_mentor ? 'Verified Mentor' : 'Mentor'}
                 </span>
+                {mentor?.email ? (
+                    <a
+                        href={`mailto:${mentor.email}`}
+                        className="mt-1.5 line-clamp-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+                        title={mentor.email}
+                    >
+                        {mentor.email}
+                    </a>
+                ) : null}
 
                 <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                     {mentor?.professionalBio || 'Sharing real-world experience through Blueprints on TaalumaWorld.'}

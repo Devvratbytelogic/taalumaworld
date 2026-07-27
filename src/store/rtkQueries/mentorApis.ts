@@ -2,6 +2,7 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type { IAllMentorTiersAPIResponse, IGetMentorTierByIdAPIResponse } from '@/types/mentorTier';
 import type { IAllMentorApplicationsAPIResponse } from '@/types/mentorApplication';
 import { IAllMentorTierUpgradeApplicationsAPIResponse, IGetMyMentorTierUpgradeApplicationAPIResponse } from '@/types/mentorTierUpgradeApplication';
+import { IFollowsAPIResponse } from '@/types/follows';
 
 
 export const mentorApis = rtkQuerieSetup.injectEndpoints({
@@ -84,7 +85,7 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminMentorTierUpgradeApplications'],
         }),
-        
+
         reviewMentorTierUpgradeApplication: builder.mutation({
             query: ({ id, values }) => ({
                 url: `/admin/mentor-tier-upgrade-applications/${id}/review`,
@@ -92,6 +93,16 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
                 body: values,
             }),
             invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication'],
+        }),
+
+        /** Followers */
+        getAllFollowers: builder.query<IFollowsAPIResponse, { fromDate?: string; toDate?: string; page?: number; limit?: number; search?: string } | void>({
+            query: (params) => ({
+                url: `/admin/followers`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminFollowers'],
         }),
     }),
 });
@@ -107,4 +118,5 @@ export const {
     useGetMyMentorTierUpgradeApplicationQuery,
     useGetAllMentorTierUpgradeApplicationsQuery,
     useReviewMentorTierUpgradeApplicationMutation,
+    useGetAllFollowersQuery,
 } = mentorApis;

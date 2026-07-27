@@ -62,7 +62,7 @@ export function MyWishlistPage() {
     return (
       <div className="space-y-6">
         <UserDashboardPageHeader title="My Wishlist" description="Series and blueprints you have saved for later" />
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm animate-pulse">
+        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
           <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-4 sm:px-6">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="h-9 w-24 rounded-full bg-gray-100" />
@@ -90,7 +90,7 @@ export function MyWishlistPage() {
     <div className="space-y-6">
       <UserDashboardPageHeader title="My Wishlist" description="Series and blueprints you have saved for later" />
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             {filterTabs.map(({ key, label }) => (
@@ -235,7 +235,7 @@ export function MyWishlistPage() {
                   <Button
                     type="button"
                     onPress={() => router.push(getHomeRoutePath())}
-                    className="global_btn rounded_full bg_primary"
+                    className="global_btn mx-auto rounded_full bg_primary"
                   >
                     Browse Content
                   </Button>
@@ -243,7 +243,7 @@ export function MyWishlistPage() {
                   <Button
                     type="button"
                     onPress={() => handleFilterChange('all')}
-                    className="global_btn rounded_full outline_primary"
+                    className="global_btn mx-auto rounded_full outline_primary"
                   >
                     Show All Saved Items
                   </Button>

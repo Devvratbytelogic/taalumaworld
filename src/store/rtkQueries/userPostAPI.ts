@@ -112,6 +112,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/follow-mentor/${id}`,
                 method: 'POST',
             }),
+            invalidatesTags: ['FollowedMentors'],
         }),
         /** add a new address */
         addUserAddress: builder.mutation({

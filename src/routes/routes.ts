@@ -99,6 +99,10 @@ export function getMentorReferralsRoutePath(): string {
   return '/admin/mentor/referrals';
 }
 
+export function getMentorFollowersRoutePath(): string {
+  return '/admin/mentor/follower';
+}
+
 export function getMentorBooksRoutePath(): string {
   return '/admin/mentor/series';
 }
@@ -240,6 +244,10 @@ export function getUserDashboardMyBooksRoutePath(): string {
 
 export function getUserDashboardMyWishlistRoutePath(): string {
   return '/user-dashboard/my-wishlist';
+}
+
+export function getUserDashboardFollowedMentorsRoutePath(): string {
+  return '/user-dashboard/followed-mentors';
 }
 
 export function getUserDashboardHistoryRoutePath(): string {

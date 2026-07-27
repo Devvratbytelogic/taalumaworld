@@ -37,6 +37,7 @@ import { IAllAgreementsDataAPIResponse } from './allAgreements';
 import { UserTypeValue } from '@/constants/common';
 import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
 import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
+import { IFollowedMentorsAPIResponse } from '@/types/follows';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -67,6 +68,14 @@ export interface IGetWishlistParams {
     page?: number;
     limit?: number;
     type?: 'Book' | 'Chapter';
+}
+
+export interface IGetFollowedMentorsParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    fromDate?: string;
+    toDate?: string;
 }
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -300,6 +309,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: (_, __, id) => [{ type: 'Address', id }],
         }),
+        /** get mentors the current user follows */
+        getFollowedMentors: builder.query<IFollowedMentorsAPIResponse, IGetFollowedMentorsParams | void>({
+            query: (params) => ({
+                url: `/user/followed-mentors`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['FollowedMentors'],
+        }),
     }),
 });
 
@@ -337,4 +355,5 @@ export const {
     useGetMentorApplicationsQuery,
     useGetUserAddressesQuery,
     useGetUserAddressByIdQuery,
+    useGetFollowedMentorsQuery,
 } = clientSideGetApis;

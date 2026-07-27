@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   ShoppingCart,
   TrendingUp,
+  Users,
   Wallet,
 } from 'lucide-react';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
@@ -28,6 +29,7 @@ import {
   getMentorBooksRoutePath,
   getMentorChaptersRoutePath,
   getMentorDashboardRoutePath,
+  getMentorFollowersRoutePath,
   getMentorProfileRoutePath,
   getMentorReferralsRoutePath,
   getMentorRevenueByBlueprintRoutePath,
@@ -66,6 +68,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     title: 'Growth',
     items: [
       { id: 'referrals', label: 'Referral Performance', href: getMentorReferralsRoutePath(), icon: Link2 },
+      { id: 'followers', label: 'Followers', href: getMentorFollowersRoutePath(), icon: Users },
     ],
   },
 ];

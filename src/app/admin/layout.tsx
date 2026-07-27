@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Percent, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, UserCog, Users, Award } from 'lucide-react';
+import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Percent, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Tag, TrendingUp, UserCircle, UserCog, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -19,6 +19,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { id: 'dashboard', label: 'Dashboard', href: getAdminDashboardRoutePath(), icon: LayoutDashboard },
             { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
             { model: 'Role', submodel: ['Permission', 'Staff'], id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
+            { model: 'Audit Log', id: 'audit_logs', label: 'Audit Logs', href: getAdminSectionRoutePath('audit_logs'), icon: ScrollText },
         ],
     },
     {

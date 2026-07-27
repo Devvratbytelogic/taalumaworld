@@ -23,11 +23,10 @@ import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
-import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { BLUEPRINT_STATUSES, DEFAULT_BLUEPRINT_STATUS, type BlueprintStatus } from '@/constants/blueprint';
+import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
 
 
 
@@ -65,13 +64,6 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const requiredAgreementIds = blueprintAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
   const chapterData = chapterResponse?.data;
-  const canPublish = chapterData?.isPublishAllowed ?? false;
-
-  const isStatusBlocked = (status: string) => {
-    if (status === 'Published' && !canPublish) return true;
-    if (canPublish && (status === 'Pending' || status === 'Review')) return true;
-    return false;
-  };
 
   const initialFormValues = {
     bookId: chapterData?.series?.id ?? '',
@@ -82,7 +74,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     sequence: chapterData?.number ?? 1,
     isFree: chapterData?.isFree ?? false,
     price: chapterData?.price ?? 0 as number | undefined,
-    status: chapterData?.status ?? DEFAULT_BLUEPRINT_STATUS,
+    // status: chapterData?.status ?? DEFAULT_BLUEPRINT_STATUS,
     cover_image: chapterData?.coverImage ?? null as File | null,
     pdf_file: (chapterData?.pdf ?? null) as File | string | null,
     accepted_agreement_ids: [] as string[],
@@ -102,15 +94,6 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
     },
     onSubmit: async (vals) => {
-      if (isStatusBlocked(vals.status)) {
-        toast.error(
-          vals.status === 'Published'
-            ? 'This blueprint cannot be published yet'
-            : 'Pending and Review are unavailable once publishing is allowed',
-        );
-        return;
-      }
-
       const formData = new FormData();
       formData.append('book', vals.bookId);
       formData.append('number', String(vals.sequence));
@@ -121,7 +104,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         formData.append('isFree', String(vals.isFree));
         formData.append('price', String(!vals.isFree ? (vals.price ?? 0) : 0));
       }
-      formData.append('status', vals.status);
+      // formData.append('status', vals.status);
       // formData.append('page', String(vals.page ?? 1));
       if (featuredImageFile) formData.append('cover_image', featuredImageFile);
       if (pdfFile) {
@@ -503,37 +486,6 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <span>Pricing is set at series level; this blueprint has no separate price.</span>
             </div>
           )}
-          <div className="space-y-2 max-w-xs">
-            <Label htmlFor="chapter-status">Status <span className="text-red-500">*</span></Label>
-            <select
-              id="chapter-status"
-              name="status"
-              value={values.status}
-              onChange={(e) => {
-                const value = e.target.value as BlueprintStatus;
-                if (isStatusBlocked(value)) return;
-                setFieldValue('status', value);
-                setFieldTouched('status', true);
-              }}
-              onBlur={handleBlur}
-              disabled={isSubmittingState}
-              className={cn(nativeSelectClassName, errors.status && touched.status && 'border-red-500')}
-            >
-              {BLUEPRINT_STATUSES.map((status) => (
-                <option key={status} value={status} disabled={isStatusBlocked(status)}>
-                  {status}
-                </option>
-              ))}
-            </select>
-            {!canPublish ? (
-              <p className="text-xs text-amber-600">Publishing not allowed yet</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">Pending and Review unavailable</p>
-            )}
-            {errors.status && touched.status && (
-              <p className="text-sm text-red-600">{errors.status}</p>
-            )}
-          </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="space-y-2 flex-1 ">

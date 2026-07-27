@@ -184,6 +184,7 @@ export function getAdminSectionRoutePath(section: string): string {
     reports: '/admin/reports',
     agreements: '/admin/agreements',
     agreement_types: '/admin/agreements/agreement-types',
+    audit_logs: '/admin/audit-logs',
     coupons: '/admin/coupons',
     taxes: '/admin/taxes',
     withdrawal_requests: '/admin/withdrawal-requests',
@@ -207,6 +208,10 @@ export function getViewChapterRoutePath(chapterId: string, isMentor: boolean = f
 /** List/back destination for blueprints — mentor panel vs admin panel. */
 export function getChaptersListRoutePath(isMentor: boolean = false): string {
   return isMentor ? getMentorChaptersRoutePath() : getAdminSectionRoutePath('chapters');
+}
+
+export function getViewAuditLogRoutePath(auditLogId: string): string {
+  return `/admin/audit-logs/${auditLogId}`;
 }
 
 export function getViewOrderRoutePath(orderId: string): string {

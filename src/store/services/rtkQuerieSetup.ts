@@ -241,6 +241,7 @@ export const rtkQuerieSetup = createApi({
         'WithdrawalLedger',
         'WithdrawalRequests',
         'AdminWithdrawals',
+        'AdminAuditLogs',
     ],
     endpoints: () => ({}),
 });

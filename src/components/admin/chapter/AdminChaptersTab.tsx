@@ -141,8 +141,8 @@ export function AdminChaptersTab() {
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 toast.success(res.message ?? `Blueprint marked as ${status}`);
             }
-        } catch {
-            toast.error('Failed to update status');
+        } catch (error) {
+            console.error('Error updating status:', error);
         } finally {
             setUpdatingId(null);
         }

@@ -30,6 +30,7 @@ import {
 import { getEditChapterRoutePath, getViewChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
 const STATUS_CONFIG = BLUEPRINT_STATUS_CONFIG;
 const STATUSES = BLUEPRINT_STATUSES;
@@ -40,6 +41,7 @@ export function AdminChaptersTab() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const isMentor = pathname.startsWith(getMentorRoutePath());
+    const { isSuperAdmin } = useAdminPermissions();
     const [search, setSearch] = useState('');
     const [filterByBook, setFilterByBook] = useState('');
     const [filterByStatus, setFilterByStatus] = useState('');
@@ -76,7 +78,7 @@ export function AdminChaptersTab() {
         ...(filterByBook ? { book_id: filterByBook } : {}),
         ...(filterByStatus ? { status: filterByStatus } : {}),
         ...(isTrashView ? { isDeleted: true } : {}),
-        ...(filterByIsMine ? { isMine: true } : {}),
+        ...(isSuperAdmin && filterByIsMine ? { isMine: true } : {}),
         ...(filterByContentFlagged ? { isContentFlagged: true } : {}),
     });
 
@@ -397,6 +399,7 @@ export function AdminChaptersTab() {
                 onIsMineChange={setFilterByIsMine}
                 isContentFlagged={filterByContentFlagged}
                 onContentFlaggedChange={handleContentFlaggedChange}
+                showMineFilter={isSuperAdmin}
             />
 
             <div className="border border-gray-200 rounded-md overflow-hidden">

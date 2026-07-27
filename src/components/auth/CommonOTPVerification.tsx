@@ -21,7 +21,7 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
     const [adminVerifyOtp, { isLoading: isVerifying }] = useAdminVerifyOtpMutation();
     const [adminResendOtp, { isLoading: isResending }] = useAdminResendOtpMutation();
 
-    const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue } = useFormik({
+    const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue, submitForm } = useFormik({
         initialValues: { code: '' },
         validationSchema: otpVerificationSchema,
         onSubmit: async (value, { resetForm }) => {
@@ -49,6 +49,11 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
         },
     });
 
+    const handleOtpComplete = async (code: string) => {
+        await setFieldValue('code', code);
+        submitForm();
+    };
+
     const handleResend = async () => {
         try {
             const res = await adminResendOtp({ email, type }).unwrap();
@@ -72,6 +77,7 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
                     <OtpInput
                         value={values.code}
                         onChange={(val) => setFieldValue('code', val)}
+                        onComplete={handleOtpComplete}
                         length={4}
                         isDisabled={isSubmitting}
                         classNames={{

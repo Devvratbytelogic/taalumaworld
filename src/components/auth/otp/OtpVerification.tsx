@@ -23,7 +23,7 @@ export default function OtpVerification() {
     const [userVerifyOtp, { isLoading: isVerifying }] = useUserVerifyOtpMutation();
     const [userResendOtp, { isLoading: isResending }] = useUserResendOtpMutation();
 
-    const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue } = useFormik({
+    const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue, submitForm } = useFormik({
         initialValues: {
             code: '',
         },
@@ -60,6 +60,11 @@ export default function OtpVerification() {
         },
     });
 
+    const handleOtpComplete = async (code: string) => {
+        await setFieldValue('code', code);
+        submitForm();
+    };
+
     const handleResend = async () => {
         if (!modalData?.email) return;
         try {
@@ -92,6 +97,7 @@ export default function OtpVerification() {
                             <OtpInput
                                 value={values.code}
                                 onChange={(val) => setFieldValue('code', val)}
+                                onComplete={handleOtpComplete}
                                 length={4}
                                 isDisabled={isSubmitting}
                                 classNames={{

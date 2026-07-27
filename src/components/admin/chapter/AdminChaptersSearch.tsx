@@ -25,6 +25,8 @@ interface AdminChaptersSearchProps {
   onIsMineChange: (value: boolean) => void;
   isContentFlagged: boolean;
   onContentFlaggedChange: (value: boolean) => void;
+  /** "My blueprints" filter is only relevant/visible for Super Administrators. */
+  showMineFilter?: boolean;
 }
 
 const STATUS_OPTIONS = BLUEPRINT_STATUSES;
@@ -41,8 +43,9 @@ export function AdminChaptersSearch({
   onIsMineChange,
   isContentFlagged,
   onContentFlaggedChange,
+  showMineFilter = false,
 }: AdminChaptersSearchProps) {
-  const hasActiveFilters = selectedBook || selectedStatus || isMine || isContentFlagged;
+  const hasActiveFilters = selectedBook || selectedStatus || (showMineFilter && isMine) || isContentFlagged;
 
   const clearAll = () => {
     onBookChange('');
@@ -83,21 +86,23 @@ export function AdminChaptersSearch({
             ))}
           </select>
 
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => onIsMineChange(!isMine)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onIsMineChange(!isMine);
-              }
-            }}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
-          >
-            <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
-            <span className="font-normal">My blueprints</span>
-          </div>
+          {showMineFilter ? (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => onIsMineChange(!isMine)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onIsMineChange(!isMine);
+                }
+              }}
+              className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+            >
+              <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
+              <span className="font-normal">My blueprints</span>
+            </div>
+          ) : null}
 
           <div
             role="button"
@@ -146,7 +151,7 @@ export function AdminChaptersSearch({
               </button>
             </span>
           ) : null}
-          {isMine ? (
+          {showMineFilter && isMine ? (
             <span className={adminFilterPillClass}>
               My blueprints
               <button type="button" onClick={() => onIsMineChange(false)} className="hover:text-primary/70">

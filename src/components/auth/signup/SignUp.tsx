@@ -2,9 +2,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
 import { Camera, Eye, EyeOff, Gift, GraduationCap, Lock, Mail, User } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import Select, { type StylesConfig } from 'react-select'
@@ -12,8 +12,7 @@ import { useFormik } from 'formik'
 import { careerArchitectSignUpSchema } from '@/utils/formValidation'
 import { RootState } from '@/store/store'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
-import { useUserRegisterMutation, useUserGoogleLoginMutation } from '@/store/rtkQueries/userAuthApi'
-import { setAuthCookies } from '@/utils/authCookies'
+import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
 import toast from '@/utils/toast'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -108,7 +107,6 @@ export default function SignUp() {
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation()
-    const [googleLogin, { isLoading: googleLoginLoading }] = useUserGoogleLoginMutation()
 
 
     useEffect(() => {
@@ -208,33 +206,6 @@ export default function SignUp() {
     })
 
 
-    const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-        if (!credentialResponse.credential) return
-
-        try {
-            const payload = {
-                id_token: credentialResponse.credential,
-                // fcm_token: getFcmToken(),
-                referral_code: referralCodeFromParams,
-            }
-            const res = await googleLogin(payload).unwrap()
-
-            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-                setAuthCookies({
-                    token: res?.data?.token ?? '',
-                    user: { id: res?.data?.id, email: res?.data?.email },
-                    role: res?.data?.role?.name ?? '',
-                })
-                toast.success(res?.message ?? 'Signed up with Google!')
-                router.refresh()
-                dispatch(closeModal())
-            }
-        } catch (error) {
-            console.error('Google sign up failed. Please try again.', error)
-            toast.error('Google sign up failed. Please try again.')
-        }
-    }
-
     const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
         touchPoint: values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION,
         userType: values.isPartnerStudent ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT,
@@ -273,21 +244,8 @@ export default function SignUp() {
                     </p>
                 </ModalHeader>
                 <ModalBody className="gap-0">
-                    <div className="flex flex-col items-center gap-3 pb-5">
-                        <div className={googleLoginLoading ? 'opacity-60 pointer-events-none' : ''}>
-                            <GoogleLogin
-                                onSuccess={handleGoogleSuccess}
-                                onError={() => toast.error('Google sign up failed. Please try again.')}
-                                text="signup_with"
-                                shape="pill"
-                                width="320"
-                            />
-                        </div>
-                        <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1 h-px bg-border" />
-                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">or</span>
-                            <div className="flex-1 h-px bg-border" />
-                        </div>
+                    <div className="pb-5">
+                        <GoogleAuthButton text="signup_with" successMessage="Signed up with Google!" />
                     </div>
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="flex items-center gap-4">

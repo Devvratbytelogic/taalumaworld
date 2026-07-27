@@ -5,15 +5,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
 import toast from '@/utils/toast'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
 import { useFormik } from 'formik'
 import { signInSchema } from '@/utils/formValidation'
-import { useUserLoginMutation, useUserGoogleLoginMutation } from '@/store/rtkQueries/userAuthApi'
+import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { setAuthCookies } from '@/utils/authCookies'
 import { RootState } from '@/store/store'
 import { getMentorLoginRoutePath } from '@/routes/routes'
@@ -25,7 +25,6 @@ export default function SignIn() {
     const router = useRouter()
     const { isOpen } = useSelector((state: RootState) => state.allModal)
     const [userLogin, { isLoading: userLoginLoading }] = useUserLoginMutation()
-    const [googleLogin, { isLoading: googleLoginLoading }] = useUserGoogleLoginMutation()
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: { email: '', password: '' },
@@ -56,33 +55,6 @@ export default function SignIn() {
         },
     })
 
-    const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-        if (!credentialResponse.credential) return
-
-        try {
-            const payload = {
-                id_token: credentialResponse.credential,
-                // fcm_token: getFcmToken(),
-            }
-            const res = await googleLogin(payload).unwrap()
-
-            if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-                setAuthCookies({
-                    token: res?.data?.token ?? '',
-                    user: { id: res?.data?.id, email: res?.data?.email },
-                    role: res?.data?.role?.name ?? '',
-                })
-                toast.success(res?.message ?? 'Signed in with Google!')
-                router.refresh()
-                dispatch(closeModal())
-            }
-        } catch (error) {
-            console.error('Google sign in failed. Please try again.', error)
-            // toast.error('Google sign in failed. Please try again.')
-        }
-    }
-
-
     return (
         <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
             <ModalContent>
@@ -93,22 +65,7 @@ export default function SignIn() {
                     </p>
                 </ModalHeader>
                 <ModalBody>
-                    <div className="flex flex-col items-center gap-3">
-                        <div className={googleLoginLoading ? 'opacity-60 pointer-events-none' : ''}>
-                            <GoogleLogin
-                                onSuccess={handleGoogleSuccess}
-                                onError={() => toast.error('Google sign in failed. Please try again.')}
-                                text="signin_with"
-                                shape="pill"
-                                width="320"
-                            />
-                        </div>
-                        <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1 h-px bg-border" />
-                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">or</span>
-                            <div className="flex-1 h-px bg-border" />
-                        </div>
-                    </div>
+                    <GoogleAuthButton text="signin_with" successMessage="Signed in with Google!" />
                     <form className="space-y-3" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <label htmlFor="signin-email" className="text-sm font-medium text-foreground">

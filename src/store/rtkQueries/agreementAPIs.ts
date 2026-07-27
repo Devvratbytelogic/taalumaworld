@@ -98,7 +98,7 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus'],
+            invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus', 'UserProfile'],
         }),
         acceptAllAgreements: builder.mutation({
             query: (payload) => ({

@@ -40,7 +40,6 @@ export function SignInForm({ variant }: SignInFormProps) {
         onSubmit: async (vals) => {
             try {
                 const res = await adminLogin({ email: vals.email, password: vals.password }).unwrap();
-                console.log('res', res);
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     if (res?.message === LOGIN_OTP_MESSAGE) {
                         setShowOtp(true);

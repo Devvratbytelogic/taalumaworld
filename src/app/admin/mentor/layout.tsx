@@ -12,6 +12,7 @@ import {
   Link2,
   ShieldAlert,
   ShoppingCart,
+  Star,
   TrendingUp,
   Users,
   Wallet,
@@ -34,6 +35,7 @@ import {
   getMentorReferralsRoutePath,
   getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
+  getMentorReviewsRoutePath,
   getMentorSalesVolumeRoutePath,
   getMentorWalletRoutePath,
 } from '@/routes/routes';
@@ -52,6 +54,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     items: [
       { id: 'books', label: 'Series', href: getMentorBooksRoutePath(), icon: Book },
       { id: 'chapters', label: 'Blueprints', href: getMentorChaptersRoutePath(), icon: FileText },
+      { id: 'reviews', label: 'Reviews', href: getMentorReviewsRoutePath(), icon: Star },
     ],
   },
   {

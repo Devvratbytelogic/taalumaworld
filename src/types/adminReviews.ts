@@ -7,13 +7,13 @@ export interface IAdminReviewsAPIResponse {
   timestamp: string;
 }
 export interface IAdminReviewsAPIResponseData {
-  data?: (IAdminReviewEntity)[] | null;
+  data?: (IAdminReviewsAPIResponseDataEntity)[] | null;
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
-export interface IAdminReviewEntity {
+export interface IAdminReviewsAPIResponseDataEntity {
   id: string;
   type: string;
   itemId: string;
@@ -22,10 +22,24 @@ export interface IAdminReviewEntity {
   status: string;
   createdAt: string;
   updatedAt: string;
+  updatedBy?: CreatedByOrUpdatedByOrCustomer | null;
   customer: Customer;
+  createdBy: CreatedByOrUpdatedByOrCustomer1;
   item: Item;
 }
+export interface CreatedByOrUpdatedByOrCustomer {
+  id: string;
+  name: string;
+  email: string;
+  profile_pic: string;
+}
 export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  profile_pic?: string | null;
+}
+export interface CreatedByOrUpdatedByOrCustomer1 {
   id: string;
   name: string;
   email: string;
@@ -37,6 +51,7 @@ export interface Item {
   slug: string;
   coverImage: string;
   number: number;
+  createdBy: CreatedByOrUpdatedByOrCustomer1;
   series: Series;
 }
 export interface Series {

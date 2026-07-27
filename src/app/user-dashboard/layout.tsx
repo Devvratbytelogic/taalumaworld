@@ -3,9 +3,8 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Book, Clock, User, Settings, GraduationCap, Heart, MapPin, Users } from 'lucide-react';
+import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, Star } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
-import { UserAvatar } from '@/components/ui/UserAvatar';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import { getUserRole } from '@/utils/authCookies';
@@ -14,9 +13,9 @@ import {
   getUserDashboardAddressRoutePath,
   getUserDashboardBecomeMentorRoutePath,
   getUserDashboardFollowedMentorsRoutePath,
-  getUserDashboardHistoryRoutePath,
   getUserDashboardMyBooksRoutePath,
   getUserDashboardMyChaptersRoutePath,
+  getUserDashboardMyReviewsRoutePath,
   getUserDashboardMyWishlistRoutePath,
   getUserDashboardProfileRoutePath,
   getUserDashboardSettingsRoutePath,
@@ -42,6 +41,7 @@ const NAV_GROUPS: {
         { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
         { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
         { href: getUserDashboardFollowedMentorsRoutePath(), label: 'Followed Mentors', icon: Users },
+        { href: getUserDashboardMyReviewsRoutePath(), label: 'My Reviews', icon: Star },
       ],
     },
     {

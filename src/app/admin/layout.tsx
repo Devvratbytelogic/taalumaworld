@@ -56,7 +56,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { model: 'Series', id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
             { model: 'Blueprint', id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
-            // { id: 'categories', label: 'Categories', href: getAdminSectionRoutePath('categories'), icon: FolderTree },
+            { model: 'Reviews', id: 'reviews', label: 'Reviews', href: getAdminSectionRoutePath('reviews'), icon: Star },
         ],
     },
     {
@@ -69,7 +69,6 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     {
         title: 'Community',
         items: [
-            { model: 'Review', id: 'reviews', label: 'Reviews', href: getAdminSectionRoutePath('reviews'), icon: Star },
             { model: 'Testimonial', id: 'testimonials', label: 'Testimonials', href: getAdminSectionRoutePath('testimonials'), icon: MessageSquare },
             { model: 'FAQs', id: 'faqs', label: 'FAQs', href: getAdminSectionRoutePath('faqs'), icon: FileEdit },
             { model: 'Contact Us', id: 'contact_us', label: 'Help & Trust Center', href: getAdminSectionRoutePath('contact_us'), icon: Mail },

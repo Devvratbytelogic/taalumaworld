@@ -38,7 +38,7 @@ import { UserTypeValue } from '@/constants/common';
 import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
 import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
 import { IFollowedMentorsAPIResponse } from '@/types/follows';
-import { IUserReviewsAPIResponse } from '@/types/user/reviews';
+import { IMyReviewsAPIResponse, IUserReviewsAPIResponse } from '@/types/user/reviews';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -84,6 +84,14 @@ export interface IGetContentReviewsParams {
     id: string;
     page?: number;
     limit?: number;
+}
+
+export interface IGetMyReviewsParams {
+    page?: number;
+    limit?: number;
+    status?: string;
+    fromDate?: string;
+    toDate?: string;
 }
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -338,6 +346,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['Reviews'],
         }),
+        /** get current user's reviews (GET /user/reviews/my) */
+        getMyReviews: builder.query<IMyReviewsAPIResponse, IGetMyReviewsParams | void>({
+            query: (params) => ({
+                url: `/user/reviews/my`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['Reviews'],
+        }),
     }),
 });
 
@@ -377,4 +394,5 @@ export const {
     useGetUserAddressByIdQuery,
     useGetFollowedMentorsQuery,
     useGetContentReviewsQuery,
+    useGetMyReviewsQuery,
 } = clientSideGetApis;

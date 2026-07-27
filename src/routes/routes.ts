@@ -111,6 +111,10 @@ export function getMentorChaptersRoutePath(): string {
   return '/admin/mentor/blueprints';
 }
 
+export function getMentorReviewsRoutePath(): string {
+  return '/admin/mentor/reviews';
+}
+
 export function getMentorCategoriesRoutePath(): string {
   return '/admin/mentor/categories';
 }
@@ -248,6 +252,10 @@ export function getUserDashboardMyWishlistRoutePath(): string {
 
 export function getUserDashboardFollowedMentorsRoutePath(): string {
   return '/user-dashboard/followed-mentors';
+}
+
+export function getUserDashboardMyReviewsRoutePath(): string {
+  return '/user-dashboard/my-reviews';
 }
 
 export function getUserDashboardHistoryRoutePath(): string {

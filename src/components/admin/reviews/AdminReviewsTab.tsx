@@ -13,6 +13,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { openModal } from '@/store/slices/allModalSlice';
 import { useGetAllAdminReviewsQuery } from '@/store/rtkQueries/adminReviewsApi';
 import { AdminReviewsSearch } from './AdminReviewsSearch';
+import ImageComponent from '@/components/ui/ImageComponent';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200!',
@@ -81,10 +82,9 @@ export function AdminReviewsTab() {
         const customer = params.row.customer;
         return (
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar className="border h-9 w-9 shrink-0">
-              <AvatarImage src={customer?.profile_pic ?? ''} alt={customer?.name ?? 'Customer'} />
-              <AvatarFallback>{customer?.name?.substring(0, 2).toUpperCase() || '—'}</AvatarFallback>
-            </Avatar>
+            <div className="border h-9 w-9 rounded-full overflow-hidden shrink-0">
+              <ImageComponent src={customer?.profile_pic ?? ''} alt={customer?.name ?? 'Customer'} object_cover={true} />
+            </div>
             <div className="min-w-0">
               <p className="text-sm font-medium truncate">{customer?.name || '—'}</p>
               <p className="text-xs text-muted-foreground truncate">{customer?.email || '—'}</p>
@@ -141,6 +141,27 @@ export function AdminReviewsTab() {
       },
     },
     {
+      field: 'createdBy',
+      headerName: 'Mentor',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => {
+        const mentor = params.row.createdBy ?? params.row.item?.createdBy;
+        return (
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="border h-9 w-9 rounded-full overflow-hidden shrink-0">
+              <ImageComponent src={mentor?.profile_pic ?? ''} alt={mentor?.name ?? 'Mentor'} object_cover={true} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{mentor?.name || '—'}</p>
+              <p className="text-xs text-muted-foreground truncate">{mentor?.email || '—'}</p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
       field: 'status',
       headerName: 'Status',
       minWidth: 120,
@@ -161,7 +182,42 @@ export function AdminReviewsTab() {
       sortable: false,
       renderCell: (params) => (
         <span className="text-sm whitespace-nowrap text-muted-foreground">
-          {params.row.createdAt ? moment(params.row.createdAt).format('DD/MM/YYYY HH:mm') : '—'}
+          {params.row.createdAt ? moment(params.row.createdAt).format('DD/MM/YYYY hh:mm A') : '—'}
+        </span>
+      ),
+    },
+    {
+      field: 'updatedBy',
+      headerName: 'Updated by',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => {
+        const updatedBy = params.row.updatedBy;
+        if (!updatedBy) {
+          return <span className="text-sm text-muted-foreground">—</span>;
+        }
+        return (
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="border h-9 w-9 rounded-full overflow-hidden shrink-0">
+              <ImageComponent src={updatedBy?.profile_pic ?? ''} alt={updatedBy?.name ?? 'Updated by'} object_cover={true} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{updatedBy.name || '—'}</p>
+              <p className="text-xs text-muted-foreground truncate">{updatedBy.email || '—'}</p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Updated date',
+      minWidth: 150,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm whitespace-nowrap text-muted-foreground">
+          {params.row.updatedAt ? moment(params.row.updatedAt).format('DD/MM/YYYY hh:mm A') : '—'}
         </span>
       ),
     },

@@ -35,6 +35,7 @@ import {
   useGetMentorApplicationsQuery,
 } from '@/store/rtkQueries/userGetAPI';
 import { useUserUpdateProfileMutation } from '@/store/rtkQueries/userAuthApi';
+import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 import { updateProfileSchema } from '@/utils/formValidation';
 import moment from 'moment';
 import {
@@ -45,6 +46,7 @@ import {
 } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
+import { ProfileAgreementsCard } from './ProfileAgreementsCard';
 
 export function ProfilePage() {
   const router = useRouter();
@@ -63,7 +65,10 @@ export function ProfilePage() {
   const canApplyForMentor = mentorApplication?.can_apply ?? true;
   const displayName = profile?.name || 'User';
   const displayPhoto = profile?.profile_pic || '';
-  
+  const agreementUserType = profile?.institution_id
+    ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA
+    : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT;
+
   const isKpisLoading = isSeriesLoading || isChaptersLoading || isHistoryLoading;
 
   const mentorDecisionBanner =
@@ -553,6 +558,8 @@ export function ProfilePage() {
           </div>
         </div>
       </div>
+
+      <ProfileAgreementsCard userType={agreementUserType} />
     </div>
   );
 }

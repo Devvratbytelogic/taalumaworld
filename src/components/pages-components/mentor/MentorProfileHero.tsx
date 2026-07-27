@@ -1,5 +1,14 @@
-import { ShieldCheck, Linkedin, Facebook, BookOpen } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { ShieldCheck, Linkedin, Facebook, BookOpen, Phone, Mail, Users, UserPlus, UserCheck } from 'lucide-react';
+import { toast } from 'sonner';
 import ImageComponent from '@/components/ui/ImageComponent';
+import Button from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { useFollowMentorMutation } from '@/store/rtkQueries/userPostAPI';
+import { openModal } from '@/store/slices/allModalSlice';
 import type { IMentorInfo } from '@/types/user/mentorDetails';
 
 function getInitials(name?: string) {
@@ -15,6 +24,31 @@ interface MentorProfileHeroProps {
 }
 
 export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileHeroProps) {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useAuth();
+  const [isFollowing, setIsFollowing] = useState(Boolean(mentor?.isFollowed));
+  const [followerCount, setFollowerCount] = useState(mentor?.followerCount ?? 0);
+  const [followMentor, { isLoading: isFollowingLoading }] = useFollowMentorMutation();
+
+  const mentorId = mentor?._id || mentor?.id || '';
+
+  const handleFollow = async () => {
+    if (!isAuthenticated) {
+      dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'follow', itemType: 'mentor' } }));
+      return;
+    }
+    if (!mentorId || isFollowing) return;
+
+    try {
+      const res = await followMentor(mentorId).unwrap();
+      setIsFollowing(true);
+      setFollowerCount((count) => count + 1);
+      toast.success(res?.message ?? `You are now following ${mentor?.name ?? 'this mentor'}`);
+    } catch (error) {
+      console.error('error following mentor', error);
+    }
+  };
+
   return (
     <section className="border-b border-border pb-10">
       <div className="container">
@@ -41,9 +75,27 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
               </span>
             </div>
 
-            <h1 className="mt-4 font-ubuntu text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
-              {mentor?.name}
-            </h1>
+            <div className="mt-4 flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between">
+              <h1 className="font-ubuntu text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
+                {mentor?.name}
+              </h1>
+
+              <Button
+                onPress={handleFollow}
+                isLoading={isFollowingLoading}
+                isDisabled={isFollowing}
+                className={`global_btn rounded_full w_fit shrink-0 ${isFollowing ? 'outline_primary' : 'bg_primary'}`}
+                startContent={
+                  isFollowingLoading ? undefined : isFollowing ? (
+                    <UserCheck className="h-4 w-4" />
+                  ) : (
+                    <UserPlus className="h-4 w-4" />
+                  )
+                }
+              >
+                {isFollowing ? 'Following' : 'Follow'}
+              </Button>
+            </div>
 
             {mentor?.professionalBio && (
               <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:mx-0">
@@ -61,6 +113,40 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
                   <p className="font-medium text-foreground">{totalBooks} published</p>
                 </div>
               </div>
+
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Followers</p>
+                  <p className="font-medium text-foreground">{followerCount.toLocaleString()}</p>
+                </div>
+              </div>
+
+              {mentor?.email && (
+                <a href={`mailto:${mentor.email}`} className="flex items-center gap-2.5 transition-colors hover:opacity-80">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="font-medium text-foreground">{mentor.email}</p>
+                  </div>
+                </a>
+              )}
+
+              {mentor?.phone && (
+                <a href={`tel:${mentor.phone}`} className="flex items-center gap-2.5 transition-colors hover:opacity-80">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground">Phone</p>
+                    <p className="font-medium text-foreground">{mentor.phone}</p>
+                  </div>
+                </a>
+              )}
             </div>
 
             {(mentor?.linkedin || mentor?.facebook) && (

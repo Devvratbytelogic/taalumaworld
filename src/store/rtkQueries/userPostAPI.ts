@@ -106,6 +106,13 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
         }),
+        /** follow a mentor (POST /user/follow-mentor/:id) */
+        followMentor: builder.mutation({
+            query: (id: string) => ({
+                url: `/user/follow-mentor/${id}`,
+                method: 'POST',
+            }),
+        }),
         /** add a new address */
         addUserAddress: builder.mutation({
             query: (body) => ({
@@ -165,6 +172,7 @@ export const {
     // useMpesaPaymentCallbackMutation,
     useUpdateReadingProgressMutation,
     useSubmitMentorApplicationMutation,
+    useFollowMentorMutation,
     useAddUserAddressMutation,
     useEditUserAddressMutation,
     useSetDefaultUserAddressMutation,

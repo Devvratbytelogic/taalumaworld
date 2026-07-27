@@ -11,7 +11,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
 import { useAuth } from '@/hooks/useAuth';
-import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { VISIBLE } from '@/constants/contentMode';
@@ -58,6 +58,13 @@ export default function ChapterDetailsModal() {
     router.push(getSeriesRoutePath(chapter?.series?.slug ?? chapter?.series?.id ?? ''));
   };
 
+  const viewMentorProfile = () => {
+    const mentorId = chapter?.mentor?.short_code || chapter?.mentor?.id;
+    if (!mentorId) return;
+    dispatch(closeModal());
+    router.push(getSingleAuthorRoutePath(mentorId));
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="xl" classNames={modalClassNames}>
       <ModalContent>
@@ -95,7 +102,18 @@ export default function ChapterDetailsModal() {
           </div>
 
           {chapter?.mentor && (
-            <div className="border flex items-center gap-3 rounded-md bg-muted/40 p-3">
+            <div
+              className="border flex items-center gap-3 rounded-md bg-muted/40 p-3 cursor-pointer hover:border-primary/50 transition-colors"
+              onClick={viewMentorProfile}
+              role="link"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  viewMentorProfile();
+                }
+              }}
+            >
               <div className="w-11 h-11 rounded-full overflow-hidden border bg-linear-to-br from-primary/20 to-primary/5 ring-2 ring-background shrink-0 flex items-center justify-center">
                 {chapter?.mentor?.profile_pic ? (
                   <ImageComponent src={chapter?.mentor?.profile_pic} alt={chapter?.mentor?.name ?? ''} object_cover={true} />

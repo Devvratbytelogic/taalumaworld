@@ -14,6 +14,7 @@ export interface IMentorInfo {
   _id: string;
   name: string;
   email: string;
+  phone?: string | null;
   role_id: IRoleId;
   professionalBio: string;
   profile_pic: string;
@@ -21,6 +22,8 @@ export interface IMentorInfo {
   linkedin: string;
   short_code: string;
   id: string;
+  isFollowed?: boolean;
+  followerCount?: number;
 }
 export interface IRoleId {
   _id: string;

@@ -3,7 +3,7 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { Modal, ModalContent, ModalBody, } from '@heroui/react'
 import { useDispatch, useSelector } from 'react-redux';
-import { BookOpen, ShoppingCart, Lock, LogIn, LogOut } from 'lucide-react';
+import { BookOpen, ShoppingCart, Lock, LogIn, UserPlus } from 'lucide-react';
 import Button from '../ui/Button';
 
 
@@ -35,6 +35,12 @@ export default function LoginRequiredModal() {
           icon: <Lock className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
           title: 'Sign In to View Details',
           description: `Create an account or sign in to view ${itemLabel} details and explore our full collection.`,
+        };
+      case 'follow':
+        return {
+          icon: <UserPlus className="h-8 w-8 md:h-12 md:w-12 text-primary" />,
+          title: 'Sign In to Follow',
+          description: 'Create an account or sign in to follow mentors and stay updated with their Blueprints.',
         };
       default:
         return {

@@ -6,12 +6,16 @@ import OurStory from '@/components/pages-components/about/OurStory';
 import CoreValues from '@/components/pages-components/about/CoreValues';
 import BlueprintShowcase from '@/components/pages-components/about/BlueprintShowcase';
 import CommonCTA from '@/components/cta/CommonCTA';
-import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
+import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
 
 export default async function WhyTaalumaExistsPage() {
-    const response = await getAllMentorsServerAPI({ limit: 4, page: 1 });
-    const mentors = response?.data?.data ?? [];
+    const globalSettingsRes = await getGlobalSettingsServerAPI();
+    const showMentorSection = globalSettingsRes?.data?.mentor_section_visibility !== false;
+
+    const mentors = showMentorSection
+        ? (await getAllMentorsServerAPI({ limit: 4, page: 1 }))?.data?.data ?? []
+        : [];
 
     return (
         <>
@@ -33,7 +37,7 @@ export default async function WhyTaalumaExistsPage() {
                     <CoreValues />
 
                     {/* Learn From Mentors Around the World */}
-                    <FeaturedMentorsSection mentors={mentors} />
+                    {showMentorSection ? <FeaturedMentorsSection mentors={mentors} /> : null}
 
                     {/* Featured Blueprints */}
                     <BlueprintShowcase />

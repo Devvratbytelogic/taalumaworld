@@ -7,6 +7,7 @@ import { Card } from '../../ui/card';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
+import { Switch } from '../../ui/switch';
 import Button from '../../ui/Button';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
@@ -17,7 +18,6 @@ import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphField
 
 const defaultValues = {
   platformName: '',
-  marketplace_name: '',
   platformDescription: '',
   supportEmail: '',
   email: '',
@@ -30,6 +30,7 @@ const defaultValues = {
   header_text_status: false,
   visible: 'chapter',
   checkout_status: false,
+  mentor_section_visibility: true,
   android_app_url: '',
   iphone_app_url: '',
   meta_title: '',
@@ -103,7 +104,6 @@ export function GeneralSettingsCard() {
 
   const initialValues: FormValues = {
     platformName: data?.platformName ?? '',
-    marketplace_name: data?.marketplace_name ?? '',
     platformDescription: data?.platformDescription ?? '',
     supportEmail: data?.supportEmail ?? '',
     email: data?.email ?? '',
@@ -116,6 +116,7 @@ export function GeneralSettingsCard() {
     header_text_status: data?.header_text_status ?? false,
     visible: data?.visible ?? 'chapter',
     checkout_status: data?.checkout_status ?? false,
+    mentor_section_visibility: data?.mentor_section_visibility ?? true,
     android_app_url: data?.android_app_url ?? '',
     iphone_app_url: data?.iphone_app_url ?? '',
     meta_title: data?.meta_title ?? '',
@@ -254,17 +255,10 @@ export function GeneralSettingsCard() {
           <section>
             <SectionHeading title="Platform Info" />
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="platformName">Platform Name *</Label>
-                  <Input {...field('platformName')} />
-                  <FieldError msg={touched.platformName ? errors.platformName : ''} />
-                </div>
-                <div>
-                  <Label htmlFor="marketplace_name">Marketplace Name *</Label>
-                  <Input {...field('marketplace_name')} />
-                  <FieldError msg={touched.marketplace_name ? errors.marketplace_name : ''} />
-                </div>
+              <div>
+                <Label htmlFor="platformName">Platform Name <span className="text-red-500">*</span></Label>
+                <Input {...field('platformName')} />
+                <FieldError msg={touched.platformName ? errors.platformName : ''} />
               </div>
               <div>
                 <Label htmlFor="platformDescription">Platform Description</Label>
@@ -273,7 +267,7 @@ export function GeneralSettingsCard() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="supportEmail">Support Email *</Label>
+                  <Label htmlFor="supportEmail">Support Email <span className="text-red-500">*</span></Label>
                   <Input type="email" {...field('supportEmail')} />
                   <FieldError msg={touched.supportEmail ? errors.supportEmail : ''} />
                 </div>
@@ -370,6 +364,25 @@ export function GeneralSettingsCard() {
                   </div>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* ── Display ── */}
+          <section>
+            <SectionHeading title="Display" />
+            <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="font-medium text-sm">Mentor Section Visibility</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {values.mentor_section_visibility
+                    ? 'Mentor section is visible on the site'
+                    : 'Mentor section is hidden on the site'}
+                </p>
+              </div>
+              <Switch
+                checked={values.mentor_section_visibility}
+                onCheckedChange={(checked) => setFieldValue('mentor_section_visibility', checked)}
+              />
             </div>
           </section>
 
@@ -479,7 +492,7 @@ export function GeneralSettingsCard() {
             handleChange={handleChange}
             handleBlur={handleBlur}
             setFieldValue={setFieldValue}
-            sourceTitle={values.marketplace_name || values.platformName}
+            sourceTitle={values.platformName}
             sourceDescription={values.platformDescription}
             sourceImageFile={logoFile}
             sourceImagePreviewUrl={typeof data?.logo === 'string' ? data.logo : null}

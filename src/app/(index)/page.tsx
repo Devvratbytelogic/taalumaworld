@@ -7,12 +7,16 @@ import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryC
 import AudienceSegmentation from '@/components/pages-components/home/AudienceSegmentation';
 import WhatIsABlueprint from '@/components/pages-components/home/WhatIsABlueprint';
 import CareerArchitectSection from '@/components/pages-components/home/CareerArchitectSection';
-import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
+import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
 
 export default async function HomePage() {
-  const response = await getAllMentorsServerAPI({ limit: 4, page: 1 })
-  const mentors = response?.data?.data ?? []
+  const globalSettingsRes = await getGlobalSettingsServerAPI()
+  const showMentorSection = globalSettingsRes?.data?.mentor_section_visibility !== false
+
+  const mentors = showMentorSection
+    ? (await getAllMentorsServerAPI({ limit: 4, page: 1 }))?.data?.data ?? []
+    : []
 
   return (
     <>
@@ -35,7 +39,7 @@ export default async function HomePage() {
           <WhatIsABlueprint />
 
           {/* Learn From Mentors Around the World */}
-          <FeaturedMentorsSection mentors={mentors} />
+          {showMentorSection ? <FeaturedMentorsSection mentors={mentors} /> : null}
 
           {/* What is a Career Architect? */}
           <CareerArchitectSection />

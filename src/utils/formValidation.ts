@@ -381,7 +381,6 @@ const urlSchema = Yup.string().url('Must be a valid URL (https://...)');
 export const globalSettingsSchema = Yup.object({
   // Platform
   platformName: Yup.string().trim().required('Platform name is required'),
-  marketplace_name: Yup.string().trim().required('Marketplace name is required'),
   platformDescription: Yup.string().trim(),
   supportEmail: emailRules.label('Support email'),
   email: Yup.string().test('strict-email', 'Enter a valid contact email', (v) => !v || validateEmail(v)),
@@ -398,6 +397,7 @@ export const globalSettingsSchema = Yup.object({
   header_text_status: Yup.boolean(),
   visible: Yup.string().oneOf(['chapter', 'book'], 'Select a valid option'),
   checkout_status: Yup.boolean(),
+  mentor_section_visibility: Yup.boolean(),
   // App URLs
   android_app_url: urlSchema,
   iphone_app_url: urlSchema,

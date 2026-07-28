@@ -26,13 +26,28 @@ export async function generateMetadata(): Promise<Metadata> {
   const data = res?.data ?? null;
 
   if (data) {
+    const title = data?.meta_title || data?.platformName || 'TaalumaWorld';
+    const description = data?.meta_description || data?.platformDescription || '';
+    const ogTitle = data?.og_title || title;
+    const ogDescription = data?.og_description || description;
+    const ogImage = data?.og_image || data?.logo || undefined;
+
     return {
-      title: data?.meta_title || data?.marketplace_name || data?.platformName || 'TaalumaWorld',
-      description: data?.meta_description || data?.platformDescription || '',
+      title,
+      description,
       keywords: data?.meta_keywords || '',
       openGraph: {
-        title: data?.meta_title || data?.marketplace_name || data?.platformName || 'TaalumaWorld',
-        description: data?.meta_description || data?.platformDescription || '',
+        title: ogTitle,
+        description: ogDescription,
+        siteName: data?.platformName || 'TaalumaWorld',
+        type: 'website',
+        ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      },
+      twitter: {
+        card: ogImage ? 'summary_large_image' : 'summary',
+        title: ogTitle,
+        description: ogDescription,
+        ...(ogImage ? { images: [ogImage] } : {}),
       },
     };
   }
@@ -83,10 +98,12 @@ export default async function RootLayout({
         )}
 
         {/* Schema Markup / JSON-LD */}
-        {globalSettings?.schema_markup && (
+        {(globalSettings?.json_ld || globalSettings?.schema_markup) && (
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: globalSettings?.schema_markup }}
+            dangerouslySetInnerHTML={{
+              __html: globalSettings?.json_ld || globalSettings?.schema_markup,
+            }}
           />
         )}
       </head>

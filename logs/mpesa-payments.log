@@ -165,3 +165,16 @@
 {"timestamp":"2026-07-27T10:01:38.716Z","event":"POLL_TICK","level":"info","checkoutId":"06740-66729512-1","status":"completed"}
 {"timestamp":"2026-07-27T10:01:38.716Z","event":"POLL_COMPLETED","level":"info","checkoutId":"06740-66729512-1","meta":{"transactionId":"06740-66729512-1"}}
 {"timestamp":"2026-07-27T10:01:38.717Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"06740-66729512-1","meta":{"transactionId":"06740-66729512-1"}}
+{"timestamp":"2026-07-28T05:56:34.637Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-28T05:56:35.887Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-28T05:56:42.587Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-28T05:56:42.911Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"67006-63981551-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"67006-63981551-1","checkoutRequestId":"ws_CO_28072026055642868287"}}
+{"timestamp":"2026-07-28T05:56:43.375Z","event":"POLL_TICK","level":"info","checkoutId":"67006-63981551-1","status":"completed"}
+{"timestamp":"2026-07-28T05:56:43.376Z","event":"POLL_COMPLETED","level":"info","checkoutId":"67006-63981551-1","meta":{"transactionId":"67006-63981551-1"}}
+{"timestamp":"2026-07-28T05:56:43.376Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"67006-63981551-1","meta":{"transactionId":"67006-63981551-1"}}
+{"timestamp":"2026-07-28T06:05:16.167Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-28T06:05:25.100Z","event":"PAYMENT_INITIATED","level":"info","phone":254712345678}
+{"timestamp":"2026-07-28T06:05:25.412Z","event":"STK_PUSH_SUCCESS","level":"info","checkoutId":"14000-41566474-1","responseCode":"0","phone":254712345678,"meta":{"merchantRequestId":"14000-41566474-1","checkoutRequestId":"ws_CO_28072026060525138312"}}
+{"timestamp":"2026-07-28T06:05:26.250Z","event":"POLL_TICK","level":"info","checkoutId":"14000-41566474-1","status":"completed"}
+{"timestamp":"2026-07-28T06:05:26.251Z","event":"POLL_COMPLETED","level":"info","checkoutId":"14000-41566474-1","meta":{"transactionId":"14000-41566474-1"}}
+{"timestamp":"2026-07-28T06:05:26.253Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"14000-41566474-1","meta":{"transactionId":"14000-41566474-1"}}

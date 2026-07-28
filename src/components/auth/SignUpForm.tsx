@@ -233,7 +233,7 @@ export function SignUpForm() {
                             onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
                             disabled={isSubmitting}
                         >
-                            I agree to the{' '}
+                            {agreement?.text}{' '}
                             <Link
                                 href={getPolicyBySlugRoutePath(agreement.slug)}
                                 target="_blank"

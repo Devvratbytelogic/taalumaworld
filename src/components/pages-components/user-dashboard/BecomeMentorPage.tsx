@@ -297,7 +297,7 @@ export function BecomeMentorPage() {
                   error={agreementsError}
                   touched={touched.accepted_agreement_ids as boolean | undefined}
                 >
-                  I accept the{' '}
+                  {agreement?.text}{' '}
                   <Link
                     href={getPolicyBySlugRoutePath(agreement.slug)}
                     className="font-medium text-primary hover:underline"

@@ -197,7 +197,7 @@ export default function SignUp() {
                     setProfilePreview(null)
                     rf()
                     toast.success(res.message ?? 'Account created! Please verify your email.')
-                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'email_verification', through:'login' } }))
+                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'email_verification', through: 'login' } }))
                 }
             } catch {
                 console.error('Registration failed. Please try again.')
@@ -567,7 +567,7 @@ export default function SignUp() {
                                     onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
                                     disabled={isSubmitting}
                                 >
-                                    I agree to the{' '}
+                                    {agreement?.text}{' '}
                                     <Link
                                         href={getPolicyBySlugRoutePath(agreement.slug)}
                                         target="_blank"

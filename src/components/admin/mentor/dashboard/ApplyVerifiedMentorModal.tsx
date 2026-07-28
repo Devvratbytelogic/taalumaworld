@@ -157,7 +157,7 @@ export default function ApplyVerifiedMentorModal() {
                                         }}
                                         onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
                                     >
-                                        I accept the{' '}
+                                        {agreement?.text}{' '}
                                         <Link
                                             href={getPolicyBySlugRoutePath(agreement.slug)}
                                             target="_blank"

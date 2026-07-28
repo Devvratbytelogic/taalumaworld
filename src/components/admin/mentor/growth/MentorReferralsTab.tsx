@@ -88,19 +88,22 @@ const referralColumns: GridColDef<IMentorReferralsAPIResponseDataEntity>[] = [
   },
   {
     field: 'commission_type',
-    headerName: 'Commission rate',
-    width: 150,
+    headerName: 'Commission type',
+    width: 140,
     sortable: false,
     renderCell: (params) => (
-      <div className="min-w-0">
-        <p className="text-sm text-slate-900">
-          {params.row.commission_type === 'percentage'
-            ? `${params.row.commission_value}%`
-            : formatKes(params.row.commission_value ?? 0)}
-        </p>
-        <p className="truncate text-xs capitalize text-slate-500">{params.row.commission_type ?? '—'}</p>
-      </div>
+      <span className="capitalize text-sm text-slate-900">{params.value ?? '—'}</span>
     ),
+  },
+  {
+    field: 'commission_value',
+    headerName: 'Commission rate',
+    width: 140,
+    sortable: false,
+    renderCell: (params) =>
+      params.row.commission_type === 'percentage'
+        ? `${params.row.commission_value}%`
+        : formatKes(params.row.commission_value ?? 0),
   },
   {
     field: 'commission_amount',

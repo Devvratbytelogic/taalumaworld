@@ -266,6 +266,10 @@ export function getUserDashboardBecomeMentorRoutePath(): string {
   return '/user-dashboard/become-mentor';
 }
 
+export function getUserDashboardMyReferralsRoutePath(): string {
+  return '/user-dashboard/my-referrals';
+}
+
 export function getUserDashboardSettingsRoutePath(): string {
   return '/user-dashboard/settings';
 }

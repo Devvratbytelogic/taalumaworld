@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, Star } from 'lucide-react';
+import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, Star, Link2 } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
@@ -15,6 +15,7 @@ import {
   getUserDashboardFollowedMentorsRoutePath,
   getUserDashboardMyBooksRoutePath,
   getUserDashboardMyChaptersRoutePath,
+  getUserDashboardMyReferralsRoutePath,
   getUserDashboardMyReviewsRoutePath,
   getUserDashboardMyWishlistRoutePath,
   getUserDashboardProfileRoutePath,
@@ -47,6 +48,7 @@ const NAV_GROUPS: {
     {
       title: 'Growth',
       items: [
+        { href: getUserDashboardMyReferralsRoutePath(), label: 'My Referrals', icon: Link2 },
         {
           href: getUserDashboardBecomeMentorRoutePath(),
           label: 'Become a Mentor',

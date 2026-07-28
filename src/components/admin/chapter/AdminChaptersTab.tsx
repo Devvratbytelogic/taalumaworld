@@ -6,11 +6,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2, Flag } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
-import {
-    useDeleteChapterMutation,
-    useUpdateChapterMutation,
-    useRestoreChapterMutation,
-} from '@/store/rtkQueries/adminPostApi';
+import { useDeleteChapterMutation, useUpdateChapterMutation, useRestoreChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import type { IChapter } from '@/types/chapter';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';

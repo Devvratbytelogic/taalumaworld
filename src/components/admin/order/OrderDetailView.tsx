@@ -8,7 +8,6 @@ import moment from 'moment';
 import { ArrowLeft, Download, ShoppingBag, TicketPercent, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/components/ui/utils';
 import {
   AdminPage,
   AdminPageHeader,
@@ -24,6 +23,14 @@ function isPercentCouponType(couponType?: string | null) {
   return normalized === 'percent' || normalized === 'percentage';
 }
 
+/** Maps API type values (book/chapter/etc.) to admin-facing labels. */
+function getOrderTypeLabel(type?: string | null) {
+  const value = (type ?? '').toLowerCase();
+  if (value === 'books' || value === 'book') return 'Series';
+  if (value === 'chapter' || value === 'blueprint') return 'Blueprint';
+  if (!value) return 'Cart';
+  return type;
+}
 
 const PAYMENT_STATUS_BADGE_CLASS: Record<string, string> = {
   paid: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -151,7 +158,9 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             </div>
             <div>
               <p className="text-lg font-semibold">{order.item}</p>
-              <p className="text-sm text-muted-foreground">{order.paymentType}</p>
+              <p className="text-sm text-muted-foreground capitalize">
+                {getOrderTypeLabel(order.paymentType ?? order.type)}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -163,7 +172,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             </Badge> */}
             <Badge
               variant="outline"
-              className={cn('capitalize', PAYMENT_STATUS_BADGE_CLASS[paymentStatusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200')}
+              className={`capitalize ${PAYMENT_STATUS_BADGE_CLASS[paymentStatusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}
             >
               {order.paymentStatus || '—'}
             </Badge>
@@ -225,8 +234,8 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             <div key={item.id} className="flex items-center justify-between gap-4 py-3">
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">{item.title}</p>
-                <p className="text-xs text-muted-foreground capitalize">
-                  {item.type} · Qty {item.quantity}
+                <p className="text-xs text-muted-foreground">
+                  {getOrderTypeLabel(item.legacyType ?? item.type)} · Qty {item.quantity}
                 </p>
               </div>
               <div className="text-right shrink-0">

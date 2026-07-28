@@ -164,12 +164,6 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {/* <Badge
-              variant="outline"
-              className={cn('capitalize', ORDER_STATUS_BADGE_CLASS[statusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200')}
-            >
-              {order.status || '—'}
-            </Badge> */}
             <Badge
               variant="outline"
               className={`capitalize ${PAYMENT_STATUS_BADGE_CLASS[paymentStatusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}
@@ -194,9 +188,23 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
           </div>
         </div>
         <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          <DetailRow label="Customer ID" value={order.customer?.id} />
           <DetailRow label="Phone" value={order.customer?.phone} />
         </dl>
+
+        <div className="mt-6 border-t border-border pt-5">
+          <p className="mb-4 text-xs font-medium uppercase tracking-wide text-slate-400">Billing Address</p>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <DetailRow label="Full Name" value={order.billing_address?.full_name} />
+            <DetailRow label="Phone" value={order.billing_address?.phone} />
+            <DetailRow label="Address Line 1" value={order.billing_address?.address_line1} />
+            <DetailRow label="Address Line 2" value={order.billing_address?.address_line2} />
+            <DetailRow label="Landmark" value={order.billing_address?.landmark} />
+            <DetailRow label="City" value={order.billing_address?.city} />
+            <DetailRow label="State" value={order.billing_address?.state} />
+            <DetailRow label="Country" value={order.billing_address?.country} />
+            <DetailRow label="Postal Code" value={order.billing_address?.postal_code} />
+          </dl>
+        </div>
       </AdminPanel>
 
       {/* Payment */}

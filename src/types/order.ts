@@ -65,8 +65,8 @@ export interface ISingleOrderAPIResponse {
     data: IOrder;
     message: string;
     timestamp: string;
-  }
-  export interface IOrder {
+}
+export interface IOrder {
     id: string;
     orderId: number;
     invoiceNumber: number;
@@ -86,18 +86,30 @@ export interface ISingleOrderAPIResponse {
     paymentMethod: string;
     transactionId: string;
     tax_percent: number;
+    billing_address: BillingAddress;
     paidAt: string;
     createdAt: string;
     customer: Customer;
     items?: (IOrderItem)[] | null;
-  }
-  export interface Customer {
+}
+export interface BillingAddress {
+    full_name: string;
+    phone: string;
+    address_line1: string;
+    address_line2: string;
+    landmark?: null;
+    city: string;
+    state: string;
+    country: string;
+    postal_code: string;
+}
+export interface Customer {
     id: string;
     name: string;
     email: string;
     phone: string;
-  }
-  export interface IOrderItem {
+}
+export interface IOrderItem {
     id: string;
     type: string;
     title: string;
@@ -105,5 +117,5 @@ export interface ISingleOrderAPIResponse {
     price: number;
     total: number;
     legacyType: string;
-  }
-  
+}
+

@@ -89,7 +89,7 @@ export default async function MentorProfilePage({ params, searchParams }: PagePr
   }
 
   return (
-    <div className="space-y-10 space_top">
+    <div className="space-y-5 space_top">
       <MentorProfileHero mentor={mentor} totalBooks={total} />
 
       <section className="container space-y-8 pb-10">

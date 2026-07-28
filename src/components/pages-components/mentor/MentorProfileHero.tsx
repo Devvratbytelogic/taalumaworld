@@ -50,7 +50,7 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
   };
 
   return (
-    <section className="border-b border-border pb-10">
+    <>
       <div className="container">
         <div className="flex flex-col items-center gap-8 text-center md:flex-row md:items-start md:gap-10 md:text-left">
           <div className="relative shrink-0">
@@ -103,7 +103,7 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
               </p>
             )}
 
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-y border-border py-4 md:justify-start">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-border pt-4 md:justify-start">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                   <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -178,6 +178,6 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
           </div>
         </div>
       </div>
-    </section>
+    </>
   );
 }

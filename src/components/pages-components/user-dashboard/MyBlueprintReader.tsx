@@ -41,6 +41,8 @@ export default function MyBlueprintReader({ chapter, onBack }: MyBlueprintReader
             content: chapter.content,
             pdf: chapter.pdf,
             canRead: true,
+            completed: chapter.completed,
+            percentage: chapter.completed ? 100 : chapter.percentage,
           }}
           hideMentorDetails={true}
         />

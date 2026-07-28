@@ -24,23 +24,30 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
   const hasContent = Boolean(data?.content);
   const hasPdf = Boolean(data?.pdf);
   const canRead = data?.canRead;
+  const isCompleted = Boolean(data?.completed);
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
+  const savedProgress = isCompleted ? 100 : Math.max(0, Math.min(100, data?.percentage ?? 0));
 
   const { ref: contentRef, progress: contentReadingProgress } = useReadingProgress({
-    enabled: hasContent,
+    enabled: hasContent && !isCompleted,
     debounceMs: 150,
   });
   const [pdfReadingProgress, setPdfReadingProgress] = useState(0);
 
   // Overall progress blends both sources, weighted only by the sections that actually exist.
+  // Never drop below the saved/completed progress when reopening a blueprint.
   const readingProgress = useMemo(() => {
-    if (hasContent && hasPdf) return Math.round((contentReadingProgress + pdfReadingProgress) / 2);
-    if (hasPdf) return pdfReadingProgress;
-    if (hasContent) return contentReadingProgress;
-    return 0;
-  }, [hasContent, hasPdf, contentReadingProgress, pdfReadingProgress]);
+    if (isCompleted) return 100;
 
-  useSyncReadingProgress(data?.id, readingProgress);
+    let liveProgress = 0;
+    if (hasContent && hasPdf) liveProgress = Math.round((contentReadingProgress + pdfReadingProgress) / 2);
+    else if (hasPdf) liveProgress = pdfReadingProgress;
+    else if (hasContent) liveProgress = contentReadingProgress;
+
+    return Math.max(savedProgress, liveProgress);
+  }, [isCompleted, hasContent, hasPdf, contentReadingProgress, pdfReadingProgress, savedProgress]);
+
+  useSyncReadingProgress(data?.id, readingProgress, { enabled: !isCompleted });
 
   return (
     <>

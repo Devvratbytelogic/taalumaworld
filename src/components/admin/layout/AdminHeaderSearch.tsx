@@ -87,6 +87,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'FAQs', description: 'Manage FAQ entries', path: getAdminSectionRoutePath('faqs'), icon: FileEdit, keywords: ['faq', 'question', 'answer'] },
     { label: 'Subscribers', description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'), icon: Mail, keywords: ['subscriber', 'newsletter', 'email'] },
     { label: 'Settings', description: 'Platform settings', path: getAdminSectionRoutePath('settings'), icon: Settings, keywords: ['setting', 'config', 'logo'] },
+    { label: 'Referral Setting', description: 'Configure affiliate referral commission', path: getAdminSectionRoutePath('referral_setting'), icon: Link2, keywords: ['referral', 'affiliate', 'commission'] },
     { label: 'My Profile', description: 'Edit your admin profile', path: getAdminProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];
 

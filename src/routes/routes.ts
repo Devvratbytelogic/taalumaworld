@@ -197,6 +197,7 @@ export function getAdminSectionRoutePath(section: string): string {
     taxes: '/admin/taxes',
     withdrawal_requests: '/admin/withdrawal-requests',
     affiliate_applications: '/admin/affiliate-applications',
+    referral_setting: '/admin/referral-setting',
   };
   return map[section] ?? '/admin/dashboard';
 }

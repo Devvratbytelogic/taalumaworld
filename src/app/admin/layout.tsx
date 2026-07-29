@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Mail, MessageSquare, Percent, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Award } from 'lucide-react';
+import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Link2, Mail, MessageSquare, Percent, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Award } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -17,9 +17,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'System',
         items: [
             { id: 'dashboard', label: 'Dashboard', href: getAdminDashboardRoutePath(), icon: LayoutDashboard },
-            { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
             { model: 'Role', submodel: ['Permission', 'Staff'], id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
-            { model: 'Audit Log', id: 'audit_logs', label: 'Audit Logs', href: getAdminSectionRoutePath('audit_logs'), icon: ScrollText },
         ],
     },
     {
@@ -73,6 +71,14 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'FAQs', id: 'faqs', label: 'FAQs', href: getAdminSectionRoutePath('faqs'), icon: FileEdit },
             { model: 'Contact Us', id: 'contact_us', label: 'Help & Trust Center', href: getAdminSectionRoutePath('contact_us'), icon: Mail },
             { model: 'Subscriber', id: 'subscribers', label: 'Subscribers', href: getAdminSectionRoutePath('subscribers'), icon: Bell },
+        ],
+    },
+    {
+        title: 'Configuration',
+        items: [
+            { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
+            { model: 'Referral Setting', id: 'referral_setting', label: 'Referral Setting', href: getAdminSectionRoutePath('referral_setting'), icon: Link2 },
+            { model: 'Audit Log', id: 'audit_logs', label: 'Audit Logs', href: getAdminSectionRoutePath('audit_logs'), icon: ScrollText },
         ],
     },
 ];

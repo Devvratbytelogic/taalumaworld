@@ -246,6 +246,7 @@ export const rtkQuerieSetup = createApi({
         'AdminWithdrawals',
         'AdminAuditLogs',
         'AdminReviews',
+        'AffiliateReferal',
     ],
     endpoints: () => ({}),
 });

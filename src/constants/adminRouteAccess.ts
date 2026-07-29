@@ -17,6 +17,7 @@ export interface AdminRouteModelMapping {
 
 export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/settings', models: ['Setting'] },
+  { path: '/admin/referral-setting', models: ['Referral Setting'] },
   { path: '/admin/roles-and-permissions', models: ['Role', 'Permission', 'Staff'] },
   { path: '/admin/audit-logs', models: ['Audit Log'] },
   { path: '/admin/transactions', models: ['Transaction'] },

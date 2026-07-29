@@ -271,6 +271,10 @@ export function getUserDashboardMyOrdersRoutePath(): string {
   return '/user-dashboard/my-orders';
 }
 
+export function getUserDashboardMyOrderDetailRoutePath(orderId: string): string {
+  return `/user-dashboard/my-orders/${orderId}`;
+}
+
 export function getUserDashboardHistoryRoutePath(): string {
   return '/user-dashboard/history';
 }

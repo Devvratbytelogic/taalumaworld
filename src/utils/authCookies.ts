@@ -72,6 +72,7 @@ export function clearAuthCookies(): void {
     Cookies.remove('auth_token', { path: '/' })
     Cookies.remove('userID', { path: '/' })
     Cookies.remove('user_role', { path: '/' })
+    Cookies.remove('user_email', { path: '/' })
     dispatchAuthChanged()
 }
 

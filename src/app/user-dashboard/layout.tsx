@@ -102,7 +102,10 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                     <div className="space-y-1">
                       {group.items.map((item) => {
                         const Icon = item.icon;
-                        const isActive = pathname === item.href;
+                        const isActive =
+                          pathname === item.href ||
+                          (item.href !== getUserDashboardProfileRoutePath() &&
+                            pathname.startsWith(`${item.href}/`));
                         return (
                           <Link
                             key={item.href}

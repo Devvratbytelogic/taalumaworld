@@ -155,7 +155,7 @@ export function MyBooksPage() {
                     key={item.id}
                     className="group flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300 sm:flex-row"
                   >
-                    <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-gray-100 sm:aspect-auto sm:w-40 sm:min-h-[168px] md:w-44">
+                    <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-gray-100 sm:aspect-auto sm:w-40 sm:min-h-42 md:w-44">
                       <div className="h-full w-full transition-transform duration-300 group-hover:scale-[1.02]">
                         <ImageComponent src={item.coverImage || ''} alt={item.title} object_cover={true} />
                       </div>

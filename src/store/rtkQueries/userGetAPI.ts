@@ -40,6 +40,7 @@ import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication'
 import { IFollowedMentorsAPIResponse } from '@/types/follows';
 import { IMyReviewsAPIResponse, IUserReviewsAPIResponse } from '@/types/user/reviews';
 import { IAllOrdersAPIResponse } from '@/types/user/allOrders';
+import { ISingleOrderAPIResponse } from '@/types/order';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -313,7 +314,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
-         
+
         /** mentor-applications */
         getMentorApplications: builder.query<IMyMentorApplicationAPIResponse, void>({
             query: () => ({
@@ -376,6 +377,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['UserOrders'],
         }),
+        userGetOrderById: builder.query<ISingleOrderAPIResponse, string>({
+            query: (id) => ({
+                url: `/user/orders/${id}`,
+                method: 'GET',
+            }),
+            providesTags: ['AdminOrders'],
+        }),
     }),
 });
 
@@ -417,4 +425,5 @@ export const {
     useGetContentReviewsQuery,
     useGetMyReviewsQuery,
     useGetAllUserOrdersQuery,
+    useUserGetOrderByIdQuery,
 } = clientSideGetApis;

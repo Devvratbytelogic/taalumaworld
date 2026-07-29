@@ -6,6 +6,7 @@ import moment from 'moment';
 import {
   ChevronLeft,
   ChevronRight,
+  Eye,
   FileDown,
   Search,
   ShoppingBag,
@@ -20,7 +21,7 @@ import {
   useGetAllUserOrdersQuery,
   useLazyGetTransactionInvoiceQuery,
 } from '@/store/rtkQueries/userGetAPI';
-import { getHomeRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getUserDashboardMyOrderDetailRoutePath } from '@/routes/routes';
 import type {
   IAllOrdersAPIResponseDataEntity,
   OrderItemsEntity,
@@ -105,15 +106,19 @@ function OrderCard({
   const items = order.Order_items ?? [];
   const visibleItems = items.slice(0, 3);
   const remainingCount = Math.max(0, items.length - visibleItems.length);
+  const detailHref = getUserDashboardMyOrderDetailRoutePath(order._id);
 
   return (
     <article className="rounded-md border border-gray-200 bg-white p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold text-gray-900">
+            <Link
+              href={detailHref}
+              className="text-sm font-semibold text-gray-900 transition-colors hover:text-primary"
+            >
               Order #{order.order_number ?? order.invoice_number ?? order.id}
-            </p>
+            </Link>
             <Badge variant="outline" className="capitalize">
               {formatOrderType(order.type || order.purchase_type)}
             </Badge>
@@ -160,15 +165,24 @@ function OrderCard({
           <p className="text-xs text-gray-500">Total</p>
           <p className="text-base font-semibold text-primary">{formatKes(order.total_amount)}</p>
         </div>
-        <Button
-          type="button"
-          className="global_btn rounded_full outline_primary"
-          isDisabled={isDownloading}
-          onPress={() => onDownloadInvoice(order._id)}
-        >
-          <FileDown className="h-4 w-4" />
-          {isDownloading ? 'Downloading…' : 'Invoice'}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={detailHref}
+            className="global_btn inline-flex items-center justify-center gap-2 rounded_full outline_primary px-4 py-2 text-sm"
+          >
+            <Eye className="h-4 w-4" />
+            View
+          </Link>
+          <Button
+            type="button"
+            className="global_btn rounded_full outline_primary"
+            isDisabled={isDownloading}
+            onPress={() => onDownloadInvoice(order._id)}
+          >
+            <FileDown className="h-4 w-4" />
+            {isDownloading ? 'Downloading…' : 'Invoice'}
+          </Button>
+        </div>
       </div>
     </article>
   );

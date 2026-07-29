@@ -244,6 +244,7 @@ export const rtkQuerieSetup = createApi({
         'AdminTaxes',
         'Address',
         'WithdrawalLedger',
+        'ReferralWalletLedger',
         'WithdrawalRequests',
         'AdminWithdrawals',
         'AdminAuditLogs',

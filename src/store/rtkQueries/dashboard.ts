@@ -6,11 +6,18 @@ import {
     IMentorReferralsAPIResponse,
     ISalesVolumeAPIResponse,
 } from '@/types/dashboard';
+import { IReferralWalletLedgerAPIResponse } from '@/types/referralWallet';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export interface IDashboardDateRangeParams {
     fromDate?: string;
     toDate?: string;
+}
+
+export interface IGetReferralWalletLedgerParams {
+    page?: number;
+    limit?: number;
+    type?: 'credit' | 'debit';
 }
 
 export const dashboardApi = rtkQuerieSetup.injectEndpoints({
@@ -60,13 +67,23 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
             }),
         }),
 
-        /** Logged-in mentor's own referrals, filterable by status — Mentor only */
+        /** Logged-in user's own referrals, filterable by status — Mentor + Career Architect */
         getMyMentorReferrals: builder.query<IMentorReferralsAPIResponse, { page?: number; limit?: number; status?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/referrals/my`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),
+        }),
+
+        /** Referral wallet ledger — Mentor + Career Architect */
+        getReferralWalletLedger: builder.query<IReferralWalletLedgerAPIResponse, IGetReferralWalletLedgerParams | void>({
+            query: (params) => ({
+                url: `/admin/referrals/wallet-ledger`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['ReferralWalletLedger'],
         }),
     }),
 });
@@ -78,4 +95,5 @@ export const {
     useGetBlueprintRevenueQuery,
     useGetMentorEconomyRevenueQuery,
     useGetMyMentorReferralsQuery,
+    useGetReferralWalletLedgerQuery,
 } = dashboardApi;

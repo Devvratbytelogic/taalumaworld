@@ -99,6 +99,10 @@ export function getMentorReferralsRoutePath(): string {
   return '/admin/mentor/referrals';
 }
 
+export function getMentorReferralWalletRoutePath(): string {
+  return '/admin/mentor/referral-wallet';
+}
+
 export function getMentorFollowersRoutePath(): string {
   return '/admin/mentor/follower';
 }
@@ -285,6 +289,10 @@ export function getUserDashboardBecomeMentorRoutePath(): string {
 
 export function getUserDashboardMyReferralsRoutePath(): string {
   return '/user-dashboard/my-referrals';
+}
+
+export function getUserDashboardReferralWalletRoutePath(): string {
+  return '/user-dashboard/referral-wallet';
 }
 
 export function getUserDashboardSettingsRoutePath(): string {

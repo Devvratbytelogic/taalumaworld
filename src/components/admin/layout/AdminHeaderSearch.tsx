@@ -56,6 +56,7 @@ import {
     getMentorRevenueByBlueprintRoutePath,
     getMentorWalletRoutePath,
     getMentorReferralsRoutePath,
+    getMentorReferralWalletRoutePath,
     getMentorReviewsRoutePath,
     getMentorOrdersRoutePath,
     getMentorUsersRoutePath,
@@ -105,6 +106,7 @@ const MENTOR_ROUTES: AdminNavRoute[] = [
     { label: 'Revenue by Blueprint', description: 'Revenue breakdown by blueprint', path: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp, keywords: ['revenue', 'blueprint'] },
     { label: 'Wallet & Payouts', description: 'Manage wallet and payouts', path: getMentorWalletRoutePath(), icon: Wallet, keywords: ['wallet', 'payout', 'withdraw'] },
     { label: 'Referral Performance', description: 'Track referral performance', path: getMentorReferralsRoutePath(), icon: Link2, keywords: ['referral', 'growth'] },
+    { label: 'Referral Wallet', description: 'Referral commission ledger', path: getMentorReferralWalletRoutePath(), icon: Wallet, keywords: ['referral', 'wallet', 'commission', 'ledger', 'credit', 'debit'] },
     { label: 'Users', description: 'Manage your users', path: getMentorUsersRoutePath(), icon: UserCircle, keywords: ['user', 'member', 'account'] },
     { label: 'My Profile', description: 'Edit your mentor profile', path: getMentorProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];

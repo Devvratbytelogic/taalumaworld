@@ -34,6 +34,7 @@ import {
   getMentorFollowersRoutePath,
   getMentorProfileRoutePath,
   getMentorReferralsRoutePath,
+  getMentorReferralWalletRoutePath,
   getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
   getMentorReviewsRoutePath,
@@ -74,6 +75,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     title: 'Growth',
     items: [
       { id: 'referrals', label: 'Referral Performance', href: getMentorReferralsRoutePath(), icon: Link2 },
+      { id: 'referral_wallet', label: 'Referral Wallet', href: getMentorReferralWalletRoutePath(), icon: Wallet },
       { id: 'followers', label: 'Followers', href: getMentorFollowersRoutePath(), icon: Users },
     ],
   },

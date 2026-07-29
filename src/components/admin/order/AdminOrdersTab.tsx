@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ShoppingBag, BookOpen, FileText, Eye, Layers } from 'lucide-react';
 import { type GridColDef } from '@mui/x-data-grid';
 import { cn } from '@/components/ui/utils';
@@ -11,7 +11,7 @@ import { OrderStats } from './OrderStats';
 import { AdminOrdersSearch } from './AdminOrdersSearch';
 import { useGetAllOrdersQuery } from '@/store/rtkQueries/adminGetApi';
 import { useDebounce } from '@/hooks/useDebounce';
-import { getViewOrderRoutePath } from '@/routes/routes';
+import { getMentorRoutePath, getViewOrderRoutePath } from '@/routes/routes';
 import moment from 'moment';
 import { IAllOrdersAPIResponseDataEntityItemEntityItemItems } from '@/types/order';
 
@@ -32,6 +32,8 @@ const SEARCH_PLACEHOLDERS: Record<OrderTab, string> = {
 
 export function AdminOrdersTab() {
     const router = useRouter();
+    const pathname = usePathname();
+    const isMentor = pathname.startsWith(getMentorRoutePath());
     const [activeTab, setActiveTab] = useState<OrderTab>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [paymentStatus, setPaymentStatus] = useState('');
@@ -228,7 +230,7 @@ export function AdminOrdersTab() {
                         type="button"
                         className="active_button"
                         title="View order"
-                        onClick={() => router.push(getViewOrderRoutePath(params.row.id))}
+                        onClick={() => router.push(getViewOrderRoutePath(params.row.id, isMentor))}
                     >
                         <Eye className="h-4 w-4" />
                     </button>
@@ -248,7 +250,11 @@ export function AdminOrdersTab() {
                             <ShoppingBag className="h-7 w-7 text-primary" />
                             <h1 className="text-3xl font-bold text-foreground">Orders</h1>
                         </div>
-                        <p className="text-muted-foreground">View and manage all customer orders</p>
+                        <p className="text-muted-foreground">
+                            {isMentor
+                                ? 'View orders for your series and blueprints'
+                                : 'View and manage all customer orders'}
+                        </p>
                     </div>
                 </div>
             </div>

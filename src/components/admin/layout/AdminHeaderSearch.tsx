@@ -57,6 +57,7 @@ import {
     getMentorWalletRoutePath,
     getMentorReferralsRoutePath,
     getMentorReviewsRoutePath,
+    getMentorOrdersRoutePath,
     getMentorUsersRoutePath,
     getMentorProfileRoutePath,
 } from '@/routes/routes';
@@ -96,6 +97,7 @@ const MENTOR_ROUTES: AdminNavRoute[] = [
     { label: 'Series', description: 'Manage your series', path: getMentorBooksRoutePath(), icon: Book, keywords: ['book', 'series', 'publish'] },
     { label: 'Blueprints', description: 'Manage your blueprints', path: getMentorChaptersRoutePath(), icon: FileText, keywords: ['blueprint', 'content'] },
     { label: 'Reviews', description: 'Monitor and moderate reviews', path: getMentorReviewsRoutePath(), icon: Star, keywords: ['review', 'rating', 'feedback'] },
+    { label: 'Orders', description: 'View your series & blueprint orders', path: getMentorOrdersRoutePath(), icon: ShoppingBag, keywords: ['order', 'purchase', 'sales'] },
     { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(true), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
     { label: 'Blueprint Performance', description: 'Track blueprint performance', path: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3, keywords: ['performance', 'analytics'] },
     { label: 'Sales Volume', description: 'View sales volume', path: getMentorSalesVolumeRoutePath(), icon: ShoppingCart, keywords: ['sales', 'volume'] },

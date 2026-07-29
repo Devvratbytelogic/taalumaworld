@@ -137,7 +137,7 @@ export function AdminTransactionsTab() {
     {
       field: 'date',
       headerName: 'Date',
-      width: 130,
+      width: 180,
       sortable: false,
       renderCell: (params) => (
         <span className="text-sm whitespace-nowrap">{params.row.date}</span>

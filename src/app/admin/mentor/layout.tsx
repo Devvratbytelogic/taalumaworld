@@ -12,6 +12,7 @@ import {
   Link2,
   ShieldAlert,
   ShoppingCart,
+  ShoppingBag,
   Star,
   TrendingUp,
   Users,
@@ -36,6 +37,7 @@ import {
   getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
   getMentorReviewsRoutePath,
+  getMentorOrdersRoutePath,
   getMentorSalesVolumeRoutePath,
   getMentorWalletRoutePath,
 } from '@/routes/routes';
@@ -60,6 +62,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
   {
     title: 'Performance & Revenue',
     items: [
+      { id: 'orders', label: 'Orders', href: getMentorOrdersRoutePath(), icon: ShoppingBag },
       { id: 'blueprint_performance', label: 'Blueprint Performance', href: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3 },
       { id: 'sales_volume', label: 'Sales Volume', href: getMentorSalesVolumeRoutePath(), icon: ShoppingCart },
       { id: 'revenue_earned', label: 'Revenue Earned', href: getMentorRevenueEarnedRoutePath(), icon: KshIcon },

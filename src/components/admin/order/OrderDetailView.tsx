@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { ArrowLeft, Download, ShoppingBag, TicketPercent, User } from 'lucide-react';
@@ -15,7 +16,7 @@ import {
   AdminSectionHeader,
 } from '@/components/admin/layout/AdminContent';
 import { useGetOrderByIdQuery } from '@/store/rtkQueries/adminGetApi';
-import { getAdminSectionRoutePath } from '@/routes/routes';
+import { getMentorRoutePath, getOrdersListRoutePath } from '@/routes/routes';
 import { API_BASE_URL } from '@/utils/config';
 
 function isPercentCouponType(couponType?: string | null) {
@@ -106,6 +107,8 @@ interface OrderDetailViewProps {
 }
 
 export function OrderDetailView({ orderId }: OrderDetailViewProps) {
+  const pathname = usePathname();
+  const isMentor = pathname.startsWith(getMentorRoutePath());
   const { data, isLoading } = useGetOrderByIdQuery(orderId);
   const order = data?.data;
 
@@ -138,7 +141,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   return (
     <AdminPage>
       <Link
-        href={getAdminSectionRoutePath('orders')}
+        href={getOrdersListRoutePath(isMentor)}
         className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />

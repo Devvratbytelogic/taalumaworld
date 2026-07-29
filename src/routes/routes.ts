@@ -115,6 +115,10 @@ export function getMentorReviewsRoutePath(): string {
   return '/admin/mentor/reviews';
 }
 
+export function getMentorOrdersRoutePath(): string {
+  return '/admin/mentor/orders';
+}
+
 export function getMentorCategoriesRoutePath(): string {
   return '/admin/mentor/categories';
 }
@@ -223,8 +227,12 @@ export function getViewAuditLogRoutePath(auditLogId: string): string {
   return `/admin/audit-logs/${auditLogId}`;
 }
 
-export function getViewOrderRoutePath(orderId: string): string {
-  return `/admin/orders/${orderId}`;
+export function getViewOrderRoutePath(orderId: string, isMentor: boolean = false): string {
+  return isMentor ? `/admin/mentor/orders/${orderId}` : `/admin/orders/${orderId}`;
+}
+
+export function getOrdersListRoutePath(isMentor: boolean = false): string {
+  return isMentor ? getMentorOrdersRoutePath() : getAdminSectionRoutePath('orders');
 }
 
 export function getDesignSystemRoutePath(): string {

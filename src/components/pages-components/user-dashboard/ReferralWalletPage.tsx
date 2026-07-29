@@ -123,6 +123,10 @@ export function ReferralWalletPage() {
     setPage(1);
   }, [type]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
+
   const { data, isLoading, isFetching } = useGetReferralWalletLedgerQuery({
     page,
     limit: PAGE_LIMIT,

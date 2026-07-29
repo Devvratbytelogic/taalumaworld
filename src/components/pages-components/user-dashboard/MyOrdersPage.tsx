@@ -205,6 +205,10 @@ export function MyOrdersPage() {
     setPage(1);
   }, [debouncedSearch, status, paymentStatus, type, fromDate, toDate]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
+
   const { data, isLoading, isFetching } = useGetAllUserOrdersQuery({
     page,
     limit: PAGE_LIMIT,

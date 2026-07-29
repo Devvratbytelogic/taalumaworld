@@ -196,12 +196,12 @@ export function MentorReferralsTab() {
           icon={Wallet}
           tone="orange"
         />
-        <AdminStatCard
+        {/* <AdminStatCard
           label="Conversion rate"
           value={`${(summary?.conversion_rate ?? 0).toFixed(1)}%`}
           icon={Percent}
           tone="slate"
-        />
+        /> */}
       </div>
 
       <div>

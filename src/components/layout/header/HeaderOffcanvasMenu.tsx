@@ -19,6 +19,7 @@ import {
   Phone,
   Settings,
   Shield,
+  ShoppingBag,
   User,
   X,
 } from 'lucide-react';
@@ -44,6 +45,7 @@ import {
   getUserDashboardHistoryRoutePath,
   getUserDashboardMyBooksRoutePath,
   getUserDashboardMyChaptersRoutePath,
+  getUserDashboardMyOrdersRoutePath,
   getUserDashboardProfileRoutePath,
   getUserDashboardRoutePath,
   getUserDashboardSettingsRoutePath,
@@ -63,6 +65,7 @@ const accountLinks = [
   { label: 'Settings', href: getUserDashboardSettingsRoutePath(), icon: Settings },
   { label: 'My Blueprints', href: getUserDashboardMyChaptersRoutePath(), icon: BookOpen },
   { label: 'My Series', href: getUserDashboardMyBooksRoutePath(), icon: Book },
+  { label: 'My Orders', href: getUserDashboardMyOrdersRoutePath(), icon: ShoppingBag },
   { label: 'Reading History', href: getUserDashboardHistoryRoutePath(), icon: Clock },
   { label: 'Become a Mentor', href: getUserDashboardBecomeMentorRoutePath(), icon: GraduationCap },
 ];
@@ -137,7 +140,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
     <>
       <div
         className={cn(
-          'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 z-200 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={onClose}
@@ -149,7 +152,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
           if (!open) setMounted(false);
         }}
         className={cn(
-          'fixed top-0 right-0 z-[201] flex h-dvh w-[min(320px,88vw)] flex-col bg-white border-l border-gray-200 transition-transform duration-300 ease-out lg:hidden',
+          'fixed top-0 right-0 z-201 flex h-dvh w-[min(320px,88vw)] flex-col bg-white border-l border-gray-200 transition-transform duration-300 ease-out lg:hidden',
           open ? 'translate-x-0' : 'translate-x-full'
         )}
         aria-hidden={!open}
@@ -157,7 +160,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
         <div className="shrink-0 border-b border-gray-100 bg-linear-to-br from-primary/8 via-primary/4 to-white px-5 py-4">
           <div className="flex items-center justify-between">
             <Link href={getHomeRoutePath()} onClick={onClose}>
-              <div className="h-9 w-[132px]">
+              <div className="h-9 w-33">
                 <ImageComponent src={logo || '/images/logo.png'} alt={brandName} object_cover={false} />
               </div>
             </Link>

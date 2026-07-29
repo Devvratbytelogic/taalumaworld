@@ -9,14 +9,13 @@ import {
   CircleDashed,
   Play,
   User,
-  FileDown,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { cn } from '@/components/ui/utils';
-import { useGetMySeriesQuery, useLazyGetTransactionInvoiceQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetMySeriesQuery } from '@/store/rtkQueries/userGetAPI';
 import type { ItemsEntity } from '@/types/user/mySeries';
 import { getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
@@ -30,7 +29,6 @@ export function MyBooksPage() {
   const router = useRouter();
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
-  const [invoiceDownloadingOrderId, setInvoiceDownloadingOrderId] = useState<string | null>(null);
 
   const { data: mySeriesData, isLoading, isFetching } = useGetMySeriesQuery({
     page,
@@ -39,7 +37,6 @@ export function MyBooksPage() {
     completed: filter === 'completed',
     unread: filter === 'unread',
   });
-  const [fetchTransactionInvoice] = useLazyGetTransactionInvoiceQuery();
 
   const series: ItemsEntity[] = mySeriesData?.data?.items ?? [];
   const summary = mySeriesData?.data?.summary;
@@ -48,24 +45,6 @@ export function MyBooksPage() {
   const handleFilterChange = (nextFilter: FilterType) => {
     setFilter(nextFilter);
     setPage(1);
-  };
-
-  const handleDownloadInvoice = async (orderId: string) => {
-    setInvoiceDownloadingOrderId(orderId);
-    try {
-      const blob = await fetchTransactionInvoice({ orderId }).unwrap();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `invoice-${orderId}.pdf`;
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } finally {
-      setInvoiceDownloadingOrderId(null);
-    }
   };
 
   if (isLoading) {
@@ -239,18 +218,6 @@ export function MyBooksPage() {
                           <ReadIcon className="h-4 w-4" />
                           {readLabel}
                         </Button>
-
-                        {item.order_id ? (
-                          <Button
-                            type="button"
-                            className="global_btn rounded_full outline_primary w-full"
-                            isDisabled={invoiceDownloadingOrderId === item.order_id}
-                            onPress={() => handleDownloadInvoice(item.order_id as string)}
-                          >
-                            <FileDown className="h-4 w-4" />
-                            {invoiceDownloadingOrderId === item.order_id ? 'Downloading…' : 'Invoice'}
-                          </Button>
-                        ) : null}
                       </div>
                     </div>
                   </article>

@@ -39,6 +39,7 @@ import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@
 import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
 import { IFollowedMentorsAPIResponse } from '@/types/follows';
 import { IMyReviewsAPIResponse, IUserReviewsAPIResponse } from '@/types/user/reviews';
+import { IAllOrdersAPIResponse } from '@/types/user/allOrders';
 
 export interface IGetAllChaptersParams {
     categoryId?: string | null;
@@ -92,6 +93,17 @@ export interface IGetMyReviewsParams {
     status?: string;
     fromDate?: string;
     toDate?: string;
+}
+
+export interface IGetAllUserOrdersParams {
+    search?: string;
+    status?: string;
+    payment_status?: string;
+    fromDate?: string;
+    toDate?: string;
+    type?: 'cart' | 'book' | 'chapter';
+    page?: number;
+    limit?: number;
 }
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
@@ -355,6 +367,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['Reviews'],
         }),
+        /** get current user's orders (GET /user/all-order) */
+        getAllUserOrders: builder.query<IAllOrdersAPIResponse, IGetAllUserOrdersParams | void>({
+            query: (params) => ({
+                url: `/user/all-order`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['UserOrders'],
+        }),
     }),
 });
 
@@ -395,4 +416,5 @@ export const {
     useGetFollowedMentorsQuery,
     useGetContentReviewsQuery,
     useGetMyReviewsQuery,
+    useGetAllUserOrdersQuery,
 } = clientSideGetApis;

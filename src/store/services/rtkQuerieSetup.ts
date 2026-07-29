@@ -209,6 +209,7 @@ export const rtkQuerieSetup = createApi({
         'Wishlist',
         'FollowedMentors',
         'Reviews',
+        'UserOrders',
         'UserProfile',
         'AdminProfile',
         'MyChapters',

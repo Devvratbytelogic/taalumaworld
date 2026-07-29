@@ -267,6 +267,10 @@ export function getUserDashboardMyReviewsRoutePath(): string {
   return '/user-dashboard/my-reviews';
 }
 
+export function getUserDashboardMyOrdersRoutePath(): string {
+  return '/user-dashboard/my-orders';
+}
+
 export function getUserDashboardHistoryRoutePath(): string {
   return '/user-dashboard/history';
 }

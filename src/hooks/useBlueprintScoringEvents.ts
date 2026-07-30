@@ -47,7 +47,7 @@ function handleSseLine(line: string) {
   if (!chapterId) return;
 
   console.log('[blueprint-sse] chapter updated', chapterId);
-  toast.success('AI scoring updated');
+  // toast.success('AI scoring updated');
 
   window.setTimeout(() => {
     store.dispatch(rtkQuerieSetup.util.invalidateTags(['AdminChapters']));

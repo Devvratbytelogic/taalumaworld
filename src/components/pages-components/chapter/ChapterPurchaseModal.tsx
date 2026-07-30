@@ -4,20 +4,18 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BadgeCheck, BookOpen, Lock, Tag, User, Wallet } from 'lucide-react';
+import { BadgeCheck, BookOpen, Lock, Tag, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
-import Button from '@/components/ui/Button';
 import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
-import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
-import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
+import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
+import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import ChapterPurchaseAddresses from '@/components/pages-components/chapter/ChapterPurchaseAddresses';
-import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { getPolicyBySlugRoutePath, getSeriesRoutePath } from '@/routes/routes';
@@ -29,7 +27,7 @@ import { USER_TYPE } from '@/constants/common';
 import { useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
 
 const modalClassNames = {
-  base: 'max-w-xl rounded-3xl overflow-hidden',
+  base: 'max-w-2xl rounded-3xl overflow-hidden',
   wrapper: 'px-6 py-12',
   body: 'p-0',
   footer: 'p-0',
@@ -41,11 +39,14 @@ export default function ChapterPurchaseModal() {
   const router = useRouter();
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const [agreementTouched, setAgreementTouched] = useState(false);
+  const [isMpesaPaying, setIsMpesaPaying] = useState(false);
+  const [isWalletPaying, setIsWalletPaying] = useState(false);
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const chapter = data?.chapter;
   const isBook = data?.type === 'series';
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
-  const isAddressAvailable = addressData?.data && addressData?.data?.length > 0 ? true : false;
+  const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
+  const isPaymentBusy = isMpesaPaying || isWalletPaying;
 
   const onClose = () => dispatch(closeModal());
 
@@ -59,6 +60,7 @@ export default function ChapterPurchaseModal() {
 
   const purchaseId = isPricingModelChapter ? chapter?.id : chapter?.series?.id;
   const purchaseType = isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK;
+  const totalPaymentRequired = Number(displayPrice ?? 0);
 
   const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
     touchPoint: AGREEMENT_TOUCHPOINTS.CHECKOUT,
@@ -73,7 +75,6 @@ export default function ChapterPurchaseModal() {
       ? 'You must accept all required agreements before purchasing'
       : undefined;
 
-
   const viewSeriesDetails = () => {
     dispatch(closeModal());
     router.push(getSeriesRoutePath(chapter?.series?.slug ?? chapter?.series?.id ?? ''));
@@ -85,34 +86,36 @@ export default function ChapterPurchaseModal() {
     router.refresh();
   };
 
-  const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
-    chapterID: purchaseId,
-    type: purchaseType,
-    acceptedAgreementIds,
-    onSuccess: handlePurchaseSuccess,
-  });
-
-  const handleBuyNow = () => {
+  const validatePurchase = () => {
+    if (!isAddressAvailable) return false;
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
-      return;
+      return false;
     }
-    startPayment();
+    return true;
+  };
+
+  const referralWalletPayload = {
+    ...(purchaseType === VISIBLE.CHAPTER
+      ? { chapter_id: purchaseId }
+      : { book_id: purchaseId }),
+    type: purchaseType,
+    accepted_agreement_ids: acceptedAgreementIds,
   };
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="xl" classNames={modalClassNames}>
+      <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="2xl" classNames={modalClassNames}>
         <ModalContent>
           {chapter?.coverImage && (
-            <div className="relative shrink-0 bg-muted flex justify-center py-6">
+            <div className="relative shrink-0 bg-muted flex justify-center py-4">
               <div className="w-40 aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
                 <ImageComponent src={chapter?.coverImage} alt={chapter?.title} object_cover={false} />
               </div>
             </div>
           )}
 
-          <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
+          <ModalBody className="py-3 px-4! sm:p-6! space-y-2 sm:space-y-4 gap-y-0! overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
                 {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
@@ -263,7 +266,7 @@ export default function ChapterPurchaseModal() {
                       setAgreementTouched(true);
                     }}
                     onBlur={() => setAgreementTouched(true)}
-                    disabled={isInitiating}
+                    disabled={isPaymentBusy}
                   >
                     {agreement.text}{' '}
                     <Link
@@ -284,16 +287,27 @@ export default function ChapterPurchaseModal() {
             )}
           </ModalBody>
 
-          <ModalFooter className="flex flex-col gap-3 p-4 border-t bg-white shrink-0">
-            <Button
-              className="global_btn rounded_full bg_primary w-full"
-              onPress={handleBuyNow}
-              isLoading={isInitiating}
-              isDisabled={!isAddressAvailable}
-              startContent={!isInitiating && <Wallet className="h-4 w-4" />}
-            >
-              Buy Now - KSH {displayPrice?.toFixed(2) ?? '0.00'}
-            </Button>
+          <ModalFooter className="flex flex-col gap-2 p-2 sm:p-4 border-t bg-white shrink-0">
+            <div className='flex max-md:flex-wrap gap-2 justify-between'>
+              <ReferralWalletPayButton
+                totalPaymentRequired={totalPaymentRequired}
+                payload={referralWalletPayload}
+                isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
+                onBeforePay={validatePurchase}
+                onSuccess={handlePurchaseSuccess}
+                onLoadingChange={setIsWalletPaying}
+              />
+              <MpesaPayButton
+                chapterID={purchaseId}
+                type={purchaseType}
+                acceptedAgreementIds={acceptedAgreementIds}
+                label={`Buy Now - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
+                onBeforePay={validatePurchase}
+                onSuccess={handlePurchaseSuccess}
+                onLoadingChange={setIsMpesaPaying}
+              />
+            </div>
 
             <AddToCartButton
               id={purchaseId}
@@ -301,13 +315,9 @@ export default function ChapterPurchaseModal() {
               className="global_btn rounded_full outline_primary w-full"
               label="Add to Cart Instead"
             />
-
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      <MpesaPhoneModal {...phoneModalProps} />
-      <MpesaWaitModal {...waitModalProps} />
     </>
   );
 }

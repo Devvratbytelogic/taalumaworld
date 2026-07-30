@@ -43,3 +43,4 @@ next-env.d.ts
 # payment logs
 /logs/*.log
 /logs/*.log.old
+/logs/mpesa-payments.log

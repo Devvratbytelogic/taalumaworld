@@ -47,18 +47,13 @@ function handleSseLine(line: string) {
   if (!chapterId) return;
 
   console.log('[blueprint-sse] chapter updated', chapterId);
-  // toast.success('AI scoring updated');
 
   window.setTimeout(() => {
     store.dispatch(rtkQuerieSetup.util.invalidateTags(['AdminChapters']));
   }, 400);
 }
 
-/**
- * Listens to GET {API}/admin/blueprints/emit via XHR.
- * fetch()+ReadableStream was stalling on this cross-origin SSE (Network showed
- * bytes, but the fetch promise never resolved), so XHR onprogress is used instead.
- */
+
 export function useBlueprintScoringEvents(enabled = true) {
   useEffect(() => {
     if (!enabled) return;

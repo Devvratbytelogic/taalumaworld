@@ -34,6 +34,7 @@ export interface IChapter {
   aiReview?: string | null;
   aiScore?: number | null;
   aiClassification?: string | null;
+  isMine?: boolean;
   aiWordCount?: number | null;
   aiScoredAt?: string | null;
   aiScoringStatus: string;

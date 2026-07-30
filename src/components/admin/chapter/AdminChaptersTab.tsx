@@ -332,45 +332,48 @@ export function AdminChaptersTab() {
                     >
                         <Eye className="h-4 w-4" />
                     </button>
-                    {isTrashView ? (
-                        <button
-                            type="button"
-                            className="active_button"
-                            title="Restore blueprint"
-                            onClick={() => dispatch(openModal({
-                                componentName: 'RestoreConfirmation',
-                                data: {
-                                    itemName: params.row.title,
-                                    onRestore: () => onRestoreChapter(params.row.id),
-                                },
-                            }))}
-                        >
-                            <RotateCcw className="h-4 w-4" />
-                        </button>
-                    ) : (
+                    {params.row.isMine &&
                         <>
-                            <button
-                                type="button"
-                                className="edit_button"
-                                onClick={() => router.push(getEditChapterRoutePath(params.row.id, isMentor))}
-                            >
-                                <Edit2 className="h-4 w-4" />
-                            </button>
-                            <button
-                                type="button"
-                                className="delete_button"
-                                onClick={() => dispatch(openModal({
-                                    componentName: 'DeleteConfirmation',
-                                    data: {
-                                        itemName: params.row.title,
-                                        onDelete: () => onDeleteChapter(params.row.id),
-                                    },
-                                }))}
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
-                        </>
-                    )}
+                            {isTrashView ? (
+                                <button
+                                    type="button"
+                                    className="active_button"
+                                    title="Restore blueprint"
+                                    onClick={() => dispatch(openModal({
+                                        componentName: 'RestoreConfirmation',
+                                        data: {
+                                            itemName: params.row.title,
+                                            onRestore: () => onRestoreChapter(params.row.id),
+                                        },
+                                    }))}
+                                >
+                                    <RotateCcw className="h-4 w-4" />
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="edit_button"
+                                        onClick={() => router.push(getEditChapterRoutePath(params.row.id, isMentor))}
+                                    >
+                                        <Edit2 className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="delete_button"
+                                        onClick={() => dispatch(openModal({
+                                            componentName: 'DeleteConfirmation',
+                                            data: {
+                                                itemName: params.row.title,
+                                                onDelete: () => onDeleteChapter(params.row.id),
+                                            },
+                                        }))}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </>
+                            )}
+                        </>}
                 </div>
             ),
         },

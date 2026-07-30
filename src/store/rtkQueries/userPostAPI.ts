@@ -157,13 +157,15 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['Reviews', 'SingleChapter', 'MyChapters'],
         }),
-        // mpesaPaymentCallback: builder.mutation({
-        //     query: (body) => ({
-        //         url: `/user/mpaisa/callback`,
-        //         method: 'POST',
-        //         body,
-        //     }),
-        // }),
+        /** pay from referral wallet (POST /user/referral-wallet/pay) */
+        referralWalletPay: builder.mutation({
+            query: (body) => ({
+                url: `/user/referral-wallet/pay`,
+                method: 'POST',
+                body,
+            }),
+            invalidatesTags: ['ReferralWalletLedger', 'Cart', 'MyChapters'],
+        }),
     }),
 });
 
@@ -179,7 +181,7 @@ export const {
     usePostContactUsMutation,
     useSubscribeToNewsletterMutation,
     useMpesaPaymentMutation,
-    // useMpesaPaymentCallbackMutation,
+
     useUpdateReadingProgressMutation,
     useSubmitMentorApplicationMutation,
     useFollowMentorMutation,
@@ -188,4 +190,5 @@ export const {
     useSetDefaultUserAddressMutation,
     useDeleteUserAddressMutation,
     useCreateReviewMutation,
+    useReferralWalletPayMutation,
 } = clientSidePostApis;

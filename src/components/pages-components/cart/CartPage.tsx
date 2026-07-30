@@ -30,22 +30,20 @@ function CheckoutSteps({ current }: { current: 'cart' | 'checkout' }) {
             {index > 0 && <span className="h-px w-6 bg-border sm:w-10" aria-hidden />}
             <Link
               href={step.href}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors ${
-                isActive
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors ${isActive
                   ? 'bg-primary text-white'
                   : isComplete
                     ? 'bg-primary/10 text-primary hover:bg-primary/15'
                     : 'bg-muted text-muted-foreground hover:text-foreground'
-              }`}
+                }`}
             >
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${
-                  isActive
+                className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${isActive
                     ? 'bg-white/20 text-white'
                     : isComplete
                       ? 'bg-primary text-white'
                       : 'bg-background text-muted-foreground'
-                }`}
+                  }`}
               >
                 {isComplete ? <Check className="h-3 w-3" /> : index + 1}
               </span>
@@ -64,22 +62,20 @@ export default function CartPage() {
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const { data: cartResponse, isLoading } = useGetCartQuery();
 
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + (item.selling_price ?? 0) * (item.quantity ?? 1),
-    0
-  );
+  const subtotal = cartData?.sub_total ?? 0;
   const discountAmount = cartData?.discount_amount ?? 0;
   const taxAmount = cartData?.tax_amount ?? 0;
-  const total = cartData?.total_amount ?? Math.max(subtotal - discountAmount + taxAmount, 0);
-  const itemCount = cartData?.item_count ?? cartItems.length;
+  const total = cartData?.total_amount ?? 0;
+  const itemCount = cartData?.item_count ?? 0;
 
   if (isPaymentConfirmed) {
-    return <PaymentConfirmed transactionId={transactionId} />;
+    return <PaymentConfirmed transactionId={transactionId} orderNumber={orderNumber} />;
   }
 
   if (isLoading) {
@@ -182,6 +178,7 @@ export default function CartPage() {
               selectedAddressId={selectedAddressId}
               onPaymentSuccess={(result) => {
                 setTransactionId(result?.transactionId ?? null);
+                setOrderNumber(result?.orderNumber ?? null);
                 setIsPaymentConfirmed(true);
               }}
               couponCode={cartData?.coupon_code}

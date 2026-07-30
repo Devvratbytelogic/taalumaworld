@@ -178,3 +178,6 @@
 {"timestamp":"2026-07-28T06:05:26.250Z","event":"POLL_TICK","level":"info","checkoutId":"14000-41566474-1","status":"completed"}
 {"timestamp":"2026-07-28T06:05:26.251Z","event":"POLL_COMPLETED","level":"info","checkoutId":"14000-41566474-1","meta":{"transactionId":"14000-41566474-1"}}
 {"timestamp":"2026-07-28T06:05:26.253Z","event":"CHECKOUT_SUCCESS","level":"info","checkoutId":"14000-41566474-1","meta":{"transactionId":"14000-41566474-1"}}
+{"timestamp":"2026-07-29T08:43:57.817Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-29T09:43:00.127Z","event":"PAYMENT_INITIATED","level":"info"}
+{"timestamp":"2026-07-29T09:43:04.111Z","event":"PAYMENT_INITIATED","level":"info"}

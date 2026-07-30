@@ -7,10 +7,16 @@ import { getUserDashboardRoutePath } from '@/routes/routes';
 
 interface PaymentConfirmedProps {
   transactionId?: string | null;
+  orderNumber?: string | null;
 }
 
-export default function PaymentConfirmed({ transactionId }: PaymentConfirmedProps) {
+export default function PaymentConfirmed({
+  transactionId,
+  orderNumber,
+}: PaymentConfirmedProps) {
   const router = useRouter();
+  const referenceId = transactionId || orderNumber;
+  const referenceLabel = transactionId ? 'Transaction ID' : 'Order Number';
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12">
@@ -20,12 +26,12 @@ export default function PaymentConfirmed({ transactionId }: PaymentConfirmedProp
             <CheckCircle className="h-12 w-12 text-success" />
           </div>
           <h1 className="mb-3 text-3xl font-bold">Order Confirmed!</h1>
-          {transactionId && (
+          {referenceId ? (
             <p className="mb-3 text-sm font-medium text-muted-foreground">
-              Transaction ID{' '}
-              <span className="font-semibold text-foreground">{transactionId}</span>
+              {referenceLabel}{' '}
+              <span className="font-semibold text-foreground">{referenceId}</span>
             </p>
-          )}
+          ) : null}
           <p className="mb-8 text-muted-foreground">
             Your blueprints are now unlocked and ready to read. Head to your dashboard to start
             exploring.

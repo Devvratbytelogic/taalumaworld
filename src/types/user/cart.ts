@@ -19,6 +19,7 @@ export interface ICartDataEntity {
   coupon_discount?: number | null;
   tax_amount: number;
   tax_percent?: number | null;
+  sub_total?: number | null;
   subtotal_amount: number;
   total_amount: number;
   createdAt: string;

@@ -36,7 +36,7 @@ interface CartSummaryProps {
   taxPercent?: number | null;
   couponType?: string | null;
   couponValue?: number | null;
-  onPaymentSuccess: (result?: { transactionId?: string }) => void;
+  onPaymentSuccess: (result?: { transactionId?: string; orderNumber?: string }) => void;
   isLoading?: boolean;
   couponCode?: string | null;
 }
@@ -161,9 +161,9 @@ export default function CartSummary({
                   {[
                     couponTypeLabel,
                     couponPercentLabel
-                      ?? (!isPercentCoupon && couponValue != null
-                        ? `KSH ${Number(couponValue).toFixed(2)}`
-                        : null),
+                    ?? (!isPercentCoupon && couponValue != null
+                      ? `KSH ${Number(couponValue).toFixed(2)}`
+                      : null),
                   ]
                     .filter(Boolean)
                     .join(' · ')}
@@ -278,6 +278,7 @@ export default function CartSummary({
 
       {isCheckoutPage ? (
         <CartPayment
+          total={total}
           cartId={cartId}
           itemCount={itemCount}
           selectedAddressId={selectedAddressId}
@@ -287,9 +288,8 @@ export default function CartSummary({
         <Link
           href={getCartCheckoutRoutePath()}
           aria-disabled={itemCount === 0 || isLoading}
-          className={`global_btn rounded_full bg_primary mb-2 h-12 w-full justify-center gap-2 whitespace-nowrap px-4 text-sm font-medium sm:gap-3 sm:px-6 sm:text-base ${
-            itemCount === 0 || isLoading ? 'pointer-events-none opacity-50' : ''
-          }`}
+          className={`global_btn rounded_full bg_primary mb-2 h-12 w-full justify-center gap-2 whitespace-nowrap px-4 text-sm font-medium sm:gap-3 sm:px-6 sm:text-base ${itemCount === 0 || isLoading ? 'pointer-events-none opacity-50' : ''
+            }`}
         >
           <span>Proceed to Checkout</span>
           <ArrowRight className="h-5 w-5 shrink-0" />

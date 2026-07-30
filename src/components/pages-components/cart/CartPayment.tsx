@@ -2,26 +2,25 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
-import Button from '@/components/ui/Button';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 import { getUserRole } from '@/utils/authCookies';
 import { USER_TYPE } from '@/constants/common';
-import { useMpesaPaymentFlow } from '@/hooks/useMpesaPaymentFlow';
-import { MpesaPhoneModal } from '@/components/payments/MpesaPhoneModal';
-import { MpesaWaitModal } from '@/components/payments/MpesaWaitModal';
+import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
+import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
 
 interface CartPaymentProps {
+  total: number;
   cartId?: string;
   itemCount: number;
   selectedAddressId?: string | null;
-  onPaymentSuccess: (result?: { transactionId?: string }) => void;
+  onPaymentSuccess: (result?: { transactionId?: string; orderNumber?: string }) => void;
 }
 
 export default function CartPayment({
+  total,
   cartId,
   itemCount,
   selectedAddressId = null,
@@ -30,23 +29,26 @@ export default function CartPayment({
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const [agreementTouched, setAgreementTouched] = useState(false);
   const [addressTouched, setAddressTouched] = useState(false);
+  const [isMpesaPaying, setIsMpesaPaying] = useState(false);
+  const [isWalletPaying, setIsWalletPaying] = useState(false);
+  const isPaymentBusy = isMpesaPaying || isWalletPaying;
 
   const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
     touchPoint: AGREEMENT_TOUCHPOINTS.CHECKOUT,
-    userType: getUserRole() === USER_TYPE.CAREER_ARCHITECT ? AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT : AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA,
-  });
-
-  const { startPayment, isInitiating, phoneModalProps, waitModalProps } = useMpesaPaymentFlow({
-    cartID: cartId,
-    type: 'cart',
-    acceptedAgreementIds,
-    onSuccess: onPaymentSuccess,
+    userType:
+      getUserRole() === USER_TYPE.CAREER_ARCHITECT
+        ? AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT
+        : AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA,
   });
 
   const checkoutAgreements = agreementsResponse?.data ?? [];
   // Only agreements the API marks as `is_required` must be accepted before checkout.
-  const requiredAgreementIds = checkoutAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
-  const allRequiredAccepted = requiredAgreementIds.every((id) => acceptedAgreementIds.includes(id));
+  const requiredAgreementIds = checkoutAgreements
+    .filter((agreement) => agreement.is_required)
+    .map((agreement) => agreement._id);
+  const allRequiredAccepted = requiredAgreementIds.every((id) =>
+    acceptedAgreementIds.includes(id),
+  );
   const hasSelectedAddress = Boolean(selectedAddressId);
 
   const agreementError =
@@ -58,16 +60,22 @@ export default function CartPayment({
       ? 'Please select a delivery address before payment'
       : undefined;
 
-  const handleCheckout = () => {
+  const validateCheckout = () => {
     if (!hasSelectedAddress) {
       setAddressTouched(true);
-      return;
+      return false;
     }
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
-      return;
+      return false;
     }
-    startPayment();
+    return true;
+  };
+
+  const referralWalletPayload = {
+    cart_id: cartId,
+    type: 'cart',
+    accepted_agreement_ids: acceptedAgreementIds,
   };
 
   return (
@@ -83,21 +91,24 @@ export default function CartPayment({
               touched={agreementTouched}
               onCheckedChange={(checked) => {
                 setAcceptedAgreementIds((prev) =>
-                  checked ? [...prev, agreement._id] : prev.filter((id) => id !== agreement._id)
+                  checked
+                    ? [...prev, agreement._id]
+                    : prev.filter((id) => id !== agreement._id),
                 );
                 setAgreementTouched(true);
               }}
               onBlur={() => setAgreementTouched(true)}
-              disabled={isInitiating}
+              disabled={isPaymentBusy}
             >
               {agreement.text}{' '}
               <Link
                 href={getPolicyBySlugRoutePath(agreement.slug ?? '')}
                 target="_blank"
-                className={`font-semibold transition-colors ${agreementError
-                  ? 'text-red-600 hover:text-red-700'
-                  : 'text-primary hover:text-primary/80'
-                  }`}
+                className={`font-semibold transition-colors ${
+                  agreementError
+                    ? 'text-red-600 hover:text-red-700'
+                    : 'text-primary hover:text-primary/80'
+                }`}
                 onClick={(e) => e.stopPropagation()}
               >
                 {agreement.title}
@@ -114,19 +125,30 @@ export default function CartPayment({
         </p>
       )}
 
-      <Button
-        size="lg"
-        className="global_btn rounded_full bg_primary h-12 w-full"
-        onPress={handleCheckout}
-        isDisabled={itemCount === 0 || isInitiating || !hasSelectedAddress}
-        startContent={isInitiating ? <Loader2 className="h-5 w-5 animate-spin" /> : undefined}
-        endContent={!isInitiating ? <ArrowRight className="h-5 w-5" /> : undefined}
-      >
-        {isInitiating ? 'Processing...' : 'Pay with M-Pesa'}
-      </Button>
-
-      <MpesaPhoneModal {...phoneModalProps} />
-      <MpesaWaitModal {...waitModalProps} />
+      <div className="space-y-3">
+        <ReferralWalletPayButton
+          totalPaymentRequired={total}
+          payload={referralWalletPayload}
+          isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
+          onBeforePay={validateCheckout}
+          onSuccess={(res) => {
+            const data = (res as { data?: { order_number?: string | number } } | undefined)?.data;
+            onPaymentSuccess({
+              orderNumber: data?.order_number != null ? String(data.order_number) : undefined,
+            });
+          }}
+          onLoadingChange={setIsWalletPaying}
+        />
+        <MpesaPayButton
+          cartID={cartId}
+          type="cart"
+          acceptedAgreementIds={acceptedAgreementIds}
+          isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
+          onBeforePay={validateCheckout}
+          onSuccess={onPaymentSuccess}
+          onLoadingChange={setIsMpesaPaying}
+        />
+      </div>
     </>
   );
 }

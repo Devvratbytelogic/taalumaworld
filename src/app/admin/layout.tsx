@@ -10,6 +10,7 @@ import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { BlueprintScoringEventsBridge } from '@/components/admin/chapter/BlueprintScoringEventsBridge';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 
 const NAV_GROUPS: SidebarNavGroup[] = [
@@ -90,7 +91,12 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     const { hasAccess } = useAdminPermissions();
 
     if (pathname.startsWith(getMentorRoutePath())) {
-        return <>{children}</>;
+        return (
+            <>
+                <BlueprintScoringEventsBridge />
+                {children}
+            </>
+        );
     }
 
     const visibleNavGroups = NAV_GROUPS
@@ -107,6 +113,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
             className="min-h-screen bg-slate-50/80 admin_panel [--admin-header-height:6rem]"
             style={{ '--admin-sidebar-width': ADMIN_SIDEBAR_WIDTH } as React.CSSProperties}
         >
+            <BlueprintScoringEventsBridge />
             <AdminHeader profileData={profileData as IAdminProfileAPIResponse} onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
             <AdminSidebar
                 groups={visibleNavGroups}

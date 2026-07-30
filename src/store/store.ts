@@ -22,8 +22,10 @@ export const store = configureStore({
       // are opened via `openModal({ data: { onDelete/onRestore: () => ... } } })`,
       // which intentionally stores a callback function in the store's `data` field.
       serializableCheck: {
+        // Modal callbacks in openModal payload; FormData bodies in RTK Query mutations
+        // (create/update chapter, profile pic, etc.) live on meta.arg.
         ignoredActions: ['allCommonModal/openModal'],
-        ignoredActionPaths: ['payload.data'],
+        ignoredActionPaths: ['payload.data', 'meta.arg', 'meta.baseQueryMeta'],
         ignoredPaths: ['allModal.data'],
       },
     }).concat(rtkQuerieSetup.middleware),

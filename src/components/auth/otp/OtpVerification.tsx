@@ -18,10 +18,20 @@ export default function OtpVerification() {
     const dispatch = useDispatch();
     const router = useRouter();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-    const modalData = data 
+    const modalData = data
+    const onSuccess = modalData?.onSuccess
+    const onCancel = modalData?.onCancel
 
     const [userVerifyOtp, { isLoading: isVerifying }] = useUserVerifyOtpMutation();
     const [userResendOtp, { isLoading: isResending }] = useUserResendOtpMutation();
+
+    const handleCancel = () => {
+        if (typeof onCancel === 'function') {
+            onCancel();
+            return;
+        }
+        dispatch(closeModal());
+    };
 
     const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue, submitForm } = useFormik({
         initialValues: {
@@ -50,6 +60,9 @@ export default function OtpVerification() {
 
                         router.refresh()
                         dispatch(closeModal())
+                        if (typeof onSuccess === 'function') {
+                            onSuccess();
+                        }
                     } else {
                         dispatch(openModal({ componentName: 'ResetPassword', data: { email: modalData.email, code: formValues.code } }));
                     }
@@ -78,7 +91,7 @@ export default function OtpVerification() {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
+        <Modal isOpen={isOpen} onClose={handleCancel} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">

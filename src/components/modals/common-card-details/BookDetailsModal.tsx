@@ -29,7 +29,6 @@ export default function BookDetailsModal() {
     const dispatch = useDispatch();
     const router = useRouter();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-    const { isAuthenticated } = useAuth();
     const book = data?.chapter;
 
     const onClose = () => dispatch(closeModal());
@@ -37,9 +36,6 @@ export default function BookDetailsModal() {
     const displayPrice = book?.effectivePrice;
     const canAccessFull = book?.isFree || book?.canRead;
 
-    const openLogin = (action: string, itemType: string) => {
-        dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType } }));
-    };
 
     const viewFullDetails = () => {
         onClose();
@@ -176,20 +172,20 @@ export default function BookDetailsModal() {
                                 View Details
                             </Button>
 
-                            {isAuthenticated
-                                ? <AddToCartButton
-                                    id={book?.id}
-                                    type={VISIBLE.BOOK}
-                                    className="global_btn rounded_full bg_primary w-full"
-                                    label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
-                                />
-                                : <Button
-                                    className="global_btn rounded_full bg_primary w-full"
-                                    onPress={() => openLogin('cart', VISIBLE.BOOK)}
-                                    startContent={<ShoppingCart className="h-4 w-4" />}
-                                >
-                                    Add to Cart - KSH {displayPrice?.toFixed(2) ?? '0.00'}
-                                </Button>}
+                            <AddToCartButton
+                                id={book?.id}
+                                type={VISIBLE.BOOK}
+                                className="global_btn rounded_full bg_primary w-full"
+                                label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                                onLoginCancel={() =>
+                                    dispatch(
+                                        openModal({
+                                            componentName: 'BookDetailsModal',
+                                            data: { chapter: book, type: data?.type },
+                                        }),
+                                    )
+                                }
+                            />
                         </>
                     )}
                 </ModalFooter>

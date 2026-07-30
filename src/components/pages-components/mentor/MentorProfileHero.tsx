@@ -32,13 +32,12 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
 
   const mentorId = mentor?._id || mentor?.id || '';
 
-  const handleFollow = async () => {
-    if (!isAuthenticated) {
-      dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'follow', itemType: 'mentor' } }));
-      return;
-    }
-    if (!mentorId || isFollowing) return;
+  const openLogin = () => {
+    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'follow', itemType: 'mentor', onSuccess: handleFollow } }));
+  };
 
+  const handleFollow = async () => {
+    if (!mentorId || isFollowing) return;
     try {
       const res = await followMentor(mentorId).unwrap();
       setIsFollowing(true);
@@ -81,7 +80,7 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
               </h1>
 
               <Button
-                onPress={handleFollow}
+                onPress={isAuthenticated ? handleFollow : openLogin}
                 isLoading={isFollowingLoading}
                 isDisabled={isFollowing}
                 className={`global_btn rounded_full w_fit shrink-0 ${isFollowing ? 'outline_primary' : 'bg_primary'}`}

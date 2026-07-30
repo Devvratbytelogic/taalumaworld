@@ -1,12 +1,13 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import toast from '@/utils/toast'
 import { closeModal } from '@/store/slices/allModalSlice'
 import { useUserGoogleLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { setAuthCookies } from '@/utils/authCookies'
+import { RootState } from '@/store/store'
 
 interface GoogleAuthButtonProps {
     text?: 'signin_with' | 'signup_with'
@@ -18,6 +19,8 @@ export default function GoogleAuthButton({ text = 'signin_with', successMessage 
     const dispatch = useDispatch()
     const router = useRouter()
     const searchParams = useSearchParams()
+    const { data } = useSelector((state: RootState) => state.allModal)
+    const onSuccess = data?.onSuccess
     const referralCodeFromParams = searchParams.get('referralCode') ?? ''
     const [googleLogin, { isLoading }] = useUserGoogleLoginMutation()
 
@@ -40,6 +43,9 @@ export default function GoogleAuthButton({ text = 'signin_with', successMessage 
                 toast.success(res?.message ?? successMessage)
                 router.refresh()
                 dispatch(closeModal())
+                if (typeof onSuccess === 'function') {
+                    onSuccess()
+                }
             }
         } catch (error) {
             console.error('Google authentication failed. Please try again.', error)

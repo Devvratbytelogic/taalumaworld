@@ -29,12 +29,11 @@ export default function WishlistButton({
     const [addToWishlist, { isLoading: isAdding }] = useAddToWishlistMutation();
     const [removeFromWishlist, { isLoading: isRemoving }] = useRemoveFromWishlistMutation();
 
+    const openLogin = () => {
+        dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'wishlist', itemType: type, onSuccess: handleToggle } }));
+    };
+    
     const handleToggle = async () => {
-        if (!isAuthenticated) {
-            dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'wishlist', itemType: type } }));
-            return;
-        }
-
         try {
             if (wishlisted) {
                 await removeFromWishlist({wishlistItemId: itemId, type}).unwrap();
@@ -57,7 +56,7 @@ export default function WishlistButton({
         <div onClick={(e) => e.stopPropagation()}>
             <Button
                 isIconOnly
-                onPress={handleToggle}
+                onPress={isAuthenticated ? handleToggle : openLogin}
                 className={className}
                 isLoading={isAdding || isRemoving}
                 aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}

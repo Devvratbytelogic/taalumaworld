@@ -101,6 +101,12 @@ export default function SignUp() {
     const searchParams = useSearchParams()
     const referralCodeFromParams = searchParams.get('referralCode') ?? ''
     const { isOpen, componentName, data } = useSelector((state: RootState) => state.allModal)
+    const onSuccess = data?.onSuccess
+    const onCancel = data?.onCancel
+    const authCallbackData = {
+        ...(typeof onSuccess === 'function' ? { onSuccess } : {}),
+        ...(typeof onCancel === 'function' ? { onCancel } : {}),
+    }
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [profileImage, setProfileImage] = useState<File | null>(null)
@@ -116,6 +122,14 @@ export default function SignUp() {
             router.push(getMentorSignupRoutePath())
         }
     }, [isOpen, componentName, dispatch, router])
+
+    const handleCancel = () => {
+        if (typeof onCancel === 'function') {
+            onCancel()
+            return
+        }
+        dispatch(closeModal())
+    }
 
     const handleAvatarClick = () => fileInputRef.current?.click()
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,7 +211,15 @@ export default function SignUp() {
                     setProfilePreview(null)
                     rf()
                     toast.success(res.message ?? 'Account created! Please verify your email.')
-                    dispatch(openModal({ componentName: 'OtpVerification', data: { email: formValues.email, type: 'email_verification', through: 'login' } }))
+                    dispatch(openModal({
+                        componentName: 'OtpVerification',
+                        data: {
+                            email: formValues.email,
+                            type: 'email_verification',
+                            through: 'login',
+                            ...authCallbackData,
+                        },
+                    }))
                 }
             } catch {
                 console.error('Registration failed. Please try again.')
@@ -230,7 +252,7 @@ export default function SignUp() {
     return (
         <Modal
             isOpen={isOpen}
-            onClose={() => dispatch(closeModal())}
+            onClose={handleCancel}
             size="2xl"
             className="modal_container"
             scrollBehavior="inside"
@@ -598,7 +620,7 @@ export default function SignUp() {
                         <button
                             type="button"
                             className="font-medium text-primary hover:text-primary/80 transition-colors"
-                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: data ?? '' }))}
+                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: authCallbackData }))}
                             disabled={isSubmitting}
                         >
                             Sign In

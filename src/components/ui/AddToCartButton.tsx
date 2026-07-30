@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { useAddChapterToCartMutation } from '@/store/rtkQueries/userPostAPI';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
-import { closeModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useAuth } from '@/hooks/useAuth';
 import { getCartRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
@@ -19,6 +19,8 @@ interface AddToCartButtonProps {
     label?: string;
     goToCartLabel?: string;
     onSuccess?: () => void;
+    /** Called when user cancels the login-required modal (e.g. reopen chapter details). */
+    onLoginCancel?: () => void;
 }
 
 export default function AddToCartButton({
@@ -28,6 +30,7 @@ export default function AddToCartButton({
     label = 'Add to Cart',
     goToCartLabel = 'Go to Cart',
     onSuccess,
+    onLoginCancel,
 }: AddToCartButtonProps) {
     const dispatch = useDispatch();
     const router = useRouter();
@@ -36,13 +39,23 @@ export default function AddToCartButton({
     const { data: cartResponse } = useGetCartQuery(undefined, { skip: !isAuthenticated });
 
     const cartItems = cartResponse?.data?.[0]?.cart_item ?? [];
-    const isInCart = !!id && cartItems.some((item) =>
-        type === VISIBLE.CHAPTER ? item.chapter_id === id : item.book_id === id
-    );
+    const isInCart = !!id && cartItems.some((item) => type === VISIBLE.CHAPTER ? item.chapter_id === id : item.book_id === id);
 
     const handleGoToCart = () => {
         dispatch(closeModal());
         router.push(getCartRoutePath());
+    };
+
+    const openLogin = () => {
+        dispatch(openModal({
+            componentName: 'LoginRequiredModal',
+            data: {
+                action: 'cart',
+                itemType: type,
+                onSuccess: handleAddToCart,
+                ...(onLoginCancel ? { onCancel: onLoginCancel } : {}),
+            },
+        }));
     };
 
     const handleAddToCart = async () => {
@@ -57,7 +70,7 @@ export default function AddToCartButton({
                 onSuccess?.();
             }
         } catch (error) {
-           console.log('error adding to cart', error);
+            console.log('error adding to cart', error);
         }
     };
 
@@ -75,7 +88,7 @@ export default function AddToCartButton({
 
     return (
         <Button
-            onPress={handleAddToCart}
+            onPress={isAuthenticated ? handleAddToCart : openLogin}
             className={className}
             isLoading={isLoading}
             startContent={!isLoading && <ShoppingCart className="h-5 w-5" />}

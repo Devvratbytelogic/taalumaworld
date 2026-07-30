@@ -31,7 +31,7 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
   const resolvedPrice = displayPrice ?? data?.price ?? 0;
 
   const openLogin = (action: string) => {
-    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType: purchaseType } }));
+    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType: purchaseType, onSuccess: handleBuyNow } }));
   };
 
   const handleBuyNow = () => {
@@ -147,22 +147,13 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                     )}
                   </Button>
 
-                  {isAuthenticated ? (
                     <AddToCartButton
                       id={purchaseId}
                       type={purchaseType}
                       className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
                       label="Add to Cart"
                     />
-                  ) : (
-                    <Button
-                      className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
-                      onPress={() => openLogin('cart')}
-                      startContent={<ShoppingCart className="h-4 w-4" />}
-                    >
-                      Add to Cart
-                    </Button>
-                  )}
+                 
                 </div>
               )}
 

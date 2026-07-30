@@ -10,7 +10,6 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
-import { useAuth } from '@/hooks/useAuth';
 import { getBlueprintRoutePath, getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
@@ -28,7 +27,6 @@ export default function ChapterDetailsModal() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-  const { isAuthenticated } = useAuth();
   const chapter = data?.chapter
 
   const onClose = () => dispatch(closeModal());
@@ -42,11 +40,6 @@ export default function ChapterDetailsModal() {
   const displayPrice = isBook
     ? (chapter?.effectivePrice)
     : (isPricingModelChapter ? chapter?.effectivePrice : chapter?.series?.effectivePrice)
-
-
-  const openLogin = (action: string, itemType: string) => {
-    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType } }));
-  };
 
   const viewFullDetails = () => {
     dispatch(closeModal());
@@ -238,20 +231,20 @@ export default function ChapterDetailsModal() {
                 View Details
               </Button>
 
-              {isAuthenticated
-                ? <AddToCartButton
-                  id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
-                  type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
-                  className="global_btn rounded_full bg_primary w-full"
-                  label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
-                />
-                : <Button
-                  className="global_btn rounded_full bg_primary w-full"
-                  onPress={() => openLogin('cart', isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK)}
-                  startContent={<ShoppingCart className="h-4 w-4" />}
-                >
-                  Add to Cart - KSH {displayPrice?.toFixed(2) ?? '0.00'}
-                </Button>}
+              <AddToCartButton
+                id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
+                type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
+                className="global_btn rounded_full bg_primary w-full"
+                label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                onLoginCancel={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'ChapterDetailsModal',
+                      data: { chapter: chapter, type: data?.type },
+                    }),
+                  )
+                }
+              />
             </>
           )}
         </ModalFooter>

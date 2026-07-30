@@ -23,8 +23,30 @@ export default function SignIn() {
     const [showPassword, setShowPassword] = useState(false)
     const dispatch = useDispatch()
     const router = useRouter()
-    const { isOpen } = useSelector((state: RootState) => state.allModal)
+    const { isOpen, data } = useSelector((state: RootState) => state.allModal)
+    const onSuccess = data?.onSuccess
+    const onCancel = data?.onCancel
     const [userLogin, { isLoading: userLoginLoading }] = useUserLoginMutation()
+
+    const authCallbackData = {
+        ...(typeof onSuccess === 'function' ? { onSuccess } : {}),
+        ...(typeof onCancel === 'function' ? { onCancel } : {}),
+    }
+
+    const handleCancel = () => {
+        if (typeof onCancel === 'function') {
+            onCancel()
+            return
+        }
+        dispatch(closeModal())
+    }
+
+    const handleAuthSuccess = () => {
+        dispatch(closeModal())
+        if (typeof onSuccess === 'function') {
+            onSuccess()
+        }
+    }
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: { email: '', password: '' },
@@ -37,7 +59,15 @@ export default function SignIn() {
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res?.message ?? 'Sign in successful!')
                     if (res?.data?.requires_email_verification) {
-                        dispatch(openModal({ componentName: 'OtpVerification', data: { email: vals.email, type: 'email_verification', through: 'login' } }))
+                        dispatch(openModal({
+                            componentName: 'OtpVerification',
+                            data: {
+                                email: vals.email,
+                                type: 'email_verification',
+                                through: 'login',
+                                ...authCallbackData,
+                            },
+                        }))
                     } else {
                         setAuthCookies({
                             token: res?.data?.token ?? '',
@@ -45,7 +75,7 @@ export default function SignIn() {
                             role: res?.data?.role?.name ?? '',
                         })
                         router.refresh()
-                        dispatch(closeModal())
+                        handleAuthSuccess()
                     }
                 }
 
@@ -56,7 +86,7 @@ export default function SignIn() {
     })
 
     return (
-        <Modal isOpen={isOpen} onClose={() => dispatch(closeModal())} className="modal_container">
+        <Modal isOpen={isOpen} onClose={handleCancel} className="modal_container">
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">Sign In</p>
@@ -147,7 +177,7 @@ export default function SignIn() {
                             <button
                                 type="button"
                                 className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                                onClick={() => dispatch(openModal({ componentName: 'SignUp', data: authCallbackData }))}
                                 disabled={isSubmitting}
                             >
                                 Sign Up

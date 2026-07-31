@@ -284,45 +284,47 @@ export function AdminBooksTab() {
           >
             <Eye className="h-4 w-4" />
           </button>
-          {isTrashView ? (
-            <button
-              type="button"
-              className="active_button"
-              title="Restore series"
-              onClick={() => dispatch(openModal({
-                componentName: 'RestoreConfirmation',
-                data: {
-                  itemName: params.row.title,
-                  onRestore: () => onRestoreBook(params.row._id),
-                },
-              }))}
-            >
-              <RotateCcw className="h-4 w-4" />
-            </button>
-          ) : (
-            <>
+         {params.row.isMine && <>
+            {isTrashView ? (
               <button
                 type="button"
-                className="edit_button"
-                onClick={() => setEditingBook(params.row)}
-              >
-                <Edit2 className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                className="delete_button"
+                className="active_button"
+                title="Restore series"
                 onClick={() => dispatch(openModal({
-                  componentName: 'DeleteConfirmation',
+                  componentName: 'RestoreConfirmation',
                   data: {
                     itemName: params.row.title,
-                    onDelete: () => onDeleteBook(params.row._id),
+                    onRestore: () => onRestoreBook(params.row._id),
                   },
                 }))}
               >
-                <Trash2 className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4" />
               </button>
-            </>
-          )}
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="edit_button"
+                  onClick={() => setEditingBook(params.row)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  className="delete_button"
+                  onClick={() => dispatch(openModal({
+                    componentName: 'DeleteConfirmation',
+                    data: {
+                      itemName: params.row.title,
+                      onDelete: () => onDeleteBook(params.row._id),
+                    },
+                  }))}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </>
+            )}
+          </>}
         </div>
       ),
     },

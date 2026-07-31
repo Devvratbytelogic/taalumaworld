@@ -84,7 +84,7 @@ export default function AdminDashboardTab() {
 
   const stats: StatCard[] = [
     {
-      title: 'Total users',
+      title: 'Total customers',
       value: (statsData?.total_users ?? 0).toLocaleString(),
       icon: Users,
       color: 'blue',

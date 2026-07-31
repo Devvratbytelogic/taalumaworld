@@ -43,12 +43,13 @@ import { IAllOrdersAPIResponse } from '@/types/user/allOrders';
 import { ISingleOrderAPIResponse } from '@/types/order';
 
 export interface IGetAllChaptersParams {
-    categoryId?: string | null;
-    thoughtLeaderId?: string | null;
-    tags?: string | null;
-    readingProgress?: string | null;
     page?: number;
     limit?: number;
+    search?: string | null;
+    isFree?: boolean | null;
+    isPurchased?: boolean | null;
+    mentorId?: string | null;
+    tags?: string | null;
 }
 
 export interface IGetMyChaptersParams {

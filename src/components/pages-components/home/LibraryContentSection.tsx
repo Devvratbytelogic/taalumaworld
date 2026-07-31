@@ -1,38 +1,54 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CommonCard from '@/components/cards/CommonCard';
-import FilterOptions from './FilterOptions';
+import FilterOptions, { type LibraryFilters } from './FilterOptions';
 import { useGetAllChaptersQuery } from '@/store/rtkQueries/userGetAPI';
 import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryContentSectionSkeleton';
 import NoDataFound from '@/components/ui/NoDataFound';
 import Button from '@/components/ui/Button';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useAuth } from '@/hooks/useAuth';
 
 const PAGE_LIMIT = 8;
 
+const EMPTY_FILTERS: LibraryFilters = {
+    isFree: false,
+    isPurchased: false,
+    mentorId: null,
+    tags: [],
+};
+
 export default function LibraryContentSection() {
-    const searchParams = useSearchParams();
     const [page, setPage] = useState(1);
+    const [search, setSearch] = useState('');
+    const [filters, setFilters] = useState<LibraryFilters>(EMPTY_FILTERS);
     const sectionRef = useRef<HTMLElement>(null);
     const isFirstPageRender = useRef(true);
+    const { isAuthenticated } = useAuth();
 
-    const categoryId = searchParams.get('categoryId') ?? undefined;
-    const thoughtLeaderId = searchParams.get('thoughtLeaderId') ?? undefined;
-    const tags = searchParams.get('tags') ?? undefined;
-    const readingProgress = searchParams.get('readingProgress') ?? undefined;
+    const debouncedSearch = useDebounce(search, 400);
+    const tagsKey = filters.tags.join(',');
+
+    // Drop purchased filter if the user logs out while it was active.
+    useEffect(() => {
+        if (!isAuthenticated && filters.isPurchased) {
+            setFilters((prev) => ({ ...prev, isPurchased: false }));
+        }
+    }, [isAuthenticated, filters.isPurchased]);
 
     useEffect(() => {
         setPage(1);
-    }, [categoryId, thoughtLeaderId, tags, readingProgress]);
+    }, [debouncedSearch, filters.isFree, filters.isPurchased, filters.mentorId, tagsKey]);
 
     const { data, isLoading, isFetching } = useGetAllChaptersQuery({
-        categoryId,
-        thoughtLeaderId,
-        tags,
-        readingProgress,
         page,
         limit: PAGE_LIMIT,
+        ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+        ...(filters.isFree ? { isFree: true } : {}),
+        ...(isAuthenticated && filters.isPurchased ? { isPurchased: true } : {}),
+        ...(filters.mentorId ? { mentorId: filters.mentorId } : {}),
+        ...(filters.tags.length > 0 ? { tags: filters.tags.join(',') } : {}),
     });
     const chapters = data?.data?.items;
     const total = data?.data?.total ?? 0;
@@ -56,7 +72,14 @@ export default function LibraryContentSection() {
         <>
             <section ref={sectionRef} className="container scroll-mt-24">
                 <div className="flex items-center justify-between mb-6">
-                    <FilterOptions total={total} viewMode={viewMode} />
+                    <FilterOptions
+                        total={total}
+                        viewMode={viewMode}
+                        filters={filters}
+                        search={search}
+                        onSearchChange={setSearch}
+                        onFiltersChange={setFilters}
+                    />
                 </div>
 
                 <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ${isFetching ? 'opacity-60' : ''}`}>

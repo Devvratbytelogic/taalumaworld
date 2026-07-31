@@ -42,7 +42,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     {
         title: 'Mentor Management',
         items: [
-            { model: 'Mentor', id: 'mentors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
+            { model: 'Mentors', id: 'mentors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
             { model: 'Mentor Application', id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
             { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
             { model: 'Mentor Verification', id: 'mentor_verification', label: 'Mentor Verification', href: getAdminSectionRoutePath('mentor_verification'), icon: ShieldCheck },
@@ -89,6 +89,9 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { data: profileData } = useGetAdminProfileQuery();
     const { hasAccess } = useAdminPermissions();
+    console.log('hasAccess', hasAccess());
+    console.log('profileData', profileData);
+
 
     if (pathname.startsWith(getMentorRoutePath())) {
         return (

@@ -11,7 +11,6 @@ import { RootState } from '@/store/store';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useUserVerifyOtpMutation, useUserResendOtpMutation } from '@/store/rtkQueries/userAuthApi';
 import { setAuthCookies } from '@/utils/authCookies';
-import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import toast from '@/utils/toast';
 
 export default function OtpVerification() {

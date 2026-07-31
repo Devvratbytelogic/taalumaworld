@@ -16,13 +16,39 @@ export interface AuthResponseData {
 
 /**
  * Store auth token, user id and role in cookies after successful login.
- * Dispatches auth-changed so hooks (e.g. useAuth + profile query) refresh.
+ * Dispatches auth-changed so hooks (e.g. useAuth + profile query) refresh,
+ * and invalidates RTK Query tags that depend on auth (e.g. purchase state on /user/content).
  */
+
+/** Tags whose responses differ for guest vs authenticated users. */
+const AUTH_DEPENDENT_TAGS = [
+    'AllChapters',
+    'SingleChapter',
+    'Cart',
+    'MyChapters',
+    'Wishlist',
+    'UserProfile',
+    'FollowedMentors',
+    'ReadingHistory',
+    'UserOrders',
+    'Address',
+    'ReferralWalletLedger',
+] as const
 
 function dispatchAuthChanged(): void {
     if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('auth-changed'))
     }
+}
+
+/** Refetch mounted queries that were cached before login/logout. Dynamic import avoids a cycle with rtkQuerieSetup → authCookies. */
+function invalidateAuthDependentQueries(): void {
+    if (typeof window === 'undefined') return
+    void import('@/store/store').then(({ store }) => {
+        void import('@/store/services/rtkQuerieSetup').then(({ rtkQuerieSetup }) => {
+            store.dispatch(rtkQuerieSetup.util.invalidateTags([...AUTH_DEPENDENT_TAGS]))
+        })
+    })
 }
 
 export function setAuthCookies(data: AuthResponseData): void {
@@ -45,6 +71,7 @@ export function setAuthCookies(data: AuthResponseData): void {
     }
 
     dispatchAuthChanged()
+    invalidateAuthDependentQueries()
 }
 
 export function getAuthToken(): string | undefined {
@@ -74,6 +101,7 @@ export function clearAuthCookies(): void {
     Cookies.remove('user_role', { path: '/' })
     Cookies.remove('user_email', { path: '/' })
     dispatchAuthChanged()
+    invalidateAuthDependentQueries()
 }
 
 /** Clear all cookies for the current domain and reload the page (e.g. after logout). */

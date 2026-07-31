@@ -12,14 +12,14 @@ type Tab = 'roles' | 'permissions' | 'staff';
 
 const TABS: { model: string; id: Tab; label: string; icon: React.ElementType; description: string }[] = [
   {
-    model: 'Role',
+    model: 'Roles',
     id: 'roles',
     label: 'Roles Registry',
     icon: Shield,
     description: 'Create, edit, and delete roles',
   },
   {
-    model: 'Permission',
+    model: 'Permissions',
     id: 'permissions',
     label: 'Permissions Matrix',
     icon: Grid3X3,

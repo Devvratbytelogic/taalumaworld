@@ -18,23 +18,23 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'System',
         items: [
             { id: 'dashboard', label: 'Dashboard', href: getAdminDashboardRoutePath(), icon: LayoutDashboard },
-            { model: 'Role', submodel: ['Permission', 'Staff'], id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
+            { model: 'Roles', submodel: ['Permissions', 'Staff'], id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
         ],
     },
     {
         title: 'Commerce',
         items: [
-            { model: 'Order', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
-            { model: 'Transaction', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
+            { model: 'Orders', id: 'orders', label: 'Orders', href: getAdminSectionRoutePath('orders'), icon: ShoppingBag },
+            { model: 'Transactions', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
             { model: 'Coupon', id: 'coupons', label: 'Coupons', href: getAdminSectionRoutePath('coupons'), icon: Tag },
-            { model: 'Tax', id: 'taxes', label: 'Taxes', href: getAdminSectionRoutePath('taxes'), icon: Percent },
+            { model: 'Taxes', id: 'taxes', label: 'Taxes', href: getAdminSectionRoutePath('taxes'), icon: Percent },
             { model: 'Withdrawal', id: 'withdrawal_requests', label: 'Withdrawals', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
         ],
     },
     {
         title: 'User Management',
         items: [
-            { model: 'User', id: 'users', label: 'Customers', href: getAdminSectionRoutePath('users'), icon: UserCircle },
+            { model: 'Users', id: 'users', label: 'Customers', href: getAdminSectionRoutePath('users'), icon: UserCircle },
             { model: 'Staff', id: 'staff', label: 'Staff', href: getAdminSectionRoutePath('staff'), icon: UserCog },
             { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],
@@ -54,15 +54,15 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'Content Management',
         items: [
             { model: 'Series', id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
-            { model: 'Blueprint', id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
+            { model: 'Blueprints', id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
             { model: 'Reviews', id: 'reviews', label: 'Reviews', href: getAdminSectionRoutePath('reviews'), icon: Star },
         ],
     },
     {
         title: 'Legal',
         items: [
-            { model: 'Agreement Type', id: 'agreement_types', label: 'Agreement Types', href: getAdminSectionRoutePath('agreement_types'), icon: FolderTree },
-            { model: 'Agreement', id: 'agreements', label: 'Agreements', href: getAdminSectionRoutePath('agreements'), icon: FileSignature },
+            { model: 'Agreement Types', id: 'agreement_types', label: 'Agreement Types', href: getAdminSectionRoutePath('agreement_types'), icon: FolderTree },
+            { model: 'Agreements', id: 'agreements', label: 'Agreements', href: getAdminSectionRoutePath('agreements'), icon: FileSignature },
         ],
     },
     {
@@ -71,7 +71,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Testimonial', id: 'testimonials', label: 'Testimonials', href: getAdminSectionRoutePath('testimonials'), icon: MessageSquare },
             { model: 'FAQs', id: 'faqs', label: 'FAQs', href: getAdminSectionRoutePath('faqs'), icon: FileEdit },
             { model: 'Contact Us', id: 'contact_us', label: 'Help & Trust Center', href: getAdminSectionRoutePath('contact_us'), icon: Mail },
-            { model: 'Subscriber', id: 'subscribers', label: 'Subscribers', href: getAdminSectionRoutePath('subscribers'), icon: Bell },
+            { model: 'Subscribers', id: 'subscribers', label: 'Subscribers', href: getAdminSectionRoutePath('subscribers'), icon: Bell },
         ],
     },
     {
@@ -89,8 +89,7 @@ export default function AdminPanelLayout({ children }: { children: React.ReactNo
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { data: profileData } = useGetAdminProfileQuery();
     const { hasAccess } = useAdminPermissions();
-    console.log('hasAccess', hasAccess());
-    console.log('profileData', profileData);
+
 
 
     if (pathname.startsWith(getMentorRoutePath())) {

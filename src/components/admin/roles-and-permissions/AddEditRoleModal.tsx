@@ -29,7 +29,7 @@ export function AddEditRoleModal() {
         initialValues: {
             name: role?.name ?? '',
             description: role?.description ?? '',
-            number_of_users: role?.number_of_users ?? 0,
+            number_of_users: role?.number_of_users ?? 1,
         },
         validationSchema: roleSchema,
         onSubmit: async (formValues) => {
@@ -105,21 +105,21 @@ export function AddEditRoleModal() {
                         </div>
                         <div>
                             <label className={labelCls} htmlFor="number_of_users">
-                                Number of Users
+                                Number of Users <span className="text-red-500">*</span>
                             </label>
                             <input
                                 id="number_of_users"
                                 name="number_of_users"
                                 type="number"
-                                min={0}
+                                min={1}
                                 className={inputCls}
                                 value={values.number_of_users}
                                 onChange={(e) => {
                                     const val = e.target.value;
-                                    setFieldValue('number_of_users', val === '' ? 0 : Number(val));
+                                    setFieldValue('number_of_users', val === '' ? '' : Number(val));
                                 }}
                                 onBlur={handleBlur}
-                                placeholder="0"
+                                placeholder="1"
                             />
                             {touched.number_of_users && errors.number_of_users && typeof errors.number_of_users === 'string' ? (
                                 <p className="mt-1 text-sm text-red-600">{errors.number_of_users}</p>

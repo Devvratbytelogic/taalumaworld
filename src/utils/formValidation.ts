@@ -560,9 +560,10 @@ export const roleSchema = Yup.object({
   name: Yup.string().trim().required('Role name is required'),
   description: Yup.string().trim(),
   number_of_users: Yup.number()
-    .transform((v) => (v === '' || v == null ? 0 : Number(v)))
+    .transform((v) => (v === '' || v == null || Number.isNaN(Number(v)) ? undefined : Number(v)))
     .integer('Must be a whole number')
-    .min(0, 'Number of users cannot be negative'),
+    .min(1, 'Number of users must be at least 1')
+    .required('Number of users is required'),
 });
 
 export const staffStatusSchema = Yup.object({

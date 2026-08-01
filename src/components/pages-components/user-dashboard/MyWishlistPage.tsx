@@ -145,7 +145,6 @@ export function MyWishlistPage() {
                       <WishlistButton
                         itemId={item.item_id}
                         type={item.type}
-                        isWishlisted={true}
                         className="absolute right-2 top-2 z-2 h-8! w-8! min-w-8! rounded-full border border-gray-200 bg-white/95 p-0! shadow-sm backdrop-blur-sm"
                       />
                     </div>

@@ -2,9 +2,9 @@ import NormalBanner from '@/components/banners/NormalBanner'
 import FaqSearch from '@/components/search/FaqSearch'
 import { faqBannerData } from '@/data/data'
 import React from 'react'
+import { ISR_REVALIDATE_SECONDS } from '@/constants/isr'
 
-/** ISR: regenerate at most every 5 minutes */
-export const revalidate = 300;
+export const revalidate = ISR_REVALIDATE_SECONDS;
 
 export default function FAQPage() {
     return (

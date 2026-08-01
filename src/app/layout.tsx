@@ -6,9 +6,10 @@ import ConditionalSiteLayout from "@/components/layout/ConditionalSiteLayout";
 import { ContentProtection } from "@/components/ContentProtection";
 import Script from "next/script";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
+import { ISR_REVALIDATE_SECONDS } from "@/constants/isr";
 
 /** Shared ISR window for public layout data (global settings). */
-export const revalidate = 300;
+export const revalidate = ISR_REVALIDATE_SECONDS;
 
 const roboto = Roboto({
   variable: "--font-roboto",

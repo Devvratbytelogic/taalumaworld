@@ -9,9 +9,9 @@ import WhatIsABlueprint from '@/components/pages-components/home/WhatIsABlueprin
 import CareerArchitectSection from '@/components/pages-components/home/CareerArchitectSection';
 import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
+import { ISR_REVALIDATE_SECONDS } from '@/constants/isr';
 
-/** ISR: regenerate home at most every 5 minutes */
-export const revalidate = 300;
+export const revalidate = ISR_REVALIDATE_SECONDS;
 
 export default async function HomePage() {
   const globalSettingsRes = await getGlobalSettingsServerAPI()

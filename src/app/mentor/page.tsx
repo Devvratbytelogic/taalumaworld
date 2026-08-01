@@ -5,9 +5,9 @@ import Button from '@/components/ui/Button';
 import MentorsDirectory from '@/components/pages-components/mentor/MentorsDirectory';
 import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
 import { getMentorSignupRoutePath } from '@/routes/routes';
+import { ISR_REVALIDATE_SECONDS } from '@/constants/isr';
 
-/** ISR: regenerate at most every 5 minutes */
-export const revalidate = 300;
+export const revalidate = ISR_REVALIDATE_SECONDS;
 
 export const metadata: Metadata = {
     title: 'Meet Our Mentors | TaalumaWorld',

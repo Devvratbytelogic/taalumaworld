@@ -1,7 +1,7 @@
 import ContactUsContent from '@/components/pages-components/contact/ContactUsContent'
+import { ISR_REVALIDATE_SECONDS } from '@/constants/isr'
 
-/** ISR: regenerate at most every 5 minutes */
-export const revalidate = 300;
+export const revalidate = ISR_REVALIDATE_SECONDS;
 
 export default function ContactUsPage() {
     return <ContactUsContent />

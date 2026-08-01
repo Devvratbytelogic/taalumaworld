@@ -1,7 +1,7 @@
 'use client';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { BadgeCheck, BookOpen, Eye, Lock, ShoppingCart, Tag, User } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';

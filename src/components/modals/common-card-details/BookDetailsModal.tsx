@@ -1,7 +1,7 @@
 'use client';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { BadgeCheck, BookOpen, Eye, ShoppingCart, Tag, User } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,6 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
-import { useAuth } from '@/hooks/useAuth';
 import { VISIBLE } from '@/constants/contentMode';
 import { getSeriesRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';

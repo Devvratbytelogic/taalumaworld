@@ -8,9 +8,8 @@ import BlueprintShowcase from '@/components/pages-components/about/BlueprintShow
 import CommonCTA from '@/components/cta/CommonCTA';
 import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
-import { ISR_REVALIDATE_SECONDS } from '@/constants/isr';
 
-export const revalidate = ISR_REVALIDATE_SECONDS;
+export const revalidate = 60;
 
 export default async function WhyTaalumaExistsPage() {
     const globalSettingsRes = await getGlobalSettingsServerAPI();

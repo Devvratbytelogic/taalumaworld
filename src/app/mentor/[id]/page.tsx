@@ -3,9 +3,8 @@ import { Suspense } from 'react';
 import MentorProfileHero from '@/components/pages-components/mentor/MentorProfileHero';
 import MentorBooksSection from '@/components/pages-components/mentor/MentorBooksSection';
 import { getAllMentorsServerAPI, getMentorDetailsServerAPI } from '@/store/server-api/serverSideAPIs';
-import { ISR_REVALIDATE_SECONDS } from '@/constants/isr';
 
-export const revalidate = ISR_REVALIDATE_SECONDS;
+export const revalidate = 60;
 export const dynamicParams = true;
 
 const PAGE_LIMIT = 8;

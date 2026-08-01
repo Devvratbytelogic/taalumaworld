@@ -7,7 +7,6 @@ import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
 import { IAgreementAPIResponse } from '@/types/user/agreement';
-import { ISR_REVALIDATE_SECONDS } from '@/constants/isr';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -29,7 +28,7 @@ async function getHeaders() {
 /** Cookie-free fetch for public ISR pages (no auth / user-specific headers). */
 export async function publicFetch<T>(
   path: string,
-  revalidate: number = ISR_REVALIDATE_SECONDS
+  revalidate: number = 60
 ): Promise<T | null> {
   try {
     const urlString = `${API_BASE_URL}${path}`;

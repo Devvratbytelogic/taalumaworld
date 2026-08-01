@@ -7,9 +7,15 @@ interface AdminCouponsHeaderProps {
   isTrashView: boolean;
   onToggleTrash: () => void;
   onCreateCoupon: () => void;
+  canAdd?: boolean;
 }
 
-export function AdminCouponsHeader({ isTrashView, onToggleTrash, onCreateCoupon }: AdminCouponsHeaderProps) {
+export function AdminCouponsHeader({
+  isTrashView,
+  onToggleTrash,
+  onCreateCoupon,
+  canAdd = true,
+}: AdminCouponsHeaderProps) {
   return (
     <AdminPageHeader
       eyebrow="Commerce"
@@ -27,7 +33,7 @@ export function AdminCouponsHeader({ isTrashView, onToggleTrash, onCreateCoupon 
       >
         {isTrashView ? 'Back to coupons' : 'Trash'}
       </Button>
-      {!isTrashView ? (
+      {!isTrashView && canAdd ? (
         <Button className="global_btn rounded_full bg_primary" onPress={onCreateCoupon} startContent={<Plus className="h-4 w-4" />}>
           Add coupon
         </Button>

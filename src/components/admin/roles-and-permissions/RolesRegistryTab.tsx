@@ -10,8 +10,11 @@ import { AdminSearchInput, AdminSearchPanel } from '@/components/admin/layout/Ad
 import Button from '@/components/ui/Button';
 import { USER_TYPE } from '@/constants/common';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { cn } from '@/components/ui/utils';
 import CommonDataTable from '../CommonDataTable';
+
+const ROLES_MODEL = 'Roles';
 
 const PROTECTED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
 
@@ -23,6 +26,9 @@ export function RolesRegistryTab() {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const { hasPermission } = useAdminPermissions();
+    const canAdd = hasPermission(ROLES_MODEL, 'add');
+    const canEdit = hasPermission(ROLES_MODEL, 'edit');
     const debouncedSearch = useDebounce(search, 500);
     const { data: res, isLoading } = useGetAllRolesQuery({
         page: paginationModel.page + 1,
@@ -112,6 +118,7 @@ export function RolesRegistryTab() {
             width: 150,
             sortable: false,
             renderCell: (params) => {
+                if (!canEdit) return null;
                 const protectedRole = isProtectedRole(params.row.name);
                 return (
                     <div className="action_buttons">
@@ -145,13 +152,15 @@ export function RolesRegistryTab() {
                         value={search}
                         onChange={setSearch}
                     />
-                    <Button
-                        className="global_btn rounded_full bg_primary lg:shrink-0"
-                        onPress={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: null } }))}
-                        startContent={<Plus className="h-4 w-4" />}
-                    >
-                        Create Role
-                    </Button>
+                    {canAdd ? (
+                        <Button
+                            className="global_btn rounded_full bg_primary lg:shrink-0"
+                            onPress={() => dispatch(openModal({ componentName: 'AddEditRoleModal', data: { role: null } }))}
+                            startContent={<Plus className="h-4 w-4" />}
+                        >
+                            Create Role
+                        </Button>
+                    ) : null}
                 </div>
             </AdminSearchPanel>
 

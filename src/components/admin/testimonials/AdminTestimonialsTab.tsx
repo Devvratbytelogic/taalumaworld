@@ -20,6 +20,9 @@ import { AdminTestimonialsSearch } from './AdminTestimonialsSearch';
 import { TestimonialForm } from './TestimonialForm';
 import { StarRating } from './StarRating';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const TESTIMONIAL_MODEL = 'Testimonial';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -31,6 +34,12 @@ export function AdminTestimonialsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const { hasPermission } = useAdminPermissions();
+
+  const canAdd = hasPermission(TESTIMONIAL_MODEL, 'add');
+  const canEdit = hasPermission(TESTIMONIAL_MODEL, 'edit');
+  const canDelete = hasPermission(TESTIMONIAL_MODEL, 'delete');
+
   const debouncedSearch = useDebounce(searchQuery, 500);
   const queryParams = {
     page: paginationModel.page + 1,
@@ -162,32 +171,39 @@ export function AdminTestimonialsTab() {
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="edit_button"
-            title="Edit testimonial"
-            onClick={() => { setEditingId(params.row._id); setShowAddForm(false); }}
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className="delete_button"
-            title="Delete testimonial"
-            onClick={() => dispatch(openModal({
-              componentName: 'DeleteConfirmation',
-              data: {
-                itemName: params.row.name,
-                onDelete: () => onDeleteTestimonial(params.row._id),
-              },
-            }))}
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canEdit && !canDelete) return null;
+        return (
+          <div className="action_buttons">
+            {canEdit ? (
+              <button
+                type="button"
+                className="edit_button"
+                title="Edit testimonial"
+                onClick={() => { setEditingId(params.row._id); setShowAddForm(false); }}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                className="delete_button"
+                title="Delete testimonial"
+                onClick={() => dispatch(openModal({
+                  componentName: 'DeleteConfirmation',
+                  data: {
+                    itemName: params.row.name,
+                    onDelete: () => onDeleteTestimonial(params.row._id),
+                  },
+                }))}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
+        );
+      },
     },
   ];
 
@@ -195,10 +211,11 @@ export function AdminTestimonialsTab() {
     <div className="space-y-6">
       <AdminTestimonialsHeader
         totalCount={totalTestimonials}
+        canAdd={canAdd}
         onAddTestimonial={() => { setShowAddForm(true); setEditingId(null); }}
       />
 
-      {(showAddForm || editingTestimonial) && (
+      {((canAdd && showAddForm) || (canEdit && editingTestimonial)) && (
         <TestimonialForm
           initial={editingTestimonial ?? undefined}
           isLoading={editingTestimonial ? isUpdating : isAdding}

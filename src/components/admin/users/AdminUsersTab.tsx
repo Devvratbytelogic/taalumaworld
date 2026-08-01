@@ -24,6 +24,9 @@ import {
   useGeneratePasswordResetLinkMutation,
 } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const USERS_MODEL = 'Users';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -37,6 +40,11 @@ export function AdminUsersTab() {
   const [suspendUser, setSuspendUser] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canView = hasPermission(USERS_MODEL, 'view');
+  const canEdit = hasPermission(USERS_MODEL, 'edit');
+  const canDelete = hasPermission(USERS_MODEL, 'delete');
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -207,45 +215,54 @@ export function AdminUsersTab() {
       renderCell: (params) => {
         const isSuspended = params.row.status === 'suspended';
         const isResetting = resettingPasswordId === params.row._id;
+        if (!canView && !canEdit && !canDelete) return null;
         return (
           <div className="action_buttons">
-            <button
-              type="button"
-              className="active_button"
-              title="View profile"
-              onClick={() => handleViewProfile(params.row)}
-            >
-              <Eye className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              className="edit_button"
-              title="Edit customer"
-              onClick={() => handleEditUser(params.row)}
-            >
-              <Edit2 className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              className="warning_button"
-              title="Reset password"
-              disabled={!!resettingPasswordId}
-              onClick={() => handleResetPassword(params.row)}
-            >
-              {isResetting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <KeyRound className="h-4 w-4" />
-              )}
-            </button>
-            <button
-              type="button"
-              className={isSuspended ? 'active_button' : 'delete_button'}
-              title={isSuspended ? 'Activate customer' : 'Suspend customer'}
-              onClick={() => handleSuspend(params.row)}
-            >
-              {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
-            </button>
+            {canView ? (
+              <button
+                type="button"
+                className="active_button"
+                title="View profile"
+                onClick={() => handleViewProfile(params.row)}
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canEdit ? (
+              <button
+                type="button"
+                className="edit_button"
+                title="Edit customer"
+                onClick={() => handleEditUser(params.row)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canEdit ? (
+              <button
+                type="button"
+                className="warning_button"
+                title="Reset password"
+                disabled={!!resettingPasswordId}
+                onClick={() => handleResetPassword(params.row)}
+              >
+                {isResetting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <KeyRound className="h-4 w-4" />
+                )}
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                className={isSuspended ? 'active_button' : 'delete_button'}
+                title={isSuspended ? 'Activate customer' : 'Suspend customer'}
+                onClick={() => handleSuspend(params.row)}
+              >
+                {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+              </button>
+            ) : null}
           </div>
         );
       },
@@ -271,26 +288,32 @@ export function AdminUsersTab() {
         />
       </div>
 
-      <ViewProfileModal
-        user={profileUser}
-        open={!!profileUser}
-        onOpenChange={(open) => !open && setProfileUser(null)}
-        onSuspend={handleSuspendFromProfile}
-      />
+      {canView ? (
+        <ViewProfileModal
+          user={profileUser}
+          open={!!profileUser}
+          onOpenChange={(open) => !open && setProfileUser(null)}
+          onSuspend={canDelete ? handleSuspendFromProfile : undefined}
+        />
+      ) : null}
 
-      <EditUserModal
-        user={editUser}
-        open={!!editUser}
-        onOpenChange={(open) => !open && setEditUser(null)}
-      />
+      {canEdit ? (
+        <EditUserModal
+          user={editUser}
+          open={!!editUser}
+          onOpenChange={(open) => !open && setEditUser(null)}
+        />
+      ) : null}
 
-      <SuspendUserDialog
-        user={suspendUser}
-        open={!!suspendUser}
-        onOpenChange={(open) => !open && setSuspendUser(null)}
-        onConfirm={confirmSuspend}
-        isLoading={isSuspending}
-      />
+      {canDelete ? (
+        <SuspendUserDialog
+          user={suspendUser}
+          open={!!suspendUser}
+          onOpenChange={(open) => !open && setSuspendUser(null)}
+          onConfirm={confirmSuspend}
+          isLoading={isSuspending}
+        />
+      ) : null}
     </div>
   );
 }

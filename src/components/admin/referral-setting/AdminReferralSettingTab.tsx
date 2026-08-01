@@ -15,11 +15,16 @@ import {
   useAddUpdateAffiliateReferalMutation,
   useGetAffiliateReferalQuery,
 } from '@/store/rtkQueries/affiliateReferralApis';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import toast from '@/utils/toast';
+
+const REFERRAL_SETTING_MODEL = 'Referral Setting';
 
 export function AdminReferralSettingTab() {
   const { data: res, isLoading } = useGetAffiliateReferalQuery();
   const [saveReferral, { isLoading: isSaving }] = useAddUpdateAffiliateReferalMutation();
+  const { hasPermission } = useAdminPermissions();
+  const canEdit = hasPermission(REFERRAL_SETTING_MODEL, 'edit');
 
   const [referalType, setReferalType] = useState('percentage');
   const [referalValues, setReferalValues] = useState('');
@@ -92,7 +97,7 @@ export function AdminReferralSettingTab() {
             <select
               id="referalType"
               value={referalType}
-              disabled={busy}
+              disabled={busy || !canEdit}
               onChange={(e) => {
                 setReferalType(e.target.value);
                 setError('');
@@ -115,7 +120,7 @@ export function AdminReferralSettingTab() {
               max={referalType === 'percentage' ? 100 : undefined}
               step="0.01"
               value={referalValues}
-              disabled={busy}
+              disabled={busy || !canEdit}
               onChange={(e) => {
                 setReferalValues(e.target.value);
                 setError('');
@@ -128,18 +133,20 @@ export function AdminReferralSettingTab() {
 
         {error ? <p className="mt-3 text-sm text-red-500">{error}</p> : null}
 
-        <div className="mt-6">
-          <Button
-            type="button"
-            className="global_btn rounded_full bg_primary"
-            onPress={handleSave}
-            isLoading={isSaving}
-            isDisabled={busy}
-            startContent={<Save className="h-4 w-4" />}
-          >
-            Save
-          </Button>
-        </div>
+        {canEdit ? (
+          <div className="mt-6">
+            <Button
+              type="button"
+              className="global_btn rounded_full bg_primary"
+              onPress={handleSave}
+              isLoading={isSaving}
+              isDisabled={busy}
+              startContent={<Save className="h-4 w-4" />}
+            >
+              Save
+            </Button>
+          </div>
+        ) : null}
       </AdminPanel>
     </AdminPage>
   );

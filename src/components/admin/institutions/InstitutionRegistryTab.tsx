@@ -28,9 +28,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminStatCard } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '../CommonDataTable';
 import moment from 'moment';
+
+const INSTITUTIONS_MODEL = 'Institutions';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
     Active: {
@@ -59,6 +62,12 @@ export function InstitutionRegistryTab() {
     const [isTrashView, setIsTrashView] = useState(false);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const { hasPermission } = useAdminPermissions();
+
+    const canAdd = hasPermission(INSTITUTIONS_MODEL, 'add');
+    const canEdit = hasPermission(INSTITUTIONS_MODEL, 'edit');
+    const canDelete = hasPermission(INSTITUTIONS_MODEL, 'delete');
+
     const debouncedSearch = useDebounce(search, 500);
 
     const { data: response, isLoading } = useGetAllInstitutionsQuery({
@@ -258,29 +267,36 @@ export function InstitutionRegistryTab() {
             headerName: 'Actions',
             width: 100,
             sortable: false,
-            renderCell: (params) => (
-                <div className="action_buttons">
-                    {isTrashView ? (
-                        <button
-                            type="button"
-                            className="active_button"
-                            title="Restore institution"
-                            onClick={() =>
-                                dispatch(
-                                    openModal({
-                                        componentName: 'RestoreConfirmation',
-                                        data: {
-                                            itemName: params.row.name,
-                                            onRestore: () => onRestoreInstitution(params.row._id),
-                                        },
-                                    }),
-                                )
-                            }
-                        >
-                            <RotateCcw className="h-4 w-4" />
-                        </button>
-                    ) : (
-                        <>
+            renderCell: (params) => {
+                if (isTrashView) {
+                    if (!canDelete) return null;
+                    return (
+                        <div className="action_buttons">
+                            <button
+                                type="button"
+                                className="active_button"
+                                title="Restore institution"
+                                onClick={() =>
+                                    dispatch(
+                                        openModal({
+                                            componentName: 'RestoreConfirmation',
+                                            data: {
+                                                itemName: params.row.name,
+                                                onRestore: () => onRestoreInstitution(params.row._id),
+                                            },
+                                        }),
+                                    )
+                                }
+                            >
+                                <RotateCcw className="h-4 w-4" />
+                            </button>
+                        </div>
+                    );
+                }
+                if (!canEdit && !canDelete) return null;
+                return (
+                    <div className="action_buttons">
+                        {canEdit ? (
                             <button
                                 type="button"
                                 className="edit_button"
@@ -292,6 +308,8 @@ export function InstitutionRegistryTab() {
                             >
                                 <Edit2 className="h-4 w-4" />
                             </button>
+                        ) : null}
+                        {canDelete ? (
                             <button
                                 type="button"
                                 className="delete_button"
@@ -310,10 +328,10 @@ export function InstitutionRegistryTab() {
                             >
                                 <Trash2 className="h-4 w-4" />
                             </button>
-                        </>
-                    )}
-                </div>
-            ),
+                        ) : null}
+                    </div>
+                );
+            },
         },
     ];
 
@@ -361,7 +379,7 @@ export function InstitutionRegistryTab() {
                         <option value="Inactive">Inactive</option>
                     </select>
                 )}
-                {!isTrashView && (
+                {!isTrashView && canAdd ? (
                     <Button
                         color="primary"
                         className="rounded-xl"
@@ -370,7 +388,7 @@ export function InstitutionRegistryTab() {
                     >
                         Add Institution
                     </Button>
-                )}
+                ) : null}
             </div>
 
             <div className="border border-gray-200 rounded-md overflow-hidden">

@@ -18,6 +18,9 @@ import { Badge } from '@/components/ui/badge';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { ViewProfileModal } from '@/components/admin/users/ViewProfileModal';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const STAFF_MODEL = 'Staff';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -30,6 +33,12 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
   const [profileStaff, setProfileStaff] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canView = hasPermission(STAFF_MODEL, 'view');
+  const canAdd = hasPermission(STAFF_MODEL, 'add');
+  const canEdit = hasPermission(STAFF_MODEL, 'edit');
+  const canDelete = hasPermission(STAFF_MODEL, 'delete');
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -172,59 +181,68 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
       renderCell: (params) => {
         const isSuspended = params.row.status === 'suspended';
         const isResetting = resettingPasswordId === params.row._id;
+        if (!canView && !canEdit && !canDelete) return null;
         return (
           <div className="action_buttons">
-            <button
-              type="button"
-              className="active_button"
-              title="View profile"
-              onClick={() => setProfileStaff(params.row)}
-            >
-              <Eye className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              className="edit_button"
-              title="Edit staff"
-              onClick={() =>
-                dispatch(
-                  openModal({
-                    componentName: 'AddEditStaffModal',
-                    data: { staff: params.row, isEdit: true },
-                  }),
-                )
-              }
-            >
-              <Edit2 className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              className="warning_button"
-              title="Reset password"
-              disabled={!!resettingPasswordId}
-              onClick={() => handleResetPassword(params.row)}
-            >
-              {isResetting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <KeyRound className="h-4 w-4" />
-              )}
-            </button>
-            <button
-              type="button"
-              className={isSuspended ? 'active_button' : 'delete_button'}
-              title={isSuspended ? 'Activate staff' : 'Suspend staff'}
-              onClick={() =>
-                dispatch(
-                  openModal({
-                    componentName: 'UpdateStaffStatusModal',
-                    data: { staff: params.row },
-                  }),
-                )
-              }
-            >
-              {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
-            </button>
+            {canView ? (
+              <button
+                type="button"
+                className="active_button"
+                title="View profile"
+                onClick={() => setProfileStaff(params.row)}
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canEdit ? (
+              <button
+                type="button"
+                className="edit_button"
+                title="Edit staff"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'AddEditStaffModal',
+                      data: { staff: params.row, isEdit: true },
+                    }),
+                  )
+                }
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canEdit ? (
+              <button
+                type="button"
+                className="warning_button"
+                title="Reset password"
+                disabled={!!resettingPasswordId}
+                onClick={() => handleResetPassword(params.row)}
+              >
+                {isResetting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <KeyRound className="h-4 w-4" />
+                )}
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                className={isSuspended ? 'active_button' : 'delete_button'}
+                title={isSuspended ? 'Activate staff' : 'Suspend staff'}
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'UpdateStaffStatusModal',
+                      data: { staff: params.row },
+                    }),
+                  )
+                }
+              >
+                {isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+              </button>
+            ) : null}
           </div>
         );
       },
@@ -251,13 +269,15 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
             value={searchQuery}
             onChange={handleSearchChange}
           />
-          <Button
-            className="global_btn rounded_full bg_primary lg:shrink-0"
-            onPress={() => dispatch(openModal({ componentName: 'AddEditStaffModal' }))}
-            startContent={<Plus className="h-4 w-4" />}
-          >
-            Add Staff
-          </Button>
+          {canAdd ? (
+            <Button
+              className="global_btn rounded_full bg_primary lg:shrink-0"
+              onPress={() => dispatch(openModal({ componentName: 'AddEditStaffModal' }))}
+              startContent={<Plus className="h-4 w-4" />}
+            >
+              Add Staff
+            </Button>
+          ) : null}
         </div>
       </AdminSearchPanel>
 
@@ -274,12 +294,14 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
         />
       </div>
 
-      <ViewProfileModal
-        user={profileStaff}
-        open={!!profileStaff}
-        onOpenChange={(open) => !open && setProfileStaff(null)}
-        onSuspend={handleSuspendFromProfile}
-      />
+      {canView ? (
+        <ViewProfileModal
+          user={profileStaff}
+          open={!!profileStaff}
+          onOpenChange={(open) => !open && setProfileStaff(null)}
+          onSuspend={canDelete ? handleSuspendFromProfile : undefined}
+        />
+      ) : null}
     </div>
   );
 }

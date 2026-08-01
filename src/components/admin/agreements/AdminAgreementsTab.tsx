@@ -17,6 +17,9 @@ import { AdminAgreementsSearch } from './AdminAgreementsSearch';
 import { AgreementModal, type AgreementFormValues } from './AgreementModal';
 import { AgreementViewModal } from './AgreementViewModal';
 import toast from '@/utils/toast';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const AGREEMENTS_MODEL = 'Agreements';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -31,6 +34,11 @@ export function AdminAgreementsTab() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAgreementId, setEditingAgreementId] = useState<string | null>(null);
   const [viewingAgreementId, setViewingAgreementId] = useState<string | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canView = hasPermission(AGREEMENTS_MODEL, 'view');
+  const canAdd = hasPermission(AGREEMENTS_MODEL, 'add');
+  const canEdit = hasPermission(AGREEMENTS_MODEL, 'edit');
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -178,30 +186,35 @@ export function AdminAgreementsTab() {
       sortable: false,
       renderCell: (params) => {
         const isEditable = params.row.isEditable !== false;
+        if (!canView && !canEdit) return null;
         return (
           <div className="action_buttons">
-            <button
-              type="button"
-              className="active_button"
-              title="View agreement"
-              onClick={() => setViewingAgreementId(params.row._id)}
-            >
-              <Eye className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              className={`edit_button${!isEditable ? ' cursor-not-allowed! opacity-40 hover:bg-transparent! hover:text-primary!' : ''}`}
-              title={isEditable ? 'Edit agreement' : 'This agreement cannot be edited'}
-              disabled={!isEditable}
-              aria-disabled={!isEditable}
-              onClick={() => {
-                if (!isEditable) return;
-                setEditingAgreementId(params.row._id);
-                setIsModalOpen(true);
-              }}
-            >
-              <Edit2 className="h-4 w-4" />
-            </button>
+            {canView ? (
+              <button
+                type="button"
+                className="active_button"
+                title="View agreement"
+                onClick={() => setViewingAgreementId(params.row._id)}
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canEdit ? (
+              <button
+                type="button"
+                className={`edit_button${!isEditable ? ' cursor-not-allowed! opacity-40 hover:bg-transparent! hover:text-primary!' : ''}`}
+                title={isEditable ? 'Edit agreement' : 'This agreement cannot be edited'}
+                disabled={!isEditable}
+                aria-disabled={!isEditable}
+                onClick={() => {
+                  if (!isEditable) return;
+                  setEditingAgreementId(params.row._id);
+                  setIsModalOpen(true);
+                }}
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+            ) : null}
           </div>
         );
       },
@@ -211,6 +224,7 @@ export function AdminAgreementsTab() {
   return (
     <div className="space-y-6">
       <AdminAgreementsHeader
+        canAdd={canAdd}
         onCreateAgreement={() => {
           setEditingAgreementId(null);
           setIsModalOpen(true);
@@ -240,22 +254,26 @@ export function AdminAgreementsTab() {
         />
       </div>
 
-      <AgreementModal
-        open={isModalOpen}
-        agreementId={editingAgreementId}
-        agreementTypeOptions={agreementTypeOptions}
-        onOpenChange={(open) => {
-          setIsModalOpen(open);
-          if (!open) setEditingAgreementId(null);
-        }}
-        onSubmit={handleSave}
-      />
+      {(canAdd || canEdit) ? (
+        <AgreementModal
+          open={isModalOpen}
+          agreementId={editingAgreementId}
+          agreementTypeOptions={agreementTypeOptions}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+            if (!open) setEditingAgreementId(null);
+          }}
+          onSubmit={handleSave}
+        />
+      ) : null}
 
-      <AgreementViewModal
-        open={!!viewingAgreementId}
-        agreementId={viewingAgreementId}
-        onOpenChange={(open) => !open && setViewingAgreementId(null)}
-      />
+      {canView ? (
+        <AgreementViewModal
+          open={!!viewingAgreementId}
+          agreementId={viewingAgreementId}
+          onOpenChange={(open) => !open && setViewingAgreementId(null)}
+        />
+      ) : null}
     </div>
   );
 }

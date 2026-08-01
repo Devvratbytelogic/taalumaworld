@@ -19,6 +19,9 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { AdminFAQsHeader } from './AdminFAQsHeader';
 import { AdminFAQsSearch } from './AdminFAQsSearch';
 import { FAQForm, type FAQFormValues } from './FAQForm';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const FAQS_MODEL = 'FAQs';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -36,6 +39,12 @@ export function AdminFAQsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const { hasPermission } = useAdminPermissions();
+
+  const canAdd = hasPermission(FAQS_MODEL, 'add');
+  const canEdit = hasPermission(FAQS_MODEL, 'edit');
+  const canDelete = hasPermission(FAQS_MODEL, 'delete');
+
   const debouncedSearch = useDebounce(searchQuery, 500);
   const queryParams = {
     page: paginationModel.page + 1,
@@ -158,32 +167,39 @@ export function AdminFAQsTab() {
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="edit_button"
-            title="Edit FAQ"
-            onClick={() => { setEditingId(params.row._id); setShowAddForm(false); }}
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className="delete_button"
-            title="Delete FAQ"
-            onClick={() => dispatch(openModal({
-              componentName: 'DeleteConfirmation',
-              data: {
-                itemName: params.row.question,
-                onDelete: () => onDeleteFAQ(params.row._id),
-              },
-            }))}
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canEdit && !canDelete) return null;
+        return (
+          <div className="action_buttons">
+            {canEdit ? (
+              <button
+                type="button"
+                className="edit_button"
+                title="Edit FAQ"
+                onClick={() => { setEditingId(params.row._id); setShowAddForm(false); }}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                className="delete_button"
+                title="Delete FAQ"
+                onClick={() => dispatch(openModal({
+                  componentName: 'DeleteConfirmation',
+                  data: {
+                    itemName: params.row.question,
+                    onDelete: () => onDeleteFAQ(params.row._id),
+                  },
+                }))}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
+        );
+      },
     },
   ];
 
@@ -191,10 +207,11 @@ export function AdminFAQsTab() {
     <div className="space-y-6">
       <AdminFAQsHeader
         totalCount={totalFAQs}
+        canAdd={canAdd}
         onAddFAQ={() => { setShowAddForm(true); setEditingId(null); }}
       />
 
-      {(showAddForm || editingFAQ) && (
+      {((canAdd && showAddForm) || (canEdit && editingFAQ)) && (
         <FAQForm
           initial={editingFAQ ?? undefined}
           isLoading={editingFAQ ? isUpdating : isAdding}

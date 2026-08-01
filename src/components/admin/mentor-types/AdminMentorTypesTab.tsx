@@ -13,6 +13,9 @@ import type { IAllMentorTiersEntity } from '@/types/mentorTier';
 import { MentorTypeModal } from './MentorTypeModal';
 import moment from 'moment';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const MODEL = 'Mentor Tier';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -27,6 +30,10 @@ export function AdminMentorTypesTab() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingTier, setEditingTier] = useState<IAllMentorTiersEntity | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canAdd = hasPermission(MODEL, 'add');
+  const canEdit = hasPermission(MODEL, 'edit');
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -171,18 +178,21 @@ export function AdminMentorTypesTab() {
       headerName: 'Actions',
       width: 100,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="edit_button"
-            title="Edit mentor tier"
-            onClick={() => setEditingTier(params.row)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canEdit) return null;
+        return (
+          <div className="action_buttons">
+            <button
+              type="button"
+              className="edit_button"
+              title="Edit mentor tier"
+              onClick={() => setEditingTier(params.row)}
+            >
+              <Edit2 className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -194,9 +204,11 @@ export function AdminMentorTypesTab() {
           title="Mentor Tiers"
           description="Configure mentor tiers, revenue share, and rank used to grade mentor performance."
         >
-          <Button className="global_btn rounded_full bg_primary" onPress={() => setIsCreateOpen(true)} startContent={<Plus className="h-4 w-4" />}>
-            Add mentor tier
-          </Button>
+          {canAdd ? (
+            <Button className="global_btn rounded_full bg_primary" onPress={() => setIsCreateOpen(true)} startContent={<Plus className="h-4 w-4" />}>
+              Add mentor tier
+            </Button>
+          ) : null}
         </AdminPageHeader>
 
         <AdminSearchPanel>
@@ -255,12 +267,14 @@ export function AdminMentorTypesTab() {
         </div>
 
 
-        <MentorTypeModal open={isCreateOpen} onOpenChange={setIsCreateOpen} />
-        <MentorTypeModal
-          open={!!editingTier}
-          mentorTier={editingTier}
-          onOpenChange={(open) => !open && setEditingTier(null)}
-        />
+        {canAdd ? <MentorTypeModal open={isCreateOpen} onOpenChange={setIsCreateOpen} /> : null}
+        {canEdit ? (
+          <MentorTypeModal
+            open={!!editingTier}
+            mentorTier={editingTier}
+            onOpenChange={(open) => !open && setEditingTier(null)}
+          />
+        ) : null}
       </AdminPage>
     </>
   );

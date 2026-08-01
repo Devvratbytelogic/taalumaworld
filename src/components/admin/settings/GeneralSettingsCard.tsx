@@ -11,10 +11,13 @@ import { Switch } from '../../ui/switch';
 import Button from '../../ui/Button';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+
+const SETTING_MODEL = 'Setting';
 
 const defaultValues = {
   platformName: '',
@@ -94,6 +97,8 @@ function CheckboxField({ id, label, checked, onChange }: { id: string; label: st
 export function GeneralSettingsCard() {
   const { data: res, isLoading } = useGetAdminGlobalSettingsQuery();
   const [updateGlobalSettings, { isLoading: isUpdating }] = useUpdateGlobalSettingsMutation();
+  const { hasPermission } = useAdminPermissions();
+  const canEdit = hasPermission(SETTING_MODEL, 'edit');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
@@ -505,17 +510,19 @@ export function GeneralSettingsCard() {
             onOgImagePrefill={handleOgImagePrefill}
           />
 
-          <div className="flex justify-end pt-2">
-            <Button
-              type="submit"
-              className="gap-2 global_btn rounded_full bg_primary"
-              disabled={isUpdating || formik.isSubmitting}
-              isLoading={isUpdating || formik.isSubmitting}
-              endContent={<Save className="h-4 w-4" />}
-            >
-              Save Changes
-            </Button>
-          </div>
+          {canEdit ? (
+            <div className="flex justify-end pt-2">
+              <Button
+                type="submit"
+                className="gap-2 global_btn rounded_full bg_primary"
+                disabled={isUpdating || formik.isSubmitting}
+                isLoading={isUpdating || formik.isSubmitting}
+                endContent={<Save className="h-4 w-4" />}
+              >
+                Save Changes
+              </Button>
+            </div>
+          ) : null}
         </form>
       )}
     </Card>

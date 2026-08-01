@@ -5,8 +5,11 @@ import { useFormik } from 'formik';
 import { Button } from '@heroui/react';
 import { MessageSquare, Eye, Save, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useGetInstituteMessagesQuery, useAddInstituteMessageMutation, } from '@/store/rtkQueries/institutionApi';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import toast from '@/utils/toast';
 import { registrationPromptSchema } from '@/utils/formValidation';
+
+const REGISTRATION_PROMPT_MODEL = 'Institute Registration Prompt';
 
 const inputCls =
     'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
@@ -15,6 +18,10 @@ const labelCls = 'block text-sm font-medium text-gray-700 mb-1';
 
 export function RegistrationPromptTab() {
     const [preview, setPreview] = useState(false);
+    const { hasPermission } = useAdminPermissions();
+
+    const canView = hasPermission(REGISTRATION_PROMPT_MODEL, 'view');
+    const canEdit = hasPermission(REGISTRATION_PROMPT_MODEL, 'edit');
 
     const { data, isLoading } = useGetInstituteMessagesQuery();
     const [addInstituteMessage, { isLoading: isAdding }] = useAddInstituteMessageMutation();
@@ -62,19 +69,33 @@ export function RegistrationPromptTab() {
                                 <MessageSquare className="h-5 w-5 text-primary" />
                                 Edit Prompt Content
                             </h3>
-                            <button
-                                type="button"
-                                onClick={() => setFieldValue('is_enabled', !values.is_enabled)}
-                                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${values.is_enabled ? 'text-green-600' : 'text-gray-400'
-                                    }`}
-                            >
-                                {values.is_enabled ? (
-                                    <ToggleRight className="h-5 w-5" />
-                                ) : (
-                                    <ToggleLeft className="h-5 w-5" />
-                                )}
-                                {values.is_enabled ? 'Prompt Enabled' : 'Prompt Disabled'}
-                            </button>
+                            {canEdit ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setFieldValue('is_enabled', !values.is_enabled)}
+                                    className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${values.is_enabled ? 'text-green-600' : 'text-gray-400'
+                                        }`}
+                                >
+                                    {values.is_enabled ? (
+                                        <ToggleRight className="h-5 w-5" />
+                                    ) : (
+                                        <ToggleLeft className="h-5 w-5" />
+                                    )}
+                                    {values.is_enabled ? 'Prompt Enabled' : 'Prompt Disabled'}
+                                </button>
+                            ) : (
+                                <span
+                                    className={`flex items-center gap-1.5 text-sm font-medium ${values.is_enabled ? 'text-green-600' : 'text-gray-400'
+                                        }`}
+                                >
+                                    {values.is_enabled ? (
+                                        <ToggleRight className="h-5 w-5" />
+                                    ) : (
+                                        <ToggleLeft className="h-5 w-5" />
+                                    )}
+                                    {values.is_enabled ? 'Prompt Enabled' : 'Prompt Disabled'}
+                                </span>
+                            )}
                         </div>
     
                         {isLoading ? (
@@ -93,6 +114,7 @@ export function RegistrationPromptTab() {
                                         value={values.heading}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
+                                        disabled={!canEdit}
                                         placeholder="Are you a student from a partner university?"
                                     />
                                     {touched.heading && errors.heading ? (
@@ -108,6 +130,7 @@ export function RegistrationPromptTab() {
                                         value={values.message}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
+                                        disabled={!canEdit}
                                         placeholder="Enter the message for students..."
                                     />
                                     {touched.message && errors.message ? (
@@ -127,6 +150,7 @@ export function RegistrationPromptTab() {
                                         value={values.contact_email}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
+                                        disabled={!canEdit}
                                         placeholder="teamtaaluma@taaluma.world"
                                     />
                                     {touched.contact_email && errors.contact_email ? (
@@ -137,23 +161,27 @@ export function RegistrationPromptTab() {
                         )}
     
                         <div className="flex gap-3 justify-end pt-2">
-                            <Button
-                                type="button"
-                                className="global_btn outline_primary rounded_full"
-                                onPress={() => setPreview((p) => !p)}
-                            >
-                                <Eye className="h-4 w-4" />
-                                {preview ? 'Hide Preview' : 'Preview'}
-                            </Button>
-                            <Button
-                                type="submit"
-                                className="global_btn bg_primary rounded_full"
-                                isLoading={isAdding}
-                                isDisabled={isAdding}
-                            >
-                                <Save className="h-4 w-4" />
-                                Save Settings
-                            </Button>
+                            {canView ? (
+                                <Button
+                                    type="button"
+                                    className="global_btn outline_primary rounded_full"
+                                    onPress={() => setPreview((p) => !p)}
+                                >
+                                    <Eye className="h-4 w-4" />
+                                    {preview ? 'Hide Preview' : 'Preview'}
+                                </Button>
+                            ) : null}
+                            {canEdit ? (
+                                <Button
+                                    type="submit"
+                                    className="global_btn bg_primary rounded_full"
+                                    isLoading={isAdding}
+                                    isDisabled={isAdding}
+                                >
+                                    <Save className="h-4 w-4" />
+                                    Save Settings
+                                </Button>
+                            ) : null}
                         </div>
                     </form>
     

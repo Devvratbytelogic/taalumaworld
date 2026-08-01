@@ -16,8 +16,11 @@ import { USER_TYPE } from '@/constants/common';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
 type PermissionMatrix = Record<string, string[]>;
+
+const PERMISSIONS_MODEL = 'Permissions';
 
 const EXCLUDED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
 
@@ -46,6 +49,8 @@ export function PermissionsMatrixTab() {
     const [modelSearch, setModelSearch] = useState('');
     const [matrix, setMatrix] = useState<PermissionMatrix>({});
     const [originalMatrix, setOriginalMatrix] = useState<PermissionMatrix>({});
+    const { hasPermission } = useAdminPermissions();
+    const canEdit = hasPermission(PERMISSIONS_MODEL, 'edit');
     const debouncedRoleSearch = useDebounce(roleSearch, 500);
 
     const { data: rolesRes, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useGetAllRolesQuery({
@@ -115,6 +120,7 @@ export function PermissionsMatrixTab() {
     const isDirty = matrixKey(matrix) !== matrixKey(originalMatrix);
 
     const toggleCell = (model: string, permission: string) => {
+        if (!canEdit) return;
         setMatrix((prev) => {
             const current = prev[model] ?? [];
             const isChecked = current.includes(permission);
@@ -134,6 +140,7 @@ export function PermissionsMatrixTab() {
     };
 
     const toggleRow = (model: string) => {
+        if (!canEdit) return;
         setMatrix((prev) => {
             const current = prev[model] ?? [];
             const allGranted = permissions.every((p) => current.includes(p));
@@ -142,6 +149,7 @@ export function PermissionsMatrixTab() {
     };
 
     const toggleColumn = (permission: string) => {
+        if (!canEdit) return;
         const isView = permission.toLowerCase() === 'view';
         setMatrix((prev) => {
             const allGranted = models.every((model) => (prev[model] ?? []).includes(permission));
@@ -250,29 +258,31 @@ export function PermissionsMatrixTab() {
                                     {models.length} models &middot; {permissions.length} permission types
                                 </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                {isDirty ? (
+                            {canEdit ? (
+                                <div className="flex items-center gap-2">
+                                    {isDirty ? (
+                                        <Button
+                                            variant="light"
+                                            size="sm"
+                                            onPress={handleDiscard}
+                                            isDisabled={isSaving}
+                                            startContent={<RotateCcw className="h-3.5 w-3.5" />}
+                                        >
+                                            Discard
+                                        </Button>
+                                    ) : null}
                                     <Button
-                                        variant="light"
+                                        color="primary"
                                         size="sm"
-                                        onPress={handleDiscard}
-                                        isDisabled={isSaving}
-                                        startContent={<RotateCcw className="h-3.5 w-3.5" />}
+                                        onPress={handleSave}
+                                        isDisabled={!isDirty || isSaving}
+                                        isLoading={isSaving}
+                                        startContent={<Save className="h-3.5 w-3.5" />}
                                     >
-                                        Discard
+                                        Save Changes
                                     </Button>
-                                ) : null}
-                                <Button
-                                    color="primary"
-                                    size="sm"
-                                    onPress={handleSave}
-                                    isDisabled={!isDirty || isSaving}
-                                    isLoading={isSaving}
-                                    startContent={<Save className="h-3.5 w-3.5" />}
-                                >
-                                    Save Changes
-                                </Button>
-                            </div>
+                                </div>
+                            ) : null}
                         </div>
 
                         <AdminSearchInput value={modelSearch} onChange={setModelSearch} placeholder="Search models..." />
@@ -294,14 +304,18 @@ export function PermissionsMatrixTab() {
                                                 key={permission}
                                                 className="px-3 py-2.5 text-center font-semibold text-slate-600 border-b border-l border-gray-200 whitespace-nowrap"
                                             >
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleColumn(permission)}
-                                                    className="hover:text-primary transition-colors"
-                                                    title={`Toggle ${formatLabel(permission)} for all models`}
-                                                >
-                                                    {formatLabel(permission)}
-                                                </button>
+                                                {canEdit ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleColumn(permission)}
+                                                        className="hover:text-primary transition-colors"
+                                                        title={`Toggle ${formatLabel(permission)} for all models`}
+                                                    >
+                                                        {formatLabel(permission)}
+                                                    </button>
+                                                ) : (
+                                                    <span>{formatLabel(permission)}</span>
+                                                )}
                                             </th>
                                         ))}
                                     </tr>
@@ -319,14 +333,18 @@ export function PermissionsMatrixTab() {
                                             return (
                                                 <tr key={model} className={idx % 2 === 1 ? 'bg-slate-50/50' : undefined}>
                                                     <td className="sticky left-0 z-1 bg-white px-4 py-2 border-b border-gray-100 font-medium text-slate-800 whitespace-nowrap">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => toggleRow(model)}
-                                                            className="hover:text-primary transition-colors text-left"
-                                                            title={`Toggle all permissions for ${formatLabel(model)}`}
-                                                        >
-                                                            {formatLabel(model)}
-                                                        </button>
+                                                        {canEdit ? (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => toggleRow(model)}
+                                                                className="hover:text-primary transition-colors text-left"
+                                                                title={`Toggle all permissions for ${formatLabel(model)}`}
+                                                            >
+                                                                {formatLabel(model)}
+                                                            </button>
+                                                        ) : (
+                                                            <span>{formatLabel(model)}</span>
+                                                        )}
                                                     </td>
                                                     {permissions.map((permission) => {
                                                         const checked = granted.includes(permission);
@@ -334,16 +352,17 @@ export function PermissionsMatrixTab() {
                                                             permission.toLowerCase() === 'view' &&
                                                             checked &&
                                                             isViewLocked(granted);
+                                                        const readOnly = !canEdit || lockedView;
                                                         return (
                                                             <td key={permission} className="border-b border-l border-gray-100 px-3 py-2 text-center">
                                                                 <input
                                                                     type="checkbox"
                                                                     className={cn(
                                                                         'h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/40',
-                                                                        lockedView ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+                                                                        readOnly ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
                                                                     )}
                                                                     checked={checked}
-                                                                    disabled={lockedView}
+                                                                    disabled={readOnly}
                                                                     title={
                                                                         lockedView
                                                                             ? 'View is required while other permissions are selected'

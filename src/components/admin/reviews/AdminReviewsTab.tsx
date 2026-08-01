@@ -14,6 +14,9 @@ import { openModal } from '@/store/slices/allModalSlice';
 import { useGetAllAdminReviewsQuery } from '@/store/rtkQueries/adminReviewsApi';
 import { AdminReviewsSearch } from './AdminReviewsSearch';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const REVIEWS_MODEL = 'Reviews';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200!',
@@ -34,6 +37,8 @@ function formatTypeLabel(type?: string) {
 
 export function AdminReviewsTab() {
   const dispatch = useDispatch();
+  const { hasPermission } = useAdminPermissions();
+  const canView = hasPermission(REVIEWS_MODEL, 'view');
   const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState('');
   const [type, setType] = useState('');
@@ -228,25 +233,28 @@ export function AdminReviewsTab() {
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="active_button"
-            title="View / update status"
-            onClick={() =>
-              dispatch(
-                openModal({
-                  componentName: 'ReviewStatusModal',
-                  data: params.row,
-                })
-              )
-            }
-          >
-            <Eye className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canView) return null;
+        return (
+          <div className="action_buttons">
+            <button
+              type="button"
+              className="active_button"
+              title="View / update status"
+              onClick={() =>
+                dispatch(
+                  openModal({
+                    componentName: 'ReviewStatusModal',
+                    data: params.row,
+                  })
+                )
+              }
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 

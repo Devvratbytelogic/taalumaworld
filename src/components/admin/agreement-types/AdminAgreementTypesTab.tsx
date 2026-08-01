@@ -20,6 +20,9 @@ import { AdminAgreementTypesHeader } from './AdminAgreementTypesHeader';
 import { AdminAgreementTypesSearch } from './AdminAgreementTypesSearch';
 import { AgreementTypeModal, type AgreementTypeFormValues } from './AgreementTypeModal';
 import toast from '@/utils/toast';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const AGREEMENT_TYPES_MODEL = 'Agreement Types';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -34,6 +37,12 @@ export function AdminAgreementTypesTab() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingType, setEditingType] = useState<IAllAgreementTypesDataEntity | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canView = hasPermission(AGREEMENT_TYPES_MODEL, 'view');
+  const canAdd = hasPermission(AGREEMENT_TYPES_MODEL, 'add');
+  const canEdit = hasPermission(AGREEMENT_TYPES_MODEL, 'edit');
+  const canDelete = hasPermission(AGREEMENT_TYPES_MODEL, 'delete');
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -185,29 +194,36 @@ export function AdminAgreementTypesTab() {
       headerName: 'Actions',
       width: 120,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          {isTrashView ? (
-            <button
-              type="button"
-              className="active_button"
-              title="Restore agreement type"
-              onClick={() =>
-                dispatch(
-                  openModal({
-                    componentName: 'RestoreConfirmation',
-                    data: {
-                      itemName: params.row.name,
-                      onRestore: () => onRestoreAgreementType(params.row._id),
-                    },
-                  }),
-                )
-              }
-            >
-              <RotateCcw className="h-4 w-4" />
-            </button>
-          ) : (
-            <>
+      renderCell: (params) => {
+        if (isTrashView) {
+          if (!canDelete) return null;
+          return (
+            <div className="action_buttons">
+              <button
+                type="button"
+                className="active_button"
+                title="Restore agreement type"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'RestoreConfirmation',
+                      data: {
+                        itemName: params.row.name,
+                        onRestore: () => onRestoreAgreementType(params.row._id),
+                      },
+                    }),
+                  )
+                }
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        }
+        if (!canEdit && !canDelete) return null;
+        return (
+          <div className="action_buttons">
+            {canEdit ? (
               <button
                 type="button"
                 className="edit_button"
@@ -219,6 +235,8 @@ export function AdminAgreementTypesTab() {
               >
                 <Edit2 className="h-4 w-4" />
               </button>
+            ) : null}
+            {canDelete ? (
               <button
                 type="button"
                 className="delete_button"
@@ -237,10 +255,10 @@ export function AdminAgreementTypesTab() {
               >
                 <Trash2 className="h-4 w-4" />
               </button>
-            </>
-          )}
-        </div>
-      ),
+            ) : null}
+          </div>
+        );
+      },
     },
   ];
 
@@ -248,6 +266,8 @@ export function AdminAgreementTypesTab() {
     <div className="space-y-6">
       <AdminAgreementTypesHeader
         isTrashView={isTrashView}
+        canView={canView}
+        canAdd={canAdd}
         onToggleTrash={handleToggleTrash}
         onCreateType={() => {
           setEditingType(null);
@@ -275,15 +295,17 @@ export function AdminAgreementTypesTab() {
         />
       </div>
 
-      <AgreementTypeModal
-        open={isModalOpen}
-        agreementType={editingType}
-        onOpenChange={(open) => {
-          setIsModalOpen(open);
-          if (!open) setEditingType(null);
-        }}
-        onSubmit={handleSave}
-      />
+      {(canAdd || canEdit) ? (
+        <AgreementTypeModal
+          open={isModalOpen}
+          agreementType={editingType}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+            if (!open) setEditingType(null);
+          }}
+          onSubmit={handleSave}
+        />
+      ) : null}
     </div>
   );
 }

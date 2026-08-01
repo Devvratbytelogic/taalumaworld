@@ -8,11 +8,16 @@ import { Label } from '@/components/ui/label';
 import Button from '@/components/ui/Button';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import toast from '@/utils/toast';
+
+const TAXES_MODEL = 'Taxes';
 
 export function DefaultTaxRateCard() {
   const { data: res, isLoading } = useGetAdminGlobalSettingsQuery();
   const [updateGlobalSettings, { isLoading: isSaving }] = useUpdateGlobalSettingsMutation();
+  const { hasPermission } = useAdminPermissions();
+  const canEdit = hasPermission(TAXES_MODEL, 'edit');
   const [taxRate, setTaxRate] = useState('');
   const [error, setError] = useState('');
 
@@ -84,23 +89,25 @@ export function DefaultTaxRateCard() {
               max={100}
               step="0.01"
               value={taxRate}
-              disabled={isLoading || isSaving}
+              disabled={isLoading || isSaving || !canEdit}
               onChange={(e) => {
                 setTaxRate(e.target.value);
                 if (error) setError('');
               }}
               className="h-10"
             />
-            <Button
-              type="button"
-              className="global_btn rounded_full bg_primary shrink-0"
-              onPress={handleSave}
-              isLoading={isSaving}
-              isDisabled={isLoading || isUnchanged}
-              startContent={<Save className="h-4 w-4" />}
-            >
-              Save
-            </Button>
+            {canEdit ? (
+              <Button
+                type="button"
+                className="global_btn rounded_full bg_primary shrink-0"
+                onPress={handleSave}
+                isLoading={isSaving}
+                isDisabled={isLoading || isUnchanged}
+                startContent={<Save className="h-4 w-4" />}
+              >
+                Save
+              </Button>
+            ) : null}
           </div>
           {error ? <p className="text-sm text-red-500">{error}</p> : null}
         </div>

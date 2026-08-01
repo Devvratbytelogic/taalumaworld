@@ -13,6 +13,7 @@ import {
 import type { IAllTaxesDataEntity } from '@/types/taxes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminTaxesHeader } from './AdminTaxesHeader';
@@ -20,6 +21,8 @@ import { AdminTaxesSearch } from './AdminTaxesSearch';
 import { DefaultTaxRateCard } from './DefaultTaxRateCard';
 import { TaxModal, type TaxFormValues } from './TaxModal';
 import toast from '@/utils/toast';
+
+const TAXES_MODEL = 'Taxes';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -33,6 +36,11 @@ export function AdminTaxesTab() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTax, setEditingTax] = useState<IAllTaxesDataEntity | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canAdd = hasPermission(TAXES_MODEL, 'add');
+  const canEdit = hasPermission(TAXES_MODEL, 'edit');
+  const canDelete = hasPermission(TAXES_MODEL, 'delete');
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -183,45 +191,53 @@ export function AdminTaxesTab() {
       headerName: 'Actions',
       width: 120,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="edit_button"
-            title="Edit tax"
-            onClick={() => {
-              setEditingTax(params.row);
-              setIsModalOpen(true);
-            }}
-          >
-            <Edit2 className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className="delete_button"
-            title="Delete tax"
-            onClick={() =>
-              dispatch(
-                openModal({
-                  componentName: 'DeleteConfirmation',
-                  data: {
-                    itemName: `${params.row.tax_name} (${params.row.country})`,
-                    onDelete: () => onDeleteTax(params.row._id),
-                  },
-                }),
-              )
-            }
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canEdit && !canDelete) return null;
+        return (
+          <div className="action_buttons">
+            {canEdit ? (
+              <button
+                type="button"
+                className="edit_button"
+                title="Edit tax"
+                onClick={() => {
+                  setEditingTax(params.row);
+                  setIsModalOpen(true);
+                }}
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                className="delete_button"
+                title="Delete tax"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'DeleteConfirmation',
+                      data: {
+                        itemName: `${params.row.tax_name} (${params.row.country})`,
+                        onDelete: () => onDeleteTax(params.row._id),
+                      },
+                    }),
+                  )
+                }
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
+        );
+      },
     },
   ];
 
   return (
     <div className="space-y-6">
       <AdminTaxesHeader
+        canAdd={canAdd}
         onCreateTax={() => {
           setEditingTax(null);
           setIsModalOpen(true);
@@ -250,15 +266,17 @@ export function AdminTaxesTab() {
         />
       </div>
 
-      <TaxModal
-        open={isModalOpen}
-        tax={editingTax}
-        onOpenChange={(open) => {
-          setIsModalOpen(open);
-          if (!open) setEditingTax(null);
-        }}
-        onSubmit={handleSave}
-      />
+      {canAdd || canEdit ? (
+        <TaxModal
+          open={isModalOpen}
+          tax={editingTax}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+            if (!open) setEditingTax(null);
+          }}
+          onSubmit={handleSave}
+        />
+      ) : null}
     </div>
   );
 }

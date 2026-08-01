@@ -27,6 +27,7 @@ interface WithdrawalReviewModalProps {
   open: boolean;
   withdrawal: IWithdrawalDataEntity | null;
   onOpenChange: (open: boolean) => void;
+  canEdit?: boolean;
 }
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -72,13 +73,19 @@ function getReviewerName(reviewedBy: IWithdrawalDataEntity['reviewed_by']) {
   return typeof reviewedBy === 'string' ? reviewedBy : reviewedBy.name;
 }
 
-export function WithdrawalReviewModal({ open, withdrawal, onOpenChange }: WithdrawalReviewModalProps) {
+export function WithdrawalReviewModal({
+  open,
+  withdrawal,
+  onOpenChange,
+  canEdit = true,
+}: WithdrawalReviewModalProps) {
   const [action, setAction] = useState<WithdrawalAction>('approve');
   const [adminNotes, setAdminNotes] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [reviewWithdrawal, { isLoading: isReviewing }] = useReviewWithdrawalMutation();
 
   const isPending = withdrawal?.status === 'pending';
+  const canReview = isPending && canEdit;
 
   useEffect(() => {
     if (!open || !withdrawal) return;
@@ -210,7 +217,7 @@ export function WithdrawalReviewModal({ open, withdrawal, onOpenChange }: Withdr
                 </p>
               ) : null}
 
-              {isPending ? (
+              {canReview ? (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="withdrawal-decision">Decision</Label>
@@ -262,9 +269,9 @@ export function WithdrawalReviewModal({ open, withdrawal, onOpenChange }: Withdr
                 onPress={handleClose}
                 disabled={isReviewing}
               >
-                <X className="h-4 w-4" /> {isPending ? 'Cancel' : 'Close'}
+                <X className="h-4 w-4" /> {canReview ? 'Cancel' : 'Close'}
               </UiButton>
-              {isPending ? (
+              {canReview ? (
                 <UiButton
                   type="button"
                   className="global_btn bg_primary rounded_full"

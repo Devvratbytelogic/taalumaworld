@@ -19,6 +19,9 @@ import { useGetChapterByIdQuery } from '@/store/rtkQueries/adminGetApi';
 import { getChaptersListRoutePath, getEditChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
 import { BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import type { AiCriteria } from '@/types/singleChapter';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const BLUEPRINTS_MODEL = 'Blueprints';
 
 const AI_CRITERIA_LABELS: Record<keyof AiCriteria, string> = {
   authenticity: 'Authenticity',
@@ -60,6 +63,8 @@ interface ChapterDetailViewProps {
 export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   const pathname = usePathname();
   const isMentor = pathname.startsWith(getMentorRoutePath());
+  const { hasPermission } = useAdminPermissions();
+  const canEdit = hasPermission(BLUEPRINTS_MODEL, 'edit');
   const { data, isLoading } = useGetChapterByIdQuery(chapterId);
   const chapter = data?.data;
 
@@ -100,11 +105,13 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
       </Link>
 
       <AdminPageHeader title="Blueprint details" description="Full details for this blueprint.">
-        <Link href={getEditChapterRoutePath(chapter.id, isMentor)}>
-          <Button type="button" className="global_btn rounded_full bg_primary" startContent={<Edit2 className="h-4 w-4" />}>
-            Edit Blueprint
-          </Button>
-        </Link>
+        {canEdit ? (
+          <Link href={getEditChapterRoutePath(chapter.id, isMentor)}>
+            <Button type="button" className="global_btn rounded_full bg_primary" startContent={<Edit2 className="h-4 w-4" />}>
+              Edit Blueprint
+            </Button>
+          </Link>
+        ) : null}
       </AdminPageHeader>
 
       <AdminPanel className="p-6">

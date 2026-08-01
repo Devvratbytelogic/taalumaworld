@@ -9,9 +9,14 @@ import { cn } from '@/components/ui/utils';
 interface AdminChaptersHeaderProps {
   isTrashView: boolean;
   onToggleTrash: () => void;
+  canAdd?: boolean;
 }
 
-export function AdminChaptersHeader({ isTrashView, onToggleTrash }: AdminChaptersHeaderProps) {
+export function AdminChaptersHeader({
+  isTrashView,
+  onToggleTrash,
+  canAdd = false,
+}: AdminChaptersHeaderProps) {
   const pathname = usePathname();
   const isMentor = pathname.startsWith(getMentorRoutePath());
 
@@ -27,7 +32,7 @@ export function AdminChaptersHeader({ isTrashView, onToggleTrash }: AdminChapter
       >
         {isTrashView ? 'Back to blueprints' : 'Trash'}
       </Button>
-      {!isTrashView ? (
+      {!isTrashView && canAdd ? (
         <Button as={Link} href={getCreateChapterRoutePath(isMentor)} className="global_btn rounded_full bg_primary">
           <Plus className="h-4 w-4" />
           Create new blueprint

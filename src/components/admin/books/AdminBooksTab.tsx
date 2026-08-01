@@ -31,6 +31,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const SERIES_MODEL = 'Series';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
   Published: {
@@ -49,6 +52,11 @@ const STATUSES = ['Published', 'Draft'] as const;
 
 export function AdminBooksTab() {
   const dispatch = useDispatch();
+  const { hasPermission } = useAdminPermissions();
+  const canView = hasPermission(SERIES_MODEL, 'view');
+  const canAdd = hasPermission(SERIES_MODEL, 'add');
+  const canEdit = hasPermission(SERIES_MODEL, 'edit');
+  const canDelete = hasPermission(SERIES_MODEL, 'delete');
   const [search, setSearch] = useState('');
   const [selectedLeader, setSelectedLeader] = useState('');
   const [filterByStatus, setFilterByStatus] = useState('');
@@ -227,6 +235,15 @@ export function AdminBooksTab() {
         const config = STATUS_CONFIG[book.status] ?? STATUS_CONFIG.Draft;
         const bookId = book._id ?? book.id;
 
+        if (!canEdit) {
+          return (
+            <Badge variant="outline" className={`flex items-center gap-1.5 ${config.badge}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+              {book.status}
+            </Badge>
+          );
+        }
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild disabled={!!updatingId}>
@@ -274,59 +291,72 @@ export function AdminBooksTab() {
       headerName: 'Actions',
       width: 150,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="active_button"
-            title="View series"
-            onClick={() => setPreviewBook(params.row)}
-          >
-            <Eye className="h-4 w-4" />
-          </button>
-         {params.row.isMine && <>
-            {isTrashView ? (
+      renderCell: (params) => {
+        if (!canView && !canEdit && !canDelete) return null;
+        return (
+          <div className="action_buttons">
+            {canView ? (
               <button
                 type="button"
                 className="active_button"
-                title="Restore series"
-                onClick={() => dispatch(openModal({
-                  componentName: 'RestoreConfirmation',
-                  data: {
-                    itemName: params.row.title,
-                    onRestore: () => onRestoreBook(params.row._id),
-                  },
-                }))}
+                title="View series"
+                onClick={() => setPreviewBook(params.row)}
               >
-                <RotateCcw className="h-4 w-4" />
+                <Eye className="h-4 w-4" />
               </button>
-            ) : (
+            ) : null}
+            {params.row.isMine ? (
               <>
-                <button
-                  type="button"
-                  className="edit_button"
-                  onClick={() => setEditingBook(params.row)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  className="delete_button"
-                  onClick={() => dispatch(openModal({
-                    componentName: 'DeleteConfirmation',
-                    data: {
-                      itemName: params.row.title,
-                      onDelete: () => onDeleteBook(params.row._id),
-                    },
-                  }))}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                {isTrashView ? (
+                  canDelete ? (
+                    <button
+                      type="button"
+                      className="active_button"
+                      title="Restore series"
+                      onClick={() => dispatch(openModal({
+                        componentName: 'RestoreConfirmation',
+                        data: {
+                          itemName: params.row.title,
+                          onRestore: () => onRestoreBook(params.row._id),
+                        },
+                      }))}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </button>
+                  ) : null
+                ) : (
+                  <>
+                    {canEdit ? (
+                      <button
+                        type="button"
+                        className="edit_button"
+                        onClick={() => setEditingBook(params.row)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                    ) : null}
+                    {canDelete ? (
+                      <button
+                        type="button"
+                        className="delete_button"
+                        onClick={() => dispatch(openModal({
+                          componentName: 'DeleteConfirmation',
+                          data: {
+                            itemName: params.row.title,
+                            onDelete: () => onDeleteBook(params.row._id),
+                          },
+                        }))}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    ) : null}
+                  </>
+                )}
               </>
-            )}
-          </>}
-        </div>
-      ),
+            ) : null}
+          </div>
+        );
+      },
     },
   ];
 
@@ -336,6 +366,7 @@ export function AdminBooksTab() {
         onCreateBook={() => setIsCreateModalOpen(true)}
         isTrashView={isTrashView}
         onToggleTrash={() => setIsTrashView((prev) => !prev)}
+        canAdd={canAdd}
       />
 
       <AdminBooksSearch
@@ -363,27 +394,33 @@ export function AdminBooksTab() {
         />
       </div>
 
-      <BookPreviewModal
-        book={previewBook}
-        open={!!previewBook}
-        onOpenChange={(open) => !open && setPreviewBook(null)}
-      />
+      {canView ? (
+        <BookPreviewModal
+          book={previewBook}
+          open={!!previewBook}
+          onOpenChange={(open) => !open && setPreviewBook(null)}
+        />
+      ) : null}
 
-      <AddBookModal
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        // categories={categories}
-        onSubmit={addBook}
-        isSubmitting={isAdding}
-      />
+      {canAdd ? (
+        <AddBookModal
+          open={isCreateModalOpen}
+          onOpenChange={setIsCreateModalOpen}
+          // categories={categories}
+          onSubmit={addBook}
+          isSubmitting={isAdding}
+        />
+      ) : null}
 
-      <EditBookModal
-        book={editingBook}
-        open={!!editingBook}
-        onOpenChange={(open) => !open && setEditingBook(null)}
-        onSubmit={updateBook}
-        isSubmitting={isUpdating}
-      />
+      {canEdit ? (
+        <EditBookModal
+          book={editingBook}
+          open={!!editingBook}
+          onOpenChange={(open) => !open && setEditingBook(null)}
+          onSubmit={updateBook}
+          isSubmitting={isUpdating}
+        />
+      ) : null}
     </div>
   );
 }

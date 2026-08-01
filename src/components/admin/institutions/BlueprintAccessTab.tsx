@@ -11,14 +11,22 @@ import type { IChapter } from '@/types/chapter';
 import toast from '@/utils/toast';
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import BlueprintAccessSkeleton from '@/components/skeleton-loader/BlueprintAccessSkeleton';
 import { openModal, closeModal } from '@/store/slices/allModalSlice';
+
+const INSTITUTION_ACCESS_MODEL = 'Institution Access';
 
 export function BlueprintAccessTab() {
     const dispatch = useDispatch();
     const [selectedInstitutionId, setSelectedInstitutionId] = useState<string>('');
     const [search, setSearch] = useState('');
     const [localSelected, setLocalSelected] = useState<string[]>([]);
+    const { hasPermission } = useAdminPermissions();
+
+    const canEdit = hasPermission(INSTITUTION_ACCESS_MODEL, 'edit');
+    const canDelete = hasPermission(INSTITUTION_ACCESS_MODEL, 'delete');
+
     const debouncedSearch = useDebounce(search, 500);
 
     const { data: instData, isLoading: loadingInst } = useGetAllInstitutionsQuery();
@@ -51,6 +59,7 @@ export function BlueprintAccessTab() {
     };
 
     const toggleBlueprint = (id: string) => {
+        if (!canEdit) return;
         setLocalSelected((prev) =>
             prev.includes(id) ? prev.filter((existingId) => existingId !== id) : [...prev, id]
         );
@@ -171,7 +180,7 @@ export function BlueprintAccessTab() {
                                     </p>
                                 </div>
                                 <div className="flex gap-2">
-                                    {isDirty && (
+                                    {canEdit && isDirty ? (
                                         <Button
                                             size="sm"
                                             color="primary"
@@ -181,7 +190,7 @@ export function BlueprintAccessTab() {
                                         >
                                             Save
                                         </Button>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
 
@@ -211,7 +220,7 @@ export function BlueprintAccessTab() {
                                             <div
                                                 key={bp?._id}
                                                 onClick={() => toggleBlueprint(bp?._id)}
-                                                className={`group flex items-center gap-3.5 rounded-md border p-3 cursor-pointer transition-all ${enabled
+                                                className={`group flex items-center gap-3.5 rounded-md border p-3 transition-all ${canEdit ? 'cursor-pointer' : 'cursor-default'} ${enabled
                                                     ? 'border-green-200! bg-green-50/60'
                                                     : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/60'
                                                     }`}
@@ -306,7 +315,7 @@ export function BlueprintAccessTab() {
                                                     >
                                                         {enabled ? 'Enabled' : 'Disabled'}
                                                     </span>
-                                                    {enabled && (
+                                                    {enabled && canDelete ? (
                                                         <button
                                                             type="button"
                                                             onClick={(e) => {
@@ -318,7 +327,7 @@ export function BlueprintAccessTab() {
                                                         >
                                                             <X className="h-4 w-4" />
                                                         </button>
-                                                    )}
+                                                    ) : null}
                                                 </div>
                                             </div>
                                         );

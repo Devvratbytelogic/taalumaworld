@@ -11,9 +11,12 @@ import { OrderStats } from './OrderStats';
 import { AdminOrdersSearch } from './AdminOrdersSearch';
 import { useGetAllOrdersQuery } from '@/store/rtkQueries/adminGetApi';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getMentorRoutePath, getViewOrderRoutePath } from '@/routes/routes';
 import moment from 'moment';
 import { IAllOrdersAPIResponseDataEntityItemEntityItemItems } from '@/types/order';
+
+const ORDERS_MODEL = 'Orders';
 
 type OrderTab = 'all' | 'books' | 'blueprints';
 
@@ -40,6 +43,8 @@ export function AdminOrdersTab() {
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const { hasPermission } = useAdminPermissions();
+    const canView = hasPermission(ORDERS_MODEL, 'view');
     const debouncedSearch = useDebounce(searchQuery, 400);
 
     const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
@@ -224,18 +229,21 @@ export function AdminOrdersTab() {
             sortable: false,
             filterable: false,
             disableColumnMenu: true,
-            renderCell: (params) => (
-                <div className="action_buttons">
-                    <button
-                        type="button"
-                        className="active_button"
-                        title="View order"
-                        onClick={() => router.push(getViewOrderRoutePath(params.row.id, isMentor))}
-                    >
-                        <Eye className="h-4 w-4" />
-                    </button>
-                </div>
-            ),
+            renderCell: (params) => {
+                if (!canView) return null;
+                return (
+                    <div className="action_buttons">
+                        <button
+                            type="button"
+                            className="active_button"
+                            title="View order"
+                            onClick={() => router.push(getViewOrderRoutePath(params.row.id, isMentor))}
+                        >
+                            <Eye className="h-4 w-4" />
+                        </button>
+                    </div>
+                );
+            },
         },
     ];
 

@@ -28,6 +28,8 @@ import toast from '@/utils/toast';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
+const BLUEPRINTS_MODEL = 'Blueprints';
+
 const STATUS_CONFIG = BLUEPRINT_STATUS_CONFIG;
 const STATUSES = BLUEPRINT_STATUSES;
 
@@ -37,7 +39,11 @@ export function AdminChaptersTab() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const isMentor = pathname.startsWith(getMentorRoutePath());
-    const { isSuperAdmin } = useAdminPermissions();
+    const { isSuperAdmin, hasPermission } = useAdminPermissions();
+    const canView = hasPermission(BLUEPRINTS_MODEL, 'view');
+    const canAdd = hasPermission(BLUEPRINTS_MODEL, 'add');
+    const canEdit = hasPermission(BLUEPRINTS_MODEL, 'edit');
+    const canDelete = hasPermission(BLUEPRINTS_MODEL, 'delete');
     const [search, setSearch] = useState('');
     const [filterByBook, setFilterByBook] = useState('');
     const [filterByStatus, setFilterByStatus] = useState('');
@@ -262,6 +268,15 @@ export function AdminChaptersTab() {
                 const config = STATUS_CONFIG[chapter.status as BlueprintStatus] ?? STATUS_CONFIG.Draft;
                 const canPublish = chapter.isPublishAllowed;
 
+                if (!canEdit) {
+                    return (
+                        <Badge variant="outline" className={`flex items-center gap-1.5 ${config.badge}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+                            {chapter.status}
+                        </Badge>
+                    );
+                }
+
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild disabled={!!updatingId}>
@@ -322,60 +337,72 @@ export function AdminChaptersTab() {
             headerName: 'Actions',
             width: 150,
             sortable: false,
-            renderCell: (params) => (
-                <div className="action_buttons">
-                    <button
-                        type="button"
-                        className="active_button"
-                        title="View blueprint"
-                        onClick={() => router.push(getViewChapterRoutePath(params.row.id, isMentor))}
-                    >
-                        <Eye className="h-4 w-4" />
-                    </button>
-                    {params.row.isMine &&
-                        <>
-                            {isTrashView ? (
-                                <button
-                                    type="button"
-                                    className="active_button"
-                                    title="Restore blueprint"
-                                    onClick={() => dispatch(openModal({
-                                        componentName: 'RestoreConfirmation',
-                                        data: {
-                                            itemName: params.row.title,
-                                            onRestore: () => onRestoreChapter(params.row.id),
-                                        },
-                                    }))}
-                                >
-                                    <RotateCcw className="h-4 w-4" />
-                                </button>
-                            ) : (
-                                <>
-                                    <button
-                                        type="button"
-                                        className="edit_button"
-                                        onClick={() => router.push(getEditChapterRoutePath(params.row.id, isMentor))}
-                                    >
-                                        <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="delete_button"
-                                        onClick={() => dispatch(openModal({
-                                            componentName: 'DeleteConfirmation',
-                                            data: {
-                                                itemName: params.row.title,
-                                                onDelete: () => onDeleteChapter(params.row.id),
-                                            },
-                                        }))}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </>
-                            )}
-                        </>}
-                </div>
-            ),
+            renderCell: (params) => {
+                if (!canView && !canEdit && !canDelete) return null;
+                return (
+                    <div className="action_buttons">
+                        {canView ? (
+                            <button
+                                type="button"
+                                className="active_button"
+                                title="View blueprint"
+                                onClick={() => router.push(getViewChapterRoutePath(params.row.id, isMentor))}
+                            >
+                                <Eye className="h-4 w-4" />
+                            </button>
+                        ) : null}
+                        {params.row.isMine ? (
+                            <>
+                                {isTrashView ? (
+                                    canDelete ? (
+                                        <button
+                                            type="button"
+                                            className="active_button"
+                                            title="Restore blueprint"
+                                            onClick={() => dispatch(openModal({
+                                                componentName: 'RestoreConfirmation',
+                                                data: {
+                                                    itemName: params.row.title,
+                                                    onRestore: () => onRestoreChapter(params.row.id),
+                                                },
+                                            }))}
+                                        >
+                                            <RotateCcw className="h-4 w-4" />
+                                        </button>
+                                    ) : null
+                                ) : (
+                                    <>
+                                        {canEdit ? (
+                                            <button
+                                                type="button"
+                                                className="edit_button"
+                                                onClick={() => router.push(getEditChapterRoutePath(params.row.id, isMentor))}
+                                            >
+                                                <Edit2 className="h-4 w-4" />
+                                            </button>
+                                        ) : null}
+                                        {canDelete ? (
+                                            <button
+                                                type="button"
+                                                className="delete_button"
+                                                onClick={() => dispatch(openModal({
+                                                    componentName: 'DeleteConfirmation',
+                                                    data: {
+                                                        itemName: params.row.title,
+                                                        onDelete: () => onDeleteChapter(params.row.id),
+                                                    },
+                                                }))}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        ) : null}
+                                    </>
+                                )}
+                            </>
+                        ) : null}
+                    </div>
+                );
+            },
         },
     ];
 
@@ -384,6 +411,7 @@ export function AdminChaptersTab() {
             <AdminChaptersHeader
                 isTrashView={isTrashView}
                 onToggleTrash={() => setIsTrashView((prev) => !prev)}
+                canAdd={canAdd}
             />
 
             <AdminChaptersSearch

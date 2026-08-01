@@ -7,12 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { AdminPage, AdminPageHeader, AdminStatCard } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { formatKes } from '@/constants/common';
 import { useGetAllWithdrawalsQuery } from '@/store/rtkQueries/walletAPIs';
 import type { IWithdrawalDataEntity } from '@/types/wallet';
 import { AdminWithdrawalsSearch } from './AdminWithdrawalsSearch';
 import { WithdrawalReviewModal } from './WithdrawalReviewModal';
 import moment from 'moment';
+
+const WITHDRAWAL_MODEL = 'Withdrawal';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200!',
@@ -44,6 +47,10 @@ export function AdminWithdrawalsTab() {
   const [walletType, setWalletType] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [reviewItem, setReviewItem] = useState<IWithdrawalDataEntity | null>(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canView = hasPermission(WITHDRAWAL_MODEL, 'view');
+  const canEdit = hasPermission(WITHDRAWAL_MODEL, 'edit');
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -173,18 +180,21 @@ export function AdminWithdrawalsTab() {
       headerName: 'Actions',
       width: 100,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="active_button"
-            title="Review withdrawal"
-            onClick={() => setReviewItem(params.row)}
-          >
-            <Eye className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canView) return null;
+        return (
+          <div className="action_buttons">
+            <button
+              type="button"
+              className="active_button"
+              title="Review withdrawal"
+              onClick={() => setReviewItem(params.row)}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -223,13 +233,16 @@ export function AdminWithdrawalsTab() {
         />
       </div>
 
-      <WithdrawalReviewModal
-        open={!!reviewItem}
-        withdrawal={reviewItem}
-        onOpenChange={(open) => {
-          if (!open) setReviewItem(null);
-        }}
-      />
+      {canView ? (
+        <WithdrawalReviewModal
+          open={!!reviewItem}
+          withdrawal={reviewItem}
+          canEdit={canEdit}
+          onOpenChange={(open) => {
+            if (!open) setReviewItem(null);
+          }}
+        />
+      ) : null}
     </AdminPage>
   );
 }

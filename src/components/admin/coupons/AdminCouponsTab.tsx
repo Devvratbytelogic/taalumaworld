@@ -12,6 +12,7 @@ import {
 import { COUPON_SCOPE_LABELS, COUPON_TYPE_LABELS } from '@/constants/coupon';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminCouponsHeader } from './AdminCouponsHeader';
@@ -19,6 +20,8 @@ import { AdminCouponsSearch } from './AdminCouponsSearch';
 import toast from '@/utils/toast';
 import { IAdminCouponEntity } from '@/types/coupon';
 import { CouponModal } from './CouponModal';
+
+const COUPON_MODEL = 'Coupon';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -47,6 +50,11 @@ export function AdminCouponsTab() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
+  const { hasPermission } = useAdminPermissions();
+
+  const canAdd = hasPermission(COUPON_MODEL, 'add');
+  const canEdit = hasPermission(COUPON_MODEL, 'edit');
+  const canDelete = hasPermission(COUPON_MODEL, 'delete');
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -209,29 +217,36 @@ export function AdminCouponsTab() {
       headerName: 'Actions',
       width: 120,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          {isTrashView ? (
-            <button
-              type="button"
-              className="active_button"
-              title="Restore coupon"
-              onClick={() =>
-                dispatch(
-                  openModal({
-                    componentName: 'RestoreConfirmation',
-                    data: {
-                      itemName: params.row.coupon_code,
-                      onRestore: () => onRestoreCoupon(params.row._id),
-                    },
-                  }),
-                )
-              }
-            >
-              <RotateCcw className="h-4 w-4" />
-            </button>
-          ) : (
-            <>
+      renderCell: (params) => {
+        if (isTrashView) {
+          if (!canDelete) return null;
+          return (
+            <div className="action_buttons">
+              <button
+                type="button"
+                className="active_button"
+                title="Restore coupon"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'RestoreConfirmation',
+                      data: {
+                        itemName: params.row.coupon_code,
+                        onRestore: () => onRestoreCoupon(params.row._id),
+                      },
+                    }),
+                  )
+                }
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        }
+        if (!canEdit && !canDelete) return null;
+        return (
+          <div className="action_buttons">
+            {canEdit ? (
               <button
                 type="button"
                 className="edit_button"
@@ -243,6 +258,8 @@ export function AdminCouponsTab() {
               >
                 <Edit2 className="h-4 w-4" />
               </button>
+            ) : null}
+            {canDelete ? (
               <button
                 type="button"
                 className="delete_button"
@@ -261,10 +278,10 @@ export function AdminCouponsTab() {
               >
                 <Trash2 className="h-4 w-4" />
               </button>
-            </>
-          )}
-        </div>
-      ),
+            ) : null}
+          </div>
+        );
+      },
     },
   ];
 
@@ -273,6 +290,7 @@ export function AdminCouponsTab() {
       <AdminCouponsHeader
         isTrashView={isTrashView}
         onToggleTrash={handleToggleTrash}
+        canAdd={canAdd}
         onCreateCoupon={() => {
           setEditingCoupon(null);
           setIsModalOpen(true);
@@ -301,14 +319,16 @@ export function AdminCouponsTab() {
         />
       </div>
 
-      <CouponModal
-        open={isModalOpen}
-        coupon={editingCoupon}
-        onOpenChange={(open) => {
-          setIsModalOpen(open);
-          if (!open) setEditingCoupon(null);
-        }}
-      />
+      {canAdd || canEdit ? (
+        <CouponModal
+          open={isModalOpen}
+          coupon={editingCoupon}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+            if (!open) setEditingCoupon(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

@@ -15,6 +15,9 @@ import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { useUpdateAdminReviewStatusMutation } from '@/store/rtkQueries/adminReviewsApi';
 import toast from '@/utils/toast';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const REVIEWS_MODEL = 'Reviews';
 
 type ReviewStatusUpdate = 'Approved' | 'Rejected';
 
@@ -47,6 +50,8 @@ function toStatusUpdate(status?: string): ReviewStatusUpdate {
 export function ReviewStatusModal() {
   const dispatch = useDispatch();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
+  const { hasPermission } = useAdminPermissions();
+  const canEdit = hasPermission(REVIEWS_MODEL, 'edit');
 
   const [status, setStatus] = useState<ReviewStatusUpdate>('Approved');
   const [reason, setReason] = useState('');
@@ -177,46 +182,57 @@ export function ReviewStatusModal() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="review-status">Status</Label>
-                <select
-                  id="review-status"
-                  value={status}
-                  onChange={(e) => {
-                    setStatus(e.target.value as ReviewStatusUpdate);
-                    setReasonError('');
-                  }}
-                  className={`${adminSelectClass} w-full`}
-                  disabled={isUpdating}
-                >
-                  {STATUS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {canEdit ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="review-status">Status</Label>
+                    <select
+                      id="review-status"
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(e.target.value as ReviewStatusUpdate);
+                        setReasonError('');
+                      }}
+                      className={`${adminSelectClass} w-full`}
+                      disabled={isUpdating}
+                    >
+                      {STATUS_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {status === 'Rejected' ? (
-                <div className="space-y-2">
-                  <Label htmlFor="review-rejection-reason">
-                    Rejection reason <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    id="review-rejection-reason"
-                    rows={3}
-                    value={reason}
-                    onChange={(e) => {
-                      setReason(e.target.value);
-                      if (reasonError) setReasonError('');
-                    }}
-                    placeholder="Explain why this review is being rejected..."
-                    disabled={isUpdating}
-                    aria-invalid={!!reasonError}
-                  />
-                  {reasonError ? (
-                    <p className="text-sm text-red-600">{reasonError}</p>
+                  {status === 'Rejected' ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="review-rejection-reason">
+                        Rejection reason <span className="text-red-500">*</span>
+                      </Label>
+                      <Textarea
+                        id="review-rejection-reason"
+                        rows={3}
+                        value={reason}
+                        onChange={(e) => {
+                          setReason(e.target.value);
+                          if (reasonError) setReasonError('');
+                        }}
+                        placeholder="Explain why this review is being rejected..."
+                        disabled={isUpdating}
+                        aria-invalid={!!reasonError}
+                      />
+                      {reasonError ? (
+                        <p className="text-sm text-red-600">{reasonError}</p>
+                      ) : null}
+                    </div>
                   ) : null}
+                </>
+              ) : data?.reason ? (
+                <div className="space-y-1.5">
+                  <p className="text-slate-500">Rejection reason</p>
+                  <p className="rounded-md border border-slate-100 bg-white p-3 text-slate-700 whitespace-pre-wrap">
+                    {data.reason}
+                  </p>
                 </div>
               ) : null}
             </ModalBody>
@@ -228,17 +244,19 @@ export function ReviewStatusModal() {
                 onPress={onClose}
                 isDisabled={isUpdating}
               >
-                <X className="h-4 w-4" /> Cancel
+                <X className="h-4 w-4" /> {canEdit ? 'Cancel' : 'Close'}
               </Button>
-              <Button
-                type="button"
-                className="global_btn bg_primary rounded_full"
-                onPress={handleSubmit}
-                isLoading={isUpdating}
-                isDisabled={isUpdating || isRejectWithoutReason}
-              >
-                <Save className="h-4 w-4" /> Update status
-              </Button>
+              {canEdit ? (
+                <Button
+                  type="button"
+                  className="global_btn bg_primary rounded_full"
+                  onPress={handleSubmit}
+                  isLoading={isUpdating}
+                  isDisabled={isUpdating || isRejectWithoutReason}
+                >
+                  <Save className="h-4 w-4" /> Update status
+                </Button>
+              ) : null}
             </ModalFooter>
           </>
         ) : (

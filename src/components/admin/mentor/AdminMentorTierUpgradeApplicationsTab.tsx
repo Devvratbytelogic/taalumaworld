@@ -36,6 +36,9 @@ import {
   VERIFIED_MENTOR_APPLICATION_ACTION,
   VERIFIED_MENTOR_APPLICATION_STATUS,
 } from '@/constants/verifiedMentorApplication';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const MODEL = 'Mentor Tier Upgrade';
 
 const STATUS_OPTIONS = Object.values(VERIFIED_MENTOR_APPLICATION_STATUS);
 
@@ -83,6 +86,10 @@ export function AdminMentorTierUpgradeApplicationsTab() {
   const [reviewApplication, setReviewApplication] = useState<IAllMentorTierUpgradeApplicationsEntity | null>(null);
   const [action, setAction] = useState<string>(VERIFIED_MENTOR_APPLICATION_ACTION.APPROVE);
   const [reviewNotes, setReviewNotes] = useState('');
+  const { hasPermission } = useAdminPermissions();
+
+  const canView = hasPermission(MODEL, 'view');
+  const canEdit = hasPermission(MODEL, 'edit');
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -225,18 +232,21 @@ export function AdminMentorTierUpgradeApplicationsTab() {
       headerName: 'Actions',
       width: 100,
       sortable: false,
-      renderCell: (params) => (
-        <div className="action_buttons">
-          <button
-            type="button"
-            className="active_button"
-            title="Review application"
-            onClick={() => openReview(params.row)}
-          >
-            <Eye className="h-4 w-4" />
-          </button>
-        </div>
-      ),
+      renderCell: (params) => {
+        if (!canView) return null;
+        return (
+          <div className="action_buttons">
+            <button
+              type="button"
+              className="active_button"
+              title="Review application"
+              onClick={() => openReview(params.row)}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -375,44 +385,50 @@ export function AdminMentorTierUpgradeApplicationsTab() {
                   <p><span className="text-slate-500">Previous decision note:</span> {reviewApplication.decision_reason}</p>
                 ) : null}
 
-                <div className="space-y-2">
-                  <Label htmlFor="decision-select">Decision</Label>
-                  <select
-                    id="decision-select"
-                    value={action}
-                    onChange={(e) => setAction(e.target.value)}
-                    className={cn(adminSelectClass, 'w-full')}
-                  >
-                    {DECISION_OPTIONS.map((item) => (
-                      <option key={item.value} value={item.value}>{item.label}</option>
-                    ))}
-                  </select>
-                </div>
+                {canEdit ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="decision-select">Decision</Label>
+                      <select
+                        id="decision-select"
+                        value={action}
+                        onChange={(e) => setAction(e.target.value)}
+                        className={cn(adminSelectClass, 'w-full')}
+                      >
+                        {DECISION_OPTIONS.map((item) => (
+                          <option key={item.value} value={item.value}>{item.label}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="decision-reason">Decision reason</Label>
-                  <Textarea
-                    id="decision-reason"
-                    rows={3}
-                    value={reviewNotes}
-                    onChange={(e) => setReviewNotes(e.target.value)}
-                    placeholder="Share context that will be visible to the applicant..."
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="decision-reason">Decision reason</Label>
+                      <Textarea
+                        id="decision-reason"
+                        rows={3}
+                        value={reviewNotes}
+                        onChange={(e) => setReviewNotes(e.target.value)}
+                        placeholder="Share context that will be visible to the applicant..."
+                      />
+                    </div>
+                  </>
+                ) : null}
               </div>
 
               <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">
                 <UiButton type="button" className="global_btn outline_primary rounded_full" onPress={closeReview} disabled={isReviewing}>
                   <X className="h-4 w-4" /> Cancel
                 </UiButton>
-                <UiButton
-                  type="button"
-                  className="global_btn bg_primary rounded_full"
-                  onPress={handleSubmitReview}
-                  isLoading={isReviewing}
-                >
-                  <Save className="h-4 w-4" /> Save
-                </UiButton>
+                {canEdit ? (
+                  <UiButton
+                    type="button"
+                    className="global_btn bg_primary rounded_full"
+                    onPress={handleSubmitReview}
+                    isLoading={isReviewing}
+                  >
+                    <Save className="h-4 w-4" /> Save
+                  </UiButton>
+                ) : null}
               </DialogFooter>
             </>
           ) : null}

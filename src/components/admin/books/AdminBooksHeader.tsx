@@ -6,9 +6,15 @@ interface AdminBooksHeaderProps {
   onCreateBook: () => void;
   isTrashView: boolean;
   onToggleTrash: () => void;
+  canAdd?: boolean;
 }
 
-export function AdminBooksHeader({ onCreateBook, isTrashView, onToggleTrash }: AdminBooksHeaderProps) {
+export function AdminBooksHeader({
+  onCreateBook,
+  isTrashView,
+  onToggleTrash,
+  canAdd = false,
+}: AdminBooksHeaderProps) {
   return (
     <AdminPageHeader
       title={isTrashView ? 'Trash' : 'Series'}
@@ -21,7 +27,7 @@ export function AdminBooksHeader({ onCreateBook, isTrashView, onToggleTrash }: A
       >
         {isTrashView ? 'Back to series' : 'Trash'}
       </Button>
-      {!isTrashView ? (
+      {!isTrashView && canAdd ? (
         <Button
           className="global_btn rounded_full bg_primary"
           onPress={onCreateBook}

@@ -6,6 +6,7 @@ import { useUpdateProfilePicMutation } from '@/store/rtkQueries/adminPostApi';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 
 type AvatarSize = 'md' | 'lg' | 'xl';
 
@@ -15,6 +16,8 @@ interface ProfileAvatarUploadProps {
   size?: AvatarSize;
   className?: string;
   ringClassName?: string;
+  /** Public mentor page cache clear after avatar upload */
+  publicMentorShortCode?: string | null;
 }
 
 const SIZE_CLASSES: Record<AvatarSize, { wrap: string; icon: string; showLabel: boolean }> = {
@@ -29,6 +32,7 @@ export function ProfileAvatarUpload({
   size = 'xl',
   className,
   ringClassName = 'ring-4 ring-white',
+  publicMentorShortCode,
 }: ProfileAvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [updateProfilePic, { isLoading }] = useUpdateProfilePicMutation();
@@ -53,6 +57,7 @@ export function ProfileAvatarUpload({
       formData.append('profile_pic', file);
       const res = await updateProfilePic(formData).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        if (publicMentorShortCode) void refreshAfterMentorChange(publicMentorShortCode);
         toast.success(res.message ?? 'Profile picture updated successfully');
       }
     } catch (error) {

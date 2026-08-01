@@ -17,6 +17,7 @@ import {
 import UiButton from '@/components/ui/Button';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import {
   AdminPage,
   AdminPageHeader,
@@ -142,6 +143,7 @@ export function AdminMentorTierUpgradeApplicationsTab() {
           decision_reason: reviewNotes.trim(),
         },
       }).unwrap();
+      void refreshAfterMentorChange();
       toast.success(res?.message ?? 'Application reviewed successfully');
       closeReview();
     } catch (error) {

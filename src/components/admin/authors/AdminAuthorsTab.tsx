@@ -21,6 +21,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 
 const MENTORS_MODEL = 'Mentors';
 
@@ -108,6 +109,7 @@ export function AdminAuthorsTab() {
           payload: { status: newStatus, status_reason: statusReason },
         }).unwrap();
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          void refreshAfterMentorChange(suspendAuthor.short_code);
           toast.success(res.message ?? `"${suspendAuthor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
         }
       } catch {

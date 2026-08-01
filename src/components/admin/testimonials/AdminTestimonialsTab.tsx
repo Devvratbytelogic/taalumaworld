@@ -21,6 +21,7 @@ import { TestimonialForm } from './TestimonialForm';
 import { StarRating } from './StarRating';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { refreshAfterTestimonialChange } from '@/store/server-api/refreshCache';
 
 const TESTIMONIAL_MODEL = 'Testimonial';
 
@@ -76,6 +77,7 @@ export function AdminTestimonialsTab() {
     try {
       const res = await addTestimonial(formData).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterTestimonialChange();
         toast.success(res.message ?? 'Testimonial added successfully');
         setShowAddForm(false);
       }
@@ -88,6 +90,7 @@ export function AdminTestimonialsTab() {
     try {
       const res = await updateTestimonial({ id, values: formData }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterTestimonialChange();
         toast.success(res.message ?? 'Testimonial updated successfully');
         setEditingId(null);
       }
@@ -100,6 +103,7 @@ export function AdminTestimonialsTab() {
     try {
       const res = await deleteTestimonial({ id }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterTestimonialChange();
         toast.success(res.message ?? 'Testimonial deleted');
         dispatch(closeModal());
       }

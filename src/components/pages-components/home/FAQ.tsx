@@ -2,13 +2,13 @@
 import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useGetFAQQuery } from '@/store/rtkQueries/userGetAPI'
-import FAQSkeleton from '@/components/skeleton-loader/FAQSkeleton'
+import type { IFAQAPIResponseDataEntity } from '@/types/user/testimonial'
 
-export default function FAQ() {
-    const { data, isLoading } = useGetFAQQuery()
-    const faqs = data?.data?.data
+type FAQProps = {
+    faqs: IFAQAPIResponseDataEntity[];
+};
 
+export default function FAQ({ faqs }: FAQProps) {
     return (
         <>
                 <div className="container mb-12">
@@ -20,16 +20,13 @@ export default function FAQ() {
                     </div>
 
                     <div className="space-y-4">
-                        {isLoading
-                            ? <FAQSkeleton />
-                            : faqs?.map((faq) => (
-                                <FAQItem
-                                    key={faq._id}
-                                    question={faq.question}
-                                    answer={faq.answer}
-                                />
-                            ))
-                        }
+                        {faqs.map((faq) => (
+                            <FAQItem
+                                key={faq._id}
+                                question={faq.question}
+                                answer={faq.answer}
+                            />
+                        ))}
                     </div>
                 </div>
         </>

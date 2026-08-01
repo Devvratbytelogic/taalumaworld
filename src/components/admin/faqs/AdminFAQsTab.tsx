@@ -20,6 +20,7 @@ import { AdminFAQsHeader } from './AdminFAQsHeader';
 import { AdminFAQsSearch } from './AdminFAQsSearch';
 import { FAQForm, type FAQFormValues } from './FAQForm';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { refreshAfterFaqChange } from '@/store/server-api/refreshCache';
 
 const FAQS_MODEL = 'FAQs';
 
@@ -82,6 +83,7 @@ export function AdminFAQsTab() {
     try {
       const res = await addFAQ(values).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterFaqChange();
         toast.success(res.message ?? 'FAQ added successfully');
         setShowAddForm(false);
       }
@@ -94,6 +96,7 @@ export function AdminFAQsTab() {
     try {
       const res = await updateFAQ({ id, values }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterFaqChange();
         toast.success(res.message ?? 'FAQ updated successfully');
         setEditingId(null);
       }
@@ -106,6 +109,7 @@ export function AdminFAQsTab() {
     try {
       const res = await deleteFAQ({ id }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterFaqChange();
         toast.success(res.message ?? 'FAQ deleted');
         dispatch(closeModal());
       }

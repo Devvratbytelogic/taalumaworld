@@ -7,7 +7,7 @@ import { ContentProtection } from "@/components/ContentProtection";
 import Script from "next/script";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 const roboto = Roboto({
   variable: "--font-roboto",

@@ -25,7 +25,6 @@ import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
 import { IMySeriesAPIResponse } from '@/types/user/mySeries';
 import { IWishlistAPIResponse } from '@/types/user/wishlist';
 import { IMyReadingHistoryAPIResponse } from '@/types/user/readingHistory';
-import { IFAQAPIResponse, ITestimonialsAPIResponse } from '@/types/user/testimonial';
 import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { ISingleBookAPIResponse } from '@/types/user/singleBook';
 import { ISearchResultsAPIResponse } from '@/types/user/saech';
@@ -245,23 +244,6 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['ReadingHistory'],
         }),
-        /** get testimonials */
-        getTestimonials: builder.query<ITestimonialsAPIResponse, void>({
-            query: () => ({
-                url: `/user/testimonial`,
-                method: 'GET',
-            }),
-        }),
-        /** get FAQs */
-        getFAQ: builder.query<IFAQAPIResponse, { type?: string } | void>({
-            query: (params) => ({
-                url: `/user/faqs`,
-                method: 'GET',
-                params: params && (params as { type?: string }).type
-                    ? { type: (params as { type?: string }).type }
-                    : undefined,
-            }),
-        }),
         /** get search results */
         getSearchResults: builder.query<ISearchResultsAPIResponse, string>({
             query: (query) => ({
@@ -405,8 +387,6 @@ export const {
     useGetMySeriesQuery,
     useGetWishlistQuery,
     useGetReadingHistoryQuery,
-    useGetTestimonialsQuery,
-    useGetFAQQuery,
     useGetSearchResultsQuery,
     useLazyGetTransactionInvoiceQuery,
     useLazyGetMpesaPaymentStatusQuery,

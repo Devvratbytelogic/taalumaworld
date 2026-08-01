@@ -18,6 +18,7 @@ import { AgreementModal, type AgreementFormValues } from './AgreementModal';
 import { AgreementViewModal } from './AgreementViewModal';
 import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { refreshAfterPolicyChange } from '@/store/server-api/refreshCache';
 
 const AGREEMENTS_MODEL = 'Agreements';
 
@@ -86,7 +87,7 @@ export function AdminAgreementsTab() {
         ? await updateAgreement({ agreementId: id, values }).unwrap()
         : await addAgreement(values).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-        console.log('res', res);
+        void refreshAfterPolicyChange(values.slug);
         toast.success(res.message ?? (id ? 'Agreement updated successfully' : 'Agreement created successfully'));
         setIsModalOpen(false);
         setEditingAgreementId(null);

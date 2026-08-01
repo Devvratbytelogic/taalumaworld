@@ -7,18 +7,31 @@ import LibraryContentSectionSkeleton from '@/components/skeleton-loader/LibraryC
 import AudienceSegmentation from '@/components/pages-components/home/AudienceSegmentation';
 import WhatIsABlueprint from '@/components/pages-components/home/WhatIsABlueprint';
 import CareerArchitectSection from '@/components/pages-components/home/CareerArchitectSection';
-import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
+import {
+  getAllMentorsServerAPI,
+  getFAQsServerAPI,
+  getGlobalSettingsServerAPI,
+  getTestimonialsServerAPI,
+} from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default async function HomePage() {
-  const globalSettingsRes = await getGlobalSettingsServerAPI()
+  const [globalSettingsRes, faqsRes, testimonialsRes] = await Promise.all([
+    getGlobalSettingsServerAPI(),
+    getFAQsServerAPI(),
+    getTestimonialsServerAPI(),
+  ]);
+
   const showMentorSection = globalSettingsRes?.data?.mentor_section_visibility !== false
 
   const mentors = showMentorSection
     ? (await getAllMentorsServerAPI({ limit: 4, page: 1 }))?.data?.data ?? []
     : []
+
+  const faqs = faqsRes?.data?.data ?? []
+  const testimonials = testimonialsRes?.data ?? []
 
   return (
     <>
@@ -47,10 +60,10 @@ export default async function HomePage() {
           <CareerArchitectSection />
 
           {/* Reader Testimonials */}
-          <ReaderTestimonials />
+          <ReaderTestimonials testimonials={testimonials} />
 
           {/* FAQ Section */}
-          <FAQ />
+          <FAQ faqs={faqs} />
         </div>
       </div>
     </>

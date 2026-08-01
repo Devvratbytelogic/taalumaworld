@@ -6,7 +6,7 @@ import MentorsDirectory from '@/components/pages-components/mentor/MentorsDirect
 import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
 import { getMentorSignupRoutePath } from '@/routes/routes';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
     title: 'Meet Our Mentors | TaalumaWorld',

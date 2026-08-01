@@ -50,6 +50,7 @@ import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/f
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
 
 const PAYOUT_FREQUENCIES = ["monthly", "quarterly", "annually"] as const;
@@ -197,6 +198,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
           setTempPhoto('');
           setPhotoFile(null);
           setIsEditing(false);
+          void refreshAfterMentorChange(profile?.short_code);
           toast.success(res.message ?? 'Profile updated successfully!');
         }
       } catch(error) {
@@ -248,7 +250,11 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
       <AdminPanel padding={false} className="overflow-hidden">
         <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-6 py-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <ProfileAvatarUpload src={profile?.profile_pic ?? ''} name={displayName} />
+            <ProfileAvatarUpload
+              src={profile?.profile_pic ?? ''}
+              name={displayName}
+              publicMentorShortCode={profile?.short_code}
+            />
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-semibold text-slate-900">{profile?.name ?? '—'}</h2>
               <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">

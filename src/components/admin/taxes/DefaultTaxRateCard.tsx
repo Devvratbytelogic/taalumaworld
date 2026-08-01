@@ -10,6 +10,7 @@ import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import toast from '@/utils/toast';
+import { refreshAfterSettingsChange } from '@/store/server-api/refreshCache';
 
 const TAXES_MODEL = 'Taxes';
 
@@ -54,6 +55,7 @@ export function DefaultTaxRateCard() {
 
       const updateRes = await updateGlobalSettings(formData).unwrap();
       if (updateRes?.http_status_code === 200 || updateRes?.http_status_code === 201) {
+        void refreshAfterSettingsChange();
         toast.success(updateRes.message ?? 'Default tax rate updated successfully');
       }
     } catch (err) {
@@ -69,7 +71,7 @@ export function DefaultTaxRateCard() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Percent className="h-[18px] w-[18px]" />
+            <Percent className="h-4.5 w-4.5" />
           </div>
           <div>
             <h2 className="text-base font-semibold text-slate-900">Default Tax Rate</h2>
@@ -79,7 +81,7 @@ export function DefaultTaxRateCard() {
           </div>
         </div>
 
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[240px]">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-60">
           <Label htmlFor="default_tax_rate">Default Tax Rate (%)</Label>
           <div className="flex items-center gap-2">
             <Input

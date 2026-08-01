@@ -36,6 +36,7 @@ import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQu
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -164,6 +165,7 @@ export function MentorProfileView() {
         payload: { status: newStatus, status_reason: statusReason },
       }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterMentorChange(suspendMentor.short_code);
         toast.success(res.message ?? `"${suspendMentor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
       }
     } catch {

@@ -17,6 +17,7 @@ import {
 import UiButton from '@/components/ui/Button';
 import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import { AdminPage, AdminPageHeader, AdminSearchInput, AdminSearchPanel, adminFilterPillClass, adminSelectClass, } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -127,6 +128,7 @@ export function AdminMentorVerificationTab() {
           decision_reason: decisionReason.trim(),
         },
       }).unwrap();
+      void refreshAfterMentorChange();
       toast.success(res?.message ?? 'Application reviewed successfully');
       closeReview();
     } catch (error) {

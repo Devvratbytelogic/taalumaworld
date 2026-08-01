@@ -11,6 +11,7 @@ import { Switch } from '../../ui/switch';
 import Button from '../../ui/Button';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
+import { refreshAfterSettingsChange } from '@/store/server-api/refreshCache';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
@@ -164,6 +165,7 @@ export function GeneralSettingsCard() {
         if (ogImageFile) formData.append('og_image', ogImageFile);
         const res = await updateGlobalSettings(formData).unwrap();
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          void refreshAfterSettingsChange();
           toast.success(res.message ?? 'Settings updated successfully');
         }
       } catch {

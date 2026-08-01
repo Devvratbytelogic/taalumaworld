@@ -1,135 +1,148 @@
-'use client';
-import React, { useState } from 'react'
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { HelpCircle, BookOpen, CreditCard, Users, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Search, HelpCircle, BookOpen, CreditCard, Users } from 'lucide-react';
-import FAQItem from '../faq/FAQItem';
-import Button from '../ui/Button';
-import { useGetFAQQuery } from '@/store/rtkQueries/userGetAPI';
+import FAQItem from '../faq/FAQItem'
+import Button from '../ui/Button'
+import { cn } from '@/components/ui/utils'
+import type { IFAQAPIResponseDataEntity } from '@/types/user/testimonial'
 
 const categories = [
     { id: 'all', label: 'All Questions', icon: HelpCircle },
     { id: 'reading', label: 'Reading & Blueprints', icon: BookOpen },
     { id: 'payment', label: 'Payments & Pricing', icon: CreditCard },
     { id: 'account', label: 'Account & Settings', icon: Users },
-];
+]
 
-export default function FaqSearch() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+type FaqSearchProps = {
+    faqs: IFAQAPIResponseDataEntity[]
+}
 
-    const { data, isLoading, isError } = useGetFAQQuery(
-        selectedCategory !== 'all' ? { type: selectedCategory } : undefined
-    );
-    const faqs = data?.data?.data ?? [];
+export default function FaqSearch({ faqs }: FaqSearchProps) {
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
 
-    const filteredFAQs = faqs.filter(faq => {
-        if (searchQuery === '') return true;
-        const q = searchQuery.toLowerCase();
-        return (
-            faq.question.toLowerCase().includes(q) ||
-            faq.answer.toLowerCase().includes(q)
-        );
-    });
+    const selectedCategory = searchParams.get('type') ?? 'all'
+    const searchFromUrl = searchParams.get('search') ?? ''
+    const [searchQuery, setSearchQuery] = useState(searchFromUrl)
+
+    useEffect(() => {
+        setSearchQuery(searchFromUrl)
+    }, [searchFromUrl])
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            const next = searchQuery.trim()
+            if (next === searchFromUrl) return
+
+            const params = new URLSearchParams(searchParams.toString())
+            if (next) params.set('search', next)
+            else params.delete('search')
+
+            const query = params.toString()
+            router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+        }, 300)
+
+        return () => clearTimeout(timeout)
+    }, [searchQuery, searchFromUrl, searchParams, pathname, router])
+
+    function setCategory(type: string) {
+        const params = new URLSearchParams(searchParams.toString())
+        if (type === 'all') params.delete('type')
+        else params.set('type', type)
+
+        const query = params.toString()
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    }
+
+    function clearFilters() {
+        setSearchQuery('')
+        router.replace(pathname, { scroll: false })
+    }
 
     return (
-        <>
-            <section className="container mt-6 mx-auto px-4">
-                <div className="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
-                    <div className="max-w-2xl mx-auto pt-4">
-                        <div className="relative">
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                            <Input
-                                type="text"
-                                placeholder="Search for answers..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="rounded-full h-14 pl-14 pr-6 text-base border border-input-border bg-white shadow-sm"
-                            />
-                        </div>
+        <div id="faq-content" style={{ scrollMarginTop: '120px' }} className="container">
+            <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full mb-4">
+                    <span className="text-sm font-medium text-primary">Browse Answers</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                    Everything you need to know
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Search by topic or browse categories to find answers about Taaluma.World.
+                </p>
+            </div>
+
+            <div className="max-w-5xl mx-auto space-y-8">
+                {/* Search */}
+                <div className="max-w-2xl mx-auto">
+                    <div className="relative">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <Input
+                            type="text"
+                            placeholder="Search for answers..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="rounded-md h-12 pl-12 pr-5 text-base border border-border bg-white"
+                        />
                     </div>
                 </div>
-            </section>
 
-            <section className="py-12 bg-background">
-                <div className="container">
-                    <div className="max-w-5xl mx-auto">
-
-                        {/* Category Tabs */}
-                        <div className="flex flex-wrap gap-3 justify-center mb-12">
-                            {categories.map((category) => {
-                                const Icon = category.icon;
-                                return (
-                                    <button
-                                        key={category.id}
-                                        onClick={() => setSelectedCategory(category.id)}
-                                        className={`flex items-center gap-2 px-5 py-3 rounded-full font-medium transition-all ${selectedCategory === category.id
-                                            ? 'bg-primary text-white shadow-md'
-                                            : 'bg-white text-foreground hover:bg-accent border border-border'
-                                            }`}
-                                    >
-                                        <Icon className="w-4 h-4" />
-                                        {category.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {/* Loading skeletons */}
-                        {isLoading && (
-                            <div className="space-y-4">
-                                {Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="h-20 rounded-3xl bg-muted animate-pulse" />
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Error state */}
-                        {isError && (
-                            <div className="text-center py-12">
-                                <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-                                    <Search className="w-8 h-8 text-destructive" />
-                                </div>
-                                <h3 className="text-xl font-semibold mb-2">Failed to load FAQs</h3>
-                                <p className="text-muted-foreground">Please try refreshing the page.</p>
-                            </div>
-                        )}
-
-                        {/* FAQ List */}
-                        {!isLoading && !isError && (
-                            <div className="space-y-4">
-                                {filteredFAQs.length > 0 ? (
-                                    filteredFAQs.map((faq) => (
-                                        <FAQItem
-                                            key={faq._id}
-                                            question={faq.question}
-                                            answer={faq.answer}
-                                        />
-                                    ))
-                                ) : (
-                                    <div className="text-center py-12">
-                                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                                            <Search className="w-8 h-8 text-muted-foreground" />
-                                        </div>
-                                        <h3 className="text-xl font-semibold mb-2">No results found</h3>
-                                        <p className="text-muted-foreground mb-6">
-                                            Try adjusting your search query
-                                        </p>
-                                        <Button
-                                            onPress={() => {
-                                                setSearchQuery('');
-                                                setSelectedCategory('all');
-                                            }}
-                                            className="global_btn rounded_full outline_primary"
-                                        >
-                                            Clear filters
-                                        </Button>
-                                    </div>
+                {/* Category filters */}
+                <div className="flex flex-wrap gap-2 justify-center">
+                    {categories.map((category) => {
+                        const Icon = category.icon
+                        const isActive = selectedCategory === category.id
+                        return (
+                            <Button
+                                key={category.id}
+                                type="button"
+                                onPress={() => setCategory(category.id)}
+                                className={cn(
+                                    'global_btn rounded_full shrink-0',
+                                    isActive ? 'bg_primary' : 'outline_primary',
                                 )}
-                            </div>
-                        )}
-                    </div>
+                                startContent={<Icon className="w-4 h-4" />}
+                            >
+                                {category.label}
+                            </Button>
+                        )
+                    })}
                 </div>
-            </section>
-        </>
+
+                {/* FAQ List */}
+                <div className="space-y-4">
+                    {faqs.length > 0 ? (
+                        faqs.map((faq) => (
+                            <FAQItem
+                                key={faq._id}
+                                question={faq.question}
+                                answer={faq.answer}
+                            />
+                        ))
+                    ) : (
+                        <div className="flex flex-col items-center text-center py-12 px-6 border border-border rounded-md bg-white">
+                            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                                <Search className="w-7 h-7 text-primary" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">No results found</h3>
+                            <p className="text-muted-foreground mb-6 max-w-md">
+                                Try a different search term or browse another category.
+                            </p>
+                            <Button
+                                onPress={clearFilters}
+                                className="global_btn rounded_full outline_primary w_fit"
+                            >
+                                Clear filters
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
     )
 }

@@ -21,6 +21,8 @@ import { editUserSchema } from '@/utils/formValidation';
 import { useUpdateUserMutation } from '@/store/rtkQueries/rolesPermissionsApi';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import toast from '@/utils/toast';
+import { USER_TYPE } from '@/constants/common';
+import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 
 interface EditUserModalProps {
   user: IAllUsersEntity | null;
@@ -71,6 +73,9 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
 
           const res = await updateUser({ id: user._id, payload: formData }).unwrap();
           if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+            const isMentor =
+              user.user_type === USER_TYPE.MENTOR || user.role?.name === USER_TYPE.MENTOR;
+            if (isMentor) void refreshAfterMentorChange(user.short_code);
             toast.success(res.message ?? 'Customer updated successfully');
             resetForm();
             setProfilePicFile(null);

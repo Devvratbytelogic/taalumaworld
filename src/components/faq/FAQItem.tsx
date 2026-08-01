@@ -1,18 +1,23 @@
-import { useState } from "react";
+'use client'
+
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface FAQItemProps {
-    question: string;
-    answer: string;
+    question: string
+    answer: string
 }
 
 export default function FAQItem({ question, answer }: FAQItemProps) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false)
 
     return (
-        <div className="border border-border rounded-3xl overflow-hidden bg-white hover:border-primary/30 transition-colors">
+        <div className="border border-border rounded-md overflow-hidden bg-white hover:border-primary/30 transition-colors">
             <button
+                type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-accent/30 transition-colors"
+                className="w-full flex items-center justify-between p-5 text-left hover:bg-accent/30 transition-colors"
             >
                 <span className="font-semibold pr-4">{question}</span>
                 <span className={`shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
@@ -27,10 +32,12 @@ export default function FAQItem({ question, answer }: FAQItemProps) {
                 </span>
             </button>
             {isOpen && (
-                <div className="px-6 pb-6 pt-0">
-                    <p className="text-muted-foreground leading-relaxed">{answer}</p>
+                <div className="px-5 pb-5 pt-0">
+                    <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:border-primary prose-blockquote:text-muted-foreground">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+                    </div>
                 </div>
             )}
         </div>
-    );
+    )
 }

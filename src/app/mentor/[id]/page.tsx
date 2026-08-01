@@ -4,7 +4,7 @@ import MentorProfileHero from '@/components/pages-components/mentor/MentorProfil
 import MentorBooksSection from '@/components/pages-components/mentor/MentorBooksSection';
 import { getAllMentorsServerAPI, getMentorDetailsServerAPI } from '@/store/server-api/serverSideAPIs';
 
-export const revalidate = 60;
+export const revalidate = 300;
 export const dynamicParams = true;
 
 const PAGE_LIMIT = 8;

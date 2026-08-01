@@ -20,6 +20,7 @@ import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, g
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
+import { refreshAfterSettingsChange } from '@/store/server-api/refreshCache';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { USER_TYPE } from '@/constants/common';
@@ -142,7 +143,12 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
 
     const onContentModeToggle = async (isBooks: boolean) => {
         const newMode = isBooks ? 'book' : 'chapter';
-        await updateGlobalSettings({ visible: newMode });
+        try {
+            await updateGlobalSettings({ visible: newMode }).unwrap();
+            void refreshAfterSettingsChange();
+        } catch (error) {
+            console.error('Failed to update content mode', error);
+        }
     };
 
     const handleLogout = () => {

@@ -1,12 +1,11 @@
-'use client';
 import React from 'react'
-import { useGetTestimonialsQuery } from '@/store/rtkQueries/userGetAPI'
-import ReaderTestimonialsSkeleton from '@/components/skeleton-loader/ReaderTestimonialsSkeleton'
+import type { ITestimonialsAPIResponseDataEntity } from '@/types/user/testimonial'
 
-export default function ReaderTestimonials() {
-    const { data, isLoading } = useGetTestimonialsQuery()
-    const testimonials = data?.data
+type ReaderTestimonialsProps = {
+    testimonials: ITestimonialsAPIResponseDataEntity[];
+};
 
+export default function ReaderTestimonials({ testimonials }: ReaderTestimonialsProps) {
     return (
         <>
             <div className="container">
@@ -18,47 +17,44 @@ export default function ReaderTestimonials() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                    {isLoading
-                        ? <ReaderTestimonialsSkeleton />
-                        : testimonials?.map((testimonial) => (
-                            <div
-                                key={testimonial._id}
-                                className="bg-white rounded-md border p-6"
-                            >
-                                <div className="flex items-center gap-1 mb-3">
-                                    {[...Array(5)].map((_, i) => (
-                                        <svg
-                                            key={i}
-                                            className={`w-4 h-4 ${i < testimonial.rating ? 'fill-primary' : 'fill-gray-200'}`}
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                                        </svg>
-                                    ))}
-                                </div>
-                                <p className="text-muted-foreground mb-4 leading-relaxed">
-                                    &ldquo;{testimonial.message}&rdquo;
-                                </p>
-                                <div className="flex items-center gap-3">
-                                    {testimonial.photo ? (
-                                        <img
-                                            src={testimonial.photo}
-                                            alt={testimonial.name}
-                                            className="w-10 h-10 rounded-full object-cover shrink-0"
-                                        />
-                                    ) : (
-                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
-                                            {testimonial.name.charAt(0).toUpperCase()}
-                                        </div>
-                                    )}
-                                    <div>
-                                        <p className="font-semibold">{testimonial.name}</p>
-                                        <p className="text-sm text-muted-foreground">{testimonial.title}</p>
+                    {testimonials && testimonials?.length > 0 && testimonials?.map((testimonial) => (
+                        <div
+                            key={testimonial._id}
+                            className="bg-white rounded-md border p-6"
+                        >
+                            <div className="flex items-center gap-1 mb-3">
+                                {[...Array(5)].map((_, i) => (
+                                    <svg
+                                        key={i}
+                                        className={`w-4 h-4 ${i < testimonial.rating ? 'fill-primary' : 'fill-gray-200'}`}
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                    </svg>
+                                ))}
+                            </div>
+                            <p className="text-muted-foreground mb-4 leading-relaxed">
+                                &ldquo;{testimonial.message}&rdquo;
+                            </p>
+                            <div className="flex items-center gap-3">
+                                {testimonial.photo ? (
+                                    <img
+                                        src={testimonial.photo}
+                                        alt={testimonial.name}
+                                        className="w-10 h-10 rounded-full object-cover shrink-0"
+                                    />
+                                ) : (
+                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
+                                        {testimonial.name.charAt(0).toUpperCase()}
                                     </div>
+                                )}
+                                <div>
+                                    <p className="font-semibold">{testimonial.name}</p>
+                                    <p className="text-sm text-muted-foreground">{testimonial.title}</p>
                                 </div>
                             </div>
-                        ))
-                    }
+                        </div>
+                    ))}
                 </div>
             </div>
         </>

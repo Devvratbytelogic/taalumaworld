@@ -9,7 +9,7 @@ import CommonCTA from '@/components/cta/CommonCTA';
 import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default async function WhyTaalumaExistsPage() {
     const globalSettingsRes = await getGlobalSettingsServerAPI();

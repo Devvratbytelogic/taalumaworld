@@ -7,6 +7,11 @@ import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
 import { IAgreementAPIResponse } from '@/types/user/agreement';
+import {
+  IFAQAPIResponse,
+  ITestimonialsAPIResponse,
+} from '@/types/user/testimonial';
+import { TAGS } from '@/store/server-api/cacheTags';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -25,17 +30,27 @@ async function getHeaders() {
   return headers;
 }
 
-/** Cookie-free fetch for public ISR pages (no auth / user-specific headers). */
+type PublicFetchOptions = {
+  revalidate?: number;
+  tags?: string[];
+};
+
+/** Cookie-free fetch for public ISR pages */
 export async function publicFetch<T>(
   path: string,
-  revalidate: number = 60
+  options: PublicFetchOptions = {}
 ): Promise<T | null> {
+  const { revalidate = 300, tags } = options;
+
   try {
     const urlString = `${API_BASE_URL}${path}`;
     const res = await fetch(urlString, {
       method: 'GET',
       headers: { Accept: 'application/json' },
-      next: { revalidate },
+      next: {
+        revalidate,
+        ...(tags?.length ? { tags } : {}),
+      },
     });
 
     if (!res.ok) {
@@ -60,7 +75,6 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
       headers: await getHeaders(),
     };
     const res = await fetch(urlString, fetchOptions);
-    // console.log('res.status', res.status);
 
     if (!res.ok) {
       if (res.status === 404) notFound();
@@ -70,23 +84,30 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
       return null;
     }
 
-    const data = await res.json();
-    return data as T;
-  } catch (error) {
-    // console.error(`Error fetching data from ${path}`, error);
+    return (await res.json()) as T;
+  } catch {
     return null;
   }
 }
 
 export async function getGlobalSettingsServerAPI() {
-  return publicFetch<IGlobalSettingsAPIResponse>(`/user/get-global`);
+  return publicFetch<IGlobalSettingsAPIResponse>(`/user/get-global`, {
+    tags: [TAGS.GLOBAL_SETTINGS],
+  });
 }
+
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
-  return serverFetch<ISingleChapterAPIResponse>(`/user/content/blueprint/${encodeURIComponent(slug)}`);
+  return serverFetch<ISingleChapterAPIResponse>(
+    `/user/content/blueprint/${encodeURIComponent(slug)}`
+  );
 }
+
 export async function getSingleSeriesServerAPI({ slug }: { slug: string }) {
-  return serverFetch<ISingleBookAPIResponse>(`/user/content/series/${encodeURIComponent(slug)}`);
+  return serverFetch<ISingleBookAPIResponse>(
+    `/user/content/series/${encodeURIComponent(slug)}`
+  );
 }
+
 export async function getAllMentorsServerAPI(params?: {
   search?: string;
   page?: number;
@@ -99,15 +120,14 @@ export async function getAllMentorsServerAPI(params?: {
   const queryString = query.toString();
 
   return publicFetch<IUserAllAuthorsAPIResponse>(
-    `/user/mentor-list${queryString ? `?${queryString}` : ''}`
+    `/user/mentor-list${queryString ? `?${queryString}` : ''}`,
+    { tags: [TAGS.MENTORS] }
   );
 }
+
 export async function getMentorDetailsServerAPI(
   shortCode: string,
-  params?: {
-    page?: number;
-    limit?: number;
-  }
+  params?: { page?: number; limit?: number }
 ) {
   const query = new URLSearchParams();
   if (params?.page) query.set('page', String(params.page));
@@ -115,9 +135,35 @@ export async function getMentorDetailsServerAPI(
   const queryString = query.toString();
 
   return publicFetch<IUserMentorDetailsAPIResponse>(
-    `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`
+    `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`,
+    { tags: [TAGS.MENTORS, TAGS.mentor(shortCode)] }
   );
 }
+
 export async function getAgreementBySlugServerAPI({ slug }: { slug: string }) {
-  return serverFetch<IAgreementAPIResponse>(`/user/agreements/${encodeURIComponent(slug)}`);
+  return publicFetch<IAgreementAPIResponse>(
+    `/user/agreements/${encodeURIComponent(slug)}`,
+    { tags: [TAGS.POLICIES, TAGS.policy(slug)] }
+  );
+}
+
+export async function getFAQsServerAPI(params?: {
+  type?: string;
+  search?: string;
+}) {
+  const query = new URLSearchParams();
+  if (params?.type) query.set('type', params.type);
+  if (params?.search) query.set('search', params.search);
+  const queryString = query.toString();
+
+  return publicFetch<IFAQAPIResponse>(
+    `/user/faqs${queryString ? `?${queryString}` : ''}`,
+    { tags: [TAGS.FAQS] }
+  );
+}
+
+export async function getTestimonialsServerAPI() {
+  return publicFetch<ITestimonialsAPIResponse>(`/user/testimonial`, {
+    tags: [TAGS.TESTIMONIALS],
+  });
 }

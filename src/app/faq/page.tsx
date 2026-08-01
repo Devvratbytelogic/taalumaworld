@@ -3,6 +3,9 @@ import FaqSearch from '@/components/search/FaqSearch'
 import { faqBannerData } from '@/data/data'
 import React from 'react'
 
+/** ISR: regenerate at most every 5 minutes */
+export const revalidate = 300;
+
 export default function FAQPage() {
     return (
         <>

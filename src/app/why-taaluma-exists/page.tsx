@@ -9,6 +9,9 @@ import CommonCTA from '@/components/cta/CommonCTA';
 import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/server-api/serverSideAPIs';
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
 
+/** ISR: regenerate at most every 5 minutes */
+export const revalidate = 300;
+
 export default async function WhyTaalumaExistsPage() {
     const globalSettingsRes = await getGlobalSettingsServerAPI();
     const showMentorSection = globalSettingsRes?.data?.mentor_section_visibility !== false;

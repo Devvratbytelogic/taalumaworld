@@ -5,8 +5,10 @@ import { AppProviders } from "../components/providers/AppProviders";
 import ConditionalSiteLayout from "@/components/layout/ConditionalSiteLayout";
 import { ContentProtection } from "@/components/ContentProtection";
 import Script from "next/script";
-import { cookies } from "next/headers";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
+
+/** Shared ISR window for public layout data (global settings). */
+export const revalidate = 300;
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -65,14 +67,9 @@ export default async function RootLayout({
 }>) {
   const res = await getGlobalSettingsServerAPI();
   const globalSettings = res?.data ?? null;
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token")?.value;
-  const userRole = cookieStore.get("user_role")?.value;
   // const logo = globalSettings?.logo ?? '/images/new-logo.png';
   const logo = '/images/new-logo.png';
   const contentMode = globalSettings?.visible ?? '';
-  const isAuthenticated = !!authToken;
-
 
   return (
     <html lang="en" className={`${roboto.variable} ${ubuntu.variable}`} suppressHydrationWarning>
@@ -112,7 +109,7 @@ export default async function RootLayout({
           <ContentProtection />
         )}
         <AppProviders>
-          <ConditionalSiteLayout isAuthenticated={isAuthenticated} userRole={userRole ?? ''} logo={logo} contentMode={contentMode}>
+          <ConditionalSiteLayout logo={logo} contentMode={contentMode}>
             {children}
           </ConditionalSiteLayout>
         </AppProviders>

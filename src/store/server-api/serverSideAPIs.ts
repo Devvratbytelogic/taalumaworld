@@ -8,6 +8,8 @@ import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
 import { IAgreementAPIResponse } from '@/types/user/agreement';
 
+const PUBLIC_REVALIDATE_SECONDS = 300;
+
 async function getHeaders() {
   const cookieStore = await cookies();
 
@@ -23,6 +25,33 @@ async function getHeaders() {
   }
 
   return headers;
+}
+
+/** Cookie-free fetch for public ISR pages (no auth / user-specific headers). */
+export async function publicFetch<T>(
+  path: string,
+  revalidate: number = PUBLIC_REVALIDATE_SECONDS
+): Promise<T | null> {
+  try {
+    const urlString = `${API_BASE_URL}${path}`;
+    const res = await fetch(urlString, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      next: { revalidate },
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) notFound();
+      const errorBody = await res.json().catch(() => ({}));
+      const message: string = (errorBody as { message?: string }).message ?? res.statusText;
+      console.error(`[API Error] ${res.status} — ${urlString}: ${message}`);
+      return null;
+    }
+
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
 }
 
 export async function serverFetch<T>(path: string): Promise<T | null> {
@@ -52,7 +81,7 @@ export async function serverFetch<T>(path: string): Promise<T | null> {
 }
 
 export async function getGlobalSettingsServerAPI() {
-  return serverFetch<IGlobalSettingsAPIResponse>(`/user/get-global`);
+  return publicFetch<IGlobalSettingsAPIResponse>(`/user/get-global`);
 }
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
   return serverFetch<ISingleChapterAPIResponse>(`/user/content/blueprint/${encodeURIComponent(slug)}`);
@@ -71,7 +100,7 @@ export async function getAllMentorsServerAPI(params?: {
   if (params?.limit) query.set('limit', String(params.limit));
   const queryString = query.toString();
 
-  return serverFetch<IUserAllAuthorsAPIResponse>(
+  return publicFetch<IUserAllAuthorsAPIResponse>(
     `/user/mentor-list${queryString ? `?${queryString}` : ''}`
   );
 }
@@ -87,7 +116,7 @@ export async function getMentorDetailsServerAPI(
   if (params?.limit) query.set('limit', String(params.limit));
   const queryString = query.toString();
 
-  return serverFetch<IUserMentorDetailsAPIResponse>(
+  return publicFetch<IUserMentorDetailsAPIResponse>(
     `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`
   );
 }

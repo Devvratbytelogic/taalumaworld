@@ -18,7 +18,7 @@ function handleUnauthorizedSession(message: string, status?: number): boolean {
     if (isLoggingOut) return true;
     addToast({ title: 'Error', description: 'Session expired. Please login again.', color: 'danger', timeout: 2000 });
     isLoggingOut = true;
-    // logoutAndRedirectToHome();
+    logoutAndRedirectToHome();
     return true;
 }
 

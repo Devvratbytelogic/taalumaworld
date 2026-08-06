@@ -46,6 +46,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [existingPdfRemoved, setExistingPdfRemoved] = useState(false);
   const slugManuallyEdited = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
@@ -109,6 +110,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (featuredImageFile) formData.append('cover_image', featuredImageFile);
       if (pdfFile) {
         formData.append('pdf_file', pdfFile);
+      } else if (existingPdfRemoved) {
+        formData.append('pdf_file', '');
       }
       if (vals.meta_title) formData.append('meta_title', vals.meta_title);
       if (vals.meta_description) formData.append('meta_description', vals.meta_description);
@@ -131,6 +134,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           setOgImageFile(null);
           setOgImagePreviewUrl(null);
           setPdfFile(null);
+          setExistingPdfRemoved(false);
           resetForm({ values: initialFormValues });
           slugManuallyEdited.current = false;
           toast.success(res.message ?? 'Blueprint updated successfully');
@@ -195,6 +199,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         toast.error('PDF must be less than 5MB');
         return;
       }
+      setExistingPdfRemoved(false);
       setPdfFile(file);
       setFieldValue('pdf_file', file);
       setFieldTouched('pdf_file', true);
@@ -256,10 +261,20 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     [ogImageFile, ogImagePreviewUrl, setFieldValue],
   );
 
-  const clearPdf = () => {
+  const clearSelectedPdf = () => {
     setPdfFile(null);
-    const existingPdf = chapterData?.pdf || null;
-    setFieldValue('pdf_file', existingPdf);
+    if (existingPdfRemoved || !chapterData?.pdf) {
+      setFieldValue('pdf_file', null);
+    } else {
+      setFieldValue('pdf_file', chapterData.pdf);
+    }
+    setFieldTouched('pdf_file', true);
+  };
+
+  const removeExistingPdf = () => {
+    setPdfFile(null);
+    setExistingPdfRemoved(true);
+    setFieldValue('pdf_file', null);
     setFieldTouched('pdf_file', true);
   };
 
@@ -410,22 +425,33 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <Button
                 type="button"
                 className="global_btn rounded_full outline_primary text-destructive hover:bg-destructive/10"
-                onPress={clearPdf}
+                onPress={clearSelectedPdf}
               >
                 Remove PDF
               </Button>
             ) : null}
           </div>
-          {!pdfFile && chapterData?.pdf ? (
-            <Link
-              href={chapterData.pdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-700 transition-colors hover:bg-slate-100"
-            >
-              <FileText className="h-4 w-4 shrink-0 text-red-500" />
-              <span className="truncate">Current PDF</span>
-            </Link>
+          {!pdfFile && chapterData?.pdf && !existingPdfRemoved ? (
+            <div className="inline-flex w-fit items-center gap-1 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1 text-sm text-slate-700">
+              <Link
+                href={chapterData.pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-w-0 items-center gap-2 transition-colors hover:text-slate-900"
+              >
+                <FileText className="h-4 w-4 shrink-0 text-red-500" />
+                <span className="truncate">Current PDF</span>
+              </Link>
+              <Button
+                type="button"
+                isIconOnly
+                aria-label="Remove current PDF"
+                className="global_btn rounded_full outline_primary icon_btn fit_btn h-7 w-7 min-w-7"
+                onPress={removeExistingPdf}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           ) : null}
           {errors.content && touched.content && !values.pdf_file ? (
             <p className="text-sm text-red-600">{errors.content}</p>

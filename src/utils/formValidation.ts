@@ -346,9 +346,8 @@ export const mentorPayoutDetailsSchema = Yup.object({
     .required('Account number is required'),
   bank_branch: Yup.string()
     .trim()
-    .min(2, 'Bank branch must be at least 2 characters')
     .max(120, 'Too long')
-    .required('Bank branch is required'),
+    .optional(),
   mpesa_number: Yup.string()
     .trim()
     .required('M-Pesa number is required')
@@ -363,6 +362,9 @@ export const mentorPayoutDetailsSchema = Yup.object({
   preferred_payment_frequency: Yup.string()
     .oneOf(['monthly', 'quarterly', 'annually'], 'Select a valid payout frequency')
     .required('Preferred payout frequency is required'),
+  paystack_preferred_settlement: Yup.string()
+    .oneOf(['mpesa', 'bank'], 'Select a valid settlement method')
+    .required('Preferred settlement method is required'),
   is_vat_registered: Yup.boolean().required(),
   vat_number: Yup.string()
     .trim()

@@ -59,19 +59,49 @@ export interface MentorInfo {
   bank_name: string;
   bank_branch: string;
   mpesa_number: string;
-  tax_id: string;
+  tax_id?: null;
+  is_vat_registered: boolean;
+  vat_number?: null;
   preferred_payment_frequency: string;
-  is_vat_registered?: boolean;
-  vat_number?: string | null;
   tier_id: string;
   tier_assigned_at: string;
   is_verified_mentor: boolean;
-  verified_mentor_at?: null;
-  verified_mentor_by?: null;
+  verified_mentor_at: string;
+  verified_mentor_by: string;
   verification_notes?: null;
   createdAt: string;
   updatedAt: string;
   __v: number;
+  paystack_bank_code: string;
+  paystack_preferred_settlement: string;
+  paystack_subaccount_status: string;
+  settlement_country: string;
+  paystack_bank_subaccount_code: string;
+  paystack_bank_subaccount_id: string;
+  paystack_mpesa_subaccount_code: string;
+  paystack_mpesa_subaccount_id: string;
+  paystack_subaccount_meta: PaystackSubaccountMeta;
+  paystack_subaccount_synced_at: string;
+  paystack_subaccount_error: string;
+}
+export interface PaystackSubaccountMeta {
+  bank: BankOrMpesa;
+  mpesa: BankOrMpesa;
+  synced_at: string;
+}
+export interface BankOrMpesa {
+  error: string;
+  data: Data1;
+}
+export interface Data1 {
+  status: boolean;
+  message: string;
+  meta: Meta;
+  type: string;
+  code: string;
+}
+export interface Meta {
+  nextStep: string;
 }
 export interface MentorEconomy {
   is_verified_mentor: boolean;

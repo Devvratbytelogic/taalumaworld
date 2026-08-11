@@ -214,9 +214,8 @@ export function MentorWalletTab() {
         const status = String(params.value ?? '').toLowerCase();
         return (
           <span
-            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-              STATUS_BADGE_CLASS[status] ?? 'bg-slate-100 text-slate-700 border border-slate-200'
-            }`}
+            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_BADGE_CLASS[status] ?? 'bg-slate-100 text-slate-700 border border-slate-200'
+              }`}
           >
             {displayValue(params.value)}
           </span>
@@ -231,17 +230,17 @@ export function MentorWalletTab() {
         eyebrow="Performance & Revenue"
         title="Wallet & Payouts"
         description="Real-time balance, refunds, and chargebacks."
-      >
-        <Button
+      />
+      {/* <Button
           type="button"
           className="global_btn rounded_full bg_primary"
           startContent={<ArrowDownToLine className="h-4 w-4" />}
           onPress={() => setWithdrawOpen(true)}
         >
           Request withdrawal
-        </Button>
+        </Button> 
       </AdminPageHeader>
-
+*/}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <AdminStatCard label="Total earnings" value={formatKes(walletSummary?.lifetime_earnings ?? 0)} icon={Wallet} tone="green" />
         <AdminStatCard label="Wallet balance" value={formatKes(walletSummary?.balance ?? 0)} icon={Wallet} tone="green" />

@@ -12,6 +12,7 @@ import { IAllContactusDataAPIResponse } from '@/types/contactData';
 import { IAllSubscribersAPIResponse } from '@/types/subscribers';
 import { IAllOrdersAPIResponse, ISingleOrderAPIResponse } from '@/types/order';
 import { ISingleChapterAPIResponse } from '@/types/singleChapter';
+import { IPaystackBanksAPIResponse } from '@/types/paystackBanks';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -162,6 +163,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminOrders'],
         }),
+
+        /** Paystack banks */
+        getPaystackBanks: builder.query<IPaystackBanksAPIResponse, void>({
+            query: () => ({
+                url: `/admin/paystack/banks`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -181,4 +190,5 @@ export const {
     useGetAllSubscribersQuery,
     useGetAllOrdersQuery,
     useGetOrderByIdQuery,
+    useGetPaystackBanksQuery,
 } = clientSideGetApis;

@@ -28,7 +28,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Transactions', id: 'transactions', label: 'Transactions', href: getAdminSectionRoutePath('transactions'), icon: KshIcon },
             { model: 'Coupon', id: 'coupons', label: 'Coupons', href: getAdminSectionRoutePath('coupons'), icon: Tag },
             { model: 'Taxes', id: 'taxes', label: 'Taxes', href: getAdminSectionRoutePath('taxes'), icon: Percent },
-            { model: 'Withdrawal', id: 'withdrawal_requests', label: 'Withdrawals', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
+            // { model: 'Withdrawal', id: 'withdrawal_requests', label: 'Withdrawals', href: getAdminSectionRoutePath('withdrawal_requests'), icon: Banknote },
         ],
     },
     {

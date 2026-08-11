@@ -188,7 +188,7 @@ export const adminPostApi = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags: ['AdminProfile'],
+            invalidatesTags: ['AdminProfile', 'AdminUserConsentStatus'],
         }),
 
         /** FAQs */

@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const, expires: 7 } // 7 days
+const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const, expires: 1 } // 7 days
 const SESSION_COOKIE_OPTIONS = { ...COOKIE_OPTIONS }
 
 /** Cookie name for auth token (used by server/layout for reading auth state) */

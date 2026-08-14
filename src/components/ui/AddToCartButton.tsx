@@ -70,7 +70,8 @@ export default function AddToCartButton({
                 onSuccess?.();
             }
         } catch (error) {
-            console.log('error adding to cart', error);
+            // Errors are already surfaced to the user via the global RTK Query error toast.
+            console.error('Failed to add to cart', error);
         }
     };
 

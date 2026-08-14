@@ -35,6 +35,9 @@ export default function BookDetailsModal() {
     const displayPrice = book?.effectivePrice;
     const canAccessFull = book?.isFree || book?.canRead;
 
+    // Series priced per-chapter can't be added to cart as a whole book; the user must
+    // open the series and add individual blueprints instead.
+    const isPricingModelChapter = book?.pricingModel === VISIBLE.CHAPTER;
 
     const viewFullDetails = () => {
         onClose();
@@ -55,7 +58,7 @@ export default function BookDetailsModal() {
                 <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                         <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
-                            Full Series
+                            {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
                         </Badge>
                         {book?.isFree ? (
                             <Badge className="text-success border-success/20 bg-success/10 rounded-full px-4 py-1 text-xs">
@@ -160,6 +163,15 @@ export default function BookDetailsModal() {
                     {canAccessFull ? (
                         <Button className="global_btn rounded_full bg_primary w-full" onPress={viewFullDetails} startContent={<BookOpen className="h-4 w-4" />}>
                             Start Reading
+                        </Button>
+                    ) : isPricingModelChapter ? (
+                        // This series is priced per blueprint, so it can't be added to cart as a whole.
+                        <Button
+                            className="global_btn rounded_full bg_primary w-full"
+                            onPress={viewFullDetails}
+                            startContent={<Eye className="h-4 w-4" />}
+                        >
+                            View Blueprints
                         </Button>
                     ) : (
                         <>

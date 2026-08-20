@@ -1,9 +1,9 @@
 'use client';
 
-import { BookOpen, FileText } from 'lucide-react';
+import { BookOpen, FileText, BadgeCheck } from 'lucide-react';
 import Link from 'next/link';
 import ImageComponent from '@/components/ui/ImageComponent';
-import ShareButtons from '@/components/blueprint/ShareButtons'; 
+import ShareButtons from '@/components/blueprint/ShareButtons';
 import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
 import { VISIBLE } from '@/constants/contentMode';
 import { getSingleAuthorRoutePath } from '@/routes/routes';
@@ -26,7 +26,7 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                 Series
               </span>
-             
+
               {bookDetails?.priceLabel && (
                 <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
                   {bookDetails?.priceLabel ?? ''}
@@ -57,7 +57,12 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
                   )}
                   <div>
                     <p className="text-xs text-muted-foreground">Mentor</p>
-                    <p className="font-medium text-foreground">{mentor?.name ?? ''}</p>
+                    <p className="flex items-center gap-1 font-medium text-foreground">
+                      {mentor?.name ?? ''}
+                      {(mentor?.is_verified_mentor || mentor?.is_mentor_verified) && (
+                        <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
+                      )}
+                    </p>
                   </div>
                 </Link>
               )}

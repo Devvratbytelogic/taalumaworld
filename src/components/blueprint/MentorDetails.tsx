@@ -4,7 +4,7 @@ import Link from 'next/link';
 import ImageComponent from '@/components/ui/ImageComponent';
 import NameInitials from '@/components/ui/NameInitials';
 import { IMentor } from '@/types/user/singleBook';
-import { Facebook, Globe, Linkedin, Mail, Phone } from 'lucide-react';
+import { Facebook, Globe, Linkedin, Mail, Phone, ShieldCheck } from 'lucide-react';
 import { getSingleAuthorRoutePath } from '@/routes/routes';
 
 interface MentorDetailsProps {
@@ -47,23 +47,30 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
 
     const mentorHeader = (
         <>
-            <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.2)]">
-                {data?.profile_pic ? (
-                    <ImageComponent
-                        src={data?.profile_pic}
-                        alt={data?.name}
-                        object_cover
-                    />
-                ) : (
-                    <NameInitials
-                        name={data?.name ?? 'Mentor'}
-                        className="flex h-full w-full items-center justify-center bg-primary/10 text-xl font-semibold uppercase text-primary"
-                    />
+            <div className="relative mx-auto mb-4 h-24 w-24">
+                <div className="h-full w-full overflow-hidden rounded-full border-2 border-white bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.2)]">
+                    {data?.profile_pic ? (
+                        <ImageComponent
+                            src={data?.profile_pic}
+                            alt={data?.name}
+                            object_cover
+                        />
+                    ) : (
+                        <NameInitials
+                            name={data?.name ?? 'Mentor'}
+                            className="flex h-full w-full items-center justify-center bg-primary/10 text-xl font-semibold uppercase text-primary"
+                        />
+                    )}
+                </div>
+                {data?.is_verified_mentor || data?.is_mentor_verified && (
+                    <div className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-secondary-accent">
+                        <ShieldCheck className="h-3.5 w-3.5 text-white" aria-label="Verified mentor" />
+                    </div>
                 )}
             </div>
 
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                Mentor
+                {data?.is_verified_mentor || data?.is_mentor_verified ? 'Verified Mentor' : 'Mentor'}
             </p>
             <h3 className="mt-2 font-ubuntu text-lg font-bold leading-tight text-[#1A1A1A]">
                 {data?.name ?? '-'}

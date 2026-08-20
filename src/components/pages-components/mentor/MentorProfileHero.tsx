@@ -47,6 +47,7 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
       console.error('error following mentor', error);
     }
   };
+  console.log('mentor', mentor);
 
   return (
     <>
@@ -62,9 +63,11 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
                 </div>
               )}
             </div>
-            <div className="absolute -right-1 -bottom-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-secondary-accent">
-              <ShieldCheck className="h-4 w-4 text-white" />
-            </div>
+            {(mentor?.is_verified_mentor) && (
+              <div className="absolute -right-1 -bottom-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-secondary-accent">
+                <ShieldCheck className="h-4 w-4 text-white" aria-label="Verified mentor" />
+              </div>
+            )}
           </div>
 
           <div className="min-w-0 flex-1">

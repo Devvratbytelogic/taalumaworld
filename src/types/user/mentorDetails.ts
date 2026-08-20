@@ -24,6 +24,7 @@ export interface IMentorInfo {
   id: string;
   isFollowed?: boolean;
   followerCount?: number;
+  is_verified_mentor?: boolean;
 }
 export interface IRoleId {
   _id: string;

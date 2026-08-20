@@ -53,6 +53,7 @@ export interface IMentor {
     is_verified: boolean;
     phone: string;
     is_mentor_verified: boolean;
+    is_verified_mentor?: boolean;
     professionalBio: string;
     linkedin: string;
     facebook: string;

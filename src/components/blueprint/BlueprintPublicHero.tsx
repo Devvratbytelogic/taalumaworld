@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, FileText, ShoppingCart, Wallet } from 'lucide-react';
+import { BookOpen, FileText, ShoppingCart, Wallet, BadgeCheck } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
@@ -115,7 +115,12 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                     )}
                     <div>
                       <p className="text-xs text-muted-foreground">Author</p>
-                      <p className="font-medium text-foreground">{data?.createdBy?.name}</p>
+                      <p className="flex items-center gap-1 font-medium text-foreground">
+                        {data?.createdBy?.name}
+                        {(data?.createdBy?.is_verified_mentor || data?.createdBy?.is_mentor_verified) && (
+                          <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
+                        )}
+                      </p>
                     </div>
                   </Link>
                 )}

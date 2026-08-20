@@ -1,11 +1,28 @@
 'use client'
 import Image from 'next/image'
 import React, { useState } from 'react'
+import { getInitials } from '@/utils/getInitials'
 
 interface ImageComponentProps {
   src: string | undefined;
   alt: string | undefined;
   object_cover: boolean;
+}
+
+function resolveImageSrc(src: string | undefined): string | null {
+  if (typeof src !== 'string') return null
+  const value = src.trim().replace(/\\/g, '/')
+  if (!value) return null
+  if (
+    value.startsWith('/') ||
+    value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('blob:') ||
+    value.startsWith('data:')
+  ) {
+    return value
+  }
+  return null
 }
 
 export default function ImageComponent({
@@ -15,33 +32,19 @@ export default function ImageComponent({
 }: ImageComponentProps) {
 
   const [hasError, setHasError] = useState(false);
+  const resolvedSrc = resolveImageSrc(src);
 
-  // 🔹 initials logic
-  const getInitials = (name?: string) => {
-    if (!name) return "NA";
-    const words = name.trim().split(/\s+/);
-
-    if (words.length === 1) {
-      return words[0].substring(0, 2).toUpperCase();
-    }
-
-    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-  };
-
-
-
-  // If already errored OR url is invalid → show initials
-  if (hasError) {
+  if (hasError || !resolvedSrc) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-sky-600 text-sm font-semibold uppercase">
-        {getInitials(alt)}
+        {getInitials(alt ?? '', 'NA')}
       </div>
     );
   }
 
   return (
     <Image
-      src={typeof src === 'string' ? src : '/images/eye-glass-placeholder.png'}
+      src={resolvedSrc}
       width={1000}
       height={1000}
       alt={alt || 'image'}

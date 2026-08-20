@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 export type LibraryFilters = {
     isFree: boolean;
     isPurchased: boolean;
-    mentorId: string | null;
+    mentorIds: string[];
     tags: string[];
 };
 
@@ -39,7 +39,7 @@ export default function FilterOptions({
     const activeFilterCount =
         (filters.isFree ? 1 : 0) +
         (isAuthenticated && filters.isPurchased ? 1 : 0) +
-        (filters.mentorId ? 1 : 0) +
+        filters.mentorIds.length +
         filters.tags.length;
 
     const contentLabel = viewMode === VISIBLE.BOOK ? 'series' : 'blueprints';

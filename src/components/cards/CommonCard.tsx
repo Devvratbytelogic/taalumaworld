@@ -22,15 +22,17 @@ export default function CommonCard({ data }: CommonCardProps) {
         ? (data?.pricingModel === VISIBLE.CHAPTER)
         : (data?.series?.pricingModel === VISIBLE.CHAPTER)
 
-    const displayPrice = isBook
-        ? (data?.effectivePrice)
-        : (isPricingModelChapter ? data?.effectivePrice : data?.series?.effectivePrice)
+    const displayPrice = Number(
+        isBook
+            ? data?.effectivePrice
+            : (isPricingModelChapter ? data?.effectivePrice : data?.series?.effectivePrice)
+    ) || 0
 
     const handleOpen = () => {
         dispatch(
             openModal({
                 componentName: isBook ? 'BookDetailsModal' : 'ChapterDetailsModal',
-                data: { chapter: data },
+                data: { chapter: data, type: data?.type },
             })
         )
     }

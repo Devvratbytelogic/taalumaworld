@@ -1,5 +1,6 @@
 import React from 'react'
 import type { ITestimonialsAPIResponseDataEntity } from '@/types/user/testimonial'
+import ImageComponent from '@/components/ui/ImageComponent';
 
 type ReaderTestimonialsProps = {
     testimonials: ITestimonialsAPIResponseDataEntity[];
@@ -38,10 +39,10 @@ export default function ReaderTestimonials({ testimonials }: ReaderTestimonialsP
                             </p>
                             <div className="flex items-center gap-3">
                                 {testimonial.photo ? (
-                                    <img
+                                    <ImageComponent
                                         src={testimonial.photo}
                                         alt={testimonial.name}
-                                        className="w-10 h-10 rounded-full object-cover shrink-0"
+                                        object_cover={true}
                                     />
                                 ) : (
                                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">

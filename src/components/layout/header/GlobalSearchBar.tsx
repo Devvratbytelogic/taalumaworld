@@ -17,7 +17,8 @@ interface GlobalSearchBarProps {
 const MIN_QUERY_LENGTH = 2;
 
 function formatPrice(price: number) {
-  return price > 0 ? `KSH ${price.toFixed(2)}` : 'FREE';
+  const amount = Number(price) || 0;
+  return amount > 0 ? `KSH ${amount.toFixed(2)}` : 'FREE';
 }
 
 export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {

@@ -29,10 +29,9 @@ export default function BookDetailsModal() {
     const router = useRouter();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
     const book = data?.chapter;
-
     const onClose = () => dispatch(closeModal());
 
-    const displayPrice = book?.effectivePrice;
+    const displayPrice = Number(book?.effectivePrice) || 0;
     const canAccessFull = book?.isFree || book?.canRead;
 
     // Series priced per-chapter can't be added to cart as a whole book; the user must
@@ -156,11 +155,15 @@ export default function BookDetailsModal() {
                                 <span>Topics covered</span>
                             </div>
                             <div className="flex items-center gap-2 flex-wrap">
-                                {book?.tags?.map((tag: string) => (
-                                    <Badge key={tag} variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
-                                        {tag}
-                                    </Badge>
-                                ))}
+                                {book.tags.map((tag: unknown, index: number) => {
+                                    const label = typeof tag === 'string' ? tag : String(tag ?? '');
+                                    if (!label) return null;
+                                    return (
+                                        <Badge key={`${label}-${index}`} variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
+                                            {label}
+                                        </Badge>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -205,7 +208,7 @@ export default function BookDetailsModal() {
                                 id={book?.id}
                                 type={VISIBLE.BOOK}
                                 className="global_btn rounded_full bg_primary w-full"
-                                label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                                label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
                                 onLoginCancel={() =>
                                     dispatch(
                                         openModal({

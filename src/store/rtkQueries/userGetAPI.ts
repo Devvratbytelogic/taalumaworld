@@ -156,10 +156,11 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
         }),
         /** get all authors */
-        getUserAllAuthors: builder.query<IUserAllAuthorsAPIResponse, void>({
-            query: () => ({
+        getUserAllAuthors: builder.query<IUserAllAuthorsAPIResponse, { search?: string } | void>({
+            query: (params) => ({
                 url: `/user/mentor-list`,
                 method: 'GET',
+                params: params?.search ? { search: params.search } : undefined,
             }),
         }),
         /** get all tags */

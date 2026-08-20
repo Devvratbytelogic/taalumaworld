@@ -15,7 +15,7 @@ const PAGE_LIMIT = 8;
 const EMPTY_FILTERS: LibraryFilters = {
     isFree: false,
     isPurchased: false,
-    mentorId: null,
+    mentorIds: [],
     tags: [],
 };
 
@@ -29,6 +29,7 @@ export default function LibraryContentSection() {
 
     const debouncedSearch = useDebounce(search, 400);
     const tagsKey = filters.tags.join(',');
+    const mentorsKey = filters.mentorIds.join(',');
 
     // Drop purchased filter if the user logs out while it was active.
     useEffect(() => {
@@ -39,7 +40,7 @@ export default function LibraryContentSection() {
 
     useEffect(() => {
         setPage(1);
-    }, [debouncedSearch, filters.isFree, filters.isPurchased, filters.mentorId, tagsKey]);
+    }, [debouncedSearch, filters.isFree, filters.isPurchased, mentorsKey, tagsKey]);
 
     const { data, isLoading, isFetching } = useGetAllChaptersQuery({
         page,
@@ -47,7 +48,7 @@ export default function LibraryContentSection() {
         ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
         ...(filters.isFree ? { isFree: true } : {}),
         ...(isAuthenticated && filters.isPurchased ? { isPurchased: true } : {}),
-        ...(filters.mentorId ? { mentorId: filters.mentorId } : {}),
+        ...(filters.mentorIds.length > 0 ? { mentorId: filters.mentorIds.join(',') } : {}),
         ...(filters.tags.length > 0 ? { tags: filters.tags.join(',') } : {}),
     });
     const chapters = data?.data?.items;

@@ -37,9 +37,11 @@ export default function ChapterDetailsModal() {
     ? (chapter?.pricingModel === VISIBLE.CHAPTER)
     : (chapter?.series?.pricingModel === VISIBLE.CHAPTER)
 
-  const displayPrice = isBook
-    ? (chapter?.effectivePrice)
-    : (isPricingModelChapter ? chapter?.effectivePrice : chapter?.series?.effectivePrice)
+  const displayPrice = Number(
+    isBook
+      ? chapter?.effectivePrice
+      : (isPricingModelChapter ? chapter?.effectivePrice : chapter?.series?.effectivePrice)
+  ) || 0
 
   const viewFullDetails = () => {
     dispatch(closeModal());
@@ -163,11 +165,15 @@ export default function ChapterDetailsModal() {
                 <span>Topics covered</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                {chapter?.tags?.map((tag: string) => (
-                  <Badge key={tag} variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
-                    {tag}
-                  </Badge>
-                ))}
+                {chapter.tags.map((tag: unknown, index: number) => {
+                  const label = typeof tag === 'string' ? tag : String(tag ?? '');
+                  if (!label) return null;
+                  return (
+                    <Badge key={`${label}-${index}`} variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
+                      {label}
+                    </Badge>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -191,7 +197,7 @@ export default function ChapterDetailsModal() {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-primary">
-                  {chapter?.series?.effectivePrice > 0 ? `KSH ${chapter?.series?.effectivePrice?.toFixed(2)}` : 'FREE'}
+                  {Number(chapter?.series?.effectivePrice) > 0 ? `KSH ${Number(chapter?.series?.effectivePrice).toFixed(2)}` : 'FREE'}
                 </p>
                 <p className="text-xs text-muted-foreground">Full Series</p>
               </div>
@@ -235,7 +241,7 @@ export default function ChapterDetailsModal() {
                 id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
                 type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
                 className="global_btn rounded_full bg_primary w-full"
-                label={`Add to Cart - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
                 onLoginCancel={() =>
                   dispatch(
                     openModal({

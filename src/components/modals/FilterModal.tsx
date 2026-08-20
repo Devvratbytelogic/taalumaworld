@@ -12,7 +12,9 @@ import { useGetUserAllAuthorsQuery, useGetAllTagsQuery } from '@/store/rtkQuerie
 import FilterModalSkeleton from '@/components/skeleton-loader/FilterModalSkeleton';
 import type { LibraryFilters } from '@/components/pages-components/home/FilterOptions';
 import { useAuth } from '@/hooks/useAuth';
+import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/components/ui/utils';
+import type { IUserAllAuthorsDataEntity } from '@/types/user/allAuthors';
 
 function SectionLabel({
   children,
@@ -114,43 +116,54 @@ export default function FilterModal() {
   const modalFilters = data?.filters as LibraryFilters | undefined;
   const onApply = data?.onApply as ((next: LibraryFilters) => void) | undefined;
 
-  const [tempMentorId, setTempMentorId] = useState<string | null>(null);
+  const [tempMentorIds, setTempMentorIds] = useState<string[]>([]);
+  const [selectedMentors, setSelectedMentors] = useState<IUserAllAuthorsDataEntity[]>([]);
   const [tempTags, setTempTags] = useState<string[]>([]);
   const [isFree, setIsFree] = useState(false);
   const [isPurchased, setIsPurchased] = useState(false);
   const [mentorSearch, setMentorSearch] = useState('');
+  const debouncedMentorSearch = useDebounce(mentorSearch.trim(), 400);
 
   useEffect(() => {
     if (!isOpen) return;
-    setTempMentorId(modalFilters?.mentorId ?? null);
+    setTempMentorIds(modalFilters?.mentorIds ?? []);
+    setSelectedMentors([]);
     setTempTags(modalFilters?.tags ?? []);
     setIsFree(Boolean(modalFilters?.isFree));
     setIsPurchased(isAuthenticated && Boolean(modalFilters?.isPurchased));
     setMentorSearch('');
   }, [isOpen, modalFilters, isAuthenticated]);
 
-  const { data: authorsResponse, isLoading: isLoadingAuthors } = useGetUserAllAuthorsQuery();
+  const { data: authorsResponse, isLoading: isLoadingAuthors, isFetching: isFetchingAuthors } = useGetUserAllAuthorsQuery(
+    debouncedMentorSearch ? { search: debouncedMentorSearch } : undefined,
+  );
   const { data: tagsResponse, isLoading: isLoadingTags } = useGetAllTagsQuery();
 
-  const isLoadingFilters = isLoadingAuthors || isLoadingTags;
+  const isLoadingFilters = (isLoadingAuthors && !authorsResponse) || isLoadingTags;
   const authors = authorsResponse?.data?.data ?? [];
   const allTags = tagsResponse?.data ?? [];
 
-  const mentorQuery = mentorSearch.trim().toLowerCase();
-  const filteredAuthors = (mentorQuery
-    ? authors.filter((author) => author.name.toLowerCase().includes(mentorQuery))
-    : authors
-  ).slice().sort((a, b) => {
-    const aSelected = tempMentorId === a.id ? 0 : 1;
-    const bSelected = tempMentorId === b.id ? 0 : 1;
-    if (aSelected !== bSelected) return aSelected - bSelected;
-    return a.name.localeCompare(b.name);
-  });
+  useEffect(() => {
+    setSelectedMentors((prev) => {
+      const next = tempMentorIds
+        .map((id) => authors.find((author) => author.id === id) ?? prev.find((mentor) => mentor.id === id))
+        .filter((mentor): mentor is IUserAllAuthorsDataEntity => Boolean(mentor));
+      const unchanged =
+        next.length === prev.length &&
+        next.every((mentor, index) => mentor.id === prev[index]?.id);
+      return unchanged ? prev : next;
+    });
+  }, [tempMentorIds, authors]);
 
-  const selectedMentor = authors.find((author) => author.id === tempMentorId) ?? null;
-
-  const handleMentorToggle = (authorId: string) => {
-    setTempMentorId((prev) => (prev === authorId ? null : authorId));
+  const handleMentorToggle = (author: IUserAllAuthorsDataEntity) => {
+    setTempMentorIds((prev) =>
+      prev.includes(author.id) ? prev.filter((id) => id !== author.id) : [...prev, author.id]
+    );
+    setSelectedMentors((prev) =>
+      prev.some((mentor) => mentor.id === author.id)
+        ? prev.filter((mentor) => mentor.id !== author.id)
+        : [...prev, author]
+    );
   };
 
   const handleTagToggle = (tag: string) => {
@@ -162,7 +175,7 @@ export default function FilterModal() {
   const currentFilters = (): LibraryFilters => ({
     isFree,
     isPurchased: isAuthenticated && isPurchased,
-    mentorId: tempMentorId,
+    mentorIds: tempMentorIds,
     tags: tempTags,
   });
 
@@ -172,18 +185,19 @@ export default function FilterModal() {
   };
 
   const handleReset = () => {
-    setTempMentorId(null);
+    setTempMentorIds([]);
+    setSelectedMentors([]);
     setTempTags([]);
     setIsFree(false);
     setIsPurchased(false);
     setMentorSearch('');
-    onApply?.({ isFree: false, isPurchased: false, mentorId: null, tags: [] });
+    onApply?.({ isFree: false, isPurchased: false, mentorIds: [], tags: [] });
   };
 
   const activeFilterCount =
     (isFree ? 1 : 0) +
     (isAuthenticated && isPurchased ? 1 : 0) +
-    (tempMentorId ? 1 : 0) +
+    tempMentorIds.length +
     tempTags.length;
 
   return (
@@ -242,9 +256,9 @@ export default function FilterModal() {
               </section>
 
               <section className="space-y-2.5">
-                <SectionLabel count={tempMentorId ? 1 : 0}>Mentor</SectionLabel>
+                <SectionLabel count={tempMentorIds.length}>Mentor</SectionLabel>
 
-                {authors.length > 0 ? (
+                {authors.length > 0 || mentorSearch.trim() ? (
                   <div className="rounded-2xl border border-border/80 bg-background overflow-hidden">
                     <div className="relative border-b border-border/70">
                       <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -267,30 +281,33 @@ export default function FilterModal() {
                       )}
                     </div>
 
-                    {selectedMentor ? (
+                    {selectedMentors.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5 px-3 py-2.5 border-b border-border/70 bg-muted/30">
-                        <button
-                          type="button"
-                          onClick={() => handleMentorToggle(selectedMentor.id)}
-                          className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary pl-2.5 pr-1.5 py-1 text-xs font-medium capitalize"
-                        >
-                          <span className="truncate max-w-36">{selectedMentor.name}</span>
-                          <span className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-primary/15">
-                            <X className="h-3 w-3" />
-                          </span>
-                        </button>
+                        {selectedMentors.map((mentor) => (
+                          <button
+                            key={mentor.id}
+                            type="button"
+                            onClick={() => handleMentorToggle(mentor)}
+                            className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary pl-2.5 pr-1.5 py-1 text-xs font-medium capitalize"
+                          >
+                            <span className="truncate max-w-36">{mentor.name}</span>
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-primary/15">
+                              <X className="h-3 w-3" />
+                            </span>
+                          </button>
+                        ))}
                       </div>
                     ) : null}
 
-                    {filteredAuthors.length > 0 ? (
-                      <ul className="max-h-52 overflow-y-auto divide-y divide-border/60">
-                        {filteredAuthors.map((author) => {
-                          const selected = tempMentorId === author.id;
+                    {authors.length > 0 ? (
+                      <ul className={`max-h-52 overflow-y-auto divide-y divide-border/60 ${isFetchingAuthors ? 'opacity-60' : ''}`}>
+                        {authors.map((author) => {
+                          const selected = tempMentorIds.includes(author.id);
                           return (
                             <li key={author.id}>
                               <button
                                 type="button"
-                                onClick={() => handleMentorToggle(author.id)}
+                                onClick={() => handleMentorToggle(author)}
                                 className={cn(
                                   'flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-colors',
                                   selected ? 'bg-primary/4' : 'hover:bg-muted/50'

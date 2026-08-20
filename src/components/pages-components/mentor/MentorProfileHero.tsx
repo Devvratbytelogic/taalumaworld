@@ -47,7 +47,6 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
       console.error('error following mentor', error);
     }
   };
-  console.log('mentor', mentor);
 
   return (
     <>

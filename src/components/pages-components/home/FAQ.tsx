@@ -20,7 +20,7 @@ export default function FAQ({ faqs }: FAQProps) {
                     </div>
 
                     <div className="space-y-4">
-                        {faqs.map((faq) => (
+                        {(faqs ?? []).map((faq) => (
                             <FAQItem
                                 key={faq._id}
                                 question={faq.question}
@@ -57,7 +57,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             {isOpen && (
                 <div className="px-5 pb-5 pt-0">
                     <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:border-primary prose-blockquote:text-muted-foreground">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer ?? ''}</ReactMarkdown>
                     </div>
                 </div>
             )}

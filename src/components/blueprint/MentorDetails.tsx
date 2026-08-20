@@ -62,7 +62,7 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
                         />
                     )}
                 </div>
-                {data?.is_verified_mentor || data?.is_mentor_verified && (
+                {(data?.is_verified_mentor || data?.is_mentor_verified) && (
                     <div className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-secondary-accent">
                         <ShieldCheck className="h-3.5 w-3.5 text-white" aria-label="Verified mentor" />
                     </div>
@@ -70,7 +70,7 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
             </div>
 
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                {data?.is_verified_mentor || data?.is_mentor_verified ? 'Verified Mentor' : 'Mentor'}
+                {(data?.is_verified_mentor || data?.is_mentor_verified) ? 'Verified Mentor' : 'Mentor'}
             </p>
             <h3 className="mt-2 font-ubuntu text-lg font-bold leading-tight text-[#1A1A1A]">
                 {data?.name ?? '-'}

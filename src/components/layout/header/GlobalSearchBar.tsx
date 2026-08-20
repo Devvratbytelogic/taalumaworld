@@ -15,7 +15,6 @@ interface GlobalSearchBarProps {
 }
 
 const MIN_QUERY_LENGTH = 2;
-const MAX_RESULTS_PER_SECTION = 5;
 
 function formatPrice(price: number) {
   return price > 0 ? `KSH ${price.toFixed(2)}` : 'FREE';

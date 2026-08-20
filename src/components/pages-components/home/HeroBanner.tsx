@@ -87,7 +87,7 @@ export default function HeroBanner() {
                                                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border border-gray-200"
                                                     style={{ backgroundColor: AVATAR_COLORS[index % AVATAR_COLORS.length] }}
                                                 >
-                                                    {user.name.charAt(0).toUpperCase()}
+                                                    {user.name?.charAt(0)?.toUpperCase() ?? '?'}
                                                 </div>
                                             )
                                         ))}

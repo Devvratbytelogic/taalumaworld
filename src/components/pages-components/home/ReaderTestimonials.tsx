@@ -45,7 +45,7 @@ export default function ReaderTestimonials({ testimonials }: ReaderTestimonialsP
                                     />
                                 ) : (
                                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
-                                        {testimonial.name.charAt(0).toUpperCase()}
+                                        {testimonial.name?.charAt(0)?.toUpperCase() ?? '?'}
                                     </div>
                                 )}
                                 <div>

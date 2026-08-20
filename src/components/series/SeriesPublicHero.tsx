@@ -1,10 +1,12 @@
 'use client';
 
 import { BookOpen, FileText } from 'lucide-react';
+import Link from 'next/link';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons'; 
 import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
 import { VISIBLE } from '@/constants/contentMode';
+import { getSingleAuthorRoutePath } from '@/routes/routes';
 
 interface SeriesPublicHeroProps {
   data: ISingleBookAPIResponseData | null;
@@ -40,7 +42,10 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-border py-4 text-sm">
               {mentor?.name && (
-                <div className="flex items-center gap-2.5">
+                <Link
+                  href={getSingleAuthorRoutePath(mentor?.short_code || mentor?.id || '')}
+                  className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+                >
                   {mentor?.profile_pic ? (
                     <div className="h-9 w-9 overflow-hidden rounded-full border border-border">
                       <ImageComponent src={mentor?.profile_pic ?? ''} alt={mentor?.name ?? ''} object_cover />
@@ -54,7 +59,7 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
                     <p className="text-xs text-muted-foreground">Mentor</p>
                     <p className="font-medium text-foreground">{mentor?.name ?? ''}</p>
                   </div>
-                </div>
+                </Link>
               )}
 
               {!!bookDetails?.chapterCount && (

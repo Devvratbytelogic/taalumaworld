@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import ImageComponent from '@/components/ui/ImageComponent';
 import NameInitials from '@/components/ui/NameInitials';
 import { IMentor } from '@/types/user/singleBook';
 import { Facebook, Globe, Linkedin, Mail, Phone } from 'lucide-react';
+import { getSingleAuthorRoutePath } from '@/routes/routes';
 
 interface MentorDetailsProps {
     data: IMentor | undefined;
@@ -39,31 +41,46 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
 
     const hasContact = Boolean(data?.email || data?.phone);
     const hasSocial = Boolean(data?.linkedin || data?.facebook);
+    const mentorPath = data?.short_code || data?.id
+        ? getSingleAuthorRoutePath(data?.short_code || data?.id || '')
+        : null;
+
+    const mentorHeader = (
+        <>
+            <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.2)]">
+                {data?.profile_pic ? (
+                    <ImageComponent
+                        src={data?.profile_pic}
+                        alt={data?.name}
+                        object_cover
+                    />
+                ) : (
+                    <NameInitials
+                        name={data?.name ?? 'Mentor'}
+                        className="flex h-full w-full items-center justify-center bg-primary/10 text-xl font-semibold uppercase text-primary"
+                    />
+                )}
+            </div>
+
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+                Mentor
+            </p>
+            <h3 className="mt-2 font-ubuntu text-lg font-bold leading-tight text-[#1A1A1A]">
+                {data?.name ?? '-'}
+            </h3>
+        </>
+    );
 
     return (
         <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_32px_-24px_rgba(0,0,0,0.18)]">
             <div className="border-b border-[#ECECEC] bg-[#FAFAFA] px-5 py-6 text-center">
-                <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.2)]">
-                    {data?.profile_pic ? (
-                        <ImageComponent
-                            src={data?.profile_pic}
-                            alt={data?.name}
-                            object_cover
-                        />
-                    ) : (
-                        <NameInitials
-                            name={data?.name ?? 'Mentor'}
-                            className="flex h-full w-full items-center justify-center bg-primary/10 text-xl font-semibold uppercase text-primary"
-                        />
-                    )}
-                </div>
-
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                    Mentor
-                </p>
-                <h3 className="mt-2 font-ubuntu text-lg font-bold leading-tight text-[#1A1A1A]">
-                    {data?.name ?? '-'}
-                </h3>
+                {mentorPath ? (
+                    <Link href={mentorPath} className="block hover:opacity-80 transition-opacity">
+                        {mentorHeader}
+                    </Link>
+                ) : (
+                    mentorHeader
+                )}
             </div>
 
             <div className="space-y-5 px-5 py-6">

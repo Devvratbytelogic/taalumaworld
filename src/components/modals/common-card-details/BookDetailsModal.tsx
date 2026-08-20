@@ -11,7 +11,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
 import { VISIBLE } from '@/constants/contentMode';
-import { getSeriesRoutePath } from '@/routes/routes';
+import { getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 
@@ -42,6 +42,13 @@ export default function BookDetailsModal() {
     const viewFullDetails = () => {
         onClose();
         router.push(getSeriesRoutePath(book?.slug ?? ''));
+    };
+
+    const viewMentorProfile = () => {
+        const mentorId = book?.mentor?.short_code || book?.mentor?.id;
+        if (!mentorId) return;
+        onClose();
+        router.push(getSingleAuthorRoutePath(mentorId));
     };
 
     return (
@@ -81,7 +88,18 @@ export default function BookDetailsModal() {
                     </div>
 
                     {book?.mentor && (
-                        <div className="border flex items-center gap-3 rounded-md bg-muted/40 p-3">
+                        <div
+                            className="border flex items-center gap-3 rounded-md bg-muted/40 p-3 cursor-pointer hover:border-primary/50 transition-colors"
+                            onClick={viewMentorProfile}
+                            role="link"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    viewMentorProfile();
+                                }
+                            }}
+                        >
                             <div className="w-11 h-11 rounded-full overflow-hidden border bg-linear-to-br from-primary/20 to-primary/5 ring-2 ring-background shrink-0 flex items-center justify-center">
                                 {book?.mentor?.profile_pic ? (
                                     <ImageComponent src={book?.mentor?.profile_pic} alt={book?.mentor?.name ?? ''} object_cover={true} />
@@ -93,7 +111,7 @@ export default function BookDetailsModal() {
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-1">
                                     <p className="text-sm font-semibold truncate tracking-tight">{book?.mentor?.name}</p>
-                                    {(book?.mentor?.is_verified || book?.mentor?.is_mentor_verified) && (
+                                    {(book?.mentor?.is_mentor_verified) && (
                                         <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
                                     )}
                                 </div>
@@ -171,7 +189,7 @@ export default function BookDetailsModal() {
                             onPress={viewFullDetails}
                             startContent={<Eye className="h-4 w-4" />}
                         >
-                            View Blueprints
+                            View Details
                         </Button>
                     ) : (
                         <>

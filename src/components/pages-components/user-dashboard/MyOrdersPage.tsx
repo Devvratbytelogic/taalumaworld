@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'nextjs-toploader/app';
 import moment from 'moment';
 import {
   ChevronLeft,
@@ -189,6 +190,7 @@ function OrderCard({
 }
 
 export function MyOrdersPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState('all');
   const [paymentStatus, setPaymentStatus] = useState('all');
@@ -241,6 +243,16 @@ export function MyOrdersPage() {
     setType('all');
     setFromDate('');
     setToDate('');
+  };
+
+  const scrollToContent = () => {
+    router.push(getHomeRoutePath(), { scroll: false });
+    window.setTimeout(() => {
+      const contentSection = document.getElementById('content-section');
+      if (contentSection) {
+        contentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleDownloadInvoice = async (orderId: string) => {
@@ -428,12 +440,12 @@ export function MyOrdersPage() {
                     Clear Filters
                   </Button>
                 ) : (
-                  <Link
-                    href={getHomeRoutePath()}
-                    className="global_btn mx-auto inline-flex items-center justify-center rounded_full bg_primary px-4 py-2 text-sm"
+                  <Button
+                    className="global_btn mx-auto rounded_full bg_primary"
+                    onPress={scrollToContent}
                   >
                     Explore content
-                  </Link>
+                  </Button>
                 )}
               </div>
             </div>

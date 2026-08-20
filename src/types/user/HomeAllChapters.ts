@@ -63,6 +63,7 @@ export interface IHomeAllChaptersMentor {
   linkedin?: string | null;
   facebook?: string | null;
   short_code?: string | null;
+  professionalBio?: string | null;
 }
 
 /** @deprecated use IHomeAllChaptersItemsEntity */

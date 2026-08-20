@@ -100,7 +100,10 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-border py-4 text-sm">
                 {data?.createdBy && (
-                  <div className="flex items-center gap-2.5">
+                  <Link
+                    href={getSingleAuthorRoutePath(data?.createdBy?.short_code || data?.createdBy?.id || '')}
+                    className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+                  >
                     {data?.createdBy?.profile_pic ? (
                       <div className="h-9 w-9 overflow-hidden rounded-full border border-border">
                         <ImageComponent src={data?.createdBy?.profile_pic} alt={data?.createdBy?.name} object_cover />
@@ -111,12 +114,10 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                       </div>
                     )}
                     <div>
-                      <Link href={getSingleAuthorRoutePath( data?.createdBy?.id ?? '')}>
-                        <p className="text-xs text-muted-foreground">Author</p>
-                        <p className="font-medium text-foreground">{data?.createdBy?.name}</p>
-                      </Link>
+                      <p className="text-xs text-muted-foreground">Author</p>
+                      <p className="font-medium text-foreground">{data?.createdBy?.name}</p>
                     </div>
-                  </div>
+                  </Link>
                 )}
 
                 {data?.seriesTitle && (

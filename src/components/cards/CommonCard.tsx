@@ -26,17 +26,19 @@ export default function CommonCard({ data }: CommonCardProps) {
         ? (data?.effectivePrice)
         : (isPricingModelChapter ? data?.effectivePrice : data?.series?.effectivePrice)
 
+    const handleOpen = () => {
+        dispatch(
+            openModal({
+                componentName: isBook ? 'BookDetailsModal' : 'ChapterDetailsModal',
+                data: { chapter: data },
+            })
+        )
+    }
+
     return (
         <Card
             className="group/card overflow-hidden cursor-pointer hover-lift gap-4 transition-all hover:border-primary/50 rounded-md flex flex-col h-full"
-            onClick={() =>
-                dispatch(
-                    openModal({
-                        componentName: isBook ? 'BookDetailsModal' : 'ChapterDetailsModal',
-                        data: { chapter: data },
-                    })
-                )
-            }
+            onClick={handleOpen}
         >
             {/* Cover Image */}
             <div className="aspect-2/2 overflow-hidden bg-muted relative shrink-0">
@@ -44,14 +46,14 @@ export default function CommonCard({ data }: CommonCardProps) {
                     <ImageComponent src={data?.coverImage ?? ''} alt={data?.title ?? ''} object_cover={true} />
                 </div>
 
-                {data?.mentor && (
-                    <MentorCardReveal
-                        name={data?.mentor?.name ?? 'Mentor'}
-                        avatar={data?.mentor?.profile_pic ?? undefined}
-                        bio={data?.mentor?.bio ?? 'Mentor bio'}
-                        social={{ linkedin: data?.mentor?.linkedin ?? '', facebook: data?.mentor?.facebook ?? '' }}
-                    />
-                )}
+                <MentorCardReveal
+                    name={data?.mentor?.name}
+                    avatar={data?.mentor?.profile_pic ?? undefined}
+                    bio={data?.mentor?.professionalBio}
+                    social={{ linkedin: data?.mentor?.linkedin ?? '', facebook: data?.mentor?.facebook ?? '' }}
+                    ctaLabel={isBook ? 'View Series' : 'View Blueprint'}
+                    onCtaClick={handleOpen}
+                />
 
                 {/* Wishlist */}
                 <WishlistButton

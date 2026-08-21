@@ -48,7 +48,7 @@ export default async function SingleSeriesPage({ params }: PageProps) {
         />
       )}
 
-      <div className="space-y-10 space_top">
+      <div className="space_top">
         <SeriesPublicHero data={data} slug={slug} />
         <SeriesPublicDetails data={data} />
       </div>

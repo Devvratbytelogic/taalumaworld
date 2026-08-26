@@ -105,13 +105,13 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
       </Link>
 
       <AdminPageHeader title="Blueprint details" description="Full details for this blueprint.">
-        {canEdit ? (
+        {/* {canEdit ? (
           <Link href={getEditChapterRoutePath(chapter.id, isMentor)}>
             <Button type="button" className="global_btn rounded_full bg_primary" startContent={<Edit2 className="h-4 w-4" />}>
               Edit Blueprint
             </Button>
           </Link>
-        ) : null}
+        ) : null} */}
       </AdminPageHeader>
 
       <AdminPanel className="p-6">

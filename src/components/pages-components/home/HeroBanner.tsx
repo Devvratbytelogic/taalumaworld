@@ -3,15 +3,25 @@ import React from 'react'
 import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent'
 import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI'
-import { useDispatch } from 'react-redux'
-import { openModal } from '@/store/slices/allModalSlice'
+import { useRouter } from 'next/navigation'
+import { getMentorLoginRoutePath, getUserDashboardBecomeMentorRoutePath } from '@/routes/routes'
+import { getUserRole, hasAuthCookie } from '@/utils/authCookies'
+import { USER_TYPE } from '@/constants/common'
 import ActiveReadersSkeleton from '@/components/skeleton-loader/ActiveReadersSkeleton'
 
 const AVATAR_COLORS = ['#0A66C2', '#8B5CF6', '#10B981', '#004182']
 
 export default function HeroBanner() {
-    const dispatch = useDispatch()
+    const router = useRouter()
     const { data: activeReadersData, isLoading: isActiveReadersLoading } = useGetActiveReadersQuery()
+
+    /** Signed-in Career Architects go straight to the mentor application; everyone else signs in first. */
+    const goToBecomeMentor = () => {
+        const role = hasAuthCookie() ? getUserRole() : undefined
+        const isCareerArchitect =
+            role === USER_TYPE.CAREER_ARCHITECT || role === USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT
+        router.push(isCareerArchitect ? getUserDashboardBecomeMentorRoutePath() : getMentorLoginRoutePath())
+    }
 
     const scrollToContent = () => {
         const contentSection = document.getElementById('content-section')
@@ -58,7 +68,7 @@ export default function HeroBanner() {
                                 </Button>
                                 <Button
                                     className="global_btn rounded_full outline_primary"
-                                    onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                                    onPress={goToBecomeMentor}
                                 >
                                     Become a Mentor
                                 </Button>

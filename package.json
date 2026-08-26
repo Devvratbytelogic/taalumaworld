@@ -7,7 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "cp -R node_modules/@dearhive/dearflip-jquery-flipbook/dflip public/dflip"
+    "postinstall": "cp -R node_modules/@dearhive/dearflip-jquery-flipbook/dflip public/dflip",
+    "trello": "node scripts/trello.js",
+    "trello:lists": "node scripts/trello.js lists",
+    "trello:side": "node scripts/trello.js side",
+    "trello:backend": "node scripts/trello.js backend",
+    "trello:explain": "node scripts/trello.js explain",
+    "trello:fix": "node scripts/trello.js fix",
+    "trello:qa": "node scripts/trello.js qa"
   },
   "dependencies": {
     "@dearhive/dearflip-jquery-flipbook": "^1.7.3",

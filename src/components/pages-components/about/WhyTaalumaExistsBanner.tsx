@@ -93,7 +93,7 @@ export default function WhyTaalumaExistsBanner() {
                             {/* Main image */}
                             <div className="relative z-10 rounded-md sm:rounded-xl overflow-hidden ring-1 ring-black/5 aspect-4/3">
                                 <ImageComponent
-                                    src="/images/common/about-img1.jpg"
+                                    src="/images/common/about-img1.webp"
                                     alt="Why Taaluma Exists Banner"
                                     object_cover={true}
                                 />

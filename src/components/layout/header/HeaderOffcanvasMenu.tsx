@@ -161,7 +161,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
           <div className="flex items-center justify-between">
             <Link href={getHomeRoutePath()} onClick={onClose}>
               <div className="h-9 w-33">
-                <ImageComponent src={logo || '/images/logo.png'} alt={brandName} object_cover={false} />
+                <ImageComponent src={logo || '/images/logo.webp'} alt={brandName} object_cover={false} />
               </div>
             </Link>
             <button

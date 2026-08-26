@@ -125,13 +125,15 @@ export function AdminChaptersTab() {
 
     const handleStatusChange = async (chapter: IChapter, status: BlueprintStatus) => {
         if (status === chapter.status || updatingId) return;
-        if (status === 'Published' && !chapter.isPublishAllowed) {
-            toast.error('This blueprint cannot be published yet');
-            return;
-        }
-        if (chapter.isPublishAllowed && (status === 'Pending' || status === 'Review')) {
-            toast.error('Pending and Review are unavailable once publishing is allowed');
-            return;
+        if (!isSuperAdmin) {
+            if (status === 'Published' && !chapter.isPublishAllowed) {
+                toast.error('This blueprint cannot be published yet');
+                return;
+            }
+            if (chapter.isPublishAllowed && (status === 'Pending' || status === 'Review')) {
+                toast.error('Pending and Review are unavailable once publishing is allowed');
+                return;
+            }
         }
 
         const formData = new FormData();
@@ -299,19 +301,19 @@ export function AdminChaptersTab() {
                             <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
                                 Change status
                             </DropdownMenuLabel>
-                            {!canPublish ? (
+                            {!isSuperAdmin && !canPublish ? (
                                 <p className="px-2 pb-1 text-[11px] text-amber-600">
                                     Publishing not allowed yet
                                 </p>
-                            ) : (
+                            ) : !isSuperAdmin ? (
                                 <p className="px-2 pb-1 text-[11px] text-muted-foreground">
                                     Pending and Review unavailable
                                 </p>
-                            )}
+                            ) : null}
                             <DropdownMenuSeparator />
                             {STATUSES.map((s) => {
-                                const publishBlocked = s === 'Published' && !canPublish;
-                                const reviewBlocked = canPublish && (s === 'Pending' || s === 'Review');
+                                const publishBlocked = !isSuperAdmin && s === 'Published' && !canPublish;
+                                const reviewBlocked = !isSuperAdmin && canPublish && (s === 'Pending' || s === 'Review');
                                 return (
                                     <DropdownMenuItem
                                         key={s}

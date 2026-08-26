@@ -113,7 +113,7 @@ export default function HeroBanner() {
                             {/* Main image */}
                             <div className="relative z-10 rounded-md sm:rounded-xl overflow-hidden ring-1 ring-black/5 aspect-4/3">
                                 <ImageComponent
-                                    src="/images/banner/home-banner2.jpg"
+                                    src="/images/banner/home-banner2.webp"
                                     alt="Teen reading on laptop"
                                     object_cover={true}
                                 />

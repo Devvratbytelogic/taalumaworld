@@ -21,7 +21,7 @@ export default function MeetOurTeam() {
                                 <div className="relative z-10 rounded-3xl overflow-hidden shadow-lg">
                                     <div className="h-80 md:h-96">
                                         <ImageComponent
-                                            src="/images/common/about-img3.png"
+                                            src="/images/common/about-img3.webp"
                                             alt="Daniel Muchika"
                                             object_cover={false}
                                         />

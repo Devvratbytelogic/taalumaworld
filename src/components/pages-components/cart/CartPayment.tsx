@@ -9,6 +9,7 @@ import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants
 import { getUserRole } from '@/utils/authCookies';
 import { USER_TYPE } from '@/constants/common';
 import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
+import { PaystackPayButton } from '@/components/payments/PaystackPayButton';
 import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
 
 interface CartPaymentProps {
@@ -31,7 +32,8 @@ export default function CartPayment({
   const [addressTouched, setAddressTouched] = useState(false);
   const [isMpesaPaying, setIsMpesaPaying] = useState(false);
   const [isWalletPaying, setIsWalletPaying] = useState(false);
-  const isPaymentBusy = isMpesaPaying || isWalletPaying;
+  const [isPaystackPaying, setIsPaystackPaying] = useState(false);
+  const isPaymentBusy = isMpesaPaying || isWalletPaying || isPaystackPaying;
 
   const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
     touchPoint: AGREEMENT_TOUCHPOINTS.CHECKOUT,
@@ -147,6 +149,15 @@ export default function CartPayment({
           onBeforePay={validateCheckout}
           onSuccess={onPaymentSuccess}
           onLoadingChange={setIsMpesaPaying}
+        />
+        <PaystackPayButton
+          cartID={cartId}
+          type="cart"
+          acceptedAgreementIds={acceptedAgreementIds}
+          isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
+          onBeforePay={validateCheckout}
+          onSuccess={onPaymentSuccess}
+          onLoadingChange={setIsPaystackPaying}
         />
       </div>
     </>

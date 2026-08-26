@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Check, Lock, MapPin, ShoppingBag } from 'lucide-react';
 import { useGetCartQuery } from '@/store/rtkQueries/userGetAPI';
@@ -12,6 +12,13 @@ import CartItemCard from './CartItemCard';
 import CartNoData from './CartNoData';
 import CartSummary from './CartSummary';
 import PaymentConfirmed from './PaymentConfirmed';
+import PaystackReturnStatus from './PaystackReturnStatus';
+
+function getPaystackReturnReference(searchParams: URLSearchParams): string | null {
+  const reference = searchParams.get('reference')?.trim();
+  const trxref = searchParams.get('trxref')?.trim();
+  return reference || trxref || null;
+}
 
 function CheckoutSteps({ current }: { current: 'cart' | 'checkout' }) {
   const steps = [
@@ -56,9 +63,11 @@ function CheckoutSteps({ current }: { current: 'cart' | 'checkout' }) {
   );
 }
 
-export default function CartPage() {
+function CartPageContent() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isCheckoutPage = pathname === getCartCheckoutRoutePath();
+  const paystackReference = getPaystackReturnReference(searchParams);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
@@ -73,6 +82,10 @@ export default function CartPage() {
   const taxAmount = cartData?.tax_amount ?? 0;
   const total = cartData?.total_amount ?? 0;
   const itemCount = cartData?.item_count ?? 0;
+
+  if (isCheckoutPage && paystackReference) {
+    return <PaystackReturnStatus reference={paystackReference} />;
+  }
 
   if (isPaymentConfirmed) {
     return <PaymentConfirmed transactionId={transactionId} orderNumber={orderNumber} />;
@@ -188,5 +201,13 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <Suspense fallback={<CartPageSkeleton />}>
+      <CartPageContent />
+    </Suspense>
   );
 }

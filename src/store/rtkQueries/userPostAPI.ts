@@ -166,6 +166,14 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['ReferralWalletLedger', 'Cart', 'MyChapters'],
         }),
+        /** initialize Paystack checkout (POST /user/paystack/pay) */
+        paystackPayment: builder.mutation({
+            query: (body) => ({
+                url: `/user/paystack/pay`,
+                method: 'POST',
+                body,
+            }),
+        }),
     }),
 });
 
@@ -191,4 +199,5 @@ export const {
     useDeleteUserAddressMutation,
     useCreateReviewMutation,
     useReferralWalletPayMutation,
+    usePaystackPaymentMutation,
 } = clientSidePostApis;

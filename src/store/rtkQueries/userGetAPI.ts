@@ -17,6 +17,42 @@ export type MpesaPaymentStatusResponse = {
         amount?: number | null;
     };
 };
+
+export type PaystackVerifyTransaction = {
+    _id?: string;
+    order_id?: string | null;
+    receipt_number?: string | null;
+    invoice_number?: string | null;
+    transaction_id?: string | null;
+    payment_status?: string;
+    payment_method?: string;
+    status?: string;
+    amount?: number | null;
+    currency?: string | null;
+    purchase_type?: string | null;
+    paid_at?: string | null;
+};
+
+export type PaystackVerifyResponse = {
+    http_status_code?: number;
+    success?: boolean;
+    status?: boolean;
+    message?: string;
+    data?: {
+        status?: string;
+        payment_status?: string;
+        reference?: string;
+        paystack_transaction_id?: string | null;
+        transaction_id?: string | null;
+        receipt_number?: string | null;
+        invoice_number?: string | null;
+        order_id?: string | null;
+        order_number?: string | number | null;
+        amount?: number | null;
+        currency?: string | null;
+        transaction?: PaystackVerifyTransaction;
+    };
+};
 import { IAddressListAPIResponse, IAddressAPIResponse } from '@/types/user/address';
 import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
@@ -266,6 +302,13 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        verifyPaystackPayment: builder.query<PaystackVerifyResponse, string>({
+            query: (reference) => ({
+                url: `/user/paystack/verify`,
+                method: 'GET',
+                params: { reference },
+            }),
+        }),
 
 
 
@@ -391,6 +434,7 @@ export const {
     useGetSearchResultsQuery,
     useLazyGetTransactionInvoiceQuery,
     useLazyGetMpesaPaymentStatusQuery,
+    useVerifyPaystackPaymentQuery,
 
 
 

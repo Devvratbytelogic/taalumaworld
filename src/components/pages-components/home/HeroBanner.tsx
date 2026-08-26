@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent'
 import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI'
 import { useRouter } from 'next/navigation'
-import { getMentorLoginRoutePath, getUserDashboardBecomeMentorRoutePath } from '@/routes/routes'
+import { getMentorSignupRoutePath, getUserDashboardBecomeMentorRoutePath } from '@/routes/routes'
 import { getUserRole, hasAuthCookie } from '@/utils/authCookies'
 import { USER_TYPE } from '@/constants/common'
 import ActiveReadersSkeleton from '@/components/skeleton-loader/ActiveReadersSkeleton'
@@ -20,7 +20,7 @@ export default function HeroBanner() {
         const role = hasAuthCookie() ? getUserRole() : undefined
         const isCareerArchitect =
             role === USER_TYPE.CAREER_ARCHITECT || role === USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT
-        router.push(isCareerArchitect ? getUserDashboardBecomeMentorRoutePath() : getMentorLoginRoutePath())
+        router.push(isCareerArchitect ? getUserDashboardBecomeMentorRoutePath() : getMentorSignupRoutePath())
     }
 
     const scrollToContent = () => {

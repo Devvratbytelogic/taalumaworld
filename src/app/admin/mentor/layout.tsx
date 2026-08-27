@@ -22,7 +22,7 @@ import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
 import { useAdminResendOtpMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
@@ -179,6 +179,10 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
 
       <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
         <DialogContent size="sm">
+          <DialogTitle className="sr-only">Verify your account</DialogTitle>
+          <DialogDescription className="sr-only">
+            Enter the verification code sent to your email.
+          </DialogDescription>
           <CommonOTPVerification
             email={mentorEmail}
             type="email_verification"

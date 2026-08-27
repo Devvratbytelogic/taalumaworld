@@ -34,6 +34,8 @@ export function MentorVerificationHeader({
 
   const onApply = () => dispatch(openModal({ componentName: 'ApplyVerifiedMentorModal' }));
 
+  const canApplyForVerification = !!profile?.is_verified && profile?.status === 'active';
+
   const isApprovedDecision = verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.APPROVED;
   const decisionBanner = isApprovedDecision
     ? {
@@ -95,16 +97,18 @@ export function MentorVerificationHeader({
               <ShieldX className="h-4 w-4" />
               Application Rejected
             </span>
-            <Button
-              type="button"
-              className="global_btn rounded_full bg_primary"
-              startContent={<ShieldCheck className="h-4 w-4" />}
-              onPress={onApply}
-            >
-              Re-apply
-            </Button>
+            {canApplyForVerification ? (
+              <Button
+                type="button"
+                className="global_btn rounded_full bg_primary"
+                startContent={<ShieldCheck className="h-4 w-4" />}
+                onPress={onApply}
+              >
+                Re-apply
+              </Button>
+            ) : null}
           </div>
-        ) : (
+        ) : canApplyForVerification ? (
           <Button
             type="button"
             className="global_btn rounded_full bg_primary"
@@ -113,7 +117,7 @@ export function MentorVerificationHeader({
           >
             Apply for Verified Mentor
           </Button>
-        )}
+        ) : null}
       </AdminPageHeader>
 
       {decisionReason ? (

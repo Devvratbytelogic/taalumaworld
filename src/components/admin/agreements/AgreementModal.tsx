@@ -196,8 +196,8 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                     value={values.agreementType}
                     onChange={(e) => setFieldValue('agreementType', e.target.value)}
                     onBlur={handleBlur}
-                    disabled={isSubmitting}
-                    className="admin-form-trigger w-full"
+                    disabled={isSubmitting || isEditing}
+                    className="admin-form-trigger w-full disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <option value="">Select agreement type</option>
                     {agreementTypeOptions.map((opt) => (

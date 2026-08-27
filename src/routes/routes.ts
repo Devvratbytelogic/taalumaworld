@@ -37,30 +37,6 @@ export function getTermsOfServiceRoutePath(): string {
   return '/policies/terms-of-service';
 }
 
-export function getMentorAgreementRoutePath(): string {
-  return '/policies/mentor-agreement';
-}
-
-export function getRevenueShareAgreementRoutePath(): string {
-  return '/policies/revenue-share-agreement';
-}
-
-export function getContentOwnershipLicensingRoutePath(): string {
-  return '/policies/content-ownership-licensing';
-}
-
-export function getCommunityStandardsRoutePath(): string {
-  return '/policies/community-standards';
-}
-
-export function getInstitutionalAccessTermsRoutePath(): string {
-  return '/policies/institutional-access-terms';
-}
-
-export function getRefundPolicyRoutePath(): string {
-  return '/policies/refund-policy';
-}
-
 export function getAdminRoutePath(): string {
   return '/admin';
 }

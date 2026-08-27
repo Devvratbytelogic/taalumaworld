@@ -64,6 +64,33 @@ function formatSettlementLabel(value?: string | null) {
   return value || '—';
 }
 
+/** Required profile fields, mirroring `mentorProfileDetailsSchema`, so the card can flag an incomplete setup. */
+function getMissingProfileFields(profile?: IAdminProfileAPIResponseData) {
+  const required: { label: string; value?: string | null }[] = [
+    { label: 'Full name', value: profile?.name },
+    { label: 'Bio', value: profile?.professionalBio },
+  ];
+
+  return required.filter((field) => !String(field.value ?? '').trim()).map((field) => field.label);
+}
+
+/** Required payout fields, mirroring `mentorPayoutDetailsSchema`, so the card can flag an incomplete setup. */
+function getMissingPayoutFields(mentorInfo?: MentorInfo | null) {
+  const required: { label: string; value?: string | null }[] = [
+    { label: 'Bank name', value: mentorInfo?.bank_name },
+    { label: 'Account number', value: mentorInfo?.bank_number },
+    { label: 'M-Pesa number', value: mentorInfo?.mpesa_number },
+    { label: 'Preferred payout frequency', value: mentorInfo?.preferred_payment_frequency },
+    { label: 'Preferred settlement', value: mentorInfo?.paystack_preferred_settlement },
+  ];
+
+  if (mentorInfo?.is_vat_registered) {
+    required.push({ label: 'VAT number', value: mentorInfo?.vat_number });
+  }
+
+  return required.filter((field) => !String(field.value ?? '').trim()).map((field) => field.label);
+}
+
 function paystackStatusBadgeClass(status?: string | null) {
   const normalized = (status ?? '').toLowerCase();
   if (['active', 'success', 'synced', 'verified'].includes(normalized)) {
@@ -108,6 +135,33 @@ function FormField({ id, label, value, onChange, onBlur, error, disabled, placeh
         className={error ? 'border-red-500' : ''}
       />
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+    </div>
+  );
+}
+
+/** Ribbon next to a card title telling the mentor whether that section's required fields are filled in. */
+function CompletionBadge({ isComplete }: { isComplete: boolean }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
+        isComplete ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700',
+      )}
+    >
+      {isComplete ? <CheckCircle2 className="h-3 w-3" /> : <CircleAlert className="h-3 w-3" />}
+      {isComplete ? 'Complete' : 'Incomplete'}
+    </span>
+  );
+}
+
+function MissingFieldsNotice({ title, fields }: { title: string; fields: string[] }) {
+  return (
+    <div className="mb-6 flex items-start gap-2.5 rounded-md border border-amber-100! bg-amber-50 px-3.5 py-3">
+      <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+      <div className="text-sm text-amber-800">
+        <p className="font-medium">{title}</p>
+        <p className="mt-0.5 text-xs">Add the following to complete this section: {fields.join(', ')}.</p>
+      </div>
     </div>
   );
 }
@@ -257,6 +311,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const displayPhoto = tempPhoto || profile?.profile_pic || '';
   const displayName = values.name || profile?.name || 'Mentor';
   const referralCode = profile?.short_code?.trim() || '';
+
+  const missingProfileFields = getMissingProfileFields(profile);
+  const isProfileIncomplete = missingProfileFields.length > 0;
 
   const copyReferralCode = async () => {
     if (!referralCode) return;
@@ -420,6 +477,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
         <div className="p-6">
           <AdminSectionHeader
             title="Personal information"
+            badge={<CompletionBadge isComplete={!isProfileIncomplete} />}
             action={
               !isEditing ? (
                 <Button
@@ -433,6 +491,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
               ) : null
             }
           />
+          {!isEditing && isProfileIncomplete ? (
+            <MissingFieldsNotice title="Your personal information is incomplete." fields={missingProfileFields} />
+          ) : null}
           {!isEditing ? (
             <dl className="grid gap-6 sm:grid-cols-2">
               <div>
@@ -722,6 +783,8 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
 
   const selectedBankOption = bankOptions && bankOptions?.length > 0 ? bankOptions.find((option) => option.value === values.bank_name) : null;
 
+  const missingPayoutFields = getMissingPayoutFields(mentorInfo);
+  const isPayoutIncomplete = missingPayoutFields.length > 0;
 
   return (
     <AdminPanel padding={false} className="overflow-hidden">
@@ -729,7 +792,10 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
         <div className="flex items-center gap-3">
           <SectionIcon icon={Wallet} />
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Payout details</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base font-semibold text-slate-900">Payout details</h2>
+              <CompletionBadge isComplete={!isPayoutIncomplete} />
+            </div>
             <p className="mt-0.5 text-xs text-slate-500">Bank, M-Pesa, and tax details used for your payouts.</p>
           </div>
         </div>
@@ -741,6 +807,10 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
       </div>
 
       <div className="p-6">
+        {!isEditing && isPayoutIncomplete ? (
+          <MissingFieldsNotice title="Your payout details are incomplete." fields={missingPayoutFields} />
+        ) : null}
+
         {!isEditing ? (
           <dl className="grid gap-6 sm:grid-cols-2">
             <div>

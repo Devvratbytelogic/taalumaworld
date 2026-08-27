@@ -155,7 +155,9 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-amber-900">Complete your account setup</p>
-                  <p className="text-sm text-amber-700">Your mentor account isn&apos;t active yet. Complete your profile to unlock the full dashboard.</p>
+                  <p className="text-sm text-amber-700">
+                    Your mentor account isn&apos;t active yet. Complete your personal information and payout details to raise your profile completion score and unlock the full dashboard.
+                  </p>
                 </div>
                 <Link
                   href={getMentorProfileRoutePath()}

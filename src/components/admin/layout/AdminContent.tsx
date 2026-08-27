@@ -130,14 +130,19 @@ export function AdminSearchInput({
 
 export function AdminSectionHeader({
   title,
+  badge,
   action,
 }: {
   title: string;
+  badge?: React.ReactNode;
   action?: React.ReactNode;
 }) {
   return (
     <div className="mb-5 flex items-center justify-between gap-4">
-      <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        {badge}
+      </div>
       {action}
     </div>
   );

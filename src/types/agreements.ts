@@ -66,39 +66,69 @@ export interface ISingleAgreementAgreementType {
 
 
 
+export interface IAgreementSentenceLinkAgreementType {
+  _id: string;
+  name: string;
+}
+export interface IAgreementSentenceLinkAgreement {
+  _id: string;
+  title: string;
+  slug: string;
+  version: string;
+  can_block: boolean;
+  agreement_type?: IAgreementSentenceLinkAgreementType;
+}
+export interface IAgreementSentenceLink {
+  phrase: string;
+  slug?: string;
+  _id?: string;
+  agreementType?: IAgreementSentenceLinkAgreementType | string | null;
+  agreement_type_id?: string;
+  agreement?: IAgreementSentenceLinkAgreement | null;
+}
+export interface IAgreementSentenceEntity {
+  _id: string;
+  text: string;
+  touchpoint: string;
+  is_required: boolean;
+  sort_order: number;
+  status?: string;
+  links?: IAgreementSentenceLink[] | null;
+  deletedAt?: null;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+}
+export interface IAgreementsByTouchpointData {
+  touchpoints?: string[] | null;
+  roles?: string[] | null;
+  sentences?: IAgreementSentenceEntity[] | null;
+}
+export interface IAgreementsByTouchpointAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IAgreementsByTouchpointData;
+  message: string;
+  timestamp: string;
+}
+export interface IAllAgreementSentencesAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IAgreementSentenceEntity[] | IAgreementsByTouchpointData;
+  message: string;
+  timestamp: string;
+}
+
 export interface IGetAgreementByTouchpointAndUserTypeAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data?: (IGetAgreementByTouchpointAndUserTypeDataEntity)[] | null;
+  data: IAgreementsByTouchpointData;
   message: string;
   timestamp: string;
 }
-export interface IGetAgreementByTouchpointAndUserTypeDataEntity {
-  _id: string;
-  title: string;
-  slug: string;
-  text: string;
-  status: string;
-  agreementType: IGetAgreementByTouchpointAndUserTypeAgreementType;
-  version: string;
-  content: string;
-  is_required: boolean;
-  can_block: boolean;
-}
-export interface IGetAgreementByTouchpointAndUserTypeAgreementType {
-  _id: string;
-  name: string;
-  description: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  deletedAt?: null;
-}
-
-
-
 
 export interface IGetUserConsentStatusAPIResponse {
   http_status_code: number;
@@ -109,7 +139,9 @@ export interface IGetUserConsentStatusAPIResponse {
   timestamp: string;
 }
 export interface IGetUserConsentStatusData {
-  visible_to: string;
+  role?: string;
+  visible_to?: string;
+  touchpoints?: string[] | null;
   agreements?: (IGetUserConsentStatusAgreementsEntity)[] | null;
   total: number;
   accepted_count: number;
@@ -120,12 +152,14 @@ export interface IGetUserConsentStatusAgreementsEntity {
   _id: string;
   title: string;
   is_required: boolean;
+  can_block?: boolean;
   slug?: string | null;
   agreement_type: IGetUserConsentStatusAgreementType;
   current_version: string;
   accepted_version: string;
   is_accepted: boolean;
   accepted_at: string;
+  touchpoints?: string[] | null;
 }
 export interface IGetUserConsentStatusAgreementType {
   _id: string;

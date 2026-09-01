@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { useRef } from 'react';
 import { useFormik } from 'formik';
 import { ShieldCheck } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
@@ -11,26 +11,18 @@ import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { fieldInvalidClassName } from '@/components/ui/field-styles';
 import toast from '@/utils/toast';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import { verifiedMentorApplicationSchema } from '@/utils/formValidation';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { useSubmitVerifiedMentorApplicationMutation } from '@/store/rtkQueries/verifiedMentorApplicationApis';
 
 export default function ApplyVerifiedMentorModal() {
     const dispatch = useDispatch();
     const { isOpen } = useSelector((state: RootState) => state.allModal);
     const onClose = () => dispatch(closeModal());
-
-    const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-        touchPoint: AGREEMENT_TOUCHPOINTS.VERIFIED_MENTOR_APPLICATION,
-        userType: AGREEMENT_VISIBLE_USER_TYPES.MENTOR,
-    });
-    const agreements = agreementsResponse?.data ?? [];
-    const requiredAgreementIds = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
+    const requiredAcceptedRef = useRef(false);
 
     const [submitVerifiedMentorApplication, { isLoading }] = useSubmitVerifiedMentorApplicationMutation();
 
@@ -42,9 +34,8 @@ export default function ApplyVerifiedMentorModal() {
                 accepted_agreement_ids: [] as string[],
             },
             validationSchema: verifiedMentorApplicationSchema,
-            validate: (vals) => {
-                const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
-                return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+            validate: () => {
+                return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
             },
             onSubmit: async (formValues) => {
                 try {
@@ -139,38 +130,16 @@ export default function ApplyVerifiedMentorModal() {
                             </div>
                         </div>
 
-                        {agreements.length > 0 ? (
-                            <div className="mt-4 space-y-2 rounded-lg border border-slate-200 bg-slate-50/60 p-3 text-left">
-                                {agreements.map((agreement) => (
-                                    <AgreementCheckbox
-                                        key={agreement._id}
-                                        id={agreement._id}
-                                        checked={values.accepted_agreement_ids.includes(agreement._id)}
-                                        error={agreementsError}
-                                        touched={touched.accepted_agreement_ids as boolean | undefined}
-                                        disabled={busy}
-                                        onCheckedChange={(checked) => {
-                                            const ids = checked
-                                                ? [...values.accepted_agreement_ids, agreement._id]
-                                                : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
-                                            setFieldValue('accepted_agreement_ids', ids);
-                                        }}
-                                        onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
-                                    >
-                                        {agreement?.text}{' '}
-                                        <Link
-                                            href={getPolicyBySlugRoutePath(agreement.slug)}
-                                            target="_blank"
-                                            className="font-medium text-primary hover:underline"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            {agreement.title}
-                                        </Link>
-                                        {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
-                                    </AgreementCheckbox>
-                                ))}
-                            </div>
-                        ) : null}
+                        <AgreementSentenceList
+                            touchpoint={AGREEMENT_TOUCHPOINTS.VERIFIED_MENTOR_APPLICATION}
+                            onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
+                            onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+                            error={agreementsError}
+                            touched={touched.accepted_agreement_ids as boolean | undefined}
+                            disabled={busy}
+                            onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+                            className="mt-4 space-y-2 rounded-lg border border-slate-200 bg-slate-50/60 p-3 text-left"
+                        />
                     </ModalBody>
 
                     <ModalFooter className="flex gap-3 mt-3 border-t border-slate-100 pt-3">

@@ -12,7 +12,7 @@ export function AdminAgreementsHeader({ onCreateAgreement, canAdd = true }: Admi
     <AdminPageHeader
       eyebrow="Legal"
       title="Agreements"
-      description="Manage the agreements users must accept at registration, checkout, and other key touchpoints."
+      description="Manage the legal documents users accept. Versions stay under the same agreement type."
     >
       {canAdd ? (
         <Button className="global_btn rounded_full bg_primary" onPress={onCreateAgreement} startContent={<Plus className="h-4 w-4" />}>

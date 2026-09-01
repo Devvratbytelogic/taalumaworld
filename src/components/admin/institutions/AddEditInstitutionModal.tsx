@@ -3,7 +3,6 @@
 import { useMemo } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import Link from 'next/link';
 import ReactSelect from 'react-select';
 import { Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -17,7 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import {
@@ -25,10 +23,7 @@ import {
   useUpdateInstitutionMutation,
 } from '@/store/rtkQueries/institutionApi';
 import { useGetAdminAllCouponsQuery } from '@/store/rtkQueries/couponApis';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
 import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import type { IAllInstitutionsDataEntity } from '@/types/institution';
 import toast from '@/utils/toast';
 import { institutionSchema } from '@/utils/formValidation';
@@ -47,19 +42,10 @@ export function AddEditInstitutionModal() {
 
   const [addInstitution, { isLoading: isAdding }] = useAddInstitutionMutation();
   const [updateInstitution, { isLoading: isUpdating }] = useUpdateInstitutionMutation();
-  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-    // touchPoint: AGREEMENT_TOUCHPOINTS.UNIVERSITY_REGISTRATION,
-    touchPoint: "",
-    userType: AGREEMENT_VISIBLE_USER_TYPES.SUPER_ADMIN,
-  });
   const { data: couponsResponse, isLoading: isCouponsLoading } = useGetAdminAllCouponsQuery(
     { type: COUPON_SCOPE_LABELS?.university?.toLowerCase() },
     { skip: !isOpen },
   );
-
-  const institutionAgreements = agreementsResponse?.data ?? [];
-  // Only agreements the API marks as `is_required` must be accepted before submitting.
-  const requiredAgreementIds = institutionAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
   const couponOptions: SelectOption[] = useMemo(
     () =>
@@ -88,13 +74,8 @@ export function AddEditInstitutionModal() {
       status: institution?.status ?? 'Active',
       books_pricing_type: institution?.books_pricing_type ?? 'Market Price',
       coupon: getCouponId(institution?.coupon),
-      accepted_agreement_ids: [] as string[],
     },
     validationSchema: institutionSchema,
-    validate: (vals) => {
-      const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
-      return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
-    },
     onSubmit: async (formValues) => {
       const payload = {
         name: formValues.name.trim(),
@@ -108,7 +89,6 @@ export function AddEditInstitutionModal() {
         contact_email: formValues.contact_email.trim(),
         books_pricing_type: formValues.books_pricing_type,
         coupon: formValues.books_pricing_type === 'Discount' ? formValues.coupon : '',
-        accepted_agreement_ids: formValues.accepted_agreement_ids,
       };
 
       try {
@@ -126,7 +106,6 @@ export function AddEditInstitutionModal() {
   });
 
   const isLoading = isAdding || isUpdating || isSubmitting;
-  const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
   const selectedCouponOption = couponOptions.find((option) => option.value === values.coupon) ?? null;
 
   return (
@@ -308,41 +287,6 @@ export function AddEditInstitutionModal() {
                 Upon promo expiry, users lose free access but can re-access books at this price.
               </p>
             </div>
-
-            {institutionAgreements && institutionAgreements.length > 0 && (
-              <div className="space-y-3">
-                {institutionAgreements.map((agreement) => (
-                  <AgreementCheckbox
-                    key={agreement._id}
-                    id={agreement._id}
-                    checked={values.accepted_agreement_ids.includes(agreement._id)}
-                    error={agreementsError}
-                    touched={touched.accepted_agreement_ids}
-                    onCheckedChange={(checked) => {
-                      const ids = checked
-                        ? [...values.accepted_agreement_ids, agreement._id]
-                        : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
-                      setFieldValue('accepted_agreement_ids', ids);
-                    }}
-                    onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
-                    disabled={isLoading}
-                  >
-                    {agreement && agreement?.text} &nbsp;
-                    <Link
-                      href={getPolicyBySlugRoutePath(agreement?.slug ?? '')}
-                      target="_blank"
-                      className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {agreement?.title}
-                    </Link>
-                    <span className="font-medium">
-                      {agreement.is_required && <span className="text-red-500"> *</span>}
-                    </span>
-                  </AgreementCheckbox>
-                ))}
-              </div>
-            )}
           </div>
 
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

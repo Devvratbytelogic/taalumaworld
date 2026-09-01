@@ -1,27 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { FileSignature, BadgeCheck, ExternalLink } from 'lucide-react';
+import { FileSignature, BadgeCheck } from 'lucide-react';
 import moment from 'moment';
 import Button from '@/components/ui/Button';
 import toast from '@/utils/toast';
-import { useGetUserConsentStatusQuery, useAcceptAgreementMutation } from '@/store/rtkQueries/agreementAPIs';
+import { useGetUserConsentStatusQuery, useAcceptAgreementMutation, useAcceptAllAgreementsMutation } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
+import { AgreementDocumentModal } from '@/components/ui/AgreementDocumentModal';
 
 interface ProfileAgreementsCardProps {
   userType?: string;
 }
 
-/** Shows the agreements required for the given account type and lets the user accept pending ones. */
 export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT }: ProfileAgreementsCardProps) {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  const [acceptingAll, setAcceptingAll] = useState(false);
+  const [viewingIdOrSlug, setViewingIdOrSlug] = useState<string | null>(null);
   const { data: consentData, isLoading } = useGetUserConsentStatusQuery({ userType });
   const [acceptAgreement] = useAcceptAgreementMutation();
+  const [acceptAllAgreements] = useAcceptAllAgreementsMutation();
 
   const agreements = consentData?.data?.agreements ?? [];
-  const acceptedCount = agreements.filter((agreement) => agreement.is_accepted).length;
+  const acceptedCount = consentData?.data?.accepted_count ?? agreements.filter((agreement) => agreement.is_accepted).length;
+  const pendingCount = consentData?.data?.pending_count ?? agreements.filter((agreement) => !agreement.is_accepted).length;
 
   const handleAccept = async (agreementId: string) => {
     setAcceptingId(agreementId);
@@ -32,6 +34,18 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
       toast.error('Failed to accept agreement. Please try again.');
     } finally {
       setAcceptingId(null);
+    }
+  };
+
+  const handleAcceptAll = async () => {
+    setAcceptingAll(true);
+    try {
+      await acceptAllAgreements(undefined).unwrap();
+      toast.success('All agreements accepted successfully!');
+    } catch {
+      toast.error('Failed to accept agreements. Please try again.');
+    } finally {
+      setAcceptingAll(false);
     }
   };
 
@@ -47,13 +61,25 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
             <p className="mt-0.5 text-xs text-gray-500">Review and accept the agreements required for your account.</p>
           </div>
         </div>
-        {!isLoading && agreements.length > 0 ? (
-          <span
-            className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-medium ${acceptedCount === agreements.length ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}
-          >
-            {acceptedCount} of {agreements.length} accepted
-          </span>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {!isLoading && agreements.length > 0 ? (
+            <span
+              className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-medium ${acceptedCount === agreements.length ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}
+            >
+              {acceptedCount} of {agreements.length} accepted
+            </span>
+          ) : null}
+          {pendingCount > 0 ? (
+            <Button
+              type="button"
+              className="global_btn rounded_full outline_primary shrink-0"
+              isLoading={acceptingAll}
+              onPress={handleAcceptAll}
+            >
+              Accept all
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div className={agreements.length === 0 && !isLoading ? '' : 'px-5 py-4 sm:px-6'}>
@@ -81,17 +107,13 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
                       <p className="text-sm font-medium text-gray-900">
                         {agreement.title} {agreement?.is_required ? <span className="text-xs text-red-500">*</span> : null}
                       </p>
-                      {agreement?.slug ? (
-                        <Link
-                          href={getPolicyBySlugRoutePath(agreement.slug)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                        >
-                          View policy
-                          <ExternalLink className="h-3 w-3" />
-                        </Link>
-                      ) : null}
+                      <button
+                        type="button"
+                        className="text-xs font-medium text-primary hover:underline"
+                        onClick={() => setViewingIdOrSlug(agreement.slug || agreement._id)}
+                      >
+                        View
+                      </button>
                     </div>
                     <p className="mt-0.5 text-xs text-gray-500">
                       {agreement.agreement_type?.name ?? 'Agreement'} · v{agreement.current_version}
@@ -121,6 +143,14 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
           </ul>
         )}
       </div>
+
+      <AgreementDocumentModal
+        open={!!viewingIdOrSlug}
+        idOrSlug={viewingIdOrSlug}
+        onOpenChange={(open) => {
+          if (!open) setViewingIdOrSlug(null);
+        }}
+      />
     </div>
   );
 }

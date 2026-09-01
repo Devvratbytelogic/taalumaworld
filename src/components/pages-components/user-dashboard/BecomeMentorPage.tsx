@@ -1,20 +1,18 @@
 'use client';
 
 import type { ComponentType } from 'react';
-import Link from 'next/link';
+import { useRef } from 'react';
 import { useFormik } from 'formik';
 import { Briefcase, CreditCard, FileCheck, Send, Share2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { cn } from '@/components/ui/utils';
 import { fieldInvalidClassName, nativeSelectClassName } from '@/components/ui/field-styles';
 import { mentorConversionApplicationSchema } from '@/utils/formValidation';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import { useSubmitMentorApplicationMutation } from '@/store/rtkQueries/userPostAPI';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import toast from '@/utils/toast';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
@@ -42,12 +40,7 @@ function SectionHeader({ icon: Icon, title, description }: SectionHeaderProps) {
 
 export function BecomeMentorPage() {
   const [submitMentorApplication] = useSubmitMentorApplicationMutation();
-  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-    touchPoint: AGREEMENT_TOUCHPOINTS.VERIFIED_MENTOR_APPLICATION,
-    userType: AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT,
-  });
-  const agreements = agreementsResponse?.data ?? [];
-  const requiredAgreementIds = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
+  const requiredAcceptedRef = useRef(false);
 
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched } =
     useFormik({
@@ -62,9 +55,8 @@ export function BecomeMentorPage() {
         accepted_agreement_ids: [] as string[],
       },
       validationSchema: mentorConversionApplicationSchema,
-      validate: (vals) => {
-        const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
-        return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+      validate: () => {
+        return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
       },
       onSubmit: async (formValues, { resetForm: rf }) => {
         try {
@@ -280,38 +272,16 @@ export function BecomeMentorPage() {
             description="Review and accept the required mentor agreements."
           />
 
-          <div className="mt-5 space-y-3 rounded-lg border border-gray-200 bg-gray-50/60 p-4 sm:p-5">
-            {agreements.length > 0 ? (
-              agreements.map((agreement) => (
-                <AgreementCheckbox
-                  key={agreement._id}
-                  id={agreement._id}
-                  checked={values.accepted_agreement_ids.includes(agreement._id)}
-                  onCheckedChange={(checked) => {
-                    const ids = checked
-                      ? [...values.accepted_agreement_ids, agreement._id]
-                      : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
-                    setFieldValue('accepted_agreement_ids', ids);
-                  }}
-                  onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
-                  error={agreementsError}
-                  touched={touched.accepted_agreement_ids as boolean | undefined}
-                >
-                  {agreement?.text}{' '}
-                  <Link
-                    href={getPolicyBySlugRoutePath(agreement.slug)}
-                    className="font-medium text-primary hover:underline"
-                    target="_blank"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {agreement.title}
-                  </Link>
-                  {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
-                </AgreementCheckbox>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No agreements to review at this time.</p>
-            )}
+          <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50/60 p-4 sm:p-5">
+            <AgreementSentenceList
+              touchpoint={AGREEMENT_TOUCHPOINTS.VERIFIED_MENTOR_APPLICATION}
+              onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
+              onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+              error={agreementsError}
+              touched={touched.accepted_agreement_ids as boolean | undefined}
+              onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+              disabled={isSubmitting}
+            />
           </div>
 
           <div className="mt-6 flex justify-end border-t border-gray-100 pt-5">

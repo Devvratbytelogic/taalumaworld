@@ -12,17 +12,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
-import { AGREEMENT_TOUCHPOINT_OPTIONS, AGREEMENT_VISIBLE_USER_TYPE_OPTIONS } from '@/constants/agreements';
 import { useGetAgreementByIdQuery } from '@/store/rtkQueries/agreementAPIs';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   inactive: 'bg-slate-100 text-slate-600 border-slate-200',
 };
-
-function labelFor(options: { value: string; label: string }[], value: string) {
-  return options.find((opt) => opt.value === value)?.label ?? value;
-}
 
 interface AgreementViewModalProps {
   open: boolean;
@@ -57,10 +52,6 @@ export function AgreementViewModal({ open, agreementId, onOpenChange }: Agreemen
                 <dd className="mt-1 text-sm text-slate-700">{agreement.slug}</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Text</dt>
-                <dd className="mt-1 text-sm text-slate-700">{agreement.text || '—'}</dd>
-              </div>
-              <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Agreement type</dt>
                 <dd className="mt-1 text-sm text-slate-700">{agreement.agreementType?.name ?? '—'}</dd>
               </div>
@@ -78,44 +69,9 @@ export function AgreementViewModal({ open, agreementId, onOpenChange }: Agreemen
               </div>
             </dl>
 
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className={agreement.is_required ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
-                {agreement.is_required ? 'Required' : 'Optional'}
-              </Badge>
-              <Badge variant="outline" className={agreement.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
-                Can block: {agreement.can_block ? 'Yes' : 'No'}
-              </Badge>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Visible to</p>
-              <div className="flex flex-wrap gap-2">
-                {agreement.visible_to?.length ? (
-                  agreement.visible_to.map((value) => (
-                    <Badge key={value} variant="outline" className="border-slate-200 text-slate-600">
-                      {labelFor(AGREEMENT_VISIBLE_USER_TYPE_OPTIONS, value)}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-sm text-slate-400">None</span>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Touchpoints</p>
-              <div className="flex flex-wrap gap-2">
-                {agreement.touchpoints?.length ? (
-                  agreement.touchpoints.map((value) => (
-                    <Badge key={value} variant="outline" className="border-slate-200 text-slate-600">
-                      {labelFor(AGREEMENT_TOUCHPOINT_OPTIONS, value)}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-sm text-slate-400">None</span>
-                )}
-              </div>
-            </div>
+            {/* <Badge variant="outline" className={agreement.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
+              Can block: {agreement.can_block ? 'Yes' : 'No'}
+            </Badge> */}
 
             <div className="space-y-2">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Agreement content</p>

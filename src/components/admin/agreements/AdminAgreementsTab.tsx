@@ -23,8 +23,8 @@ import { refreshAfterPolicyChange } from '@/store/server-api/refreshCache';
 const AGREEMENTS_MODEL = 'Agreements';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  inactive: 'bg-slate-100 text-slate-600 border-slate-200',
+  active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
+  inactive: 'bg-slate-100 text-slate-600 border-slate-200!',
 };
 
 export function AdminAgreementsTab() {
@@ -147,28 +147,17 @@ export function AdminAgreementsTab() {
       sortable: false,
       renderCell: (params) => <span className="text-sm text-slate-700">{params.row.version ?? '—'}</span>,
     },
-    {
-      field: 'is_required',
-      headerName: 'Required',
-      width: 110,
-      sortable: false,
-      renderCell: (params) => (
-        <Badge variant="outline" className={params.row.is_required ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
-          {params.row.is_required ? 'Required' : 'Optional'}
-        </Badge>
-      ),
-    },
-    {
-      field: 'can_block',
-      headerName: 'Can block',
-      width: 110,
-      sortable: false,
-      renderCell: (params) => (
-        <Badge variant="outline" className={params.row.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
-          {params.row.can_block ? 'Yes' : 'No'}
-        </Badge>
-      ),
-    },
+    // {
+    //   field: 'can_block',
+    //   headerName: 'Can block',
+    //   width: 110,
+    //   sortable: false,
+    //   renderCell: (params) => (
+    //     <Badge variant="outline" className={params.row.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
+    //       {params.row.can_block ? 'Yes' : 'No'}
+    //     </Badge>
+    //   ),
+    // },
     {
       field: 'status',
       headerName: 'Status',

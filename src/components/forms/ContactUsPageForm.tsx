@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import toast from '@/utils/toast';
 import { useFormik } from 'formik';
 import { contactFormSchema } from '@/utils/formValidation';
@@ -7,6 +7,8 @@ import { Send } from 'lucide-react';
 import { Input } from '../ui/input';
 import Button from '../ui/Button';
 import { usePostContactUsMutation } from '@/store/rtkQueries/userPostAPI';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 
 const INQUIRY_OPTIONS = [
     'I want to become a Mentor',
@@ -21,15 +23,20 @@ const INQUIRY_OPTIONS = [
 export default function ContactUsPageForm() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [postContactUs, { isLoading }] = usePostContactUsMutation();
+    const requiredAcceptedRef = useRef(false);
     const formik = useFormik({
         initialValues: {
             name: '',
             email: '',
             inquiryType: '',
             subject: '',
-            message: ''
+            message: '',
+            accepted_agreement_ids: [] as string[],
         },
         validationSchema: contactFormSchema,
+        validate: () => {
+            return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+        },
         onSubmit: async (values, { resetForm }) => {
             try {
                 const res = await postContactUs({
@@ -38,6 +45,7 @@ export default function ContactUsPageForm() {
                     subject: values.subject,
                     inquiryType: values.inquiryType,
                     message: values.message,
+                    accepted_agreement_ids: values.accepted_agreement_ids,
                 }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     setIsSubmitted(true);
@@ -165,6 +173,16 @@ export default function ContactUsPageForm() {
                             <p className="text-sm text-red-500">{formik.errors.message}</p>
                         )}
                     </div>
+
+                    <AgreementSentenceList
+                        touchpoint={AGREEMENT_TOUCHPOINTS.CONTACT_FORM}
+                        onAcceptedAgreementIdsChange={(ids) => formik.setFieldValue('accepted_agreement_ids', ids)}
+                        onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+                        error={typeof formik.errors.accepted_agreement_ids === 'string' ? formik.errors.accepted_agreement_ids : undefined}
+                        touched={formik.touched.accepted_agreement_ids}
+                        onBlur={() => formik.setFieldTouched('accepted_agreement_ids', true)}
+                        disabled={formik.isSubmitting || isLoading}
+                    />
 
                     {/* Submit Button */}
                     <Button

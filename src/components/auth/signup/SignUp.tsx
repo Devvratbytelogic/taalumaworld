@@ -16,10 +16,9 @@ import { useUserRegisterMutation } from '@/store/rtkQueries/userAuthApi'
 import toast from '@/utils/toast'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { getMentorSignupRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes'
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox'
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs'
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements'
+import { getMentorSignupRoutePath, } from '@/routes/routes'
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList'
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements'
 import { useGetInstituteMessageQuery, useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
 
 const DEFAULT_PARTNER_PROMPT_HEADING = 'Partner university student'
@@ -154,6 +153,8 @@ export default function SignUp() {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
+    const requiredAcceptedRef = useRef(false)
+
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, setFieldValue, setFieldTouched } = useFormik({
         initialValues: {
             name: '',
@@ -170,8 +171,7 @@ export default function SignUp() {
         validate: (vals) => {
             const validationErrors: Record<string, string> = {}
 
-            const allRequiredAccepted = requiredAgreementIds.every((id: string) => vals.accepted_agreement_ids.includes(id))
-            if (!allRequiredAccepted) {
+            if (!requiredAcceptedRef.current) {
                 validationErrors.accepted_agreement_ids = 'Please accept all required agreements before submitting.'
             }
 
@@ -228,13 +228,6 @@ export default function SignUp() {
     })
 
 
-    const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-        touchPoint: values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION,
-        userType: values.isPartnerStudent ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT,
-    });
-
-    const agreements = agreementsResponse?.data ?? []
-    const requiredAgreementIds: string[] = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id)
     const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined
 
     const { data: partnerInstitutionsResponse, isFetching: isLoadingPartnerInstitutions } = useGetPartnerInstitutionsQuery(undefined, { skip: !values.isPartnerStudent })
@@ -573,34 +566,16 @@ export default function SignUp() {
                         </div>
 
                         <div className="rounded-2xl border border-gray-100 bg-muted/20 p-4 space-y-3">
-                            {agreements.map((agreement) => (
-                                <AgreementCheckbox
-                                    key={agreement._id}
-                                    id={agreement._id}
-                                    checked={values.accepted_agreement_ids.includes(agreement._id)}
-                                    error={agreementsError}
-                                    touched={touched.accepted_agreement_ids}
-                                    onCheckedChange={(checked) => {
-                                        const ids = checked
-                                            ? [...values.accepted_agreement_ids, agreement._id]
-                                            : values.accepted_agreement_ids.filter((id: string) => id !== agreement._id)
-                                        setFieldValue('accepted_agreement_ids', ids)
-                                    }}
-                                    onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
-                                    disabled={isSubmitting}
-                                >
-                                    {agreement?.text}{' '}
-                                    <Link
-                                        href={getPolicyBySlugRoutePath(agreement.slug)}
-                                        target="_blank"
-                                        className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        {agreement.title}
-                                    </Link>
-                                    {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
-                                </AgreementCheckbox>
-                            ))}
+                            <AgreementSentenceList
+                                key={values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION}
+                                touchpoint={values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION}
+                                onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
+                                onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted }}
+                                error={agreementsError}
+                                touched={touched.accepted_agreement_ids}
+                                onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+                                disabled={isSubmitting}
+                            />
                         </div>
 
                         <Button

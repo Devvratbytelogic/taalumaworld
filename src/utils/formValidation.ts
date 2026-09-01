@@ -141,6 +141,7 @@ export const contactFormSchema = Yup.object({
     .min(10, 'Message must be at least 10 characters')
     .max(1000, 'Message must be less than 1000 characters')
     .required('Message is required'),
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
 const openGraphFieldsSchema = {
@@ -376,6 +377,7 @@ export const mentorPayoutDetailsSchema = Yup.object({
           .matches(/^[0-9]{9,14}$/, 'Enter a valid VAT number (9–14 digits)'),
       otherwise: (schema) => schema.optional(),
     }),
+  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 
 // Global Settings Validation Schema
@@ -692,12 +694,34 @@ export const couponSchema = Yup.object({
 export const agreementSchema = Yup.object({
   title: Yup.string().trim().min(2, 'Title is required').required('Title is required'),
   slug: Yup.string().trim().required('Slug is required'),
-  text: Yup.string().trim().required('Text is required'),
   content: Yup.string().trim().required('Agreement content is required'),
   agreementType: Yup.string().required('Please select an agreement type'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
-  visible_to: Yup.array().of(Yup.string().required()).min(1, 'Select at least one user type').required(),
-  touchpoints: Yup.array().of(Yup.string().required()).min(1, 'Select at least one touchpoint').required(),
-  is_required: Yup.boolean(),
   can_block: Yup.boolean(),
+});
+
+export const agreementSentenceSchema = Yup.object({
+  text: Yup.string().trim().required('Sentence text is required'),
+  touchpoint: Yup.string().required('Please select a touchpoint'),
+  is_required: Yup.boolean(),
+  sort_order: Yup.number()
+    .transform((v) => (v === '' || v == null ? 0 : Number(v)))
+    .min(0, 'Sort order cannot be negative')
+    .integer('Must be a whole number'),
+  status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive'),
+  links: Yup.array()
+    .of(
+      Yup.object({
+        phrase: Yup.string().trim().required('Phrase is required'),
+        agreementType: Yup.string().required('Please select an agreement type'),
+      }),
+    )
+    .min(1, 'Add at least one linked phrase')
+    .required()
+    .test('phrase-in-text', 'Each phrase must appear in the sentence text', function (links) {
+      const text = this.parent.text ?? '';
+      const missing = (links ?? []).find((link) => link?.phrase && !text.includes(link.phrase));
+      if (!missing?.phrase) return true;
+      return this.createError({ message: `"${missing.phrase}" must appear in the sentence text` });
+    }),
 });

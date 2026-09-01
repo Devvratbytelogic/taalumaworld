@@ -1,16 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { getUserRole } from '@/utils/authCookies';
-import { USER_TYPE } from '@/constants/common';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
 import { PaystackPayButton } from '@/components/payments/PaystackPayButton';
 import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
+// import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 
 interface CartPaymentProps {
   total: number;
@@ -28,29 +24,16 @@ export default function CartPayment({
   onPaymentSuccess,
 }: CartPaymentProps) {
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
+  const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [agreementTouched, setAgreementTouched] = useState(false);
   const [addressTouched, setAddressTouched] = useState(false);
   const [isMpesaPaying, setIsMpesaPaying] = useState(false);
   const [isWalletPaying, setIsWalletPaying] = useState(false);
   const [isPaystackPaying, setIsPaystackPaying] = useState(false);
   const isPaymentBusy = isMpesaPaying || isWalletPaying || isPaystackPaying;
+  // const { isTouchpointBlocked } = useBlockedTouchpoints();
+  // const checkoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
-  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-    touchPoint: AGREEMENT_TOUCHPOINTS.CHECKOUT,
-    userType:
-      getUserRole() === USER_TYPE.CAREER_ARCHITECT
-        ? AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT
-        : AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA,
-  });
-
-  const checkoutAgreements = agreementsResponse?.data ?? [];
-  // Only agreements the API marks as `is_required` must be accepted before checkout.
-  const requiredAgreementIds = checkoutAgreements
-    .filter((agreement) => agreement.is_required)
-    .map((agreement) => agreement._id);
-  const allRequiredAccepted = requiredAgreementIds.every((id) =>
-    acceptedAgreementIds.includes(id),
-  );
   const hasSelectedAddress = Boolean(selectedAddressId);
 
   const agreementError =
@@ -63,6 +46,7 @@ export default function CartPayment({
       : undefined;
 
   const validateCheckout = () => {
+    // if (checkoutBlocked) return false;
     if (!hasSelectedAddress) {
       setAddressTouched(true);
       return false;
@@ -82,44 +66,27 @@ export default function CartPayment({
 
   return (
     <>
-      {checkoutAgreements.length > 0 && (
-        <div className="mb-4 space-y-3">
-          {checkoutAgreements.map((agreement) => (
-            <AgreementCheckbox
-              key={agreement._id}
-              id={agreement._id}
-              checked={acceptedAgreementIds.includes(agreement._id)}
-              error={agreementError}
-              touched={agreementTouched}
-              onCheckedChange={(checked) => {
-                setAcceptedAgreementIds((prev) =>
-                  checked
-                    ? [...prev, agreement._id]
-                    : prev.filter((id) => id !== agreement._id),
-                );
-                setAgreementTouched(true);
-              }}
-              onBlur={() => setAgreementTouched(true)}
-              disabled={isPaymentBusy}
-            >
-              {agreement.text}{' '}
-              <Link
-                href={getPolicyBySlugRoutePath(agreement.slug ?? '')}
-                target="_blank"
-                className={`font-semibold transition-colors ${
-                  agreementError
-                    ? 'text-red-600 hover:text-red-700'
-                    : 'text-primary hover:text-primary/80'
-                }`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {agreement.title}
-              </Link>
-              {agreement.is_required && <span className="text-red-500"> *</span>}
-            </AgreementCheckbox>
-          ))}
-        </div>
-      )}
+      {/* {checkoutBlocked ? (
+        <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Please{' '}
+          <Link href={getUserDashboardProfileRoutePath()} className="font-medium underline">
+            accept the latest agreements
+          </Link>{' '}
+          in your profile before checkout.
+        </p>
+      ) : null} */}
+
+      <div className="mb-4">
+        <AgreementSentenceList
+          touchpoint={AGREEMENT_TOUCHPOINTS.CHECKOUT}
+          onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
+          onRequiredAcceptedChange={setAllRequiredAccepted}
+          error={agreementError}
+          touched={agreementTouched}
+          onBlur={() => setAgreementTouched(true)}
+          disabled={isPaymentBusy}
+        />
+      </div>
 
       {(addressError || !hasSelectedAddress) && (
         <p className={`mb-3 text-sm ${addressError ? 'text-danger' : 'text-muted-foreground'}`}>

@@ -345,6 +345,9 @@
   .space_top {
     @apply mt-10;
   }
+  label {
+    gap: 0!important;
+  }
 }
 
 @layer base {
@@ -405,6 +408,7 @@
       font-weight: var(--font-weight-medium);
       line-height: 1.5;
       color: var(--foreground);
+      gap: 0!important;
     }
 
     button {

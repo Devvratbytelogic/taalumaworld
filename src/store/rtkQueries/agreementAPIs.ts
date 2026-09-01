@@ -1,11 +1,11 @@
-import { IAllAgreementsAPIResponse, IGetAgreementByTouchpointAndUserTypeAPIResponse, IGetUserConsentStatusAPIResponse, ISingleAgreementAPIResponse } from '@/types/agreements';
+import { IAllAgreementsAPIResponse, IAgreementsByTouchpointAPIResponse, IAllAgreementSentencesAPIResponse, IGetUserConsentStatusAPIResponse, ISingleAgreementAPIResponse } from '@/types/agreements';
+import { IAgreementAPIResponse } from '@/types/user/agreement';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IAddAgreementTypeAPIResponse, IAllAgreementTypesAPIResponse, } from '@/types/agreementTypes';
 
 
 export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
-        /** Agreement Types */
         getAllAgreementTypes: builder.query<IAllAgreementTypesAPIResponse, { page?: number; limit?: number; search?: string; status?: string; isDeleted?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/agreement-types`,
@@ -52,7 +52,6 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminAgreementTypes'],
         }),
 
-        /** Agreements */
         getAllAgreements: builder.query<IAllAgreementsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; agreementType?: string } | void>({
             query: (params) => ({
                 url: `/admin/agreements`,
@@ -68,13 +67,50 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminAgreements'],
         }),
-        getAgreementByTouchpointAndUserType: builder.query<IGetAgreementByTouchpointAndUserTypeAPIResponse, { touchPoint: string; userType: string }>({
-            query: ({ touchPoint, userType }) => ({
-                url: `/admin/agreements/by-touchpoint-and-user-type`,
+        getAgreementsByTouchpoint: builder.query<IAgreementsByTouchpointAPIResponse, string>({
+            query: (touchpoint) => ({
+                url: `/user/agreements/by-touchpoint`,
                 method: 'GET',
-                params: { touchPoint, userType },
+                params: { touchpoint },
             }),
-            providesTags: ['AdminAgreements'],
+            providesTags: ['UserAgreementSentences'],
+        }),
+        getUserAgreementByIdOrSlug: builder.query<IAgreementAPIResponse, string>({
+            query: (idOrSlug) => ({
+                url: `/user/agreements/${idOrSlug}`,
+                method: 'GET',
+            }),
+        }),
+        getAllAgreementSentences: builder.query<IAllAgreementSentencesAPIResponse, { touchpoint?: string } | void>({
+            query: (params) => ({
+                url: `/admin/agreements/sentences`,
+                method: 'GET',
+                params: params?.touchpoint ? { touchpoint: params.touchpoint } : {},
+            }),
+            providesTags: ['AdminAgreementSentences'],
+        }),
+        addAgreementSentence: builder.mutation({
+            query: (payload) => ({
+                url: `/admin/agreements/sentences`,
+                method: 'POST',
+                body: payload,
+            }),
+            invalidatesTags: ['AdminAgreementSentences', 'UserAgreementSentences'],
+        }),
+        updateAgreementSentence: builder.mutation({
+            query: ({ id, values }) => ({
+                url: `/admin/agreements/sentences/${id}`,
+                method: 'PUT',
+                body: values,
+            }),
+            invalidatesTags: ['AdminAgreementSentences', 'UserAgreementSentences'],
+        }),
+        deleteAgreementSentence: builder.mutation({
+            query: ({ id }) => ({
+                url: `/admin/agreements/sentences/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['AdminAgreementSentences', 'UserAgreementSentences'],
         }),
         addAgreement: builder.mutation({
             query: (payload) => ({
@@ -82,7 +118,7 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags: ['AdminAgreements'],
+            invalidatesTags: ['AdminAgreements', 'UserAgreementSentences'],
         }),
         updateAgreement: builder.mutation({
             query: ({ agreementId, values }) => ({
@@ -90,7 +126,7 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
                 method: 'PUT',
                 body: values,
             }),
-            invalidatesTags: ['AdminAgreements'],
+            invalidatesTags: ['AdminAgreements', 'UserAgreementSentences', 'AdminUserConsentStatus'],
         }),
         acceptAgreement: builder.mutation({
             query: (payload) => ({
@@ -100,17 +136,18 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus', 'UserProfile'],
         }),
-        acceptAllAgreements: builder.mutation({
-            query: (payload) => ({
+        acceptAllAgreements: builder.mutation<unknown, void>({
+            query: () => ({
                 url: `/admin/agreements/accept-all`,
                 method: 'POST',
-                body: payload,
             }),
             invalidatesTags: ['AdminAgreements', 'AdminUserConsentStatus'],
         }),
-        getUserConsentStatus: builder.query<IGetUserConsentStatusAPIResponse, { userType: string }>({
-            query: ({ userType }) => ({
-                url: `/admin/agreements/user-consent-status/${userType}`,
+        getUserConsentStatus: builder.query<IGetUserConsentStatusAPIResponse, { userType?: string } | void>({
+            query: (params) => ({
+                url: params?.userType
+                    ? `/admin/agreements/user-consent-status/${params.userType}`
+                    : `/admin/agreements/user-consent-status`,
                 method: 'GET',
             }),
             providesTags: ['AdminUserConsentStatus'],
@@ -119,7 +156,6 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
 });
 
 export const {
-    // Agreement Types
     useGetAllAgreementTypesQuery,
     useGetAgreementTypeByIdQuery,
     useAddAgreementTypeMutation,
@@ -127,10 +163,14 @@ export const {
     useDeleteAgreementTypeMutation,
     useRestoreAgreementTypeMutation,
 
-    // Agreements
     useGetAllAgreementsQuery,
     useGetAgreementByIdQuery,
-    useGetAgreementByTouchpointAndUserTypeQuery,
+    useGetAgreementsByTouchpointQuery,
+    useGetUserAgreementByIdOrSlugQuery,
+    useGetAllAgreementSentencesQuery,
+    useAddAgreementSentenceMutation,
+    useUpdateAgreementSentenceMutation,
+    useDeleteAgreementSentenceMutation,
     useAddAgreementMutation,
     useUpdateAgreementMutation,
     useAcceptAgreementMutation,

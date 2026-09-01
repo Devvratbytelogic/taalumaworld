@@ -8,14 +8,13 @@ import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { mentorSignUpSchema } from '@/utils/formValidation';
 import { useRegisterMentorMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import { getHomeRoutePath, getMentorDashboardRoutePath, getMentorLoginRoutePath, getPolicyBySlugRoutePath, } from '@/routes/routes';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { getHomeRoutePath, getMentorDashboardRoutePath, getMentorLoginRoutePath, } from '@/routes/routes';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { setAuthCookies } from '@/utils/authCookies';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
@@ -28,13 +27,7 @@ export function SignUpForm() {
     const [profilePreview, setProfilePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [registerMentor, { isLoading: isRegistering }] = useRegisterMentorMutation();
-    const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-        touchPoint: AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION,
-        userType: AGREEMENT_VISIBLE_USER_TYPES.MENTOR,
-    });
-
-    const agreements = agreementsResponse?.data ?? [];
-    const requiredAgreementIds = agreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
+    const requiredAcceptedRef = useRef(false);
 
     const handleAvatarClick = () => fileInputRef.current?.click();
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,9 +62,8 @@ export function SignUpForm() {
             accepted_agreement_ids: [] as string[],
         },
         validationSchema: mentorSignUpSchema,
-        validate: (vals) => {
-            const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
-            return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+        validate: () => {
+            return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
         },
         onSubmit: async (formValues, { resetForm: rf }) => {
             try {
@@ -217,34 +209,15 @@ export function SignUpForm() {
                 </div>
 
                 <div className="space-y-3 pt-1">
-                    {agreements.map((agreement) => (
-                        <AgreementCheckbox
-                            key={agreement._id}
-                            id={agreement._id}
-                            checked={values.accepted_agreement_ids.includes(agreement._id)}
-                            error={agreementsError}
-                            touched={touched.accepted_agreement_ids}
-                            onCheckedChange={(checked) => {
-                                const ids = checked
-                                    ? [...values.accepted_agreement_ids, agreement._id]
-                                    : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
-                                setFieldValue('accepted_agreement_ids', ids);
-                            }}
-                            onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
-                            disabled={isSubmitting}
-                        >
-                            {agreement?.text}{' '}
-                            <Link
-                                href={getPolicyBySlugRoutePath(agreement.slug)}
-                                target="_blank"
-                                className="font-semibold text-primary hover:text-primary/80"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {agreement.title}
-                            </Link>
-                            {agreement.is_required && <span className="font-medium text-red-500"> *</span>}
-                        </AgreementCheckbox>
-                    ))}
+                    <AgreementSentenceList
+                        touchpoint={AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION}
+                        onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
+                        onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+                        error={agreementsError}
+                        touched={touched.accepted_agreement_ids}
+                        onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+                        disabled={isSubmitting}
+                    />
                 </div>
 
                 <Button type="submit" className="global_btn bg_primary w-full" disabled={isSubmitting || isRegistering} isLoading={isSubmitting || isRegistering}>

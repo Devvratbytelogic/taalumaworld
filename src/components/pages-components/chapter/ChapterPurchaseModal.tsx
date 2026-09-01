@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { BadgeCheck, BookOpen, Lock, Tag, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
@@ -15,16 +14,14 @@ import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
 import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
 import { PaystackPayButton } from '@/components/payments/PaystackPayButton';
 import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import ChapterPurchaseAddresses from '@/components/pages-components/chapter/ChapterPurchaseAddresses';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
-import { getPolicyBySlugRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { getSeriesRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { getUserRole } from '@/utils/authCookies';
-import { USER_TYPE } from '@/constants/common';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
+// import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 import { useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
 
 const modalClassNames = {
@@ -39,6 +36,7 @@ export default function ChapterPurchaseModal() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
+  const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [agreementTouched, setAgreementTouched] = useState(false);
   const [isMpesaPaying, setIsMpesaPaying] = useState(false);
   const [isWalletPaying, setIsWalletPaying] = useState(false);
@@ -49,6 +47,8 @@ export default function ChapterPurchaseModal() {
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
   const isPaymentBusy = isMpesaPaying || isWalletPaying || isPaystackPaying;
+  // const { isTouchpointBlocked } = useBlockedTouchpoints();
+  // const checkoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
   const onClose = () => dispatch(closeModal());
 
@@ -64,14 +64,6 @@ export default function ChapterPurchaseModal() {
   const purchaseType = isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK;
   const totalPaymentRequired = Number(displayPrice ?? 0);
 
-  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-    touchPoint: AGREEMENT_TOUCHPOINTS.CHECKOUT,
-    userType: getUserRole() === USER_TYPE.CAREER_ARCHITECT ? AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT : AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA,
-  });
-  const checkoutAgreements = agreementsResponse?.data ?? [];
-  // Only agreements the API marks as `is_required` must be accepted before purchase.
-  const requiredAgreementIds = checkoutAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
-  const allRequiredAccepted = requiredAgreementIds.every((id) => acceptedAgreementIds.includes(id));
   const agreementError =
     agreementTouched && !allRequiredAccepted
       ? 'You must accept all required agreements before purchasing'
@@ -89,6 +81,7 @@ export default function ChapterPurchaseModal() {
   };
 
   const validatePurchase = () => {
+    // if (checkoutBlocked) return false;
     if (!isAddressAvailable) return false;
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
@@ -252,41 +245,26 @@ export default function ChapterPurchaseModal() {
 
             <ChapterPurchaseAddresses addressData={addressData} isLoading={isLoading} />
 
-            {checkoutAgreements.length > 0 && (
-              <div className="space-y-3 border-t pt-3">
-                {checkoutAgreements.map((agreement) => (
-                  <AgreementCheckbox
-                    key={agreement._id}
-                    id={agreement._id}
-                    checked={acceptedAgreementIds.includes(agreement._id)}
-                    error={agreementError}
-                    touched={agreementTouched}
-                    onCheckedChange={(checked) => {
-                      setAcceptedAgreementIds((prev) =>
-                        checked ? [...prev, agreement._id] : prev.filter((id) => id !== agreement._id)
-                      );
-                      setAgreementTouched(true);
-                    }}
-                    onBlur={() => setAgreementTouched(true)}
-                    disabled={isPaymentBusy}
-                  >
-                    {agreement.text}{' '}
-                    <Link
-                      href={getPolicyBySlugRoutePath(agreement.slug ?? '')}
-                      target="_blank"
-                      className={`font-semibold transition-colors ${agreementError
-                        ? 'text-red-600 hover:text-red-700'
-                        : 'text-primary hover:text-primary/80'
-                        }`}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {agreement.title}
-                    </Link>
-                    {agreement.is_required && <span className="text-red-500"> *</span>}
-                  </AgreementCheckbox>
-                ))}
-              </div>
-            )}
+            {/* {checkoutBlocked ? (
+              <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                Please{' '}
+                <Link href={getUserDashboardProfileRoutePath()} className="font-medium underline">
+                  accept the latest agreements
+                </Link>{' '}
+                in your profile before purchasing.
+              </p>
+            ) : null} */}
+
+            <AgreementSentenceList
+              touchpoint={AGREEMENT_TOUCHPOINTS.CHECKOUT}
+              onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
+              onRequiredAcceptedChange={setAllRequiredAccepted}
+              error={agreementError}
+              touched={agreementTouched}
+              onBlur={() => setAgreementTouched(true)}
+              disabled={isPaymentBusy}
+              className="space-y-3 border-t pt-3"
+            />
           </ModalBody>
 
           <ModalFooter className="flex flex-col gap-2 p-2 sm:p-4 border-t bg-white shrink-0">

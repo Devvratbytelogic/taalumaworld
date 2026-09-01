@@ -21,16 +21,16 @@ import {
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
-import { getChaptersListRoutePath, getBlueprintRoutePath, getPolicyBySlugRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { getChaptersListRoutePath, getBlueprintRoutePath, getMentorRoutePath } from '@/routes/routes';
 import Link from 'next/link';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
 import { SELECT_STYLES } from '@/constants/selectStyle';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
+// import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
 
 const initialFormValues = {
@@ -69,25 +69,20 @@ export function CreateChapterForm() {
   const slugManuallyEdited = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
-  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-    touchPoint: AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD,
-    userType: AGREEMENT_VISIBLE_USER_TYPES.MENTOR,
-  });
+  const requiredAcceptedRef = useRef(false);
+  // const { isTouchpointBlocked } = useBlockedTouchpoints();
+  // const blueprintBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD);
   const [addChapter, { isLoading: isAdding }] = useAddChapterMutation();
 
   const booksData = booksResponse?.data;
   const books = booksData?.data ?? [];
   const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
-  const blueprintAgreements = agreementsResponse?.data ?? [];
-  // Only agreements the API marks as `is_required` must be accepted before submitting.
-  const requiredAgreementIds = blueprintAgreements.filter((agreement) => agreement.is_required).map((agreement) => agreement._id);
 
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
     validationSchema: addChapterSchema,
-    validate: (vals) => {
-      const allRequiredAccepted = requiredAgreementIds.every((id) => vals.accepted_agreement_ids.includes(id));
-      return allRequiredAccepted ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+    validate: () => {
+      return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
     },
     onSubmit: async (vals) => {
       const formData = new FormData();
@@ -538,36 +533,21 @@ export function CreateChapterForm() {
 
       </div>
 
-      {blueprintAgreements && blueprintAgreements?.length > 0 && blueprintAgreements?.map((agreement) => (
-        <AgreementCheckbox
-          key={agreement._id}
-          id={agreement._id}
-          checked={values.accepted_agreement_ids.includes(agreement._id)}
-          error={agreementsError}
-          touched={touched.accepted_agreement_ids}
-          onCheckedChange={(checked) => {
-            const ids = checked
-              ? [...values.accepted_agreement_ids, agreement._id]
-              : values.accepted_agreement_ids.filter((id) => id !== agreement._id);
-            setFieldValue('accepted_agreement_ids', ids);
-          }}
-          onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
-          disabled={isSubmittingState}
-        >
-          {agreement && agreement?.text} &nbsp;
-          <Link
-            href={getPolicyBySlugRoutePath(agreement?.slug ?? '')}
-            target="_blank"
-            className="font-semibold text-primary hover:text-primary/80 transition-colors"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {agreement?.title}
-          </Link>
-          <span className="font-medium">
-            {agreement.is_required && <span className="text-red-500"> *</span>}
-          </span>
-        </AgreementCheckbox>
-      ))}
+      <AgreementSentenceList
+        touchpoint={AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD}
+        onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
+        onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+        error={agreementsError}
+        touched={touched.accepted_agreement_ids}
+        onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+        disabled={isSubmittingState}
+      />
+
+      {/* {blueprintBlocked ? (
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Please accept the latest agreements in your profile before uploading a blueprint.
+        </p>
+      ) : null} */}
 
       <div className="form-footer">
         <Button

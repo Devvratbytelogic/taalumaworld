@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useFormik } from 'formik';
 import { Loader2, Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+// import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -17,32 +16,24 @@ import {
 } from '@/components/ui/dialog';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { agreementSchema } from '@/utils/formValidation';
-import { AGREEMENT_STATUS_OPTIONS, AGREEMENT_TOUCHPOINT_OPTIONS, AGREEMENT_VISIBLE_USER_TYPE_OPTIONS } from '@/constants/agreements';
+import { AGREEMENT_STATUS_OPTIONS } from '@/constants/agreements';
 import { useGetAgreementByIdQuery } from '@/store/rtkQueries/agreementAPIs';
 
 export type AgreementFormValues = {
   title: string;
   slug: string;
-  text: string;
   content: string;
   agreementType: string;
   status: 'active' | 'inactive';
-  visible_to: string[];
-  touchpoints: string[];
-  is_required: boolean;
   can_block: boolean;
 };
 
 const emptyValues: AgreementFormValues = {
   title: '',
   slug: '',
-  text: '',
   content: '',
   agreementType: '',
   status: 'active',
-  visible_to: [],
-  touchpoints: [],
-  is_required: true,
   can_block: false,
 };
 
@@ -66,8 +57,17 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
   });
   const agreement = agreementResponse?.data;
 
+  const initialValues: AgreementFormValues = {
+    title: agreement?.title ?? '',
+    slug: agreement?.slug ?? '',
+    content: agreement?.content ?? '',
+    agreementType: agreement?.agreementType?._id ?? '',
+    status: (agreement?.status as 'active' | 'inactive') ?? 'active',
+    can_block: agreement?.can_block ?? false,
+  };
+
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, resetForm } = useFormik({
-    initialValues: emptyValues,
+    initialValues,
     validationSchema: agreementSchema,
     enableReinitialize: true,
     onSubmit: async (formValues) => {
@@ -75,49 +75,20 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
     },
   });
 
-  useEffect(() => {
-    if (!open) return;
-    if (!agreementId) {
-      resetForm({ values: emptyValues });
-      return;
-    }
-    if (!agreement) return;
-    resetForm({
-      values: {
-        title: agreement.title,
-        slug: agreement.slug,
-        text: agreement.text ?? '',
-        content: agreement.content ?? '',
-        agreementType: agreement.agreementType?._id ?? '',
-        status: (agreement.status as 'active' | 'inactive') ?? 'active',
-        visible_to: agreement.visible_to ?? [],
-        touchpoints: agreement.touchpoints ?? [],
-        is_required: agreement.is_required ?? true,
-        can_block: agreement.can_block ?? false,
-      },
-    });
-  }, [open, agreementId, agreement, resetForm]);
-
   const closeModal = () => {
     resetForm({ values: emptyValues });
     onOpenChange(false);
-  };
-
-  const toggleListValue = (field: 'visible_to' | 'touchpoints', value: string) => {
-    const current = values[field];
-    const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-    setFieldValue(field, next);
   };
 
   const isLoadingDetails = isEditing && isFetching && !agreement;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
+      <DialogContent className="admin_panel flex max-h-[95vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
         <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
           <DialogTitle>{isEditing ? 'Edit agreement' : 'Add agreement'}</DialogTitle>
           <DialogDescription>
-            Configure the agreement content, where it appears, and which user types must accept it.
+            Configure the legal document content and version lineage.
           </DialogDescription>
         </DialogHeader>
 
@@ -140,7 +111,7 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                     value={values.title}
                     onChange={(e) => {
                       handleChange(e);
-                      if (!isEditing && (!values.slug || values.slug === toSlug(values.title))) {
+                      if (!values.slug || values.slug === toSlug(values.title)) {
                         setFieldValue('slug', toSlug(e.target.value));
                       }
                     }}
@@ -166,23 +137,6 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                   />
                   {errors.slug && touched.slug ? <p className="text-sm text-red-600">{errors.slug}</p> : null}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="agreement-text">
-                  Text<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="agreement-text"
-                  name="text"
-                  placeholder="e.g., Short text for this agreement"
-                  value={values.text}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting}
-                  className={errors.text && touched.text ? 'border-red-500' : ''}
-                />
-                {errors.text && touched.text ? <p className="text-sm text-red-600">{errors.text}</p> : null}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -245,72 +199,14 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                 {errors.content && touched.content ? <p className="text-sm text-red-600">{errors.content}</p> : null}
               </div>
 
-              <div className="space-y-2">
-                <Label>
-                  Visible to<span className="text-red-500">*</span>
-                </Label>
-                <div className="flex flex-wrap gap-3">
-                  {AGREEMENT_VISIBLE_USER_TYPE_OPTIONS.map((opt) => (
-                    <label
-                      key={opt.value}
-                      className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
-                    >
-                      <Checkbox
-                        checked={values.visible_to.includes(opt.value)}
-                        onCheckedChange={() => toggleListValue('visible_to', opt.value)}
-                        disabled={isSubmitting}
-                      />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
-                {errors.visible_to && touched.visible_to ? (
-                  <p className="text-sm text-red-600">{errors.visible_to as string}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label>
-                  Touchpoints<span className="text-red-500">*</span>
-                </Label>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {AGREEMENT_TOUCHPOINT_OPTIONS.map((opt) => (
-                    <label
-                      key={opt.value}
-                      className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
-                    >
-                      <Checkbox
-                        checked={values.touchpoints.includes(opt.value)}
-                        onCheckedChange={() => toggleListValue('touchpoints', opt.value)}
-                        disabled={isSubmitting}
-                      />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
-                {errors.touchpoints && touched.touchpoints ? (
-                  <p className="text-sm text-red-600">{errors.touchpoints as string}</p>
-                ) : null}
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <label className="flex items-center gap-2 text-sm text-slate-700">
-                  <Checkbox
-                    checked={values.is_required}
-                    onCheckedChange={(checked) => setFieldValue('is_required', !!checked)}
-                    disabled={isSubmitting}
-                  />
-                  Required — user must accept to proceed
-                </label>
-                <label className="flex items-center gap-2 text-sm text-slate-700">
-                  <Checkbox
-                    checked={values.can_block}
-                    onCheckedChange={(checked) => setFieldValue('can_block', !!checked)}
-                    disabled={isSubmitting}
-                  />
-                  Can block — prevents the touchpoint action until accepted
-                </label>
-              </div>
+              {/* <label className="flex items-center gap-2 text-sm text-slate-700">
+                <Checkbox
+                  checked={values.can_block}
+                  onCheckedChange={(checked) => setFieldValue('can_block', !!checked)}
+                  disabled={isSubmitting}
+                />
+                Can block — users who have not accepted the latest version cannot complete linked touchpoints
+              </label> */}
             </div>
 
             <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

@@ -41,6 +41,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/blueprints', models: ['Blueprints'] },
   { path: '/admin/reviews', models: ['Reviews'] },
   { path: '/admin/agreements/agreement-types', models: ['Agreement Types'] },
+  { path: '/admin/agreements/sentences', models: ['Agreements'] },
   { path: '/admin/agreements', models: ['Agreements'] },
   { path: '/admin/testimonials', models: ['Testimonial'] },
   { path: '/admin/faqs', models: ['FAQs'] },

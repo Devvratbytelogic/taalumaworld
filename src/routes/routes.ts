@@ -176,6 +176,7 @@ export function getAdminSectionRoutePath(section: string): string {
     reports: '/admin/reports',
     agreements: '/admin/agreements',
     agreement_types: '/admin/agreements/agreement-types',
+    sentences: '/admin/agreements/sentences',
     audit_logs: '/admin/audit-logs',
     coupons: '/admin/coupons',
     taxes: '/admin/taxes',

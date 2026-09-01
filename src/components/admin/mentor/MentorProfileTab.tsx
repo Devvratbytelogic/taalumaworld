@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useFormik } from 'formik';
 import { Avatar } from '@heroui/react';
@@ -15,7 +15,6 @@ import {
   CircleAlert,
   Clock,
   Copy,
-  ExternalLink,
   Facebook,
   FileSignature,
   Info,
@@ -39,10 +38,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { AdminEmptyState, AdminPage, AdminPanel, AdminSectionHeader, adminPanelClass, } from '@/components/admin/layout/AdminContent';
 import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
 import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
+import { AgreementDocumentModal } from '@/components/ui/AgreementDocumentModal';
 import { useGetAdminProfileQuery, useGetPaystackBanksQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/store/rtkQueries/adminPostApi';
-import { useAcceptAgreementMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
+import { useAcceptAgreementMutation, useAcceptAllAgreementsMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
+// import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 import { useGetMyMentorTierUpgradeApplicationQuery } from '@/store/rtkQueries/mentorApis';
 import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorApplication';
 import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
@@ -727,6 +729,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
 function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
   const [isEditing, setIsEditing] = useState(false);
   const [updateMentorInfo] = useUpdateMentorInfoMutation();
+  const requiredAcceptedRef = useRef(false);
+  // const { isTouchpointBlocked } = useBlockedTouchpoints();
+  // const payoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.MENTOR_PAYOUT_SETUP);
   const { data: banksResponse, isLoading: isBanksLoading } = useGetPaystackBanksQuery(undefined, {
     skip: !isEditing,
   });
@@ -752,8 +757,13 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
       paystack_preferred_settlement: mentorInfo?.paystack_preferred_settlement ?? 'mpesa',
       is_vat_registered: mentorInfo?.is_vat_registered ?? false,
       vat_number: mentorInfo?.vat_number ?? '',
+      accepted_agreement_ids: [] as string[],
     },
     validationSchema: mentorPayoutDetailsSchema,
+    validate: () => {
+      if (!isEditing) return {};
+      return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
+    },
     onSubmit: async (formValues) => {
       try {
         const res = await updateMentorInfo(formValues).unwrap();
@@ -800,13 +810,24 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
           </div>
         </div>
         {!isEditing ? (
-          <Button type="button" className="global_btn rounded_full outline_primary" startContent={<Pencil className="h-4 w-4" />} onPress={() => setIsEditing(true)}>
+          <Button
+            type="button"
+            className="global_btn rounded_full outline_primary"
+            startContent={<Pencil className="h-4 w-4" />}
+            onPress={() => setIsEditing(true)}
+          >
             Edit
           </Button>
         ) : null}
       </div>
 
       <div className="p-6">
+        {/* {payoutBlocked ? (
+          <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            Please accept the latest agreements before updating payout details.
+          </p>
+        ) : null} */}
+
         {!isEditing && isPayoutIncomplete ? (
           <MissingFieldsNotice title="Your payout details are incomplete." fields={missingPayoutFields} />
         ) : null}
@@ -1107,6 +1128,16 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
               ) : null}
             </div>
 
+            <AgreementSentenceList
+              touchpoint={AGREEMENT_TOUCHPOINTS.MENTOR_PAYOUT_SETUP}
+              onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
+              onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+              error={typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined}
+              touched={touched.accepted_agreement_ids}
+              onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
+              disabled={isSubmitting}
+            />
+
             <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-5">
               <Button type="submit" className="global_btn rounded_full bg_primary" isLoading={isSubmitting} startContent={<Check className="h-4 w-4" />}>
                 Save changes
@@ -1125,9 +1156,14 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
 /** ── Section 3: Required agreements — GET consent-status + POST agreements/accept ── */
 function AgreementsCard() {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  const [acceptingAll, setAcceptingAll] = useState(false);
+  const [viewingIdOrSlug, setViewingIdOrSlug] = useState<string | null>(null);
   const { data: consentData, isLoading } = useGetUserConsentStatusQuery({ userType: 'Mentor' });
   const [acceptAgreement] = useAcceptAgreementMutation();
+  const [acceptAllAgreements] = useAcceptAllAgreementsMutation();
   const agreements = consentData?.data?.agreements ?? [];
+  const acceptedCount = consentData?.data?.accepted_count ?? agreements.filter((agreement) => agreement.is_accepted).length;
+  const pendingCount = consentData?.data?.pending_count ?? agreements.filter((agreement) => !agreement.is_accepted).length;
 
   const handleAccept = async (agreementId: string) => {
     setAcceptingId(agreementId);
@@ -1141,7 +1177,17 @@ function AgreementsCard() {
     }
   };
 
-  const acceptedCount = agreements.filter((agreement) => agreement.is_accepted).length;
+  const handleAcceptAll = async () => {
+    setAcceptingAll(true);
+    try {
+      await acceptAllAgreements(undefined).unwrap();
+      toast.success('All agreements accepted successfully!');
+    } catch {
+      toast.error('Failed to accept agreements. Please try again.');
+    } finally {
+      setAcceptingAll(false);
+    }
+  };
 
   return (
     <AdminPanel padding={false} className="overflow-hidden">
@@ -1153,16 +1199,23 @@ function AgreementsCard() {
             <p className="mt-0.5 text-xs text-slate-500">Review and accept the agreements required for your mentor account.</p>
           </div>
         </div>
-        {!isLoading && agreements.length > 0 ? (
-          <span
-            className={cn(
-              'inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-medium',
-              acceptedCount === agreements.length ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700',
-            )}
-          >
-            {acceptedCount} of {agreements.length} accepted
-          </span>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {!isLoading && agreements.length > 0 ? (
+            <span
+              className={cn(
+                'inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-medium',
+                acceptedCount === agreements.length ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700',
+              )}
+            >
+              {acceptedCount} of {agreements.length} accepted
+            </span>
+          ) : null}
+          {pendingCount > 0 ? (
+            <Button type="button" className="global_btn rounded_full outline_primary shrink-0" isLoading={acceptingAll} onPress={handleAcceptAll}>
+              Accept all
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div className={agreements.length === 0 && !isLoading ? '' : 'p-6'}>
@@ -1188,17 +1241,13 @@ function AgreementsCard() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-slate-900">{agreement.title} {agreement?.is_required ? <span className="text-xs text-red-500">*</span> : null}</p>
-                      {agreement?.slug ? (
-                        <Link
-                          href={getPolicyBySlugRoutePath(agreement?.slug)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                        >
-                          View policy
-                          <ExternalLink className="h-3 w-3" />
-                        </Link>
-                      ) : null}
+                      <button
+                        type="button"
+                        className="text-xs font-medium text-primary hover:underline"
+                        onClick={() => setViewingIdOrSlug(agreement.slug || agreement._id)}
+                      >
+                        View
+                      </button>
                     </div>
                     <p className="mt-0.5 text-xs text-slate-500">
                       {agreement.agreement_type?.name ?? 'Agreement'} · v{agreement.current_version}
@@ -1227,6 +1276,13 @@ function AgreementsCard() {
           </ul>
         )}
       </div>
+      <AgreementDocumentModal
+        open={!!viewingIdOrSlug}
+        idOrSlug={viewingIdOrSlug}
+        onOpenChange={(open) => {
+          if (!open) setViewingIdOrSlug(null);
+        }}
+      />
     </AdminPanel>
   );
 }

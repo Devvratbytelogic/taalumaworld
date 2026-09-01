@@ -25,8 +25,8 @@ import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 const AGREEMENT_TYPES_MODEL = 'Agreement Types';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  inactive: 'bg-slate-100 text-slate-600 border-slate-200',
+  active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
+  inactive: 'bg-slate-100 text-slate-600 border-slate-200!',
 };
 
 export function AdminAgreementTypesTab() {

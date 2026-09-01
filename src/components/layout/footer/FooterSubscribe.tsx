@@ -1,57 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@heroui/react';
-import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
+import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Input } from '@/components/ui/input';
-import { AGREEMENT_TOUCHPOINTS, AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { USER_TYPE } from '@/constants/common';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
-import { useGetAgreementByTouchpointAndUserTypeQuery } from '@/store/rtkQueries/agreementAPIs';
+import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { useSubscribeToNewsletterMutation } from '@/store/rtkQueries/userPostAPI';
-import { getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
-
-function getNewsletterUserType() {
-  const role = getUserRole();
-  if (role === USER_TYPE.MENTOR) return AGREEMENT_VISIBLE_USER_TYPES.MENTOR;
-  if (role === USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT) {
-    return AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA;
-  }
-  return AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT;
-}
 
 export default function FooterSubscribe() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
+  const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [agreementTouched, setAgreementTouched] = useState(false);
   const [subscribeToNewsletter, { isLoading: isSubscribing }] = useSubscribeToNewsletterMutation();
 
-  const { data: agreementsResponse } = useGetAgreementByTouchpointAndUserTypeQuery({
-    touchPoint: AGREEMENT_TOUCHPOINTS.NEWSLETTER,
-    userType: getNewsletterUserType(),
-  });
-
-  const agreements = agreementsResponse?.data ?? [];
-  const agreementIds = agreements.map((agreement) => agreement._id);
-  const agreementIdsKey = agreementIds.join('|');
-  const requiredAgreementIds = agreements
-    .filter((agreement) => agreement.is_required)
-    .map((agreement) => agreement._id);
-  const allRequiredAccepted = requiredAgreementIds.every((id) => acceptedAgreementIds.includes(id));
   const hasEmailError = emailTouched && !newsletterEmail.trim();
   const agreementError =
     agreementTouched && !allRequiredAccepted
       ? 'Please accept all required agreements before subscribing.'
       : undefined;
-
-  // Default-check all newsletter agreements once they load.
-  useEffect(() => {
-    if (!agreementIdsKey) return;
-    setAcceptedAgreementIds(agreementIdsKey.split('|'));
-  }, [agreementIdsKey]);
 
   const handleSubscribe = async () => {
     const email = newsletterEmail.trim();
@@ -75,7 +44,7 @@ export default function FooterSubscribe() {
         toast.success(res.message ?? 'Subscribed successfully!');
         setNewsletterEmail('');
         setEmailTouched(false);
-        setAcceptedAgreementIds(agreementIds);
+        setAcceptedAgreementIds([]);
         setAgreementTouched(false);
       }
     } catch {
@@ -107,42 +76,17 @@ export default function FooterSubscribe() {
         </Button>
       </div>
 
-      {agreements.length > 0 && (
-        <div className="space-y-3 [&_label]:text-gray-300 [&_label_.text-muted-foreground]:text-gray-500">
-          {agreements.map((agreement) => (
-            <AgreementCheckbox
-              key={agreement._id}
-              id={agreement._id}
-              checked={acceptedAgreementIds.includes(agreement._id)}
-              error={agreementError}
-              touched={agreementTouched}
-              onCheckedChange={(checked) => {
-                setAcceptedAgreementIds((prev) =>
-                  checked ? [...prev, agreement._id] : prev.filter((id) => id !== agreement._id)
-                );
-                setAgreementTouched(true);
-              }}
-              onBlur={() => setAgreementTouched(true)}
-              disabled={isSubscribing}
-            >
-              {agreement.text}{' '}
-              <Link
-                href={getPolicyBySlugRoutePath(agreement.slug ?? '')}
-                target="_blank"
-                className={`font-semibold transition-colors ${
-                  agreementError
-                    ? 'text-red-600 hover:text-red-700'
-                    : 'text-primary hover:text-primary/80'
-                }`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {agreement.title}
-              </Link>
-              {agreement.is_required && <span className="text-red-500"> *</span>}
-            </AgreementCheckbox>
-          ))}
-        </div>
-      )}
+      <div className="[&_label]:text-gray-300 [&_label_.text-muted-foreground]:text-gray-500">
+        <AgreementSentenceList
+          touchpoint={AGREEMENT_TOUCHPOINTS.NEWSLETTER}
+          onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
+          onRequiredAcceptedChange={setAllRequiredAccepted}
+          error={agreementError}
+          touched={agreementTouched}
+          onBlur={() => setAgreementTouched(true)}
+          disabled={isSubscribing}
+        />
+      </div>
     </div>
   );
 }

@@ -18,6 +18,7 @@ export interface ISingleChapterAPIResponseData {
   description: string;
   pageCount: number;
   content: string;
+  content_type?: string;
   pdf: string;
   price: number;
   effectivePrice: number;

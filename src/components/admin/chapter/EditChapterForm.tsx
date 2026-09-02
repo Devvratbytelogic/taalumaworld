@@ -27,6 +27,7 @@ import { SELECT_STYLES } from '@/constants/selectStyle';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
+import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import {
   IMAGE_UPLOAD_MAX_BYTES,
@@ -75,6 +76,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     slug: chapterData?.slug ?? '',
     description: chapterData?.description ?? '',
     content: chapterData?.content ?? '',
+    content_type: chapterData?.content_type || 'pdf',
     sequence: chapterData?.number ?? 1,
     isFree: chapterData?.isFree ?? false,
     price: chapterData?.price ?? 0 as number | undefined,
@@ -102,6 +104,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       formData.append('number', String(vals.sequence));
       formData.append('title', vals.title);
       formData.append('description', vals.description ?? '');
+      formData.append('content_type', vals.content_type);
       formData.append('content', vals.content ?? '');
       if (chapterPricingEnabled) {
         formData.append('isFree', String(vals.isFree));
@@ -370,7 +373,12 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="chapter-desc">Description <span className="text-red-500">*</span></Label>
+          <Label htmlFor="chapter-desc">
+            Description <span className="text-red-500">*</span>
+            <span className="text-xs font-normal text-muted-foreground">
+              &nbsp;(Career Architects can see this without paying for the blueprint)
+            </span>
+          </Label>
           <Textarea
             id="chapter-desc"
             name="description"
@@ -388,78 +396,99 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label>
-            Blueprint content <span className="text-red-500">*</span>
+          <Label htmlFor="chapter-content-type">
+            Content type <span className="text-red-500">*</span>
+            <span className="text-xs font-normal text-muted-foreground">
+              &nbsp;(Visible only after purchasing the blueprint)
+            </span>
           </Label>
-          <p className="text-sm text-slate-500">Required if no PDF is uploaded.</p>
-          <RichTextEditor
-            value={values.content}
-            onChange={handleContentChange}
-            placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
+          <select
+            id="chapter-content-type"
+            name="content_type"
+            value={values.content_type}
+            onChange={handleChange}
+            onBlur={handleBlur}
             disabled={isSubmittingState}
-          />
-          {errors.content && touched.content ? (
-            <p className="text-sm text-red-600">{errors.content}</p>
-          ) : null}
+            className={cn(nativeSelectClassName, 'max-w-md')}
+          >
+            <option value="pdf">PDF</option>
+            <option value="editor">Blueprint Content</option>
+          </select>
         </div>
 
-        <div className="blueprint-form-section">
-          <div>
-            <h3 className="text-sm font-semibold text-slate-900 inline-flex items-center">
-              Upload PDF <span className="text-red-500">*</span>
-              <FileUploadLimitHint kind="pdf" />
-            </h3>
-            <p className="mt-1 text-sm text-slate-500">
-              Required if blueprint content is empty. Provide content or a PDF (or both).
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <label
-              className={cn(
-                'blueprint-file-picker w-fit',
-                errors.content && touched.content && !values.pdf_file && 'border-red-500',
-              )}
-            >
-              <Upload className="h-4 w-4 shrink-0" />
-              <input type="file" accept="application/pdf" onChange={handlePdfChange} className="sr-only" />
-              {pdfFile ? pdfFile.name : 'Choose PDF...'}
-            </label>
-            {pdfFile ? (
-              <Button
-                type="button"
-                className="global_btn rounded_full outline_primary text-destructive hover:bg-destructive/10"
-                onPress={clearSelectedPdf}
-              >
-                Remove PDF
-              </Button>
+        {values.content_type === 'editor' && (
+          <div className="space-y-2">
+            <Label>
+              Blueprint content <span className="text-red-500">*</span>
+            </Label>
+            <RichTextEditor
+              value={values.content}
+              onChange={handleContentChange}
+              placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
+              disabled={isSubmittingState}
+            />
+            {errors.content && touched.content ? (
+              <p className="text-sm text-red-600">{errors.content}</p>
             ) : null}
           </div>
-          {!pdfFile && chapterData?.pdf && !existingPdfRemoved ? (
-            <div className="inline-flex w-fit items-center gap-1 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1 text-sm text-slate-700">
-              <Link
-                href={chapterData.pdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-w-0 items-center gap-2 transition-colors hover:text-slate-900"
-              >
-                <FileText className="h-4 w-4 shrink-0 text-red-500" />
-                <span className="truncate">Current PDF</span>
-              </Link>
-              <Button
-                type="button"
-                isIconOnly
-                aria-label="Remove current PDF"
-                className="global_btn rounded_full outline_primary icon_btn fit_btn h-7 w-7 min-w-7"
-                onPress={removeExistingPdf}
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
+        )}
+
+        {values.content_type === 'pdf' && (
+          <div className="blueprint-form-section">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 inline-flex items-center">
+                Upload PDF <span className="text-red-500">*</span>
+                <FileUploadLimitHint kind="pdf" />
+              </h3>
             </div>
-          ) : null}
-          {errors.content && touched.content && !values.pdf_file ? (
-            <p className="text-sm text-red-600">{errors.content}</p>
-          ) : null}
-        </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <label
+                className={cn(
+                  'blueprint-file-picker w-fit',
+                  errors.pdf_file && touched.pdf_file && !values.pdf_file && 'border-red-500',
+                )}
+              >
+                <Upload className="h-4 w-4 shrink-0" />
+                <input type="file" accept="application/pdf" onChange={handlePdfChange} className="sr-only" />
+                {pdfFile ? pdfFile.name : 'Choose PDF...'}
+              </label>
+              {pdfFile ? (
+                <Button
+                  type="button"
+                  className="global_btn rounded_full outline_primary text-destructive hover:bg-destructive/10"
+                  onPress={clearSelectedPdf}
+                >
+                  Remove PDF
+                </Button>
+              ) : null}
+            </div>
+            {!pdfFile && chapterData?.pdf && !existingPdfRemoved ? (
+              <div className="inline-flex w-fit items-center gap-1 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1 text-sm text-slate-700">
+                <Link
+                  href={chapterData.pdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-w-0 items-center gap-2 transition-colors hover:text-slate-900"
+                >
+                  <FileText className="h-4 w-4 shrink-0 text-red-500" />
+                  <span className="truncate">Current PDF</span>
+                </Link>
+                <Button
+                  type="button"
+                  isIconOnly
+                  aria-label="Remove current PDF"
+                  className="global_btn rounded_full outline_primary icon_btn fit_btn h-7 w-7 min-w-7"
+                  onPress={removeExistingPdf}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ) : null}
+            {errors.pdf_file && touched.pdf_file ? (
+              <p className="text-sm text-red-600">{errors.pdf_file as string}</p>
+            ) : null}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {chapterPricingEnabled ? (

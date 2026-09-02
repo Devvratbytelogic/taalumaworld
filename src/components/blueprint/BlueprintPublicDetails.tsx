@@ -20,9 +20,11 @@ interface BlueprintPublicDetailsProps {
 }
 
 export default function BlueprintPublicDetails({ data, hideMentorDetails = false }: BlueprintPublicDetailsProps) {
+// console.log('data', data);
 
-  const hasContent = Boolean(data?.content);
-  const hasPdf = Boolean(data?.pdf);
+  const contentType = data?.content_type || (data?.pdf ? 'pdf' : 'editor');
+  const hasContent = contentType === 'editor' && Boolean(data?.content);
+  const hasPdf = contentType === 'pdf' && Boolean(data?.pdf);
   const canRead = data?.canRead;
   const isCompleted = Boolean(data?.completed);
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
@@ -34,16 +36,9 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
   });
   const [pdfReadingProgress, setPdfReadingProgress] = useState(0);
 
-  // Overall progress blends both sources, weighted only by the sections that actually exist.
-  // Never drop below the saved/completed progress when reopening a blueprint.
   const readingProgress = useMemo(() => {
     if (isCompleted) return 100;
-
-    let liveProgress = 0;
-    if (hasContent && hasPdf) liveProgress = Math.round((contentReadingProgress + pdfReadingProgress) / 2);
-    else if (hasPdf) liveProgress = pdfReadingProgress;
-    else if (hasContent) liveProgress = contentReadingProgress;
-
+    const liveProgress = hasPdf ? pdfReadingProgress : hasContent ? contentReadingProgress : 0;
     return Math.max(savedProgress, liveProgress);
   }, [isCompleted, hasContent, hasPdf, contentReadingProgress, pdfReadingProgress, savedProgress]);
 
@@ -101,7 +96,7 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                 </div>
 
                 {canRead ? <>
-                  {data?.content && (
+                  {hasContent && (
                     <div ref={contentRef} className="p-6">
                       <MarkdownContent
                         content={data?.content ?? ''}
@@ -110,19 +105,10 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                       />
                     </div>
                   )}
-                  {data?.pdf && (
-                    <div className="flex items-center gap-4 px-6 py-4 sm:px-8">
-                      <div className="h-px flex-1 bg-[#ECECEC]" />
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#6B6B6B]">
-                        Additional Document
-                      </p>
-                      <div className="h-px flex-1 bg-[#ECECEC]" />
-                    </div>
-                  )}
-                  {data?.pdf && (
+                  {hasPdf && (
                     <div>
                       <PdfReader
-                        url={data.pdf}
+                        url={data?.pdf ?? ''}
                         title={data?.title ?? ''}
                         onProgressChange={setPdfReadingProgress}
                       />

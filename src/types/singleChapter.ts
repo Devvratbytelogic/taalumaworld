@@ -16,6 +16,7 @@ export interface IChapter {
   short_code: string;
   description: string;
   content: string;
+  content_type?: string;
   isFree: boolean;
   coverImage: string;
   pdf?: string | null;

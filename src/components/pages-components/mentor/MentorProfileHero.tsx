@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { ShieldCheck, Linkedin, Facebook, BookOpen, Phone, Mail, Users, UserPlus, UserCheck } from 'lucide-react';
+import { ShieldCheck, Linkedin, Facebook, BookOpen, Phone, Mail, Users, UserPlus, UserMinus } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageComponent from '@/components/ui/ImageComponent';
 import Button from '@/components/ui/Button';
@@ -28,24 +28,32 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
   const { isAuthenticated } = useAuth();
   const [isFollowing, setIsFollowing] = useState(Boolean(mentor?.isFollowed));
   const [followerCount, setFollowerCount] = useState(mentor?.followerCount ?? 0);
-  const [followMentor, { isLoading: isFollowingLoading }] = useFollowMentorMutation();
+  const [followMentor, { isLoading: isUpdatingFollow }] = useFollowMentorMutation();
 
   const mentorId = mentor?._id || mentor?.id || '';
 
-  const openLogin = () => {
-    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action: 'follow', itemType: 'mentor', onSuccess: handleFollow } }));
-  };
-
-  const handleFollow = async () => {
-    if (!mentorId || isFollowing) return;
+  const handleToggleFollow = async () => {
+    if (!mentorId) return;
     try {
       const res = await followMentor(mentorId).unwrap();
-      setIsFollowing(true);
-      setFollowerCount((count) => count + 1);
-      toast.success(res?.message ?? `You are now following ${mentor?.name ?? 'this mentor'}`);
+      const nextFollowing = !isFollowing;
+      setIsFollowing(nextFollowing);
+      setFollowerCount((count) => nextFollowing ? count + 1 : Math.max(0, count - 1));
+      toast.success(
+        res?.message ?? (nextFollowing
+          ? `You are now following ${mentor?.name ?? 'this mentor'}`
+          : `You unfollowed ${mentor?.name ?? 'this mentor'}`)
+      );
     } catch (error) {
-      console.error('error following mentor', error);
+      console.error('error updating follow status', error);
     }
+  };
+
+  const openLogin = () => {
+    dispatch(openModal({
+      componentName: 'LoginRequiredModal',
+      data: { action: 'follow', itemType: 'mentor', onSuccess: handleToggleFollow },
+    }));
   };
 
   return (
@@ -82,19 +90,18 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
               </h1>
 
               <Button
-                onPress={isAuthenticated ? handleFollow : openLogin}
-                isLoading={isFollowingLoading}
-                isDisabled={isFollowing}
+                onPress={isAuthenticated ? handleToggleFollow : openLogin}
+                isLoading={isUpdatingFollow}
                 className={`global_btn rounded_full w_fit shrink-0 ${isFollowing ? 'outline_primary' : 'bg_primary'}`}
                 startContent={
-                  isFollowingLoading ? undefined : isFollowing ? (
-                    <UserCheck className="h-4 w-4" />
+                  isUpdatingFollow ? undefined : isFollowing ? (
+                    <UserMinus className="h-4 w-4" />
                   ) : (
                     <UserPlus className="h-4 w-4" />
                   )
                 }
               >
-                {isFollowing ? 'Following' : 'Follow'}
+                {isFollowing ? 'Unfollow' : 'Follow'}
               </Button>
             </div>
 

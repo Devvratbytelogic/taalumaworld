@@ -48,7 +48,6 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
     const authToken = cookieStore.get('auth_token')?.value;
     const isAuthenticated = !!authToken;
 
-    console.log('response', response);
     return (
         <>
             {data?.json_ld && (

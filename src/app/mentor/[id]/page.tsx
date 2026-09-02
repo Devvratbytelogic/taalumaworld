@@ -4,7 +4,6 @@ import MentorProfileHero from '@/components/pages-components/mentor/MentorProfil
 import MentorBooksSection from '@/components/pages-components/mentor/MentorBooksSection';
 import { getAllMentorsServerAPI, getMentorDetailsServerAPI } from '@/store/server-api/serverSideAPIs';
 
-export const revalidate = 300;
 export const dynamicParams = true;
 
 const PAGE_LIMIT = 8;
@@ -61,7 +60,6 @@ export default async function MentorProfilePage({ params }: PageProps) {
     const books = response?.data?.books?.data ?? [];
     const total = response?.data?.books?.total ?? 0;
     const totalPages = response?.data?.books?.totalPages ?? 1;
-
     if (!mentor) {
         return (
             <div className="container py-24 text-center">

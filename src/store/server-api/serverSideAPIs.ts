@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, unstable_rethrow } from 'next/navigation';
 import { API_BASE_URL } from '@/utils/config';
 import type { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
@@ -35,6 +35,16 @@ type PublicFetchOptions = {
   tags?: string[];
 };
 
+async function readJsonOrNotFound<T>(res: Response, urlString: string): Promise<T | null> {
+  const body = await res.json().catch(() => null) as { http_status_code?: number; message?: string } | null;
+  if (res.status === 404 || body?.http_status_code === 404) notFound();
+  if (!res.ok) {
+    console.error(`[API Error] ${res.status} — ${urlString}: ${body?.message ?? res.statusText}`);
+    return null;
+  }
+  return body as T;
+}
+
 /** Cookie-free fetch for public ISR pages */
 export async function publicFetch<T>(
   path: string,
@@ -52,17 +62,9 @@ export async function publicFetch<T>(
         ...(tags?.length ? { tags } : {}),
       },
     });
-
-    if (!res.ok) {
-      if (res.status === 404) notFound();
-      const errorBody = await res.json().catch(() => ({}));
-      const message: string = (errorBody as { message?: string }).message ?? res.statusText;
-      console.error(`[API Error] ${res.status} — ${urlString}: ${message}`);
-      return null;
-    }
-
-    return (await res.json()) as T;
-  } catch {
+    return await readJsonOrNotFound<T>(res, urlString);
+  } catch (error) {
+    unstable_rethrow(error);
     return null;
   }
 }
@@ -70,22 +72,13 @@ export async function publicFetch<T>(
 export async function serverFetch<T>(path: string): Promise<T | null> {
   try {
     const urlString = `${API_BASE_URL}${path}`;
-    const fetchOptions = {
+    const res = await fetch(urlString, {
       method: 'GET',
       headers: await getHeaders(),
-    };
-    const res = await fetch(urlString, fetchOptions);
-
-    if (!res.ok) {
-      if (res.status === 404) notFound();
-      const errorBody = await res.json().catch(() => ({}));
-      const message: string = (errorBody as { message?: string }).message ?? res.statusText;
-      console.error(`[API Error] ${res.status} — ${urlString}: ${message}`);
-      return null;
-    }
-
-    return (await res.json()) as T;
-  } catch {
+    });
+    return await readJsonOrNotFound<T>(res, urlString);
+  } catch (error) {
+    unstable_rethrow(error);
     return null;
   }
 }
@@ -134,9 +127,8 @@ export async function getMentorDetailsServerAPI(
   if (params?.limit) query.set('limit', String(params.limit));
   const queryString = query.toString();
 
-  return publicFetch<IUserMentorDetailsAPIResponse>(
-    `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`,
-    { tags: [TAGS.MENTORS, TAGS.mentor(shortCode)] }
+  return serverFetch<IUserMentorDetailsAPIResponse>(
+    `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`
   );
 }
 

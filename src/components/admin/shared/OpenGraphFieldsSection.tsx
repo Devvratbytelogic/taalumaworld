@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/components/ui/utils';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 
 export type OpenGraphFormValues = {
   meta_title: string;
@@ -333,6 +334,7 @@ export function OpenGraphFieldsSection({
             {ogImageOptional ? (
               <span className="ml-1 text-xs font-normal text-slate-400">(optional)</span>
             ) : null}
+            <FileUploadLimitHint kind="image" />
           </Label>
           <label
             htmlFor={`${idPrefix}-og-image`}

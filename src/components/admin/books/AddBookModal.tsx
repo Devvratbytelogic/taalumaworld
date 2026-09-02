@@ -19,6 +19,8 @@ import { addBookSchema } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { slugify } from '@/utils/slugify';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 const initialFormValues = {
   title: '',
@@ -124,8 +126,8 @@ export function AddBookModal({
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -151,8 +153,8 @@ export function AddBookModal({
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -324,7 +326,10 @@ export function AddBookModal({
 
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
-                <Label htmlFor="book-cover">Cover Image<span className="text-red-500">*</span></Label>
+                <Label htmlFor="book-cover">
+                  Cover Image<span className="text-red-500">*</span>
+                  <FileUploadLimitHint kind="image" />
+                </Label>
                 <label
                   htmlFor="book-cover"
                   className={`blueprint-file-picker ${errors.cover_image && touched.cover_image ? 'border-red-500' : ''}`}

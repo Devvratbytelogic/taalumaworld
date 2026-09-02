@@ -17,6 +17,8 @@ import {
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { memo, useRef, useEffect, useMemo } from 'react';
+import toast from '@/utils/toast';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 function createEditorPlugins(imageUploadHandler: (file: File) => Promise<string>) {
   return [
@@ -83,6 +85,10 @@ function RichTextEditorComponent({
   const editorPlugins = useMemo(
     () =>
       createEditorPlugins(async (file: File) => {
+        if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+          toast.error(getImageSizeLimitMessage());
+          throw new Error(getImageSizeLimitMessage());
+        }
         const handler = onImageUploadRef.current;
         if (handler) {
           try {

@@ -20,6 +20,8 @@ import { editBookSchema } from '@/utils/formValidation';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { IBook } from '@/types/books';
 import { slugify } from '@/utils/slugify';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 const emptyFormValues = {
   title: '',
@@ -179,8 +181,8 @@ export function EditBookModal({
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -208,8 +210,8 @@ export function EditBookModal({
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -345,7 +347,11 @@ export function EditBookModal({
             </div>
             <div className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
-                <Label htmlFor="edit-book-cover">Cover Image <span className="text-xs text-muted-foreground font-normal">(leave unchanged to keep current)</span></Label>
+                <Label htmlFor="edit-book-cover">
+                  Cover Image
+                  <span className="text-xs text-muted-foreground font-normal">(leave unchanged to keep current)</span>
+                  <FileUploadLimitHint kind="image" />
+                </Label>
                 <label
                   htmlFor="edit-book-cover"
                   className="blueprint-file-picker"

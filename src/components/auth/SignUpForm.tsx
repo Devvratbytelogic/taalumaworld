@@ -16,6 +16,8 @@ import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import { getHomeRoutePath, getMentorDashboardRoutePath, getMentorLoginRoutePath, } from '@/routes/routes';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { setAuthCookies } from '@/utils/authCookies';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -37,8 +39,8 @@ export function SignUpForm() {
             toast.error('Please select an image file (e.g. JPG, PNG)');
             return;
         }
-        if (file.size > 2 * 1024 * 1024) {
-            toast.error('Image must be less than 2MB');
+        if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+            toast.error(getImageSizeLimitMessage());
             return;
         }
         setProfileImage(file);
@@ -143,7 +145,10 @@ export function SignUpForm() {
                             </>
                         )}
                     </button>
-                    <span className="text-sm text-muted-foreground">Profile picture (optional)</span>
+                    <span className="text-sm text-muted-foreground inline-flex items-center gap-1.5">
+                        Profile picture (optional)
+                        <FileUploadLimitHint kind="image" />
+                    </span>
                 </div>
 
                 <div className="space-y-2">

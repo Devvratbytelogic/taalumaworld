@@ -56,6 +56,8 @@ import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
 import ReactSelect from 'react-select';
 import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 const PAYOUT_FREQUENCIES = ["monthly", "quarterly", "annually"] as const;
 const PAYSTACK_SETTLEMENT_OPTIONS = ["mpesa", "bank"] as const;
@@ -289,8 +291,8 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Photo must be less than 2MB');
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage('Photo'));
       return;
     }
     if (!file.type.startsWith('image/')) {
@@ -577,8 +579,11 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
               <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center">
                 <Avatar src={displayPhoto} name={displayName} className="h-16 w-16 shrink-0 text-xl" />
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Profile photo</p>
-                  <p className="mt-0.5 text-xs text-slate-500">JPG or PNG, max 2 MB</p>
+                  <p className="text-sm font-medium text-slate-900 inline-flex items-center gap-1.5">
+                    Profile photo
+                    <FileUploadLimitHint kind="image" />
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-500">JPG or PNG</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <label>
                       <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />

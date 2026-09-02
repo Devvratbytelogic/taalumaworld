@@ -32,6 +32,13 @@ import { SELECT_STYLES } from '@/constants/selectStyle';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import {
+  IMAGE_UPLOAD_MAX_BYTES,
+  PDF_UPLOAD_MAX_BYTES,
+  getImageSizeLimitMessage,
+  getPdfSizeLimitMessage,
+} from '@/constants/fileUpload';
 
 const initialFormValues = {
   bookId: '',
@@ -156,8 +163,8 @@ export function CreateChapterForm() {
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (featuredImagePreviewUrl) URL.revokeObjectURL(featuredImagePreviewUrl);
@@ -176,8 +183,8 @@ export function CreateChapterForm() {
         toast.error('Please select a PDF file');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('PDF must be less than 5MB');
+      if (file.size > PDF_UPLOAD_MAX_BYTES) {
+        toast.error(getPdfSizeLimitMessage());
         return;
       }
       setPdfFile(file);
@@ -202,8 +209,8 @@ export function CreateChapterForm() {
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -367,11 +374,12 @@ export function CreateChapterForm() {
 
         <div className="blueprint-form-section">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">
+            <h3 className="text-sm font-semibold text-slate-900 inline-flex items-center">
               Upload PDF <span className="text-red-500">*</span>
+              <FileUploadLimitHint kind="pdf" />
             </h3>
             <p className="mt-1 text-sm text-slate-500">
-              Required if blueprint content is empty (max 5MB). Provide content or a PDF (or both).
+              Required if blueprint content is empty. Provide content or a PDF (or both).
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -457,7 +465,10 @@ export function CreateChapterForm() {
         </div>
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           <div className="space-y-2 flex-1 ">
-            <Label htmlFor="chapter-image">Featured image <span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-image">
+              Featured image <span className="text-red-500">*</span>
+              <FileUploadLimitHint kind="image" />
+            </Label>
             <label
               htmlFor="chapter-image"
               className={cn('blueprint-file-picker', errors.cover_image && touched.cover_image && 'border-red-500')}

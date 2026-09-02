@@ -22,6 +22,8 @@ import { mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -128,8 +130,8 @@ export function AdminProfileTab() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Photo must be less than 2MB');
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage('Photo'));
       return;
     }
     if (!file.type.startsWith('image/')) {
@@ -307,8 +309,11 @@ export function AdminProfileTab() {
               <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center">
                 <Avatar src={displayPhoto} name={displayName} className="h-16 w-16 shrink-0 text-xl" />
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Profile photo</p>
-                  <p className="mt-0.5 text-xs text-slate-500">JPG or PNG, max 2 MB</p>
+                  <p className="text-sm font-medium text-slate-900 inline-flex items-center gap-1.5">
+                    Profile photo
+                    <FileUploadLimitHint kind="image" />
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-500">JPG or PNG</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <label>
                       <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
@@ -487,7 +492,7 @@ export function AdminProfileTab() {
           </span>
         </div>
         {permissions.length > 0 ? (
-          <ul className="max-h-[420px] divide-y divide-slate-100 overflow-y-auto p-6 pt-0">
+          <ul className="max-h-105 divide-y divide-slate-100 overflow-y-auto p-6 pt-0">
             {permissions.map((entry) => (
               <li key={entry._id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <span className="text-sm font-medium text-slate-800">{entry.model}</span>

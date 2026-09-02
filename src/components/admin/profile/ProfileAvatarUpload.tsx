@@ -7,6 +7,8 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
+import { IMAGE_UPLOAD_LIMIT_LABEL, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 
 type AvatarSize = 'md' | 'lg' | 'xl';
 
@@ -47,8 +49,8 @@ export function ProfileAvatarUpload({
       toast.error('Please upload a valid image file');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Photo must be less than 2MB');
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage('Photo'));
       return;
     }
 
@@ -66,52 +68,55 @@ export function ProfileAvatarUpload({
   };
 
   return (
-    <div className={cn('relative z-10 shrink-0 rounded-full overflow-hidden border bg-white', sizeConfig.wrap, className)}>
-      <button
-        type="button"
-        onClick={() => !isLoading && inputRef.current?.click()}
-        disabled={isLoading}
-        className={cn(
-          'group relative block h-full w-full overflow-hidden rounded-full shadow-md outline-none',
-          ringClassName,
-          'focus-visible:ring-primary/40',
-          isLoading ? 'cursor-wait' : 'cursor-pointer',
-        )}
-        title="Change profile picture"
-        aria-label="Change profile picture"
-      >
-        <UserAvatar
-          userName={name}
-          userPhoto={src}
-          size="xl"
-          className="h-full! w-full! text-2xl"
-        />
-        <span
+    <div className="relative z-10 flex shrink-0 flex-col items-center">
+      <div className={cn('overflow-hidden rounded-full border bg-white', sizeConfig.wrap, className)}>
+        <button
+          type="button"
+          onClick={() => !isLoading && inputRef.current?.click()}
+          disabled={isLoading}
           className={cn(
-            'pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-0.5 rounded-full bg-black/50 text-white transition-opacity',
-            isLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+            'group relative block h-full w-full overflow-hidden rounded-full shadow-md outline-none',
+            ringClassName,
+            'focus-visible:ring-primary/40',
+            isLoading ? 'cursor-wait' : 'cursor-pointer',
           )}
+          title={`Change profile picture (${IMAGE_UPLOAD_LIMIT_LABEL})`}
+          aria-label={`Change profile picture (${IMAGE_UPLOAD_LIMIT_LABEL})`}
         >
-          {isLoading ? (
-            <Loader2 className={cn('animate-spin', sizeConfig.icon)} />
-          ) : (
-            <>
-              <Camera className={sizeConfig.icon} />
-              {sizeConfig.showLabel ? (
-                <span className="text-[10px] font-medium">Change</span>
-              ) : null}
-            </>
-          )}
-        </span>
-      </button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="sr-only"
-        onChange={handleFileChange}
-        disabled={isLoading}
-      />
+          <UserAvatar
+            userName={name}
+            userPhoto={src}
+            size="xl"
+            className="h-full! w-full! text-2xl"
+          />
+          <span
+            className={cn(
+              'pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-0.5 rounded-full bg-black/50 text-white transition-opacity',
+              isLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+            )}
+          >
+            {isLoading ? (
+              <Loader2 className={cn('animate-spin', sizeConfig.icon)} />
+            ) : (
+              <>
+                <Camera className={sizeConfig.icon} />
+                {sizeConfig.showLabel ? (
+                  <span className="text-[10px] font-medium">Change</span>
+                ) : null}
+              </>
+            )}
+          </span>
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleFileChange}
+          disabled={isLoading}
+        />
+      </div>
+      <FileUploadLimitHint kind="image" className="mt-1" />
     </div>
   );
 }

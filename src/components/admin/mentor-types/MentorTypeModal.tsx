@@ -18,6 +18,8 @@ import toast from '@/utils/toast';
 import { mentorTierSchema } from '@/utils/formValidation';
 import { useAddMentorTierMutation, useUpdateMentorTierMutation } from '@/store/rtkQueries/mentorApis';
 import type { IAllMentorTiersEntity } from '@/types/mentorTier';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 
 
@@ -103,8 +105,8 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
       toast.error('Please select an image file (e.g. JPG, PNG, SVG)');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Badge image must be less than 2MB');
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage('Badge image'));
       return;
     }
     setBadgeFile(file);
@@ -137,8 +139,9 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <Label className="mb-1 block">
+                <Label className="mb-1">
                   Badge <span className="font-normal text-muted-foreground">(optional)</span>
+                  <FileUploadLimitHint kind="image" />
                 </Label>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleBadgeChange} />
                 <div className="flex flex-wrap items-center gap-2">
@@ -161,7 +164,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                     {badgeFile.name}
                   </p>
                 ) : null}
-                <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, SVG — max 2 MB</p>
+                <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, SVG</p>
               </div>
             </div>
 

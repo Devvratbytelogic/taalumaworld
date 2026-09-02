@@ -23,6 +23,8 @@ import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import toast from '@/utils/toast';
 import { USER_TYPE } from '@/constants/common';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 interface EditUserModalProps {
   user: IAllUsersEntity | null;
@@ -98,6 +100,10 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
       toast.error('Please select an image file (e.g. JPG, PNG)');
       return;
     }
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage());
+      return;
+    }
     if (profilePicPreview?.startsWith('blob:')) URL.revokeObjectURL(profilePicPreview);
     const url = URL.createObjectURL(file);
     setProfilePicFile(file);
@@ -130,7 +136,10 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
                 <AvatarFallback>{values.name?.[0]?.toUpperCase() ?? 'C'}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1 space-y-2">
-                <Label htmlFor="edit-user-profile-pic">Profile picture</Label>
+                <Label htmlFor="edit-user-profile-pic">
+                  Profile picture
+                  <FileUploadLimitHint kind="image" />
+                </Label>
                 <label
                   htmlFor="edit-user-profile-pic"
                   className={cn(

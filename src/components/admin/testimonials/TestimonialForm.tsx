@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import type { ITestimonialsDataEntity } from '@/types/testimonial';
 import { testimonialSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 interface TestimonialFormProps {
   initial?: Partial<ITestimonialsDataEntity>;
@@ -70,8 +72,8 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
       toast.error('Please select an image file (e.g. JPG, PNG)');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be less than 2MB');
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage());
       return;
     }
     setPhotoFile(file);
@@ -116,8 +118,9 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
           )}
         </div>
         <div>
-          <Label className="mb-1 block">
+          <Label className="mb-1">
             Photo <span className="text-muted-foreground font-normal">(optional)</span>
+            <FileUploadLimitHint kind="image" />
           </Label>
           <input
             ref={fileInputRef}
@@ -135,7 +138,7 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
           >
             {photoFile ? photoFile.name : 'Choose image'}
           </Button>
-          <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP — max 2 MB</p>
+          <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP</p>
         </div>
       </div>
 

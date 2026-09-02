@@ -20,6 +20,8 @@ import { getMentorSignupRoutePath, } from '@/routes/routes'
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList'
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements'
 import { useGetInstituteMessageQuery, useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint'
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload'
 
 const DEFAULT_PARTNER_PROMPT_HEADING = 'Partner university student'
 const DEFAULT_PARTNER_PROMPT_MESSAGE = 'Use your official university email to access selected content free during our promotional period.'
@@ -138,8 +140,8 @@ export default function SignUp() {
             toast.error('Please select an image file (e.g. JPG, PNG)')
             return
         }
-        if (file.size > 2 * 1024 * 1024) {
-            toast.error('Image must be less than 2MB')
+        if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+            toast.error(getImageSizeLimitMessage())
             return
         }
         setProfileImage(file)
@@ -297,9 +299,12 @@ export default function SignUp() {
                                 )}
                             </button>
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-foreground">Profile photo</p>
+                                <p className="text-sm font-medium text-foreground inline-flex items-center gap-1.5">
+                                    Profile photo
+                                    <FileUploadLimitHint kind="image" />
+                                </p>
                                 <p className="text-xs text-muted-foreground mt-0.5">
-                                    Optional · JPG or PNG, max 2 MB
+                                    Optional · JPG or PNG
                                 </p>
                                 {!profilePreview && (
                                     <button

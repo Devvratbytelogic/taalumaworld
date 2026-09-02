@@ -17,6 +17,8 @@ import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 const SETTING_MODEL = 'Setting';
 
@@ -185,8 +187,8 @@ export function GeneralSettingsCard() {
         toast.error('Please select an image file (e.g. JPG, PNG)');
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('Image must be less than 2MB');
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
         return;
       }
       if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -309,7 +311,10 @@ export function GeneralSettingsCard() {
 
               {/* Logo upload */}
               <div>
-                <Label>Platform Logo</Label>
+                <Label>
+                  Platform Logo
+                  <FileUploadLimitHint kind="image" />
+                </Label>
                 <div className="mt-2 flex items-center gap-4">
                   {/* Preview */}
                   {(logoFile || data?.logo) && (
@@ -346,8 +351,8 @@ export function GeneralSettingsCard() {
                             e.target.value = '';
                             return;
                           }
-                          if (file.size > 2 * 1024 * 1024) {
-                            toast.error('Image must be less than 2MB');
+                          if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+                            toast.error(getImageSizeLimitMessage());
                             e.target.value = '';
                             return;
                           }

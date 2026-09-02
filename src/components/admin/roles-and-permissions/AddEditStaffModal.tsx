@@ -22,6 +22,8 @@ import ReactSelect from 'react-select';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { USER_TYPE } from '@/constants/common';
 import { cn } from '@/components/ui/utils';
+import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
 
 const DISABLED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
 
@@ -133,6 +135,10 @@ export function AddEditStaffModal() {
       toast.error('Please select an image file (e.g. JPG, PNG)');
       return;
     }
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      toast.error(getImageSizeLimitMessage());
+      return;
+    }
     if (profilePicPreview?.startsWith('blob:')) URL.revokeObjectURL(profilePicPreview);
     const url = URL.createObjectURL(file);
     setProfilePicFile(file);
@@ -171,7 +177,10 @@ export function AddEditStaffModal() {
                 <AvatarFallback>{values.name?.[0]?.toUpperCase() ?? 'S'}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1 space-y-2">
-                <Label htmlFor="staff-profile-pic">Profile picture</Label>
+                <Label htmlFor="staff-profile-pic">
+                  Profile picture
+                  <FileUploadLimitHint kind="image" />
+                </Label>
                 <label
                   htmlFor="staff-profile-pic"
                   className={cn(

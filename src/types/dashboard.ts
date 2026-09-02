@@ -9,6 +9,24 @@ export interface IAdminDashboardAPIResponse {
   timestamp: string;
 }
 
+export interface IDashboardMentorActionItem {
+  _id: string;
+  name: string;
+  email: string;
+  profile_pic?: string | null;
+  subtitle?: string | null;
+  createdAt: string;
+  status: string;
+  status_label?: string | null;
+  from_tier?: string | null;
+  to_tier?: string | null;
+}
+
+export interface IDashboardMentorActionQueue {
+  total: number;
+  latest?: IDashboardMentorActionItem[] | null;
+}
+
 export interface IAdminDashboardStats {
   total_users: number;
   total_mentors: number;
@@ -16,6 +34,13 @@ export interface IAdminDashboardStats {
   total_blueprints: number;
   total_series: number;
   flagged_content: number;
+  pending_total?: number;
+  min_publish_score?: number;
+  reviewBlueprint?: number;
+  newMentorRegistrations?: IDashboardMentorActionQueue;
+  mentorConversions?: IDashboardMentorActionQueue;
+  mentorVerification?: IDashboardMentorActionQueue;
+  mentorTierUpgrade?: IDashboardMentorActionQueue;
 }
 
 /** Lean series reference embedded on performance/revenue rows */

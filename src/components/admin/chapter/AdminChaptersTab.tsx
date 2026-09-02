@@ -52,6 +52,9 @@ export function AdminChaptersTab() {
     const [filterByContentFlagged, setFilterByContentFlagged] = useState(
         () => searchParams.get('isContentFlagged') === 'true',
     );
+    const [filterByReviewBlueprint, setFilterByReviewBlueprint] = useState(
+        () => searchParams.get('reviewBlueprint') === 'true',
+    );
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -59,6 +62,7 @@ export function AdminChaptersTab() {
 
     useEffect(() => {
         setFilterByContentFlagged(searchParams.get('isContentFlagged') === 'true');
+        setFilterByReviewBlueprint(searchParams.get('reviewBlueprint') === 'true');
     }, [searchParams]);
 
     const handleContentFlaggedChange = (value: boolean) => {
@@ -73,15 +77,28 @@ export function AdminChaptersTab() {
         router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     };
 
+    const handleReviewBlueprintChange = (value: boolean) => {
+        setFilterByReviewBlueprint(value);
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+            params.set('reviewBlueprint', 'true');
+        } else {
+            params.delete('reviewBlueprint');
+        }
+        const query = params.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    };
+
     const { data: chaptersResponse, isLoading } = useGetAllAdminChaptersQuery({
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
         search: debouncedSearch,
-        ...(filterByBook ? { book_id: filterByBook } : {}),
+        ...(filterByBook ? { bookId: filterByBook } : {}),
         ...(filterByStatus ? { status: filterByStatus } : {}),
         ...(isTrashView ? { isDeleted: true } : {}),
         ...(isSuperAdmin && filterByIsMine ? { isMine: true } : {}),
         ...(filterByContentFlagged ? { isContentFlagged: true } : {}),
+        ...(filterByReviewBlueprint ? { reviewBlueprint: true } : {}),
     });
 
     const { data: booksResponse } = useGetAllBooksQuery();
@@ -97,7 +114,7 @@ export function AdminChaptersTab() {
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine, filterByContentFlagged]);
+    }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine, filterByContentFlagged, filterByReviewBlueprint]);
 
     const onDeleteChapter = async (id: string) => {
         try {
@@ -428,6 +445,8 @@ export function AdminChaptersTab() {
                 onIsMineChange={setFilterByIsMine}
                 isContentFlagged={filterByContentFlagged}
                 onContentFlaggedChange={handleContentFlaggedChange}
+                reviewBlueprint={filterByReviewBlueprint}
+                onReviewBlueprintChange={handleReviewBlueprintChange}
                 showMineFilter={isSuperAdmin}
             />
 

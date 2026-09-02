@@ -41,8 +41,8 @@ function StatCardSkeleton() {
 export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: stats.length || 6 }).map((_, i) => (
           <StatCardSkeleton key={i} />
         ))}
       </div>
@@ -50,7 +50,7 @@ export function DashboardStatsGrid({ stats, isLoading }: DashboardStatsGridProps
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {      stats.map((stat) => {
         const Icon = stat.icon;
 

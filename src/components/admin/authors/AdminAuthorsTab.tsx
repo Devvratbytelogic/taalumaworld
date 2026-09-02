@@ -185,6 +185,17 @@ export function AdminAuthorsTab() {
         ),
     },
     {
+      field: 'score',
+      headerName: 'Score',
+      width: 100,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm font-medium text-slate-700">
+          {params.row.score == null ? '-' : params.row.score}
+        </span>
+      ),
+    },
+    {
       field: 'wallet_balance',
       headerName: 'Wallet Balance',
       width: 140,

@@ -25,6 +25,8 @@ interface AdminChaptersSearchProps {
   onIsMineChange: (value: boolean) => void;
   isContentFlagged: boolean;
   onContentFlaggedChange: (value: boolean) => void;
+  reviewBlueprint: boolean;
+  onReviewBlueprintChange: (value: boolean) => void;
   /** "My blueprints" filter is only relevant/visible for Super Administrators. */
   showMineFilter?: boolean;
 }
@@ -43,15 +45,18 @@ export function AdminChaptersSearch({
   onIsMineChange,
   isContentFlagged,
   onContentFlaggedChange,
+  reviewBlueprint,
+  onReviewBlueprintChange,
   showMineFilter = false,
 }: AdminChaptersSearchProps) {
-  const hasActiveFilters = selectedBook || selectedStatus || (showMineFilter && isMine) || isContentFlagged;
+  const hasActiveFilters = selectedBook || selectedStatus || (showMineFilter && isMine) || isContentFlagged || reviewBlueprint;
 
   const clearAll = () => {
     onBookChange('');
     onStatusChange('');
     onIsMineChange(false);
     onContentFlaggedChange(false);
+    onReviewBlueprintChange(false);
   };
 
   return (
@@ -120,6 +125,22 @@ export function AdminChaptersSearch({
             <span className="font-normal">Flagged content</span>
           </div>
 
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => onReviewBlueprintChange(!reviewBlueprint)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onReviewBlueprintChange(!reviewBlueprint);
+              }
+            }}
+            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+          >
+            <Checkbox checked={reviewBlueprint} tabIndex={-1} className="pointer-events-none" />
+            <span className="font-normal">Blueprints to review</span>
+          </div>
+
           {hasActiveFilters ? (
             <button
               type="button"
@@ -163,6 +184,14 @@ export function AdminChaptersSearch({
             <span className={adminFilterPillClass}>
               Flagged content
               <button type="button" onClick={() => onContentFlaggedChange(false)} className="hover:text-primary/70">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ) : null}
+          {reviewBlueprint ? (
+            <span className={adminFilterPillClass}>
+              Blueprints to review
+              <button type="button" onClick={() => onReviewBlueprintChange(false)} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
             </span>

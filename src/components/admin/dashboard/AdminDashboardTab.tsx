@@ -1,16 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Book, CalendarDays, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet, X } from 'lucide-react';
+import { Book, CalendarDays, ClipboardCheck, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPanel,
-  AdminSearchPanel,
   AdminSectionHeader,
   AdminStatCard,
   AdminTableShell,
 } from '@/components/admin/layout/AdminContent';
-import { Input } from '@/components/ui/input';
 import { DashboardWelcomeHeader } from './DashboardWelcomeHeader';
 import { DashboardStatsGrid, type StatCard } from './DashboardStatsGrid';
 import { DashboardMentorActions } from './DashboardMentorActions';
@@ -57,7 +55,6 @@ export default function AdminDashboardTab() {
     ...(fromDate ? { fromDate } : {}),
     ...(toDate ? { toDate } : {}),
   };
-  const hasDateFilter = !!fromDate || !!toDate;
   const clearDateFilter = () => {
     setFromDate('');
     setToDate('');
@@ -130,6 +127,13 @@ export default function AdminDashboardTab() {
       color: 'orange',
       href: `${getAdminSectionRoutePath('chapters')}?isContentFlagged=true`,
     },
+    {
+      title: 'Blueprints to review',
+      value: (statsData?.reviewBlueprint ?? 0).toLocaleString(),
+      icon: ClipboardCheck,
+      color: 'purple',
+      href: `${getAdminSectionRoutePath('chapters')}?reviewBlueprint=true`,
+    },
   ];
 
   const performanceSummary = performanceData?.data?.summary;
@@ -143,43 +147,19 @@ export default function AdminDashboardTab() {
 
   return (
     <AdminPage>
-      <DashboardWelcomeHeader userName={userName} contentMode={contentMode} />
-      <div className="flex flex-wrap items-end justify-end gap-3">
-        <div className="flex min-w-0 flex-col gap-1 sm:w-40">
-          <label className="text-xs font-medium text-slate-500">From</label>
-          <Input
-            type="date"
-            value={fromDate}
-            max={toDate || undefined}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="h-9 w-full text-sm"
-          />
-        </div>
-        <div className="flex min-w-0 flex-col gap-1 sm:w-40">
-          <label className="text-xs font-medium text-slate-500">To</label>
-          <Input
-            type="date"
-            value={toDate}
-            min={fromDate || undefined}
-            onChange={(e) => setToDate(e.target.value)}
-            className="h-9 w-full text-sm"
-          />
-        </div>
-        {hasDateFilter ? (
-          <button
-            type="button"
-            onClick={clearDateFilter}
-            className="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200! px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
-          >
-            <X className="h-3.5 w-3.5" />
-            Clear
-          </button>
-        ) : null}
-      </div>
+      <DashboardWelcomeHeader
+        userName={userName}
+        contentMode={contentMode}
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={setFromDate}
+        onToDateChange={setToDate}
+        onClearDateFilter={clearDateFilter}
+      />
 
       <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
 
-      <DashboardMentorActions />
+      <DashboardMentorActions stats={statsData} isLoading={dashboardLoading} />
 
       <AdminPanel>
         <AdminSectionHeader title="Blueprint performance" />

@@ -71,6 +71,7 @@ export interface IAllUsersEntity {
   profile_completion_percentage?: number | null;
   profile_completion?: ProfileCompletion | null;
   mentor_economy?: MentorEconomy | null;
+  score?: number | null;
   dob?: string | null;
   username?: string | null;
   short_code?: string | null;

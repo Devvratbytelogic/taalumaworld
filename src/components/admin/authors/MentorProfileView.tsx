@@ -267,6 +267,7 @@ export function MentorProfileView() {
             <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-slate-100 pt-5">
               <InfoRow label="Joining Date" value={mentor.createdAt ? moment(mentor.createdAt).format('DD MMM YYYY hh:mm A') : '-'} />
               <InfoRow label="Last Updated" value={mentor.updatedAt ? moment(mentor.updatedAt).format('DD MMM YYYY hh:mm A') : '-'} />
+              <InfoRow label="Score" value={mentor.score == null ? '-' : String(mentor.score)} />
               <InfoRow
                 label="Account Verified"
                 value={

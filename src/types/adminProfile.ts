@@ -40,6 +40,7 @@ export interface IAdminProfileAPIResponseData {
   mentor_info?: MentorInfo;
   profile_completion_percentage?: number;
   mentor_economy?: MentorEconomy;
+  score?: number | null;
 }
 export interface Role {
   _id: string;

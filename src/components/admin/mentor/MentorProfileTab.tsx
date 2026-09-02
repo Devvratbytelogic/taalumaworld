@@ -370,7 +370,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Profile completion</p>
               <p className="mt-1 text-lg font-semibold text-slate-900">{profile?.profile_completion_percentage ?? 0}%</p>
@@ -472,6 +472,12 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                   Request upgrade
                 </button>
               )}
+            </div>
+            <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Score</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900">
+                {profile?.score == null ? '—' : profile.score}
+              </p>
             </div>
           </div>
         </div>

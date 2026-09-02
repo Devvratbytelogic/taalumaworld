@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/components/ui/utils';
 import { AdminHeaderSearch, AdminHeaderSearchProvider } from '@/components/admin/layout/AdminHeaderSearch';
+import { AdminNotificationBell } from '@/components/admin/layout/AdminNotificationBell';
 import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorProfileRoutePath } from '@/routes/routes';
 import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
 import toast from '@/utils/toast';
@@ -165,7 +166,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
 
                 {/* Top bar */}
                 <div className="border-b border-primary-dark/30 bg-primary text-white">
-                    <div className="mx-auto flex h-10 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
+                    <div className="mx-auto flex h-10 max-w-360 items-center justify-between gap-4 px-4 sm:px-6">
                         <div className="flex h-full min-w-0 items-center">
                             <p className="hidden min-w-0 items-center gap-2 text-sm leading-none sm:flex">
                                 <span className="shrink-0 font-semibold tracking-tight text-white">
@@ -191,7 +192,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                 </div>
 
                 {/* Main header */}
-                <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
+                <div className="mx-auto max-w-360 px-4 sm:px-6">
                     <div className="relative flex h-14 items-center">
                         <div className="flex min-w-0 flex-1 items-center gap-2">
                             <button
@@ -208,7 +209,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                                 className="flex min-w-0 shrink-0 items-center gap-2.5"
                             >
                                 {logo ? (
-                                    <div className="h-9 w-[140px] sm:h-10 sm:w-[160px]">
+                                    <div className="h-9 w-35 sm:h-10 sm:w-40">
                                         <ImageComponent src={logo} alt={brandName} object_cover={false} />
                                     </div>
                                 ) : (
@@ -231,6 +232,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                         />
 
                         <div className="flex flex-1 items-center justify-end gap-2">
+                            <AdminNotificationBell />
                             <button
                                 type="button"
                                 onClick={() => router.push(getHomeRoutePath())}

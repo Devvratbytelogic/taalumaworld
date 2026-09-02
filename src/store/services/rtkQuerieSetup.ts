@@ -252,6 +252,7 @@ export const rtkQuerieSetup = createApi({
         'AdminAuditLogs',
         'AdminReviews',
         'AffiliateReferal',
+        'AdminNotifications',
     ],
     endpoints: () => ({}),
 });

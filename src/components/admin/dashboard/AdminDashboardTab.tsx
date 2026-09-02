@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { DashboardWelcomeHeader } from './DashboardWelcomeHeader';
 import { DashboardStatsGrid, type StatCard } from './DashboardStatsGrid';
+import { DashboardMentorActions } from './DashboardMentorActions';
 import { DashboardRecentActivity } from './DashboardRecentActivity';
 import { DashboardTopContent } from './DashboardTopContent';
 import type { ContentMode } from '@/types/admin';
@@ -177,6 +178,8 @@ export default function AdminDashboardTab() {
       </div>
 
       <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
+
+      <DashboardMentorActions />
 
       <AdminPanel>
         <AdminSectionHeader title="Blueprint performance" />

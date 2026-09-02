@@ -140,26 +140,26 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                 )}
               </div>
 
-              {showPurchaseActions && resolvedPrice > 0 && (
+              {showPurchaseActions && (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Button
                     className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
                     onPress={handleBuyNow}
                     startContent={<Wallet className="h-4 w-4" />}
                   >
-                    Buy Now - KSH {resolvedPrice.toFixed(2)}
+                    Buy Now - {resolvedPrice <= 0 ? 'Free' : `KSH ${resolvedPrice.toFixed(2)}`}
                     {data?.series?.pricingModel === VISIBLE.BOOK && (
                       <span className="ml-1 text-xs font-normal opacity-80">(complete series)</span>
                     )}
                   </Button>
 
-                    <AddToCartButton
-                      id={purchaseId}
-                      type={purchaseType}
-                      className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
-                      label="Add to Cart"
-                    />
-                 
+                  <AddToCartButton
+                    id={purchaseId}
+                    type={purchaseType}
+                    className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
+                    label={`Add to Cart - ${resolvedPrice <= 0 ? 'Free' : `KSH ${resolvedPrice.toFixed(2)}`}`}
+                  />
+
                 </div>
               )}
 

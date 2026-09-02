@@ -28,7 +28,7 @@ import type {
   OrderItemsEntity,
 } from '@/types/user/allOrders';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
-import { formatKes } from '@/constants/common';
+import { formatKesOrFree, isZeroPrice } from '@/constants/common';
 
 const PAGE_LIMIT = 10;
 
@@ -108,6 +108,7 @@ function OrderCard({
   const visibleItems = items.slice(0, 3);
   const remainingCount = Math.max(0, items.length - visibleItems.length);
   const detailHref = getUserDashboardMyOrderDetailRoutePath(order._id);
+  const isFree = isZeroPrice(order.total_amount);
 
   return (
     <article className="rounded-md border border-gray-200 bg-white p-4 sm:p-5">
@@ -135,8 +136,8 @@ function OrderCard({
           {/* <Badge variant="outline" className={cn('capitalize', badgeClass(order.status))}>
             {formatLabel(order.status)}
           </Badge> */}
-          <Badge variant="outline" className={cn('capitalize', badgeClass(order.payment_status))}>
-            {formatLabel(order.payment_status)}
+          <Badge variant="outline" className={cn('capitalize', isFree ? badgeClass('paid') : badgeClass(order.payment_status))}>
+            {isFree ? 'Free' : formatLabel(order.payment_status)}
           </Badge>
         </div>
       </div>
@@ -152,7 +153,7 @@ function OrderCard({
                   {item.quantity > 1 ? ` · Qty ${item.quantity}` : ''}
                 </p>
               </div>
-              <span className="shrink-0 font-medium text-gray-700">{formatKes(item.total)}</span>
+              <span className="shrink-0 font-medium text-gray-700">{formatKesOrFree(item.total)}</span>
             </li>
           ))}
           {remainingCount > 0 ? (
@@ -164,7 +165,7 @@ function OrderCard({
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4">
         <div>
           <p className="text-xs text-gray-500">Total</p>
-          <p className="text-base font-semibold text-primary">{formatKes(order.total_amount)}</p>
+          <p className="text-base font-semibold text-primary">{formatKesOrFree(order.total_amount)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link
@@ -174,15 +175,17 @@ function OrderCard({
             <Eye className="h-4 w-4" />
             View
           </Link>
-          <Button
-            type="button"
-            className="global_btn rounded_full outline_primary"
-            isDisabled={isDownloading}
-            onPress={() => onDownloadInvoice(order._id)}
-          >
-            <FileDown className="h-4 w-4" />
-            {isDownloading ? 'Downloading…' : 'Invoice'}
-          </Button>
+          {!isFree ? (
+            <Button
+              type="button"
+              className="global_btn rounded_full outline_primary"
+              isDisabled={isDownloading}
+              onPress={() => onDownloadInvoice(order._id)}
+            >
+              <FileDown className="h-4 w-4" />
+              {isDownloading ? 'Downloading…' : 'Invoice'}
+            </Button>
+          ) : null}
         </div>
       </div>
     </article>

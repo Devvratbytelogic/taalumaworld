@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 import { useLazyGetTransactionInvoiceQuery, useUserGetOrderByIdQuery } from '@/store/rtkQueries/userGetAPI';
 import { getUserDashboardMyOrdersRoutePath } from '@/routes/routes';
-import { formatKes } from '@/constants/common';
+import { formatKes, formatKesOrFree, isZeroPrice } from '@/constants/common';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 function isPercentCouponType(couponType?: string | null) {
@@ -108,14 +108,15 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
     );
   }
 
-  const paymentStatusKey = (order.paymentStatus || '').toLowerCase();
+  const isFree = isZeroPrice(order.totalAmount);
+  const paymentStatusKey = isFree ? 'paid' : (order.paymentStatus || '').toLowerCase();
   const couponTypeLabel = order.couponType;
   const isPercentCoupon = isPercentCouponType(order.couponType);
   const couponValueLabel =
     order.coupon_value != null
       ? isPercentCoupon
         ? `${Number(order.coupon_value)}%`
-        : formatKes(Number(order.coupon_value))
+        : formatKesOrFree(Number(order.coupon_value))
       : null;
 
   return (
@@ -132,15 +133,17 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
         title={`Order #${order.orderId}`}
         description="Full details for this order"
       >
-        <Button
-          type="button"
-          className="global_btn rounded_full bg_primary"
-          isDisabled={isDownloading}
-          onPress={handleDownloadInvoice}
-        >
-          <FileDown className="h-4 w-4" />
-          {isDownloading ? 'Downloading…' : 'Download Invoice'}
-        </Button>
+        {!isFree ? (
+          <Button
+            type="button"
+            className="global_btn rounded_full bg_primary"
+            isDisabled={isDownloading}
+            onPress={handleDownloadInvoice}
+          >
+            <FileDown className="h-4 w-4" />
+            {isDownloading ? 'Downloading…' : 'Download Invoice'}
+          </Button>
+        ) : null}
       </UserDashboardPageHeader>
 
       <Panel>
@@ -163,10 +166,10 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
               PAYMENT_STATUS_BADGE_CLASS[paymentStatusKey] ?? 'bg-gray-50 text-gray-600 border-gray-200!',
             )}
           >
-            {order.paymentStatus || '—'}
+            {isFree ? 'Free' : order.paymentStatus || '—'}
           </Badge>
         </div>
-        <p className="mt-4 text-3xl font-bold text-primary">{formatKes(order.totalAmount ?? 0)}</p>
+        <p className="mt-4 text-3xl font-bold text-primary">{formatKesOrFree(order.totalAmount)}</p>
       </Panel>
 
       <Panel>
@@ -188,7 +191,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
         <PanelTitle>Payment</PanelTitle>
         <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
           <DetailRow label="Order #" value={order.orderId} />
-          <DetailRow label="Invoice #" value={order.invoiceNumber} />
+          {!isFree ? <DetailRow label="Invoice #" value={order.invoiceNumber} /> : null}
           <DetailRow label="Transaction ID" value={order.transactionId} />
           <DetailRow label="Payment Method" value={order.paymentMethod} />
           <DetailRow label="Coupon Code" value={order.couponCode} />
@@ -196,14 +199,16 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
           <DetailRow label="Coupon Value" value={couponValueLabel} />
           <DetailRow
             label="Coupon Discount"
-            value={order.couponDiscount != null ? formatKes(Number(order.couponDiscount)) : null}
+            value={order.couponDiscount != null ? formatKesOrFree(Number(order.couponDiscount)) : null}
           />
+          {!isFree ? (
+            <DetailRow
+              label="Tax Percent"
+              value={order.tax_percent != null ? `${Number(order.tax_percent)}%` : null}
+            />
+          ) : null}
           <DetailRow
-            label="Tax Percent"
-            value={order.tax_percent != null ? `${Number(order.tax_percent)}%` : null}
-          />
-          <DetailRow
-            label="Paid At"
+            label={isFree ? 'Completed' : 'Paid At'}
             value={order.paidAt ? moment(order.paidAt).format('DD MMM YYYY, hh:mm A') : null}
           />
           <DetailRow
@@ -225,7 +230,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
                 </p>
               </div>
               <p className="shrink-0 text-sm font-semibold text-primary">
-                {formatKes(item.total ?? 0)}
+                {formatKesOrFree(item.total)}
               </p>
             </div>
           ))}
@@ -252,12 +257,14 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
               </dd>
             </div>
           ) : null}
-          <div className="flex items-center justify-between text-sm">
-            <dt className="text-gray-500">
-              Tax{order.tax_percent != null ? ` (${Number(order.tax_percent)}%)` : ''}
-            </dt>
-            <dd className="font-medium text-gray-800">{formatKes(order.taxAmount ?? 0)}</dd>
-          </div>
+          {(order.taxAmount ?? 0) > 0 || !isFree ? (
+            <div className="flex items-center justify-between text-sm">
+              <dt className="text-gray-500">
+                Tax{order.tax_percent != null ? ` (${Number(order.tax_percent)}%)` : ''}
+              </dt>
+              <dd className="font-medium text-gray-800">{formatKes(order.taxAmount ?? 0)}</dd>
+            </div>
+          ) : null}
         </dl>
 
         {order.couponCode ? (
@@ -277,7 +284,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
 
         <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-base">
           <span className="font-semibold text-gray-900">Total</span>
-          <span className="font-bold text-primary">{formatKes(order.totalAmount ?? 0)}</span>
+          <span className="font-bold text-primary">{formatKesOrFree(order.totalAmount)}</span>
         </div>
       </Panel>
     </div>

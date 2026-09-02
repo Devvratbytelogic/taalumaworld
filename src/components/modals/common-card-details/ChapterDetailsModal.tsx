@@ -28,6 +28,7 @@ export default function ChapterDetailsModal() {
   const router = useRouter();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const chapter = data?.chapter
+  console.log('chapter', chapter);
 
   const onClose = () => dispatch(closeModal());
 
@@ -223,7 +224,7 @@ export default function ChapterDetailsModal() {
         </ModalBody>
 
         <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
-          {chapter?.isFree || chapter?.canRead ? (
+          {chapter?.canRead ? (
             <Button className="global_btn rounded_full bg_primary w-full" onPress={viewFullDetails} startContent={<BookOpen className="h-4 w-4" />}>
               Read Free Blueprint
             </Button>
@@ -241,7 +242,7 @@ export default function ChapterDetailsModal() {
                 id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
                 type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
                 className="global_btn rounded_full bg_primary w-full"
-                label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
+                label={`Add to Cart - ${displayPrice <= 0 ? 'Free' : `KSH ${displayPrice.toFixed(2)}`}`}
                 onLoginCancel={() =>
                   dispatch(
                     openModal({

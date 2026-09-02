@@ -1,3 +1,5 @@
+import { USER_TYPE } from '@/constants/common';
+
 export const AGREEMENT_TOUCHPOINTS = {
   CAREER_ARCHITECT_REGISTRATION: 'career_architect_registration',
   INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION: 'institutional_career_architect_registration',
@@ -34,3 +36,10 @@ export const AGREEMENT_VISIBLE_USER_TYPES = {
 };
 
 export const AGREEMENT_STATUS_OPTIONS = ['active', 'inactive'];
+
+export function getAgreementConsentUserType(role?: string | null): string | undefined {
+  if (role === USER_TYPE.MENTOR) return AGREEMENT_VISIBLE_USER_TYPES.MENTOR;
+  if (role === USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT) return AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA;
+  if (role === USER_TYPE.CAREER_ARCHITECT) return AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT;
+  return undefined;
+}

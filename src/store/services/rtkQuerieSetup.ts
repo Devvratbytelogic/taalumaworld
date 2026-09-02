@@ -6,11 +6,13 @@ import { addToast } from '@heroui/react';
 import { API_BASE_URL } from '@/utils/config';
 import { isBrowserOnline, isFetchNetworkError, NETWORK_MESSAGES } from '@/utils/network';
 import { hasAuthCookie, isUnauthorizedError, logoutAndRedirectToHome } from '@/utils/authCookies';
-import { getUserDashboardProfileRoutePath } from '@/routes/routes';
 
 const mutex = new Mutex();
 let isLoggingOut = false;
-let isRedirectingForApproval = false;
+
+function isPendingApprovalError(message: string, status?: number): boolean {
+    return status === 403 && (message || '').toLowerCase().includes('pending approval');
+}
 
 /** Clear session and redirect when an authenticated request returns 401 / invalid token. */
 function handleUnauthorizedSession(message: string, status?: number): boolean {
@@ -19,19 +21,6 @@ function handleUnauthorizedSession(message: string, status?: number): boolean {
     addToast({ title: 'Error', description: 'Session expired. Please login again.', color: 'danger', timeout: 2000 });
     isLoggingOut = true;
     logoutAndRedirectToHome();
-    return true;
-}
-
-/** Send the user to their profile page when the API blocks a request because the account is pending approval. */
-function handlePendingApprovalRedirect(message: string, status?: number): boolean {
-    if (status !== 403 || !(message || '').toLowerCase().includes('pending approval')) return false;
-    if (typeof window === 'undefined') return true;
-
-    const profilePath = getUserDashboardProfileRoutePath();
-    if (isRedirectingForApproval || window.location.pathname === profilePath) return true;
-
-    isRedirectingForApproval = true;
-    window.location.href = profilePath;
     return true;
 }
 
@@ -124,17 +113,9 @@ const baseQueryWithAuth: BaseQueryFn<
                 };
             }
 
-            if (handlePendingApprovalRedirect(message, httpStatus)) {
-                return {
-                    error: {
-                        status: 'CUSTOM_ERROR',
-                        data: { message, httpStatus },
-                        error: message,
-                    },
-                };
+            if (!isPendingApprovalError(message, httpStatus)) {
+                addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
             }
-
-            addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
             return {
                 error: {
                     status: "CUSTOM_ERROR",
@@ -155,7 +136,7 @@ const baseQueryWithAuth: BaseQueryFn<
             };
         }
 
-        if (res && handlePendingApprovalRedirect(res.message, res.http_status_code)) {
+        if (res && isPendingApprovalError(res.message, res.http_status_code)) {
             return {
                 error: {
                     status: 'CUSTOM_ERROR',

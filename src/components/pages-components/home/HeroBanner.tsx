@@ -4,9 +4,9 @@ import Button from '@/components/ui/Button'
 import ImageComponent from '@/components/ui/ImageComponent'
 import { useGetActiveReadersQuery } from '@/store/rtkQueries/userGetAPI'
 import { useRouter } from 'next/navigation'
-import { getMentorSignupRoutePath, getUserDashboardBecomeMentorRoutePath } from '@/routes/routes'
+import { getMentorDashboardRoutePath, getMentorSignupRoutePath, getUserDashboardBecomeMentorRoutePath } from '@/routes/routes'
 import { getUserRole, hasAuthCookie } from '@/utils/authCookies'
-import { USER_TYPE } from '@/constants/common'
+import { isCareerArchitectRole, isMentorRole } from '@/constants/common'
 import ActiveReadersSkeleton from '@/components/skeleton-loader/ActiveReadersSkeleton'
 
 const AVATAR_COLORS = ['#0A66C2', '#8B5CF6', '#10B981', '#004182']
@@ -14,13 +14,16 @@ const AVATAR_COLORS = ['#0A66C2', '#8B5CF6', '#10B981', '#004182']
 export default function HeroBanner() {
     const router = useRouter()
     const { data: activeReadersData, isLoading: isActiveReadersLoading } = useGetActiveReadersQuery()
+    const signedInRole = hasAuthCookie() ? getUserRole() : undefined
+    const isMentor = isMentorRole(signedInRole)
 
-    /** Signed-in Career Architects go straight to the mentor application; everyone else signs in first. */
+    /** Signed-in Career Architects apply in-dashboard; mentors go to their panel; guests sign up. */
     const goToBecomeMentor = () => {
-        const role = hasAuthCookie() ? getUserRole() : undefined
-        const isCareerArchitect =
-            role === USER_TYPE.CAREER_ARCHITECT || role === USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT
-        router.push(isCareerArchitect ? getUserDashboardBecomeMentorRoutePath() : getMentorSignupRoutePath())
+        if (isMentor) {
+            router.push(getMentorDashboardRoutePath())
+            return
+        }
+        router.push(isCareerArchitectRole(signedInRole) ? getUserDashboardBecomeMentorRoutePath() : getMentorSignupRoutePath())
     }
 
     const scrollToContent = () => {
@@ -70,7 +73,7 @@ export default function HeroBanner() {
                                     className="global_btn rounded_full outline_primary"
                                     onPress={goToBecomeMentor}
                                 >
-                                    Become a Mentor
+                                    {isMentor ? 'Mentor Panel' : 'Become a Mentor'}
                                 </Button>
                             </div>
 

@@ -37,6 +37,8 @@ import {
 } from '@/store/rtkQueries/userGetAPI';
 import { useUserUpdateProfileMutation } from '@/store/rtkQueries/userAuthApi';
 import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
+import { isMentorRole } from '@/constants/common';
+import { getUserRole } from '@/utils/authCookies';
 import { updateProfileSchema } from '@/utils/formValidation';
 import moment from 'moment';
 import {
@@ -57,9 +59,12 @@ export function ProfilePage() {
   const { data: seriesData, isLoading: isSeriesLoading } = useGetMySeriesQuery();
   const { data: chaptersData, isLoading: isChaptersLoading } = useGetMyChaptersQuery();
   const { data: historyData, isLoading: isHistoryLoading } = useGetReadingHistoryQuery();
-  const { data: mentorApplicationsData } = useGetMentorApplicationsQuery();
+  const { data: mentorApplicationsData } = useGetMentorApplicationsQuery(undefined, {
+    skip: isMentorRole(getUserRole()),
+  });
   const [updateProfile] = useUserUpdateProfileMutation();
   const profile = profileData?.data;
+  const isMentor = isMentorRole(profile?.role?.name) || isMentorRole(getUserRole());
   const mentorApplication = mentorApplicationsData?.data;
   const latestMentorApplication = mentorApplication?.latest_application ?? null;
   const mentorApplicationStatus = latestMentorApplication?.status;
@@ -67,9 +72,11 @@ export function ProfilePage() {
   const displayName = profile?.name || 'User';
   const displayPhoto = profile?.profile_pic || '';
   const shortCode = profile?.short_code?.trim() || '';
-  const agreementUserType = profile?.institution_id
-    ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA
-    : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT;
+  const agreementUserType = isMentor
+    ? AGREEMENT_VISIBLE_USER_TYPES.MENTOR
+    : profile?.institution_id
+      ? AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA
+      : AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT;
 
   const copyShortCode = async () => {
     if (!shortCode) return;
@@ -207,17 +214,19 @@ export function ProfilePage() {
       <UserDashboardPageHeader title="Profile" description="View and update your account details">
         {!isEditing ? (
           <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-start sm:justify-end">
-            {mentorApplicationStatus === 'pending_review' ? (
+            {!isMentor && mentorApplicationStatus === 'pending_review' ? (
               <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-center text-sm font-medium text-amber-700">
                 <Clock className="h-4 w-4 shrink-0" />
                 Mentor Application Pending Review
               </span>
-            ) : mentorApplicationStatus === 'approved' ? (
+            ) : null}
+            {!isMentor && mentorApplicationStatus === 'approved' ? (
               <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-emerald-200! bg-emerald-50 px-4 py-2 text-center text-sm font-medium text-emerald-700">
                 <ShieldCheck className="h-4 w-4 shrink-0" />
                 Mentor Application Approved
               </span>
-            ) : mentorApplicationStatus === 'rejected' ? (
+            ) : null}
+            {!isMentor && mentorApplicationStatus === 'rejected' ? (
               <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                 <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200! bg-red-50 px-4 py-2 text-center text-sm font-medium text-red-700">
                   <ShieldX className="h-4 w-4 shrink-0" />
@@ -232,7 +241,8 @@ export function ProfilePage() {
                   Re-apply
                 </Button>
               </div>
-            ) : (
+            ) : null}
+            {!isMentor && !mentorApplicationStatus ? (
               <div className="flex flex-col items-stretch gap-1 sm:items-end">
                 {/* the title tooltip is put on this wrapping span, not the button itself,
                     because a disabled button never receives hover events so its own title never shows */}
@@ -256,7 +266,7 @@ export function ProfilePage() {
                   </p>
                 ) : null}
               </div>
-            )}
+            ) : null}
             <Button
               type="button"
               className="global_btn w-full rounded_full outline_primary sm:w-auto"
@@ -294,7 +304,7 @@ export function ProfilePage() {
         )}
       </UserDashboardPageHeader>
 
-      {latestMentorApplication?.decision_reason ? (
+      {!isMentor && latestMentorApplication?.decision_reason ? (
         <div
           className={cn(
             'flex items-start gap-3.5 rounded-md border p-4',

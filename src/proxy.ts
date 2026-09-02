@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { USER_TYPE } from '@/constants/common';
+import { USER_TYPE, canAccessUserDashboard, isCareerArchitectRole, isMentorRole } from '@/constants/common';
 import { getRequiredModelsForPath } from '@/constants/adminRouteAccess';
 import { API_BASE_URL } from '@/utils/config';
 import {
@@ -21,8 +21,6 @@ const USER_DASHBOARD_PREFIX = '/user-dashboard';
 
 /** Login / signup pages that must stay reachable no matter the auth state, to avoid redirect loops. */
 const PUBLIC_AUTH_ROUTES = ['/portal/login', '/mentor/login', '/mentor/signup', '/mentor/forgot-password'];
-
-const CAREER_ARCHITECT_ROLES: string[] = [USER_TYPE.CAREER_ARCHITECT, USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT];
 
 function isPublicAuthRoute(pathname: string): boolean {
   return PUBLIC_AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
@@ -110,10 +108,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     if (!isAuthenticated) {
       return redirectTo(request, getMentorLoginRoutePath());
     }
-    if (role !== USER_TYPE.MENTOR) {
+    if (!isMentorRole(role)) {
       // Career Architects have no admin access at all; everyone else
       // authenticated here is Super Admin / staff, who belong in /admin.
-      const fallback = role && CAREER_ARCHITECT_ROLES.includes(role)
+      const fallback = isCareerArchitectRole(role)
         ? getHomeRoutePath()
         : getAdminDashboardRoutePath();
       return redirectTo(request, fallback);
@@ -126,10 +124,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     if (!isAuthenticated) {
       return redirectTo(request, getAdminPortalLoginRoutePath());
     }
-    if (role === USER_TYPE.MENTOR) {
+    if (isMentorRole(role)) {
       return redirectTo(request, getMentorDashboardRoutePath());
     }
-    if (role && CAREER_ARCHITECT_ROLES.includes(role)) {
+    if (isCareerArchitectRole(role)) {
       return redirectTo(request, getHomeRoutePath());
     }
 
@@ -145,16 +143,16 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
-  // ── Career Architect dashboard: /user-dashboard/* ─────────────────────────
+  // ── Buyer dashboard: /user-dashboard/* — Career Architects and Mentors ────
   if (isUserDashboardRoute(pathname)) {
     if (!isAuthenticated) {
       return redirectTo(request, getHomeRoutePath());
     }
-    if (role === USER_TYPE.MENTOR) {
-      return redirectTo(request, getMentorDashboardRoutePath());
+    if (canAccessUserDashboard(role)) {
+      return NextResponse.next();
     }
-    // Anything left that isn't a Career Architect role is Super Admin / staff.
-    if (role && !CAREER_ARCHITECT_ROLES.includes(role)) {
+    // Super Admin / staff belong in /admin, not the marketplace account area.
+    if (role) {
       return redirectTo(request, getAdminDashboardRoutePath());
     }
     return NextResponse.next();

@@ -141,6 +141,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
 
     const isAuthor = adminUser.role === USER_TYPE.MENTOR || getUserRole() === USER_TYPE.MENTOR;
     const roleLabel = isAuthor ? 'Mentor' : (profileData?.data?.role?.name ?? 'Admin');
+    const showWebsiteLink = !isAuthor || Boolean(profileData?.data?.is_verified);
 
     const onContentModeToggle = async (isBooks: boolean) => {
         const newMode = isBooks ? 'book' : 'chapter';
@@ -233,14 +234,16 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
 
                         <div className="flex flex-1 items-center justify-end gap-2">
                             <AdminNotificationBell />
-                            <button
-                                type="button"
-                                onClick={() => router.push(getHomeRoutePath())}
-                                className={headerButtonClass}
-                            >
-                                <Home className="h-4 w-4 text-primary" />
-                                <span className="hidden lg:inline">Website</span>
-                            </button>
+                            {showWebsiteLink ? (
+                                <button
+                                    type="button"
+                                    onClick={() => router.push(getHomeRoutePath())}
+                                    className={headerButtonClass}
+                                >
+                                    <Home className="h-4 w-4 text-primary" />
+                                    <span className="hidden lg:inline">Website</span>
+                                </button>
+                            ) : null}
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -295,13 +298,15 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                                                 Settings
                                             </DropdownMenuItem>
                                         ) : null}
-                                        <DropdownMenuItem
-                                            className="cursor-pointer rounded-md px-3 py-2.5"
-                                            onSelect={() => router.push(getHomeRoutePath())}
-                                        >
-                                            <Home className="h-4 w-4 text-slate-500" />
-                                            Back to Website
-                                        </DropdownMenuItem>
+                                        {showWebsiteLink ? (
+                                            <DropdownMenuItem
+                                                className="cursor-pointer rounded-md px-3 py-2.5"
+                                                onSelect={() => router.push(getHomeRoutePath())}
+                                            >
+                                                <Home className="h-4 w-4 text-slate-500" />
+                                                Back to Website
+                                            </DropdownMenuItem>
+                                        ) : null}
                                     </div>
 
                                     <DropdownMenuSeparator className="mx-0 bg-slate-100" />

@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Home,
   Info,
+  LayoutDashboard,
   LogOut,
   MapPin,
   Phone,
@@ -38,6 +39,7 @@ import {
   getContactUsRoutePath,
   getFAQRoutePath,
   getHomeRoutePath,
+  getMentorDashboardRoutePath,
   getPrivacyPolicyRoutePath,
   getTermsOfServiceRoutePath,
   getUserDashboardAddressRoutePath,
@@ -52,6 +54,7 @@ import {
 } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import { useAuth } from '@/hooks/useAuth';
+import { isStaffAdminRole, USER_TYPE, type UserTypeValue } from '@/constants/common';
 
 const mainLinks = [
   { label: 'Home', href: getHomeRoutePath(), icon: Home },
@@ -59,7 +62,7 @@ const mainLinks = [
   { label: 'Help & Trust Center', href: getContactUsRoutePath(), icon: Phone },
 ];
 
-const accountLinks = [
+const accountLinks: { label: string; href: string; icon: typeof User; roles?: UserTypeValue[] }[] = [
   { label: 'Profile', href: getUserDashboardProfileRoutePath(), icon: User },
   { label: 'Address', href: getUserDashboardAddressRoutePath(), icon: MapPin },
   { label: 'Settings', href: getUserDashboardSettingsRoutePath(), icon: Settings },
@@ -67,7 +70,18 @@ const accountLinks = [
   { label: 'My Series', href: getUserDashboardMyBooksRoutePath(), icon: Book },
   { label: 'My Orders', href: getUserDashboardMyOrdersRoutePath(), icon: ShoppingBag },
   { label: 'Reading History', href: getUserDashboardHistoryRoutePath(), icon: Clock },
-  { label: 'Become a Mentor', href: getUserDashboardBecomeMentorRoutePath(), icon: GraduationCap },
+  {
+    label: 'Become a Mentor',
+    href: getUserDashboardBecomeMentorRoutePath(),
+    icon: GraduationCap,
+    roles: [USER_TYPE.CAREER_ARCHITECT, USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT],
+  },
+  {
+    label: 'Mentor Panel',
+    href: getMentorDashboardRoutePath(),
+    icon: LayoutDashboard,
+    roles: [USER_TYPE.MENTOR],
+  },
 ];
 
 const supportLinks = [
@@ -91,12 +105,15 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
   const contentMode = globalSettings?.data?.visible;
   const logo = globalSettings?.data?.logo as string | null | undefined;
   const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
-  const isAdmin = ['admin', 'author'].includes(user?.role?.toLowerCase() ?? '');
+  const isStaff = isStaffAdminRole(user?.role);
   const userPhoto = user?.photo?.trim() || undefined;
   const libraryHref =
     contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath();
   const libraryLabel = contentMode === VISIBLE.BOOK ? 'My Series' : 'My Blueprints';
-  const accountHref = isAdmin ? getAdminRoutePath() : getUserDashboardRoutePath();
+  const accountHref = isStaff ? getAdminRoutePath() : getUserDashboardRoutePath();
+  const visibleAccountLinks = accountLinks.filter(
+    (item) => !item.roles || item.roles.includes(user?.role as UserTypeValue),
+  );
 
   useEffect(() => {
     if (open) setMounted(true);
@@ -187,7 +204,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
               </Link>
             ))}
 
-            {isAuthenticated && (
+            {isAuthenticated && !isStaff && (
               <Link href={libraryHref} onClick={onClose} className={linkClass(libraryHref)}>
                 <span className={iconClass(libraryHref)}>
                   <BookMarked className="h-4 w-4" aria-hidden />
@@ -197,11 +214,11 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
             )}
           </nav>
 
-          {isAuthenticated && (
+          {isAuthenticated && !isStaff && (
             <>
               <p className="mt-5 px-2 pb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Account</p>
               <nav className="space-y-0.5">
-                {accountLinks.map(({ label, href, icon: Icon }) => (
+                {visibleAccountLinks.map(({ label, href, icon: Icon }) => (
                   <Link key={href} href={href} onClick={onClose} className={linkClass(href)}>
                     <span className={iconClass(href)}>
                       <Icon className="h-4 w-4" aria-hidden />
@@ -237,9 +254,9 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
                 <UserAvatar userName={user?.fullName || user?.email || 'User'} userPhoto={userPhoto} size="sm" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-gray-900">
-                    {isAdmin ? 'Admin Panel' : user?.fullName || 'My Account'}
+                    {isStaff ? 'Admin Panel' : user?.fullName || 'My Account'}
                   </p>
-                  {!isAdmin && user?.email ? (
+                  {!isStaff && user?.email ? (
                     <p className="truncate text-xs text-gray-500">{user.email}</p>
                   ) : null}
                 </div>

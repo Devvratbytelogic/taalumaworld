@@ -7,6 +7,23 @@ export const USER_TYPE = {
 
 export type UserTypeValue = (typeof USER_TYPE)[keyof typeof USER_TYPE];
 
+export function isCareerArchitectRole(role?: string | null): boolean {
+  return role === USER_TYPE.CAREER_ARCHITECT || role === USER_TYPE.INSTITUTIONAL_CAREER_ARCHITECT;
+}
+
+export function isMentorRole(role?: string | null): boolean {
+  return role === USER_TYPE.MENTOR;
+}
+
+/** Mentors can also shop as buyers, so they share the Career Architect dashboard. */
+export function canAccessUserDashboard(role?: string | null): boolean {
+  return isCareerArchitectRole(role) || isMentorRole(role);
+}
+
+export function isStaffAdminRole(role?: string | null): boolean {
+  return Boolean(role) && !canAccessUserDashboard(role);
+}
+
 export function formatKes(amount: number) {
   return `KSh ${amount.toLocaleString()}`;
 }

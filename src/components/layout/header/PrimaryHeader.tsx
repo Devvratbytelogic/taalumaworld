@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import toast from '@/utils/toast';
-import { Menu, Search, X, ShoppingCart, BookMarked, LogOut, User, ChevronDown } from 'lucide-react';
+import { Menu, Search, X, ShoppingCart, BookMarked, LogOut, User, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { useGetCartQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
@@ -14,9 +14,10 @@ import { cn } from '@/components/ui/utils';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderOffcanvasMenu from './HeaderOffcanvasMenu';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorLoginRoutePath, getMentorSignupRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { clearAuthCookies } from '@/utils/authCookies';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { isMentorRole, isStaffAdminRole } from '@/constants/common';
 
 interface PrimaryHeaderProps {
   isAuthenticated: boolean;
@@ -36,10 +37,21 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
 
   const brandName = 'TaalumaWorld';
 
-  const isAdmin = userRole === 'admin' || userRole === 'author';
+  const isStaff = isStaffAdminRole(userRole);
+  const isMentor = isMentorRole(userRole);
+  const isMentorAuthPage =
+    pathName === getMentorLoginRoutePath() ||
+    pathName.startsWith(`${getMentorLoginRoutePath()}/`) ||
+    pathName === getMentorSignupRoutePath() ||
+    pathName.startsWith(`${getMentorSignupRoutePath()}/`) ||
+    pathName === getMentorForgotPasswordRoutePath() ||
+    pathName.startsWith(`${getMentorForgotPasswordRoutePath()}/`);
+  const isPolicyPage = pathName === '/policies' || pathName.startsWith('/policies/');
 
-  const { data: cartData } = useGetCartQuery(undefined, { skip: !isAuthenticated });
-  const { data: userData } = useGetUserProfileQuery(undefined, { skip: !isAuthenticated });
+  const { data: cartData } = useGetCartQuery(undefined, {
+    skip: !isAuthenticated || isMentorAuthPage || isPolicyPage,
+  });
+  const { data: userData } = useGetUserProfileQuery(undefined, { skip: !isAuthenticated || isMentorAuthPage });
   const cartCount = cartData?.data?.[0]?.item_count ?? 0;
   const userName = userData?.data?.name || 'User';
   const userEmail = userData?.data?.email || 'No email found';
@@ -163,7 +175,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
         <div className="container">
           <div className="relative flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3">
             <Link href={getHomeRoutePath()} className="flex min-w-0 shrink items-center">
-              <div className="h-8 w-[120px] sm:h-10 sm:w-[200px]">
+              <div className="h-8 w-30 sm:h-10 sm:w-50">
                 <ImageComponent src={logo || '/images/logo.webp'} alt={brandName} object_cover={false} />
               </div>
             </Link>
@@ -174,7 +186,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                   {item.label}
                   <span
                     className={cn(
-                      'absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-primary transition-opacity',
+                      'absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary transition-opacity',
                       isActive(item.href) ? 'opacity-100' : 'opacity-0'
                     )}
                     aria-hidden
@@ -191,10 +203,10 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                 aria-label={isSearchOpen ? 'Close search' : 'Open search'}
                 aria-expanded={isSearchOpen}
               >
-                {isSearchOpen ? <X className="h-[18px] w-[18px]" /> : <Search className="h-[18px] w-[18px]" />}
+                {isSearchOpen ? <X className="h-4.5 w-4.5" /> : <Search className="h-4.5 w-4.5" />}
               </button>
 
-              {isAuthenticated && (
+              {isAuthenticated && !isStaff && (
                 <Link
                   href={libraryHref}
                   className="hidden items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary lg:inline-flex"
@@ -206,9 +218,9 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
 
               {isAuthenticated && (
                 <Link href={getCartRoutePath()} className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10')} aria-label="Shopping cart">
-                  <ShoppingCart className="h-[18px] w-[18px]" />
+                  <ShoppingCart className="h-4.5 w-4.5" />
                   {cartCount > 0 && (
-                    <span className="absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-white">
+                    <span className="absolute right-0 top-0 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-white">
                       {cartCount > 99 ? '99+' : cartCount}
                     </span>
                   )}
@@ -245,20 +257,32 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                         ) : null}
                       </div>
                       <div className="p-1.5">
-                        {isAdmin ? (
+                        {isStaff ? (
                           <Link href={getAdminRoutePath()} className={menuItemClass} onClick={() => setIsUserMenuOpen(false)}>
                             <User className="h-4 w-4 shrink-0" aria-hidden />
                             Admin Panel
                           </Link>
                         ) : (
-                          <Link
-                            href={getUserDashboardRoutePath()}
-                            className={menuItemClass}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <User className="h-4 w-4 shrink-0" aria-hidden />
-                            My Account
-                          </Link>
+                          <>
+                            <Link
+                              href={getUserDashboardRoutePath()}
+                              className={menuItemClass}
+                              onClick={() => setIsUserMenuOpen(false)}
+                            >
+                              <User className="h-4 w-4 shrink-0" aria-hidden />
+                              My Account
+                            </Link>
+                            {isMentor ? (
+                              <Link
+                                href={getMentorDashboardRoutePath()}
+                                className={menuItemClass}
+                                onClick={() => setIsUserMenuOpen(false)}
+                              >
+                                <LayoutDashboard className="h-4 w-4 shrink-0" aria-hidden />
+                                Mentor Panel
+                              </Link>
+                            ) : null}
+                          </>
                         )}
                         <button type="button" onClick={handleSignOut} className={cn(menuItemClass, 'text-red-600 hover:bg-red-50 hover:text-red-600')}>
                           <LogOut className="h-4 w-4 shrink-0" aria-hidden />
@@ -291,7 +315,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                 className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10 lg:hidden')}
                 aria-label="Open menu"
               >
-                <Menu className="h-[18px] w-[18px]" />
+                <Menu className="h-4.5 w-4.5" />
               </button>
             </div>
           </div>

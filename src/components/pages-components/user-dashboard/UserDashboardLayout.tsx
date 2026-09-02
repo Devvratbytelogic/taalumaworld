@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, Star, Link2, ShoppingBag, Wallet } from 'lucide-react';
+import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, Star, Link2, ShoppingBag, Wallet, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
@@ -22,6 +22,7 @@ import {
   getUserDashboardProfileRoutePath,
   getUserDashboardReferralWalletRoutePath,
   getUserDashboardSettingsRoutePath,
+  getMentorDashboardRoutePath,
 } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
 
@@ -35,6 +36,12 @@ const NAV_GROUPS: {
         { href: getUserDashboardProfileRoutePath(), label: 'Profile', icon: User },
         { href: getUserDashboardAddressRoutePath(), label: 'Address', icon: MapPin },
         { href: getUserDashboardSettingsRoutePath(), label: 'Settings', icon: Settings },
+        {
+          href: getMentorDashboardRoutePath(),
+          label: 'Mentor Panel',
+          icon: LayoutDashboard,
+          roles: [USER_TYPE.MENTOR],
+        },
       ],
     },
     {

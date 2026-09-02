@@ -39,7 +39,6 @@ import { AdminEmptyState, AdminPage, AdminPanel, AdminSectionHeader, adminPanelC
 import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
 import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
-import { AgreementDocumentModal } from '@/components/ui/AgreementDocumentModal';
 import { useGetAdminProfileQuery, useGetPaystackBanksQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/store/rtkQueries/adminPostApi';
 import { useAcceptAgreementMutation, useAcceptAllAgreementsMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
@@ -51,6 +50,7 @@ import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
 import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
+import { getPolicyBySlugRoutePath } from '@/routes/routes';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
@@ -1163,7 +1163,6 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
 function AgreementsCard() {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [acceptingAll, setAcceptingAll] = useState(false);
-  const [viewingIdOrSlug, setViewingIdOrSlug] = useState<string | null>(null);
   const { data: consentData, isLoading } = useGetUserConsentStatusQuery({ userType: 'Mentor' });
   const [acceptAgreement] = useAcceptAgreementMutation();
   const [acceptAllAgreements] = useAcceptAllAgreementsMutation();
@@ -1247,13 +1246,14 @@ function AgreementsCard() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-slate-900">{agreement.title} {agreement?.is_required ? <span className="text-xs text-red-500">*</span> : null}</p>
-                      <button
-                        type="button"
+                      <Link
+                        href={getPolicyBySlugRoutePath(agreement.slug || agreement._id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-xs font-medium text-primary hover:underline"
-                        onClick={() => setViewingIdOrSlug(agreement.slug || agreement._id)}
                       >
                         View
-                      </button>
+                      </Link>
                     </div>
                     <p className="mt-0.5 text-xs text-slate-500">
                       {agreement.agreement_type?.name ?? 'Agreement'} · v{agreement.current_version}
@@ -1282,13 +1282,6 @@ function AgreementsCard() {
           </ul>
         )}
       </div>
-      <AgreementDocumentModal
-        open={!!viewingIdOrSlug}
-        idOrSlug={viewingIdOrSlug}
-        onOpenChange={(open) => {
-          if (!open) setViewingIdOrSlug(null);
-        }}
-      />
     </AdminPanel>
   );
 }

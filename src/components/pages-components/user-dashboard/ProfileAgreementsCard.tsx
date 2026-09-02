@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { FileSignature, BadgeCheck } from 'lucide-react';
 import moment from 'moment';
 import Button from '@/components/ui/Button';
 import toast from '@/utils/toast';
 import { useGetUserConsentStatusQuery, useAcceptAgreementMutation, useAcceptAllAgreementsMutation } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { AgreementDocumentModal } from '@/components/ui/AgreementDocumentModal';
+import { getPolicyBySlugRoutePath } from '@/routes/routes';
 
 interface ProfileAgreementsCardProps {
   userType?: string;
@@ -16,7 +17,6 @@ interface ProfileAgreementsCardProps {
 export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT }: ProfileAgreementsCardProps) {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [acceptingAll, setAcceptingAll] = useState(false);
-  const [viewingIdOrSlug, setViewingIdOrSlug] = useState<string | null>(null);
   const { data: consentData, isLoading } = useGetUserConsentStatusQuery({ userType });
   const [acceptAgreement] = useAcceptAgreementMutation();
   const [acceptAllAgreements] = useAcceptAllAgreementsMutation();
@@ -107,13 +107,14 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
                       <p className="text-sm font-medium text-gray-900">
                         {agreement.title} {agreement?.is_required ? <span className="text-xs text-red-500">*</span> : null}
                       </p>
-                      <button
-                        type="button"
+                      <Link
+                        href={getPolicyBySlugRoutePath(agreement.slug || agreement._id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-xs font-medium text-primary hover:underline"
-                        onClick={() => setViewingIdOrSlug(agreement.slug || agreement._id)}
                       >
                         View
-                      </button>
+                      </Link>
                     </div>
                     <p className="mt-0.5 text-xs text-gray-500">
                       {agreement.agreement_type?.name ?? 'Agreement'} · v{agreement.current_version}
@@ -143,14 +144,6 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
           </ul>
         )}
       </div>
-
-      <AgreementDocumentModal
-        open={!!viewingIdOrSlug}
-        idOrSlug={viewingIdOrSlug}
-        onOpenChange={(open) => {
-          if (!open) setViewingIdOrSlug(null);
-        }}
-      />
     </div>
   );
 }

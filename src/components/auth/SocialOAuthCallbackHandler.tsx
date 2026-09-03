@@ -10,6 +10,7 @@ import {
     claimSocialOAuthCode,
     clearSocialOAuth,
     getSocialOAuthRedirectUri,
+    hasSocialOAuthCallbackParams,
     isSocialOAuthCallbackPath,
     readSocialOAuthPending,
     readSocialOAuthState,
@@ -40,6 +41,9 @@ export default function SocialOAuthCallbackHandler({ provider }: { provider: Soc
     const [metaLogin] = useUserMetaLoginMutation()
     const [isExchanging, setIsExchanging] = useState(false)
     const startedRef = useRef(false)
+
+    const isCallbackScreen =
+        isSocialOAuthCallbackPath(provider, pathname) && hasSocialOAuthCallbackParams(searchParams)
 
     useEffect(() => {
         if (!isSocialOAuthCallbackPath(provider, pathname)) return
@@ -98,8 +102,7 @@ export default function SocialOAuthCallbackHandler({ provider }: { provider: Soc
                 })
                 toast.success(res?.message ?? SUCCESS_MESSAGE[provider])
                 clearSocialOAuth(provider)
-                router.replace(pending?.returnTo || fallbackPath)
-                router.refresh()
+                window.location.replace(pending?.returnTo || fallbackPath)
             } catch (err) {
                 console.error(`${provider} authentication failed. Please try again.`, err)
                 clearSocialOAuth(provider)
@@ -110,10 +113,10 @@ export default function SocialOAuthCallbackHandler({ provider }: { provider: Soc
         })()
     }, [linkedInLogin, metaLogin, pathname, provider, router, searchParams])
 
-    if (!isExchanging) return null
+    if (!isCallbackScreen && !isExchanging) return null
 
     return (
-        <div className="fixed inset-0 z-99999 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-99999 flex items-center justify-center bg-background">
             <div className="flex items-center gap-3 rounded-md border bg-white px-5 py-4 shadow-sm">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <p className="text-sm font-medium text-foreground">{LOADING_LABEL[provider]}</p>

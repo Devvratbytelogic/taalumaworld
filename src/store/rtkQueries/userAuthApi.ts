@@ -17,6 +17,22 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
                 body: body,
             }),
         }),
+        /** Sign in / sign up with LinkedIn (frontend sends the one-time OAuth code; the API exchanges it) */
+        userLinkedInLogin: builder.mutation({
+            query: (body) => ({
+                url: `/user/auth/linkedin`,
+                method: "POST",
+                body: body,
+            }),
+        }),
+        /** Sign in / sign up with Facebook / Meta (JS SDK access token, or OAuth code) */
+        userMetaLogin: builder.mutation({
+            query: (body) => ({
+                url: `/user/auth/meta`,
+                method: "POST",
+                body: body,
+            }),
+        }),
         userRegister: builder.mutation({
             query: (userData) => ({
                 url: `/user/register`,
@@ -75,6 +91,8 @@ export const userAuthApi = rtkQuerieSetup.injectEndpoints({
 export const {
     useUserLoginMutation,
     useUserGoogleLoginMutation,
+    useUserLinkedInLoginMutation,
+    useUserMetaLoginMutation,
     useUserRegisterMutation,
     useUserForgotPasswordMutation,
     useUserResetPasswordMutation,

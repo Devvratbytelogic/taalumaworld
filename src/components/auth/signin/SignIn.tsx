@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
-import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
+import SocialAuthButtons from '@/components/auth/SocialAuthButtons'
 import toast from '@/utils/toast'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { closeModal, openModal } from '@/store/slices/allModalSlice'
@@ -95,7 +95,9 @@ export default function SignIn() {
                     </p>
                 </ModalHeader>
                 <ModalBody>
-                    <GoogleAuthButton text="signin_with" successMessage="Signed in with Google!" />
+                    <Suspense fallback={null}>
+                        <SocialAuthButtons text="signin_with" />
+                    </Suspense>
                     <form className="space-y-3" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <label htmlFor="signin-email" className="text-sm font-medium text-foreground">

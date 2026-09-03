@@ -1,10 +1,10 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { Input } from '@/components/ui/input'
 import Button from '@/components/ui/Button'
-import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
+import SocialAuthButtons from '@/components/auth/SocialAuthButtons'
 import { Camera, Eye, EyeOff, Gift, GraduationCap, Lock, Mail, User } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import Select, { type StylesConfig } from 'react-select'
@@ -262,7 +262,13 @@ export default function SignUp() {
                 </ModalHeader>
                 <ModalBody className="gap-0">
                     <div className="pb-5">
-                        <GoogleAuthButton text="signup_with" successMessage="Signed up with Google!" />
+                        <Suspense fallback={null}>
+                            <SocialAuthButtons
+                                text="signup_with"
+                                referralCode={values.referralCode}
+                                acceptedAgreementIds={values.accepted_agreement_ids}
+                            />
+                        </Suspense>
                     </div>
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="flex items-center gap-4">

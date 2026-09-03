@@ -19,7 +19,8 @@ export default function ConditionalSiteLayout({
     const userRole = user?.role ?? getUserRole() ?? '';
     const isAdminRoute = pathname.startsWith('/admin');
     const isPortalRoute = pathname.startsWith('/portal');
-    const hideSiteChrome = isAdminRoute || isPortalRoute;
+    const isAuthCallbackRoute = pathname.startsWith('/auth/');
+    const hideSiteChrome = isAdminRoute || isPortalRoute || isAuthCallbackRoute;
 
     return (
         <>

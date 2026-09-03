@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { Suspense } from 'react';
 import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import NextTopLoader from 'nextjs-toploader';
@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { Toaster } from 'sonner';
 import AllModal from '../modals/AllModal';
 import { PendingAgreementsGate } from '@/components/agreements/PendingAgreementsGate';
+import SocialOAuthCallbackHandler from '@/components/auth/SocialOAuthCallbackHandler';
 // import { NetworkStatusBanner } from '../network/NetworkStatusBanner';
 
 interface ProvidersProps {
@@ -27,6 +28,10 @@ export function AppProviders({ children }: ProvidersProps) {
                             showSpinner={false}
                         />
                         <AllModal />
+                        <Suspense fallback={null}>
+                            <SocialOAuthCallbackHandler provider="linkedin" />
+                            <SocialOAuthCallbackHandler provider="meta" />
+                        </Suspense>
                         <PendingAgreementsGate />
                         {/* <NetworkStatusBanner /> */}
                         {children}

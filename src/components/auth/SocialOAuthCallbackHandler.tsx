@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import toast from '@/utils/toast'
 import { useUserLinkedInLoginMutation, useUserMetaLoginMutation } from '@/store/rtkQueries/userAuthApi'
@@ -10,6 +10,7 @@ import {
     claimSocialOAuthCode,
     clearSocialOAuth,
     getSocialOAuthRedirectUri,
+    hasSocialOAuthCallbackParams,
     isSocialOAuthCallbackPath,
     readSocialOAuthPending,
     readSocialOAuthState,
@@ -32,14 +33,20 @@ const LOADING_LABEL: Record<SocialOAuthProvider, string> = {
     meta: 'Signing in with Facebook…',
 }
 
+function goTo(path: string) {
+    window.location.replace(path)
+}
+
 export default function SocialOAuthCallbackHandler({ provider }: { provider: SocialOAuthProvider }) {
-    const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [linkedInLogin] = useUserLinkedInLoginMutation()
     const [metaLogin] = useUserMetaLoginMutation()
     const [isExchanging, setIsExchanging] = useState(false)
     const startedRef = useRef(false)
+
+    const isCallbackScreen =
+        isSocialOAuthCallbackPath(provider, pathname) && hasSocialOAuthCallbackParams(searchParams)
 
     useEffect(() => {
         if (!isSocialOAuthCallbackPath(provider, pathname)) return
@@ -57,14 +64,14 @@ export default function SocialOAuthCallbackHandler({ provider }: { provider: Soc
         if (!savedState || !state || state !== savedState) {
             clearSocialOAuth(provider)
             toast.error(ERROR_MESSAGE[provider])
-            router.replace(fallbackPath)
+            goTo(fallbackPath)
             return
         }
 
         if (error) {
             clearSocialOAuth(provider)
             toast.error(ERROR_MESSAGE[provider])
-            router.replace(fallbackPath)
+            goTo(fallbackPath)
             return
         }
 
@@ -98,22 +105,21 @@ export default function SocialOAuthCallbackHandler({ provider }: { provider: Soc
                 })
                 toast.success(res?.message ?? SUCCESS_MESSAGE[provider])
                 clearSocialOAuth(provider)
-                router.replace(pending?.returnTo || fallbackPath)
-                router.refresh()
+                goTo(pending?.returnTo || fallbackPath)
             } catch (err) {
                 console.error(`${provider} authentication failed. Please try again.`, err)
                 clearSocialOAuth(provider)
-                router.replace(pending?.returnTo || fallbackPath)
+                goTo(pending?.returnTo || fallbackPath)
             } finally {
                 setIsExchanging(false)
             }
         })()
-    }, [linkedInLogin, metaLogin, pathname, provider, router, searchParams])
+    }, [linkedInLogin, metaLogin, pathname, provider, searchParams])
 
-    if (!isExchanging) return null
+    if (!isCallbackScreen && !isExchanging) return null
 
     return (
-        <div className="fixed inset-0 z-99999 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-99999 flex items-center justify-center bg-background">
             <div className="flex items-center gap-3 rounded-md border bg-white px-5 py-4 shadow-sm">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <p className="text-sm font-medium text-foreground">{LOADING_LABEL[provider]}</p>

@@ -141,3 +141,8 @@ export function isSocialOAuthCallbackPath(provider: SocialOAuthProvider, pathnam
     // LinkedIn's registered redirect URI is the site origin (no path), so the browser lands on `/`.
     return pathname === '/'
 }
+
+/** LinkedIn returns to `/` with OAuth query params — treat that as a callback, not the homepage. */
+export function hasSocialOAuthCallbackParams(searchParams: { get: (key: string) => string | null }): boolean {
+    return Boolean(searchParams.get('state') && (searchParams.get('code') || searchParams.get('error')))
+}

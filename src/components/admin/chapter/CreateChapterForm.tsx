@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
-import { addChapterSchema } from '@/utils/formValidation';
+import { addChapterSchema, isBlueprintFormComplete } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
@@ -22,7 +22,6 @@ import {
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
 import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath } from '@/routes/routes';
-import Link from 'next/link';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
@@ -79,6 +78,7 @@ export function CreateChapterForm() {
 
   const { data: booksResponse } = useGetAllBooksQuery();
   const requiredAcceptedRef = useRef(false);
+  const [requiredAgreementsAccepted, setRequiredAgreementsAccepted] = useState(false);
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const blueprintBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD);
   const [addChapter, { isLoading: isAdding }] = useAddChapterMutation();
@@ -251,6 +251,10 @@ export function CreateChapterForm() {
   };
 
   const isSubmittingState = isSubmitting || isAdding;
+  const isRequiredComplete = isBlueprintFormComplete(values, {
+    chapterPricingEnabled,
+    agreementsAccepted: requiredAgreementsAccepted,
+  });
 
   const handleContentChange = useCallback(
     (html: string) => {
@@ -574,7 +578,10 @@ export function CreateChapterForm() {
       <AgreementSentenceList
         touchpoint={AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD}
         onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
-        onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+        onRequiredAcceptedChange={(accepted) => {
+          requiredAcceptedRef.current = accepted;
+          setRequiredAgreementsAccepted(accepted);
+        }}
         error={agreementsError}
         touched={touched.accepted_agreement_ids}
         onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
@@ -592,21 +599,20 @@ export function CreateChapterForm() {
           type="submit"
           className="global_btn rounded_full bg_primary"
           startContent={<Save className="h-4 w-4" />}
-          isDisabled={isSubmittingState || books.length === 0}
+          isDisabled={isSubmittingState || books.length === 0 || !isRequiredComplete}
           isLoading={isSubmittingState}
         >
           Create Blueprint
         </Button>
-        <Link href={getChaptersListRoutePath(isMentor)}>
-          <Button
-            type="button"
-            className="global_btn rounded_full outline_primary"
-            startContent={<X className="h-4 w-4" />}
-            isDisabled={isSubmittingState}
-          >
-            Cancel
-          </Button>
-        </Link>
+        <Button
+          type="button"
+          className="global_btn rounded_full outline_primary"
+          startContent={<X className="h-4 w-4" />}
+          isDisabled={isSubmittingState}
+          onPress={() => router.push(getChaptersListRoutePath(isMentor))}
+        >
+          Cancel
+        </Button>
       </div>
     </form>
   );

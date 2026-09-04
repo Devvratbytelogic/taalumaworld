@@ -26,7 +26,7 @@ export function AgreementSentenceList({
   disabled,
   className,
 }: AgreementSentenceListProps) {
-  const { data: sentencesResponse } = useGetAgreementsByTouchpointQuery(touchpoint, {
+  const { data: sentencesResponse, isSuccess } = useGetAgreementsByTouchpointQuery(touchpoint, {
     skip: !touchpoint,
   });
   const sentences = useMemo(
@@ -51,7 +51,8 @@ export function AgreementSentenceList({
     return Array.from(ids);
   }, [sentences, checkedSentenceIds]);
 
-  const allRequiredAccepted = requiredSentenceIds.every((id) => checkedSentenceIds.includes(id));
+  const allRequiredAccepted =
+    isSuccess && requiredSentenceIds.every((id) => checkedSentenceIds.includes(id));
   const acceptedIdsKey = acceptedAgreementIds.join('|');
 
   const onIdsChangeRef = useRef(onAcceptedAgreementIdsChange);

@@ -225,6 +225,34 @@ function isRichTextEmpty(html: string | undefined | null): boolean {
     .length === 0;
 }
 
+type BlueprintRequiredFields = {
+  bookId?: string;
+  title?: string;
+  description?: string;
+  content_type?: string;
+  content?: string;
+  pdf_file?: File | string | null;
+  isFree?: boolean;
+  price?: number;
+  cover_image?: File | string | null;
+};
+
+export function isBlueprintFormComplete(
+  values: BlueprintRequiredFields,
+  options: { chapterPricingEnabled: boolean; agreementsAccepted: boolean },
+): boolean {
+  if (!values.bookId) return false;
+  if (!values.title?.trim()) return false;
+  if (!values.description?.trim()) return false;
+  if (values.content_type === 'editor' && isRichTextEmpty(values.content)) return false;
+  if (values.content_type === 'pdf' && (values.pdf_file == null || values.pdf_file === '')) return false;
+  if (options.chapterPricingEnabled && !values.isFree && !(typeof values.price === 'number' && values.price >= 1)) {
+    return false;
+  }
+  if (values.cover_image == null || values.cover_image === '') return false;
+  return options.agreementsAccepted;
+}
+
 export const addChapterSchema = Yup.object({
   bookId: Yup.string().required('Please select a series'),
   title: Yup.string()

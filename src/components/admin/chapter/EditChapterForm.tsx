@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
-import { addChapterSchema } from '@/utils/formValidation';
+import { addChapterSchema, isBlueprintFormComplete } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
@@ -60,6 +60,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const { data: booksResponse } = useGetAllBooksQuery();
   const { data: chapterResponse } = useGetChapterByIdQuery(chapterId);
   const requiredAcceptedRef = useRef(false);
+  const [requiredAgreementsAccepted, setRequiredAgreementsAccepted] = useState(false);
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const blueprintBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD);
   const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
@@ -284,6 +285,10 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   };
 
   const isSubmittingState = isSubmitting || isUpdating;
+  const isRequiredComplete = isBlueprintFormComplete(values, {
+    chapterPricingEnabled,
+    agreementsAccepted: requiredAgreementsAccepted,
+  });
 
   const handleContentChange = useCallback(
     (html: string) => {
@@ -629,7 +634,10 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       <AgreementSentenceList
         touchpoint={AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD}
         onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
-        onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+        onRequiredAcceptedChange={(accepted) => {
+          requiredAcceptedRef.current = accepted;
+          setRequiredAgreementsAccepted(accepted);
+        }}
         error={agreementsError}
         touched={touched.accepted_agreement_ids}
         onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
@@ -647,21 +655,20 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           type="submit"
           className="global_btn rounded_full bg_primary"
           startContent={<Save className="h-4 w-4" />}
-          isDisabled={isSubmittingState || books.length === 0}
+          isDisabled={isSubmittingState || books.length === 0 || !isRequiredComplete}
           isLoading={isSubmittingState}
         >
           Update Blueprint
         </Button>
-        <Link href={getChaptersListRoutePath(isMentor)}>
-          <Button
-            type="button"
-            className="global_btn rounded_full outline_primary"
-            startContent={<X className="h-4 w-4" />}
-            isDisabled={isSubmittingState}
-          >
-            Cancel
-          </Button>
-        </Link>
+        <Button
+          type="button"
+          className="global_btn rounded_full outline_primary"
+          startContent={<X className="h-4 w-4" />}
+          isDisabled={isSubmittingState}
+          onPress={() => router.push(getChaptersListRoutePath(isMentor))}
+        >
+          Cancel
+        </Button>
       </div>
     </form>
   );

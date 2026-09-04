@@ -18,6 +18,7 @@ export interface AdminRouteModelMapping {
 export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/settings', models: ['Setting'] },
   { path: '/admin/referral-setting', models: ['Referral Setting'] },
+  { path: '/admin/referrals/performance', models: ['Referral Performance'] },
   { path: '/admin/roles-and-permissions', models: ['Roles', 'Permissions', 'Staff'] },
   { path: '/admin/audit-logs', models: ['Audit Log'] },
   { path: '/admin/transactions', models: ['Transactions'] },
@@ -37,6 +38,8 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/application-mentor-tier-upgrades', models: ['Mentor Tier Upgrade'] },
   { path: '/admin/affiliate-applications', models: ['Affiliate Application'] },
   { path: '/admin/authors', models: ['Mentors'] },
+  { path: '/admin/mentors/performance', models: ['Mentor Performance'] },
+  { path: '/admin/mentors/revenue', models: ['Mentor Revenue'] },
   { path: '/admin/series', models: ['Series'] },
   { path: '/admin/blueprints', models: ['Blueprints'] },
   { path: '/admin/reviews', models: ['Reviews'] },

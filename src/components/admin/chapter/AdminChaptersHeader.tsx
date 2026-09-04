@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import Button from '../../ui/Button';
-import { getCreateChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { getCreateChapterRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import { cn } from '@/components/ui/utils';
 
@@ -18,7 +18,7 @@ export function AdminChaptersHeader({
   canAdd = false,
 }: AdminChaptersHeaderProps) {
   const pathname = usePathname();
-  const isMentor = pathname.startsWith(getMentorRoutePath());
+  const isMentor = isMentorPanelPath(pathname);
 
   return (
     <AdminPageHeader

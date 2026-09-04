@@ -47,12 +47,21 @@ export function getAdminDashboardRoutePath(): string {
 export function getMentorRoutePath(): string {
   return '/admin/mentor';
 }
+
+export function isMentorPanelPath(pathname: string): boolean {
+  const prefix = getMentorRoutePath();
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
 export function getMentorDashboardRoutePath(): string {
   return '/admin/mentor/dashboard';
 }
 
 export function getMentorBlueprintPerformanceRoutePath(): string {
   return '/admin/mentor/blueprint-performance';
+}
+
+export function getMentorCouponPerformanceRoutePath(): string {
+  return '/admin/mentor/coupon-performance';
 }
 
 export function getMentorSalesVolumeRoutePath(): string {
@@ -129,6 +138,18 @@ export function getAdminMentorTypesRoutePath(): string {
   return '/admin/types/mentor-types';
 }
 
+export function getAdminMentorPerformanceRoutePath(): string {
+  return '/admin/mentors/performance';
+}
+
+export function getAdminMentorRevenueRoutePath(): string {
+  return '/admin/mentors/revenue';
+}
+
+export function getAdminReferralPerformanceRoutePath(): string {
+  return '/admin/referrals/performance';
+}
+
 export function getAdminMentorApplicationsRoutePath(): string {
   return '/admin/applications/mentors';
 }
@@ -154,6 +175,9 @@ export function getAdminSectionRoutePath(section: string): string {
     chapters: '/admin/blueprints',
     categories: '/admin/categories',
     authors: '/admin/authors',
+    mentor_performance: '/admin/mentors/performance',
+    mentor_revenue: '/admin/mentors/revenue',
+    referral_performance: '/admin/referrals/performance',
     mentor_types: '/admin/types/mentor-types',
     mentor_applications: '/admin/applications/mentors',
     mentor_verification: '/admin/application-mentor-verification',

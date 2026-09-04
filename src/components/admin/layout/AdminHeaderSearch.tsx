@@ -37,6 +37,7 @@ import {
     Link2,
     Percent,
     Star,
+    Tag,
 } from 'lucide-react';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { cn } from '@/components/ui/utils';
@@ -45,12 +46,16 @@ import {
     getAdminSectionRoutePath,
     getAdminProfileRoutePath,
     getAdminMentorTypesRoutePath,
+    getAdminMentorPerformanceRoutePath,
+    getAdminMentorRevenueRoutePath,
+    getAdminReferralPerformanceRoutePath,
     getCreateChapterRoutePath,
-    getMentorRoutePath,
+    isMentorPanelPath,
     getMentorDashboardRoutePath,
     getMentorBooksRoutePath,
     getMentorChaptersRoutePath,
     getMentorBlueprintPerformanceRoutePath,
+    getMentorCouponPerformanceRoutePath,
     getMentorSalesVolumeRoutePath,
     getMentorRevenueEarnedRoutePath,
     getMentorRevenueByBlueprintRoutePath,
@@ -78,6 +83,8 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
     { label: 'Categories', description: 'Manage categories', path: getAdminSectionRoutePath('categories'), icon: FolderTree, keywords: ['category', 'tag'] },
     { label: 'Mentors', description: 'Manage mentors', path: getAdminSectionRoutePath('authors'), icon: Users, keywords: ['author', 'leader', 'thought', 'mentor'] },
+    { label: 'Mentor Performance', description: 'Track mentor sales, revenue, and AI scores', path: getAdminMentorPerformanceRoutePath(), icon: BarChart3, keywords: ['mentor', 'performance', 'sales', 'revenue', 'ai score'] },
+    { label: 'Mentor Revenue', description: 'Track mentor revenue, discounts, and share split', path: getAdminMentorRevenueRoutePath(), icon: Wallet, keywords: ['mentor', 'revenue', 'gross', 'discount', 'share', 'csv'] },
     { label: 'Mentor Types', description: 'Configure mentor categories and revenue share', path: getAdminMentorTypesRoutePath(), icon: Award, keywords: ['mentor type', 'mentor category', 'founding', 'revenue share', 'badge'] },
     { label: 'Users', description: 'Manage registered users', path: getAdminSectionRoutePath('users'), icon: UserCircle, keywords: ['user', 'member', 'account'] },
     { label: 'Staff', description: 'Manage staff members and roles', path: getAdminSectionRoutePath('staff'), icon: UserCog, keywords: ['staff', 'institutional', 'admin', 'role'] },
@@ -89,6 +96,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'FAQs', description: 'Manage FAQ entries', path: getAdminSectionRoutePath('faqs'), icon: FileEdit, keywords: ['faq', 'question', 'answer'] },
     { label: 'Subscribers', description: 'View newsletter subscribers', path: getAdminSectionRoutePath('subscribers'), icon: Mail, keywords: ['subscriber', 'newsletter', 'email'] },
     { label: 'Settings', description: 'Platform settings', path: getAdminSectionRoutePath('settings'), icon: Settings, keywords: ['setting', 'config', 'logo'] },
+    { label: 'Referral Performance', description: 'Track referral registrations, conversions, and commission', path: getAdminReferralPerformanceRoutePath(), icon: TrendingUp, keywords: ['referral', 'performance', 'commission', 'conversion'] },
     { label: 'Referral Setting', description: 'Configure affiliate referral commission', path: getAdminSectionRoutePath('referral_setting'), icon: Link2, keywords: ['referral', 'affiliate', 'commission'] },
     { label: 'My Profile', description: 'Edit your admin profile', path: getAdminProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];
@@ -101,6 +109,7 @@ const MENTOR_ROUTES: AdminNavRoute[] = [
     { label: 'Orders', description: 'View your series & blueprint orders', path: getMentorOrdersRoutePath(), icon: ShoppingBag, keywords: ['order', 'purchase', 'sales'] },
     { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(true), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
     { label: 'Blueprint Performance', description: 'Track blueprint performance', path: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3, keywords: ['performance', 'analytics'] },
+    { label: 'Coupon Performance', description: 'Track coupon redemptions and revenue', path: getMentorCouponPerformanceRoutePath(), icon: Tag, keywords: ['coupon', 'discount', 'promo', 'performance'] },
     { label: 'Sales Volume', description: 'View sales volume', path: getMentorSalesVolumeRoutePath(), icon: ShoppingCart, keywords: ['sales', 'volume'] },
     { label: 'Revenue Earned', description: 'View revenue earned', path: getMentorRevenueEarnedRoutePath(), icon: KshIcon, keywords: ['revenue', 'earnings', 'money'] },
     { label: 'Revenue by Blueprint', description: 'Revenue breakdown by blueprint', path: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp, keywords: ['revenue', 'blueprint'] },
@@ -152,7 +161,7 @@ function useAdminHeaderSearchState(): AdminHeaderSearchContextValue {
     const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
     const isSearchActive = searchQuery.trim().length >= 1;
-    const isMentor = pathname.startsWith(getMentorRoutePath());
+    const isMentor = isMentorPanelPath(pathname);
     const routes = isMentor ? MENTOR_ROUTES : ADMIN_ROUTES;
 
     const searchResults = useMemo(() => {

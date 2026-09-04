@@ -21,7 +21,7 @@ import {
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
-import { getChaptersListRoutePath, getBlueprintRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
@@ -69,7 +69,7 @@ function slugFromTitle(title: string): string {
 export function CreateChapterForm() {
   const router = useRouter();
   const pathname = usePathname();
-  const isMentor = pathname.startsWith(getMentorRoutePath());
+  const isMentor = isMentorPanelPath(pathname);
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [featuredImagePreviewUrl, setFeaturedImagePreviewUrl] = useState<string | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);

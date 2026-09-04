@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Banknote, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Link2, Mail, MessageSquare, Percent, Quote, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Award } from 'lucide-react';
-import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorTypesRoutePath, getAdminSectionRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, FolderTree, GraduationCap, Handshake, LayoutDashboard, Link2, Mail, MessageSquare, Percent, Quote, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
+import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
@@ -43,6 +43,8 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'Mentor Management',
         items: [
             { model: 'Mentors', id: 'mentors', label: 'Mentors', href: getAdminSectionRoutePath('authors'), icon: Users },
+            { model: 'Mentor Performance', id: 'mentor_performance', label: 'Mentor Performance', href: getAdminMentorPerformanceRoutePath(), icon: BarChart3 },
+            { model: 'Mentor Revenue', id: 'mentor_revenue', label: 'Mentor Revenue', href: getAdminMentorRevenueRoutePath(), icon: Wallet },
             { model: 'Mentor Application', id: 'mentor_applications', label: 'Mentor Applications', href: getAdminMentorApplicationsRoutePath(), icon: ClipboardList },
             { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
             { model: 'Mentor Verification', id: 'mentor_verification', label: 'Mentor Verification', href: getAdminSectionRoutePath('mentor_verification'), icon: ShieldCheck },
@@ -79,6 +81,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'Configuration',
         items: [
             { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
+            { model: 'Referral Performance', id: 'referral_performance', label: 'Referral Performance', href: getAdminReferralPerformanceRoutePath(), icon: TrendingUp },
             { model: 'Referral Setting', id: 'referral_setting', label: 'Referral Setting', href: getAdminSectionRoutePath('referral_setting'), icon: Link2 },
             { model: 'Audit Log', id: 'audit_logs', label: 'Audit Logs', href: getAdminSectionRoutePath('audit_logs'), icon: ScrollText },
         ],
@@ -93,7 +96,7 @@ export default function AdminAppLayout({ children }: { children: React.ReactNode
 
 
 
-    if (pathname.startsWith(getMentorRoutePath())) {
+    if (isMentorPanelPath(pathname)) {
         return (
             <>
                 <BlueprintScoringEventsBridge />

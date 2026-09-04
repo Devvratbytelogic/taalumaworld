@@ -23,7 +23,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getEditChapterRoutePath, getViewChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { getEditChapterRoutePath, getViewChapterRoutePath, isMentorPanelPath } from '@/routes/routes';
 import toast from '@/utils/toast';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
@@ -38,7 +38,7 @@ export function AdminChaptersTab() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const isMentor = pathname.startsWith(getMentorRoutePath());
+    const isMentor = isMentorPanelPath(pathname);
     const { isSuperAdmin, hasPermission } = useAdminPermissions();
     const canView = hasPermission(BLUEPRINTS_MODEL, 'view');
     const canAdd = hasPermission(BLUEPRINTS_MODEL, 'add');

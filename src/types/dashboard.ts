@@ -194,6 +194,129 @@ export interface IMentorEconomyRevenueAPIResponseDataEntity {
   yourShare: number;
 }
 
+/** ── GET /admin/mentors/performance — Admin only ───────────────────────────── */
+
+export interface IMentorPerformanceAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IMentorPerformanceAPIResponseData;
+  message: string;
+  timestamp: string;
+}
+export interface IMentorPerformanceAPIResponseData {
+  summary: IMentorPerformanceSummary;
+  data: IMentorPerformanceListData;
+}
+export interface IMentorPerformanceAiScoreDistribution {
+  high_value: number;
+  standard: number;
+  needs_improvement: number;
+  hold_for_review: number;
+  unscored: number;
+}
+export interface IMentorPerformanceSummary {
+  mentors: number;
+  totalSales: number;
+  totalGross: number;
+  totalDiscount: number;
+  totalRevenue: number;
+  totalMentorShare: number;
+  totalPlatformShare: number;
+  avgAiScore: number;
+  aiScoreDistribution: IMentorPerformanceAiScoreDistribution;
+}
+export interface IMentorPerformanceListData {
+  data?: (IMentorPerformanceEntity)[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+export interface IMentorPerformanceTier {
+  id: string;
+  code: string;
+  mentor_share_percent: number;
+  platform_share_percent: number;
+  rank: number;
+}
+export interface IMentorPerformanceEntity {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  profile_pic?: string | null;
+  sales: number;
+  gross: number;
+  discount: number;
+  revenue: number;
+  net: number;
+  mentorShare: number;
+  platformShare: number;
+  avgAiScore?: number | null;
+  qualityScore: number;
+  blueprintCount: number;
+  scoredBlueprintCount: number;
+  aiScoreDistribution: IMentorPerformanceAiScoreDistribution;
+  is_verified_mentor: boolean;
+  verified_mentor_badge: boolean;
+  verified_mentor_at?: string | null;
+  tier: IMentorPerformanceTier;
+  rank: number;
+}
+
+/** ── GET /admin/mentors/revenue — Admin only (same payload as performance) ─── */
+
+export type IMentorRevenueAPIResponse = IMentorPerformanceAPIResponse;
+export type IMentorRevenueEntity = IMentorPerformanceEntity;
+
+/** ── GET /admin/referrals/performance — Admin only ─────────────────────────── */
+
+export const REFERRAL_PERFORMANCE_USER_TYPES = ['all', 'mentor', 'user'] as const;
+export type ReferralPerformanceUserType = (typeof REFERRAL_PERFORMANCE_USER_TYPES)[number];
+
+export interface IReferralPerformanceAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IReferralPerformanceAPIResponseData;
+  message: string;
+  timestamp: string;
+}
+export interface IReferralPerformanceAPIResponseData {
+  summary: IReferralPerformanceSummary;
+  data: IReferralPerformanceListData;
+}
+export interface IReferralPerformanceSummary {
+  referrers: number;
+  registrations: number;
+  conversions: number;
+  conversion_rate: number;
+  attributed_revenue: number;
+  commission: number;
+}
+export interface IReferralPerformanceListData {
+  data?: (IReferralPerformanceEntity)[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+export interface IReferralPerformanceEntity {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  role: string;
+  user_type: Exclude<ReferralPerformanceUserType, 'all'>;
+  registrations: number;
+  conversions: number;
+  conversion_rate: number;
+  attributed_revenue: number;
+  commission: number;
+  rank: number;
+}
+
 
 
 

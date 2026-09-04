@@ -8,6 +8,7 @@ import {
   AdminSectionHeader,
   AdminStatCard,
   AdminTableShell,
+  AdminTextLink,
 } from '@/components/admin/layout/AdminContent';
 import { DashboardWelcomeHeader } from './DashboardWelcomeHeader';
 import { DashboardStatsGrid, type StatCard } from './DashboardStatsGrid';
@@ -23,9 +24,10 @@ import {
   useGetAdminDashboardQuery,
   useGetBlueprintPerformanceQuery,
   useGetBlueprintRevenueQuery,
+  useGetMentorPerformanceQuery,
   useGetSalesVolumeQuery,
 } from '@/store/rtkQueries/dashboard';
-import { getAdminSectionRoutePath } from '@/routes/routes';
+import { getAdminMentorPerformanceRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
 import { formatKes } from '@/constants/common';
 
 function TableSkeleton({ columns }: { columns: number }) {
@@ -79,6 +81,15 @@ export default function AdminDashboardTab() {
     isLoading: revenueLoading,
     isError: revenueError,
   } = useGetBlueprintRevenueQuery(dateRangeParams);
+  const {
+    data: mentorPerformanceData,
+    isLoading: mentorPerformanceLoading,
+    isError: mentorPerformanceError,
+  } = useGetMentorPerformanceQuery({
+    ...dateRangeParams,
+    page: 1,
+    limit: 5,
+  });
 
   const stats: StatCard[] = [
     {
@@ -145,6 +156,9 @@ export default function AdminDashboardTab() {
   const revenueSummary = revenueData?.data?.summary;
   const topEarningBlueprints = revenueData?.data?.data?.data ?? [];
 
+  const mentorPerformanceSummary = mentorPerformanceData?.data?.summary;
+  const topMentors = mentorPerformanceData?.data?.data?.data ?? [];
+
   return (
     <AdminPage>
       <DashboardWelcomeHeader
@@ -160,6 +174,55 @@ export default function AdminDashboardTab() {
       <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
 
       <DashboardMentorActions stats={statsData} isLoading={dashboardLoading} />
+
+      <AdminPanel>
+        <AdminSectionHeader
+          title="Mentor performance"
+          action={<AdminTextLink href={getAdminMentorPerformanceRoutePath()}>View all</AdminTextLink>}
+        />
+        <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <AdminStatCard label="Mentors" value={(mentorPerformanceSummary?.mentors ?? 0).toLocaleString()} icon={GraduationCap} tone="blue" />
+          <AdminStatCard label="Total sales" value={(mentorPerformanceSummary?.totalSales ?? 0).toLocaleString()} icon={ShoppingCart} tone="green" />
+          <AdminStatCard label="Total revenue" value={formatKes(mentorPerformanceSummary?.totalRevenue ?? 0)} icon={Wallet} tone="purple" />
+          <AdminStatCard label="Avg. AI score" value={mentorPerformanceSummary?.avgAiScore != null ? Number(mentorPerformanceSummary.avgAiScore).toFixed(2) : '—'} icon={Sparkles} tone="orange" />
+        </div>
+        <AdminTableShell>
+          {mentorPerformanceLoading ? (
+            <TableSkeleton columns={6} />
+          ) : mentorPerformanceError ? (
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load mentor performance right now.</p>
+          ) : topMentors.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-500">No mentor performance data available yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
+                    <th className="px-5 py-3 font-medium">Rank</th>
+                    <th className="px-5 py-3 font-medium">Mentor</th>
+                    <th className="px-5 py-3 font-medium">Sales</th>
+                    <th className="px-5 py-3 font-medium">Revenue</th>
+                    <th className="px-5 py-3 font-medium">Mentor share</th>
+                    <th className="px-5 py-3 font-medium text-right">AI score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topMentors.map((row) => (
+                    <tr key={row.id} className="border-b border-slate-50 last:border-0">
+                      <td className="px-5 py-4 text-slate-600">{row.rank}</td>
+                      <td className="px-5 py-4 font-medium text-slate-900">{row.name}</td>
+                      <td className="px-5 py-4 text-slate-600">{row.sales.toLocaleString()}</td>
+                      <td className="px-5 py-4 text-slate-600">{formatKes(row.revenue)}</td>
+                      <td className="px-5 py-4 text-slate-600">{formatKes(row.mentorShare)}</td>
+                      <td className="px-5 py-4 text-right text-slate-900">{row.avgAiScore == null ? '—' : Number(row.avgAiScore).toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </AdminTableShell>
+      </AdminPanel>
 
       <AdminPanel>
         <AdminSectionHeader title="Blueprint performance" />

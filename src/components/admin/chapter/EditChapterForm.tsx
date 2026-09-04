@@ -16,7 +16,7 @@ import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
 import { useUpdateChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import { useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
-import { getChaptersListRoutePath, getBlueprintRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
@@ -48,7 +48,7 @@ interface EditChapterFormProps {
 export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const isMentor = pathname.startsWith(getMentorRoutePath());
+  const isMentor = isMentorPanelPath(pathname);
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [featuredImagePreviewUrl, setFeaturedImagePreviewUrl] = useState<string | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);

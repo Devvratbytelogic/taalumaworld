@@ -1,6 +1,7 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type {
     IAllCouponsAPIResponse,
+    ICouponPerformanceAPIResponse,
 } from '@/types/coupon';
 
 export const couponApi = rtkQuerieSetup.injectEndpoints({
@@ -59,7 +60,7 @@ export const couponApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminCoupons'],
         }),
-        getCouponPerformance: builder.query<any, { id?: string; page?: number; limit?: number; search?: string } | void>({
+        getCouponPerformance: builder.query<ICouponPerformanceAPIResponse, { id?: string; page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
                 url: `/admin/coupons/performance`,
                 method: 'GET',

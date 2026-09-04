@@ -9,13 +9,12 @@ import {
   getHomeRoutePath,
   getMentorDashboardRoutePath,
   getMentorLoginRoutePath,
-  getMentorRoutePath,
+  isMentorPanelPath,
 } from '@/routes/routes';
 
 const AUTH_COOKIE_NAME = 'auth_token';
 const ROLE_COOKIE_NAME = 'user_role';
 
-const MENTOR_PANEL_PREFIX = getMentorRoutePath(); // '/admin/mentor'
 const ADMIN_PANEL_PREFIX = '/admin';
 const USER_DASHBOARD_PREFIX = '/user-dashboard';
 
@@ -27,7 +26,7 @@ function isPublicAuthRoute(pathname: string): boolean {
 }
 
 function isMentorPanelRoute(pathname: string): boolean {
-  return pathname === MENTOR_PANEL_PREFIX || pathname.startsWith(`${MENTOR_PANEL_PREFIX}/`);
+  return isMentorPanelPath(pathname);
 }
 
 function isAdminPanelRoute(pathname: string): boolean {

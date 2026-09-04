@@ -3,8 +3,12 @@ import {
     IBlueprintPerformanceAPIResponse,
     IBlueprintRevenueAPIResponse,
     IMentorEconomyRevenueAPIResponse,
+    IMentorPerformanceAPIResponse,
     IMentorReferralsAPIResponse,
+    IMentorRevenueAPIResponse,
+    IReferralPerformanceAPIResponse,
     ISalesVolumeAPIResponse,
+    ReferralPerformanceUserType,
 } from '@/types/dashboard';
 import { IReferralWalletLedgerAPIResponse } from '@/types/referralWallet';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
@@ -18,6 +22,32 @@ export interface IGetReferralWalletLedgerParams {
     page?: number;
     limit?: number;
     type?: 'credit' | 'debit';
+}
+
+export interface IGetMentorPerformanceParams extends IDashboardDateRangeParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    tier_id?: string;
+    verified?: string;
+    hasSales?: boolean;
+}
+
+export interface IGetMentorRevenueParams extends IDashboardDateRangeParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    tier_id?: string;
+    verified?: string;
+    hasRevenue?: boolean;
+}
+
+export interface IGetReferralPerformanceParams extends IDashboardDateRangeParams {
+    page?: number;
+    limit?: number;
+    user_type?: ReferralPerformanceUserType;
 }
 
 export const dashboardApi = rtkQuerieSetup.injectEndpoints({
@@ -67,6 +97,33 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
             }),
         }),
 
+        /** Mentor performance — Admin only */
+        getMentorPerformance: builder.query<IMentorPerformanceAPIResponse, IGetMentorPerformanceParams | void>({
+            query: (params) => ({
+                url: `/admin/mentors/performance`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
+        /** Mentor revenue — Admin only */
+        getMentorRevenue: builder.query<IMentorRevenueAPIResponse, IGetMentorRevenueParams | void>({
+            query: (params) => ({
+                url: `/admin/mentors/revenue`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
+        /** Referral performance — Admin only */
+        getReferralPerformance: builder.query<IReferralPerformanceAPIResponse, IGetReferralPerformanceParams | void>({
+            query: (params) => ({
+                url: `/admin/referrals/performance`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
         /** Logged-in user's own referrals, filterable by status — Mentor + Career Architect */
         getMyMentorReferrals: builder.query<IMentorReferralsAPIResponse, { page?: number; limit?: number; status?: string } & IDashboardDateRangeParams | void>({
             query: (params) => ({
@@ -94,6 +151,9 @@ export const {
     useGetSalesVolumeQuery,
     useGetBlueprintRevenueQuery,
     useGetMentorEconomyRevenueQuery,
+    useGetMentorPerformanceQuery,
+    useGetMentorRevenueQuery,
+    useGetReferralPerformanceQuery,
     useGetMyMentorReferralsQuery,
     useGetReferralWalletLedgerQuery,
 } = dashboardApi;

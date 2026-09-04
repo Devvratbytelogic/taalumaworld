@@ -23,6 +23,7 @@ interface AdminOrdersSearchProps {
 const PAYMENT_STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
   { value: 'Paid', label: 'Paid' },
+  { value: 'Failed', label: 'Failed' },
   { value: 'Pending', label: 'Pending' },
 ];
 

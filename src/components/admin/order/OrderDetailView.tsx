@@ -16,7 +16,7 @@ import {
   AdminSectionHeader,
 } from '@/components/admin/layout/AdminContent';
 import { useGetOrderByIdQuery } from '@/store/rtkQueries/adminGetApi';
-import { getMentorRoutePath, getOrdersListRoutePath } from '@/routes/routes';
+import { getOrdersListRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { API_BASE_URL } from '@/utils/config';
 
 function isPercentCouponType(couponType?: string | null) {
@@ -37,6 +37,7 @@ const PAYMENT_STATUS_BADGE_CLASS: Record<string, string> = {
   paid: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
   unpaid: 'bg-red-50 text-red-700 border-red-200!',
   partial: 'bg-amber-50 text-amber-700 border-amber-200!',
+  failed: 'bg-red-50 text-red-700 border-red-200!',
 };
 
 
@@ -108,7 +109,7 @@ interface OrderDetailViewProps {
 
 export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   const pathname = usePathname();
-  const isMentor = pathname.startsWith(getMentorRoutePath());
+  const isMentor = isMentorPanelPath(pathname);
   const { data, isLoading } = useGetOrderByIdQuery(orderId);
   const order = data?.data;
 

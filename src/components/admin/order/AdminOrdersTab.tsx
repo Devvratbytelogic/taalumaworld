@@ -12,7 +12,7 @@ import { AdminOrdersSearch } from './AdminOrdersSearch';
 import { useGetAllOrdersQuery } from '@/store/rtkQueries/adminGetApi';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { getMentorRoutePath, getViewOrderRoutePath } from '@/routes/routes';
+import { getViewOrderRoutePath, isMentorPanelPath } from '@/routes/routes';
 import moment from 'moment';
 import { IAllOrdersAPIResponseDataEntityItemEntityItemItems } from '@/types/order';
 
@@ -36,7 +36,7 @@ const SEARCH_PLACEHOLDERS: Record<OrderTab, string> = {
 export function AdminOrdersTab() {
     const router = useRouter();
     const pathname = usePathname();
-    const isMentor = pathname.startsWith(getMentorRoutePath());
+    const isMentor = isMentorPanelPath(pathname);
     const [activeTab, setActiveTab] = useState<OrderTab>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [paymentStatus, setPaymentStatus] = useState('');
@@ -205,9 +205,9 @@ export function AdminOrdersTab() {
                         <span className="text-xs text-muted-foreground truncate">{params.row.paymentMethod}</span>
                         <Badge
                             variant="outline"
-                            className={cn('capitalize shrink-0', params.row.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200!' : params.row.status === 'pending' ? 'bg-red-50 text-red-700 border-red-200!' : 'bg-amber-50 text-amber-700 border-amber-200!')}
+                            className={cn('capitalize shrink-0', params.row.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200!' : params.row.status === 'pending' ? 'bg-red-50 text-red-700 border-red-200!' : params.row.status === 'failed' ? 'bg-red-50 text-red-700 border-red-200!' : 'bg-amber-50 text-amber-700 border-amber-200!')}
                         >
-                            {params.row.status === 'completed' ? 'Paid' : params.row.status === 'pending' ? 'Pending' : 'Partial'}
+                            {params.row.status === 'completed' ? 'Paid' : params.row.status === 'pending' ? 'Pending' : params.row.status}
                         </Badge>
                     </div>
                 );

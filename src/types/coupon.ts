@@ -37,3 +37,42 @@ export interface IAdminCouponEntity {
   blueprints?: (string)[] | null;
   series?: (string)[] | null;
 }
+
+export interface ICouponPerformanceAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: ICouponPerformanceData;
+  message: string;
+  timestamp: string;
+}
+export interface ICouponPerformanceData {
+  summary: ICouponPerformanceSummary;
+  data?: (ICouponPerformanceEntity)[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+export interface ICouponPerformanceSummary {
+  total_coupons: number;
+  total_redemptions: number;
+  total_discount_given: number;
+  total_revenue: number;
+}
+export interface ICouponPerformanceEntity {
+  _id: string;
+  coupon_code: string;
+  coupon_type: string;
+  coupon_for: string;
+  value: number;
+  status: string;
+  expiry_date?: string | null;
+  usage_limit: number;
+  redeemed_count: number;
+  uses_remaining: number;
+  orders_count: number;
+  total_discount_given: number;
+  total_revenue: number;
+  last_used_at: string;
+}

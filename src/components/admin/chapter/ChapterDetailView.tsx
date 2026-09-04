@@ -16,7 +16,7 @@ import {
   AdminSectionHeader,
 } from '@/components/admin/layout/AdminContent';
 import { useGetChapterByIdQuery } from '@/store/rtkQueries/adminGetApi';
-import { getChaptersListRoutePath, getEditChapterRoutePath, getMentorRoutePath } from '@/routes/routes';
+import { getChaptersListRoutePath, getEditChapterRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import type { AiCriteria } from '@/types/singleChapter';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
@@ -62,7 +62,7 @@ interface ChapterDetailViewProps {
 
 export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   const pathname = usePathname();
-  const isMentor = pathname.startsWith(getMentorRoutePath());
+  const isMentor = isMentorPanelPath(pathname);
   const { hasPermission } = useAdminPermissions();
   const canEdit = hasPermission(BLUEPRINTS_MODEL, 'edit');
   const { data, isLoading } = useGetChapterByIdQuery(chapterId);

@@ -118,6 +118,11 @@ function LedgerCard({ entry }: { entry: IReferralWalletLedgerEntry }) {
 export function ReferralWalletPage() {
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     setPage(1);
@@ -170,7 +175,7 @@ export function ReferralWalletPage() {
     },
   ] as const;
 
-  if (isLoading) {
+  if (!hasMounted || isLoading) {
     return (
       <div className="space-y-6">
         <UserDashboardPageHeader

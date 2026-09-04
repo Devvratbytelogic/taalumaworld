@@ -38,6 +38,7 @@ import {
     Percent,
     Star,
     Tag,
+    History,
 } from 'lucide-react';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { cn } from '@/components/ui/utils';
@@ -98,6 +99,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Settings', description: 'Platform settings', path: getAdminSectionRoutePath('settings'), icon: Settings, keywords: ['setting', 'config', 'logo'] },
     { label: 'Referral Performance', description: 'Track referral registrations, conversions, and commission', path: getAdminReferralPerformanceRoutePath(), icon: TrendingUp, keywords: ['referral', 'performance', 'commission', 'conversion'] },
     { label: 'Referral Setting', description: 'Configure affiliate referral commission', path: getAdminSectionRoutePath('referral_setting'), icon: Link2, keywords: ['referral', 'affiliate', 'commission'] },
+    { label: 'Consent Records', description: 'View and export per-user agreement consent history', path: getAdminSectionRoutePath('consent_records'), icon: History, keywords: ['consent', 'gdpr', 'agreement', 'legal', 'history', 'export'] },
     { label: 'My Profile', description: 'Edit your admin profile', path: getAdminProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];
 

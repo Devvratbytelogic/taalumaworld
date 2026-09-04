@@ -1,4 +1,9 @@
 import { IAllAgreementsAPIResponse, IAgreementsByTouchpointAPIResponse, IAllAgreementSentencesAPIResponse, IGetUserConsentStatusAPIResponse, ISingleAgreementAPIResponse } from '@/types/agreements';
+import type {
+    IConsentRecordsAPIResponse,
+    IGetConsentRecordsParams,
+    IUserConsentAuditAPIResponse,
+} from '@/types/consentRecords';
 import { IAgreementAPIResponse } from '@/types/user/agreement';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import { IAddAgreementTypeAPIResponse, IAllAgreementTypesAPIResponse, } from '@/types/agreementTypes';
@@ -152,6 +157,25 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AdminUserConsentStatus'],
         }),
+        getConsentRecords: builder.query<IConsentRecordsAPIResponse, IGetConsentRecordsParams | void>({
+            query: (params) => ({
+                url: `/admin/consent-records`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminConsentRecords'],
+        }),
+        getUserConsentRecords: builder.query<
+            IUserConsentAuditAPIResponse,
+            { userId: string; page?: number; limit?: number }
+        >({
+            query: ({ userId, page, limit }) => ({
+                url: `/admin/consent-records/users/${userId}`,
+                method: 'GET',
+                params: { page, limit },
+            }),
+            providesTags: ['AdminConsentRecords'],
+        }),
     }),
 });
 
@@ -176,4 +200,6 @@ export const {
     useAcceptAgreementMutation,
     useAcceptAllAgreementsMutation,
     useGetUserConsentStatusQuery,
+    useGetConsentRecordsQuery,
+    useGetUserConsentRecordsQuery,
 } = agreementAPIs;

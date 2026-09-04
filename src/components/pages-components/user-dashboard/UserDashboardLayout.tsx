@@ -7,7 +7,6 @@ import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, St
 import { cn } from '@/components/ui/utils';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
-import { getUserRole } from '@/utils/authCookies';
 import { USER_TYPE, UserTypeValue } from '@/constants/common';
 import {
   getUserDashboardAddressRoutePath,
@@ -70,12 +69,18 @@ const NAV_GROUPS: {
     },
   ];
 
-export default function UserDashboardAppLayout({ children }: { children: React.ReactNode }) {
+export default function UserDashboardAppLayout({
+  children,
+  initialRole,
+}: {
+  children: React.ReactNode;
+  initialRole?: string;
+}) {
   const pathname = usePathname();
   const { data: profileData } = useGetUserProfileQuery();
   const userName = profileData?.data?.name ?? 'User';
   const userPhoto = profileData?.data?.profile_pic ?? '';
-  const userRole = getUserRole();
+  const userRole = profileData?.data?.role?.name ?? initialRole;
 
   const navGroups = NAV_GROUPS.map((group) => ({
     ...group,

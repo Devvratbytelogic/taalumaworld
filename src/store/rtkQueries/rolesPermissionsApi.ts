@@ -5,6 +5,7 @@ import type {
     IAllRolePermissionsAPIResponse,
     IAllRolesAPIResponse,
     IAllUsersAPIResponse,
+    IGetUserByIdAPIResponse,
 } from '@/types/rolesPermissions';
 
 export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
@@ -52,6 +53,13 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
                 url: `/admin/get-all-users`,
                 method: 'GET',
                 params: params ?? {}
+            }),
+            providesTags: ['AdminStaff'],
+        }),
+        getUserById: builder.query<IGetUserByIdAPIResponse, string>({
+            query: (id) => ({
+                url: `/admin/get-user/${id}`,
+                method: 'GET',
             }),
             providesTags: ['AdminStaff'],
         }),
@@ -125,6 +133,7 @@ export const rolesPermissionsApi = rtkQuerieSetup.injectEndpoints({
 export const {
     useGetAllRolesQuery,
     useGetAllUsersQuery,
+    useGetUserByIdQuery,
     useAddRoleMutation,
     useUpdateRoleMutation,
     useDeleteRoleMutation,

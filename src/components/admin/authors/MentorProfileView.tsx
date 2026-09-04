@@ -32,7 +32,7 @@ import {
   adminPanelClass,
 } from '@/components/admin/layout/AdminContent';
 import { SuspendUserDialog } from '@/components/admin/users/SuspendUserDialog';
-import { useGetAllUsersQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
+import { useGetUserByIdQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
@@ -143,14 +143,10 @@ export function MentorProfileView() {
 
   const [suspendMentor, setSuspendMentor] = useState<IAllUsersEntity | null>(null);
 
-  const { data: mentorsResponse, isLoading } = useGetAllUsersQuery({
-    page: 1,
-    limit: 500,
-    user_type: 'mentor',
-  });
+  const { data: mentorResponse, isLoading } = useGetUserByIdQuery(mentorId ?? '', { skip: !mentorId });
   const [updateMentorStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
 
-  const mentor = mentorsResponse?.data?.data?.find((item) => item._id === mentorId) ?? null;
+  const mentor = mentorResponse?.data ?? null;
 
   const handleSuspendClick = () => {
     if (mentor) setSuspendMentor(mentor);

@@ -6,6 +6,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Ban, CircleCheck, Edit2, KeyRound, Loader2 } from 'lucide-react';
 import toast from '@/utils/toast';
@@ -15,7 +16,6 @@ import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminUsersHeader } from './AdminUsersHeader';
 import { AdminUsersSearch } from './AdminUsersSearch';
-import { ViewProfileModal } from './ViewProfileModal';
 import { EditUserModal } from './EditUserModal';
 import { SuspendUserDialog } from './SuspendUserDialog';
 import {
@@ -25,6 +25,7 @@ import {
 } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { getAdminUserDetailRoutePath } from '@/routes/routes';
 
 const USERS_MODEL = 'Users';
 
@@ -34,8 +35,8 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
 };
 
 export function AdminUsersTab() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [profileUser, setProfileUser] = useState<IAllUsersEntity | null>(null);
   const [editUser, setEditUser] = useState<IAllUsersEntity | null>(null);
   const [suspendUser, setSuspendUser] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
@@ -68,7 +69,7 @@ export function AdminUsersTab() {
   };
 
   const handleViewProfile = (user: IAllUsersEntity) => {
-    setProfileUser(user);
+    router.push(getAdminUserDetailRoutePath(user._id));
   };
 
   const handleEditUser = (user: IAllUsersEntity) => {
@@ -109,14 +110,8 @@ export function AdminUsersTab() {
         toast.error(`Failed to update "${suspendUser.name}"`);
       } finally {
         setSuspendUser(null);
-        setProfileUser(null);
       }
     }
-  };
-
-  const handleSuspendFromProfile = (user: IAllUsersEntity) => {
-    setProfileUser(null);
-    setSuspendUser(user);
   };
 
   const columns: GridColDef[] = [
@@ -287,15 +282,6 @@ export function AdminUsersTab() {
           onPaginationModelChange={setPaginationModel}
         />
       </div>
-
-      {canView ? (
-        <ViewProfileModal
-          user={profileUser}
-          open={!!profileUser}
-          onOpenChange={(open) => !open && setProfileUser(null)}
-          onSuspend={canDelete ? handleSuspendFromProfile : undefined}
-        />
-      ) : null}
 
       {canEdit ? (
         <EditUserModal

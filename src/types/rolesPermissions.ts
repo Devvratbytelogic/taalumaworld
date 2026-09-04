@@ -37,6 +37,15 @@ export interface IAllUsersAPIResponse {
   message: string;
   timestamp: string;
 }
+
+export interface IGetUserByIdAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IAllUsersEntity;
+  message: string;
+  timestamp: string;
+}
 export interface IAllUsersAPIResponseData {
   data?: (IAllUsersEntity)[] | null;
   page: number;

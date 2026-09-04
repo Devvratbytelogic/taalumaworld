@@ -201,6 +201,7 @@ export function getAdminSectionRoutePath(section: string): string {
     agreements: '/admin/agreements',
     agreement_types: '/admin/agreements/agreement-types',
     sentences: '/admin/agreements/sentences',
+    consent_records: '/admin/agreements/consent-records',
     audit_logs: '/admin/audit-logs',
     coupons: '/admin/coupons',
     taxes: '/admin/taxes',
@@ -230,6 +231,10 @@ export function getChaptersListRoutePath(isMentor: boolean = false): string {
 
 export function getViewAuditLogRoutePath(auditLogId: string): string {
   return `/admin/audit-logs/${auditLogId}`;
+}
+
+export function getAdminUserDetailRoutePath(userId: string): string {
+  return `/admin/users/${userId}`;
 }
 
 export function getViewOrderRoutePath(orderId: string, isMentor: boolean = false): string {

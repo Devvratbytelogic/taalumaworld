@@ -216,6 +216,7 @@ export const rtkQuerieSetup = createApi({
         'AdminAgreementSentences',
         'UserAgreementSentences',
         'AdminUserConsentStatus',
+        'AdminConsentRecords',
         'AdminMentorTiers',
         'AdminMentorApplications',
         'AdminMentorTierUpgradeApplications',

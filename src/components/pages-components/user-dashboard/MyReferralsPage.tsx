@@ -115,12 +115,21 @@ function ReferralCard({ referral }: { referral: IMentorReferralsAPIResponseDataE
   );
 }
 
+function asTrimmedString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 export function MyReferralsPage() {
   const [status, setStatus] = useState<MentorReferralStatus | ''>('');
   const [page, setPage] = useState(1);
+  const [hasMounted, setHasMounted] = useState(false);
 
   const { data: profileData } = useGetUserProfileQuery();
-  const shortCode = profileData?.data?.short_code?.trim() || '';
+  const shortCode = asTrimmedString(profileData?.data?.short_code);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     setPage(1);
@@ -163,7 +172,7 @@ export function MyReferralsPage() {
     },
   ] as const;
 
-  if (isLoading) {
+  if (!hasMounted || isLoading) {
     return (
       <div className="space-y-6">
         <UserDashboardPageHeader

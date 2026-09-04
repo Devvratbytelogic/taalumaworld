@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2, Flag } from 'lucide-react';
+import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2, Flag, Info } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
 import { useDeleteChapterMutation, useUpdateChapterMutation, useRestoreChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import type { IChapter } from '@/types/chapter';
@@ -27,11 +27,42 @@ import { getEditChapterRoutePath, getViewChapterRoutePath, isMentorPanelPath } f
 import toast from '@/utils/toast';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const BLUEPRINTS_MODEL = 'Blueprints';
 
 const STATUS_CONFIG = BLUEPRINT_STATUS_CONFIG;
 const STATUSES = BLUEPRINT_STATUSES;
+
+function getAiScoreColorClass(score: number): string {
+    if (score < 5) return 'text-red-600';
+    if (score <= 8.5) return 'text-amber-500';
+    return 'text-emerald-600';
+}
+
+function AiReviewNotesTooltip({ notes }: { notes?: string | null }) {
+    const review = notes?.trim();
+    if (!review) return null;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <span
+                    tabIndex={0}
+                    aria-label="AI review notes"
+                    className="inline-flex shrink-0 cursor-help items-center text-slate-400 hover:text-slate-600"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <Info className="h-3.5 w-3.5" />
+                </span>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="max-w-sm py-2 text-left leading-relaxed whitespace-pre-wrap">
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300">AI review notes</p>
+                {review}
+            </TooltipContent>
+        </Tooltip>
+    );
+}
 
 export function AdminChaptersTab() {
     const dispatch = useDispatch();
@@ -253,27 +284,32 @@ export function AdminChaptersTab() {
         {
             field: 'aiScore',
             headerName: 'AI Score',
-            width: 110,
+            width: 140,
             sortable: false,
             renderCell: (params) => {
                 const score = params.row.aiScore;
                 const scoringStatus = params.row.aiScoringStatus;
+                const reviewTooltip = <AiReviewNotesTooltip notes={params.row.aiReview} />;
                 if (score == null) {
                     return (
-                        <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 text-sm text-muted-foreground whitespace-nowrap">
                             {scoringStatus && scoringStatus !== 'completed' ? scoringStatus : '—'}
+                            {reviewTooltip}
                         </span>
                     );
                 }
                 return (
-                    <span className="text-sm font-medium whitespace-nowrap" title={params.row.aiClassification ?? undefined}>
-                        {score}
+                    <div className="flex flex-col items-start">
+                        <span className="inline-flex items-center gap-1 text-sm font-medium">
+                            <span className={getAiScoreColorClass(Number(score))}>{score}</span>
+                            {reviewTooltip}
+                        </span>
                         {params.row.aiClassification ? (
-                            <span className="block text-xs text-muted-foreground font-normal truncate max-w-24">
+                            <span className="max-w-24 truncate text-xs text-muted-foreground" title={params.row.aiClassification}>
                                 {params.row.aiClassification}
                             </span>
                         ) : null}
-                    </span>
+                    </div>
                 );
             },
         },

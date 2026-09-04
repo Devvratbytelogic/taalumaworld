@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { ChevronLeft, ChevronRight, Loader2, Star } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -70,10 +70,15 @@ export default function BlueprintReviews({
   isReviewed = false,
 }: BlueprintReviewsProps) {
   const [page, setPage] = useState(1);
-  const limit = 1;
-  const canAddReview = Boolean(itemId && isPurchased && !isReviewed);
+  const [hasReviewed, setHasReviewed] = useState(isReviewed);
+  const limit = 3;
+  const canAddReview = Boolean(itemId && isPurchased && !hasReviewed);
 
-  const { data, isLoading, isFetching } = useGetContentReviewsQuery(
+  useEffect(() => {
+    setHasReviewed(isReviewed);
+  }, [isReviewed]);
+
+  const { data, isLoading, isFetching, refetch } = useGetContentReviewsQuery(
     { type, id: itemId!, page, limit },
     { skip: !itemId },
   );
@@ -101,6 +106,11 @@ export default function BlueprintReviews({
             itemId={itemId}
             itemTitle={itemTitle ?? undefined}
             type={type}
+            onSuccess={() => {
+              setHasReviewed(true);
+              setPage(1);
+              void refetch();
+            }}
           />
         ) : null}
       </div>

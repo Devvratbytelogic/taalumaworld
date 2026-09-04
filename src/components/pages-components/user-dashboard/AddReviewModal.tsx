@@ -56,6 +56,7 @@ export function AddReviewModal() {
 
       if (res?.http_status_code === 200 || res?.http_status_code === 201 || res?.success) {
         toast.success(res?.message ?? 'Review submitted successfully');
+        data?.onSuccess?.();
         onClose();
       }
     } catch (error) {

@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
 import { useGetMyReviewsQuery } from '@/store/rtkQueries/userGetAPI';
-import { getHomeRoutePath } from '@/routes/routes';
-import type { IMyReviewsAPIResponseDataEntity } from '@/types/user/reviews';
+import { getBlueprintRoutePath, getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import type { IMyReviewsAPIResponseDataEntity, IMyReviewsItem } from '@/types/user/reviews';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
 const PAGE_LIMIT = 10;
@@ -59,19 +59,39 @@ function StarRow({ rating }: { rating: number }) {
   );
 }
 
+function getReviewItem(itemId?: IMyReviewsAPIResponseDataEntity['itemId']): IMyReviewsItem | null {
+  if (!itemId || typeof itemId === 'string') return null;
+  return itemId;
+}
+
+function getReviewItemHref(type: string | undefined, slug?: string) {
+  if (!slug) return null;
+  if (type === 'Book') return getSeriesRoutePath(slug);
+  return getBlueprintRoutePath(slug);
+}
+
 function ReviewCard({ review }: { review: IMyReviewsAPIResponseDataEntity }) {
   const statusKey = String(review.status || 'pending').toLowerCase();
+  const item = getReviewItem(review.itemId);
+  const typeLabel = formatTypeLabel(review.type);
+  const title = item?.title?.trim() || `${typeLabel} review`;
+  const href = getReviewItemHref(review.type, item?.slug);
 
   return (
     <article className="rounded-md border border-gray-200 bg-white p-4 sm:p-5">
       <div className="space-y-2">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900">
-              {formatTypeLabel(review.type)} review
-            </p>
+            {href ? (
+              <Link href={href} className="text-sm font-semibold text-gray-900 hover:text-primary hover:underline">
+                {title}
+              </Link>
+            ) : (
+              <p className="text-sm font-semibold text-gray-900">{title}</p>
+            )}
             <p className="mt-0.5 text-xs text-gray-500">
-              {review.createdAt ? moment(review.createdAt).format('DD MMM YYYY') : '—'}
+              {typeLabel}
+              {review.createdAt ? ` · ${moment(review.createdAt).format('DD MMM YYYY')}` : ''}
               {review.customer?.name ? ` · ${review.customer.name}` : ''}
             </p>
           </div>

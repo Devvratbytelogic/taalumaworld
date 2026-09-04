@@ -54,7 +54,7 @@ export interface IMyReviewsAPIResponseData {
 export interface IMyReviewsAPIResponseDataEntity {
   id: string;
   type: string;
-  itemId: string;
+  itemId?: IMyReviewsItem | string | null;
   rating: number;
   comment: string;
   status: string;
@@ -62,6 +62,11 @@ export interface IMyReviewsAPIResponseDataEntity {
   createdAt: string;
   updatedAt: string;
   customer: Customer;
+}
+export interface IMyReviewsItem {
+  _id: string;
+  title: string;
+  slug: string;
 }
 export interface Customer {
   id: string;

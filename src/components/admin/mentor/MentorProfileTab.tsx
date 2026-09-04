@@ -256,7 +256,6 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
       facebook: profile?.facebook ?? '',
       linkedin: profile?.linkedin ?? '',
       isEmailPrivate: profile?.isEmailPrivate ?? false,
-      isNamePrivate: profile?.isNamePrivate ?? false,
       isPhonePrivate: profile?.isPhonePrivate ?? false,
     },
     validationSchema: mentorProfileDetailsSchema,
@@ -270,7 +269,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
         formData.append('facebook', formValues.facebook?.trim() ?? '');
         formData.append('linkedin', formValues.linkedin?.trim() ?? '');
         formData.append('isEmailPrivate', String(formValues.isEmailPrivate));
-        formData.append('isNamePrivate', String(formValues.isNamePrivate));
+        formData.append('isNamePrivate', 'false');
         formData.append('isPhonePrivate', String(formValues.isPhonePrivate));
         if (photoFile) formData.append('profile_pic', photoFile);
 
@@ -509,7 +508,6 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
                   Full name
-                  <PrivacyBadge isPrivate={profile?.isNamePrivate} />
                 </dt>
                 <dd className="mt-1 text-sm font-medium text-slate-900">{profile?.name ?? '—'}</dd>
               </div>
@@ -658,15 +656,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                 <div className="space-y-3 sm:col-span-2">
                   <p className="text-sm font-medium text-slate-900">Privacy</p>
                   <p className="text-xs text-slate-500">Control what others can see on your public profile.</p>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <PrivacyToggle
-                      id="isNamePrivate"
-                      label="Hide name"
-                      description="Keep your name private"
-                      checked={values.isNamePrivate}
-                      onCheckedChange={(checked) => setFieldValue('isNamePrivate', checked)}
-                      disabled={isSubmitting}
-                    />
+                  <div className="grid gap-3 sm:grid-cols-2">
                     <PrivacyToggle
                       id="isEmailPrivate"
                       label="Hide email"

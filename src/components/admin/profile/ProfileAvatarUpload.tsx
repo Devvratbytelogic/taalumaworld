@@ -7,7 +7,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
-import { IMAGE_UPLOAD_LIMIT_LABEL, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_LIMIT_LABEL, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 
 type AvatarSize = 'md' | 'lg' | 'xl';
@@ -45,8 +45,8 @@ export function ProfileAvatarUpload({
     e.target.value = '';
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload a valid image file');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -110,7 +110,7 @@ export function ProfileAvatarUpload({
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept={ALLOWED_IMAGE_ACCEPT}
           className="sr-only"
           onChange={handleFileChange}
           disabled={isLoading}

@@ -10,7 +10,7 @@ import type { ITestimonialsDataEntity } from '@/types/testimonial';
 import { testimonialSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 interface TestimonialFormProps {
   initial?: Partial<ITestimonialsDataEntity>;
@@ -68,8 +68,8 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file (e.g. JPG, PNG)');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -125,7 +125,7 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept={ALLOWED_IMAGE_ACCEPT}
             className="hidden"
             onChange={handlePhotoChange}
           />
@@ -138,7 +138,6 @@ export function TestimonialForm({ initial = {}, onSubmit, onCancel, isLoading }:
           >
             {photoFile ? photoFile.name : 'Choose image'}
           </Button>
-          <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP</p>
         </div>
       </div>
 

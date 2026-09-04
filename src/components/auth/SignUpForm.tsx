@@ -17,7 +17,7 @@ import { getHomeRoutePath, getMentorDashboardRoutePath, getMentorLoginRoutePath,
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { setAuthCookies } from '@/utils/authCookies';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -35,8 +35,8 @@ export function SignUpForm() {
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            toast.error('Please select an image file (e.g. JPG, PNG)');
+        if (!isAllowedImageFile(file)) {
+            toast.error(getImageTypeErrorMessage());
             return;
         }
         if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -123,7 +123,7 @@ export function SignUpForm() {
         >
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center gap-2">
-                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                    <input ref={fileInputRef} type="file" accept={ALLOWED_IMAGE_ACCEPT} className="hidden" onChange={handleAvatarChange} />
                     <button
                         type="button"
                         onClick={handleAvatarClick}

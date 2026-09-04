@@ -18,7 +18,7 @@ import toast from '@/utils/toast';
 import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 const SETTING_MODEL = 'Setting';
 
@@ -183,8 +183,8 @@ export function GeneralSettingsCard() {
   const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file (e.g. JPG, PNG)');
+      if (!isAllowedImageFile(file)) {
+        toast.error(getImageTypeErrorMessage());
         return;
       }
       if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -341,13 +341,13 @@ export function GeneralSettingsCard() {
                       ref={logoInputRef}
                       id="logo"
                       type="file"
-                      accept="image/*"
+                      accept={ALLOWED_IMAGE_ACCEPT}
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0] ?? null;
                         if (file) {
-                          if (!file.type.startsWith('image/')) {
-                            toast.error('Please select an image file (e.g. JPG, PNG)');
+                          if (!isAllowedImageFile(file)) {
+                            toast.error(getImageTypeErrorMessage());
                             e.target.value = '';
                             return;
                           }
@@ -372,7 +372,6 @@ export function GeneralSettingsCard() {
                         <span>Click to select a logo image</span>
                       )}
                     </button>
-                    <p className="text-sm text-muted-foreground mt-1">PNG, JPG, SVG or WebP recommended</p>
                   </div>
                 </div>
               </div>

@@ -23,7 +23,7 @@ import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -134,8 +134,8 @@ export function AdminProfileTab() {
       toast.error(getImageSizeLimitMessage('Photo'));
       return;
     }
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload a valid image file');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     setPhotoFile(file);
@@ -313,10 +313,9 @@ export function AdminProfileTab() {
                     Profile photo
                     <FileUploadLimitHint kind="image" />
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500">JPG or PNG</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <label>
-                      <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
+                      <input type="file" accept={ALLOWED_IMAGE_ACCEPT} onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
                       <span className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
                         <Camera className="h-4 w-4" />
                         {displayPhoto ? 'Change photo' : 'Upload photo'}

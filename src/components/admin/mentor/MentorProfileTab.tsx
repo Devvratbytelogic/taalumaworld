@@ -57,7 +57,7 @@ import moment from 'moment';
 import ReactSelect from 'react-select';
 import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 const PAYOUT_FREQUENCIES = ["monthly", "quarterly", "annually"] as const;
 const PAYSTACK_SETTLEMENT_OPTIONS = ["mpesa", "bank"] as const;
@@ -294,8 +294,8 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
       toast.error(getImageSizeLimitMessage('Photo'));
       return;
     }
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload a valid image file');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     setPhotoFile(file);
@@ -581,10 +581,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                     Profile photo
                     <FileUploadLimitHint kind="image" />
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500">JPG or PNG</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <label>
-                      <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
+                      <input type="file" accept={ALLOWED_IMAGE_ACCEPT} onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
                       <span className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
                         <Camera className="h-4 w-4" />
                         {displayPhoto ? 'Change photo' : 'Upload photo'}

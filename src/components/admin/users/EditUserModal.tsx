@@ -24,7 +24,7 @@ import toast from '@/utils/toast';
 import { USER_TYPE } from '@/constants/common';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 interface EditUserModalProps {
   user: IAllUsersEntity | null;
@@ -96,8 +96,8 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file (e.g. JPG, PNG)');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -150,7 +150,7 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
                   <input
                     id="edit-user-profile-pic"
                     type="file"
-                    accept="image/*"
+                    accept={ALLOWED_IMAGE_ACCEPT}
                     className="sr-only"
                     onChange={handleProfilePicChange}
                     disabled={isLoading}

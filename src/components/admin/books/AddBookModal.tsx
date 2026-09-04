@@ -20,7 +20,7 @@ import { appendUserIpToFormData } from '@/utils/clientIp';
 import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { slugify } from '@/utils/slugify';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 const initialFormValues = {
   title: '',
@@ -122,8 +122,8 @@ export function AddBookModal({
   const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file (e.g. JPG, PNG)');
+      if (!isAllowedImageFile(file)) {
+        toast.error(getImageTypeErrorMessage());
         return;
       }
       if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -149,8 +149,8 @@ export function AddBookModal({
   const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file (e.g. JPG, PNG)');
+      if (!isAllowedImageFile(file)) {
+        toast.error(getImageTypeErrorMessage());
         return;
       }
       if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -337,7 +337,7 @@ export function AddBookModal({
                   <input
                     id="book-cover"
                     type="file"
-                    accept="image/*"
+                    accept={ALLOWED_IMAGE_ACCEPT}
                     onChange={handleCoverFileChange}
                     className="sr-only"
                   />

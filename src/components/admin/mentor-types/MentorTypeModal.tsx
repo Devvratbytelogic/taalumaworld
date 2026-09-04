@@ -19,7 +19,7 @@ import { mentorTierSchema } from '@/utils/formValidation';
 import { useAddMentorTierMutation, useUpdateMentorTierMutation } from '@/store/rtkQueries/mentorApis';
 import type { IAllMentorTiersEntity } from '@/types/mentorTier';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 
 
@@ -101,8 +101,8 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
   const handleBadgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file (e.g. JPG, PNG, SVG)');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -143,7 +143,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                   Badge <span className="font-normal text-muted-foreground">(optional)</span>
                   <FileUploadLimitHint kind="image" />
                 </Label>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleBadgeChange} />
+                <input ref={fileInputRef} type="file" accept={ALLOWED_IMAGE_ACCEPT} className="hidden" onChange={handleBadgeChange} />
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
                     type="button"
@@ -164,7 +164,6 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                     {badgeFile.name}
                   </p>
                 ) : null}
-                <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, SVG</p>
               </div>
             </div>
 

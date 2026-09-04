@@ -21,7 +21,7 @@ import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList'
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements'
 import { useGetInstituteMessageQuery, useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint'
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload'
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload'
 
 const DEFAULT_PARTNER_PROMPT_HEADING = 'Partner university student'
 const DEFAULT_PARTNER_PROMPT_MESSAGE = 'Use your official university email to access selected content free during our promotional period.'
@@ -136,8 +136,8 @@ export default function SignUp() {
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
-        if (!file.type.startsWith('image/')) {
-            toast.error('Please select an image file (e.g. JPG, PNG)')
+        if (!isAllowedImageFile(file)) {
+            toast.error(getImageTypeErrorMessage())
             return
         }
         if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -275,7 +275,7 @@ export default function SignUp() {
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept="image/*"
+                                accept={ALLOWED_IMAGE_ACCEPT}
                                 className="hidden"
                                 onChange={handleAvatarChange}
                             />
@@ -310,7 +310,7 @@ export default function SignUp() {
                                     <FileUploadLimitHint kind="image" />
                                 </p>
                                 <p className="text-xs text-muted-foreground mt-0.5">
-                                    Optional · JPG or PNG
+                                    Optional
                                 </p>
                                 {!profilePreview && (
                                     <button

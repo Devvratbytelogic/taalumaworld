@@ -30,10 +30,13 @@ import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
 import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import {
+  ALLOWED_IMAGE_ACCEPT,
   IMAGE_UPLOAD_MAX_BYTES,
   PDF_UPLOAD_MAX_BYTES,
   getImageSizeLimitMessage,
+  getImageTypeErrorMessage,
   getPdfSizeLimitMessage,
+  isAllowedImageFile,
 } from '@/constants/fileUpload';
 
 
@@ -177,8 +180,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const handleFeaturedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file (e.g. JPG, PNG)');
+      if (!isAllowedImageFile(file)) {
+        toast.error(getImageTypeErrorMessage());
         return;
       }
       if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -225,8 +228,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const handleOgImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file (e.g. JPG, PNG)');
+      if (!isAllowedImageFile(file)) {
+        toast.error(getImageTypeErrorMessage());
         return;
       }
       if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -563,7 +566,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <input
                 id="chapter-image"
                 type="file"
-                accept="image/*"
+                accept={ALLOWED_IMAGE_ACCEPT}
                 onChange={handleFeaturedImageChange}
                 className="sr-only"
               />

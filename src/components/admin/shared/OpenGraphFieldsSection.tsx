@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/components/ui/utils';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { ALLOWED_IMAGE_ACCEPT } from '@/constants/fileUpload';
 
 export type OpenGraphFormValues = {
   meta_title: string;
@@ -346,7 +347,7 @@ export function OpenGraphFieldsSection({
             <input
               id={`${idPrefix}-og-image`}
               type="file"
-              accept="image/*"
+              accept={ALLOWED_IMAGE_ACCEPT}
               onChange={handleOgImageInputChange}
               disabled={disabled}
               className="sr-only"

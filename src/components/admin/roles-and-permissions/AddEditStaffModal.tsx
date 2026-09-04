@@ -23,7 +23,7 @@ import { SELECT_STYLES } from '@/constants/selectStyle';
 import { USER_TYPE } from '@/constants/common';
 import { cn } from '@/components/ui/utils';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 const DISABLED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
 
@@ -131,8 +131,8 @@ export function AddEditStaffModal() {
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file (e.g. JPG, PNG)');
+    if (!isAllowedImageFile(file)) {
+      toast.error(getImageTypeErrorMessage());
       return;
     }
     if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
@@ -191,7 +191,7 @@ export function AddEditStaffModal() {
                   <input
                     id="staff-profile-pic"
                     type="file"
-                    accept="image/*"
+                    accept={ALLOWED_IMAGE_ACCEPT}
                     className="sr-only"
                     onChange={handleProfilePicChange}
                     disabled={isLoading}

@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import { COUPON_SCOPES, COUPON_TYPES } from '@/constants/coupon';
 import { BLUEPRINT_STATUSES } from '@/constants/blueprint';
+import { getImageTypeErrorMessage, isAllowedImageValue } from '@/constants/fileUpload';
 
 
 const passwordRules = Yup.string()
@@ -154,7 +155,8 @@ const openGraphFieldsSchema = {
     .optional()
     .test('is-file-or-string-or-null', 'Please select a valid image file', (v) =>
       v == null || v instanceof File || typeof v === 'string'
-    ),
+    )
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
   json_ld: Yup.string()
     .trim()
     .test('valid-json', 'Enter valid JSON-LD', (v) => {
@@ -178,7 +180,8 @@ export const addBookSchema = Yup.object({
     .required('Please enter a description'),
   cover_image: Yup.mixed<File>()
     .required('Please select a cover image')
-    .test('is-file', 'Please select a cover image', (v) => v instanceof File),
+    .test('is-file', 'Please select a cover image', (v) => v instanceof File)
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
   pricingModel: Yup.string().oneOf(['book', 'chapter']),
   status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
   price: Yup.number()
@@ -201,7 +204,8 @@ export const editBookSchema = Yup.object({
   cover_image: Yup.mixed<File>()
     .nullable()
     .optional()
-    .test('is-file-or-null', 'Please select a valid image file', (v) => v == null || v instanceof File),
+    .test('is-file-or-null', 'Please select a valid image file', (v) => v == null || v instanceof File)
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
   pricingModel: Yup.string().oneOf(['book', 'chapter']),
   status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
   price: Yup.number()
@@ -285,7 +289,9 @@ export const addChapterSchema = Yup.object({
           .required('Price is required when blueprint is not free'),
     }),
   status: Yup.string().oneOf([...BLUEPRINT_STATUSES], 'Select a valid status'),
-  cover_image: Yup.mixed().required('Cover image is required'),
+  cover_image: Yup.mixed()
+    .required('Cover image is required')
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
   ...openGraphFieldsSchema,
 });
@@ -467,7 +473,10 @@ export const testimonialSchema = Yup.object({
   status: Yup.string()
     .oneOf(['Active', 'Inactive'], 'Select a valid status')
     .required('Status is required'),
-  photo: Yup.mixed().nullable().optional(),
+  photo: Yup.mixed()
+    .nullable()
+    .optional()
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
 });
 
 export const inviteMentorSchema = Yup.object({
@@ -490,7 +499,8 @@ export const authorSchema = Yup.object({
     .nullable()
     .test('avatar', 'Avatar must be an image file or valid URL', (v) =>
       !v || v instanceof File || (typeof v === 'string' && /^https?:\/\//.test(v))
-    ),
+    )
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
 });
 
 const optionalUrl = Yup.string()
@@ -618,7 +628,9 @@ export const editUserSchema = Yup.object({
     .trim()
     .test('url-or-empty', 'Enter a valid LinkedIn URL', (value) => !value || /^https?:\/\/.+/i.test(value)),
   professionalBio: Yup.string().trim(),
-  profile_pic: Yup.mixed().nullable(),
+  profile_pic: Yup.mixed()
+    .nullable()
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
 });
 
 // Add / Edit staff — Edit User fields + role assignment
@@ -671,7 +683,8 @@ export const mentorTierSchema = Yup.object({
   badge: Yup.mixed()
     .nullable()
     .optional()
-    .test('badge', 'Badge must be an image file', (v) => !v || v instanceof File || typeof v === 'string'),
+    .test('badge', 'Badge must be an image file', (v) => !v || v instanceof File || typeof v === 'string')
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
 });
 
 // Add / Edit Coupon Modal Validation Schema (matches API: coupon_code, coupon_type, coupon_for, institutions, books, chapters, value, expiry_date, minimum_cart_value, usage_limit, status)

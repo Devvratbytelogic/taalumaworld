@@ -8,7 +8,8 @@ import { BadgeCheck, FileSignature, LogOut } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import toast from '@/utils/toast';
 import { useAuth } from '@/hooks/useAuth';
-import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
+import { getUserRole } from '@/utils/authCookies';
+import { signOut } from '@/utils/refreshSession';
 import { getAgreementConsentUserType } from '@/constants/agreements';
 import {
   useAcceptAgreementMutation,
@@ -96,9 +97,8 @@ export function PendingAgreementsGate() {
   };
 
   const handleSignOut = () => {
-    clearAuthCookies();
     toast.success('Signed out successfully');
-    window.location.href = getHomeRoutePath();
+    void signOut({ redirectTo: getHomeRoutePath() });
   };
 
   if (!mounted || !open) return null;

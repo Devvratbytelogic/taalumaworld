@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
 import { type GridColDef } from '@mui/x-data-grid';
 import { BadgeCheck, Banknote, Download, GraduationCap, ShoppingCart, Sparkles, Wallet } from 'lucide-react';
 import {
@@ -21,6 +20,7 @@ import { useGetMentorRevenueQuery } from '@/store/rtkQueries/dashboard';
 import { useGetAllMentorTiersQuery } from '@/store/rtkQueries/mentorApis';
 import type { IMentorRevenueEntity } from '@/types/dashboard';
 import { API_BASE_URL } from '@/utils/config';
+import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminMentorRevenueSearch } from './AdminMentorRevenueSearch';
 
@@ -81,9 +81,6 @@ export function AdminMentorRevenueTab() {
     if (isExporting) return;
     setIsExporting(true);
     try {
-      const token = Cookies.get('auth_token') || '';
-      const deviceId = Cookies.get('device') || '';
-      const userId = Cookies.get('userID') || '';
       const params = new URLSearchParams();
       Object.entries(listParams).forEach(([key, value]) => {
         if (value === undefined || value === '') return;
@@ -91,13 +88,8 @@ export function AdminMentorRevenueTab() {
       });
       params.set('export', 'csv');
 
-      const res = await fetch(`${API_BASE_URL}/admin/mentors/revenue?${params.toString()}`, {
+      const res = await authFetch(`${API_BASE_URL}/admin/mentors/revenue?${params.toString()}`, {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          device: deviceId,
-          userID: userId,
-        },
       });
       if (!res.ok) throw new Error('Failed to export mentor revenue');
 

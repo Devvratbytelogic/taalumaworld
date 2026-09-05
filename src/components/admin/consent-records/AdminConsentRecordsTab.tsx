@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import moment from 'moment';
-import Cookies from 'js-cookie';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Download, FileSignature, UserRound, Users } from 'lucide-react';
 import { AdminPage, AdminPageHeader, AdminStatCard } from '@/components/admin/layout/AdminContent';
@@ -12,6 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useGetAllAgreementTypesQuery, useGetConsentRecordsQuery } from '@/store/rtkQueries/agreementAPIs';
 import type { IConsentRecord } from '@/types/consentRecords';
 import { API_BASE_URL } from '@/utils/config';
+import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminConsentRecordsSearch } from './AdminConsentRecordsSearch';
 
@@ -57,14 +57,8 @@ export function AdminConsentRecordsTab() {
       Object.entries(listParams).forEach(([key, value]) => params.set(key, value));
       params.set('export', 'csv');
 
-      const res = await fetch(`${API_BASE_URL}/admin/consent-records?${params.toString()}`, {
+      const res = await authFetch(`${API_BASE_URL}/admin/consent-records?${params.toString()}`, {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${Cookies.get('auth_token') || ''}`,
-          device: Cookies.get('device') || '',
-          userID: Cookies.get('userID') || '',
-        },
-        credentials: 'include',
       });
       if (!res.ok) throw new Error('Export failed');
 

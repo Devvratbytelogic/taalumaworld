@@ -4,24 +4,31 @@ import { Mutex } from 'async-mutex';
 import Cookies from "js-cookie";
 import { addToast } from '@heroui/react';
 import { API_BASE_URL } from '@/utils/config';
-import { isBrowserOnline, isFetchNetworkError, NETWORK_MESSAGES } from '@/utils/network';
-import { hasAuthCookie, isUnauthorizedError, logoutAndRedirectToHome } from '@/utils/authCookies';
+import { isBrowserOnline, NETWORK_MESSAGES } from '@/utils/network';
+import { AUTH_COOKIE_NAME, hasAuthCookie } from '@/utils/authCookies';
+import {
+    endSessionAfterRefreshFailure,
+    isSessionEnding,
+    refreshAccessToken,
+    shouldSkipTokenRefresh,
+} from '@/utils/refreshSession';
 
 const mutex = new Mutex();
-let isLoggingOut = false;
 
 function isPendingApprovalError(message: string, status?: number): boolean {
     return status === 403 && (message || '').toLowerCase().includes('pending approval');
 }
 
-/** Clear session and redirect when an authenticated request returns 401 / invalid token. */
-function handleUnauthorizedSession(message: string, status?: number): boolean {
-    if (!hasAuthCookie() || !isUnauthorizedError(message, status)) return false;
-    if (isLoggingOut) return true;
-    addToast({ title: 'Error', description: 'Session expired. Please login again.', color: 'danger', timeout: 2000 });
-    isLoggingOut = true;
-    logoutAndRedirectToHome();
-    return true;
+function getRequestUrl(args: string | FetchArgs): string {
+    return typeof args === 'string' ? args : args.url ?? '';
+}
+
+function unauthorizedQueryError(message: string, httpStatus?: number): FetchBaseQueryError {
+    return {
+        status: 'CUSTOM_ERROR',
+        data: { message, httpStatus },
+        error: message,
+    };
 }
 
 interface IAPIResponse<T = unknown> {
@@ -60,7 +67,7 @@ const baseQuery = fetchBaseQuery({
     timeout: REQUEST_TIMEOUT_MS,
     credentials: 'include',
     prepareHeaders: async (headers) => {
-        const token = Cookies.get("auth_token") || null
+        const token = Cookies.get(AUTH_COOKIE_NAME) || null
         const deviceId = Cookies.get("device") || ''
         const userId = Cookies.get("userID") || ''
         // headers.set('clientid', API_CLIENT_ID);
@@ -75,6 +82,59 @@ const baseQuery = fetchBaseQuery({
 });
 
 
+function getErrorMeta(result: { error?: unknown; data?: unknown }): { message: string; httpStatus?: number } {
+    const errorData = result.error as IAPIError & {
+        status?: number | string;
+        originalStatus?: number;
+        data?: { message?: string; http_status_code?: number };
+    } | undefined;
+    const rawStatus = errorData?.status;
+    const status = typeof rawStatus === 'number'
+        ? rawStatus
+        : (errorData?.originalStatus ?? errorData?.data?.http_status_code);
+    const responseData = errorData?.data;
+    const message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
+    const httpStatus = typeof status === 'number' ? status : undefined;
+    return { message, httpStatus };
+}
+
+function isHttpUnauthorized(status?: number): boolean {
+    return status === 401;
+}
+
+function shouldAttemptRefresh(httpStatus: number | undefined, url: string): boolean {
+    if (isSessionEnding() || shouldSkipTokenRefresh(url)) return false;
+    if (!hasAuthCookie()) return false;
+    return isHttpUnauthorized(httpStatus);
+}
+
+async function refreshAndRetry(
+    args: string | FetchArgs,
+    api: Parameters<typeof baseQuery>[1],
+    extraOptions: Parameters<typeof baseQuery>[2],
+    url: string,
+): Promise<Awaited<ReturnType<typeof baseQuery>> | 'session-ended' | 'refresh-unavailable'> {
+    if (mutex.isLocked()) {
+        await mutex.waitForUnlock();
+        if (isSessionEnding()) return 'session-ended';
+        return baseQuery(args, api, extraOptions);
+    }
+
+    const release = await mutex.acquire();
+    try {
+        const token = await refreshAccessToken(url);
+        if (!token) {
+            endSessionAfterRefreshFailure();
+            return 'session-ended';
+        }
+        return baseQuery(args, api, extraOptions);
+    } catch {
+        return 'refresh-unavailable';
+    } finally {
+        release();
+    }
+}
+
 //  with all response data
 const baseQueryWithAuth: BaseQueryFn<
     string | FetchArgs,
@@ -82,6 +142,10 @@ const baseQueryWithAuth: BaseQueryFn<
     FetchBaseQueryError
 > = async (args, api, extraOptions) => {
     await mutex.waitForUnlock();
+
+    if (isSessionEnding()) {
+        return { error: unauthorizedQueryError('Session ended') };
+    }
 
     if (!isBrowserOnline()) {
         const message = NETWORK_MESSAGES.requestFailedOffline;
@@ -94,23 +158,31 @@ const baseQueryWithAuth: BaseQueryFn<
     }
 
     try {
-        const result = await baseQuery(args, api, extraOptions);
-        const res = result.data as IAPIResponse;
-        if (result.error) {
-            const errorData = result.error as IAPIError & { status?: number; data?: { data?: { flow?: string }; message?: string; http_status_code?: number } };
-            const status = errorData?.status ?? errorData?.data?.http_status_code;
-            const responseData = errorData?.data;
-            const message = toToastMessage(responseData?.message ?? responseData, 'Unknown API error');
-            const httpStatus = typeof status === 'number' ? status : undefined;
+        let result = await baseQuery(args, api, extraOptions);
+        const url = getRequestUrl(args);
 
-            if (handleUnauthorizedSession(message, httpStatus)) {
-                return {
-                    error: {
-                        status: 'CUSTOM_ERROR',
-                        data: { message, httpStatus },
-                        error: message,
-                    },
-                };
+        const errorMeta = result.error ? getErrorMeta(result) : null;
+        const body = result.data as IAPIResponse | undefined;
+        const refreshStatus = errorMeta?.httpStatus ?? body?.http_status_code;
+        if (shouldAttemptRefresh(refreshStatus, url)) {
+            const retried = await refreshAndRetry(args, api, extraOptions, url);
+            if (retried === 'session-ended') {
+                return { error: unauthorizedQueryError(errorMeta?.message ?? body?.message ?? '', refreshStatus) };
+            }
+            if (retried !== 'refresh-unavailable') {
+                result = retried;
+            }
+        }
+
+        if (result.error) {
+            const { message, httpStatus } = getErrorMeta(result);
+
+            if (isSessionEnding()) {
+                return { error: unauthorizedQueryError(message, httpStatus) };
+            }
+
+            if (isHttpUnauthorized(httpStatus) && !hasAuthCookie() && !shouldSkipTokenRefresh(url)) {
+                return { error: unauthorizedQueryError(message, httpStatus) };
             }
 
             if (!isPendingApprovalError(message, httpStatus)) {
@@ -119,30 +191,17 @@ const baseQueryWithAuth: BaseQueryFn<
             return {
                 error: {
                     status: "CUSTOM_ERROR",
-                    data: { message, httpStatus: status },
+                    data: { message, httpStatus: httpStatus },
                     error: message,
                 },
             };
         }
 
-        if (res && hasAuthCookie() && isUnauthorizedError(res.message, res.http_status_code)) {
-            handleUnauthorizedSession(res.message, res.http_status_code);
-            return {
-                error: {
-                    status: 'CUSTOM_ERROR',
-                    data: { message: res.message, httpStatus: res.http_status_code },
-                    error: res.message,
-                },
-            };
-        }
+        const res = result.data as IAPIResponse;
 
         if (res && isPendingApprovalError(res.message, res.http_status_code)) {
             return {
-                error: {
-                    status: 'CUSTOM_ERROR',
-                    data: { message: res.message, httpStatus: res.http_status_code },
-                    error: res.message,
-                },
+                error: unauthorizedQueryError(res.message, res.http_status_code),
             };
         }
 

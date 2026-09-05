@@ -15,7 +15,7 @@ import GlobalSearchBar from './GlobalSearchBar';
 import HeaderOffcanvasMenu from './HeaderOffcanvasMenu';
 import HeaderToolbar from './HeaderToolbar';
 import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorLoginRoutePath, getMentorSignupRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
-import { clearAuthCookies } from '@/utils/authCookies';
+import { signOut } from '@/utils/refreshSession';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { isMentorRole, isStaffAdminRole } from '@/constants/common';
 
@@ -148,10 +148,9 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
   }, [pathName]);
 
   const handleSignOut = () => {
-    clearAuthCookies();
     setIsUserMenuOpen(false);
     toast.success('Signed out successfully');
-    window.location.href = getHomeRoutePath();
+    void signOut({ redirectTo: getHomeRoutePath() });
   };
 
   if (pathName === getAdminRoutePath()) {

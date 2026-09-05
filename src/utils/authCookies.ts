@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 
-const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const, expires: 1 } // 7 days
+/** Access-token cookie lifetime matches the refresh session (1 day). JWT expiry is 15 min; the interceptor refreshes it. */
+const COOKIE_OPTIONS = { path: '/', sameSite: 'lax' as const, expires: 1 }
 const SESSION_COOKIE_OPTIONS = { ...COOKIE_OPTIONS }
 
 /** Cookie name for auth token (used by server/layout for reading auth state) */
@@ -51,6 +52,15 @@ function invalidateAuthDependentQueries(): void {
     })
 }
 
+/** Replace only the access token after a successful refresh. Does not fire auth-changed. */
+export function setAccessToken(token: string | null): void {
+    if (token) {
+        Cookies.set(AUTH_COOKIE_NAME, token, SESSION_COOKIE_OPTIONS)
+        return
+    }
+    Cookies.remove(AUTH_COOKIE_NAME, { path: '/' })
+}
+
 export function setAuthCookies(data: AuthResponseData): void {
     const token = data.token ?? data.access_token;
     const userId = data.user?.id;
@@ -58,7 +68,7 @@ export function setAuthCookies(data: AuthResponseData): void {
     const role = data.role;
 
     if (token) {
-        Cookies.set('auth_token', token, SESSION_COOKIE_OPTIONS)
+        Cookies.set(AUTH_COOKIE_NAME, token, SESSION_COOKIE_OPTIONS)
     }
     if (userId) {
         Cookies.set('userID', userId, SESSION_COOKIE_OPTIONS)
@@ -75,7 +85,7 @@ export function setAuthCookies(data: AuthResponseData): void {
 }
 
 export function getAuthToken(): string | undefined {
-    return Cookies.get('auth_token')
+    return Cookies.get(AUTH_COOKIE_NAME)
 }
 
 export function getUserRole(): string | undefined {
@@ -95,13 +105,15 @@ export function hasAuthCookie(): boolean {
 }
 
 /** Clear auth cookies on logout */
-export function clearAuthCookies(): void {
-    Cookies.remove('auth_token', { path: '/' })
+export function clearAuthCookies(options?: { refetchQueries?: boolean }): void {
+    Cookies.remove(AUTH_COOKIE_NAME, { path: '/' })
     Cookies.remove('userID', { path: '/' })
     Cookies.remove('user_role', { path: '/' })
     Cookies.remove('user_email', { path: '/' })
     dispatchAuthChanged()
-    invalidateAuthDependentQueries()
+    if (options?.refetchQueries !== false) {
+        invalidateAuthDependentQueries()
+    }
 }
 
 /** Clear all cookies for the current domain and reload the page (e.g. after logout). */
@@ -119,14 +131,4 @@ export function isUnauthorizedError(message: string, status?: number): boolean {
     if (status === 401) return true
     const lower = (message || '').toLowerCase()
     return lower.includes('unauthorized') || lower.includes('invalid token') || lower.includes('token expired')
-}
-
-/**
- * Clear auth cookies and redirect to home. Safe to call from API error handlers.
- * No-op when run on server (no window).
- */
-export function logoutAndRedirectToHome(): void {
-    if (typeof window === 'undefined') return
-    clearAuthCookies()
-    window.location.href = '/'
 }

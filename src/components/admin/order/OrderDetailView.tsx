@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Cookies from 'js-cookie';
 import moment from 'moment';
 import { ArrowLeft, Download, ShoppingBag, TicketPercent, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -18,6 +17,7 @@ import {
 import { useGetOrderByIdQuery } from '@/store/rtkQueries/adminGetApi';
 import { getOrdersListRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { API_BASE_URL } from '@/utils/config';
+import { authFetch } from '@/utils/refreshSession';
 
 function isPercentCouponType(couponType?: string | null) {
   const normalized = (couponType ?? '').toLowerCase();
@@ -63,16 +63,8 @@ function DownloadInvoiceButton({ orderId, invoiceNumber }: DownloadInvoiceButton
   async function handleDownload() {
     setIsDownloading(true);
     try {
-      const token = Cookies.get('auth_token') || '';
-      const deviceId = Cookies.get('device') || '';
-      const userId = Cookies.get('userID') || '';
-      const res = await fetch(`${API_BASE_URL}/admin/invoice/${orderId}`, {
+      const res = await authFetch(`${API_BASE_URL}/admin/invoice/${orderId}`, {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          device: deviceId,
-          userID: userId,
-        },
       });
       if (!res.ok) throw new Error('Failed to download invoice');
       const blob = await res.blob();

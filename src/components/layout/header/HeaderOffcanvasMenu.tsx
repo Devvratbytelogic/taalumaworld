@@ -52,7 +52,7 @@ import {
   getUserDashboardRoutePath,
   getUserDashboardSettingsRoutePath,
 } from '@/routes/routes';
-import { clearAuthCookies } from '@/utils/authCookies';
+import { signOut } from '@/utils/refreshSession';
 import { useAuth } from '@/hooks/useAuth';
 import { isStaffAdminRole, USER_TYPE, type UserTypeValue } from '@/constants/common';
 
@@ -126,11 +126,10 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
     };
   }, [open]);
 
-  const signOut = () => {
-    clearAuthCookies();
+  const signOutUser = () => {
     onClose();
     toast.success('Signed out successfully');
-    window.location.href = getHomeRoutePath();
+    void signOut({ redirectTo: getHomeRoutePath() });
   };
 
   if (!mounted) return null;
@@ -261,7 +260,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
                   ) : null}
                 </div>
               </Link>
-              <Button className="global_btn rounded_full outline_primary w-full" onPress={signOut}>
+              <Button className="global_btn rounded_full outline_primary w-full" onPress={signOutUser}>
                 <LogOut className="h-4 w-4" />
                 Sign Out
               </Button>

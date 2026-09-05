@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { API_BASE_URL } from '@/utils/config';
 import { getAuthToken } from '@/utils/authCookies';
+import { refreshAccessToken } from '@/utils/refreshSession';
 import { store } from '@/store/store';
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import toast from '@/utils/toast';
@@ -70,6 +71,8 @@ export function useBlueprintScoringEvents(enabled = true) {
     let lineBuffer = '';
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     let startTimer: ReturnType<typeof setTimeout> | null = null;
+    let refreshedOnce = false;
+    let handlingAuthError = false;
 
     const processNewText = (fullText: string) => {
       const chunk = fullText.slice(seen);
@@ -85,11 +88,17 @@ export function useBlueprintScoringEvents(enabled = true) {
     const connect = () => {
       if (closed) return;
 
+      const currentToken = getAuthToken();
+      if (!currentToken) {
+        console.warn('[blueprint-sse] no auth token, skip connect');
+        return;
+      }
+
       seen = 0;
       lineBuffer = '';
       xhr = new XMLHttpRequest();
       xhr.open('GET', `${API_BASE_URL}/admin/blueprints/emit`);
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.setRequestHeader('Authorization', `Bearer ${currentToken}`);
       xhr.setRequestHeader('Accept', 'text/event-stream');
       xhr.setRequestHeader('Cache-Control', 'no-cache');
       xhr.withCredentials = true;
@@ -98,6 +107,19 @@ export function useBlueprintScoringEvents(enabled = true) {
         if (!xhr || closed) return;
         if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
           console.log('[blueprint-sse] connected', xhr.status);
+          if (xhr.status === 401) {
+            handlingAuthError = true;
+            xhr.abort();
+            if (refreshedOnce) return;
+            refreshedOnce = true;
+            void refreshAccessToken('/admin/blueprints/emit').then((newToken) => {
+              handlingAuthError = false;
+              if (!newToken) return;
+              if (!closed) scheduleReconnect();
+            }).catch(() => {
+              handlingAuthError = false;
+            });
+          }
         }
       };
 
@@ -129,7 +151,7 @@ export function useBlueprintScoringEvents(enabled = true) {
     };
 
     const scheduleReconnect = () => {
-      if (closed || reconnectTimer) return;
+      if (closed || reconnectTimer || handlingAuthError) return;
       reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
         connect();

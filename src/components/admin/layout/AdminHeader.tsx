@@ -18,7 +18,8 @@ import { cn } from '@/components/ui/utils';
 import { AdminHeaderSearch, AdminHeaderSearchProvider } from '@/components/admin/layout/AdminHeaderSearch';
 import { AdminNotificationBell } from '@/components/admin/layout/AdminNotificationBell';
 import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorProfileRoutePath } from '@/routes/routes';
-import { clearAuthCookies, getUserRole } from '@/utils/authCookies';
+import { getUserRole } from '@/utils/authCookies';
+import { signOut } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi';
 import { refreshAfterSettingsChange } from '@/store/server-api/refreshCache';
@@ -154,9 +155,8 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
     };
 
     const handleLogout = () => {
-        clearAuthCookies();
         toast.success('Signed out successfully');
-        window.location.href = getHomeRoutePath();
+        void signOut({ redirectTo: getHomeRoutePath() });
     };
 
     const goToProfile = () => router.push(isAuthor ? getMentorProfileRoutePath() : getAdminProfileRoutePath());

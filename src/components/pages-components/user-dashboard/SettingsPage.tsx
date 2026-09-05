@@ -10,7 +10,7 @@ import toast from '@/utils/toast';
 import { useUserChangePasswordMutation } from '@/store/rtkQueries/userAuthApi';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import moment from 'moment';
-import { clearAuthCookies } from '@/utils/authCookies';
+import { signOut } from '@/utils/refreshSession';
 import { getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
@@ -84,8 +84,7 @@ export function SettingsPage() {
   const handleLogout = () => {
     toast.success('Logged out successfully');
     setShowLogoutModal(false);
-    clearAuthCookies();
-    window.location.href = getHomeRoutePath();
+    void signOut({ redirectTo: getHomeRoutePath() });
   };
 
   const handleCancel = () => {

@@ -34,6 +34,7 @@ export interface IAdminDashboardStats {
   total_blueprints: number;
   total_series: number;
   flagged_content: number;
+  platform_total_earning?: number;
   pending_total?: number;
   min_publish_score?: number;
   reviewBlueprint?: number;
@@ -375,4 +376,126 @@ export interface IMentorReferralsAPIResponseDataOrder {
   _id: string;
   order_number: number;
   total_amount: number;
+}
+
+/** ── GET /admin/dashboard/charts/earnings ──────────────────────────────────── */
+
+export interface IDashboardEarningsChartAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IDashboardEarningsChartData;
+  message: string;
+  timestamp: string;
+}
+export interface IDashboardEarningsChartData {
+  fromDate: string;
+  toDate: string;
+  interval: string;
+  summary: IDashboardEarningsChartSummary;
+  series?: IDashboardEarningsChartPoint[] | null;
+}
+export interface IDashboardEarningsChartSummary {
+  platform_earning: number;
+  mentor_share: number;
+  gross: number;
+  sales: number;
+}
+export interface IDashboardEarningsChartPoint {
+  date: string;
+  label: string;
+  platform_earning: number;
+  mentor_share: number;
+  gross: number;
+  sales: number;
+}
+
+/** ── GET /admin/dashboard/charts/sales-volume ──────────────────────────────── */
+
+export interface IDashboardSalesVolumeChartAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IDashboardSalesVolumeChartData;
+  message: string;
+  timestamp: string;
+}
+export interface IDashboardSalesVolumeChartData {
+  fromDate: string;
+  toDate: string;
+  interval: string;
+  summary: IDashboardSalesVolumeChartSummary;
+  series?: IDashboardSalesVolumeChartPoint[] | null;
+}
+export interface IDashboardSalesVolumeChartSummary {
+  book: number;
+  chapter: number;
+  other: number;
+  total: number;
+}
+export interface IDashboardSalesVolumeChartPoint {
+  date: string;
+  label: string;
+  book: number;
+  chapter: number;
+  other: number;
+  total: number;
+}
+
+/** ── GET /admin/dashboard/charts/registrations ─────────────────────────────── */
+
+export interface IDashboardRegistrationsChartAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IDashboardRegistrationsChartData;
+  message: string;
+  timestamp: string;
+}
+export interface IDashboardRegistrationsChartData {
+  fromDate: string;
+  toDate: string;
+  interval: string;
+  summary: IDashboardRegistrationsChartSummary;
+  series?: IDashboardRegistrationsChartPoint[] | null;
+}
+export interface IDashboardRegistrationsChartSummary {
+  customers: number;
+  mentors: number;
+  total: number;
+}
+export interface IDashboardRegistrationsChartPoint {
+  date: string;
+  label: string;
+  customers: number;
+  mentors: number;
+  total: number;
+}
+
+/** ── GET /admin/dashboard/charts/revenue-split ─────────────────────────────── */
+
+export interface IDashboardRevenueSplitChartAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IDashboardRevenueSplitChartData;
+  message: string;
+  timestamp: string;
+}
+export interface IDashboardRevenueSplitChartData {
+  fromDate: string;
+  toDate: string;
+  summary: IDashboardRevenueSplitChartSummary;
+  series?: IDashboardRevenueSplitChartPoint[] | null;
+}
+export interface IDashboardRevenueSplitChartSummary {
+  platform_earning: number;
+  mentor_share: number;
+  gross: number;
+  total: number;
+}
+export interface IDashboardRevenueSplitChartPoint {
+  key: string;
+  label: string;
+  value: number;
 }

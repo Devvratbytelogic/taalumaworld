@@ -26,9 +26,19 @@ import {
   useGetBlueprintRevenueQuery,
   useGetMentorPerformanceQuery,
   useGetSalesVolumeQuery,
+  type IDashboardDateRangeParams,
 } from '@/store/rtkQueries/dashboard';
-import { getAdminMentorPerformanceRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
+import { getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
+import { DashboardCharts } from './DashboardCharts';
 import { formatKes } from '@/constants/common';
+
+const CURRENT_YEAR = new Date().getFullYear();
+
+function getOverviewParams(year: string, fromDate: string, toDate: string): IDashboardDateRangeParams {
+  if (fromDate && toDate) return { fromDate, toDate };
+  if (year) return { year: Number(year) };
+  return {};
+}
 
 function TableSkeleton({ columns }: { columns: number }) {
   return (
@@ -53,16 +63,18 @@ export default function AdminDashboardTab() {
 
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [year, setYear] = useState(String(CURRENT_YEAR));
   const dateRangeParams = {
     ...(fromDate ? { fromDate } : {}),
     ...(toDate ? { toDate } : {}),
   };
+  const overviewParams = getOverviewParams(year, fromDate, toDate);
   const clearDateFilter = () => {
     setFromDate('');
     setToDate('');
   };
 
-  const { data: dashboardData, isLoading: dashboardLoading } = useGetAdminDashboardQuery(dateRangeParams);
+  const { data: dashboardData, isLoading: dashboardLoading } = useGetAdminDashboardQuery(overviewParams);
   const statsData = dashboardData?.data;
 
   /** Admin & Mentor shared metrics */
@@ -92,6 +104,13 @@ export default function AdminDashboardTab() {
   });
 
   const stats: StatCard[] = [
+    {
+      title: 'Platform earning',
+      value: formatKes(statsData?.platform_total_earning ?? 0),
+      icon: Wallet,
+      color: 'green',
+      href: getAdminMentorRevenueRoutePath(),
+    },
     {
       title: 'Total customers',
       value: (statsData?.total_users ?? 0).toLocaleString(),
@@ -174,6 +193,12 @@ export default function AdminDashboardTab() {
       <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
 
       <DashboardMentorActions stats={statsData} isLoading={dashboardLoading} />
+
+      <DashboardCharts
+        year={year}
+        onYearChange={setYear}
+        filterParams={overviewParams}
+      />
 
       <AdminPanel>
         <AdminSectionHeader

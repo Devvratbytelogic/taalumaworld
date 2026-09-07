@@ -2,6 +2,10 @@ import {
     IAdminDashboardAPIResponse,
     IBlueprintPerformanceAPIResponse,
     IBlueprintRevenueAPIResponse,
+    IDashboardEarningsChartAPIResponse,
+    IDashboardRegistrationsChartAPIResponse,
+    IDashboardRevenueSplitChartAPIResponse,
+    IDashboardSalesVolumeChartAPIResponse,
     IMentorEconomyRevenueAPIResponse,
     IMentorPerformanceAPIResponse,
     IMentorReferralsAPIResponse,
@@ -16,6 +20,7 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 export interface IDashboardDateRangeParams {
     fromDate?: string;
     toDate?: string;
+    year?: number;
 }
 
 export interface IGetReferralWalletLedgerParams {
@@ -56,6 +61,42 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
         getAdminDashboard: builder.query<IAdminDashboardAPIResponse, IDashboardDateRangeParams | void>({
             query: (params) => ({
                 url: `/admin/dashboard`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
+        /** Line chart — platform earning / mentor share / gross / sales */
+        getAdminDashboardEarningsChart: builder.query<IDashboardEarningsChartAPIResponse, IDashboardDateRangeParams | void>({
+            query: (params) => ({
+                url: `/admin/dashboard/charts/earnings`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
+        /** Bar chart — book vs chapter sales volume */
+        getAdminDashboardSalesVolumeChart: builder.query<IDashboardSalesVolumeChartAPIResponse, IDashboardDateRangeParams | void>({
+            query: (params) => ({
+                url: `/admin/dashboard/charts/sales-volume`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
+        /** Line chart — customer vs mentor registrations */
+        getAdminDashboardRegistrationsChart: builder.query<IDashboardRegistrationsChartAPIResponse, IDashboardDateRangeParams | void>({
+            query: (params) => ({
+                url: `/admin/dashboard/charts/registrations`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+        }),
+
+        /** Pie/donut — platform vs mentor share */
+        getAdminDashboardRevenueSplitChart: builder.query<IDashboardRevenueSplitChartAPIResponse, IDashboardDateRangeParams | void>({
+            query: (params) => ({
+                url: `/admin/dashboard/charts/revenue-split`,
                 method: 'GET',
                 params: params ? { ...params } : {},
             }),
@@ -147,6 +188,10 @@ export const dashboardApi = rtkQuerieSetup.injectEndpoints({
 
 export const {
     useGetAdminDashboardQuery,
+    useGetAdminDashboardEarningsChartQuery,
+    useGetAdminDashboardSalesVolumeChartQuery,
+    useGetAdminDashboardRegistrationsChartQuery,
+    useGetAdminDashboardRevenueSplitChartQuery,
     useGetBlueprintPerformanceQuery,
     useGetSalesVolumeQuery,
     useGetBlueprintRevenueQuery,

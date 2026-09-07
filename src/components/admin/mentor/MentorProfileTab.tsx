@@ -236,6 +236,9 @@ function SectionIcon({ icon: Icon, tone = 'primary' }: { icon: React.ComponentTy
 
 /** ── Section 1: Name, bio, photo, and social links — POST /admin/update-profile ── */
 function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseData }) {
+  const { isFetching } = useGetAdminProfileQuery();
+  const tier = profile?.mentor_economy?.tier;
+  const isTierPending = isFetching && !tier;
   const [isEditing, setIsEditing] = useState(false);
   const [tempPhoto, setTempPhoto] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -432,7 +435,19 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
             </div>
             <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Mentor tier</p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">{profile?.mentor_economy?.tier?.code ?? '—'}</p>
+              {isTierPending ? (
+                <>
+                  <div className="mt-1 h-5 w-24 animate-pulse rounded bg-slate-100" />
+                  <div className="mt-1.5 h-3 w-32 animate-pulse rounded bg-slate-100" />
+                </>
+              ) : (
+                <>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">{tier?.code ?? '—'}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
+                  </p>
+                </>
+              )}
               {isTierUpgradePending ? (
                 <p className="mt-1.5 flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-amber-700">
                   <Clock className="h-3.5 w-3.5 shrink-0" />

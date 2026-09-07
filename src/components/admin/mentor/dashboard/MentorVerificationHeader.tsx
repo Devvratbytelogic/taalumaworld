@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { Clock, ShieldCheck, ShieldX, Wallet } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -9,6 +10,31 @@ import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorAp
 import { openModal } from '@/store/slices/allModalSlice';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useGetMyVerifiedMentorApplicationQuery } from '@/store/rtkQueries/verifiedMentorApplicationApis';
+import type { Tier } from '@/types/adminProfile';
+
+function AccountStatusSkeleton() {
+  return <div className="mt-1 h-7 w-24 animate-pulse rounded bg-slate-100" />;
+}
+
+function MentorTierStatus({ isPending, tier }: { isPending: boolean; tier?: Tier }) {
+  if (isPending) {
+    return (
+      <>
+        <AccountStatusSkeleton />
+        <div className="mt-1 h-3 w-32 animate-pulse rounded bg-slate-100" />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="mt-1 text-lg font-semibold text-slate-900">{tier?.code ?? '—'}</p>
+      <p className="mt-0.5 text-xs text-slate-500">
+        {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
+      </p>
+    </>
+  );
+}
 
 type MentorVerificationHeaderProps = {
   eyebrow?: string;
@@ -24,9 +50,12 @@ export function MentorVerificationHeader({
   showAccountStatus = true,
 }: MentorVerificationHeaderProps) {
   const dispatch = useDispatch();
-  const { data: profileData } = useGetAdminProfileQuery();
+  const { data: profileData, isLoading, isFetching, refetch } = useGetAdminProfileQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const profile = profileData?.data;
   const mentorName = profile?.name ?? 'Mentor';
+  const retriedMissingTier = useRef(false);
   const { data: verifiedMentorApplicationData } = useGetMyVerifiedMentorApplicationQuery();
   const verifiedMentorApplication = verifiedMentorApplicationData?.data ?? null;
   const verificationStatus = verifiedMentorApplication?.status;
@@ -71,6 +100,17 @@ export function MentorVerificationHeader({
   const profileCompletion = profile?.profile_completion_percentage ?? 0;
   const tier = profile?.mentor_economy?.tier;
   const wallet = profile?.mentor_economy?.wallet;
+  const isTierPending = (isLoading || isFetching) && !tier;
+
+  useEffect(() => {
+    retriedMissingTier.current = false;
+  }, [profile?._id]);
+
+  useEffect(() => {
+    if (isLoading || isFetching || !profile?._id || tier || retriedMissingTier.current) return;
+    retriedMissingTier.current = true;
+    void refetch();
+  }, [isLoading, isFetching, profile?._id, tier, refetch]);
 
   return (
     <>
@@ -160,10 +200,7 @@ export function MentorVerificationHeader({
             </div>
             <div>
               <p className="text-sm text-slate-500">Mentor tier</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">{tier?.code ?? '—'}</p>
-              <p className="mt-0.5 text-xs text-slate-500">
-                {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
-              </p>
+              <MentorTierStatus isPending={isTierPending} tier={tier} />
             </div>
             <div>
               <p className="text-sm text-slate-500">Wallet balance</p>

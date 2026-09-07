@@ -20,12 +20,38 @@ export interface IAdminReviewsAPIResponseDataEntity {
   rating: number;
   comment: string;
   status: string;
+  reason?: string | null;
   createdAt: string;
   updatedAt: string;
   updatedBy?: CreatedByOrUpdatedByOrCustomer | null;
   customer: Customer;
   createdBy: CreatedByOrUpdatedByOrCustomer1;
   item: Item;
+}
+
+export interface IAdminReviewRejectAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: {
+    id: string;
+    status: string;
+    reason: string;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface IAdminReviewReportMutationAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: {
+    id: string;
+    status: string;
+  };
+  message: string;
+  timestamp: string;
 }
 export interface CreatedByOrUpdatedByOrCustomer {
   id: string;

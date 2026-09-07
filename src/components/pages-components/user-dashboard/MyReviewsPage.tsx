@@ -256,7 +256,7 @@ export function MyReviewsPage() {
                 <p className="mb-6 text-sm text-gray-500">
                   {hasActiveFilters
                     ? 'Try adjusting the status or date range.'
-                    : 'After you review a blueprint or series, it will show up here.'}
+                    : 'After you review a blueprint, it will show up here.'}
                 </p>
                 {hasActiveFilters ? (
                   <Button

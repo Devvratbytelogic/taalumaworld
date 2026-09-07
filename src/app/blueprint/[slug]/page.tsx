@@ -68,7 +68,6 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
                 <BlueprintReviews
                     itemId={data?.id}
                     itemTitle={data?.title}
-                    type="Chapter"
                     isPurchased={Boolean(data?.isPurchased)}
                     isReviewed={Boolean(data?.isReviewed)}
                 />

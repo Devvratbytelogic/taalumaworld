@@ -48,11 +48,11 @@ export function AdminReviewsSearch({
   type,
   onTypeChange,
 }: AdminReviewsSearchProps) {
-  const hasActiveFilters = !!status || !!type;
+  const hasActiveFilters = !!status || type !== 'Chapter';
 
   const clearFilters = () => {
     onStatusChange('');
-    onTypeChange('');
+    onTypeChange('Chapter');
   };
 
   return (
@@ -122,10 +122,17 @@ export function AdminReviewsSearch({
               </button>
             </span>
           ) : null}
-          {type ? (
+          {type && type !== 'Chapter' ? (
             <span className={adminFilterPillClass}>
-              {formatTypeLabel(type)}
-              <button type="button" onClick={() => onTypeChange('')} className="hover:text-primary/70">
+              {formatTypeLabel(type) || 'All types'}
+              <button type="button" onClick={() => onTypeChange('Chapter')} className="hover:text-primary/70">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ) : type === '' ? (
+            <span className={adminFilterPillClass}>
+              All types
+              <button type="button" onClick={() => onTypeChange('Chapter')} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
             </span>

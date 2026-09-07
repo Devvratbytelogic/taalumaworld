@@ -17,6 +17,7 @@ export type AdminSection =
   | 'transactions'
   | 'orders'
   | 'reviews'
+  | 'review_reports'
   | 'moderation'
   | 'analytics'
   | 'reports'

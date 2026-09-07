@@ -118,7 +118,7 @@ export interface IGetFollowedMentorsParams {
 }
 
 export interface IGetContentReviewsParams {
-    type?: 'Book' | 'Chapter';
+    type?: 'Chapter';
     id: string;
     page?: number;
     limit?: number;

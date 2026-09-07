@@ -148,7 +148,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['Address'],
         }),
-        /** create a review for a chapter/book (POST /user/reviews) */
+        /** create a review for a blueprint (POST /user/reviews) */
         createReview: builder.mutation({
             query: (body) => ({
                 url: `/user/reviews`,
@@ -156,6 +156,15 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 body,
             }),
             invalidatesTags: ['Reviews', 'SingleChapter', 'MyChapters'],
+        }),
+        /** report another user's blueprint review (POST /user/reviews/:reviewId/report) */
+        reportReview: builder.mutation({
+            query: ({ reviewId, reason }: { reviewId: string; reason: string }) => ({
+                url: `/user/reviews/${reviewId}/report`,
+                method: 'POST',
+                body: { reason },
+            }),
+            invalidatesTags: ['Reviews'],
         }),
         /** pay from referral wallet (POST /user/referral-wallet/pay) */
         referralWalletPay: builder.mutation({
@@ -198,6 +207,7 @@ export const {
     useSetDefaultUserAddressMutation,
     useDeleteUserAddressMutation,
     useCreateReviewMutation,
+    useReportReviewMutation,
     useReferralWalletPayMutation,
     usePaystackPaymentMutation,
 } = clientSidePostApis;

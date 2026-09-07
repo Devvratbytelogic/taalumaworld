@@ -37,8 +37,20 @@ export function hrefFromApiLink(link?: string | null): string | null {
     }
 }
 
+/** Mentor panel lives under `/admin/mentor`; rewrite staff report links for that shell. */
+export function resolveAdminNotificationHref(href: string | null, isMentorPanel: boolean): string | null {
+    if (!href) return null;
+    if (isMentorPanel && (href === '/admin/review-reports' || href.startsWith('/admin/review-reports/'))) {
+        return href.replace('/admin/review-reports', '/admin/mentor/review-reports');
+    }
+    return href;
+}
+
 export function getNotificationTypeStyle(type: string): { icon: LucideIcon; className: string } {
     const value = type.toLowerCase();
+    if (value.includes('reported') || (value.includes('review') && value.includes('report'))) {
+        return { icon: Flag, className: 'bg-orange-50 text-orange-600' };
+    }
     if (value.includes('flag')) {
         return { icon: Flag, className: 'bg-orange-50 text-orange-600' };
     }

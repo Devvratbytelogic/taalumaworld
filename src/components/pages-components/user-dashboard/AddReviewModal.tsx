@@ -17,7 +17,7 @@ export function AddReviewModal() {
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const itemId = data?.itemId ?? '';
   const itemTitle = data?.itemTitle ?? '';
-  const type = data?.type ?? 'Chapter';
+  const type = 'chapter';
 
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);

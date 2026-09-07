@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Save, Star, X } from 'lucide-react';
+import { Ban, Save, Star, X } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Button from '@/components/ui/Button';
 import { adminSelectClass } from '@/components/admin/layout/AdminContent';
-import { closeModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { useUpdateAdminReviewStatusMutation } from '@/store/rtkQueries/adminReviewsApi';
 import toast from '@/utils/toast';
@@ -50,14 +50,19 @@ function toStatusUpdate(status?: string): ReviewStatusUpdate {
 export function ReviewStatusModal() {
   const dispatch = useDispatch();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
-  const { hasPermission } = useAdminPermissions();
-  const canEdit = hasPermission(REVIEWS_MODEL, 'edit');
+  const { hasPermission, isMentor } = useAdminPermissions();
+  const canEdit = hasPermission(REVIEWS_MODEL, 'edit') && !isMentor;
 
   const [status, setStatus] = useState<ReviewStatusUpdate>('Approved');
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState('');
   const [updateAdminReviewStatus, { isLoading: isUpdating }] = useUpdateAdminReviewStatusMutation();
 
+  const currentStatus = String(data?.status || '').toLowerCase();
+  const isPendingLegacy = currentStatus === 'pending';
+  const isRejected = currentStatus === 'rejected';
+  const canRejectDirectly = canEdit && !isRejected;
+  const canUpdateLegacyStatus = canEdit && isPendingLegacy;
   const isRejectWithoutReason = status === 'Rejected' && !reason.trim();
 
   useEffect(() => {
@@ -77,8 +82,8 @@ export function ReviewStatusModal() {
     if (!data?.id) return;
 
     if (status === 'Rejected' && !reason.trim()) {
-      setReasonError('Rejection reason is required.');
-      toast.error('Please provide a rejection reason.');
+      setReasonError('reason is required');
+      toast.error('reason is required');
       return;
     }
 
@@ -100,13 +105,24 @@ export function ReviewStatusModal() {
     }
   };
 
+  const handleOpenReject = () => {
+    dispatch(
+      openModal({
+        componentName: 'ReviewRejectModal',
+        data,
+      }),
+    );
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="xl" scrollBehavior="inside">
       <ModalContent className="admin_panel">
         <ModalHeader className="flex flex-col gap-1">
           <p className="text-xl font-bold">Review details</p>
           <p className="text-sm font-normal text-muted-foreground">
-            View the review and update its moderation status.
+            {canUpdateLegacyStatus
+              ? 'View the review and update its moderation status.'
+              : 'View the review details.'}
           </p>
         </ModalHeader>
 
@@ -182,7 +198,16 @@ export function ReviewStatusModal() {
                 </p>
               </div>
 
-              {canEdit ? (
+              {data?.reason ? (
+                <div className="space-y-1.5">
+                  <p className="text-slate-500">Rejection reason</p>
+                  <p className="rounded-md border border-slate-100 bg-white p-3 text-slate-700 whitespace-pre-wrap">
+                    {data.reason}
+                  </p>
+                </div>
+              ) : null}
+
+              {canUpdateLegacyStatus ? (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="review-status">Status</Label>
@@ -227,13 +252,6 @@ export function ReviewStatusModal() {
                     </div>
                   ) : null}
                 </>
-              ) : data?.reason ? (
-                <div className="space-y-1.5">
-                  <p className="text-slate-500">Rejection reason</p>
-                  <p className="rounded-md border border-slate-100 bg-white p-3 text-slate-700 whitespace-pre-wrap">
-                    {data.reason}
-                  </p>
-                </div>
               ) : null}
             </ModalBody>
 
@@ -244,9 +262,9 @@ export function ReviewStatusModal() {
                 onPress={onClose}
                 isDisabled={isUpdating}
               >
-                <X className="h-4 w-4" /> {canEdit ? 'Cancel' : 'Close'}
+                <X className="h-4 w-4" /> {canUpdateLegacyStatus || canRejectDirectly ? 'Cancel' : 'Close'}
               </Button>
-              {canEdit ? (
+              {canUpdateLegacyStatus ? (
                 <Button
                   type="button"
                   className="global_btn bg_primary rounded_full"
@@ -255,6 +273,14 @@ export function ReviewStatusModal() {
                   isDisabled={isUpdating || isRejectWithoutReason}
                 >
                   <Save className="h-4 w-4" /> Update status
+                </Button>
+              ) : canRejectDirectly ? (
+                <Button
+                  type="button"
+                  className="global_btn bg_primary rounded_full"
+                  onPress={handleOpenReject}
+                >
+                  <Ban className="h-4 w-4" /> Reject
                 </Button>
               ) : null}
             </ModalFooter>

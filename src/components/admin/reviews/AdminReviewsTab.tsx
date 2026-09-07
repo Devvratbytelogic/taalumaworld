@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Star } from 'lucide-react';
+import { Eye, Ban, Star } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -37,11 +36,12 @@ function formatTypeLabel(type?: string) {
 
 export function AdminReviewsTab() {
   const dispatch = useDispatch();
-  const { hasPermission } = useAdminPermissions();
+  const { hasPermission, isMentor } = useAdminPermissions();
   const canView = hasPermission(REVIEWS_MODEL, 'view');
+  const canReject = hasPermission(REVIEWS_MODEL, 'edit') && !isMentor;
   const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState('Chapter');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -229,18 +229,20 @@ export function AdminReviewsTab() {
     {
       field: 'actions',
       headerName: '',
-      width: 80,
+      width: canReject ? 110 : 80,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
       renderCell: (params) => {
         if (!canView) return null;
+        const statusKey = String(params.row.status || '').toLowerCase();
+        const showReject = canReject && statusKey !== 'rejected';
         return (
           <div className="action_buttons">
             <button
               type="button"
               className="active_button"
-              title="View / update status"
+              title="View review"
               onClick={() =>
                 dispatch(
                   openModal({
@@ -252,6 +254,23 @@ export function AdminReviewsTab() {
             >
               <Eye className="h-4 w-4" />
             </button>
+            {showReject ? (
+              <button
+                type="button"
+                className="delete_button"
+                title="Reject"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'ReviewRejectModal',
+                      data: params.row,
+                    })
+                  )
+                }
+              >
+                <Ban className="h-4 w-4" />
+              </button>
+            ) : null}
           </div>
         );
       },
@@ -262,7 +281,7 @@ export function AdminReviewsTab() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Reviews & ratings"
-        description="Monitor and moderate user reviews."
+        description="Monitor and moderate Blueprint reviews. Super Admin and staff can reject a review without a report."
       >
         <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
           Total reviews: {total}

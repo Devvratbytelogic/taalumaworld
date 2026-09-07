@@ -104,6 +104,10 @@ export function getMentorReviewsRoutePath(): string {
   return '/admin/mentor/reviews';
 }
 
+export function getMentorReviewReportsRoutePath(): string {
+  return '/admin/mentor/review-reports';
+}
+
 export function getMentorOrdersRoutePath(): string {
   return '/admin/mentor/orders';
 }
@@ -189,6 +193,7 @@ export function getAdminSectionRoutePath(section: string): string {
     transactions: '/admin/transactions',
     orders: '/admin/orders',
     reviews: '/admin/reviews',
+    review_reports: '/admin/review-reports',
     testimonials: '/admin/testimonials',
     faqs: '/admin/faqs',
     contact_us: '/admin/all-contact-us',
@@ -239,6 +244,16 @@ export function getAdminUserDetailRoutePath(userId: string): string {
 
 export function getViewOrderRoutePath(orderId: string, isMentor: boolean = false): string {
   return isMentor ? `/admin/mentor/orders/${orderId}` : `/admin/orders/${orderId}`;
+}
+
+export function getReviewReportsListRoutePath(isMentor: boolean = false): string {
+  return isMentor ? getMentorReviewReportsRoutePath() : getAdminSectionRoutePath('review_reports');
+}
+
+export function getReviewReportDetailRoutePath(reportId: string, isMentor: boolean = false): string {
+  return isMentor
+    ? `/admin/mentor/review-reports/${reportId}`
+    : `/admin/review-reports/${reportId}`;
 }
 
 export function getOrdersListRoutePath(isMentor: boolean = false): string {

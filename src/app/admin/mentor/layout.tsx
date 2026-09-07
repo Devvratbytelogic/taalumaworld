@@ -7,6 +7,7 @@ import {
   ArrowRight,
   BarChart3,
   Book,
+  Flag,
   FileText,
   LayoutDashboard,
   Link2,
@@ -40,6 +41,7 @@ import {
   getMentorRevenueByBlueprintRoutePath,
   getMentorRevenueEarnedRoutePath,
   getMentorReviewsRoutePath,
+  getMentorReviewReportsRoutePath,
   getMentorOrdersRoutePath,
   getMentorSalesVolumeRoutePath,
   getMentorWalletRoutePath,
@@ -60,6 +62,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
       { id: 'books', label: 'Series', href: getMentorBooksRoutePath(), icon: Book },
       { id: 'chapters', label: 'Blueprints', href: getMentorChaptersRoutePath(), icon: FileText },
       { id: 'reviews', label: 'Reviews', href: getMentorReviewsRoutePath(), icon: Star },
+      { id: 'review_reports', label: 'Review reports', href: getMentorReviewReportsRoutePath(), icon: Flag },
     ],
   },
   {

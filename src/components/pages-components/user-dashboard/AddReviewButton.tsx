@@ -8,14 +8,12 @@ import { openModal } from '@/store/slices/allModalSlice';
 interface AddReviewButtonProps {
   itemId: string;
   itemTitle?: string;
-  type?: 'Chapter' | 'Book';
   onSuccess?: () => void;
 }
 
 export function AddReviewButton({
   itemId,
   itemTitle,
-  type = 'Chapter',
   onSuccess,
 }: AddReviewButtonProps) {
   const dispatch = useDispatch();
@@ -28,7 +26,7 @@ export function AddReviewButton({
         dispatch(
           openModal({
             componentName: 'AddReviewModal',
-            data: { itemId, itemTitle, type, onSuccess },
+            data: { itemId, itemTitle, type: 'chapter', onSuccess },
           }),
         )
       }

@@ -23,7 +23,10 @@ import ChapterPurchaseModal from '../pages-components/chapter/ChapterPurchaseMod
 import ApplyVerifiedMentorModal from '../admin/mentor/dashboard/ApplyVerifiedMentorModal';
 import { AddEditAddressModal } from '../pages-components/user-dashboard/AddEditAddressModal';
 import { AddReviewModal } from '../pages-components/user-dashboard/AddReviewModal';
+import { ReportReviewModal } from '../pages-components/user-dashboard/ReportReviewModal';
 import { ReviewStatusModal } from '../admin/reviews/ReviewStatusModal';
+import { ReviewRejectModal } from '../admin/reviews/ReviewRejectModal';
+import { ReviewReportProcessModal } from '../admin/reviews/ReviewReportProcessModal';
 
 export default function AllModal() {
     const dispatch = useDispatch();
@@ -78,8 +81,14 @@ export default function AllModal() {
                 return <AddEditAddressModal />;
             case "AddReviewModal":
                 return <AddReviewModal />;
+            case "ReportReviewModal":
+                return <ReportReviewModal />;
             case "ReviewStatusModal":
                 return <ReviewStatusModal />;
+            case "ReviewRejectModal":
+                return <ReviewRejectModal />;
+            case "ReviewReportProcessModal":
+                return <ReviewReportProcessModal />;
             default:
                 return null;
         }

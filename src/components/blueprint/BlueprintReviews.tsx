@@ -2,17 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import moment from 'moment';
-import { ChevronLeft, ChevronRight, Loader2, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flag, Loader2, Star } from 'lucide-react';
+import { useDispatch } from 'react-redux';
 import Button from '@/components/ui/Button';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { AddReviewButton } from '@/components/pages-components/user-dashboard/AddReviewButton';
-import { useGetContentReviewsQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetContentReviewsQuery, useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
+import { openModal } from '@/store/slices/allModalSlice';
+import { useAuth } from '@/hooks/useAuth';
 import type { IUserReviewEntity } from '@/types/user/reviews';
 
 interface BlueprintReviewsProps {
   itemId?: string | null;
   itemTitle?: string | null;
-  type?: 'Chapter' | 'Book';
   isPurchased?: boolean;
   isReviewed?: boolean;
 }
@@ -32,7 +34,19 @@ function StarRow({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' }
   );
 }
 
-function ReviewCard({ review }: { review: IUserReviewEntity }) {
+function ReviewCard({
+  review,
+  canReport,
+  alreadyReported,
+  onReported,
+}: {
+  review: IUserReviewEntity;
+  canReport: boolean;
+  alreadyReported: boolean;
+  onReported: () => void;
+}) {
+  const dispatch = useDispatch();
+
   return (
     <article className="rounded-md border border-[#ECECEC] bg-white p-5 sm:p-6">
       <div className="flex items-start gap-3">
@@ -56,6 +70,28 @@ function ReviewCard({ review }: { review: IUserReviewEntity }) {
           <p className="text-sm leading-relaxed text-[#333333] whitespace-pre-wrap">
             {review.comment?.trim() || 'No comment provided.'}
           </p>
+
+          {canReport ? (
+            alreadyReported ? (
+              <p className="text-xs text-[#6B6B6B]">Reported</p>
+            ) : (
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6B6B6B] transition-colors hover:text-red-600"
+                onClick={() =>
+                  dispatch(
+                    openModal({
+                      componentName: 'ReportReviewModal',
+                      data: { reviewId: review.id, onSuccess: onReported },
+                    }),
+                  )
+                }
+              >
+                <Flag className="h-3.5 w-3.5" />
+                Report
+              </button>
+            )
+          ) : null}
         </div>
       </div>
     </article>
@@ -65,21 +101,24 @@ function ReviewCard({ review }: { review: IUserReviewEntity }) {
 export default function BlueprintReviews({
   itemId,
   itemTitle,
-  type = 'Chapter',
   isPurchased = false,
   isReviewed = false,
 }: BlueprintReviewsProps) {
   const [page, setPage] = useState(1);
   const [hasReviewed, setHasReviewed] = useState(isReviewed);
+  const [reportedIds, setReportedIds] = useState<string[]>([]);
   const limit = 3;
   const canAddReview = Boolean(itemId && isPurchased && !hasReviewed);
+  const { isAuthenticated } = useAuth();
+  const { data: profileRes } = useGetUserProfileQuery(undefined, { skip: !isAuthenticated });
+  const currentUserId = profileRes?.data?.id || profileRes?.data?._id || '';
 
   useEffect(() => {
     setHasReviewed(isReviewed);
   }, [isReviewed]);
 
   const { data, isLoading, isFetching, refetch } = useGetContentReviewsQuery(
-    { type, id: itemId!, page, limit },
+    { type: 'Chapter', id: itemId!, page, limit },
     { skip: !itemId },
   );
 
@@ -105,7 +144,6 @@ export default function BlueprintReviews({
           <AddReviewButton
             itemId={itemId}
             itemTitle={itemTitle ?? undefined}
-            type={type}
             onSuccess={() => {
               setHasReviewed(true);
               setPage(1);
@@ -158,9 +196,21 @@ export default function BlueprintReviews({
 
           {reviews.length > 0 ? (
             <div className={`space-y-4 ${isFetching ? 'opacity-60' : ''}`}>
-              {reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
-              ))}
+              {reviews.map((review) => {
+                const isOwnReview = Boolean(
+                  currentUserId &&
+                    (review.customer?.id === currentUserId || review.customer?.id === profileRes?.data?._id),
+                );
+                return (
+                  <ReviewCard
+                    key={review.id}
+                    review={review}
+                    canReport={isAuthenticated && !isOwnReview}
+                    alreadyReported={reportedIds.includes(review.id)}
+                    onReported={() => setReportedIds((prev) => (prev.includes(review.id) ? prev : [...prev, review.id]))}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-2xl border border-[#ECECEC] bg-white px-6 py-14 text-center">

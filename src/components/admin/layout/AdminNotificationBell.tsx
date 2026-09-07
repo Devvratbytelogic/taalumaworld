@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Bell, BellOff, CheckCheck, ChevronLeft, ChevronRight, Loader2, Trash2 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -11,11 +11,14 @@ import {
 import { cn } from '@/components/ui/utils';
 import { useAdminNotifications } from '@/hooks/useAdminNotifications';
 import toast from '@/utils/toast';
-import { formatNotificationTime, getNotificationTypeStyle } from '@/utils/adminNotifications';
+import { formatNotificationTime, getNotificationTypeStyle, resolveAdminNotificationHref } from '@/utils/adminNotifications';
+import { isMentorPanelPath } from '@/routes/routes';
 import type { AdminNotificationItem } from '@/types/notification';
 
 export function AdminNotificationBell() {
     const router = useRouter();
+    const pathname = usePathname();
+    const isMentorPanel = isMentorPanelPath(pathname);
     const [open, setOpen] = useState(false);
     const {
         items,
@@ -41,8 +44,9 @@ export function AdminNotificationBell() {
     const showPagination = totalPages > 1;
 
     const openHref = (href: string | null) => {
-        if (!href) return;
-        router.push(href);
+        const resolved = resolveAdminNotificationHref(href, isMentorPanel);
+        if (!resolved) return;
+        router.push(resolved);
     };
 
     const handleOpenChange = (nextOpen: boolean) => {

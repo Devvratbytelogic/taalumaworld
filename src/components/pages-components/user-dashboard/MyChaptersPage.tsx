@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   BookOpen,
@@ -34,6 +34,11 @@ export function MyChaptersPage() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
   const [selectedChapter, setSelectedChapter] = useState<ItemsEntity | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const { data: myChaptersData, isLoading, isFetching } = useGetMyChaptersQuery({
     page,
@@ -61,7 +66,7 @@ export function MyChaptersPage() {
     );
   }
 
-  if (isLoading) {
+  if (!hasMounted || isLoading) {
     return (
       <div className="space-y-6">
         <UserDashboardPageHeader

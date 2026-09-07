@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Book,
@@ -29,6 +29,11 @@ export function MyBooksPage() {
   const router = useRouter();
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const { data: mySeriesData, isLoading, isFetching } = useGetMySeriesQuery({
     page,
@@ -47,8 +52,13 @@ export function MyBooksPage() {
     setPage(1);
   };
 
-  if (isLoading) {
-    return <MyBooksPageSkeleton />;
+  if (!hasMounted || isLoading) {
+    return (
+      <div className="space-y-6">
+        <UserDashboardPageHeader title="My Series" description="Your personal collection of purchased series" />
+        <MyBooksPageSkeleton />
+      </div>
+    );
   }
 
   const statItems = [
@@ -126,7 +136,8 @@ export function MyBooksPage() {
           {series.length > 0 ? (
             <div className="flex flex-col gap-4">
               {series.map((item) => {
-                const { totalChapters, completedChapters } = item.progress;
+                const totalChapters = item.progress?.totalChapters ?? 0;
+                const completedChapters = item.progress?.completedChapters ?? 0;
                 const progress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
                 const isCompleted = item.readStatus === 'completed' || (totalChapters > 0 && completedChapters >= totalChapters);
 

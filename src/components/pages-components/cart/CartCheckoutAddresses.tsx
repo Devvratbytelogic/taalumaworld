@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Check, MapPin, Pencil, Phone, Plus, Star, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -25,44 +25,32 @@ interface CartCheckoutAddressesProps {
 }
 
 export default function CartCheckoutAddresses({
-  selectedAddressId: controlledSelectedId,
+  selectedAddressId,
   onSelectAddress,
 }: CartCheckoutAddressesProps) {
   const dispatch = useDispatch();
-  const { data: addressData, isLoading } = useGetUserAddressesQuery();
+  const { data, isLoading, isFetching } = useGetUserAddressesQuery();
   const [setDefaultAddress, { isLoading: isSettingDefault }] = useSetDefaultUserAddressMutation();
   const [deleteAddress] = useDeleteUserAddressMutation();
-  const addresses = addressData?.data ?? [];
 
-  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
-  const selectedAddressId = controlledSelectedId ?? internalSelectedId;
+  const addresses = Array.isArray(data?.data) ? data.data : [];
 
+  // Pick the default address (or the first one) once the list loads.
   useEffect(() => {
-    if (addresses.length === 0) return;
-
-    const defaultAddress = addresses.find((a) => a.isDefault) ?? addresses[0];
-    if (!defaultAddress) return;
-
-    if (selectedAddressId !== defaultAddress._id) {
-      if (controlledSelectedId == null) setInternalSelectedId(defaultAddress._id);
-      onSelectAddress?.(defaultAddress._id);
-    }
-  }, [addresses, controlledSelectedId, onSelectAddress, selectedAddressId]);
+    if (selectedAddressId || addresses.length === 0) return;
+    const defaultAddress = addresses.find((address) => address.isDefault) ?? addresses[0];
+    if (defaultAddress?._id) onSelectAddress?.(defaultAddress._id);
+  }, [addresses, onSelectAddress, selectedAddressId]);
 
   const handleSelect = async (address: IAddress) => {
-    if (isSettingDefault) return;
+    if (!address._id) return;
+    onSelectAddress?.(address._id);
 
-    if (address.isDefault) {
-      if (controlledSelectedId == null) setInternalSelectedId(address._id);
-      onSelectAddress?.(address._id);
-      return;
-    }
+    if (address.isDefault || isSettingDefault) return;
 
     try {
       const res = await setDefaultAddress(address._id).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-        if (controlledSelectedId == null) setInternalSelectedId(address._id);
-        onSelectAddress?.(address._id);
         toast.success(res.message ?? 'Default address updated!');
       }
     } catch (error) {
@@ -96,7 +84,7 @@ export default function CartCheckoutAddresses({
       })
     );
 
-  if (isLoading) {
+  if (isLoading || (isFetching && addresses.length === 0)) {
     return (
       <div className="space-y-3">
         <div className="flex justify-end">
@@ -125,7 +113,7 @@ export default function CartCheckoutAddresses({
       {addresses.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {addresses.map((address) => {
-            const isSelected = selectedAddressId === address._id || address.isDefault;
+            const isSelected = selectedAddressId === address._id;
             return (
               <div
                 key={address._id}
@@ -138,8 +126,7 @@ export default function CartCheckoutAddresses({
                 <button
                   type="button"
                   onClick={() => handleSelect(address)}
-                  disabled={isSettingDefault}
-                  className="w-full text-left disabled:opacity-60"
+                  className="w-full text-left"
                 >
                   <div className="mb-3 flex items-start justify-between gap-2">
                     <span

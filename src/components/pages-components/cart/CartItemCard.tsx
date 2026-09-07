@@ -112,11 +112,12 @@ export default function CartItemCard({ item, compact = false }: CartItemCardProp
 
             <div className="shrink-0 sm:text-right">
               <p className="text-lg font-bold text-primary">
-                KSH {(item.selling_price + taxAmount).toFixed(2)}
+                {/* KSH {(item.selling_price + taxAmount).toFixed(2)} */}
+                KSH {item.selling_price.toFixed(2)}
               </p>
-              <p className="text-xs text-muted-foreground">
+              {/* <p className="text-xs text-muted-foreground">
                 includes KSH {taxAmount.toFixed(2)} tax
-              </p>
+              </p> */}
             </div>
           </div>
 

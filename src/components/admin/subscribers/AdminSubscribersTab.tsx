@@ -16,6 +16,7 @@ import {
     adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
+import { validateEmail } from '@/utils/formValidation';
 
 const STATUS_OPTIONS = ['Active', 'Inactive'];
 
@@ -66,14 +67,27 @@ export function AdminSubscribersTab() {
             minWidth: 220,
             flex: 1,
             sortable: false,
-            renderCell: (params) => (
-                <a
-                    href={`mailto:${params.row.email}`}
-                    className="text-primary hover:underline truncate"
-                >
-                    {params.row.email}
-                </a>
-            ),
+            renderCell: (params) => {
+                const email = params.row.email ?? '';
+                if (!validateEmail(email)) {
+                    return (
+                        <span
+                            className="truncate text-red-600"
+                            title="This stored value is not a valid email address"
+                        >
+                            {email || '—'}
+                        </span>
+                    );
+                }
+                return (
+                    <a
+                        href={`mailto:${email}`}
+                        className="text-primary hover:underline truncate"
+                    >
+                        {email}
+                    </a>
+                );
+            },
         },
         {
             field: 'status',
@@ -82,7 +96,7 @@ export function AdminSubscribersTab() {
             sortable: false,
             renderCell: (params) => (
                 params.row.status ? (
-                    <Badge className="bg-green-100 text-green-700 border-green-200 gap-1">
+                    <Badge className="bg-green-100 text-green-700 border-green-200! gap-1">
                         <CheckCircle className="h-3 w-3" />
                         Active
                     </Badge>

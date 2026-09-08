@@ -14,6 +14,7 @@ type AgreementSentenceListProps = {
   onBlur?: () => void;
   disabled?: boolean;
   className?: string;
+  defaultChecked?: boolean;
 };
 
 export function AgreementSentenceList({
@@ -25,6 +26,7 @@ export function AgreementSentenceList({
   onBlur,
   disabled,
   className,
+  defaultChecked = false,
 }: AgreementSentenceListProps) {
   const { data: sentencesResponse, isSuccess } = useGetAgreementsByTouchpointQuery(touchpoint, {
     skip: !touchpoint,
@@ -33,7 +35,13 @@ export function AgreementSentenceList({
     () => sentencesResponse?.data?.sentences ?? [],
     [sentencesResponse?.data?.sentences],
   );
-  const [checkedSentenceIds, setCheckedSentenceIds] = useState<string[]>([]);
+  const [checkedSentenceIds, setCheckedSentenceIds] = useState<string[] | null>(null);
+
+  const resolvedCheckedIds = useMemo(() => {
+    if (checkedSentenceIds !== null) return checkedSentenceIds;
+    if (defaultChecked) return sentences.map((sentence) => sentence._id);
+    return [];
+  }, [checkedSentenceIds, defaultChecked, sentences]);
 
   const requiredSentenceIds = useMemo(
     () => sentences.filter((sentence) => sentence.is_required).map((sentence) => sentence._id),
@@ -43,16 +51,16 @@ export function AgreementSentenceList({
   const acceptedAgreementIds = useMemo(() => {
     const ids = new Set<string>();
     for (const sentence of sentences) {
-      if (!checkedSentenceIds.includes(sentence._id)) continue;
+      if (!resolvedCheckedIds.includes(sentence._id)) continue;
       for (const link of sentence.links ?? []) {
         if (link.agreement?._id) ids.add(link.agreement._id);
       }
     }
     return Array.from(ids);
-  }, [sentences, checkedSentenceIds]);
+  }, [sentences, resolvedCheckedIds]);
 
   const allRequiredAccepted =
-    isSuccess && requiredSentenceIds.every((id) => checkedSentenceIds.includes(id));
+    isSuccess && requiredSentenceIds.every((id) => resolvedCheckedIds.includes(id));
   const acceptedIdsKey = acceptedAgreementIds.join('|');
 
   const onIdsChangeRef = useRef(onAcceptedAgreementIdsChange);
@@ -61,6 +69,10 @@ export function AgreementSentenceList({
   const lastRequiredRef = useRef<boolean | null>(null);
   onIdsChangeRef.current = onAcceptedAgreementIdsChange;
   onRequiredChangeRef.current = onRequiredAcceptedChange;
+
+  useEffect(() => {
+    setCheckedSentenceIds(null);
+  }, [touchpoint]);
 
   useEffect(() => {
     if (lastIdsKeyRef.current === acceptedIdsKey && lastRequiredRef.current === allRequiredAccepted) return;
@@ -78,14 +90,17 @@ export function AgreementSentenceList({
         <AgreementCheckbox
           key={sentence._id}
           id={`sentence-${sentence._id}`}
-          checked={checkedSentenceIds.includes(sentence._id)}
+          checked={resolvedCheckedIds.includes(sentence._id)}
           error={error}
           touched={touched}
           disabled={disabled}
           onCheckedChange={(checked) => {
-            setCheckedSentenceIds((prev) =>
-              checked ? [...prev, sentence._id] : prev.filter((id) => id !== sentence._id),
-            );
+            setCheckedSentenceIds((prev) => {
+              const current = prev ?? (defaultChecked ? sentences.map((item) => item._id) : []);
+              return checked
+                ? [...current, sentence._id]
+                : current.filter((id) => id !== sentence._id);
+            });
           }}
           onBlur={onBlur}
         >

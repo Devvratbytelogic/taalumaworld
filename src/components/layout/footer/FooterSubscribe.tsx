@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Button } from '@heroui/react';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Input } from '@/components/ui/input';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { useSubscribeToNewsletterMutation } from '@/store/rtkQueries/userPostAPI';
+import { EMAIL_VALIDATION_MESSAGE, normalizeEmail, validateEmail } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 
 export default function FooterSubscribe() {
@@ -16,18 +17,27 @@ export default function FooterSubscribe() {
   const [agreementTouched, setAgreementTouched] = useState(false);
   const [subscribeToNewsletter, { isLoading: isSubscribing }] = useSubscribeToNewsletterMutation();
 
-  const hasEmailError = emailTouched && !newsletterEmail.trim();
+  const trimmedEmail = newsletterEmail.trim();
+  const emailError = !emailTouched
+    ? undefined
+    : !trimmedEmail
+      ? 'Email is required'
+      : !validateEmail(trimmedEmail)
+        ? EMAIL_VALIDATION_MESSAGE
+        : undefined;
   const agreementError =
     agreementTouched && !allRequiredAccepted
       ? 'Please accept all required agreements before subscribing.'
       : undefined;
 
-  const handleSubscribe = async () => {
-    const email = newsletterEmail.trim();
-    if (!email) {
-      setEmailTouched(true);
-      return;
-    }
+  const handleSubscribe = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubscribing) return;
+
+    setEmailTouched(true);
+    const email = normalizeEmail(newsletterEmail);
+    if (!validateEmail(email)) return;
+
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
       return;
@@ -44,7 +54,6 @@ export default function FooterSubscribe() {
         toast.success(res.message ?? 'Subscribed successfully!');
         setNewsletterEmail('');
         setEmailTouched(false);
-        setAcceptedAgreementIds([]);
         setAgreementTouched(false);
       }
     } catch {
@@ -53,32 +62,44 @@ export default function FooterSubscribe() {
   };
 
   return (
-    <div className="space-y-3">
+    <form className="space-y-3" noValidate onSubmit={handleSubscribe}>
       <p className="text-sm font-medium text-white">Subscribe to The Taaluma Signal</p>
       <div className="flex gap-2">
         <Input
+          id="footer-newsletter-email"
+          name="email"
           placeholder="Your email"
           type="email"
+          inputMode="email"
+          autoComplete="email"
+          maxLength={254}
           value={newsletterEmail}
           onChange={(e) => setNewsletterEmail(e.target.value)}
           onBlur={() => setEmailTouched(true)}
-          aria-invalid={hasEmailError}
+          aria-invalid={Boolean(emailError)}
+          aria-describedby={emailError ? 'footer-newsletter-email-error' : undefined}
           className={`bg-gray-800 h-auto text-white placeholder:text-gray-500 ${
-            hasEmailError ? 'border-red-500! focus-visible:border-red-500!' : 'border-gray-700'
+            emailError ? 'border-red-500! focus-visible:border-red-500!' : 'border-gray-700'
           }`}
         />
         <Button
+          type="submit"
           className="global_btn rounded_full bg_primary"
           disabled={isSubscribing}
-          onPress={handleSubscribe}
         >
           {isSubscribing ? 'Subscribing...' : 'Subscribe'}
         </Button>
       </div>
+      {emailError ? (
+        <p id="footer-newsletter-email-error" className="text-xs text-red-400">
+          {emailError}
+        </p>
+      ) : null}
 
       <div className="[&_label]:text-gray-300 [&_label_.text-muted-foreground]:text-gray-500">
         <AgreementSentenceList
           touchpoint={AGREEMENT_TOUCHPOINTS.NEWSLETTER}
+          defaultChecked
           onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
           onRequiredAcceptedChange={setAllRequiredAccepted}
           error={agreementError}
@@ -87,6 +108,6 @@ export default function FooterSubscribe() {
           disabled={isSubscribing}
         />
       </div>
-    </div>
+    </form>
   );
 }

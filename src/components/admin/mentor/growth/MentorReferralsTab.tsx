@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Percent, TrendingUp, UserCheck, Users, Wallet } from 'lucide-react';
+import { Download, Percent, TrendingUp, UserCheck, Users, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPageHeader,
@@ -12,9 +12,13 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { Badge } from '@/components/ui/badge';
+import Button from '@/components/ui/Button';
 import { formatKes } from '@/constants/common';
 import { useGetMyMentorReferralsQuery } from '@/store/rtkQueries/dashboard';
 import { IMentorReferralsAPIResponseDataEntity, MentorReferralStatus } from '@/types/dashboard';
+import { API_BASE_URL } from '@/utils/config';
+import { authFetch } from '@/utils/refreshSession';
+import toast from '@/utils/toast';
 
 const STATUS_FILTER_OPTIONS: { label: string; value: MentorReferralStatus | '' }[] = [
   { label: 'All statuses', value: '' },
@@ -160,11 +164,16 @@ const referralColumns: GridColDef<IMentorReferralsAPIResponseDataEntity>[] = [
 export function MentorReferralsTab() {
   const [statusFilter, setStatusFilter] = useState<MentorReferralStatus | ''>('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [isExporting, setIsExporting] = useState(false);
+
+  const listParams = {
+    ...(statusFilter ? { status: statusFilter } : {}),
+  };
 
   const { data, isLoading, isFetching } = useGetMyMentorReferralsQuery({
     page: paginationModel.page + 1,
     limit: paginationModel.pageSize,
-    ...(statusFilter ? { status: statusFilter } : {}),
+    ...listParams,
   });
 
   const summary = data?.data?.summary;
@@ -178,13 +187,53 @@ export function MentorReferralsTab() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
+  const handleExportCsv = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const params = new URLSearchParams();
+      Object.entries(listParams).forEach(([key, value]) => {
+        if (value == null) return;
+        params.set(key, String(value));
+      });
+      params.set('export', 'true');
+
+      const res = await authFetch(`${API_BASE_URL}/admin/referrals/my?${params.toString()}`, {
+        method: 'GET',
+      });
+      if (!res.ok) throw new Error('Failed to export referrals');
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'my-referrals.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Referrals exported');
+    } catch {
+      toast.error('Failed to export referrals');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <AdminPage>
       <AdminPageHeader
         eyebrow="Growth"
         title="Referral Link Performance"
         description="Registrations and conversions from your mentor referral link."
-      />
+      >
+        <Button
+          className="global_btn rounded_full bg_primary"
+          onPress={handleExportCsv}
+          isLoading={isExporting}
+          startContent={!isExporting ? <Download className="h-4 w-4" /> : undefined}
+        >
+          Export CSV
+        </Button>
+      </AdminPageHeader>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <AdminStatCard label="Total referrals" value={summary?.total_referrals ?? 0} icon={Users} tone="blue" />

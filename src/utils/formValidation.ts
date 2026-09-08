@@ -14,19 +14,37 @@ const passwordRules = Yup.string()
 
 // Basic email shape: local + @ + domain with TLD (used for initial format check)
 const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+const MAX_EMAIL_LENGTH = 254
+const MAX_LOCAL_PART_LENGTH = 64
+const MAX_DOMAIN_LENGTH = 255
+
+/**
+ * Trim + lowercase so marketing/auth comparisons use one canonical value.
+ * Non-strings (arrays, objects) become '' so they cannot be persisted as JSON.
+ */
+export function normalizeEmail(email: unknown): string {
+  if (typeof email !== 'string') return ''
+  return email.trim().toLowerCase()
+}
 
 /**
  * Validates email with strict rules:
+ * - Must be a string (rejects arrays / objects)
+ * - RFC length limits (local ≤ 64, domain ≤ 255, total ≤ 254)
  * - Local: no leading/trailing dot or hyphen; no consecutive dots
  * - Domain: no label starting/ending with hyphen; no consecutive hyphens
  */
-export function validateEmail(email: string): boolean {
+export function validateEmail(email: unknown): boolean {
+  if (typeof email !== 'string') return false
+
   const trimmed = email.trim()
-  if (!trimmed || !EMAIL_REGEX.test(trimmed)) return false
+  if (!trimmed || trimmed.length > MAX_EMAIL_LENGTH || !EMAIL_REGEX.test(trimmed)) return false
 
   const atIndex = trimmed.indexOf('@')
   const local = trimmed.slice(0, atIndex)
   const domain = trimmed.slice(atIndex + 1)
+
+  if (local.length > MAX_LOCAL_PART_LENGTH || domain.length > MAX_DOMAIN_LENGTH) return false
 
   // Local part: no leading/trailing dot or hyphen, no consecutive dots
   if (local.startsWith('.') || local.endsWith('.')) return false
@@ -46,7 +64,7 @@ export function validateEmail(email: string): boolean {
   return true
 }
 
-const EMAIL_VALIDATION_MESSAGE = 'Please enter a valid email address'
+export const EMAIL_VALIDATION_MESSAGE = 'Please enter a valid email address'
 
 const emailRules = Yup.string()
   .required('Email is required')

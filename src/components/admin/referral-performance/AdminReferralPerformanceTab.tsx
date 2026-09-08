@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Percent, ShoppingBag, TrendingUp, Users, UserPlus, Wallet } from 'lucide-react';
+import { Download, Percent, ShoppingBag, TrendingUp, Users, UserPlus, Wallet } from 'lucide-react';
 import {
   AdminPage,
   AdminPageHeader,
@@ -11,10 +11,14 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { Badge } from '@/components/ui/badge';
+import Button from '@/components/ui/Button';
 import { formatKes } from '@/constants/common';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { useGetReferralPerformanceQuery } from '@/store/rtkQueries/dashboard';
 import type { IReferralPerformanceEntity, ReferralPerformanceUserType } from '@/types/dashboard';
+import { API_BASE_URL } from '@/utils/config';
+import { authFetch } from '@/utils/refreshSession';
+import toast from '@/utils/toast';
 import { AdminReferralPerformanceSearch } from './AdminReferralPerformanceSearch';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -28,13 +32,18 @@ export function AdminReferralPerformanceTab() {
   const [toDate, setToDate] = useState('');
   const [userType, setUserType] = useState<ReferralPerformanceUserType>('all');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [isExporting, setIsExporting] = useState(false);
+
+  const listParams = {
+    user_type: userType,
+    ...(fromDate ? { fromDate } : {}),
+    ...(toDate ? { toDate } : {}),
+  };
 
   const { data, isLoading, isFetching } = useGetReferralPerformanceQuery({
     page: paginationModel.page + 1,
     limit: paginationModel.pageSize,
-    user_type: userType,
-    ...(fromDate ? { fromDate } : {}),
-    ...(toDate ? { toDate } : {}),
+    ...listParams,
   });
 
   const summary = data?.data?.summary;
@@ -43,6 +52,37 @@ export function AdminReferralPerformanceTab() {
   const loading = isLoading || isFetching;
 
   const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleExportCsv = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const params = new URLSearchParams();
+      Object.entries(listParams).forEach(([key, value]) => {
+        if (value === undefined || value === '') return;
+        params.set(key, String(value));
+      });
+      params.set('export', 'true');
+
+      const res = await authFetch(`${API_BASE_URL}/admin/referrals/performance?${params.toString()}`, {
+        method: 'GET',
+      });
+      if (!res.ok) throw new Error('Failed to export referral performance');
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'referral-performance.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Referral performance exported');
+    } catch {
+      toast.error('Failed to export referral performance');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const columns: GridColDef<IReferralPerformanceEntity>[] = [
     {
@@ -140,7 +180,16 @@ export function AdminReferralPerformanceTab() {
         eyebrow="Configuration"
         title="Referral Performance"
         description="Registrations, conversions, and commission across referrers."
-      />
+      >
+        <Button
+          className="global_btn rounded_full bg_primary"
+          onPress={handleExportCsv}
+          isLoading={isExporting}
+          startContent={!isExporting ? <Download className="h-4 w-4" /> : undefined}
+        >
+          Export CSV
+        </Button>
+      </AdminPageHeader>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <AdminStatCard label="Referrers" value={(summary?.referrers ?? 0).toLocaleString()} icon={Users} tone="blue" />

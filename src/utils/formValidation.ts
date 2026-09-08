@@ -542,15 +542,15 @@ export const mentorConversionApplicationSchema = Yup.object({
       if (!value) return true;
       return value.split(/\s+/).filter(Boolean).length <= 300;
     }),
-  paymentFrequency: Yup.string()
-    .oneOf(['monthly', 'quarterly', 'annually'], 'Select payment frequency')
-    .required('Select payment frequency'),
-  bankName: Yup.string().trim().required('Bank name is required'),
-  accountNumber: Yup.string().trim().required('Account number is required'),
-  mpesaNumber: Yup.string()
-    .trim()
-    .required('M-Pesa number is required')
-    .matches(/^\+?[0-9]{9,15}$/, 'Enter a valid phone number'),
+  // paymentFrequency: Yup.string()
+  //   .oneOf(['monthly', 'quarterly', 'annually'], 'Select payment frequency')
+  //   .required('Select payment frequency'),
+  // bankName: Yup.string().trim().required('Bank name is required'),
+  // accountNumber: Yup.string().trim().required('Account number is required'),
+  // mpesaNumber: Yup.string()
+  //   .trim()
+  //   .required('M-Pesa number is required')
+  //   .matches(/^\+?[0-9]{9,15}$/, 'Enter a valid phone number'),
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 

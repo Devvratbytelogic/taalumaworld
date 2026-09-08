@@ -359,6 +359,7 @@ export function AdminMentorApplicationsTab() {
                   </p>
                 </div>
 
+                {/* Payment information — temporarily hidden
                 <div className="grid gap-2 rounded-lg border border-slate-100 bg-slate-50/60 p-3 sm:grid-cols-2">
                   <p><span className="text-slate-500">Payout frequency:</span> {formatStatusLabel(reviewApplication.preferred_payment_frequency)}</p>
                   <p><span className="text-slate-500">Bank name:</span> {reviewApplication.bank_name || '—'}</p>
@@ -367,6 +368,7 @@ export function AdminMentorApplicationsTab() {
                   {reviewApplication.mpesa_number ? <p><span className="text-slate-500">M-Pesa:</span> {reviewApplication.mpesa_number}</p> : null}
                   {reviewApplication.tax_id ? <p><span className="text-slate-500">Tax ID:</span> {reviewApplication.tax_id}</p> : null}
                 </div>
+                */}
 
                 <p><span className="text-slate-500">Submitted:</span> {formatDate(reviewApplication.submitted_at ?? reviewApplication.createdAt)}</p>
 

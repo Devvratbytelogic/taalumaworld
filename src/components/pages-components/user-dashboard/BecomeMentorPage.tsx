@@ -3,13 +3,15 @@
 import type { ComponentType } from 'react';
 import { useRef } from 'react';
 import { useFormik } from 'formik';
-import { Briefcase, CreditCard, FileCheck, Send, Share2 } from 'lucide-react';
+import { Briefcase, FileCheck, Send, Share2 } from 'lucide-react';
+// import { CreditCard } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { cn } from '@/components/ui/utils';
-import { fieldInvalidClassName, nativeSelectClassName } from '@/components/ui/field-styles';
+import { fieldInvalidClassName } from '@/components/ui/field-styles';
+// import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { mentorConversionApplicationSchema } from '@/utils/formValidation';
 import { useSubmitMentorApplicationMutation } from '@/store/rtkQueries/userPostAPI';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
@@ -48,10 +50,10 @@ export function BecomeMentorPage() {
         linkedinUrl: '',
         facebookUrl: '',
         careerSummary: '',
-        paymentFrequency: '',
-        bankName: '',
-        accountNumber: '',
-        mpesaNumber: '',
+        // paymentFrequency: '',
+        // bankName: '',
+        // accountNumber: '',
+        // mpesaNumber: '',
         accepted_agreement_ids: [] as string[],
       },
       validationSchema: mentorConversionApplicationSchema,
@@ -64,10 +66,10 @@ export function BecomeMentorPage() {
             ...(formValues.linkedinUrl.trim() ? { linkedin_url: formValues.linkedinUrl.trim() } : {}),
             ...(formValues.facebookUrl.trim() ? { facebook_url: formValues.facebookUrl.trim() } : {}),
             professional_summary: formValues.careerSummary.trim(),
-            bank_name: formValues.bankName.trim(),
-            bank_number: formValues.accountNumber.trim(),
-            mpesa_number: formValues.mpesaNumber.trim(),
-            preferred_payment_frequency: formValues.paymentFrequency,
+            // bank_name: formValues.bankName.trim(),
+            // bank_number: formValues.accountNumber.trim(),
+            // mpesa_number: formValues.mpesaNumber.trim(),
+            // preferred_payment_frequency: formValues.paymentFrequency,
             accepted_agreement_ids: formValues.accepted_agreement_ids,
           }).unwrap();
           rf();
@@ -177,6 +179,7 @@ export function BecomeMentorPage() {
           </div>
         </section>
 
+        {/* Payment information — temporarily hidden
         <section className="border-b border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader
             icon={CreditCard}
@@ -264,6 +267,7 @@ export function BecomeMentorPage() {
             </div>
           </div>
         </section>
+        */}
 
         <section className="px-4 py-5 sm:px-8 sm:py-6">
           <SectionHeader

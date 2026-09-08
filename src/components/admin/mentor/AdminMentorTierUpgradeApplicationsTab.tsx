@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { ArrowUpCircle, Eye, ExternalLink, Save, X } from 'lucide-react';
+import { ArrowUpCircle, CheckCircle2, Circle, Eye, ExternalLink, Save, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,27 +32,40 @@ import {
   useGetAllMentorTierUpgradeApplicationsQuery,
   useReviewMentorTierUpgradeApplicationMutation,
 } from '@/store/rtkQueries/mentorApis';
-import type { IAllMentorTierUpgradeApplicationsEntity } from '@/types/mentorTierUpgradeApplication';
+import type {
+  IAllMentorTierUpgradeApplicationsEntity,
+  IMentorTierUpgradeEligibility,
+} from '@/types/mentorTierUpgradeApplication';
 import {
-  VERIFIED_MENTOR_APPLICATION_ACTION,
-  VERIFIED_MENTOR_APPLICATION_STATUS,
-} from '@/constants/verifiedMentorApplication';
+  MENTOR_TIER_UPGRADE_APPLICATION_ACTION,
+  MENTOR_TIER_UPGRADE_APPLICATION_STATUS,
+} from '@/constants/mentorTierUpgradeApplication';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
 const MODEL = 'Mentor Tier Upgrade';
 
-const STATUS_OPTIONS = Object.values(VERIFIED_MENTOR_APPLICATION_STATUS);
+const STATUS_OPTIONS = Object.values(MENTOR_TIER_UPGRADE_APPLICATION_STATUS);
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
-  [VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW]: 'bg-sky-50 text-sky-700 border-sky-200!',
-  [VERIFIED_MENTOR_APPLICATION_STATUS.APPROVED]: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
-  [VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED]: 'bg-red-50 text-red-700 border-red-200!',
+  [MENTOR_TIER_UPGRADE_APPLICATION_STATUS.PENDING_REVIEW]: 'bg-sky-50 text-sky-700 border-sky-200!',
+  [MENTOR_TIER_UPGRADE_APPLICATION_STATUS.APPROVED]: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
+  [MENTOR_TIER_UPGRADE_APPLICATION_STATUS.REJECTED]: 'bg-red-50 text-red-700 border-red-200!',
+  [MENTOR_TIER_UPGRADE_APPLICATION_STATUS.WITHDRAWN]: 'bg-slate-100 text-slate-600 border-slate-200!',
 };
 
 const DECISION_OPTIONS = [
-  { value: VERIFIED_MENTOR_APPLICATION_ACTION.APPROVE, label: 'Approve' },
-  { value: VERIFIED_MENTOR_APPLICATION_ACTION.REJECT, label: 'Reject' },
+  { value: MENTOR_TIER_UPGRADE_APPLICATION_ACTION.APPROVE, label: 'Approve' },
+  { value: MENTOR_TIER_UPGRADE_APPLICATION_ACTION.REJECT, label: 'Reject' },
 ];
+
+function hasGate(value?: number | null) {
+  return value != null && Number(value) !== 0;
+}
+
+function formatRating(value?: number | null) {
+  if (value == null) return '—';
+  return String(value);
+}
 
 function getApplicantName(app: IAllMentorTierUpgradeApplicationsEntity) {
   return app.user_id?.name ?? '—';
@@ -64,7 +77,7 @@ function getApplicantEmail(app: IAllMentorTierUpgradeApplicationsEntity) {
 
 function getReviewerName(reviewedBy: IAllMentorTierUpgradeApplicationsEntity['reviewed_by']) {
   if (!reviewedBy) return null;
-  return typeof reviewedBy === 'string' ? reviewedBy : (reviewedBy as { name?: string }).name;
+  return typeof reviewedBy === 'string' ? reviewedBy : reviewedBy.name;
 }
 
 function formatStatusLabel(status?: string) {
@@ -80,13 +93,92 @@ function formatDate(value?: string) {
   return new Date(value).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+function EligibilityCheckRow({ passed, label }: { passed: boolean; label: string }) {
+  return (
+    <li className="flex items-start gap-2 text-sm">
+      {passed ? (
+        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+      ) : (
+        <Circle className="mt-0.5 h-4 w-4 shrink-0 text-slate-300" />
+      )}
+      <span className={passed ? 'text-slate-700' : 'text-slate-500'}>{label}</span>
+    </li>
+  );
+}
+
+function EligibilitySnapshot({ eligibility }: { eligibility?: IMentorTierUpgradeEligibility | null }) {
+  if (!eligibility) return null;
+
+  const required = eligibility.required ?? {};
+  const checks = eligibility.checks ?? {};
+  const ratingGate = hasGate(required.min_rating);
+  const blueprintParts = [
+    hasGate(required.min_words_per_blueprint) ? `${required.min_words_per_blueprint} words` : null,
+    hasGate(required.min_confirmed_sales) ? `${required.min_confirmed_sales} confirmed sales` : null,
+    hasGate(required.min_days_since_published) ? `published ${required.min_days_since_published}+ days ago` : null,
+  ].filter(Boolean);
+  const hasBlueprintGate = blueprintParts.length > 0;
+
+  return (
+    <div className="space-y-3 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Live eligibility</p>
+        <Badge
+          variant="outline"
+          className={
+            eligibility.is_eligible
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200!'
+              : 'bg-red-50 text-red-700 border-red-200!'
+          }
+        >
+          {eligibility.is_eligible ? 'Eligible' : 'Not eligible'}
+        </Badge>
+      </div>
+      <p className="text-xs text-slate-400">
+        Computed live and may have changed since apply. Approving does not re-run these checks.
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <p>
+          <span className="text-slate-500">Overall rating:</span> {formatRating(eligibility.overall_rating)}
+          {eligibility.total_reviews != null ? ` (${eligibility.total_reviews} reviews)` : ''}
+        </p>
+        <p>
+          <span className="text-slate-500">Required min rating:</span>{' '}
+          {ratingGate ? formatRating(required.min_rating) : 'No gate'}
+        </p>
+        <p>
+          <span className="text-slate-500">Qualifying Blueprints:</span>{' '}
+          {eligibility.qualifying_blueprint_count ?? '—'}
+        </p>
+      </div>
+      {ratingGate || hasBlueprintGate ? (
+        <ul className="space-y-2">
+          {ratingGate ? (
+            <EligibilityCheckRow
+              passed={Boolean(checks.min_rating)}
+              label={`Overall rating of at least ${required.min_rating}`}
+            />
+          ) : null}
+          {hasBlueprintGate ? (
+            <EligibilityCheckRow
+              passed={Boolean(checks.qualifying_blueprint)}
+              label={`At least one Blueprint meeting ${blueprintParts.join(', ')}`}
+            />
+          ) : null}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 export function AdminMentorTierUpgradeApplicationsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [reviewApplication, setReviewApplication] = useState<IAllMentorTierUpgradeApplicationsEntity | null>(null);
-  const [action, setAction] = useState<string>(VERIFIED_MENTOR_APPLICATION_ACTION.APPROVE);
+  const [action, setAction] = useState<string>(MENTOR_TIER_UPGRADE_APPLICATION_ACTION.APPROVE);
   const [reviewNotes, setReviewNotes] = useState('');
+  const [adminNotes, setAdminNotes] = useState('');
   const { hasPermission } = useAdminPermissions();
 
   const canView = hasPermission(MODEL, 'view');
@@ -105,6 +197,9 @@ export function AdminMentorTierUpgradeApplicationsTab() {
 
   const applications = data?.data?.applications ?? [];
   const total = data?.data?.pagination?.total ?? 0;
+  const isPendingReview =
+    reviewApplication?.status === MENTOR_TIER_UPGRADE_APPLICATION_STATUS.PENDING_REVIEW;
+  const canReview = canEdit && isPendingReview;
 
   const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
 
@@ -120,17 +215,15 @@ export function AdminMentorTierUpgradeApplicationsTab() {
 
   const openReview = (app: IAllMentorTierUpgradeApplicationsEntity) => {
     setReviewApplication(app);
-    setAction(
-      app.status === VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED
-        ? VERIFIED_MENTOR_APPLICATION_ACTION.REJECT
-        : VERIFIED_MENTOR_APPLICATION_ACTION.APPROVE,
-    );
+    setAction(MENTOR_TIER_UPGRADE_APPLICATION_ACTION.APPROVE);
     setReviewNotes(app.decision_reason ?? '');
+    setAdminNotes(app.admin_notes ?? '');
   };
 
   const closeReview = () => {
     setReviewApplication(null);
     setReviewNotes('');
+    setAdminNotes('');
   };
 
   const handleSubmitReview = async () => {
@@ -140,7 +233,10 @@ export function AdminMentorTierUpgradeApplicationsTab() {
         id: reviewApplication._id,
         values: {
           action,
-          decision_reason: reviewNotes.trim(),
+          ...(action === MENTOR_TIER_UPGRADE_APPLICATION_ACTION.REJECT && reviewNotes.trim()
+            ? { decision_reason: reviewNotes.trim() }
+            : {}),
+          ...(adminNotes.trim() ? { admin_notes: adminNotes.trim() } : {}),
         },
       }).unwrap();
       void refreshAfterMentorChange();
@@ -153,7 +249,7 @@ export function AdminMentorTierUpgradeApplicationsTab() {
 
   const hasActiveFilters = !!statusFilter;
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<IAllMentorTierUpgradeApplicationsEntity>[] = [
     {
       field: 'index',
       headerName: '#',
@@ -172,8 +268,8 @@ export function AdminMentorTierUpgradeApplicationsTab() {
     },
     {
       field: 'applicant',
-      headerName: 'Applicant',
-      minWidth: 220,
+      headerName: 'Mentor',
+      minWidth: 200,
       flex: 1,
       sortable: false,
       renderCell: (params) => (
@@ -205,6 +301,68 @@ export function AdminMentorTierUpgradeApplicationsTab() {
       renderCell: (params) => (
         <span className="text-sm font-medium text-slate-900">{params.row.requested_tier_id?.code ?? '—'}</span>
       ),
+    },
+    {
+      field: 'overall_rating',
+      headerName: 'Overall rating',
+      width: 140,
+      sortable: false,
+      renderCell: (params) => {
+        const rating = params.row.eligibility?.overall_rating;
+        const reviews = params.row.eligibility?.total_reviews;
+        if (rating == null) return <span className="text-sm text-slate-400">—</span>;
+        return (
+          <span className="text-sm text-slate-700">
+            {rating}
+            {reviews != null ? <span className="text-slate-400"> ({reviews})</span> : null}
+          </span>
+        );
+      },
+    },
+    {
+      field: 'min_rating',
+      headerName: 'Min rating',
+      width: 110,
+      sortable: false,
+      renderCell: (params) => {
+        const required = params.row.eligibility?.required?.min_rating ?? params.row.requested_tier_id?.min_rating;
+        return (
+          <span className="text-sm text-slate-700">{hasGate(required) ? required : '—'}</span>
+        );
+      },
+    },
+    {
+      field: 'qualifying',
+      headerName: 'Qualifying Blueprints',
+      minWidth: 160,
+      sortable: false,
+      renderCell: (params) => (
+        <span className="text-sm text-slate-700">
+          {params.row.eligibility?.qualifying_blueprint_count ?? '—'}
+        </span>
+      ),
+    },
+    {
+      field: 'eligible',
+      headerName: 'Eligible',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => {
+        const isEligible = params.row.eligibility?.is_eligible;
+        if (isEligible == null) return <span className="text-sm text-slate-400">—</span>;
+        return (
+          <Badge
+            variant="outline"
+            className={
+              isEligible
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200!'
+                : 'bg-red-50 text-red-700 border-red-200!'
+            }
+          >
+            {isEligible ? 'Eligible' : 'Not eligible'}
+          </Badge>
+        );
+      },
     },
     {
       field: 'submitted_at',
@@ -265,7 +423,7 @@ export function AdminMentorTierUpgradeApplicationsTab() {
           <AdminSearchInput
             value={searchQuery}
             onChange={handleSearchChange}
-            placeholder="Search by applicant name or email..."
+            placeholder="Search by mentor name, email, or statement..."
           />
 
           <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
@@ -347,19 +505,16 @@ export function AdminMentorTierUpgradeApplicationsTab() {
                   <p><span className="text-slate-500">Requested tier:</span> {reviewApplication.requested_tier_id?.code ?? '—'}</p>
                 </div>
 
-                {/* <div className="space-y-1.5">
-                  <div className="flex items-baseline justify-between gap-3">
+                <EligibilitySnapshot eligibility={reviewApplication.eligibility} />
+
+                {reviewApplication.application_statement ? (
+                  <div className="space-y-1.5">
                     <Label>Application statement</Label>
-                    {reviewApplication.statement_word_count != null ? (
-                      <span className="shrink-0 text-xs tabular-nums text-slate-400">
-                        {reviewApplication.statement_word_count} words
-                      </span>
-                    ) : null}
+                    <p className="whitespace-pre-wrap rounded-lg border border-slate-100 bg-slate-50/60 p-3 text-slate-700">
+                      {reviewApplication.application_statement}
+                    </p>
                   </div>
-                  <p className="whitespace-pre-wrap rounded-lg border border-slate-100 bg-slate-50/60 p-3 text-slate-700">
-                    {reviewApplication.application_statement || '—'}
-                  </p>
-                </div> */}
+                ) : null}
 
                 {reviewApplication.portfolio_url ? (
                   <a
@@ -387,8 +542,15 @@ export function AdminMentorTierUpgradeApplicationsTab() {
                   <p><span className="text-slate-500">Previous decision note:</span> {reviewApplication.decision_reason}</p>
                 ) : null}
 
-                {canEdit ? (
+                {canReview ? (
                   <>
+                    {reviewApplication.eligibility?.is_eligible === false &&
+                    action === MENTOR_TIER_UPGRADE_APPLICATION_ACTION.APPROVE ? (
+                      <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                        This mentor is not currently eligible. You can still approve and assign the requested tier.
+                      </p>
+                    ) : null}
+
                     <div className="space-y-2">
                       <Label htmlFor="decision-select">Decision</Label>
                       <select
@@ -403,14 +565,27 @@ export function AdminMentorTierUpgradeApplicationsTab() {
                       </select>
                     </div>
 
+                    {action === MENTOR_TIER_UPGRADE_APPLICATION_ACTION.REJECT ? (
+                      <div className="space-y-2">
+                        <Label htmlFor="decision-reason">Decision reason</Label>
+                        <Textarea
+                          id="decision-reason"
+                          rows={3}
+                          value={reviewNotes}
+                          onChange={(e) => setReviewNotes(e.target.value)}
+                          placeholder="Share context that will be visible to the applicant..."
+                        />
+                      </div>
+                    ) : null}
+
                     <div className="space-y-2">
-                      <Label htmlFor="decision-reason">Decision reason</Label>
+                      <Label htmlFor="admin-notes">Admin notes</Label>
                       <Textarea
-                        id="decision-reason"
+                        id="admin-notes"
                         rows={3}
-                        value={reviewNotes}
-                        onChange={(e) => setReviewNotes(e.target.value)}
-                        placeholder="Share context that will be visible to the applicant..."
+                        value={adminNotes}
+                        onChange={(e) => setAdminNotes(e.target.value)}
+                        placeholder="Internal notes for this review..."
                       />
                     </div>
                   </>
@@ -419,9 +594,9 @@ export function AdminMentorTierUpgradeApplicationsTab() {
 
               <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">
                 <UiButton type="button" className="global_btn outline_primary rounded_full" onPress={closeReview} disabled={isReviewing}>
-                  <X className="h-4 w-4" /> Cancel
+                  <X className="h-4 w-4" /> {canReview ? 'Cancel' : 'Close'}
                 </UiButton>
-                {canEdit ? (
+                {canReview ? (
                   <UiButton
                     type="button"
                     className="global_btn bg_primary rounded_full"

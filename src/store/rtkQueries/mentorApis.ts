@@ -1,7 +1,12 @@
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type { IAllMentorTiersAPIResponse, IGetMentorTierByIdAPIResponse } from '@/types/mentorTier';
 import type { IAllMentorApplicationsAPIResponse } from '@/types/mentorApplication';
-import { IAllMentorTierUpgradeApplicationsAPIResponse, IGetMyMentorTierUpgradeApplicationAPIResponse } from '@/types/mentorTierUpgradeApplication';
+import type {
+    IAllMentorTierUpgradeApplicationsAPIResponse,
+    IGetMyMentorTierUpgradeApplicationAPIResponse,
+    IReviewMentorTierUpgradeApplicationAPIResponse,
+    IReviewMentorTierUpgradeApplicationPayload,
+} from '@/types/mentorTierUpgradeApplication';
 import { IFollowsAPIResponse } from '@/types/follows';
 import type { IAssignMentorTierAPIResponse } from '@/types/mentorEquity';
 
@@ -85,6 +90,14 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication'],
         }),
 
+        withdrawMentorTierUpgrade: builder.mutation<{ http_status_code?: number; success?: boolean; message?: string }, void>({
+            query: () => ({
+                url: `/admin/mentor-tier-upgrade-applications/withdraw`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication'],
+        }),
+
         getMyMentorTierUpgradeApplication: builder.query<IGetMyMentorTierUpgradeApplicationAPIResponse, void>({
             query: () => ({
                 url: `/admin/mentor-tier-upgrade-applications/my`,
@@ -102,7 +115,10 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminMentorTierUpgradeApplications'],
         }),
 
-        reviewMentorTierUpgradeApplication: builder.mutation({
+        reviewMentorTierUpgradeApplication: builder.mutation<
+            IReviewMentorTierUpgradeApplicationAPIResponse,
+            { id: string; values: IReviewMentorTierUpgradeApplicationPayload }
+        >({
             query: ({ id, values }) => ({
                 url: `/admin/mentor-tier-upgrade-applications/${id}/review`,
                 method: 'PUT',
@@ -132,6 +148,7 @@ export const {
     useGetAllMentorApplicationsQuery,
     useReviewMentorApplicationMutation,
     useApplyMentorTierUpgradeMutation,
+    useWithdrawMentorTierUpgradeMutation,
     useGetMyMentorTierUpgradeApplicationQuery,
     useGetAllMentorTierUpgradeApplicationsQuery,
     useReviewMentorTierUpgradeApplicationMutation,

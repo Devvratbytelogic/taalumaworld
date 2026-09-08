@@ -2,22 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import moment from 'moment';
 import { type GridColDef } from '@mui/x-data-grid';
-import { BadgeCheck, Eye, Undo2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { AdminPage, AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { useGetAllMentorEquityQuery } from '@/store/rtkQueries/mentorEquityApis';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AdminMentorEquitySearch } from './AdminMentorEquitySearch';
-import { MentorEquityGrantModal } from './MentorEquityGrantModal';
 import type { IMentorEquityEntity, MentorEquityListStatus } from '@/types/mentorEquity';
-
-const MODEL = 'Mentor Equity';
 
 function formatYesNo(value?: boolean) {
   return value ? 'Yes' : 'No';
@@ -25,12 +20,9 @@ function formatYesNo(value?: boolean) {
 
 export function AdminMentorEquityTab() {
   const router = useRouter();
-  const { hasPermission } = useAdminPermissions();
-  const canEdit = hasPermission(MODEL, 'edit');
   const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-  const [grantTarget, setGrantTarget] = useState<{ mentor: IMentorEquityEntity; granted: boolean } | null>(null);
   const debouncedSearch = useDebounce(searchQuery, 400);
 
   useEffect(() => {
@@ -118,22 +110,6 @@ export function AdminMentorEquityTab() {
       ),
     },
     {
-      field: 'pool',
-      headerName: 'Rank / slots',
-      width: 130,
-      sortable: false,
-      renderCell: (params) => {
-        const rank = params.row.pool?.rank;
-        const slots = params.row.pool?.slots;
-        if (rank == null && slots == null) return <span className="text-sm text-slate-400">—</span>;
-        return (
-          <span className="text-sm text-slate-700">
-            {rank ?? '—'} / {slots ?? '—'}
-          </span>
-        );
-      },
-    },
-    {
       field: 'eligible',
       headerName: 'Eligible',
       width: 110,
@@ -143,8 +119,8 @@ export function AdminMentorEquityTab() {
           variant="outline"
           className={
             params.row.equity?.is_eligible
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-              : 'bg-slate-100 text-slate-600 border-slate-200'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200!'
+              : 'bg-slate-100 text-slate-600 border-slate-200!'
           }
         >
           {formatYesNo(params.row.equity?.is_eligible)}
@@ -152,72 +128,25 @@ export function AdminMentorEquityTab() {
       ),
     },
     {
-      field: 'granted',
-      headerName: 'Granted',
-      width: 140,
-      sortable: false,
-      renderCell: (params) => (
-        <div className="min-w-0">
-          <Badge
-            variant="outline"
-            className={
-              params.row.equity?.is_granted
-                ? 'bg-violet-50 text-violet-700 border-violet-200'
-                : 'bg-slate-100 text-slate-600 border-slate-200'
-            }
-          >
-            {formatYesNo(params.row.equity?.is_granted)}
-          </Badge>
-          {params.row.equity?.granted_at ? (
-            <p className="mt-0.5 text-[11px] text-slate-400">
-              {moment(params.row.equity.granted_at).format('DD MMM YYYY')}
-            </p>
-          ) : null}
-        </div>
-      ),
-    },
-    {
       field: 'actions',
       headerName: 'Actions',
-      width: 130,
+      width: 90,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
       renderCell: (params) => {
         const profileId = params.row.user?.id;
-        const isGranted = Boolean(params.row.equity?.is_granted);
+        if (!profileId) return null;
         return (
           <div className="action_buttons">
-            {profileId ? (
-              <button
-                type="button"
-                className="active_button"
-                title="View mentor"
-                onClick={() => router.push(getAdminMentorDetailRoutePath(profileId))}
-              >
-                <Eye className="h-4 w-4" />
-              </button>
-            ) : null}
-            {canEdit && !isGranted ? (
-              <button
-                type="button"
-                className="edit_button"
-                title="Mark granted"
-                onClick={() => setGrantTarget({ mentor: params.row, granted: true })}
-              >
-                <BadgeCheck className="h-4 w-4" />
-              </button>
-            ) : null}
-            {canEdit && isGranted ? (
-              <button
-                type="button"
-                className="warning_button"
-                title="Clear grant"
-                onClick={() => setGrantTarget({ mentor: params.row, granted: false })}
-              >
-                <Undo2 className="h-4 w-4" />
-              </button>
-            ) : null}
+            <button
+              type="button"
+              className="active_button"
+              title="View mentor"
+              onClick={() => router.push(getAdminMentorDetailRoutePath(profileId))}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
           </div>
         );
       },
@@ -229,7 +158,7 @@ export function AdminMentorEquityTab() {
       <AdminPageHeader
         eyebrow="Mentor Management"
         title="Mentor equity"
-        description="Equity eligibility flags only — this does not issue shares. Mark granted after the offline legal agreement exists."
+        description="Equity eligibility flags only — this does not issue shares."
       >
         <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
           Total: {total}
@@ -255,15 +184,6 @@ export function AdminMentorEquityTab() {
           onPaginationModelChange={setPaginationModel}
         />
       </div>
-
-      {canEdit ? (
-        <MentorEquityGrantModal
-          open={!!grantTarget}
-          mentor={grantTarget?.mentor}
-          granted={grantTarget?.granted ?? true}
-          onOpenChange={(open) => !open && setGrantTarget(null)}
-        />
-      ) : null}
     </AdminPage>
   );
 }

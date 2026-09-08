@@ -51,6 +51,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
     min_confirmed_sales: mentorTier?.min_confirmed_sales || 0,
     min_days_since_published: mentorTier?.min_days_since_published || 0,
     min_words_per_blueprint: mentorTier?.min_words_per_blueprint || 0,
+    min_rating: mentorTier?.min_rating ?? '',
     equity_track: mentorTier?.equity_track ?? false,
     equity_eligible_percent: mentorTier?.equity_eligible_percent ?? '',
     badge: mentorTier?.badge || null,
@@ -66,11 +67,19 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
       fd.append('platform_share_percent', String(formValues.platform_share_percent));
       fd.append('rank', String(formValues.rank));
       fd.append('status', formValues.status);
-      fd.append('max_mentors', String(formValues.max_mentors));
-      fd.append('min_confirmed_sales', String(formValues.min_confirmed_sales));
-      fd.append('min_days_since_published', String(formValues.min_days_since_published));
-      fd.append('min_words_per_blueprint', String(formValues.min_words_per_blueprint));
       const isRank1 = Number(formValues.rank) === 1;
+      const appendGate = (key: string, value: unknown) => {
+        if (isRank1 || value === '' || value == null) {
+          fd.append(key, '');
+          return;
+        }
+        fd.append(key, String(value));
+      };
+      appendGate('max_mentors', formValues.max_mentors);
+      appendGate('min_confirmed_sales', formValues.min_confirmed_sales);
+      appendGate('min_days_since_published', formValues.min_days_since_published);
+      appendGate('min_words_per_blueprint', formValues.min_words_per_blueprint);
+      appendGate('min_rating', formValues.min_rating);
       const equityTrack = isRank1 ? false : Boolean(formValues.equity_track);
       fd.append('equity_track', String(equityTrack));
       if (!isRank1 && equityTrack && formValues.equity_eligible_percent !== '' && formValues.equity_eligible_percent != null) {
@@ -234,6 +243,11 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                     if (nextRank === 1) {
                       setFieldValue('equity_track', false);
                       setFieldValue('equity_eligible_percent', '');
+                      setFieldValue('max_mentors', 0);
+                      setFieldValue('min_confirmed_sales', 0);
+                      setFieldValue('min_days_since_published', 0);
+                      setFieldValue('min_words_per_blueprint', 0);
+                      setFieldValue('min_rating', '');
                     }
                   }}
                   placeholder="e.g. 1"
@@ -257,58 +271,90 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
               </div>
             </div>
 
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Eligibility criteria (optional)</p>
+            {Number(values.rank) !== 1 ? (
+              <>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Eligibility criteria (optional)</p>
+                <p className="text-xs text-slate-400">Leave a field empty (or 0) for no gate.</p>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="max_mentors">Max mentors</Label>
-                <Input
-                  id="max_mentors"
-                  name="max_mentors"
-                  type="text"
-                  inputMode="numeric"
-                  value={values.max_mentors}
-                  onChange={(e) => setFieldValue('max_mentors', e.target.value.replace(/[^\d]/g, ''))}
-                  placeholder="e.g. 10"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="min_confirmed_sales">Min confirmed sales</Label>
-                <Input
-                  id="min_confirmed_sales"
-                  name="min_confirmed_sales"
-                  type="text"
-                  inputMode="numeric"
-                  value={values.min_confirmed_sales}
-                  onChange={(e) => setFieldValue('min_confirmed_sales', e.target.value.replace(/[^\d]/g, ''))}
-                  placeholder="e.g. 5"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="min_days_since_published">Min days since published</Label>
-                <Input
-                  id="min_days_since_published"
-                  name="min_days_since_published"
-                  type="text"
-                  inputMode="numeric"
-                  value={values.min_days_since_published}
-                  onChange={(e) => setFieldValue('min_days_since_published', e.target.value.replace(/[^\d]/g, ''))}
-                  placeholder="e.g. 30"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="min_words_per_blueprint">Min words per blueprint</Label>
-                <Input
-                  id="min_words_per_blueprint"
-                  name="min_words_per_blueprint"
-                  type="text"
-                  inputMode="numeric"
-                  value={values.min_words_per_blueprint}
-                  onChange={(e) => setFieldValue('min_words_per_blueprint', e.target.value.replace(/[^\d]/g, ''))}
-                  placeholder="e.g. 500"
-                />
-              </div>
-            </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="min_rating">Minimum overall rating</Label>
+                    <Input
+                      id="min_rating"
+                      name="min_rating"
+                      type="text"
+                      inputMode="decimal"
+                      value={values.min_rating}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/[^\d.]/g, '');
+                        const parts = raw.split('.');
+                        const sanitized = parts.length > 1 ? `${parts[0]}.${parts.slice(1).join('').slice(0, 2)}` : raw;
+                        setFieldValue('min_rating', sanitized === '' ? '' : sanitized);
+                      }}
+                      onBlur={handleBlur}
+                      placeholder="e.g. 4"
+                    />
+                    {errors.min_rating && touched.min_rating ? (
+                      <p className="text-sm text-red-600">{errors.min_rating}</p>
+                    ) : (
+                      <p className="text-xs text-slate-400">0–5, in steps of 0.1. Leave empty for no rating gate.</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="max_mentors">Max mentors</Label>
+                    <Input
+                      id="max_mentors"
+                      name="max_mentors"
+                      type="text"
+                      inputMode="numeric"
+                      value={values.max_mentors}
+                      onChange={(e) => setFieldValue('max_mentors', e.target.value.replace(/[^\d]/g, ''))}
+                      placeholder="e.g. 10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="min_confirmed_sales">Min confirmed sales</Label>
+                    <Input
+                      id="min_confirmed_sales"
+                      name="min_confirmed_sales"
+                      type="text"
+                      inputMode="numeric"
+                      value={values.min_confirmed_sales}
+                      onChange={(e) => setFieldValue('min_confirmed_sales', e.target.value.replace(/[^\d]/g, ''))}
+                      placeholder="e.g. 5"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="min_days_since_published">Min days since published</Label>
+                    <Input
+                      id="min_days_since_published"
+                      name="min_days_since_published"
+                      type="text"
+                      inputMode="numeric"
+                      value={values.min_days_since_published}
+                      onChange={(e) => setFieldValue('min_days_since_published', e.target.value.replace(/[^\d]/g, ''))}
+                      placeholder="e.g. 30"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="min_words_per_blueprint">Min words per blueprint</Label>
+                    <Input
+                      id="min_words_per_blueprint"
+                      name="min_words_per_blueprint"
+                      type="text"
+                      inputMode="numeric"
+                      value={values.min_words_per_blueprint}
+                      onChange={(e) => setFieldValue('min_words_per_blueprint', e.target.value.replace(/[^\d]/g, ''))}
+                      placeholder="e.g. 500"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-xs text-slate-500">
+                Rank 1 is the starting tier. Eligibility gates are not used.
+              </p>
+            )}
 
             {Number(values.rank) !== 1 ? (
               <div className="space-y-4 rounded-lg border border-slate-100 bg-slate-50/60 p-4">

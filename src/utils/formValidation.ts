@@ -680,6 +680,11 @@ export const mentorTierSchema = Yup.object({
   min_confirmed_sales: optionalNonNegativeNumber,
   min_days_since_published: optionalNonNegativeNumber,
   min_words_per_blueprint: optionalNonNegativeNumber,
+  min_rating: Yup.number()
+    .transform((v) => (v === '' || v == null || Number.isNaN(Number(v)) ? undefined : Number(v)))
+    .min(0, 'min_rating must be a number between 0 and 5')
+    .max(5, 'min_rating must be a number between 0 and 5')
+    .optional(),
   equity_track: Yup.boolean(),
   equity_eligible_percent: Yup.number()
     .transform((v) => (v === '' || v == null ? null : Number(v)))

@@ -45,8 +45,8 @@ import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/st
 import { useAcceptAgreementMutation, useAcceptAllAgreementsMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
-import { useGetMyMentorTierUpgradeApplicationQuery } from '@/store/rtkQueries/mentorApis';
-import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorApplication';
+import { useGetMyMentorTierUpgradeApplicationQuery, useWithdrawMentorTierUpgradeMutation } from '@/store/rtkQueries/mentorApis';
+import { MENTOR_TIER_UPGRADE_APPLICATION_STATUS } from '@/constants/mentorTierUpgradeApplication';
 import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
 import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/formValidation';
 import { getLinkedAgreementIds, getTouchpointLabel } from '@/utils/agreementConsent';
@@ -247,10 +247,11 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const [isTierModalOpen, setIsTierModalOpen] = useState(false);
   const [updateAdminProfile] = useUpdateAdminProfileMutation();
   const { data: tierUpgradeData } = useGetMyMentorTierUpgradeApplicationQuery();
+  const [withdrawMentorTierUpgrade, { isLoading: isWithdrawing }] = useWithdrawMentorTierUpgradeMutation();
 
   const tierUpgradeApplication = tierUpgradeData?.data;
-  const isTierUpgradePending = tierUpgradeApplication?.status === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW;
-  const isTierUpgradeRejected = tierUpgradeApplication?.status === VERIFIED_MENTOR_APPLICATION_STATUS.REJECTED;
+  const isTierUpgradePending = tierUpgradeApplication?.status === MENTOR_TIER_UPGRADE_APPLICATION_STATUS.PENDING_REVIEW;
+  const isTierUpgradeRejected = tierUpgradeApplication?.status === MENTOR_TIER_UPGRADE_APPLICATION_STATUS.REJECTED;
 
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm, setFieldValue } = useFormik({
     enableReinitialize: true,
@@ -451,10 +452,32 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                 </>
               )}
               {isTierUpgradePending ? (
-                <p className="mt-1.5 flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-amber-700">
-                  <Clock className="h-3.5 w-3.5 shrink-0" />
-                  Upgrade pending
-                </p>
+                <div className="mt-1.5 space-y-1">
+                  <p className="flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-amber-700">
+                    <Clock className="h-3.5 w-3.5 shrink-0" />
+                    Upgrade pending
+                    {tierUpgradeApplication?.eligibility?.is_eligible === false ? (
+                      <span className="font-normal text-slate-500">· not currently eligible</span>
+                    ) : null}
+                  </p>
+                  {tierUpgradeApplication?.can_withdraw ? (
+                    <button
+                      type="button"
+                      disabled={isWithdrawing}
+                      onClick={async () => {
+                        try {
+                          const res = await withdrawMentorTierUpgrade().unwrap();
+                          toast.success(res?.message ?? 'Upgrade request withdrawn');
+                        } catch (error) {
+                          console.error('Failed to withdraw tier upgrade request', error);
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      Withdraw request
+                    </button>
+                  ) : null}
+                </div>
               ) : isTierUpgradeRejected ? (
                 <div className="mt-1.5 flex items-center gap-1 whitespace-nowrap text-xs font-medium text-red-600">
                   <button

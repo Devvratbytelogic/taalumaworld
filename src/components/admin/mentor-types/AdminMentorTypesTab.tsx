@@ -124,7 +124,11 @@ export function AdminMentorTypesTab() {
       flex: 1.2,
       sortable: false,
       renderCell: (params) => {
+        if (params.row.rank === 1) {
+          return <span className="text-sm text-slate-400">Starting tier</span>;
+        }
         const criteria: string[] = [];
+        if (params.row.min_rating) criteria.push(`${params.row.min_rating}+ rating`);
         if (params.row.max_mentors) criteria.push(`Max ${params.row.max_mentors} mentors`);
         if (params.row.min_confirmed_sales) criteria.push(`${params.row.min_confirmed_sales}+ sales`);
         if (params.row.min_days_since_published) criteria.push(`${params.row.min_days_since_published}+ days live`);

@@ -7,7 +7,6 @@ import { type GridColDef } from '@mui/x-data-grid';
 import { Check, Eye, Star, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminPageHeader } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -17,12 +16,6 @@ import { getReviewReportDetailRoutePath, isMentorPanelPath } from '@/routes/rout
 import ImageComponent from '@/components/ui/ImageComponent';
 import { AdminReviewReportsSearch } from './AdminReviewReportsSearch';
 import type { IAdminReviewReportEntity } from '@/types/adminReviewReports';
-
-const STATUS_TABS = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'ignored', label: 'Ignored' },
-] as const;
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200!',
@@ -47,21 +40,19 @@ export function AdminReviewReportsTab() {
   const pathname = usePathname();
   const isMentor = isMentorPanelPath(pathname);
   const [searchQuery, setSearchQuery] = useState('');
-  const [status, setStatus] = useState<string>('pending');
-  const [type, setType] = useState('Chapter');
+  const [status, setStatus] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const debouncedSearch = useDebounce(searchQuery, 400);
 
   useEffect(() => {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-  }, [debouncedSearch, status, type]);
+  }, [debouncedSearch, status]);
 
   const { data, isLoading, isFetching } = useGetAllAdminReviewReportsQuery({
     page: paginationModel.page + 1,
     limit: paginationModel.pageSize,
-    status: status as 'pending' | 'accepted' | 'ignored',
+    ...(status ? { status: status as 'pending' | 'accepted' | 'ignored' } : {}),
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
-    ...(type ? { type } : {}),
   });
 
   const reports = data?.data?.data ?? [];
@@ -237,21 +228,11 @@ export function AdminReviewReportsTab() {
         </Badge>
       </AdminPageHeader>
 
-      <Tabs value={status} onValueChange={setStatus}>
-        <TabsList>
-          {STATUS_TABS.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
       <AdminReviewReportsSearch
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        type={type}
-        onTypeChange={setType}
+        status={status}
+        onStatusChange={setStatus}
       />
 
       <div className="border border-gray-200 rounded-md overflow-hidden">

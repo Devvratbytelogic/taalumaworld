@@ -109,24 +109,24 @@ export function AdminSubscribersTab() {
             ),
         },
         {
-            field: 'date_of_subscription',
+            field: 'createdAt',
             headerName: 'Subscribed On',
             minWidth: 160,
             sortable: false,
             renderCell: (params) => (
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    {params.row.date_of_subscription}
+                    {params.row.createdAt}
                 </p>
             ),
         },
         {
-            field: 'createdAt',
-            headerName: 'Joining Date',
+            field: 'unsubscribedAt',
+            headerName: 'Unsubscribed On',
             minWidth: 140,
             sortable: false,
             renderCell: (params) => (
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
-                    {formatDate(params.row.createdAt)}
+                    {params.row.unsubscribedAt}
                 </p>
             ),
         },
@@ -138,7 +138,7 @@ export function AdminSubscribersTab() {
                 title="Subscribers"
                 description="Manage newsletter and email subscribers"
             >
-                
+
             </AdminPageHeader>
 
             <AdminSearchPanel>

@@ -41,18 +41,11 @@ const TYPE_TABS: { key: OrderTypeFilter; label: string }[] = [
   { key: 'chapter', label: 'Blueprints' },
 ];
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'All statuses' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'partial', label: 'Partial' },
-  { value: 'cancelled', label: 'Cancelled' },
-];
-
 const PAYMENT_STATUS_OPTIONS = [
   { value: 'all', label: 'All payments' },
   { value: 'Paid', label: 'Paid' },
   { value: 'Pending', label: 'Pending' },
+  { value: 'Failed', label: 'Failed' },
 ];
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -195,7 +188,6 @@ function OrderCard({
 export function MyOrdersPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [status, setStatus] = useState('all');
   const [paymentStatus, setPaymentStatus] = useState('all');
   const [type, setType] = useState<OrderTypeFilter>('all');
   const [fromDate, setFromDate] = useState('');
@@ -208,7 +200,7 @@ export function MyOrdersPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status, paymentStatus, type, fromDate, toDate]);
+  }, [debouncedSearch, paymentStatus, type, fromDate, toDate]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -218,7 +210,6 @@ export function MyOrdersPage() {
     page,
     limit: PAGE_LIMIT,
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
-    ...(status !== 'all' ? { status } : {}),
     ...(paymentStatus !== 'all' ? { payment_status: paymentStatus } : {}),
     ...(type !== 'all' ? { type } : {}),
     ...(fromDate ? { fromDate } : {}),
@@ -233,7 +224,6 @@ export function MyOrdersPage() {
 
   const hasActiveFilters =
     !!searchQuery.trim() ||
-    status !== 'all' ||
     paymentStatus !== 'all' ||
     type !== 'all' ||
     !!fromDate ||
@@ -241,7 +231,6 @@ export function MyOrdersPage() {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setStatus('all');
     setPaymentStatus('all');
     setType('all');
     setFromDate('');
@@ -344,20 +333,6 @@ export function MyOrdersPage() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-end sm:gap-2">
               <div className="col-span-2 flex min-w-0 flex-col gap-1 sm:col-span-1 sm:w-44">
-                <label className="text-xs font-medium text-gray-500">Status</label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="h-9 w-full rounded-sm border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none transition-colors focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
-                >
-                  {STATUS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-span-2 flex min-w-0 flex-col gap-1 sm:col-span-1 sm:w-44">
                 <label className="text-xs font-medium text-gray-500">Payment</label>
                 <select
                   value={paymentStatus}
@@ -431,7 +406,7 @@ export function MyOrdersPage() {
                 </h3>
                 <p className="mb-6 text-sm text-gray-500">
                   {hasActiveFilters
-                    ? 'Try adjusting search, status, payment, type, or date range.'
+                    ? 'Try adjusting search, payment, type, or date range.'
                     : 'When you purchase a series or blueprint, your orders will show up here.'}
                 </p>
                 {hasActiveFilters ? (

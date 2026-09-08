@@ -6,7 +6,7 @@ export interface SubscriberEntry {
     status: boolean;
     createdAt: string;
     updatedAt: string;
-    date_of_subscription: string;
+    unsubscribedAt: string;
     __v: number;
 }
 

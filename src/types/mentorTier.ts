@@ -29,6 +29,8 @@ export interface IAllMentorTiersEntity {
   min_days_since_published?: number | null;
   min_words_per_blueprint?: number | null;
   badge?: string | null;
+  equity_track?: boolean;
+  equity_eligible_percent?: number | null;
 }
 
 
@@ -59,4 +61,6 @@ export interface IGetMentorTierByIdAPIResponseData {
   min_days_since_published?: number | null;
   min_words_per_blueprint?: number | null;
   badge?: string | null;
+  equity_track?: boolean;
+  equity_eligible_percent?: number | null;
 }

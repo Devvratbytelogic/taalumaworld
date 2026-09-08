@@ -22,6 +22,11 @@ type PermissionMatrix = Record<string, string[]>;
 
 const PERMISSIONS_MODEL = 'Permissions';
 
+const MODEL_DESCRIPTIONS: Record<string, string> = {
+    'Review Reports': 'Reported reviews inbox',
+    'Mentor Equity': 'Equity eligibility flags (not share issuance)',
+};
+
 const EXCLUDED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));
 
 function isExcludedRole(name?: string | null) {
@@ -332,7 +337,7 @@ export function PermissionsMatrixTab() {
                                             const granted = matrix[model] ?? [];
                                             return (
                                                 <tr key={model} className={idx % 2 === 1 ? 'bg-slate-50/50' : undefined}>
-                                                    <td className="sticky left-0 z-1 bg-white px-4 py-2 border-b border-gray-100 font-medium text-slate-800 whitespace-nowrap">
+                                                    <td className="sticky left-0 z-1 bg-white px-4 py-2 border-b border-gray-100 font-medium text-slate-800">
                                                         {canEdit ? (
                                                             <button
                                                                 type="button"
@@ -345,6 +350,11 @@ export function PermissionsMatrixTab() {
                                                         ) : (
                                                             <span>{formatLabel(model)}</span>
                                                         )}
+                                                        {MODEL_DESCRIPTIONS[model] ? (
+                                                            <p className="mt-0.5 text-xs font-normal text-muted-foreground whitespace-normal">
+                                                                {MODEL_DESCRIPTIONS[model]}
+                                                            </p>
+                                                        ) : null}
                                                     </td>
                                                     {permissions.map((permission) => {
                                                         const checked = granted.includes(permission);

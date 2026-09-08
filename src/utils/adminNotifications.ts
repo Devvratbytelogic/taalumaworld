@@ -11,6 +11,7 @@ import {
     TrendingUp,
     Users,
     Wallet,
+    Scale,
     ShieldCheck,
 } from 'lucide-react';
 import type {
@@ -56,6 +57,9 @@ export function getNotificationTypeStyle(type: string): { icon: LucideIcon; clas
     }
     if (value.includes('score') || value.includes('ai')) {
         return { icon: Sparkles, className: 'bg-rose-50 text-rose-600' };
+    }
+    if (value.includes('equity')) {
+        return { icon: Scale, className: 'bg-violet-50 text-violet-600' };
     }
     if (value.includes('verif')) {
         return { icon: ShieldCheck, className: 'bg-violet-50 text-violet-600' };

@@ -1,3 +1,5 @@
+import type { IMentorEquityFlags } from '@/types/mentorEquity';
+
 export interface IAllRolesAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -144,6 +146,7 @@ export interface MentorEconomy {
   verified_mentor_at?: null;
   tier: Tier;
   wallet: Wallet;
+  equity?: IMentorEquityFlags | null;
 }
 export interface Tier {
   id: string;

@@ -17,6 +17,9 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { useGetAdminReviewReportByIdQuery } from '@/store/rtkQueries/adminReviewReportsApi';
 import { openModal } from '@/store/slices/allModalSlice';
 import { getReviewReportsListRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const REVIEW_REPORTS_MODEL = 'Review Reports';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200!',
@@ -68,6 +71,8 @@ export function ReviewReportDetailView({ reportId }: ReviewReportDetailViewProps
   const dispatch = useDispatch();
   const pathname = usePathname();
   const isMentor = isMentorPanelPath(pathname);
+  const { hasPermission } = useAdminPermissions();
+  const canProcessReports = hasPermission(REVIEW_REPORTS_MODEL, 'edit');
   const { data, isLoading, isError } = useGetAdminReviewReportByIdQuery(reportId);
   const report = data?.data;
   const listHref = getReviewReportsListRoutePath(isMentor);
@@ -207,7 +212,7 @@ export function ReviewReportDetailView({ reportId }: ReviewReportDetailViewProps
         </AdminPanel>
       ) : null}
 
-      {report.can_process ? (
+      {report.can_process && canProcessReports ? (
         <div className="flex flex-wrap justify-end gap-2">
           <Button
             type="button"

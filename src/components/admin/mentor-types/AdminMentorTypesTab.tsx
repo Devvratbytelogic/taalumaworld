@@ -139,6 +139,26 @@ export function AdminMentorTypesTab() {
       },
     },
     {
+      field: 'equity',
+      headerName: 'Equity track',
+      width: 140,
+      sortable: false,
+      renderCell: (params) => {
+        if (params.row.rank === 1) {
+          return <span className="text-sm text-slate-400">—</span>;
+        }
+        if (!params.row.equity_track) {
+          return <span className="text-sm text-slate-400">Off</span>;
+        }
+        const percent = params.row.equity_eligible_percent;
+        return (
+          <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200">
+            Top {percent == null ? '—' : `${percent}%`}
+          </Badge>
+        );
+      },
+    },
+    {
       field: 'createdAt',
       headerName: 'Created',
       width: 120,

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, LayoutDashboard, Link2, Mail, MessageSquare, Percent, Quote, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
-import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, LayoutDashboard, Link2, Mail, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
+import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorEquityRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
@@ -49,6 +49,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Mentor Tier', id: 'mentor_types', label: 'Mentor Types', href: getAdminMentorTypesRoutePath(), icon: Award },
             { model: 'Mentor Verification', id: 'mentor_verification', label: 'Mentor Verification', href: getAdminSectionRoutePath('mentor_verification'), icon: ShieldCheck },
             { model: 'Mentor Tier Upgrade', id: 'mentor_tier_upgrades', label: 'Mentor Tier Upgrade', href: getAdminSectionRoutePath('mentor_tier_upgrades'), icon: TrendingUp },
+            { model: 'Mentor Equity', id: 'mentor_equity', label: 'Mentor Equity', href: getAdminMentorEquityRoutePath(), icon: Scale },
             // { model: 'Affiliate Application', id: 'affiliate_applications', label: 'Affiliate Applications', href: getAdminSectionRoutePath('affiliate_applications'), icon: Handshake },
         ],
     },
@@ -58,7 +59,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
             { model: 'Series', id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
             { model: 'Blueprints', id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
             { model: 'Reviews', id: 'reviews', label: 'Reviews', href: getAdminSectionRoutePath('reviews'), icon: Star },
-            { model: 'Reviews', id: 'review_reports', label: 'Review reports', href: getAdminSectionRoutePath('review_reports'), icon: Flag },
+            { model: 'Review Reports', id: 'review_reports', label: 'Review reports', href: getAdminSectionRoutePath('review_reports'), icon: Flag },
         ],
     },
     {

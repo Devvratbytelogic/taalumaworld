@@ -280,6 +280,8 @@ export const rtkQuerieSetup = createApi({
         'AdminMentorApplications',
         'AdminMentorTierUpgradeApplications',
         'MyMentorTierUpgradeApplication',
+        'AdminMentorEquity',
+        'MyMentorEquity',
         'AdminVerifiedMentorApplications',
         'MyVerifiedMentorApplication',
         'AdminFollowers',

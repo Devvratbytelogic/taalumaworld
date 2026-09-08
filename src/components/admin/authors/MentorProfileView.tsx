@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   Circle,
   UserX,
+  Award,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import Button from '@/components/ui/Button';
@@ -32,12 +33,14 @@ import {
   adminPanelClass,
 } from '@/components/admin/layout/AdminContent';
 import { SuspendUserDialog } from '@/components/admin/users/SuspendUserDialog';
+import { AssignMentorTierModal } from './AssignMentorTierModal';
 import { useGetUserByIdQuery, useUpdateStaffStatusMutation } from '@/store/rtkQueries/rolesPermissionsApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -142,6 +145,9 @@ export function MentorProfileView() {
   const mentorId = params?.id;
 
   const [suspendMentor, setSuspendMentor] = useState<IAllUsersEntity | null>(null);
+  const [isAssignOpen, setIsAssignOpen] = useState(false);
+  const { hasPermission } = useAdminPermissions();
+  const canAssignTier = hasPermission('Mentor Tier', 'edit');
 
   const { data: mentorResponse, isLoading } = useGetUserByIdQuery(mentorId ?? '', { skip: !mentorId });
   const [updateMentorStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
@@ -218,13 +224,24 @@ export function MentorProfileView() {
       {backLink}
 
       <AdminPageHeader eyebrow="Mentor Management" title={mentor.name} description={mentor.email}>
-        <Button
-          onPress={handleSuspendClick}
-          className={`global_btn rounded_full ${isSuspended ? 'success_btn' : 'danger_btn'}`}
-          startContent={isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
-        >
-          {isSuspended ? 'Activate Mentor' : 'Suspend Mentor'}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          {canAssignTier ? (
+            <Button
+              onPress={() => setIsAssignOpen(true)}
+              className="global_btn rounded_full outline_primary"
+              startContent={<Award className="h-4 w-4" />}
+            >
+              Assign tier
+            </Button>
+          ) : null}
+          <Button
+            onPress={handleSuspendClick}
+            className={`global_btn rounded_full ${isSuspended ? 'success_btn' : 'danger_btn'}`}
+            startContent={isSuspended ? <CircleCheck className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+          >
+            {isSuspended ? 'Activate Mentor' : 'Suspend Mentor'}
+          </Button>
+        </div>
       </AdminPageHeader>
 
       <div className="grid gap-6 xl:grid-cols-3">
@@ -548,6 +565,20 @@ export function MentorProfileView() {
           </AdminPanel>
         </div>
       </div>
+
+      {canAssignTier ? (
+        <AssignMentorTierModal
+          open={isAssignOpen}
+          mentorId={mentor._id}
+          mentorName={mentor.name}
+          currentTierId={economy?.tier?.id ?? mentorInfo?.tier_id}
+          currentTierCode={economy?.tier?.code}
+          onOpenChange={setIsAssignOpen}
+          onSuccess={() => {
+            if (mentor.short_code) void refreshAfterMentorChange(mentor.short_code);
+          }}
+        />
+      ) : null}
 
       <SuspendUserDialog
         user={suspendMentor}

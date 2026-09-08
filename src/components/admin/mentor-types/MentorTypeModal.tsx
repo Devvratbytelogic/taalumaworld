@@ -6,6 +6,7 @@ import { Award, Save, Upload, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,8 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
     min_confirmed_sales: mentorTier?.min_confirmed_sales || 0,
     min_days_since_published: mentorTier?.min_days_since_published || 0,
     min_words_per_blueprint: mentorTier?.min_words_per_blueprint || 0,
+    equity_track: mentorTier?.equity_track ?? false,
+    equity_eligible_percent: mentorTier?.equity_eligible_percent ?? '',
     badge: mentorTier?.badge || null,
   };
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, resetForm, setFieldValue } = useFormik({
@@ -67,6 +70,14 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
       fd.append('min_confirmed_sales', String(formValues.min_confirmed_sales));
       fd.append('min_days_since_published', String(formValues.min_days_since_published));
       fd.append('min_words_per_blueprint', String(formValues.min_words_per_blueprint));
+      const isRank1 = Number(formValues.rank) === 1;
+      const equityTrack = isRank1 ? false : Boolean(formValues.equity_track);
+      fd.append('equity_track', String(equityTrack));
+      if (!isRank1 && equityTrack && formValues.equity_eligible_percent !== '' && formValues.equity_eligible_percent != null) {
+        fd.append('equity_eligible_percent', String(formValues.equity_eligible_percent));
+      } else {
+        fd.append('equity_eligible_percent', '');
+      }
       if (badgeFile) fd.append('badge', badgeFile);
 
       try {
@@ -218,7 +229,12 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                   value={values.rank}
                   onChange={(e) => {
                     const digits = e.target.value.replace(/[^\d]/g, '');
-                    setFieldValue('rank', digits ? Number(digits) : 0);
+                    const nextRank = digits ? Number(digits) : 0;
+                    setFieldValue('rank', nextRank);
+                    if (nextRank === 1) {
+                      setFieldValue('equity_track', false);
+                      setFieldValue('equity_eligible_percent', '');
+                    }
                   }}
                   placeholder="e.g. 1"
                 />
@@ -293,6 +309,56 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                 />
               </div>
             </div>
+
+            {Number(values.rank) !== 1 ? (
+              <div className="space-y-4 rounded-lg border border-slate-100 bg-slate-50/60 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <Label htmlFor="equity_track">Equity track</Label>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Does not grant shares. Flags the top % for legal review.
+                    </p>
+                  </div>
+                  <Switch
+                    id="equity_track"
+                    checked={Boolean(values.equity_track)}
+                    onCheckedChange={(checked) => {
+                      setFieldValue('equity_track', checked);
+                      if (checked && (values.equity_eligible_percent === '' || values.equity_eligible_percent == null)) {
+                        setFieldValue('equity_eligible_percent', 1);
+                      }
+                    }}
+                  />
+                </div>
+                {values.equity_track ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="equity_eligible_percent">
+                      Top % eligible for equity review<span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="equity_eligible_percent"
+                      name="equity_eligible_percent"
+                      type="text"
+                      inputMode="decimal"
+                      value={values.equity_eligible_percent}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/[^\d.]/g, '');
+                        const parts = raw.split('.');
+                        const sanitized = parts.length > 1 ? `${parts[0]}.${parts.slice(1).join('')}` : raw;
+                        setFieldValue('equity_eligible_percent', sanitized === '' ? '' : sanitized);
+                      }}
+                      onBlur={handleBlur}
+                      placeholder="e.g. 1"
+                    />
+                    {errors.equity_eligible_percent && touched.equity_eligible_percent ? (
+                      <p className="text-sm text-red-600">{errors.equity_eligible_percent}</p>
+                    ) : (
+                      <p className="text-xs text-slate-400">Number between 0 and 100.</p>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

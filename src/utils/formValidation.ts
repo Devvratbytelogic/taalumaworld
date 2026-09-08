@@ -680,6 +680,20 @@ export const mentorTierSchema = Yup.object({
   min_confirmed_sales: optionalNonNegativeNumber,
   min_days_since_published: optionalNonNegativeNumber,
   min_words_per_blueprint: optionalNonNegativeNumber,
+  equity_track: Yup.boolean(),
+  equity_eligible_percent: Yup.number()
+    .transform((v) => (v === '' || v == null ? null : Number(v)))
+    .nullable()
+    .when(['equity_track', 'rank'], {
+      is: (track: boolean, rank: number) => Boolean(track) && Number(rank) !== 1,
+      then: (schema) =>
+        schema
+          .typeError('equity_eligible_percent must be a number between 0 and 100')
+          .min(0, 'equity_eligible_percent must be a number between 0 and 100')
+          .max(100, 'equity_eligible_percent must be a number between 0 and 100')
+          .required('equity_eligible_percent must be a number between 0 and 100'),
+      otherwise: (schema) => schema.nullable().optional(),
+    }),
   badge: Yup.mixed()
     .nullable()
     .optional()

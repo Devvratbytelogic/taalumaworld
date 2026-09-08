@@ -158,6 +158,10 @@ export function getAdminMentorApplicationsRoutePath(): string {
   return '/admin/applications/mentors';
 }
 
+export function getAdminMentorEquityRoutePath(): string {
+  return '/admin/mentor-equity';
+}
+
 export function getAdminProfileRoutePath(): string {
   return '/admin/profile';
 }
@@ -186,6 +190,7 @@ export function getAdminSectionRoutePath(section: string): string {
     mentor_applications: '/admin/applications/mentors',
     mentor_verification: '/admin/application-mentor-verification',
     mentor_tier_upgrades: '/admin/application-mentor-tier-upgrades',
+    mentor_equity: '/admin/mentor-equity',
     users: '/admin/users',
     staff: '/admin/staff',
     activity_logs: '/admin/activity-logs',

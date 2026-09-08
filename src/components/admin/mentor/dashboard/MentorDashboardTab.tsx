@@ -23,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
+import { MentorEquityStatusCard } from '@/components/admin/mentor/dashboard/MentorEquityStatusCard';
 import { formatKes } from '@/constants/common';
 import {
   useGetBlueprintPerformanceQuery,
@@ -166,6 +167,7 @@ export function MentorDashboardTab() {
   return (
     <AdminPage>
       <MentorVerificationHeader />
+      <MentorEquityStatusCard />
 
         <div className="flex flex-wrap items-end justify-end gap-3">
           <div className="flex min-w-0 flex-col gap-1 sm:w-40">

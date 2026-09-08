@@ -3,6 +3,7 @@ import type { IAllMentorTiersAPIResponse, IGetMentorTierByIdAPIResponse } from '
 import type { IAllMentorApplicationsAPIResponse } from '@/types/mentorApplication';
 import { IAllMentorTierUpgradeApplicationsAPIResponse, IGetMyMentorTierUpgradeApplicationAPIResponse } from '@/types/mentorTierUpgradeApplication';
 import { IFollowsAPIResponse } from '@/types/follows';
+import type { IAssignMentorTierAPIResponse } from '@/types/mentorEquity';
 
 
 export const mentorApis = rtkQuerieSetup.injectEndpoints({
@@ -29,7 +30,7 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags: ['AdminMentorTiers'],
+            invalidatesTags: ['AdminMentorTiers', 'AdminMentorEquity', 'MyMentorEquity'],
         }),
         updateMentorTier: builder.mutation({
             query: ({ id, values }) => ({
@@ -37,7 +38,22 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
                 method: 'PUT',
                 body: values,
             }),
-            invalidatesTags: ['AdminMentorTiers'],
+            invalidatesTags: ['AdminMentorTiers', 'AdminMentorEquity', 'MyMentorEquity'],
+        }),
+        assignMentorTier: builder.mutation<
+            IAssignMentorTierAPIResponse,
+            { mentorId: string; tier_id?: string; tier_code?: string; admin_notes?: string }
+        >({
+            query: ({ mentorId, tier_id, tier_code, admin_notes }) => ({
+                url: `/admin/mentors/${mentorId}/tier`,
+                method: 'PUT',
+                body: {
+                    ...(tier_id ? { tier_id } : {}),
+                    ...(tier_code ? { tier_code } : {}),
+                    ...(admin_notes?.trim() ? { admin_notes: admin_notes.trim() } : {}),
+                },
+            }),
+            invalidatesTags: ['AdminStaff', 'AdminMentorTiers', 'AdminMentorEquity', 'MyMentorEquity', 'AdminProfile'],
         }),
 
 
@@ -92,7 +108,7 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
                 method: 'PUT',
                 body: values,
             }),
-            invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication'],
+            invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication', 'AdminMentorEquity', 'MyMentorEquity', 'AdminStaff', 'AdminProfile'],
         }),
 
         /** Followers */
@@ -112,6 +128,7 @@ export const {
     useGetMentorTierByIdQuery,
     useAddMentorTierMutation,
     useUpdateMentorTierMutation,
+    useAssignMentorTierMutation,
     useGetAllMentorApplicationsQuery,
     useReviewMentorApplicationMutation,
     useApplyMentorTierUpgradeMutation,

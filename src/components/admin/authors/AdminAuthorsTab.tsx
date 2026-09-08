@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Ban, CircleCheck, BadgeCheck, Edit2, KeyRound, Loader2 } from 'lucide-react';
+import { Eye, Ban, CircleCheck, BadgeCheck, Edit2, KeyRound, Loader2, Award } from 'lucide-react';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,6 +13,7 @@ import { AdminAuthorsHeader } from './AdminAuthorsHeader';
 import { AdminAuthorsSearch } from './AdminAuthorsSearch';
 import { SuspendUserDialog } from '@/components/admin/users/SuspendUserDialog';
 import { EditUserModal } from '@/components/admin/users/EditUserModal';
+import { AssignMentorTierModal } from './AssignMentorTierModal';
 import {
   useGetAllUsersQuery,
   useUpdateStaffStatusMutation,
@@ -24,6 +25,7 @@ import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 
 const MENTORS_MODEL = 'Mentors';
+const MENTOR_TIER_MODEL = 'Mentor Tier';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -43,6 +45,7 @@ export function AdminAuthorsTab() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [editAuthor, setEditAuthor] = useState<IAllUsersEntity | null>(null);
+  const [assignAuthor, setAssignAuthor] = useState<IAllUsersEntity | null>(null);
   const [suspendAuthor, setSuspendAuthor] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
@@ -51,6 +54,7 @@ export function AdminAuthorsTab() {
   const canView = hasPermission(MENTORS_MODEL, 'view');
   const canEdit = hasPermission(MENTORS_MODEL, 'edit');
   const canDelete = hasPermission(MENTORS_MODEL, 'delete');
+  const canAssignTier = hasPermission(MENTOR_TIER_MODEL, 'edit');
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -237,12 +241,12 @@ export function AdminAuthorsTab() {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 200,
+      width: 260,
       sortable: false,
       renderCell: (params) => {
         const isSuspended = params.row.status === 'suspended';
         const isResetting = resettingPasswordId === params.row._id;
-        if (!canView && !canEdit && !canDelete) return null;
+        if (!canView && !canEdit && !canDelete && !canAssignTier) return null;
         return (
           <div className="action_buttons">
             {canView ? (
@@ -253,6 +257,16 @@ export function AdminAuthorsTab() {
                 onClick={() => handleViewProfile(params.row)}
               >
                 <Eye className="h-4 w-4" />
+              </button>
+            ) : null}
+            {canAssignTier ? (
+              <button
+                type="button"
+                className="active_button"
+                title="Assign tier"
+                onClick={() => setAssignAuthor(params.row)}
+              >
+                <Award className="h-4 w-4" />
               </button>
             ) : null}
             {canEdit ? (
@@ -314,6 +328,20 @@ export function AdminAuthorsTab() {
           onPaginationModelChange={setPaginationModel}
         />
       </div>
+
+      {canAssignTier ? (
+        <AssignMentorTierModal
+          open={!!assignAuthor}
+          mentorId={assignAuthor?._id}
+          mentorName={assignAuthor?.name}
+          currentTierId={assignAuthor?.mentor_economy?.tier?.id ?? assignAuthor?.mentor_info?.tier_id}
+          currentTierCode={assignAuthor?.mentor_economy?.tier?.code}
+          onOpenChange={(open) => !open && setAssignAuthor(null)}
+          onSuccess={() => {
+            if (assignAuthor?.short_code) void refreshAfterMentorChange(assignAuthor.short_code);
+          }}
+        />
+      ) : null}
 
       {canEdit ? (
         <EditUserModal

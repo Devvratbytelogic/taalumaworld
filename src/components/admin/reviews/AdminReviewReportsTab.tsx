@@ -16,6 +16,9 @@ import { getReviewReportDetailRoutePath, isMentorPanelPath } from '@/routes/rout
 import ImageComponent from '@/components/ui/ImageComponent';
 import { AdminReviewReportsSearch } from './AdminReviewReportsSearch';
 import type { IAdminReviewReportEntity } from '@/types/adminReviewReports';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const REVIEW_REPORTS_MODEL = 'Review Reports';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200!',
@@ -39,6 +42,8 @@ export function AdminReviewReportsTab() {
   const router = useRouter();
   const pathname = usePathname();
   const isMentor = isMentorPanelPath(pathname);
+  const { hasPermission } = useAdminPermissions();
+  const canProcessReports = hasPermission(REVIEW_REPORTS_MODEL, 'edit');
   const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
@@ -192,7 +197,7 @@ export function AdminReviewReportsTab() {
           >
             <Eye className="h-4 w-4" />
           </button>
-          {params.row.can_process ? (
+          {params.row.can_process && canProcessReports ? (
             <>
               <button
                 type="button"

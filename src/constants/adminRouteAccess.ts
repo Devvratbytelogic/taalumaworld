@@ -27,6 +27,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/taxes', models: ['Taxes'] },
   { path: '/admin/withdrawal-requests', models: ['Withdrawal', 'Withdrawal Request'] },
   { path: '/admin/users', models: ['Users'] },
+  { path: '/admin/campaign-users', models: ['Campaign Users'] },
   { path: '/admin/staff', models: ['Staff'] },
   {
     path: '/admin/institutions',

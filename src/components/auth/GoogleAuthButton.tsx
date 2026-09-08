@@ -5,6 +5,7 @@ import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import toast from '@/utils/toast'
 import { useUserGoogleLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { useCompleteSocialAuth } from '@/hooks/useCompleteSocialAuth'
+import { getReferralCodeFromSearch } from '@/utils/campaignAttribution'
 import { buildSocialAuthBody, type SocialAuthExtras } from '@/utils/socialAuth'
 import { GoogleIcon } from '@/components/ui/AllSVG'
 
@@ -27,7 +28,7 @@ export default function GoogleAuthButton({
 }: GoogleAuthButtonProps) {
     const searchParams = useSearchParams()
     const completeSocialAuth = useCompleteSocialAuth()
-    const referralCodeFromParams = searchParams.get('referralCode') ?? ''
+    const referralCodeFromParams = getReferralCodeFromSearch(searchParams)
     const [googleLogin, { isLoading }] = useUserGoogleLoginMutation()
 
     const handleSuccess = async (credentialResponse: CredentialResponse) => {

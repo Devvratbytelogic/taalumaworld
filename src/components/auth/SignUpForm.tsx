@@ -18,6 +18,7 @@ import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { setAuthCookies } from '@/utils/authCookies';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
+import { appendCampaignAttributionToFormData } from '@/utils/campaignAttribution';
 
 const AVATAR_BORDER_COLOR = '#C8D7EE';
 
@@ -79,6 +80,7 @@ export function SignUpForm() {
                     formData.append('professionalBio', formValues.professionalBio.trim());
                 }
                 formValues.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
+                appendCampaignAttributionToFormData(formData);
 
                 const res = await registerMentor(formData).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {

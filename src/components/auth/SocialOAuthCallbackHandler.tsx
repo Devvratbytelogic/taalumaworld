@@ -7,6 +7,7 @@ import toast from '@/utils/toast'
 import { useUserLinkedInLoginMutation, useUserMetaLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { setAuthCookies } from '@/utils/authCookies'
 import {
+    buildSocialAuthBody,
     claimSocialOAuthCode,
     clearSocialOAuth,
     getSocialOAuthRedirectUri,
@@ -84,10 +85,10 @@ export default function SocialOAuthCallbackHandler({ provider }: { provider: Soc
                 const res = await exchange({
                     code,
                     redirect_uri: getSocialOAuthRedirectUri(provider),
-                    ...(pending?.referral_code ? { referral_code: pending.referral_code } : {}),
-                    ...(pending?.accepted_agreement_ids?.length
-                        ? { accepted_agreement_ids: pending.accepted_agreement_ids }
-                        : {}),
+                    ...buildSocialAuthBody({
+                        referralCode: pending?.referral_code,
+                        acceptedAgreementIds: pending?.accepted_agreement_ids,
+                    }),
                 }).unwrap()
 
                 const token = res?.data?.token

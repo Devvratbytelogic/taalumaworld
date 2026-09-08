@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import AllModal from '../modals/AllModal';
 import { PendingAgreementsGate } from '@/components/agreements/PendingAgreementsGate';
 import SocialOAuthCallbackHandler from '@/components/auth/SocialOAuthCallbackHandler';
+import { CampaignAttributionCapture } from '@/components/providers/CampaignAttributionCapture';
 // import { NetworkStatusBanner } from '../network/NetworkStatusBanner';
 
 interface ProvidersProps {
@@ -27,6 +28,7 @@ export function AppProviders({ children }: ProvidersProps) {
                             color="#f7941d"
                             showSpinner={false}
                         />
+                        <CampaignAttributionCapture />
                         <AllModal />
                         <Suspense fallback={null}>
                             <SocialOAuthCallbackHandler provider="linkedin" />

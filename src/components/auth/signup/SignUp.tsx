@@ -22,6 +22,7 @@ import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements'
 import { useGetInstituteMessageQuery, useGetPartnerInstitutionsQuery } from '@/store/rtkQueries/userGetAPI'
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint'
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload'
+import { appendCampaignAttributionToFormData, getReferralCodeFromSearch, getStoredReferralCode } from '@/utils/campaignAttribution'
 
 const DEFAULT_PARTNER_PROMPT_HEADING = 'Partner university student'
 const DEFAULT_PARTNER_PROMPT_MESSAGE = 'Use your official university email to access selected content free during our promotional period.'
@@ -100,7 +101,7 @@ export default function SignUp() {
     const dispatch = useDispatch()
     const router = useRouter()
     const searchParams = useSearchParams()
-    const referralCodeFromParams = searchParams.get('referralCode') ?? ''
+    const referralCodeFromParams = getReferralCodeFromSearch(searchParams)
     const { isOpen, componentName, data } = useSelector((state: RootState) => state.allModal)
     const onSuccess = data?.onSuccess
     const onCancel = data?.onCancel
@@ -113,6 +114,7 @@ export default function SignUp() {
     const [profileImage, setProfileImage] = useState<File | null>(null)
     const [profilePreview, setProfilePreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const didPrefillReferral = useRef(false)
     const [userRegister, { isLoading: isRegistering }] = useUserRegisterMutation()
 
 
@@ -205,6 +207,7 @@ export default function SignUp() {
                 if (formValues.referralCode.trim()) formData.append('referral_code', formValues.referralCode.trim())
                 if (formValues.isPartnerStudent && formValues.university) formData.append('institution_id', formValues.university)
                 formValues.accepted_agreement_ids.forEach((id: string, index: number) => formData.append(`accepted_agreement_ids[${index}]`, id))
+                appendCampaignAttributionToFormData(formData)
 
                 const res = await userRegister(formData).unwrap()
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
@@ -229,6 +232,18 @@ export default function SignUp() {
         },
     })
 
+    useEffect(() => {
+        if (!isOpen) {
+            didPrefillReferral.current = false
+            return
+        }
+        if (didPrefillReferral.current || values.referralCode) return
+        const storedReferral = getStoredReferralCode()
+        if (storedReferral) {
+            didPrefillReferral.current = true
+            setFieldValue('referralCode', storedReferral)
+        }
+    }, [isOpen, setFieldValue, values.referralCode])
 
     const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined
 

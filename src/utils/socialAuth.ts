@@ -1,3 +1,5 @@
+import { getCampaignRegisterFields, getStoredReferralCode, type CampaignRegisterFields } from '@/utils/campaignAttribution'
+
 export type SocialAuthExtras = {
     referralCode?: string
     acceptedAgreementIds?: string[]
@@ -18,9 +20,12 @@ export type SocialLoginResult = {
 
 export type SocialOAuthProvider = 'linkedin' | 'meta'
 
-export type SocialOAuthPending = {
+export type SocialAuthBody = CampaignRegisterFields & {
     referral_code?: string
     accepted_agreement_ids?: string[]
+}
+
+export type SocialOAuthPending = SocialAuthBody & {
     returnTo: string
 }
 
@@ -44,12 +49,11 @@ export function generateOAuthState(): string {
     return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export function buildSocialAuthBody(extras: SocialAuthExtras): {
-    referral_code?: string
-    accepted_agreement_ids?: string[]
-} {
-    const body: { referral_code?: string; accepted_agreement_ids?: string[] } = {}
-    const referral = extras.referralCode?.trim()
+export function buildSocialAuthBody(extras: SocialAuthExtras): SocialAuthBody {
+    const body: SocialAuthBody = { ...getCampaignRegisterFields() }
+    const referral = extras.referralCode !== undefined
+        ? extras.referralCode.trim()
+        : getStoredReferralCode()
     if (referral) body.referral_code = referral
     if (extras.acceptedAgreementIds?.length) {
         body.accepted_agreement_ids = extras.acceptedAgreementIds

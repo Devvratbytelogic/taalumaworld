@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, LayoutDashboard, Link2, Mail, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
+import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, LayoutDashboard, Link2, Mail, Megaphone, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorEquityRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -35,6 +35,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'User Management',
         items: [
             { model: 'Users', id: 'users', label: 'Customers', href: getAdminSectionRoutePath('users'), icon: UserCircle },
+            { model: 'Campaign Users', id: 'campaign_users', label: 'Campaign Users', href: getAdminSectionRoutePath('campaign_users'), icon: Megaphone },
             { model: 'Staff', id: 'staff', label: 'Staff', href: getAdminSectionRoutePath('staff'), icon: UserCog },
             { model: 'Institutions', submodel: ['Institution Access', 'Institute Usage Report', 'Institute Registration Prompt'], id: 'institutions', label: 'University Partners', href: getAdminSectionRoutePath('institutions'), icon: GraduationCap },
         ],

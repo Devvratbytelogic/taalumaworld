@@ -8,6 +8,7 @@ import toast from '@/utils/toast'
 import { LINKEDIN_CLIENT_ID, META_APP_ID } from '@/utils/config'
 import { useUserMetaLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { useCompleteSocialAuth } from '@/hooks/useCompleteSocialAuth'
+import { getReferralCodeFromSearch } from '@/utils/campaignAttribution'
 import {
     beginSocialOAuth,
     buildSocialAuthBody,
@@ -42,7 +43,7 @@ export default function SocialAuthButtons({
 }: SocialAuthButtonsProps) {
     const searchParams = useSearchParams()
     const completeSocialAuth = useCompleteSocialAuth()
-    const referralCodeFromParams = searchParams.get('referralCode') ?? ''
+    const referralCodeFromParams = getReferralCodeFromSearch(searchParams)
     const [metaLogin, { isLoading: isMetaLoading }] = useUserMetaLoginMutation()
     const [isLinkedInRedirecting, setIsLinkedInRedirecting] = useState(false)
     const [isFacebookStarting, setIsFacebookStarting] = useState(false)

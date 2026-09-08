@@ -13,6 +13,7 @@ import { IAllSubscribersAPIResponse } from '@/types/subscribers';
 import { IAllOrdersAPIResponse, ISingleOrderAPIResponse } from '@/types/order';
 import { ISingleChapterAPIResponse } from '@/types/singleChapter';
 import { IPaystackBanksAPIResponse } from '@/types/paystackBanks';
+import { ICampaignUsersAPIResponse, IGetCampaignUsersParams } from '@/types/campaignUsers';
 
 export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
@@ -171,6 +172,15 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        getCampaignUsers: builder.query<ICampaignUsersAPIResponse, IGetCampaignUsersParams | void>({
+            query: (params) => ({
+                url: `/admin/campaign-users`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminCampaignUsers'],
+        }),
     }),
 });
 
@@ -191,4 +201,5 @@ export const {
     useGetAllOrdersQuery,
     useGetOrderByIdQuery,
     useGetPaystackBanksQuery,
+    useGetCampaignUsersQuery,
 } = clientSideGetApis;

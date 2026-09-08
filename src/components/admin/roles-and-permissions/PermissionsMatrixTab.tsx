@@ -25,6 +25,7 @@ const PERMISSIONS_MODEL = 'Permissions';
 const MODEL_DESCRIPTIONS: Record<string, string> = {
     'Review Reports': 'Reported reviews inbox',
     'Mentor Equity': 'Equity eligibility flags (not share issuance)',
+    'Campaign Users': 'Users who signed up from a campaign / ad',
 };
 
 const EXCLUDED_ROLE_NAMES = new Set<string>(Object.values(USER_TYPE));

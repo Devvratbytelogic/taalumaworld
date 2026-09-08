@@ -76,6 +76,8 @@ export interface CurrentTierIdOrRequestedTierId {
   min_words_per_blueprint?: number | null;
   min_confirmed_sales?: number | null;
   min_days_since_published?: number | null;
+  equity_track?: boolean;
+  equity_eligible_percent?: number | null;
 }
 
 export interface IMentorTierUpgradeReviewer {

@@ -33,6 +33,7 @@ import {
   useReviewMentorTierUpgradeApplicationMutation,
 } from '@/store/rtkQueries/mentorApis';
 import type {
+  CurrentTierIdOrRequestedTierId,
   IAllMentorTierUpgradeApplicationsEntity,
   IMentorTierUpgradeEligibility,
 } from '@/types/mentorTierUpgradeApplication';
@@ -65,6 +66,10 @@ function hasGate(value?: number | null) {
 function formatRating(value?: number | null) {
   if (value == null) return '—';
   return String(value);
+}
+
+function formatGate(value?: number | null) {
+  return hasGate(value) ? String(value) : '—';
 }
 
 function getApplicantName(app: IAllMentorTierUpgradeApplicationsEntity) {
@@ -106,16 +111,25 @@ function EligibilityCheckRow({ passed, label }: { passed: boolean; label: string
   );
 }
 
-function EligibilitySnapshot({ eligibility }: { eligibility?: IMentorTierUpgradeEligibility | null }) {
-  if (!eligibility) return null;
+function EligibilitySnapshot({
+  eligibility,
+  requestedTier,
+}: {
+  eligibility?: IMentorTierUpgradeEligibility | null;
+  requestedTier?: CurrentTierIdOrRequestedTierId | null;
+}) {
+  if (!eligibility && !requestedTier) return null;
 
-  const required = eligibility.required ?? {};
-  const checks = eligibility.checks ?? {};
-  const ratingGate = hasGate(required.min_rating);
+  const required = eligibility?.required ?? {};
+  const checks = eligibility?.checks ?? {};
+  const minWords = requestedTier?.min_words_per_blueprint ?? required.min_words_per_blueprint;
+  const minSales = requestedTier?.min_confirmed_sales ?? required.min_confirmed_sales;
+  const minDays = requestedTier?.min_days_since_published ?? required.min_days_since_published;
+  const ratingGate = hasGate(required.min_rating ?? requestedTier?.min_rating);
   const blueprintParts = [
-    hasGate(required.min_words_per_blueprint) ? `${required.min_words_per_blueprint} words` : null,
-    hasGate(required.min_confirmed_sales) ? `${required.min_confirmed_sales} confirmed sales` : null,
-    hasGate(required.min_days_since_published) ? `published ${required.min_days_since_published}+ days ago` : null,
+    hasGate(minWords) ? `${minWords} words` : null,
+    hasGate(minSales) ? `${minSales} confirmed sales` : null,
+    hasGate(minDays) ? `published ${minDays}+ days ago` : null,
   ].filter(Boolean);
   const hasBlueprintGate = blueprintParts.length > 0;
 
@@ -123,40 +137,62 @@ function EligibilitySnapshot({ eligibility }: { eligibility?: IMentorTierUpgrade
     <div className="space-y-3 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Live eligibility</p>
-        <Badge
-          variant="outline"
-          className={
-            eligibility.is_eligible
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200!'
-              : 'bg-red-50 text-red-700 border-red-200!'
-          }
-        >
-          {eligibility.is_eligible ? 'Eligible' : 'Not eligible'}
-        </Badge>
+        {eligibility ? (
+          <Badge
+            variant="outline"
+            className={
+              eligibility.is_eligible
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200!'
+                : 'bg-red-50 text-red-700 border-red-200!'
+            }
+          >
+            {eligibility.is_eligible ? 'Eligible' : 'Not eligible'}
+          </Badge>
+        ) : null}
       </div>
-      <p className="text-xs text-slate-400">
-        Computed live and may have changed since apply. Approving does not re-run these checks.
-      </p>
-      <div className="grid gap-2 sm:grid-cols-2">
-        <p>
-          <span className="text-slate-500">Overall rating:</span> {formatRating(eligibility.overall_rating)}
-          {eligibility.total_reviews != null ? ` (${eligibility.total_reviews} reviews)` : ''}
+      {eligibility ? (
+        <p className="text-xs text-slate-400">
+          Computed live and may have changed since apply. Approving does not re-run these checks.
         </p>
-        <p>
-          <span className="text-slate-500">Required min rating:</span>{' '}
-          {ratingGate ? formatRating(required.min_rating) : 'No gate'}
-        </p>
-        <p>
-          <span className="text-slate-500">Qualifying Blueprints:</span>{' '}
-          {eligibility.qualifying_blueprint_count ?? '—'}
-        </p>
-      </div>
+      ) : null}
+      {eligibility ? (
+        <div className="grid gap-2 sm:grid-cols-2">
+          <p>
+            <span className="text-slate-500">Overall rating:</span> {formatRating(eligibility.overall_rating)}
+            {eligibility.total_reviews != null ? ` (${eligibility.total_reviews} reviews)` : ''}
+          </p>
+          <p>
+            <span className="text-slate-500">Required min rating:</span>{' '}
+            {ratingGate ? formatRating(required.min_rating ?? requestedTier?.min_rating) : '—'}
+          </p>
+          <p>
+            <span className="text-slate-500">Qualifying Blueprints:</span>{' '}
+            {eligibility.qualifying_blueprint_count ?? '—'}
+          </p>
+        </div>
+      ) : null}
+      {requestedTier ? (
+        <div className="space-y-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Requested tier eligibility</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <p>
+              <span className="text-slate-500">Min confirmed sales:</span> {formatGate(minSales)}
+            </p>
+            <p>
+              <span className="text-slate-500">Min days since published:</span> {formatGate(minDays)}
+            </p>
+            <p>
+              <span className="text-slate-500">Min words per blueprint:</span> {formatGate(minWords)}
+            </p>
+          </div>
+        </div>
+      ) : null}
       {ratingGate || hasBlueprintGate ? (
         <ul className="space-y-2">
           {ratingGate ? (
             <EligibilityCheckRow
               passed={Boolean(checks.min_rating)}
-              label={`Overall rating of at least ${required.min_rating}`}
+              label={`Overall rating of at least ${required.min_rating ?? requestedTier?.min_rating}`}
             />
           ) : null}
           {hasBlueprintGate ? (
@@ -505,7 +541,10 @@ export function AdminMentorTierUpgradeApplicationsTab() {
                   <p><span className="text-slate-500">Requested tier:</span> {reviewApplication.requested_tier_id?.code ?? '—'}</p>
                 </div>
 
-                <EligibilitySnapshot eligibility={reviewApplication.eligibility} />
+                <EligibilitySnapshot
+                  eligibility={reviewApplication.eligibility}
+                  requestedTier={reviewApplication.requested_tier_id}
+                />
 
                 {reviewApplication.application_statement ? (
                   <div className="space-y-1.5">

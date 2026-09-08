@@ -93,6 +93,7 @@ export interface IAgreementSentenceEntity {
   is_required: boolean;
   sort_order: number;
   status?: string;
+  is_accepted?: boolean;
   links?: IAgreementSentenceLink[] | null;
   deletedAt?: null;
   createdAt?: string;
@@ -142,6 +143,7 @@ export interface IGetUserConsentStatusData {
   role?: string;
   visible_to?: string;
   touchpoints?: string[] | null;
+  sentences?: IAgreementSentenceEntity[] | null;
   agreements?: (IGetUserConsentStatusAgreementsEntity)[] | null;
   total: number;
   accepted_count: number;

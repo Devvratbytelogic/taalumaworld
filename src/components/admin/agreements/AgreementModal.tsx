@@ -5,7 +5,7 @@ import { Loader2, Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-// import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -199,14 +199,14 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                 {errors.content && touched.content ? <p className="text-sm text-red-600">{errors.content}</p> : null}
               </div>
 
-              {/* <label className="flex items-center gap-2 text-sm text-slate-700">
+              <label className="flex items-center gap-2 text-sm text-slate-700">
                 <Checkbox
                   checked={values.can_block}
                   onCheckedChange={(checked) => setFieldValue('can_block', !!checked)}
                   disabled={isSubmitting}
                 />
                 Can block — users who have not accepted the latest version cannot complete linked touchpoints
-              </label> */}
+              </label>
             </div>
 
             <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

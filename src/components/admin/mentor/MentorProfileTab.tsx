@@ -39,6 +39,7 @@ import { AdminEmptyState, AdminPage, AdminPanel, AdminSectionHeader, adminPanelC
 import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
 import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
+import { AgreementLinkedText } from '@/components/ui/AgreementLinkedText';
 import { useGetAdminProfileQuery, useGetPaystackBanksQuery } from '@/store/rtkQueries/adminGetApi';
 import { useUpdateAdminProfileMutation, useUpdateMentorInfoMutation } from '@/store/rtkQueries/adminPostApi';
 import { useAcceptAgreementMutation, useAcceptAllAgreementsMutation, useGetUserConsentStatusQuery } from '@/store/rtkQueries/agreementAPIs';
@@ -48,9 +49,10 @@ import { useGetMyMentorTierUpgradeApplicationQuery } from '@/store/rtkQueries/me
 import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorApplication';
 import { IAdminProfileAPIResponseData, MentorInfo } from '@/types/adminProfile';
 import { mentorPayoutDetailsSchema, mentorProfileDetailsSchema } from '@/utils/formValidation';
+import { getLinkedAgreementIds, getTouchpointLabel } from '@/utils/agreementConsent';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
-import { getPolicyBySlugRoutePath } from '@/routes/routes';
+import type { IAgreementSentenceEntity } from '@/types/agreements';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
@@ -1175,14 +1177,19 @@ function AgreementsCard() {
   const { data: consentData, isLoading } = useGetUserConsentStatusQuery({ userType: 'Mentor' });
   const [acceptAgreement] = useAcceptAgreementMutation();
   const [acceptAllAgreements] = useAcceptAllAgreementsMutation();
-  const agreements = consentData?.data?.agreements ?? [];
-  const acceptedCount = consentData?.data?.accepted_count ?? agreements.filter((agreement) => agreement.is_accepted).length;
-  const pendingCount = consentData?.data?.pending_count ?? agreements.filter((agreement) => !agreement.is_accepted).length;
+  const sentences = consentData?.data?.sentences ?? [];
+  const acceptedCount = sentences.filter((sentence) => sentence.is_accepted).length;
+  const pendingCount = sentences.filter((sentence) => sentence.is_accepted === false).length;
 
-  const handleAccept = async (agreementId: string) => {
-    setAcceptingId(agreementId);
+  const handleAccept = async (sentence: IAgreementSentenceEntity) => {
+    const acceptedAgreementIds = getLinkedAgreementIds(sentence);
+    if (acceptedAgreementIds.length === 0) {
+      toast.error('Failed to accept agreement. Please try again.');
+      return;
+    }
+    setAcceptingId(sentence._id);
     try {
-      await acceptAgreement({ accepted_agreement_ids: [agreementId] }).unwrap();
+      await acceptAgreement({ accepted_agreement_ids: acceptedAgreementIds }).unwrap();
       toast.success('Agreement accepted successfully!');
     } catch {
       toast.error('Failed to accept agreement. Please try again.');
@@ -1205,7 +1212,7 @@ function AgreementsCard() {
 
   return (
     <AdminPanel padding={false} className="overflow-hidden">
-      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
         <div className="flex items-center gap-3">
           <SectionIcon icon={FileSignature} />
           <div>
@@ -1214,14 +1221,14 @@ function AgreementsCard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {!isLoading && agreements.length > 0 ? (
+          {!isLoading && sentences.length > 0 ? (
             <span
               className={cn(
                 'inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-medium',
-                acceptedCount === agreements.length ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700',
+                acceptedCount === sentences.length ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700',
               )}
             >
-              {acceptedCount} of {agreements.length} accepted
+              {acceptedCount} of {sentences.length} accepted
             </span>
           ) : null}
           {pendingCount > 0 ? (
@@ -1232,13 +1239,13 @@ function AgreementsCard() {
         </div>
       </div>
 
-      <div className={agreements.length === 0 && !isLoading ? '' : 'p-6'}>
+      <div className={sentences.length === 0 && !isLoading ? '' : 'p-6'}>
         {isLoading ? (
           <div className="space-y-3 p-6">
             <div className="h-14 animate-pulse rounded-lg bg-slate-100" />
             <div className="h-14 animate-pulse rounded-lg bg-slate-100" />
           </div>
-        ) : agreements.length === 0 ? (
+        ) : sentences.length === 0 ? (
           <AdminEmptyState
             icon={FileSignature}
             title="No agreements found"
@@ -1246,31 +1253,19 @@ function AgreementsCard() {
           />
         ) : (
           <ul className="divide-y divide-slate-100">
-            {agreements.map((agreement) => (
-              <li key={agreement._id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100">
-                    <FileSignature className="h-4 w-4 text-slate-500" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-slate-900">{agreement.title} {agreement?.is_required ? <span className="text-xs text-red-500">*</span> : null}</p>
-                      <Link
-                        href={getPolicyBySlugRoutePath(agreement.slug || agreement._id)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs font-medium text-primary hover:underline"
-                      >
-                        View
-                      </Link>
-                    </div>
-                    <p className="mt-0.5 text-xs text-slate-500">
-                      {agreement.agreement_type?.name ?? 'Agreement'} · v{agreement.current_version}
-                      {agreement.is_accepted && agreement.accepted_at ? ` · Accepted ${moment(agreement.accepted_at).format('MMM D, YYYY HH:mm A')}` : ''}
-                    </p>
-                  </div>
+            {sentences.map((sentence) => (
+              <li key={sentence._id} className="flex items-start gap-3 py-3.5">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100">
+                  <FileSignature className="h-4 w-4 text-slate-500" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm leading-6 text-slate-800">
+                    <AgreementLinkedText text={sentence.text} links={sentence.links} />
+                    {sentence.is_required ? <span className="font-medium text-red-500"> *</span> : null}
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-500">{getTouchpointLabel(sentence.touchpoint)}</p>
                 </div>
-                {agreement.is_accepted ? (
+                {sentence.is_accepted ? (
                   <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
                     <BadgeCheck className="h-3.5 w-3.5" />
                     Accepted
@@ -1280,8 +1275,8 @@ function AgreementsCard() {
                     type="button"
                     size="sm"
                     className="global_btn rounded_full bg_primary shrink-0"
-                    isLoading={acceptingId === agreement._id}
-                    onPress={() => handleAccept(agreement._id)}
+                    isLoading={acceptingId === sentence._id}
+                    onPress={() => handleAccept(sentence)}
                   >
                     Accept
                   </Button>

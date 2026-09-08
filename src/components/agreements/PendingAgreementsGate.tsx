@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BadgeCheck, FileSignature, LogOut } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { AgreementLinkedText } from '@/components/ui/AgreementLinkedText';
 import toast from '@/utils/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { getUserRole } from '@/utils/authCookies';
@@ -21,8 +21,9 @@ import {
   getMentorForgotPasswordRoutePath,
   getMentorLoginRoutePath,
   getMentorSignupRoutePath,
-  getPolicyBySlugRoutePath,
 } from '@/routes/routes';
+import type { IAgreementSentenceEntity } from '@/types/agreements';
+import { getLinkedAgreementIds, isPendingRequiredSentence } from '@/utils/agreementConsent';
 
 function isExemptPath(pathname: string): boolean {
   if (pathname === '/policies' || pathname.startsWith('/policies/')) return true;
@@ -33,11 +34,6 @@ function isExemptPath(pathname: string): boolean {
     return true;
   }
   return false;
-}
-
-function isBlockingPending(agreement: { is_accepted: boolean; is_required?: boolean; can_block?: boolean }): boolean {
-  if (agreement.is_accepted) return false;
-  return Boolean(agreement.can_block || agreement.is_required);
 }
 
 export function PendingAgreementsGate() {
@@ -56,8 +52,10 @@ export function PendingAgreementsGate() {
   const [acceptingAll, setAcceptingAll] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const pendingAgreements = (consentData?.data?.agreements ?? []).filter(isBlockingPending);
-  const open = !skip && !isLoading && pendingAgreements.length > 0;
+  const pendingSentences = (consentData?.data?.sentences ?? [])
+    .filter(isPendingRequiredSentence)
+    .sort((a, b) => a.sort_order - b.sort_order);
+  const open = !skip && !isLoading && pendingSentences.length > 0;
 
   useEffect(() => {
     setMounted(true);
@@ -72,10 +70,15 @@ export function PendingAgreementsGate() {
     };
   }, [open]);
 
-  const handleAccept = async (agreementId: string) => {
-    setAcceptingId(agreementId);
+  const handleAccept = async (sentence: IAgreementSentenceEntity) => {
+    const acceptedAgreementIds = getLinkedAgreementIds(sentence);
+    if (acceptedAgreementIds.length === 0) {
+      toast.error('Failed to accept agreement. Please try again.');
+      return;
+    }
+    setAcceptingId(sentence._id);
     try {
-      await acceptAgreement({ accepted_agreement_ids: [agreementId] }).unwrap();
+      await acceptAgreement({ accepted_agreement_ids: acceptedAgreementIds }).unwrap();
       toast.success('Agreement accepted successfully!');
     } catch {
       toast.error('Failed to accept agreement. Please try again.');
@@ -109,7 +112,7 @@ export function PendingAgreementsGate() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="pending-agreements-title"
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg"
+        className="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-b border-gray-100 px-5 py-4 sm:px-6">
@@ -130,33 +133,17 @@ export function PendingAgreementsGate() {
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-2 sm:px-6">
           <ul className="divide-y divide-gray-100">
-            {pendingAgreements.map((agreement) => (
-              <li key={agreement._id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-900">
-                      {agreement.title}
-                      {agreement.is_required ? <span className="ml-1 text-xs text-red-500">*</span> : null}
-                    </p>
-                    <Link
-                      href={getPolicyBySlugRoutePath(agreement.slug || agreement._id)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-medium text-primary hover:underline"
-                    >
-                      View
-                    </Link>
-                  </div>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {agreement.agreement_type?.name ?? 'Agreement'}
-                    {agreement.current_version ? ` · v${agreement.current_version}` : ''}
-                  </p>
-                </div>
+            {pendingSentences.map((sentence) => (
+              <li key={sentence._id} className="flex items-start gap-4 py-3.5">
+                <p className="min-w-0 flex-1 text-sm leading-6 text-gray-800">
+                  <AgreementLinkedText text={sentence.text} links={sentence.links} />
+                  {sentence.is_required ? <span className="font-medium text-red-500"> *</span> : null}
+                </p>
                 <Button
                   type="button"
                   className="global_btn rounded_full bg_primary shrink-0"
-                  isLoading={acceptingId === agreement._id}
-                  onPress={() => handleAccept(agreement._id)}
+                  isLoading={acceptingId === sentence._id}
+                  onPress={() => handleAccept(sentence)}
                 >
                   Accept
                 </Button>
@@ -170,7 +157,7 @@ export function PendingAgreementsGate() {
             <LogOut className="h-4 w-4" />
             Sign Out
           </Button>
-          {pendingAgreements.length > 1 ? (
+          {pendingSentences.length > 1 ? (
             <Button
               type="button"
               className="global_btn rounded_full bg_primary"

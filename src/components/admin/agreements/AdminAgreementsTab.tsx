@@ -147,17 +147,17 @@ export function AdminAgreementsTab() {
       sortable: false,
       renderCell: (params) => <span className="text-sm text-slate-700">{params.row.version ?? '—'}</span>,
     },
-    // {
-    //   field: 'can_block',
-    //   headerName: 'Can block',
-    //   width: 110,
-    //   sortable: false,
-    //   renderCell: (params) => (
-    //     <Badge variant="outline" className={params.row.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
-    //       {params.row.can_block ? 'Yes' : 'No'}
-    //     </Badge>
-    //   ),
-    // },
+    {
+      field: 'can_block',
+      headerName: 'Can block',
+      width: 110,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className={params.row.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
+          {params.row.can_block ? 'Yes' : 'No'}
+        </Badge>
+      ),
+    },
     {
       field: 'status',
       headerName: 'Status',

@@ -127,7 +127,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
         title={`Order #${order.orderId}`}
         description="Full details for this order"
       >
-        {!isFree ? (
+        {/* {!isFree ? ( */}
           <Button
             type="button"
             className="global_btn rounded_full bg_primary"
@@ -137,7 +137,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
             <FileDown className="h-4 w-4" />
             {isDownloading ? 'Downloading…' : 'Download Invoice'}
           </Button>
-        ) : null}
+        {/* ) : null} */}
       </UserDashboardPageHeader>
 
       <Panel>

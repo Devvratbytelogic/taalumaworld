@@ -169,7 +169,7 @@ function OrderCard({
             <Eye className="h-4 w-4" />
             View
           </Link>
-          {!isFree ? (
+          {/* {!isFree ? ( */}
             <Button
               type="button"
               className="global_btn rounded_full outline_primary"
@@ -179,7 +179,7 @@ function OrderCard({
               <FileDown className="h-4 w-4" />
               {isDownloading ? 'Downloading…' : 'Invoice'}
             </Button>
-          ) : null}
+          {/* ) : null} */}
         </div>
       </div>
     </article>

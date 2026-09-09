@@ -12,6 +12,7 @@ import { useLazyGetTransactionInvoiceQuery, useUserGetOrderByIdQuery } from '@/s
 import { getUserDashboardMyOrdersRoutePath } from '@/routes/routes';
 import { formatKes, formatKesOrFree, isZeroPrice } from '@/constants/common';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardOrderDetailSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 function isPercentCouponType(couponType?: string | null) {
   const normalized = (couponType ?? '').toLowerCase();
@@ -83,14 +84,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-5 w-32 animate-pulse rounded bg-gray-100" />
-        <div className="h-24 animate-pulse rounded-lg border border-gray-200 bg-white" />
-        <div className="h-48 animate-pulse rounded-lg border border-gray-200 bg-white" />
-        <div className="h-40 animate-pulse rounded-lg border border-gray-200 bg-white" />
-      </div>
-    );
+    return <DashboardOrderDetailSkeleton />;
   }
 
   if (!order) {

@@ -28,6 +28,7 @@ import type {
   OrderItemsEntity,
 } from '@/types/user/allOrders';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardOrdersSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 import { formatKesOrFree, isZeroPrice } from '@/constants/common';
 
 const PAGE_LIMIT = 10;
@@ -272,25 +273,7 @@ export function MyOrdersPage() {
           title="My Orders"
           description="Track purchases and download invoices"
         />
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="space-y-3 border-b border-gray-100 px-4 py-4 sm:px-6">
-            <div className="h-10 w-full rounded-lg bg-gray-100" />
-            <div className="flex gap-2">
-              <div className="h-9 w-28 rounded-full bg-gray-100" />
-              <div className="h-9 w-28 rounded-full bg-gray-100" />
-              <div className="h-9 w-28 rounded-full bg-gray-100" />
-            </div>
-            <div className="flex gap-2">
-              <div className="h-9 w-40 rounded-lg bg-gray-100" />
-              <div className="h-9 w-40 rounded-lg bg-gray-100" />
-            </div>
-          </div>
-          <div className="space-y-3 p-4 sm:p-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-36 rounded-xl border border-gray-200 bg-gray-50" />
-            ))}
-          </div>
-        </div>
+        <DashboardOrdersSkeleton />
       </div>
     );
   }

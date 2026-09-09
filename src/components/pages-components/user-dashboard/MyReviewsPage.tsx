@@ -12,6 +12,7 @@ import { useGetMyReviewsQuery } from '@/store/rtkQueries/userGetAPI';
 import { getBlueprintRoutePath, getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import type { IMyReviewsAPIResponseDataEntity, IMyReviewsItem } from '@/types/user/reviews';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardReviewsSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 const PAGE_LIMIT = 10;
 
@@ -157,20 +158,7 @@ export function MyReviewsPage() {
           title="My Reviews"
           description="Reviews you have submitted across TaalumaWorld"
         />
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="space-y-3 border-b border-gray-100 px-4 py-4 sm:px-6">
-            <div className="h-9 w-40 rounded-lg bg-gray-100" />
-            <div className="flex gap-2">
-              <div className="h-9 w-40 rounded-lg bg-gray-100" />
-              <div className="h-9 w-40 rounded-lg bg-gray-100" />
-            </div>
-          </div>
-          <div className="space-y-3 p-4 sm:p-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-28 rounded-xl border border-gray-200 bg-gray-50" />
-            ))}
-          </div>
-        </div>
+        <DashboardReviewsSkeleton />
       </div>
     );
   }

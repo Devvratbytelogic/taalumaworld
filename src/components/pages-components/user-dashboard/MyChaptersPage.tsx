@@ -19,6 +19,7 @@ import { useGetMyChaptersQuery } from '@/store/rtkQueries/userGetAPI';
 import type { ItemsEntity } from '@/types/user/myChapters';
 import { getHomeRoutePath, getPurchasedBlueprintRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardLibraryListSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
 import { openModal } from '@/store/slices/allModalSlice';
@@ -62,31 +63,7 @@ export function MyChaptersPage() {
           title="My Blueprints"
           description="Your personal collection of purchased blueprints"
         />
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-5 py-4 sm:px-6">
-                <div className="h-9 w-9 rounded-md bg-gray-200" />
-                <div className="space-y-2">
-                  <div className="h-5 w-8 rounded bg-gray-200" />
-                  <div className="h-3 w-24 rounded bg-gray-100" />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-4 p-5 sm:p-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 sm:flex-row">
-                <div className="aspect-16/10 w-full bg-gray-200 sm:w-40 sm:min-h-42" />
-                <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
-                  <div className="h-3 w-32 rounded bg-gray-100" />
-                  <div className="h-5 w-3/4 rounded bg-gray-200" />
-                  <div className="h-1.5 w-full rounded-full bg-gray-100" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <DashboardLibraryListSkeleton />
       </div>
     );
   }

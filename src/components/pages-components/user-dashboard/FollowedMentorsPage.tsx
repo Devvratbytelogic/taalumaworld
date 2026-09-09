@@ -11,6 +11,7 @@ import { useGetFollowedMentorsQuery } from '@/store/rtkQueries/userGetAPI';
 import { getAllAuthorsRoutePath } from '@/routes/routes';
 import MentorCard from '@/components/pages-components/mentor/MentorCard';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardFollowedMentorsSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 const PAGE_LIMIT = 9;
 
@@ -53,20 +54,7 @@ export function FollowedMentorsPage() {
           title="Followed Mentors"
           description="Mentors you follow across TaalumaWorld"
         />
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="space-y-3 border-b border-gray-100 px-4 py-4 sm:px-6">
-            <div className="h-10 w-full rounded-lg bg-gray-100" />
-            <div className="flex gap-2">
-              <div className="h-9 w-40 rounded-lg bg-gray-100" />
-              <div className="h-9 w-40 rounded-lg bg-gray-100" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-64 rounded-xl border border-gray-200 bg-gray-50" />
-            ))}
-          </div>
-        </div>
+        <DashboardFollowedMentorsSkeleton />
       </div>
     );
   }

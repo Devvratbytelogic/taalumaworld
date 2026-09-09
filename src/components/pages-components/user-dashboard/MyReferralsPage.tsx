@@ -25,6 +25,7 @@ import type {
 } from '@/types/dashboard';
 import toast from '@/utils/toast';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardReferralsSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 const PAGE_LIMIT = 10;
 
@@ -179,18 +180,7 @@ export function MyReferralsPage() {
           title="My Referrals"
           description="Track registrations and conversions from your referral code"
         />
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="grid grid-cols-2 gap-px bg-gray-100 lg:grid-cols-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-20 bg-white px-5 py-4" />
-            ))}
-          </div>
-          <div className="space-y-3 p-4 sm:p-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-28 rounded-xl border border-gray-200 bg-gray-50" />
-            ))}
-          </div>
-        </div>
+        <DashboardReferralsSkeleton />
       </div>
     );
   }

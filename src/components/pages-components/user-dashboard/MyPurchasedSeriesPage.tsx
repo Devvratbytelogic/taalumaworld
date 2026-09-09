@@ -11,6 +11,7 @@ import {
   getUserDashboardMyBooksRoutePath,
 } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardPurchasedSeriesSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 export function MyPurchasedSeriesPage({ slug }: { slug: string }) {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function MyPurchasedSeriesPage({ slug }: { slug: string }) {
   const chapters = response?.data?.chapters?.data ?? [];
 
   if (isLoading) {
-    return <div className="h-64 animate-pulse rounded-lg border border-gray-200 bg-white" />;
+    return <DashboardPurchasedSeriesSkeleton />;
   }
 
   if (isError || !book) {

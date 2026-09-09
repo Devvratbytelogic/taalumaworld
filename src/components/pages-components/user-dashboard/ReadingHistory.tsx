@@ -10,6 +10,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { cn } from '@/components/ui/utils';
 import { getPurchasedBlueprintRoutePath, getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardHistorySkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 export function ReadingHistory() {
   const router = useRouter();
@@ -83,31 +84,7 @@ export function ReadingHistory() {
     return (
       <div className="space-y-6">
         <UserDashboardPageHeader title="Reading History" description="Track your reading journey and progress" />
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white animate-pulse">
-          <div className="grid grid-cols-1 divide-y divide-gray-200/70 bg-gray-50/60 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-5 py-4 sm:px-6">
-                <div className="h-9 w-9 rounded-md bg-gray-200" />
-                <div className="space-y-2">
-                  <div className="h-5 w-8 rounded bg-gray-200" />
-                  <div className="h-3 w-24 rounded bg-gray-100" />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-4 p-5 sm:p-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 sm:flex-row">
-                <div className="aspect-16/10 w-full bg-gray-200 sm:w-40 sm:min-h-[168px]" />
-                <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
-                  <div className="h-3 w-32 rounded bg-gray-100" />
-                  <div className="h-5 w-3/4 rounded bg-gray-200" />
-                  <div className="h-1.5 w-full rounded-full bg-gray-100" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <DashboardHistorySkeleton />
       </div>
     );
   }

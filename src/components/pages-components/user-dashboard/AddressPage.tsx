@@ -9,6 +9,7 @@ import { useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
 import { useSetDefaultUserAddressMutation, useDeleteUserAddressMutation } from '@/store/rtkQueries/userPostAPI';
 import { IAddress } from '@/types/user/address';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardAddressSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 function formatAddressLine(address: IAddress): string {
   return [address.address_line1, address.address_line2, address.landmark].filter(Boolean).join(', ');
@@ -67,19 +68,18 @@ export function AddressPage() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-6">
-        <div className="flex justify-between">
-          <div className="space-y-2">
-            <div className="h-7 w-28 rounded bg-gray-200" />
-            <div className="h-4 w-52 rounded bg-gray-100" />
-          </div>
-          <div className="h-10 w-36 rounded-full bg-gray-200" />
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {[1, 2].map((i) => (
-            <div key={i} className="h-40 rounded-lg border border-gray-200 bg-gray-50" />
-          ))}
-        </div>
+      <div className="space-y-6">
+        <UserDashboardPageHeader title="Address" description="Manage the addresses saved to your account">
+          <Button
+            type="button"
+            className="global_btn w-full rounded_full bg_primary sm:w-auto"
+            startContent={<Plus className="h-4 w-4" />}
+            onPress={openAddModal}
+          >
+            Add New Address
+          </Button>
+        </UserDashboardPageHeader>
+        <DashboardAddressSkeleton />
       </div>
     );
   }

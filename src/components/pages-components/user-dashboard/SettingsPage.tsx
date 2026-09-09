@@ -13,6 +13,7 @@ import moment from 'moment';
 import { signOut } from '@/utils/refreshSession';
 import { getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardSettingsSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 export function SettingsPage() {
   const { data: profileRes, isLoading: isLoadingProfile } = useGetUserProfileQuery();
@@ -95,11 +96,18 @@ export function SettingsPage() {
     setErrors({});
   };
 
+  if (isLoadingProfile) {
+    return (
+      <div className="space-y-6">
+        <UserDashboardPageHeader title="Settings" description="Manage your account settings and preferences" />
+        <DashboardSettingsSkeleton />
+      </div>
+    );
+  }
+
   const lastChangedLabel =
-    isLoadingProfile || !lastChangedDate || !moment(lastChangedDate).isValid()
-      ? isLoadingProfile
-        ? 'Loading...'
-        : '—'
+    !lastChangedDate || !moment(lastChangedDate).isValid()
+      ? '—'
       : moment(lastChangedDate).format('MMMM D, YYYY · h:mm A');
 
   return (

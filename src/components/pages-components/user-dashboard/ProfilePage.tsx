@@ -48,6 +48,7 @@ import {
   getUserDashboardMyChaptersRoutePath,
 } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
+import { DashboardProfileSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { ProfileAgreementsCard } from './ProfileAgreementsCard';
 
@@ -182,29 +183,18 @@ export function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-6">
-        <div className="flex justify-between">
-          <div className="space-y-2">
-            <div className="h-7 w-28 rounded bg-gray-200" />
-            <div className="h-4 w-52 rounded bg-gray-100" />
-          </div>
-          <div className="h-10 w-28 rounded-full bg-gray-200" />
-        </div>
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-          <div className="h-32 bg-gray-100" />
-          <div className="space-y-4 px-6 py-8">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-16 rounded-lg bg-gray-50" />
-              ))}
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 rounded-lg bg-gray-50" />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="space-y-6">
+        <UserDashboardPageHeader title="Profile" description="View and update your account details">
+          <Button
+            type="button"
+            className="global_btn w-full rounded_full outline_primary sm:w-auto"
+            isDisabled
+          >
+            <Pencil className="h-4 w-4" />
+            Edit profile
+          </Button>
+        </UserDashboardPageHeader>
+        <DashboardProfileSkeleton />
       </div>
     );
   }

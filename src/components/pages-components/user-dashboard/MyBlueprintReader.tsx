@@ -8,6 +8,7 @@ import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetail
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 import { useGetPurchasedBlueprintQuery } from '@/store/rtkQueries/userGetAPI';
 import { getUserDashboardMyChaptersRoutePath } from '@/routes/routes';
+import { DashboardBlueprintReaderSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 
 export default function MyBlueprintReader({ slug }: { slug: string }) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function MyBlueprintReader({ slug }: { slug: string }) {
   const data = response?.data;
 
   if (isLoading) {
-    return <div className="h-96 animate-pulse rounded-lg border border-gray-200 bg-white" />;
+    return <DashboardBlueprintReaderSkeleton />;
   }
 
   if (isError || !data) {

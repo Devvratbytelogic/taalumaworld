@@ -90,8 +90,16 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
       <div className={sentences.length === 0 && !isLoading ? '' : 'px-5 py-4 sm:px-6'}>
         {isLoading ? (
           <div className="space-y-3">
-            <div className="h-14 animate-pulse rounded-lg bg-gray-100" />
-            <div className="h-14 animate-pulse rounded-lg bg-gray-100" />
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="flex animate-pulse items-start gap-3 py-3.5">
+                <div className="h-9 w-9 shrink-0 rounded-full bg-gray-100" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="h-4 w-full rounded bg-gray-100" />
+                  <div className="h-3 w-24 rounded bg-gray-50" />
+                </div>
+                <div className="h-8 w-20 shrink-0 rounded-full bg-gray-100" />
+              </div>
+            ))}
           </div>
         ) : sentences.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 px-5 py-10 text-center">

@@ -175,6 +175,15 @@ const openGraphFieldsSchema = {
       v == null || v instanceof File || typeof v === 'string'
     )
     .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
+  twitter_title: Yup.string().trim(),
+  twitter_description: Yup.string().trim(),
+  twitter_image: Yup.mixed()
+    .nullable()
+    .optional()
+    .test('is-file-or-string-or-null', 'Please select a valid image file', (v) =>
+      v == null || v instanceof File || typeof v === 'string'
+    )
+    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
   json_ld: Yup.string()
     .trim()
     .test('valid-json', 'Enter valid JSON-LD', (v) => {

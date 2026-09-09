@@ -34,6 +34,9 @@ export interface IBook {
   og_description: string;
   og_image: string;
   og_title: string;
+  twitter_title?: string;
+  twitter_description?: string;
+  twitter_image?: string;
   id: string;
 }
 export interface createdBy {

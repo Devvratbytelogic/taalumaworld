@@ -23,16 +23,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = bookDetails?.meta_title || bookDetails?.title || 'TaalumaWorld';
   const description = bookDetails?.meta_description || bookDetails?.description || '';
+  const ogTitle = bookDetails?.og_title || title;
+  const ogDescription = bookDetails?.og_description || description;
+  const ogImage = bookDetails?.og_image || bookDetails?.coverImage || undefined;
+  const twitterTitle = bookDetails?.twitter_title || ogTitle;
+  const twitterDescription = bookDetails?.twitter_description || ogDescription;
+  const twitterImage = bookDetails?.twitter_image || ogImage;
 
   return {
     title,
     description,
     openGraph: {
-      title: bookDetails?.og_title || title,
-      description: bookDetails?.og_description || description,
-      ...(bookDetails?.og_image || bookDetails?.coverImage
-        ? { images: [{ url: bookDetails?.og_image || bookDetails?.coverImage }] }
-        : {}),
+      title: ogTitle,
+      description: ogDescription,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+    twitter: {
+      card: twitterImage ? 'summary_large_image' : 'summary',
+      title: twitterTitle,
+      description: twitterDescription,
+      ...(twitterImage ? { images: [twitterImage] } : {}),
     },
   };
 }

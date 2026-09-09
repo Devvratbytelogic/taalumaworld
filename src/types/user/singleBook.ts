@@ -41,6 +41,9 @@ export interface IBookDetails {
     og_title: string;
     og_description: string;
     og_image: string;
+    twitter_title?: string;
+    twitter_description?: string;
+    twitter_image?: string;
     json_ld: string;
     legacyType: string;
     blueprintNumbers?: (number)[] | null;

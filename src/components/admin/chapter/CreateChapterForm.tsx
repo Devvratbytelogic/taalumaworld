@@ -60,6 +60,9 @@ const initialFormValues = {
   og_title: '',
   og_description: '',
   og_image: null as File | null,
+  twitter_title: '',
+  twitter_description: '',
+  twitter_image: null as File | string | null,
   json_ld: '',
   accepted_agreement_ids: [] as string[],
 };
@@ -117,6 +120,9 @@ export function CreateChapterForm() {
       if (vals.og_title) formData.append('og_title', vals.og_title);
       if (vals.og_description) formData.append('og_description', vals.og_description);
       if (ogImageFile) formData.append('og_image', ogImageFile);
+      if (vals.twitter_title) formData.append('twitter_title', vals.twitter_title);
+      if (vals.twitter_description) formData.append('twitter_description', vals.twitter_description);
+      if (vals.twitter_image instanceof File) formData.append('twitter_image', vals.twitter_image);
       if (vals.json_ld) formData.append('json_ld', vals.json_ld);
       vals.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
       formData.append('slug', vals.slug);
@@ -556,6 +562,9 @@ export function CreateChapterForm() {
             og_title: values.og_title,
             og_description: values.og_description,
             og_image: values.og_image,
+            twitter_title: values.twitter_title,
+            twitter_description: values.twitter_description,
+            twitter_image: values.twitter_image,
             json_ld: values.json_ld,
           }}
           errors={errors}

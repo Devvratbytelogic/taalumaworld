@@ -32,6 +32,9 @@ export async function generateMetadata(): Promise<Metadata> {
     const ogTitle = data?.og_title || title;
     const ogDescription = data?.og_description || description;
     const ogImage = data?.og_image || data?.logo || undefined;
+    const twitterTitle = data?.twitter_title || ogTitle;
+    const twitterDescription = data?.twitter_description || ogDescription;
+    const twitterImage = data?.twitter_image || ogImage;
 
     return {
       title,
@@ -45,10 +48,10 @@ export async function generateMetadata(): Promise<Metadata> {
         ...(ogImage ? { images: [{ url: ogImage }] } : {}),
       },
       twitter: {
-        card: ogImage ? 'summary_large_image' : 'summary',
-        title: ogTitle,
-        description: ogDescription,
-        ...(ogImage ? { images: [ogImage] } : {}),
+        card: twitterImage ? 'summary_large_image' : 'summary',
+        title: twitterTitle,
+        description: twitterDescription,
+        ...(twitterImage ? { images: [twitterImage] } : {}),
       },
     };
   }

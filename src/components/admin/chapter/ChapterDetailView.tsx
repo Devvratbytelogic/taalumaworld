@@ -304,6 +304,23 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
               ) : null
             }
           />
+          <DetailRow label="X Title" value={chapter.twitter_title} />
+          <DetailRow label="X Description" value={chapter.twitter_description} />
+          <DetailRow
+            label="X Image"
+            value={
+              chapter.twitter_image ? (
+                <a
+                  href={chapter.twitter_image}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {chapter.twitter_image}
+                </a>
+              ) : null
+            }
+          />
         </dl>
         {chapter.json_ld ? (
           <div className="mt-5">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/components/ui/utils';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { ALLOWED_IMAGE_ACCEPT } from '@/constants/fileUpload';
+import toast from '@/utils/toast';
+import {
+  ALLOWED_IMAGE_ACCEPT,
+  IMAGE_UPLOAD_MAX_BYTES,
+  getImageSizeLimitMessage,
+  getImageTypeErrorMessage,
+  isAllowedImageFile,
+} from '@/constants/fileUpload';
 
 export type OpenGraphFormValues = {
   meta_title: string;
@@ -16,6 +23,9 @@ export type OpenGraphFormValues = {
   og_title: string;
   og_description: string;
   og_image: File | string | null;
+  twitter_title: string;
+  twitter_description: string;
+  twitter_image: File | string | null;
   json_ld: string;
 };
 
@@ -23,7 +33,13 @@ export type OpenGraphSchemaType = 'Article' | 'Book' | 'WebSite' | 'WebPage';
 
 type GeneratedOpenGraphFields = Pick<
   OpenGraphFormValues,
-  'meta_title' | 'meta_description' | 'og_title' | 'og_description' | 'json_ld'
+  | 'meta_title'
+  | 'meta_description'
+  | 'og_title'
+  | 'og_description'
+  | 'twitter_title'
+  | 'twitter_description'
+  | 'json_ld'
 >;
 
 const GENERATED_FIELDS: (keyof GeneratedOpenGraphFields)[] = [
@@ -31,6 +47,8 @@ const GENERATED_FIELDS: (keyof GeneratedOpenGraphFields)[] = [
   'meta_description',
   'og_title',
   'og_description',
+  'twitter_title',
+  'twitter_description',
   'json_ld',
 ];
 
@@ -84,6 +102,8 @@ export function buildOpenGraphMetadata({
     meta_description: metaDescription,
     og_title: metaTitle,
     og_description: metaDescription,
+    twitter_title: metaTitle,
+    twitter_description: metaDescription,
     json_ld: JSON.stringify(jsonLdObject, null, 2),
   };
 }
@@ -101,7 +121,7 @@ interface OpenGraphFieldsSectionProps {
   touched: Partial<Record<keyof OpenGraphFormValues, boolean>>;
   handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   handleBlur: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  setFieldValue: (field: string, value: string) => void;
+  setFieldValue: (field: string, value: string | File | null) => void;
   /** Title used to auto-generate SEO / OG / JSON-LD fields. */
   sourceTitle?: string;
   /** Description used to auto-generate SEO / OG / JSON-LD fields. */
@@ -225,6 +245,21 @@ export function OpenGraphFieldsSection({
     ogImagePreviewUrl,
   ]);
 
+  const [twitterImagePreviewUrl, setTwitterImagePreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (values.twitter_image instanceof File) {
+      const url = URL.createObjectURL(values.twitter_image);
+      setTwitterImagePreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    if (typeof values.twitter_image === 'string' && values.twitter_image) {
+      setTwitterImagePreviewUrl(values.twitter_image);
+      return;
+    }
+    setTwitterImagePreviewUrl(null);
+  }, [values.twitter_image]);
+
   const handleGeneratedFieldChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
     event,
   ) => {
@@ -245,13 +280,40 @@ export function OpenGraphFieldsSection({
     onOgImageClear();
   };
 
+  const twitterCardPreviewUrl = twitterImagePreviewUrl ?? ogImagePreviewUrl ?? null;
+  const twitterImageFileName =
+    values.twitter_image instanceof File ? values.twitter_image.name : null;
+  const hasCustomTwitterImage = Boolean(twitterImagePreviewUrl);
+
+  const handleTwitterImageChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!isAllowedImageFile(file)) {
+        toast.error(getImageTypeErrorMessage());
+        event.target.value = '';
+        return;
+      }
+      if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+        toast.error(getImageSizeLimitMessage());
+        event.target.value = '';
+        return;
+      }
+      setFieldValue('twitter_image', file);
+    }
+    event.target.value = '';
+  };
+
+  const handleTwitterImageClear = () => {
+    setFieldValue('twitter_image', null);
+  };
+
   return (
     <div className="blueprint-form-section">
       <div>
-        <h3 className="text-sm font-semibold text-slate-900">SEO, Open Graph & structured data</h3>
+        <h3 className="text-sm font-semibold text-slate-900">SEO, Open Graph, X & structured data</h3>
         <p className="mt-1 text-sm text-slate-500">
           Text fields fill from the title and description; OG image fills from the cover or logo
-          image. Edit any field to customize it.
+          image. X/Twitter fields follow the same defaults. Edit any field to customize it.
         </p>
       </div>
 
@@ -373,6 +435,106 @@ export function OpenGraphFieldsSection({
             >
               <X className="h-4 w-4" />
             </Button>
+          </div>
+        ) : (
+          <div className="image-preview-placeholder max-w-24 text-xs">
+            <span className="px-2">Preview</span>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor={`${idPrefix}-twitter-title`}>X title</Label>
+          <Input
+            id={`${idPrefix}-twitter-title`}
+            name="twitter_title"
+            placeholder="X/Twitter share title"
+            value={values.twitter_title ?? ''}
+            onChange={handleGeneratedFieldChange}
+            onBlur={handleBlur}
+            disabled={disabled}
+            className={errors.twitter_title && touched.twitter_title ? 'border-red-500' : undefined}
+          />
+          {errors.twitter_title && touched.twitter_title ? (
+            <p className="text-sm text-red-600">{errors.twitter_title}</p>
+          ) : null}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor={`${idPrefix}-twitter-description`}>X description</Label>
+          <Textarea
+            id={`${idPrefix}-twitter-description`}
+            name="twitter_description"
+            placeholder="X/Twitter share description"
+            value={values.twitter_description ?? ''}
+            onChange={handleGeneratedFieldChange}
+            onBlur={handleBlur}
+            disabled={disabled}
+            rows={2}
+            className={
+              errors.twitter_description && touched.twitter_description
+                ? 'border-red-500'
+                : undefined
+            }
+          />
+          {errors.twitter_description && touched.twitter_description ? (
+            <p className="text-sm text-red-600">{errors.twitter_description}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex flex-col items-start gap-4 sm:flex-row">
+        <div className="min-w-0 flex-1 space-y-2">
+          <Label htmlFor={`${idPrefix}-twitter-image`}>
+            X image
+            <span className="ml-1 text-xs font-normal text-slate-400">
+              (optional — uses OG image if empty)
+            </span>
+            <FileUploadLimitHint kind="image" />
+          </Label>
+          <label
+            htmlFor={`${idPrefix}-twitter-image`}
+            className={cn(
+              'blueprint-file-picker',
+              errors.twitter_image && touched.twitter_image && 'border-red-500',
+            )}
+          >
+            <input
+              id={`${idPrefix}-twitter-image`}
+              type="file"
+              accept={ALLOWED_IMAGE_ACCEPT}
+              onChange={handleTwitterImageChange}
+              disabled={disabled}
+              className="sr-only"
+            />
+            <span className="truncate">
+              {twitterImageFileName ??
+                (hasCustomTwitterImage ? 'Replace X image...' : 'Select X image...')}
+            </span>
+          </label>
+          {errors.twitter_image && touched.twitter_image ? (
+            <p className="text-sm text-red-600">{errors.twitter_image as string}</p>
+          ) : null}
+        </div>
+        {twitterCardPreviewUrl ? (
+          <div className="relative inline-block">
+            <div className="image-preview max-w-24">
+              <img
+                src={twitterCardPreviewUrl}
+                alt="X image preview"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            {hasCustomTwitterImage ? (
+              <Button
+                type="button"
+                isIconOnly
+                className="absolute top-1 right-1 global_btn bg_transparent icon_btn"
+                onPress={handleTwitterImageClear}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            ) : null}
           </div>
         ) : (
           <div className="image-preview-placeholder max-w-24 text-xs">

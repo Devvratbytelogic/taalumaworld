@@ -48,6 +48,9 @@ export interface IChapter {
   og_title: string;
   og_description: string;
   og_image: string;
+  twitter_title?: string;
+  twitter_description?: string;
+  twitter_image?: string;
   json_ld: string;
   createdAt: string;
   updatedAt: string;

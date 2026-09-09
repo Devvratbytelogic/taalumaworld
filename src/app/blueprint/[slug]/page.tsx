@@ -29,16 +29,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     const title = data?.meta_title || data?.title || 'TaalumaWorld';
     const description = data?.meta_description || data?.description || '';
+    const ogTitle = data?.og_title || title;
+    const ogDescription = data?.og_description || description;
+    const ogImage = data?.og_image || data?.coverImage || undefined;
+    const twitterTitle = data?.twitter_title || ogTitle;
+    const twitterDescription = data?.twitter_description || ogDescription;
+    const twitterImage = data?.twitter_image || ogImage;
 
     return {
         title,
         description,
         openGraph: {
-            title: data?.og_title || title,
-            description: data?.og_description || description,
-            ...(data?.og_image || data?.coverImage
-                ? { images: [{ url: data?.og_image || data?.coverImage }] }
-                : {}),
+            title: ogTitle,
+            description: ogDescription,
+            ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+        },
+        twitter: {
+            card: twitterImage ? 'summary_large_image' : 'summary',
+            title: twitterTitle,
+            description: twitterDescription,
+            ...(twitterImage ? { images: [twitterImage] } : {}),
         },
     };
 }

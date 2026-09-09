@@ -44,6 +44,9 @@ const defaultValues = {
   og_title: '',
   og_description: '',
   og_image: null as File | string | null,
+  twitter_title: '',
+  twitter_description: '',
+  twitter_image: null as File | string | null,
   json_ld: '',
   google_analytics_id: '',
   google_tag_manager: '',
@@ -132,6 +135,9 @@ export function GeneralSettingsCard() {
     og_title: data?.og_title ?? data?.og_tag ?? '',
     og_description: data?.og_description ?? '',
     og_image: data?.og_image ?? null,
+    twitter_title: data?.twitter_title ?? '',
+    twitter_description: data?.twitter_description ?? '',
+    twitter_image: data?.twitter_image ?? null,
     json_ld: data?.json_ld ?? data?.schema_markup ?? '',
     google_analytics_id: data?.google_analytics_id ?? '',
     google_tag_manager: data?.google_tag_manager ?? '',
@@ -160,11 +166,12 @@ export function GeneralSettingsCard() {
       try {
         const formData = new FormData();
         (Object.keys(values) as (keyof FormValues)[]).forEach((key) => {
-          if (key === 'og_image') return;
+          if (key === 'og_image' || key === 'twitter_image') return;
           formData.append(key, String(values[key]));
         });
         if (logoFile) formData.append('logo', logoFile);
         if (ogImageFile) formData.append('og_image', ogImageFile);
+        if (values.twitter_image instanceof File) formData.append('twitter_image', values.twitter_image);
         const res = await updateGlobalSettings(formData).unwrap();
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
           void refreshAfterSettingsChange();
@@ -496,6 +503,9 @@ export function GeneralSettingsCard() {
               og_title: values.og_title,
               og_description: values.og_description,
               og_image: values.og_image,
+              twitter_title: values.twitter_title,
+              twitter_description: values.twitter_description,
+              twitter_image: values.twitter_image,
               json_ld: values.json_ld,
             }}
             errors={errors}

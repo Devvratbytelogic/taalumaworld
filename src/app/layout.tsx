@@ -69,8 +69,8 @@ export default async function RootLayout({
 }>) {
   const res = await getGlobalSettingsServerAPI();
   const globalSettings = res?.data ?? null;
-  // const logo = globalSettings?.logo ?? '/images/new-logo.webp';
-  const logo = '/images/new-logo.webp';
+  const logo = globalSettings?.logo ?? '';
+  // const logo = '/images/new-logo.webp';
   const contentMode = globalSettings?.visible ?? '';
 
   return (

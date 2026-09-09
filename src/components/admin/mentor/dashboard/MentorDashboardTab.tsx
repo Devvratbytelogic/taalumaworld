@@ -234,7 +234,6 @@ export function MentorDashboardTab() {
               getRowId={(row) => row.id}
               loading={performanceLoading}
               paginationMode="client"
-              rowCount={topBlueprints.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}
               onPaginationModelChange={noopPaginationChange}
               hideFooter
@@ -265,7 +264,6 @@ export function MentorDashboardTab() {
                 getRowId={(row) => row.id}
                 loading={salesVolumeLoading}
                 paginationMode="client"
-                rowCount={salesByMonth.length}
                 paginationModel={PREVIEW_PAGINATION_MODEL}
                 onPaginationModelChange={noopPaginationChange}
                 hideFooter
@@ -295,7 +293,6 @@ export function MentorDashboardTab() {
                 getRowId={(row) => row.id}
                 loading={revenueEarnedLoading}
                 paginationMode="client"
-                rowCount={topEarningBlueprints.length}
                 paginationModel={PREVIEW_PAGINATION_MODEL}
                 onPaginationModelChange={noopPaginationChange}
                 hideFooter
@@ -329,7 +326,6 @@ export function MentorDashboardTab() {
               getRowId={(row) => row.id}
               loading={economyRevenueLoading}
               paginationMode="client"
-              rowCount={revenueByMonth.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}
               onPaginationModelChange={noopPaginationChange}
               hideFooter

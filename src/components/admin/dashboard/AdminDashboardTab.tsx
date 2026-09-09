@@ -293,7 +293,6 @@ export default function AdminDashboardTab() {
               getRowId={(row) => row.id}
               loading={mentorPerformanceLoading}
               paginationMode="client"
-              rowCount={topMentors.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}
               onPaginationModelChange={noopPaginationChange}
               hideFooter
@@ -322,7 +321,6 @@ export default function AdminDashboardTab() {
               getRowId={(row) => row.id}
               loading={performanceLoading}
               paginationMode="client"
-              rowCount={topPerformingBlueprints.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}
               onPaginationModelChange={noopPaginationChange}
               hideFooter
@@ -350,7 +348,6 @@ export default function AdminDashboardTab() {
                 getRowId={(row) => row.id}
                 loading={salesVolumeLoading}
                 paginationMode="client"
-                rowCount={salesByMonth.length}
                 paginationModel={PREVIEW_PAGINATION_MODEL}
                 onPaginationModelChange={noopPaginationChange}
                 hideFooter
@@ -377,7 +374,6 @@ export default function AdminDashboardTab() {
                 getRowId={(row) => row.id}
                 loading={revenueLoading}
                 paginationMode="client"
-                rowCount={topEarningBlueprints.length}
                 paginationModel={PREVIEW_PAGINATION_MODEL}
                 onPaginationModelChange={noopPaginationChange}
                 hideFooter

@@ -1,18 +1,19 @@
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid'
 import React from 'react'
 
-interface CommonDataTableProps {
+type CommonDataTableProps = {
     rows: any[];
     columns: GridColDef[];
     getRowId: (row: any) => string;
     loading: boolean;
-    paginationMode: 'client' | 'server';
-    rowCount: number;
     paginationModel: GridPaginationModel;
     onPaginationModelChange: (model: GridPaginationModel) => void;
     hideFooter?: boolean;
     pageSizeOptions?: number[];
-}
+} & (
+    | { paginationMode: 'client'; rowCount?: never }
+    | { paginationMode: 'server'; rowCount: number }
+);
 
 export default function CommonDataTable({
     rows,
@@ -33,7 +34,7 @@ export default function CommonDataTable({
             getRowId={getRowId}
             loading={loading}
             paginationMode={paginationMode}
-            rowCount={rowCount}
+            {...(paginationMode === 'server' ? { rowCount } : {})}
             paginationModel={paginationModel}
             onPaginationModelChange={onPaginationModelChange}
             pageSizeOptions={pageSizeOptions}

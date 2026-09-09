@@ -4,26 +4,20 @@ export const ANALYTICS_TOP_LIMIT = 10;
 
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
 
-export function formatYmd(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-export function getLastNDaysRange(days: number): { fromDate: string; toDate: string } {
-  const to = new Date();
-  const from = new Date();
-  from.setDate(from.getDate() - (days - 1));
-  return { fromDate: formatYmd(from), toDate: formatYmd(to) };
-}
-
 export function isValidDateRange(fromDate: string, toDate: string): boolean {
   return YMD.test(fromDate) && YMD.test(toDate) && fromDate <= toDate;
 }
 
+export function analyticsRangeParams(fromDate: string, toDate: string): { fromDate?: string; toDate?: string } {
+  if (isValidDateRange(fromDate, toDate)) return { fromDate, toDate };
+  return {};
+}
+
 export function analyticsQueryOptions(params: { fromDate?: string; toDate?: string }) {
-  return { skip: !isValidDateRange(params.fromDate ?? '', params.toDate ?? '') };
+  const from = params.fromDate ?? '';
+  const to = params.toDate ?? '';
+  const hasAny = Boolean(from || to);
+  return { skip: hasAny && !isValidDateRange(from, to) };
 }
 
 export function formatAnalyticsMoney(amount?: number | null): string {
@@ -108,6 +102,11 @@ export function normalizeNamedCounts(
     name: humanizeKey(key),
     count: Number(count ?? 0),
   }));
+}
+
+export function analyticsCsvSuffix(params: { fromDate?: string; toDate?: string }) {
+  if (params.fromDate && params.toDate) return `${params.fromDate}-to-${params.toDate}`;
+  return 'all-time';
 }
 
 export function queryErrorMessage(error: unknown, fallback = 'Unable to load this block right now.'): string {

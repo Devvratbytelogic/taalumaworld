@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import Link from 'next/link';
 import { type GridColDef } from '@mui/x-data-grid';
+import { CsvExportButton } from '@/components/admin/CsvExportButton';
 import { useGetAnalyticsRegistrationsQuery, type IAnalyticsRangeParams } from '@/store/rtkQueries/analytics';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import {
@@ -23,7 +24,7 @@ import {
   AnalyticsSummary,
   analyticsTooltipStyle,
 } from './AnalyticsShared';
-import { analyticsQueryOptions, formatRate, humanizeKey, queryErrorMessage } from './analyticsUtils';
+import { analyticsCsvSuffix, analyticsQueryOptions, formatRate, humanizeKey, queryErrorMessage } from './analyticsUtils';
 
 function conversionColumns(nameHeader: string): GridColDef[] {
   return [
@@ -75,7 +76,25 @@ export function AnalyticsRegistrationsSection({ params }: { params: IAnalyticsRa
   const bySource = payload?.bySource ?? [];
 
   return (
-    <AnalyticsBlock title="Registration & conversion" interval={payload?.interval}>
+    <AnalyticsBlock
+      title="Registration & conversion"
+      interval={payload?.interval}
+      action={
+        <CsvExportButton
+          filename={`registrations-chart-${analyticsCsvSuffix(params)}.csv`}
+          ariaLabel="Export registrations chart CSV"
+          disabled={pending || isError}
+          rows={byPeriod}
+          columns={[
+            { header: 'Date', value: (row) => row.date },
+            { header: 'Period', value: (row) => row.label },
+            { header: 'Registrations', value: (row) => row.registrations },
+            { header: 'Conversions', value: (row) => row.conversions },
+            { header: 'Conversion rate', value: (row) => row.conversionRate },
+          ]}
+        />
+      }
+    >
       {pending ? (
         <AnalyticsChartSkeleton />
       ) : isError ? (

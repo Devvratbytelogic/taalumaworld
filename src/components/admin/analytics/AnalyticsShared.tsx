@@ -122,7 +122,6 @@ export function AnalyticsDataTable({
         getRowId={getRowId}
         loading={loading}
         paginationMode="client"
-        rowCount={rows.length}
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         hideFooter={rows.length <= paginationModel.pageSize}

@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { type GridColDef } from '@mui/x-data-grid';
+import { CsvExportButton } from '@/components/admin/CsvExportButton';
 import { useGetAnalyticsAiQualityQuery, type IAnalyticsRangeParams } from '@/store/rtkQueries/analytics';
 import {
   AnalyticsBlock,
@@ -20,6 +21,7 @@ import {
 } from './AnalyticsShared';
 import {
   AI_CLASSIFICATION_COLORS,
+  analyticsCsvSuffix,
   analyticsQueryOptions,
   distributionToSeries,
   formatScore,
@@ -70,7 +72,23 @@ export function AnalyticsAiQualitySection({ params }: { params: IAnalyticsRangeP
   const byStatus = normalizeNamedCounts(ai?.byStatus);
 
   return (
-    <AnalyticsBlock title="AI & quality" interval={payload?.interval}>
+    <AnalyticsBlock
+      title="AI & quality"
+      interval={payload?.interval}
+      action={
+        <CsvExportButton
+          filename={`ai-quality-chart-${analyticsCsvSuffix(params)}.csv`}
+          ariaLabel="Export AI quality chart CSV"
+          disabled={pending || isError}
+          rows={series}
+          columns={[
+            { header: 'Key', value: (row) => row.key },
+            { header: 'Label', value: (row) => row.label },
+            { header: 'Value', value: (row) => row.value },
+          ]}
+        />
+      }
+    >
       {pending ? (
         <AnalyticsChartSkeleton />
       ) : isError ? (

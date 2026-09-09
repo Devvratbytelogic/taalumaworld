@@ -15,6 +15,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { CsvExportButton } from '@/components/admin/CsvExportButton';
 import { AdminPanel, AdminSectionHeader, adminSelectClass } from '@/components/admin/layout/AdminContent';
 import { formatKes } from '@/constants/common';
 import {
@@ -77,6 +78,13 @@ function ChartSummary({ items }: { items: { label: string; value: string }[] }) 
 
 const CURRENT_YEAR = new Date().getFullYear();
 const CHART_YEARS = Array.from({ length: CURRENT_YEAR - 2020 + 1 }, (_, i) => CURRENT_YEAR - i);
+
+function chartCsvSuffix(year: string, filterParams: IDashboardDateRangeParams) {
+  if (filterParams.fromDate && filterParams.toDate) {
+    return `${filterParams.fromDate}-to-${filterParams.toDate}`;
+  }
+  return year || 'all-years';
+}
 
 function YearFilter({
   year,
@@ -144,6 +152,7 @@ export function DashboardCharts({
   const salesVolumeSeries = salesVolume?.series ?? [];
   const registrationsSeries = registrations?.series ?? [];
   const revenueSplitSeries = (revenueSplit?.series ?? []).filter((item) => item.value > 0);
+  const csvSuffix = chartCsvSuffix(year, filterParams);
 
   return (
     <div className="space-y-4">
@@ -157,7 +166,25 @@ export function DashboardCharts({
       </div>
 
       <AdminPanel>
-        <AdminSectionHeader title="Earnings" />
+        <AdminSectionHeader
+          title="Earnings"
+          action={
+            <CsvExportButton
+              filename={`earnings-chart-${csvSuffix}.csv`}
+              ariaLabel="Export earnings chart CSV"
+              disabled={earningsLoading || earningsError}
+              rows={earningsSeries}
+              columns={[
+                { header: 'Date', value: (row) => row.date },
+                { header: 'Period', value: (row) => row.label },
+                { header: 'Platform earning', value: (row) => row.platform_earning },
+                { header: 'Mentor share', value: (row) => row.mentor_share },
+                { header: 'Gross', value: (row) => row.gross },
+                { header: 'Sales', value: (row) => row.sales },
+              ]}
+            />
+          }
+        />
         {earningsLoading ? (
           <ChartSkeleton />
         ) : earningsError ? (
@@ -216,7 +243,25 @@ export function DashboardCharts({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <AdminPanel>
-          <AdminSectionHeader title="Sales volume" />
+          <AdminSectionHeader
+            title="Sales volume"
+            action={
+              <CsvExportButton
+                filename={`sales-volume-chart-${csvSuffix}.csv`}
+                ariaLabel="Export sales volume chart CSV"
+                disabled={salesVolumeLoading || salesVolumeError}
+                rows={salesVolumeSeries}
+                columns={[
+                  { header: 'Date', value: (row) => row.date },
+                  { header: 'Period', value: (row) => row.label },
+                  { header: 'Books', value: (row) => row.book },
+                  { header: 'Blueprints', value: (row) => row.chapter },
+                  { header: 'Other', value: (row) => row.other },
+                  { header: 'Total', value: (row) => row.total },
+                ]}
+              />
+            }
+          />
           {salesVolumeLoading ? (
             <ChartSkeleton />
           ) : salesVolumeError ? (
@@ -250,7 +295,24 @@ export function DashboardCharts({
         </AdminPanel>
 
         <AdminPanel>
-          <AdminSectionHeader title="Registrations" />
+          <AdminSectionHeader
+            title="Registrations"
+            action={
+              <CsvExportButton
+                filename={`registrations-chart-${csvSuffix}.csv`}
+                ariaLabel="Export registrations chart CSV"
+                disabled={registrationsLoading || registrationsError}
+                rows={registrationsSeries}
+                columns={[
+                  { header: 'Date', value: (row) => row.date },
+                  { header: 'Period', value: (row) => row.label },
+                  { header: 'Customers', value: (row) => row.customers },
+                  { header: 'Mentors', value: (row) => row.mentors },
+                  { header: 'Total', value: (row) => row.total },
+                ]}
+              />
+            }
+          />
           {registrationsLoading ? (
             <ChartSkeleton />
           ) : registrationsError ? (
@@ -285,7 +347,22 @@ export function DashboardCharts({
       </div>
 
       <AdminPanel>
-        <AdminSectionHeader title="Revenue split" />
+        <AdminSectionHeader
+          title="Revenue split"
+          action={
+            <CsvExportButton
+              filename={`revenue-split-chart-${csvSuffix}.csv`}
+              ariaLabel="Export revenue split chart CSV"
+              disabled={revenueSplitLoading || revenueSplitError}
+              rows={revenueSplitSeries}
+              columns={[
+                { header: 'Key', value: (row) => row.key },
+                { header: 'Label', value: (row) => row.label },
+                { header: 'Value', value: (row) => row.value },
+              ]}
+            />
+          }
+        />
         {revenueSplitLoading ? (
           <ChartSkeleton />
         ) : revenueSplitError ? (

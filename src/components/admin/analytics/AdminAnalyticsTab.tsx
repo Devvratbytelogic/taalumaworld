@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AdminPage } from '@/components/admin/layout/AdminContent';
 import { AdminAnalyticsHeader } from './AdminAnalyticsHeader';
 import { AnalyticsRegistrationsSection } from './AnalyticsRegistrationsSection';
@@ -11,25 +11,19 @@ import { AnalyticsRevenueSection } from './AnalyticsRevenueSection';
 import { AnalyticsCouponsSection } from './AnalyticsCouponsSection';
 import { AnalyticsReferralsSection } from './AnalyticsReferralsSection';
 import { AnalyticsAiQualitySection } from './AnalyticsAiQualitySection';
-import { ANALYTICS_TOP_LIMIT, getLastNDaysRange, isValidDateRange } from './analyticsUtils';
+import { ANALYTICS_TOP_LIMIT, analyticsRangeParams, isValidDateRange } from './analyticsUtils';
 
 export function AdminAnalyticsTab() {
   const [draftFrom, setDraftFrom] = useState('');
   const [draftTo, setDraftTo] = useState('');
   const [applied, setApplied] = useState({ fromDate: '', toDate: '' });
 
-  useEffect(() => {
-    const range = getLastNDaysRange(30);
-    setDraftFrom(range.fromDate);
-    setDraftTo(range.toDate);
-    setApplied(range);
-  }, []);
-
-  const rangeParams = applied;
-  const topParams = { ...applied, limit: ANALYTICS_TOP_LIMIT };
+  const rangeParams = analyticsRangeParams(applied.fromDate, applied.toDate);
+  const topParams = { ...rangeParams, limit: ANALYTICS_TOP_LIMIT };
 
   const applyRange = (range: { fromDate: string; toDate: string }) => {
-    if (!isValidDateRange(range.fromDate, range.toDate)) return;
+    const isClear = !range.fromDate && !range.toDate;
+    if (!isClear && !isValidDateRange(range.fromDate, range.toDate)) return;
     setDraftFrom(range.fromDate);
     setDraftTo(range.toDate);
     setApplied(range);

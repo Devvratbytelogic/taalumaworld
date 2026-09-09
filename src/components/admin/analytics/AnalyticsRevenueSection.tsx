@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { CsvExportButton } from '@/components/admin/CsvExportButton';
 import { useGetAnalyticsRevenueQuery, type IAnalyticsRangeParams } from '@/store/rtkQueries/analytics';
 import {
   ANALYTICS_CHART_COLORS,
@@ -19,7 +20,7 @@ import {
   AnalyticsSummary,
   analyticsTooltipStyle,
 } from './AnalyticsShared';
-import { analyticsQueryOptions, formatAnalyticsMoney, formatCompactKes, queryErrorMessage } from './analyticsUtils';
+import { analyticsCsvSuffix, analyticsQueryOptions, formatAnalyticsMoney, formatCompactKes, queryErrorMessage } from './analyticsUtils';
 
 export function AnalyticsRevenueSection({ params }: { params: IAnalyticsRangeParams }) {
   const { data, isLoading, isError, error, isUninitialized } = useGetAnalyticsRevenueQuery(
@@ -32,7 +33,27 @@ export function AnalyticsRevenueSection({ params }: { params: IAnalyticsRangePar
   const series = payload?.series ?? [];
 
   return (
-    <AnalyticsBlock title="Revenue (net after commissions)" interval={payload?.interval}>
+    <AnalyticsBlock
+      title="Revenue (net after commissions)"
+      interval={payload?.interval}
+      action={
+        <CsvExportButton
+          filename={`revenue-chart-${analyticsCsvSuffix(params)}.csv`}
+          ariaLabel="Export revenue chart CSV"
+          disabled={pending || isError}
+          rows={series}
+          columns={[
+            { header: 'Date', value: (row) => row.date },
+            { header: 'Period', value: (row) => row.label },
+            { header: 'Sales', value: (row) => row.sales },
+            { header: 'Gross', value: (row) => row.gross },
+            { header: 'Mentor share', value: (row) => row.mentorShare },
+            { header: 'Platform earning', value: (row) => row.platformEarning },
+            { header: 'Net after commissions', value: (row) => row.netAfterCommissions },
+          ]}
+        />
+      }
+    >
       {pending ? (
         <AnalyticsChartSkeleton />
       ) : isError ? (

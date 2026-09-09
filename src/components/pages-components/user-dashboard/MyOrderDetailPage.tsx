@@ -194,6 +194,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
           {!isFree ? <DetailRow label="Invoice #" value={order.invoiceNumber} /> : null}
           <DetailRow label="Transaction ID" value={order.transactionId} />
           <DetailRow label="Payment Method" value={order.paymentMethod} />
+          <DetailRow label="Card Brand" value={order.cardBrand} />
           <DetailRow label="Coupon Code" value={order.couponCode} />
           <DetailRow label="Coupon Type" value={couponTypeLabel} />
           <DetailRow label="Coupon Value" value={couponValueLabel} />

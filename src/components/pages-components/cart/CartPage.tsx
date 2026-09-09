@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Check, Lock, MapPin, ShoppingBag } from 'lucide-react';
@@ -68,11 +68,16 @@ function CartPageContent() {
   const searchParams = useSearchParams();
   const isCheckoutPage = pathname === getCartCheckoutRoutePath();
   const paystackReference = getPaystackReturnReference(searchParams);
+  const [hasMounted, setHasMounted] = useState(false);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const { data: cartResponse, isLoading } = useGetCartQuery();
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
@@ -83,16 +88,16 @@ function CartPageContent() {
   const total = cartData?.total_amount ?? 0;
   const itemCount = cartData?.item_count ?? 0;
 
+  if (!hasMounted || isLoading) {
+    return <CartPageSkeleton />;
+  }
+
   if (isCheckoutPage && paystackReference) {
     return <PaystackReturnStatus reference={paystackReference} />;
   }
 
   if (isPaymentConfirmed) {
     return <PaymentConfirmed transactionId={transactionId} orderNumber={orderNumber} />;
-  }
-
-  if (isLoading) {
-    return <CartPageSkeleton />;
   }
 
   if (cartItems.length === 0) {

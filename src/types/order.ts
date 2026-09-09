@@ -84,6 +84,7 @@ export interface IOrder {
     status: string;
     paymentStatus: string;
     paymentMethod: string;
+    cardBrand?: string | null;
     transactionId: string;
     tax_percent: number;
     billing_address: BillingAddress;

@@ -56,7 +56,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
     equity_eligible_percent: mentorTier?.equity_eligible_percent ?? '',
     badge: mentorTier?.badge || null,
   };
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit, resetForm, setFieldValue } = useFormik({
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit, resetForm, setFieldValue, setFieldTouched, submitCount } = useFormik({
     initialValues,
     validationSchema: mentorTierSchema,
     enableReinitialize: true,
@@ -131,6 +131,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
     }
     setBadgeFile(file);
     setFieldValue('badge', file);
+    setFieldTouched('badge', true);
     e.target.value = '';
   };
 
@@ -138,6 +139,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
     setBadgeFile(null);
     setBadgePreview(null);
     setFieldValue('badge', null);
+    setFieldTouched('badge', true);
   };
 
   return (
@@ -160,7 +162,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
               </div>
               <div className="min-w-0 flex-1">
                 <Label className="mb-1">
-                  Badge <span className="font-normal text-muted-foreground">(optional)</span>
+                  Badge<span className="text-red-500">*</span>
                   <FileUploadLimitHint kind="image" />
                 </Label>
                 <input ref={fileInputRef} type="file" accept={ALLOWED_IMAGE_ACCEPT} className="hidden" onChange={handleBadgeChange} />
@@ -183,6 +185,9 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                   <p className="mt-1 max-w-full truncate text-xs text-slate-500" title={badgeFile.name}>
                     {badgeFile.name}
                   </p>
+                ) : null}
+                {errors.badge && (touched.badge || submitCount > 0) ? (
+                  <p className="mt-1 text-sm text-red-600">{errors.badge}</p>
                 ) : null}
               </div>
             </div>
@@ -274,7 +279,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
             {Number(values.rank) !== 1 ? (
               <>
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Eligibility criteria (optional)</p>
-                <p className="text-xs text-slate-400">Leave a field empty (or 0) for no gate.</p>
+                <p className="text-xs text-slate-400">Leave a field empty (or 0) for no gate. Max mentors must be greater than 0.</p>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
@@ -309,8 +314,12 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                       inputMode="numeric"
                       value={values.max_mentors}
                       onChange={(e) => setFieldValue('max_mentors', e.target.value.replace(/[^\d]/g, ''))}
+                      onBlur={handleBlur}
                       placeholder="e.g. 10"
                     />
+                    {errors.max_mentors && touched.max_mentors ? (
+                      <p className="text-sm text-red-600">{errors.max_mentors}</p>
+                    ) : null}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="min_confirmed_sales">Min confirmed sales</Label>

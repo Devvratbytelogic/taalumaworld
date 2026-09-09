@@ -694,7 +694,19 @@ export const mentorTierSchema = Yup.object({
   platform_share_percent: Yup.number().min(0).max(100).required('Required'),
   rank: Yup.number().min(1, 'Rank must be at least 1').required('Rank is required'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
-  max_mentors: optionalNonNegativeNumber,
+  max_mentors: Yup.number()
+    .transform((value, originalValue) =>
+      originalValue === '' || originalValue == null ? undefined : Number(originalValue)
+    )
+    .when('rank', {
+      is: (rank: number) => Number(rank) !== 1,
+      then: (schema) =>
+        schema
+          .typeError('Max mentors must be greater than 0')
+          .min(1, 'Max mentors must be greater than 0')
+          .optional(),
+      otherwise: (schema) => schema.nullable().optional(),
+    }),
   min_confirmed_sales: optionalNonNegativeNumber,
   min_days_since_published: optionalNonNegativeNumber,
   min_words_per_blueprint: optionalNonNegativeNumber,
@@ -718,9 +730,12 @@ export const mentorTierSchema = Yup.object({
       otherwise: (schema) => schema.nullable().optional(),
     }),
   badge: Yup.mixed()
-    .nullable()
-    .optional()
-    .test('badge', 'Badge must be an image file', (v) => !v || v instanceof File || typeof v === 'string')
+    .required('Badge is required')
+    .test(
+      'badge',
+      'Badge is required',
+      (v) => v instanceof File || (typeof v === 'string' && v.trim().length > 0),
+    )
     .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
 });
 

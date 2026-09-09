@@ -100,7 +100,7 @@ export default function ChapterPurchaseModal() {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="2xl" classNames={modalClassNames}>
+      <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="2xl" scrollBehavior='outside' classNames={modalClassNames}>
         <ModalContent>
           {chapter?.coverImage && (
             <div className="relative shrink-0 bg-muted flex justify-center py-4">

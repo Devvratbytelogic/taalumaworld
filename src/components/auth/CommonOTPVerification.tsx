@@ -1,13 +1,16 @@
+'use client';
+
 import { useAdminResendOtpMutation, useAdminVerifyOtpMutation } from '@/store/rtkQueries/adminAuth';
 import OtpInput from './OtpInput';
 import { otpVerificationSchema } from '@/utils/formValidation';
 import { useFormik } from 'formik';
 import toast from '@/utils/toast';
 import { Button } from '@heroui/react';
-import Cookies from 'js-cookie';
 import { setAuthCookies } from '@/utils/authCookies';
 import { useRouter } from 'next/navigation';
 import { getAdminDashboardRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
+import { useOtpResendCooldown } from '@/hooks/useOtpResendCooldown';
+import { OtpResendButton } from '@/components/auth/OtpResendButton';
 
 interface CommonOTPVerificationProps {
     email: string;
@@ -20,6 +23,7 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
     const router = useRouter();
     const [adminVerifyOtp, { isLoading: isVerifying }] = useAdminVerifyOtpMutation();
     const [adminResendOtp, { isLoading: isResending }] = useAdminResendOtpMutation();
+    const { remainingSeconds, canResend, startCooldown } = useOtpResendCooldown();
 
     const { errors, touched, isSubmitting, values, handleSubmit, setFieldValue, submitForm } = useFormik({
         initialValues: { code: '' },
@@ -55,9 +59,11 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
     };
 
     const handleResend = async () => {
+        if (!canResend) return;
         try {
             const res = await adminResendOtp({ email, type }).unwrap();
             toast.success((res as { message?: string }).message ?? 'Code resent successfully!');
+            startCooldown();
         } catch (error) {
             console.error('Failed to resend code. Please try again.', error);
         }
@@ -100,14 +106,13 @@ export default function CommonOTPVerification({ email, type, isAdmin, onVerified
                 </Button>
             </form>
             <div className="mt-4 text-center">
-                <button
-                    type="button"
-                    className="text-sm font-medium text-primary hover:text-primary/80 disabled:opacity-50"
+                <OtpResendButton
+                    remainingSeconds={remainingSeconds}
+                    isResending={isResending}
+                    disabled={isSubmitting}
                     onClick={handleResend}
-                    disabled={isSubmitting || isResending}
-                >
-                    {isResending ? 'Sending...' : 'Resend code'}
-                </button>
+                    className="text-sm font-medium text-primary hover:text-primary/80 disabled:cursor-not-allowed disabled:opacity-50"
+                />
             </div>
         </>
     )

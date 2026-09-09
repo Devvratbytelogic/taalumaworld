@@ -31,8 +31,12 @@ export default function ImageComponent({
   object_cover,
 }: ImageComponentProps) {
 
-  const [hasError, setHasError] = useState(false);
   const resolvedSrc = resolveImageSrc(src);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+
+  const hasLoaded = loadedSrc === resolvedSrc;
+  const hasError = failedSrc === resolvedSrc;
 
   if (hasError || !resolvedSrc) {
     return (
@@ -49,8 +53,9 @@ export default function ImageComponent({
       height={1000}
       alt={alt || 'image'}
       title={alt || 'image'}
-      className={`w-full h-full ${object_cover ? 'object-cover' : 'object-contain'}`}
-      onError={() => setHasError(true)}
+      className={`w-full h-full ${object_cover ? 'object-cover' : 'object-contain'} ${hasLoaded ? '' : 'invisible'}`}
+      onLoad={() => setLoadedSrc(resolvedSrc)}
+      onError={() => setFailedSrc(resolvedSrc)}
     />
   )
 }

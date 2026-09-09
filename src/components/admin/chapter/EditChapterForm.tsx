@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
-import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
@@ -59,6 +59,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [existingPdfRemoved, setExistingPdfRemoved] = useState(false);
   const slugManuallyEdited = useRef(false);
+  const skipOgImagePrefillRef = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
   const { data: chapterResponse } = useGetChapterByIdQuery(chapterId);
@@ -125,15 +126,17 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       } else if (existingPdfRemoved) {
         formData.append('pdf_file', '');
       }
-      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
-      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
-      if (vals.og_title) formData.append('og_title', vals.og_title);
-      if (vals.og_description) formData.append('og_description', vals.og_description);
-      if (ogImageFile) formData.append('og_image', ogImageFile);
-      if (vals.twitter_title) formData.append('twitter_title', vals.twitter_title);
-      if (vals.twitter_description) formData.append('twitter_description', vals.twitter_description);
-      if (vals.twitter_image instanceof File) formData.append('twitter_image', vals.twitter_image);
-      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      appendOpenGraphFieldsToFormData(formData, {
+        meta_title: vals.meta_title,
+        meta_description: vals.meta_description,
+        og_title: vals.og_title,
+        og_description: vals.og_description,
+        twitter_title: vals.twitter_title,
+        twitter_description: vals.twitter_description,
+        json_ld: vals.json_ld,
+        ogImage: ogImageFile ?? vals.og_image,
+        twitterImage: vals.twitter_image,
+      });
       vals.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
       formData.append('slug', vals.slug);
       const baseUrl = APP_SITE_URL.replace(/\/$/, '');
@@ -150,6 +153,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           setOgImagePreviewUrl(null);
           setPdfFile(null);
           setExistingPdfRemoved(false);
+          skipOgImagePrefillRef.current = false;
           resetForm({ values: initialFormValues });
           slugManuallyEdited.current = false;
           toast.success(res.message ?? 'Blueprint updated successfully');
@@ -166,9 +170,15 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const chapterPricingEnabled = pricingModel === 'chapter';
 
   useEffect(() => {
+    skipOgImagePrefillRef.current = false;
+  }, [chapterId]);
+
+  useEffect(() => {
     if (!chapterData) return;
     if (!featuredImageFile) setFeaturedImagePreviewUrl(chapterData.coverImage || null);
-    if (!ogImageFile) setOgImagePreviewUrl(chapterData.og_image || null);
+    if (!ogImageFile && !skipOgImagePrefillRef.current) {
+      setOgImagePreviewUrl(chapterData.og_image || null);
+    }
   }, [chapterData]);
 
   useEffect(() => {
@@ -242,7 +252,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         toast.error(getImageSizeLimitMessage());
         return;
       }
-      if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
+      skipOgImagePrefillRef.current = true;
+      if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       setOgImageFile(file);
       setOgImagePreviewUrl(URL.createObjectURL(file));
       setFieldValue('og_image', file);
@@ -252,16 +263,17 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   };
 
   const clearOgImage = () => {
+    skipOgImagePrefillRef.current = true;
     if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
-    const existingOgImage = chapterData?.og_image || null;
-    setOgImagePreviewUrl(existingOgImage);
-    setFieldValue('og_image', existingOgImage);
+    setOgImagePreviewUrl(null);
+    setFieldValue('og_image', null);
     setFieldTouched('og_image', true);
   };
 
   const handleOgImagePrefill = useCallback(
     ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      if (skipOgImagePrefillRef.current) return;
       if (ogImageFile && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       if (file) {
         setOgImageFile(file);

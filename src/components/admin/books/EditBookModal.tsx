@@ -17,7 +17,7 @@ import {
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
 import { editBookSchema } from '@/utils/formValidation';
-import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { IBook } from '@/types/books';
 import { slugify } from '@/utils/slugify';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
@@ -64,6 +64,7 @@ export function EditBookModal({
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const coverIsObjectUrlRef = useRef(false);
   const ogImageIsObjectUrlRef = useRef(false);
+  const skipOgImagePrefillRef = useRef(false);
 
   const initialValues = {
     title: book?.title ?? '',
@@ -110,15 +111,17 @@ export function EditBookModal({
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
       values.tags.forEach((tag, index) => formData.append(`tags[${index}]`, tag));
-      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
-      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
-      if (vals.og_title) formData.append('og_title', vals.og_title);
-      if (vals.og_description) formData.append('og_description', vals.og_description);
-      if (ogImageFile) formData.append('og_image', ogImageFile);
-      if (vals.twitter_title) formData.append('twitter_title', vals.twitter_title);
-      if (vals.twitter_description) formData.append('twitter_description', vals.twitter_description);
-      if (vals.twitter_image instanceof File) formData.append('twitter_image', vals.twitter_image);
-      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      appendOpenGraphFieldsToFormData(formData, {
+        meta_title: vals.meta_title,
+        meta_description: vals.meta_description,
+        og_title: vals.og_title,
+        og_description: vals.og_description,
+        twitter_title: vals.twitter_title,
+        twitter_description: vals.twitter_description,
+        json_ld: vals.json_ld,
+        ogImage: ogImageFile ?? vals.og_image,
+        twitterImage: vals.twitter_image,
+      });
 
       try {
         const res = (await onSubmit({ id: book._id, values: formData }).unwrap()) as { http_status_code?: number; message?: string };
@@ -131,6 +134,7 @@ export function EditBookModal({
           setOgImagePreviewUrl(null);
           coverIsObjectUrlRef.current = false;
           ogImageIsObjectUrlRef.current = false;
+          skipOgImagePrefillRef.current = false;
           onOpenChange(false);
           toast.success(res.message ?? 'Series updated successfully');
         }
@@ -148,8 +152,11 @@ export function EditBookModal({
       setOgImagePreviewUrl(book.og_image ?? null);
       ogImageIsObjectUrlRef.current = false;
       setOgImageFile(null);
+      skipOgImagePrefillRef.current = false;
     }
-  }, [open, book]);
+    // Only re-sync when the modal opens or a different series is selected.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- avoid resetting a cleared OG image on book object identity changes
+  }, [open, book?._id]);
 
   useEffect(() => {
     if (!open) {
@@ -161,6 +168,7 @@ export function EditBookModal({
       setOgImagePreviewUrl(null);
       coverIsObjectUrlRef.current = false;
       ogImageIsObjectUrlRef.current = false;
+      skipOgImagePrefillRef.current = false;
       resetForm({ values: emptyFormValues });
     }
   }, [open, resetForm]);
@@ -223,6 +231,7 @@ export function EditBookModal({
         toast.error(getImageSizeLimitMessage());
         return;
       }
+      skipOgImagePrefillRef.current = true;
       if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       setOgImageFile(file);
       setOgImagePreviewUrl(URL.createObjectURL(file));
@@ -234,17 +243,18 @@ export function EditBookModal({
   };
 
   const clearOgImage = () => {
+    skipOgImagePrefillRef.current = true;
     if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
-    const existingOgImage = book?.og_image ?? null;
-    setOgImagePreviewUrl(existingOgImage);
+    setOgImagePreviewUrl(null);
     ogImageIsObjectUrlRef.current = false;
-    setFieldValue('og_image', existingOgImage);
+    setFieldValue('og_image', null);
     setFieldTouched('og_image', true);
   };
 
   const handleOgImagePrefill = useCallback(
     ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      if (skipOgImagePrefillRef.current) return;
       if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       if (file) {
         setOgImageFile(file);
@@ -270,6 +280,7 @@ export function EditBookModal({
     setOgImagePreviewUrl(null);
     coverIsObjectUrlRef.current = false;
     ogImageIsObjectUrlRef.current = false;
+    skipOgImagePrefillRef.current = false;
     resetForm({ values: emptyFormValues });
     onOpenChange(false);
   };

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -114,6 +113,141 @@ function getImageSourceKey(file?: File | null, previewUrl?: string | null) {
   return null;
 }
 
+const OPEN_GRAPH_TEXT_FIELDS = [
+  'meta_title',
+  'meta_description',
+  'og_title',
+  'og_description',
+  'twitter_title',
+  'twitter_description',
+  'json_ld',
+] as const;
+
+export const OPEN_GRAPH_FORM_FIELD_KEYS = [
+  ...OPEN_GRAPH_TEXT_FIELDS,
+  'og_image',
+  'twitter_image',
+] as const;
+
+function isKeptRemoteImageUrl(value: string) {
+  return /^(https?:|\/)/i.test(value);
+}
+
+function appendOpenGraphImageField(
+  formData: FormData,
+  field: 'og_image' | 'twitter_image',
+  value: File | string | null | undefined,
+) {
+  if (value instanceof File) {
+    formData.append(field, value);
+    return;
+  }
+
+  // Keep an already-saved remote image by omitting the file field.
+  if (typeof value === 'string' && value && isKeptRemoteImageUrl(value)) {
+    return;
+  }
+
+  formData.append(field, '');
+}
+
+/** Always send OG/SEO fields, including empty strings, so the API can clear them. */
+export function appendOpenGraphFieldsToFormData(
+  formData: FormData,
+  values: {
+    meta_title?: string | null;
+    meta_description?: string | null;
+    og_title?: string | null;
+    og_description?: string | null;
+    twitter_title?: string | null;
+    twitter_description?: string | null;
+    json_ld?: string | null;
+    ogImage: File | string | null | undefined;
+    twitterImage: File | string | null | undefined;
+  },
+) {
+  formData.append('meta_title', values.meta_title ?? '');
+  formData.append('meta_description', values.meta_description ?? '');
+  formData.append('og_title', values.og_title ?? '');
+  formData.append('og_description', values.og_description ?? '');
+  formData.append('twitter_title', values.twitter_title ?? '');
+  formData.append('twitter_description', values.twitter_description ?? '');
+  formData.append('json_ld', values.json_ld ?? '');
+  appendOpenGraphImageField(formData, 'og_image', values.ogImage);
+  appendOpenGraphImageField(formData, 'twitter_image', values.twitterImage);
+}
+
+/** Native picker via a hidden input so the dialog does not scroll a focused file control out of view. */
+function FilePickerControl({
+  id,
+  accept,
+  disabled,
+  onChange,
+  ariaLabel,
+  error,
+  children,
+}: {
+  id: string;
+  accept: string;
+  disabled?: boolean;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  ariaLabel: string;
+  error?: boolean;
+  children: React.ReactNode;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div className="relative">
+      <input
+        ref={inputRef}
+        id={id}
+        type="file"
+        accept={accept}
+        onChange={onChange}
+        disabled={disabled}
+        tabIndex={-1}
+        className="hidden"
+      />
+      <button
+        type="button"
+        disabled={disabled}
+        aria-label={ariaLabel}
+        className={cn('blueprint-file-picker w-full text-left', error && 'border-red-500')}
+        onClick={() => inputRef.current?.click()}
+      >
+        <span className="truncate">{children}</span>
+      </button>
+    </div>
+  );
+}
+
+function ImagePreviewRemoveButton({
+  ariaLabel,
+  disabled,
+  onRemove,
+}: {
+  ariaLabel: string;
+  disabled?: boolean;
+  onRemove: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      disabled={disabled}
+      className="absolute top-1 right-1 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm hover:text-red-500 disabled:pointer-events-none disabled:opacity-50"
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onRemove();
+      }}
+    >
+      <X className="h-4 w-4" />
+    </button>
+  );
+}
+
 interface OpenGraphFieldsSectionProps {
   idPrefix: string;
   values: OpenGraphFormValues;
@@ -139,6 +273,8 @@ interface OpenGraphFieldsSectionProps {
   onOgImageClear: () => void;
   /** Called when OG image should mirror the source cover/featured/logo image. */
   onOgImagePrefill?: (payload: { file: File | null; previewUrl: string | null }) => void;
+  /** Mirror featured/cover image into X image on create/add forms. */
+  prefillTwitterFromSource?: boolean;
   ogImageOptional?: boolean;
 }
 
@@ -161,12 +297,15 @@ export function OpenGraphFieldsSection({
   onOgImageChange,
   onOgImageClear,
   onOgImagePrefill,
+  prefillTwitterFromSource = false,
   ogImageOptional = true,
 }: OpenGraphFieldsSectionProps) {
   const lastGeneratedRef = useRef<GeneratedOpenGraphFields | null>(null);
   const manualFieldsRef = useRef<Set<keyof GeneratedOpenGraphFields>>(new Set());
   const ogImageManualRef = useRef(false);
   const lastSourceImageKeyRef = useRef<string | null>(null);
+  const twitterImageManualRef = useRef(false);
+  const lastTwitterSourceImageKeyRef = useRef<string | null>(null);
   const valuesRef = useRef(values);
   valuesRef.current = values;
 
@@ -245,6 +384,41 @@ export function OpenGraphFieldsSection({
     ogImagePreviewUrl,
   ]);
 
+  // Mirror featured/cover into X image on create until the user sets or clears it.
+  useEffect(() => {
+    if (disabled || !prefillTwitterFromSource) return;
+
+    const sourceKey = getImageSourceKey(sourceImageFile, sourceImagePreviewUrl);
+    const currentTwitter = valuesRef.current.twitter_image;
+    const hasExistingTwitter =
+      (typeof currentTwitter === 'string' && currentTwitter.length > 0) ||
+      currentTwitter instanceof File;
+
+    if (!sourceKey && !hasExistingTwitter) {
+      twitterImageManualRef.current = false;
+      lastTwitterSourceImageKeyRef.current = null;
+      return;
+    }
+
+    if (twitterImageManualRef.current) return;
+    if (!sourceKey || sourceKey === lastTwitterSourceImageKeyRef.current) return;
+
+    if (hasExistingTwitter && lastTwitterSourceImageKeyRef.current === null) {
+      twitterImageManualRef.current = true;
+      lastTwitterSourceImageKeyRef.current = sourceKey;
+      return;
+    }
+
+    lastTwitterSourceImageKeyRef.current = sourceKey;
+    setFieldValue('twitter_image', sourceImageFile ?? sourceImagePreviewUrl ?? null);
+  }, [
+    disabled,
+    prefillTwitterFromSource,
+    sourceImageFile,
+    sourceImagePreviewUrl,
+    setFieldValue,
+  ]);
+
   const [twitterImagePreviewUrl, setTwitterImagePreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -277,13 +451,13 @@ export function OpenGraphFieldsSection({
 
   const handleOgImageClearClick = () => {
     ogImageManualRef.current = true;
+    lastSourceImageKeyRef.current =
+      getImageSourceKey(sourceImageFile, sourceImagePreviewUrl) ?? lastSourceImageKeyRef.current;
     onOgImageClear();
   };
 
-  const twitterCardPreviewUrl = twitterImagePreviewUrl ?? ogImagePreviewUrl ?? null;
   const twitterImageFileName =
     values.twitter_image instanceof File ? values.twitter_image.name : null;
-  const hasCustomTwitterImage = Boolean(twitterImagePreviewUrl);
 
   const handleTwitterImageChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const file = event.target.files?.[0];
@@ -298,12 +472,16 @@ export function OpenGraphFieldsSection({
         event.target.value = '';
         return;
       }
+      twitterImageManualRef.current = true;
       setFieldValue('twitter_image', file);
     }
     event.target.value = '';
   };
 
   const handleTwitterImageClear = () => {
+    twitterImageManualRef.current = true;
+    lastTwitterSourceImageKeyRef.current =
+      getImageSourceKey(sourceImageFile, sourceImagePreviewUrl) ?? lastTwitterSourceImageKeyRef.current;
     setFieldValue('twitter_image', null);
   };
 
@@ -312,8 +490,8 @@ export function OpenGraphFieldsSection({
       <div>
         <h3 className="text-sm font-semibold text-slate-900">SEO, Open Graph, X & structured data</h3>
         <p className="mt-1 text-sm text-slate-500">
-          Text fields fill from the title and description; OG image fills from the cover or logo
-          image. X/Twitter fields follow the same defaults. Edit any field to customize it.
+          Text fields fill from the title and description. On create, OG and X images fill from the
+          cover or featured image until you replace them or remove them with the X.
         </p>
       </div>
 
@@ -391,7 +569,7 @@ export function OpenGraphFieldsSection({
 
       <div className="flex flex-col items-start gap-4 sm:flex-row">
         <div className="min-w-0 flex-1 space-y-2">
-          <Label htmlFor={`${idPrefix}-og-image`}>
+          <Label>
             OG image
             {!ogImageOptional ? <span className="text-red-500"> *</span> : null}
             {ogImageOptional ? (
@@ -399,25 +577,16 @@ export function OpenGraphFieldsSection({
             ) : null}
             <FileUploadLimitHint kind="image" />
           </Label>
-          <label
-            htmlFor={`${idPrefix}-og-image`}
-            className={cn(
-              'blueprint-file-picker',
-              errors.og_image && touched.og_image && 'border-red-500',
-            )}
+          <FilePickerControl
+            id={`${idPrefix}-og-image`}
+            accept={ALLOWED_IMAGE_ACCEPT}
+            onChange={handleOgImageInputChange}
+            disabled={disabled}
+            ariaLabel="OG image"
+            error={Boolean(errors.og_image && touched.og_image)}
           >
-            <input
-              id={`${idPrefix}-og-image`}
-              type="file"
-              accept={ALLOWED_IMAGE_ACCEPT}
-              onChange={handleOgImageInputChange}
-              disabled={disabled}
-              className="sr-only"
-            />
-            <span className="truncate">
-              {ogImageFileName ?? (ogImagePreviewUrl ? 'Replace OG image...' : 'Select OG image...')}
-            </span>
-          </label>
+            {ogImageFileName ?? (ogImagePreviewUrl ? 'Replace OG image...' : 'Select OG image...')}
+          </FilePickerControl>
           {errors.og_image && touched.og_image ? (
             <p className="text-sm text-red-600">{errors.og_image as string}</p>
           ) : null}
@@ -427,14 +596,11 @@ export function OpenGraphFieldsSection({
             <div className="image-preview max-w-24">
               <img src={ogImagePreviewUrl} alt="OG image preview" className="h-full w-full object-cover" />
             </div>
-            <Button
-              type="button"
-              isIconOnly
-              className="absolute top-1 right-1 global_btn bg_transparent icon_btn"
-              onPress={handleOgImageClearClick}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <ImagePreviewRemoveButton
+              ariaLabel="Remove OG image"
+              disabled={disabled}
+              onRemove={handleOgImageClearClick}
+            />
           </div>
         ) : (
           <div className="image-preview-placeholder max-w-24 text-xs">
@@ -485,56 +651,40 @@ export function OpenGraphFieldsSection({
 
       <div className="flex flex-col items-start gap-4 sm:flex-row">
         <div className="min-w-0 flex-1 space-y-2">
-          <Label htmlFor={`${idPrefix}-twitter-image`}>
+          <Label>
             X image
-            <span className="ml-1 text-xs font-normal text-slate-400">
-              (optional — uses OG image if empty)
-            </span>
+            <span className="ml-1 text-xs font-normal text-slate-400">(optional)</span>
             <FileUploadLimitHint kind="image" />
           </Label>
-          <label
-            htmlFor={`${idPrefix}-twitter-image`}
-            className={cn(
-              'blueprint-file-picker',
-              errors.twitter_image && touched.twitter_image && 'border-red-500',
-            )}
+          <FilePickerControl
+            id={`${idPrefix}-twitter-image`}
+            accept={ALLOWED_IMAGE_ACCEPT}
+            onChange={handleTwitterImageChange}
+            disabled={disabled}
+            ariaLabel="X image"
+            error={Boolean(errors.twitter_image && touched.twitter_image)}
           >
-            <input
-              id={`${idPrefix}-twitter-image`}
-              type="file"
-              accept={ALLOWED_IMAGE_ACCEPT}
-              onChange={handleTwitterImageChange}
-              disabled={disabled}
-              className="sr-only"
-            />
-            <span className="truncate">
-              {twitterImageFileName ??
-                (hasCustomTwitterImage ? 'Replace X image...' : 'Select X image...')}
-            </span>
-          </label>
+            {twitterImageFileName ??
+              (twitterImagePreviewUrl ? 'Replace X image...' : 'Select X image...')}
+          </FilePickerControl>
           {errors.twitter_image && touched.twitter_image ? (
             <p className="text-sm text-red-600">{errors.twitter_image as string}</p>
           ) : null}
         </div>
-        {twitterCardPreviewUrl ? (
+        {twitterImagePreviewUrl ? (
           <div className="relative inline-block">
             <div className="image-preview max-w-24">
               <img
-                src={twitterCardPreviewUrl}
+                src={twitterImagePreviewUrl}
                 alt="X image preview"
                 className="h-full w-full object-cover"
               />
             </div>
-            {hasCustomTwitterImage ? (
-              <Button
-                type="button"
-                isIconOnly
-                className="absolute top-1 right-1 global_btn bg_transparent icon_btn"
-                onPress={handleTwitterImageClear}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            ) : null}
+            <ImagePreviewRemoveButton
+              ariaLabel="Remove X image"
+              disabled={disabled}
+              onRemove={handleTwitterImageClear}
+            />
           </div>
         ) : (
           <div className="image-preview-placeholder max-w-24 text-xs">

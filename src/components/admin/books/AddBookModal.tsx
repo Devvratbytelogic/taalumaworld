@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useFormik } from 'formik';
 import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
@@ -17,7 +17,7 @@ import {
 import toast from '@/utils/toast';
 import { addBookSchema } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
-import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { slugify } from '@/utils/slugify';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
@@ -61,6 +61,7 @@ export function AddBookModal({
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
+  const skipOgImagePrefillRef = useRef(false);
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
@@ -77,15 +78,17 @@ export function AddBookModal({
       formData.append('price', String(vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
       vals.tags.forEach((tag, index) => formData.append(`tags[${index}]`, tag));
-      if (vals.meta_title) formData.append('meta_title', vals.meta_title);
-      if (vals.meta_description) formData.append('meta_description', vals.meta_description);
-      if (vals.og_title) formData.append('og_title', vals.og_title);
-      if (vals.og_description) formData.append('og_description', vals.og_description);
-      if (ogImageFile) formData.append('og_image', ogImageFile);
-      if (vals.twitter_title) formData.append('twitter_title', vals.twitter_title);
-      if (vals.twitter_description) formData.append('twitter_description', vals.twitter_description);
-      if (vals.twitter_image instanceof File) formData.append('twitter_image', vals.twitter_image);
-      if (vals.json_ld) formData.append('json_ld', vals.json_ld);
+      appendOpenGraphFieldsToFormData(formData, {
+        meta_title: vals.meta_title,
+        meta_description: vals.meta_description,
+        og_title: vals.og_title,
+        og_description: vals.og_description,
+        twitter_title: vals.twitter_title,
+        twitter_description: vals.twitter_description,
+        json_ld: vals.json_ld,
+        ogImage: ogImageFile ?? vals.og_image,
+        twitterImage: vals.twitter_image,
+      });
       await appendUserIpToFormData(formData);
 
       try {
@@ -97,6 +100,7 @@ export function AddBookModal({
           setCoverPreviewUrl(null);
           setOgImageFile(null);
           setOgImagePreviewUrl(null);
+          skipOgImagePrefillRef.current = false;
           resetForm({ values: initialFormValues });
           onOpenChange(false);
           toast.success(res.message ?? 'Series created successfully');
@@ -163,6 +167,7 @@ export function AddBookModal({
         toast.error(getImageSizeLimitMessage());
         return;
       }
+      skipOgImagePrefillRef.current = true;
       if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       setOgImageFile(file);
       setOgImagePreviewUrl(URL.createObjectURL(file));
@@ -173,6 +178,7 @@ export function AddBookModal({
   };
 
   const clearOgImage = () => {
+    skipOgImagePrefillRef.current = true;
     if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
     setOgImagePreviewUrl(null);
@@ -182,6 +188,7 @@ export function AddBookModal({
 
   const handleOgImagePrefill = useCallback(
     ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      if (skipOgImagePrefillRef.current) return;
       setOgImagePreviewUrl((current) => {
         if (current) URL.revokeObjectURL(current);
         if (file) return URL.createObjectURL(file);
@@ -200,6 +207,7 @@ export function AddBookModal({
     setCoverPreviewUrl(null);
     setOgImageFile(null);
     setOgImagePreviewUrl(null);
+    skipOgImagePrefillRef.current = false;
     resetForm({ values: initialFormValues });
     onOpenChange(false);
   };
@@ -469,6 +477,7 @@ export function AddBookModal({
               onOgImageChange={handleOgImageChange}
               onOgImageClear={clearOgImage}
               onOgImagePrefill={handleOgImagePrefill}
+              prefillTwitterFromSource
             />
           </div>
           <DialogFooter className="shrink-0 gap-3 border-t border-slate-100 px-6 py-4">

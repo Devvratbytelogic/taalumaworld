@@ -38,17 +38,13 @@ export default function ReaderTestimonials({ testimonials }: ReaderTestimonialsP
                                 &ldquo;{testimonial.message}&rdquo;
                             </p>
                             <div className="flex items-center gap-3">
-                                {testimonial.photo ? (
+                                <div className="w-10 h-10 rounded-full bg-primary/10 overflow-hidden shrink-0">
                                     <ImageComponent
-                                        src={testimonial.photo}
+                                        src={testimonial.photo ?? undefined}
                                         alt={testimonial.name}
                                         object_cover={true}
                                     />
-                                ) : (
-                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
-                                        {testimonial.name?.charAt(0)?.toUpperCase() ?? '?'}
-                                    </div>
-                                )}
+                                </div>
                                 <div>
                                     <p className="font-semibold">{testimonial.name}</p>
                                     <p className="text-sm text-muted-foreground">{testimonial.title}</p>

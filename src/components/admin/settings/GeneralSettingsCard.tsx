@@ -16,7 +16,7 @@ import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { globalSettingsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
-import { OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
+import { appendOpenGraphFieldsToFormData, OPEN_GRAPH_FORM_FIELD_KEYS, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
@@ -108,8 +108,10 @@ export function GeneralSettingsCard() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
+  const [ogImageRemoved, setOgImageRemoved] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const ogImageIsObjectUrlRef = useRef(false);
+  const skipOgImagePrefillRef = useRef(false);
 
   const data = res?.data;
 
@@ -166,14 +168,25 @@ export function GeneralSettingsCard() {
       try {
         const formData = new FormData();
         (Object.keys(values) as (keyof FormValues)[]).forEach((key) => {
-          if (key === 'og_image' || key === 'twitter_image') return;
+          if ((OPEN_GRAPH_FORM_FIELD_KEYS as readonly string[]).includes(key)) return;
           formData.append(key, String(values[key]));
         });
         if (logoFile) formData.append('logo', logoFile);
-        if (ogImageFile) formData.append('og_image', ogImageFile);
-        if (values.twitter_image instanceof File) formData.append('twitter_image', values.twitter_image);
+        appendOpenGraphFieldsToFormData(formData, {
+          meta_title: values.meta_title,
+          meta_description: values.meta_description,
+          og_title: values.og_title,
+          og_description: values.og_description,
+          twitter_title: values.twitter_title,
+          twitter_description: values.twitter_description,
+          json_ld: values.json_ld,
+          ogImage: ogImageFile ?? values.og_image,
+          twitterImage: values.twitter_image,
+        });
         const res = await updateGlobalSettings(formData).unwrap();
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+          skipOgImagePrefillRef.current = false;
+          setOgImageRemoved(false);
           void refreshAfterSettingsChange();
           toast.success(res.message ?? 'Settings updated successfully');
         }
@@ -198,6 +211,8 @@ export function GeneralSettingsCard() {
         toast.error(getImageSizeLimitMessage());
         return;
       }
+      skipOgImagePrefillRef.current = true;
+      setOgImageRemoved(false);
       if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       setOgImageFile(file);
       setOgImagePreviewUrl(URL.createObjectURL(file));
@@ -209,16 +224,19 @@ export function GeneralSettingsCard() {
   };
 
   const clearOgImage = () => {
+    skipOgImagePrefillRef.current = true;
     if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
     setOgImageFile(null);
-    setOgImagePreviewUrl(existingOgImage);
+    setOgImagePreviewUrl(null);
+    setOgImageRemoved(true);
     ogImageIsObjectUrlRef.current = false;
-    setFieldValue('og_image', existingOgImage);
+    setFieldValue('og_image', null);
     setFieldTouched('og_image', true);
   };
 
   const handleOgImagePrefill = useCallback(
     ({ file, previewUrl }: { file: File | null; previewUrl: string | null }) => {
+      if (skipOgImagePrefillRef.current) return;
       if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
       if (file) {
         setOgImageFile(file);
@@ -519,7 +537,7 @@ export function GeneralSettingsCard() {
             sourceImagePreviewUrl={typeof data?.logo === 'string' ? data.logo : null}
             schemaType="WebSite"
             disabled={isUpdating || formik.isSubmitting}
-            ogImagePreviewUrl={ogImagePreviewUrl ?? existingOgImage}
+            ogImagePreviewUrl={ogImageRemoved ? null : (ogImagePreviewUrl ?? existingOgImage)}
             ogImageFileName={ogImageFile?.name ?? null}
             onOgImageChange={handleOgImageChange}
             onOgImageClear={clearOgImage}

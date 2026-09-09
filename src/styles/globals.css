@@ -877,6 +877,7 @@
 }
 
 .admin_panel .blueprint-file-picker {
+  position: relative;
   display: flex;
   height: 2.5rem;
   min-height: 2.5rem;
@@ -884,6 +885,7 @@
   cursor: pointer;
   align-items: center;
   gap: 0.5rem;
+  overflow: hidden;
   border-radius: 0.5rem;
   border: 1px dashed rgb(203 213 225);
   background: rgb(248 250 252);

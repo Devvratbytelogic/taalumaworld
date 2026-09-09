@@ -12,6 +12,8 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useUserVerifyOtpMutation, useUserResendOtpMutation } from '@/store/rtkQueries/userAuthApi';
 import { setAuthCookies } from '@/utils/authCookies';
 import toast from '@/utils/toast';
+import { useOtpResendCooldown } from '@/hooks/useOtpResendCooldown';
+import { OtpResendButton } from '@/components/auth/OtpResendButton';
 
 export default function OtpVerification() {
     const dispatch = useDispatch();
@@ -23,6 +25,7 @@ export default function OtpVerification() {
 
     const [userVerifyOtp, { isLoading: isVerifying }] = useUserVerifyOtpMutation();
     const [userResendOtp, { isLoading: isResending }] = useUserResendOtpMutation();
+    const { remainingSeconds, canResend, startCooldown } = useOtpResendCooldown();
 
     const handleCancel = () => {
         if (typeof onCancel === 'function') {
@@ -78,11 +81,12 @@ export default function OtpVerification() {
     };
 
     const handleResend = async () => {
-        if (!modalData?.email) return;
+        if (!modalData?.email || !canResend) return;
         try {
             const res = await userResendOtp({ email: modalData.email, type: modalData.type }).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 toast.success(res?.message ?? 'Code resent successfully!');
+                startCooldown();
             }
         } catch (error) {
             console.error('Failed to resend code. Please try again.', error);
@@ -132,26 +136,14 @@ export default function OtpVerification() {
                         </Button>
                     </form>
                     <ModalFooter>
-                        <div className="w-full text-center text-sm text-muted-foreground space-y-2">
-                            <button
-                                type="button"
-                                className="font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                        <div className="w-full text-center text-sm text-muted-foreground">
+                            <OtpResendButton
+                                remainingSeconds={remainingSeconds}
+                                isResending={isResending}
+                                disabled={isSubmitting}
                                 onClick={handleResend}
-                                disabled={isSubmitting || isResending}
-                            >
-                                {isResending ? 'Sending...' : 'Resend code'}
-                            </button>
-                            <div>
-                                <span>Entered the wrong email? </span>
-                                <button
-                                    type="button"
-                                    className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                    onClick={() => dispatch(openModal({ componentName: 'ForgotPassword', data: '' }))}
-                                    disabled={isSubmitting}
-                                >
-                                    Try again
-                                </button>
-                            </div>
+                                className="font-medium text-primary hover:text-primary/80 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                            />
                         </div>
                     </ModalFooter>
                 </ModalBody>

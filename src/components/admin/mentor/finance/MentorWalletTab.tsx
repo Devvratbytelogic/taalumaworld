@@ -243,10 +243,10 @@ export function MentorWalletTab() {
 */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <AdminStatCard label="Total earnings" value={formatKes(walletSummary?.lifetime_earnings ?? 0)} icon={Wallet} tone="green" />
-        <AdminStatCard label="Wallet balance" value={formatKes(walletSummary?.balance ?? 0)} icon={Wallet} tone="green" />
+        {/* <AdminStatCard label="Wallet balance" value={formatKes(walletSummary?.balance ?? 0)} icon={Wallet} tone="green" />
         <AdminStatCard label="Available balance" value={formatKes(walletSummary?.available_balance ?? 0)} icon={Wallet} tone="blue" />
         <AdminStatCard label="Total withdrawals" value={formatKes(walletSummary?.total_withdrawn ?? 0)} icon={Wallet} tone="purple" />
-        <AdminStatCard label="Pending withdrawals" value={formatKes(walletSummary?.pending_withdrawals ?? 0)} icon={Wallet} tone="purple" />
+        <AdminStatCard label="Pending withdrawals" value={formatKes(walletSummary?.pending_withdrawals ?? 0)} icon={Wallet} tone="purple" /> */}
       </div>
 
       <AdminPanel>

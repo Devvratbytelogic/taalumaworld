@@ -137,7 +137,7 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
                     </div>
                   )}
                   <div>
-                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Author</p>
+                    <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Mentor</p>
                     <p className="flex items-center gap-1 font-medium text-foreground">
                       {mentor.name}
                       {(mentor.is_verified_mentor || mentor.is_mentor_verified) && (

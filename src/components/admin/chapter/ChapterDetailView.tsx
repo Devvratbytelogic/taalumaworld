@@ -172,7 +172,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
         <AdminSectionHeader title="Details" />
         <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {/* <DetailRow label="Blueprint ID" value={chapter.id} /> */}
-          {/* <DetailRow label="Short code" value={chapter.short_code} /> */}
+          {/* <DetailRow label="Referral code" value={chapter.short_code} /> */}
           <DetailRow label="Slug" value={chapter.slug} />
           <DetailRow label="Blueprint Number" value={chapter.number} />
           <DetailRow label="Series" value={chapter.series?.title} />

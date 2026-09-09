@@ -82,9 +82,9 @@ export function ProfilePage() {
     if (!shortCode) return;
     try {
       await navigator.clipboard.writeText(shortCode);
-      toast.success('Short code copied', { description: shortCode });
+      toast.success('Referral code copied', { description: shortCode });
     } catch {
-      toast.error('Failed to copy short code');
+      toast.error('Failed to copy referral code');
     }
   };
 
@@ -456,7 +456,7 @@ export function ProfilePage() {
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <Hash className="h-4 w-4 text-primary" aria-hidden />
                       </span>
-                      Short code
+                      Referral code
                     </dt>
                     <dd className="sm:text-right">
                       {shortCode ? (
@@ -464,7 +464,7 @@ export function ProfilePage() {
                           type="button"
                           onClick={copyShortCode}
                           className="inline-flex items-center gap-2 text-base font-medium text-gray-900 transition-colors hover:text-primary"
-                          title="Copy short code"
+                          title="Copy referral code"
                         >
                           <span className="font-mono">{shortCode}</span>
                           <Copy className="h-4 w-4 shrink-0 text-gray-500" />
@@ -566,7 +566,7 @@ export function ProfilePage() {
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                         <Hash className="h-4 w-4 text-primary" aria-hidden />
                       </span>
-                      Short code
+                      Referral code
                     </p>
                     <div className="sm:text-right">
                       {shortCode ? (
@@ -574,7 +574,7 @@ export function ProfilePage() {
                           type="button"
                           onClick={copyShortCode}
                           className="inline-flex items-center gap-2 text-base font-normal text-gray-900 transition-colors hover:text-primary"
-                          title="Copy short code"
+                          title="Copy referral code"
                         >
                           <span className="font-mono">{shortCode}</span>
                           <Copy className="h-4 w-4 shrink-0 text-gray-500" />

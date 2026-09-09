@@ -43,7 +43,7 @@ function formatDate(value?: string | null): string {
   return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export function MentorCouponPerformanceTab() {
+export function MentorCouponPerformanceTab({ hideHeader = false }: { hideHeader?: boolean }) {
   const [search, setSearch] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const debouncedSearch = useDebounce(search, 500);
@@ -162,18 +162,22 @@ export function MentorCouponPerformanceTab() {
 
   return (
     <AdminPage>
-      <AdminPageHeader
-        eyebrow="Performance & Revenue"
-        title="Coupon Performance"
-        description="Redemptions, discounts, and revenue from your coupons."
-      />
+      {!hideHeader && (
+        <AdminPageHeader
+          eyebrow="Performance & Revenue"
+          title="Coupon Performance"
+          description="Redemptions, discounts, and revenue from your coupons."
+        />
+      )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <AdminStatCard label="Total coupons" value={(summary?.total_coupons ?? 0).toLocaleString()} icon={TicketPercent} tone="blue" />
-        <AdminStatCard label="Total redemptions" value={(summary?.total_redemptions ?? 0).toLocaleString()} icon={ShoppingBag} tone="green" />
-        <AdminStatCard label="Discount given" value={formatKes(summary?.total_discount_given ?? 0)} icon={Percent} tone="purple" />
-        <AdminStatCard label="Total revenue" value={formatKes(summary?.total_revenue ?? 0)} icon={Wallet} tone="orange" />
-      </div>
+      {!hideHeader && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <AdminStatCard label="Total coupons" value={(summary?.total_coupons ?? 0).toLocaleString()} icon={TicketPercent} tone="blue" />
+          <AdminStatCard label="Total redemptions" value={(summary?.total_redemptions ?? 0).toLocaleString()} icon={ShoppingBag} tone="green" />
+          <AdminStatCard label="Discount given" value={formatKes(summary?.total_discount_given ?? 0)} icon={Percent} tone="purple" />
+          <AdminStatCard label="Total revenue" value={formatKes(summary?.total_revenue ?? 0)} icon={Wallet} tone="orange" />
+        </div>
+      )}
 
       <AdminSearchPanel>
         <AdminSearchInput

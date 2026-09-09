@@ -70,7 +70,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     items: [
       { id: 'orders', label: 'Orders', href: getMentorOrdersRoutePath(), icon: ShoppingBag },
       { id: 'blueprint_performance', label: 'Blueprint Performance', href: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3 },
-      // { id: 'coupon_performance', label: 'Coupon Performance', href: getMentorCouponPerformanceRoutePath(), icon: Tag },
+      { id: 'coupon_performance', label: 'Coupon Performance', href: getMentorCouponPerformanceRoutePath(), icon: Tag },
       { id: 'sales_volume', label: 'Sales Volume', href: getMentorSalesVolumeRoutePath(), icon: ShoppingCart },
       { id: 'revenue_earned', label: 'Revenue Earned', href: getMentorRevenueEarnedRoutePath(), icon: KshIcon },
       { id: 'revenue_by_blueprint', label: 'Revenue by Blueprint', href: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp },

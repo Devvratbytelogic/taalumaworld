@@ -114,7 +114,7 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                       </div>
                     )}
                     <div>
-                      <p className="text-xs text-muted-foreground">Author</p>
+                      <p className="text-xs text-muted-foreground">Mentor</p>
                       <p className="flex items-center gap-1 font-medium text-foreground">
                         {data?.createdBy?.name}
                         {(data?.createdBy?.is_verified_mentor || data?.createdBy?.is_mentor_verified) && (

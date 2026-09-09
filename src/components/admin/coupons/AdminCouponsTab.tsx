@@ -3,20 +3,25 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Edit2, RotateCcw, Tag, Trash2 } from 'lucide-react';
+import { BarChart3, Edit2, Percent, RotateCcw, ShoppingBag, Tag, TicketPercent, Trash2, Wallet } from 'lucide-react';
 import {
   useGetAdminAllCouponsQuery,
+  useGetCouponPerformanceQuery,
   useDeleteCouponMutation,
   useRestoreCouponMutation,
 } from '@/store/rtkQueries/couponApis';
 import { COUPON_SCOPE_LABELS, COUPON_TYPE_LABELS } from '@/constants/coupon';
+import { formatKes } from '@/constants/common';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
+import { adminPanelClass, AdminStatCard } from '@/components/admin/layout/AdminContent';
+import { cn } from '@/components/ui/utils';
 import { AdminCouponsHeader } from './AdminCouponsHeader';
 import { AdminCouponsSearch } from './AdminCouponsSearch';
+import { MentorCouponPerformanceTab } from '@/components/admin/mentor/performance/MentorCouponPerformanceTab';
 import toast from '@/utils/toast';
 import { IAdminCouponEntity } from '@/types/coupon';
 import { CouponModal } from './CouponModal';
@@ -50,7 +55,9 @@ export function AdminCouponsTab() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
+  const [tab, setTab] = useState<'manage' | 'performance'>('manage');
   const { hasPermission } = useAdminPermissions();
+  const showPerformance = !isTrashView && tab === 'performance';
 
   const canAdd = hasPermission(COUPON_MODEL, 'add');
   const canEdit = hasPermission(COUPON_MODEL, 'edit');
@@ -66,6 +73,8 @@ export function AdminCouponsTab() {
     ...(scopeFilter ? { type: scopeFilter } : {}),
     ...(isTrashView ? { isDeleted: true } : {}),
   });
+  const { data: performanceResponse } = useGetCouponPerformanceQuery();
+  const summary = performanceResponse?.data?.summary;
 
   const couponsData = couponsResponse?.data;
   const coupons = couponsData?.data ?? [];
@@ -297,6 +306,46 @@ export function AdminCouponsTab() {
         }}
       />
 
+      {!isTrashView && (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <AdminStatCard label="Total coupons" value={(summary?.total_coupons ?? 0).toLocaleString()} icon={TicketPercent} tone="blue" />
+            <AdminStatCard label="Total redemptions" value={(summary?.total_redemptions ?? 0).toLocaleString()} icon={ShoppingBag} tone="green" />
+            <AdminStatCard label="Discount given" value={formatKes(summary?.total_discount_given ?? 0)} icon={Percent} tone="purple" />
+            <AdminStatCard label="Total revenue" value={formatKes(summary?.total_revenue ?? 0)} icon={Wallet} tone="orange" />
+          </div>
+
+          <div className={cn(adminPanelClass, 'flex flex-wrap gap-1 p-1.5')}>
+            <button
+              type="button"
+              onClick={() => setTab('manage')}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all sm:flex-none',
+                tab === 'manage' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+              )}
+            >
+              <Tag className="h-4 w-4 shrink-0" />
+              Manage
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab('performance')}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all sm:flex-none',
+                tab === 'performance' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+              )}
+            >
+              <BarChart3 className="h-4 w-4 shrink-0" />
+              Performance
+            </button>
+          </div>
+        </>
+      )}
+
+      {showPerformance ? (
+        <MentorCouponPerformanceTab hideHeader />
+      ) : (
+        <>
       <AdminCouponsSearch
         searchQuery={search}
         onSearchChange={handleSearchChange}
@@ -318,6 +367,8 @@ export function AdminCouponsTab() {
           onPaginationModelChange={setPaginationModel}
         />
       </div>
+        </>
+      )}
 
       {canAdd || canEdit ? (
         <CouponModal

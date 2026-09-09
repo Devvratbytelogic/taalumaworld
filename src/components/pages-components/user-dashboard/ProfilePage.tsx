@@ -73,6 +73,10 @@ export function ProfilePage() {
   const displayName = profile?.name || 'User';
   const displayPhoto = profile?.profile_pic || '';
   const shortCode = profile?.short_code?.trim() || '';
+  const lastUpdatedLabel =
+    profile?.updatedAt && moment(profile.updatedAt).isValid()
+      ? moment(profile.updatedAt).format('MMM D, YYYY · h:mm A')
+      : null;
   const agreementUserType = isMentor
     ? AGREEMENT_VISIBLE_USER_TYPES.MENTOR
     : profile?.institution_id
@@ -333,6 +337,12 @@ export function ProfilePage() {
                     <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
                     <span className="break-all">{profile?.email ?? '—'}</span>
                   </p>
+                  {lastUpdatedLabel ? (
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+                      <Clock className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+                      <span>Updated {lastUpdatedLabel}</span>
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary">
@@ -366,11 +376,17 @@ export function ProfilePage() {
                 <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
                 {profile?.email ?? '—'}
               </p>
+              {lastUpdatedLabel ? (
+                <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-gray-500">
+                  <Clock className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+                  Updated {lastUpdatedLabel}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
 
-        <div className="relative px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-12">
+        <div className="relative px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-16">
           <div className="mt-2 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:mt-6 lg:grid-cols-4">
             {kpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
               <Link

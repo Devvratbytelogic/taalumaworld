@@ -209,6 +209,7 @@ export function DashboardProfileSkeleton() {
               <div className="space-y-2">
                 <Bone className="h-5 w-32" />
                 <Bone className="h-4 w-40 bg-gray-100" />
+                <Bone className="h-4 w-36 bg-gray-100" />
               </div>
             </div>
             <Bone className="mt-3 h-6 w-24 rounded-full bg-gray-100" />
@@ -222,10 +223,11 @@ export function DashboardProfileSkeleton() {
           <div className="space-y-2 pb-1">
             <Bone className="h-5 w-36" />
             <Bone className="h-3 w-48 bg-gray-100" />
+            <Bone className="h-3 w-40 bg-gray-100" />
           </div>
         </div>
       </div>
-      <div className="px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-12">
+      <div className="px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-16">
         <div className="mt-2 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:mt-6 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="rounded-lg border border-gray-200 bg-gray-50/60 p-4">

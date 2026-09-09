@@ -7,6 +7,8 @@
  * section. Routes not listed here (e.g. dashboard, profile) have no
  * associated model and are accessible to any authenticated staff member,
  * matching `useAdminPermissions().hasAccess(undefined) === true`.
+ * `/admin/analytics` is intentionally ungated like dashboard: commercial
+ * analytics is staff-only at the API (mentors / CA / ICA receive 403).
  */
 export interface AdminRouteModelMapping {
   /** Route prefix, matched against `pathname === path || pathname.startsWith(path + '/')`. */

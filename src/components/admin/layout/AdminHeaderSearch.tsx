@@ -32,6 +32,7 @@ import {
     UserCircle,
     UserCog,
     BarChart3,
+    LineChart,
     ShoppingCart,
     Wallet,
     TrendingUp,
@@ -82,6 +83,7 @@ export type AdminNavRoute = {
 
 const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Dashboard', description: 'Overview & stats', path: getAdminSectionRoutePath('dashboard'), icon: LayoutDashboard, keywords: ['home', 'overview', 'stats'] },
+    { label: 'Analytics', description: 'Commercial analytics: registrations, revenue, coupons, referrals, and AI quality', path: getAdminSectionRoutePath('analytics'), icon: LineChart, keywords: ['analytics', 'commercial', 'registration', 'conversion', 'revenue', 'coupon', 'referral', 'ai'] },
     { label: 'Series', description: 'Manage all series', path: getAdminSectionRoutePath('books'), icon: Book, keywords: ['book', 'series', 'publish'] },
     { label: 'Blueprints', description: 'Manage all blueprints', path: getAdminSectionRoutePath('chapters'), icon: FileText, keywords: ['blueprint', 'content'] },
     { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },

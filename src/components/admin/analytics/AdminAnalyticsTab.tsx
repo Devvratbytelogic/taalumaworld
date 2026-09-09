@@ -1,38 +1,60 @@
-/**
- * Admin Analytics Tab
- * Track performance and engagement metrics
- */
+'use client';
 
-import { Users, DollarSign, BookOpen, Eye } from 'lucide-react';
-import type { ContentMode } from '../../../types/admin';
-import type { AnalyticsStat } from './AnalyticsStatsGrid';
+import { useEffect, useState } from 'react';
+import { AdminPage } from '@/components/admin/layout/AdminContent';
 import { AdminAnalyticsHeader } from './AdminAnalyticsHeader';
-import { AnalyticsStatsGrid } from './AnalyticsStatsGrid';
-import { AnalyticsChartsSection } from './AnalyticsChartsSection';
+import { AnalyticsRegistrationsSection } from './AnalyticsRegistrationsSection';
+import { AnalyticsBlueprintsSection } from './AnalyticsBlueprintsSection';
+import { AnalyticsMentorsSection } from './AnalyticsMentorsSection';
+import { AnalyticsInstitutionsSection } from './AnalyticsInstitutionsSection';
+import { AnalyticsRevenueSection } from './AnalyticsRevenueSection';
+import { AnalyticsCouponsSection } from './AnalyticsCouponsSection';
+import { AnalyticsReferralsSection } from './AnalyticsReferralsSection';
+import { AnalyticsAiQualitySection } from './AnalyticsAiQualitySection';
+import { ANALYTICS_TOP_LIMIT, getLastNDaysRange, isValidDateRange } from './analyticsUtils';
 
-interface AdminAnalyticsTabProps {
-  contentMode: ContentMode;
-}
+export function AdminAnalyticsTab() {
+  const [draftFrom, setDraftFrom] = useState('');
+  const [draftTo, setDraftTo] = useState('');
+  const [applied, setApplied] = useState({ fromDate: '', toDate: '' });
 
-export function AdminAnalyticsTab({ contentMode }: AdminAnalyticsTabProps) {
-  const stats: AnalyticsStat[] = [
-    { title: 'Total Users', value: '2,543', change: '+12.5%', changeType: 'positive', icon: Users },
-    {
-      title: `Total ${contentMode === 'chapters' ? 'Focus Areas' : 'Series'}`,
-      value: contentMode === 'chapters' ? '156' : '42',
-      change: '+8.2%',
-      changeType: 'positive',
-      icon: BookOpen,
-    },
-    { title: 'Total Revenue', value: 'KSH 45,231', change: '+23.1%', changeType: 'positive', icon: DollarSign },
-    { title: 'Page Views', value: '128,543', change: '+15.3%', changeType: 'positive', icon: Eye },
-  ];
+  useEffect(() => {
+    const range = getLastNDaysRange(30);
+    setDraftFrom(range.fromDate);
+    setDraftTo(range.toDate);
+    setApplied(range);
+  }, []);
+
+  const rangeParams = applied;
+  const topParams = { ...applied, limit: ANALYTICS_TOP_LIMIT };
+
+  const applyRange = (range: { fromDate: string; toDate: string }) => {
+    if (!isValidDateRange(range.fromDate, range.toDate)) return;
+    setDraftFrom(range.fromDate);
+    setDraftTo(range.toDate);
+    setApplied(range);
+  };
 
   return (
-    <div className="space-y-6">
-      <AdminAnalyticsHeader contentMode={contentMode} />
-      <AnalyticsStatsGrid stats={stats} />
-      <AnalyticsChartsSection />
-    </div>
+    <AdminPage>
+      <AdminAnalyticsHeader
+        draftFrom={draftFrom}
+        draftTo={draftTo}
+        appliedFrom={applied.fromDate}
+        appliedTo={applied.toDate}
+        onDraftFromChange={setDraftFrom}
+        onDraftToChange={setDraftTo}
+        onApply={applyRange}
+      />
+
+      <AnalyticsRegistrationsSection params={rangeParams} />
+      <AnalyticsRevenueSection params={rangeParams} />
+      <AnalyticsBlueprintsSection params={topParams} />
+      <AnalyticsMentorsSection params={topParams} />
+      <AnalyticsInstitutionsSection params={rangeParams} />
+      <AnalyticsCouponsSection params={topParams} />
+      <AnalyticsReferralsSection params={topParams} />
+      <AnalyticsAiQualitySection params={rangeParams} />
+    </AdminPage>
   );
 }

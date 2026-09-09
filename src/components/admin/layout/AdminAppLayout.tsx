@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, LayoutDashboard, Link2, Mail, Megaphone, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
+import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, LayoutDashboard, LineChart, Link2, Mail, Megaphone, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorEquityRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
@@ -18,6 +18,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'System',
         items: [
             { id: 'dashboard', label: 'Dashboard', href: getAdminDashboardRoutePath(), icon: LayoutDashboard },
+            { id: 'analytics', label: 'Analytics', href: getAdminSectionRoutePath('analytics'), icon: LineChart },
             { model: 'Roles', submodel: ['Permissions', 'Staff'], id: 'roles', label: 'Roles & Permissions', href: getAdminSectionRoutePath('roles_permissions'), icon: Shield },
         ],
     },

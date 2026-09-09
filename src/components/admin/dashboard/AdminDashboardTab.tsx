@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { type GridColDef } from '@mui/x-data-grid';
 import { Book, CalendarDays, ClipboardCheck, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react';
 import {
   AdminPage,
@@ -10,6 +11,7 @@ import {
   AdminTableShell,
   AdminTextLink,
 } from '@/components/admin/layout/AdminContent';
+import CommonDataTable from '@/components/admin/CommonDataTable';
 import { DashboardWelcomeHeader } from './DashboardWelcomeHeader';
 import { DashboardStatsGrid, type StatCard } from './DashboardStatsGrid';
 import { DashboardMentorActions } from './DashboardMentorActions';
@@ -33,6 +35,8 @@ import { DashboardCharts } from './DashboardCharts';
 import { formatKes } from '@/constants/common';
 
 const CURRENT_YEAR = new Date().getFullYear();
+const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
+const noopPaginationChange = () => { };
 
 function getOverviewParams(year: string, fromDate: string, toDate: string): IDashboardDateRangeParams {
   if (fromDate && toDate) return { fromDate, toDate };
@@ -40,19 +44,83 @@ function getOverviewParams(year: string, fromDate: string, toDate: string): IDas
   return {};
 }
 
-function TableSkeleton({ columns }: { columns: number }) {
-  return (
-    <div className="space-y-2 p-5">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex gap-4">
-          {Array.from({ length: columns }).map((_, j) => (
-            <div key={j} className="h-4 flex-1 animate-pulse rounded bg-slate-100" />
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
+const mentorPerformanceColumns: GridColDef[] = [
+  { field: 'rank', headerName: 'Rank', width: 80, sortable: false },
+  { field: 'name', headerName: 'Mentor', flex: 1, minWidth: 160, sortable: false },
+  {
+    field: 'sales',
+    headerName: 'Sales',
+    width: 100,
+    sortable: false,
+    renderCell: (params) => (params.value ?? 0).toLocaleString(),
+  },
+  {
+    field: 'revenue',
+    headerName: 'Revenue',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'mentorShare',
+    headerName: 'Mentor share',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
+    field: 'avgAiScore',
+    headerName: 'AI score',
+    width: 110,
+    sortable: false,
+    renderCell: (params) => (params.value == null ? '—' : Number(params.value).toFixed(2)),
+  },
+];
+
+const blueprintPerformanceColumns: GridColDef[] = [
+  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'status', headerName: 'Status', width: 130, sortable: false },
+  {
+    field: 'views',
+    headerName: 'Views',
+    width: 110,
+    sortable: false,
+    renderCell: (params) => (params.value ?? 0).toLocaleString(),
+  },
+  { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
+  {
+    field: 'conversion',
+    headerName: 'Conversion',
+    width: 120,
+    sortable: false,
+    renderCell: (params) => `${params.value ?? 0}%`,
+  },
+  { field: 'classification', headerName: 'Classification', width: 160, sortable: false },
+];
+
+const salesVolumeColumns: GridColDef[] = [
+  { field: 'month', headerName: 'Month', flex: 1, minWidth: 140, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 100, sortable: false },
+  {
+    field: 'revenue',
+    headerName: 'Revenue',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
+
+const blueprintRevenueColumns: GridColDef[] = [
+  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
+  {
+    field: 'earned',
+    headerName: 'Earned',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+];
 
 export default function AdminDashboardTab() {
   const { data: profileData } = useGetAdminProfileQuery();
@@ -77,22 +145,21 @@ export default function AdminDashboardTab() {
   const { data: dashboardData, isLoading: dashboardLoading } = useGetAdminDashboardQuery(overviewParams);
   const statsData = dashboardData?.data;
 
-  /** Admin & Mentor shared metrics */
   const {
     data: performanceData,
     isLoading: performanceLoading,
     isError: performanceError,
-  } = useGetBlueprintPerformanceQuery(dateRangeParams);
+  } = useGetBlueprintPerformanceQuery({ page: 1, limit: 5, ...dateRangeParams });
   const {
     data: salesVolumeData,
     isLoading: salesVolumeLoading,
     isError: salesVolumeError,
-  } = useGetSalesVolumeQuery(dateRangeParams);
+  } = useGetSalesVolumeQuery({ page: 1, limit: 5, ...dateRangeParams });
   const {
     data: revenueData,
     isLoading: revenueLoading,
     isError: revenueError,
-  } = useGetBlueprintRevenueQuery(dateRangeParams);
+  } = useGetBlueprintRevenueQuery({ page: 1, limit: 5, ...dateRangeParams });
   const {
     data: mentorPerformanceData,
     isLoading: mentorPerformanceLoading,
@@ -170,7 +237,10 @@ export default function AdminDashboardTab() {
   const topPerformingBlueprints = performanceData?.data?.data?.data ?? [];
 
   const salesVolumeSummary = salesVolumeData?.data?.summary;
-  const salesByMonth = salesVolumeData?.data?.data?.data ?? [];
+  const salesByMonth = (salesVolumeData?.data?.data?.data ?? []).map((row, idx) => ({
+    ...row,
+    id: `${row.month}-${idx}`,
+  }));
 
   const revenueSummary = revenueData?.data?.summary;
   const topEarningBlueprints = revenueData?.data?.data?.data ?? [];
@@ -212,39 +282,22 @@ export default function AdminDashboardTab() {
           <AdminStatCard label="Avg. AI score" value={mentorPerformanceSummary?.avgAiScore != null ? Number(mentorPerformanceSummary.avgAiScore).toFixed(2) : '—'} icon={Sparkles} tone="orange" />
         </div>
         <AdminTableShell>
-          {mentorPerformanceLoading ? (
-            <TableSkeleton columns={6} />
-          ) : mentorPerformanceError ? (
+          {mentorPerformanceError ? (
             <p className="py-8 text-center text-sm text-slate-500">Unable to load mentor performance right now.</p>
-          ) : topMentors.length === 0 ? (
+          ) : !mentorPerformanceLoading && topMentors.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No mentor performance data available yet.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
-                    <th className="px-5 py-3 font-medium">Rank</th>
-                    <th className="px-5 py-3 font-medium">Mentor</th>
-                    <th className="px-5 py-3 font-medium">Sales</th>
-                    <th className="px-5 py-3 font-medium">Revenue</th>
-                    <th className="px-5 py-3 font-medium">Mentor share</th>
-                    <th className="px-5 py-3 font-medium text-right">AI score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topMentors.map((row) => (
-                    <tr key={row.id} className="border-b border-slate-50 last:border-0">
-                      <td className="px-5 py-4 text-slate-600">{row.rank}</td>
-                      <td className="px-5 py-4 font-medium text-slate-900">{row.name}</td>
-                      <td className="px-5 py-4 text-slate-600">{row.sales.toLocaleString()}</td>
-                      <td className="px-5 py-4 text-slate-600">{formatKes(row.revenue)}</td>
-                      <td className="px-5 py-4 text-slate-600">{formatKes(row.mentorShare)}</td>
-                      <td className="px-5 py-4 text-right text-slate-900">{row.avgAiScore == null ? '—' : Number(row.avgAiScore).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CommonDataTable
+              rows={topMentors}
+              columns={mentorPerformanceColumns}
+              getRowId={(row) => row.id}
+              loading={mentorPerformanceLoading}
+              paginationMode="client"
+              rowCount={topMentors.length}
+              paginationModel={PREVIEW_PAGINATION_MODEL}
+              onPaginationModelChange={noopPaginationChange}
+              hideFooter
+            />
           )}
         </AdminTableShell>
       </AdminPanel>
@@ -258,39 +311,22 @@ export default function AdminDashboardTab() {
           <AdminStatCard label="High Value blueprints" value={performanceSummary?.highValueBlueprints ?? 0} icon={Sparkles} tone="orange" />
         </div>
         <AdminTableShell>
-          {performanceLoading ? (
-            <TableSkeleton columns={5} />
-          ) : performanceError ? (
+          {performanceError ? (
             <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint performance right now.</p>
-          ) : topPerformingBlueprints.length === 0 ? (
+          ) : !performanceLoading && topPerformingBlueprints.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No performance data available yet.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/80 text-left text-slate-500">
-                    <th className="px-5 py-3 font-medium">Blueprint</th>
-                    <th className="px-5 py-3 font-medium">Status</th>
-                    <th className="px-5 py-3 font-medium">Views</th>
-                    <th className="px-5 py-3 font-medium">Sales</th>
-                    <th className="px-5 py-3 font-medium">Conversion</th>
-                    <th className="px-5 py-3 font-medium text-right">Classification</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topPerformingBlueprints.slice(0, 5).map((row) => (
-                    <tr key={row.id} className="border-b border-slate-50 last:border-0">
-                      <td className="px-5 py-4 font-medium text-slate-900">{row.title}</td>
-                      <td className="px-5 py-4 text-slate-600">{row.status}</td>
-                      <td className="px-5 py-4 text-slate-600">{row.views.toLocaleString()}</td>
-                      <td className="px-5 py-4 text-slate-600">{row.sales}</td>
-                      <td className="px-5 py-4 text-slate-600">{row.conversion}%</td>
-                      <td className="px-5 py-4 text-right text-slate-900">{row.classification}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CommonDataTable
+              rows={topPerformingBlueprints}
+              columns={blueprintPerformanceColumns}
+              getRowId={(row) => row.id}
+              loading={performanceLoading}
+              paginationMode="client"
+              rowCount={topPerformingBlueprints.length}
+              paginationModel={PREVIEW_PAGINATION_MODEL}
+              onPaginationModelChange={noopPaginationChange}
+              hideFooter
+            />
           )}
         </AdminTableShell>
       </AdminPanel>
@@ -302,33 +338,24 @@ export default function AdminDashboardTab() {
             <AdminStatCard label="This month" value={salesVolumeSummary?.thisMonth ?? 0} icon={CalendarDays} tone="blue" />
             <AdminStatCard label="Last month" value={salesVolumeSummary?.lastMonth ?? 0} icon={ShoppingCart} tone="green" />
           </div>
-          {salesVolumeLoading ? (
-            <TableSkeleton columns={3} />
-          ) : salesVolumeError ? (
+          {salesVolumeError ? (
             <p className="py-8 text-center text-sm text-slate-500">Unable to load sales volume right now.</p>
-          ) : salesByMonth.length === 0 ? (
+          ) : !salesVolumeLoading && salesByMonth.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No sales data available yet.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 text-left text-slate-500">
-                    <th className="pb-3 font-medium">Month</th>
-                    <th className="pb-3 font-medium">Sales</th>
-                    <th className="pb-3 font-medium text-right">Revenue</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {salesByMonth.slice(0, 5).map((row) => (
-                    <tr key={row.month} className="border-b border-slate-50 last:border-0">
-                      <td className="py-3 font-medium text-slate-900">{row.month}</td>
-                      <td className="py-3 text-slate-600">{row.sales}</td>
-                      <td className="py-3 text-right text-slate-900">{formatKes(row.revenue)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <AdminTableShell>
+              <CommonDataTable
+                rows={salesByMonth}
+                columns={salesVolumeColumns}
+                getRowId={(row) => row.id}
+                loading={salesVolumeLoading}
+                paginationMode="client"
+                rowCount={salesByMonth.length}
+                paginationModel={PREVIEW_PAGINATION_MODEL}
+                onPaginationModelChange={noopPaginationChange}
+                hideFooter
+              />
+            </AdminTableShell>
           )}
         </AdminPanel>
 
@@ -338,33 +365,24 @@ export default function AdminDashboardTab() {
             <AdminStatCard label="Earned" value={formatKes(revenueSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
             <AdminStatCard label="Pending" value={formatKes(revenueSummary?.totalPending ?? 0)} icon={TrendingUp} tone="orange" />
           </div>
-          {revenueLoading ? (
-            <TableSkeleton columns={3} />
-          ) : revenueError ? (
+          {revenueError ? (
             <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint revenue right now.</p>
-          ) : topEarningBlueprints.length === 0 ? (
+          ) : !revenueLoading && topEarningBlueprints.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No revenue data available yet.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 text-left text-slate-500">
-                    <th className="pb-3 font-medium">Blueprint</th>
-                    <th className="pb-3 font-medium">Sales</th>
-                    <th className="pb-3 font-medium text-right">Earned</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topEarningBlueprints.slice(0, 5).map((row) => (
-                    <tr key={row.id} className="border-b border-slate-50 last:border-0">
-                      <td className="py-3 font-medium text-slate-900">{row.title}</td>
-                      <td className="py-3 text-slate-600">{row.sales}</td>
-                      <td className="py-3 text-right text-slate-900">{formatKes(row.earned)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <AdminTableShell>
+              <CommonDataTable
+                rows={topEarningBlueprints}
+                columns={blueprintRevenueColumns}
+                getRowId={(row) => row.id}
+                loading={revenueLoading}
+                paginationMode="client"
+                rowCount={topEarningBlueprints.length}
+                paginationModel={PREVIEW_PAGINATION_MODEL}
+                onPaginationModelChange={noopPaginationChange}
+                hideFooter
+              />
+            </AdminTableShell>
           )}
         </AdminPanel>
       </div>

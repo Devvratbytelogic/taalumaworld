@@ -237,6 +237,7 @@ export function MentorDashboardTab() {
               rowCount={topBlueprints.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}
               onPaginationModelChange={noopPaginationChange}
+              hideFooter
             />
           )}
         </AdminTableShell>
@@ -267,6 +268,7 @@ export function MentorDashboardTab() {
                 rowCount={salesByMonth.length}
                 paginationModel={PREVIEW_PAGINATION_MODEL}
                 onPaginationModelChange={noopPaginationChange}
+                hideFooter
               />
             </AdminTableShell>
           )}
@@ -296,6 +298,7 @@ export function MentorDashboardTab() {
                 rowCount={topEarningBlueprints.length}
                 paginationModel={PREVIEW_PAGINATION_MODEL}
                 onPaginationModelChange={noopPaginationChange}
+                hideFooter
               />
             </AdminTableShell>
           )}
@@ -329,6 +332,7 @@ export function MentorDashboardTab() {
               rowCount={revenueByMonth.length}
               paginationModel={PREVIEW_PAGINATION_MODEL}
               onPaginationModelChange={noopPaginationChange}
+              hideFooter
             />
           )}
         </AdminTableShell>

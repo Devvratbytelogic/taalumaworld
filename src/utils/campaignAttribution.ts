@@ -106,7 +106,9 @@ function peekStored(): StoredCampaignAttribution | null {
 
 function shouldStripTrackingParams(): boolean {
   const path = window.location.pathname;
+  const params = new URLSearchParams(window.location.search);
   // Never mutate payment-return URLs; Paystack uses `reference` / `trxref`.
+  if (params.has('trxref') || params.has('reference')) return false;
   return path !== '/cart' && !path.startsWith('/cart/');
 }
 

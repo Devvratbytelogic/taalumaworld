@@ -7,43 +7,28 @@ import Button from '@/components/ui/Button';
 import { getCartCheckoutRoutePath } from '@/routes/routes';
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { useAppDispatch } from '@/store/hooks';
-import {
-  useVerifyPaystackPaymentQuery,
-  type PaystackVerifyResponse,
-} from '@/store/rtkQueries/userGetAPI';
+import { useVerifyPaystackPaymentQuery } from '@/store/rtkQueries/userGetAPI';
+import { getPaystackVerifyOutcome } from '@/utils/paystackReturn';
 import PaymentConfirmed from './PaymentConfirmed';
 
-type VerifyOutcome = 'pending' | 'completed' | 'failed';
+type PaystackReturnStatusProps = {
+  reference: string;
+  retryHref?: string;
+  retryLabel?: string;
+  continueHref?: string;
+  continueLabel?: string;
+  message?: string;
+};
 
-const SUCCESS_STATUSES = new Set(['success', 'successful', 'completed', 'paid']);
-const FAILED_STATUSES = new Set([
-  'failed',
-  'fail',
-  'cancelled',
-  'canceled',
-  'cancel',
-  'abandoned',
-  'unpaid',
-]);
-
-function normalizeStatus(value?: string | null) {
-  return value?.trim().toLowerCase() ?? '';
-}
-
-function getPaystackVerifyOutcome(res?: PaystackVerifyResponse): VerifyOutcome {
-  const raw =
-    normalizeStatus(res?.data?.status) || normalizeStatus(res?.data?.payment_status);
-
-  if (SUCCESS_STATUSES.has(raw)) return 'completed';
-  if (FAILED_STATUSES.has(raw)) return 'failed';
-  if (raw === 'pending' || raw === 'processing') return 'pending';
-  if (!raw && (res?.success || res?.status || res?.http_status_code === 200)) {
-    return 'completed';
-  }
-  return 'pending';
-}
-
-function PaymentFailed({ message }: { message?: string }) {
+function PaymentFailed({
+  message,
+  retryHref,
+  retryLabel,
+}: {
+  message?: string;
+  retryHref: string;
+  retryLabel: string;
+}) {
   const router = useRouter();
 
   return (
@@ -55,14 +40,14 @@ function PaymentFailed({ message }: { message?: string }) {
           </div>
           <h1 className="mb-3 text-3xl font-bold">Payment was not completed</h1>
           <p className="mb-8 text-muted-foreground">
-            {message || 'We could not confirm this Paystack payment. You can return to checkout and try again.'}
+            {message || 'We could not confirm this Paystack payment. You can try again.'}
           </p>
           <Button
             size="lg"
             className="global_btn rounded_full bg_primary w-full"
-            onPress={() => router.replace(getCartCheckoutRoutePath())}
+            onPress={() => router.replace(retryHref)}
           >
-            Back to Checkout
+            {retryLabel}
           </Button>
         </div>
       </div>
@@ -88,7 +73,14 @@ function PaymentVerifying() {
   );
 }
 
-export default function PaystackReturnStatus({ reference }: { reference: string }) {
+export default function PaystackReturnStatus({
+  reference,
+  retryHref = getCartCheckoutRoutePath(),
+  retryLabel = 'Back to Checkout',
+  continueHref,
+  continueLabel,
+  message,
+}: PaystackReturnStatusProps) {
   const dispatch = useAppDispatch();
   const [shouldPoll, setShouldPoll] = useState(true);
   const { data, isLoading, isError } = useVerifyPaystackPaymentQuery(reference, {
@@ -104,11 +96,11 @@ export default function PaystackReturnStatus({ reference }: { reference: string 
 
   useEffect(() => {
     if (outcome !== 'completed') return;
-    dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters']));
+    dispatch(rtkQuerieSetup.util.invalidateTags(['Cart', 'AllChapters', 'MyChapters', 'SingleChapter']));
   }, [dispatch, outcome]);
 
   if (isError) {
-    return <PaymentFailed />;
+    return <PaymentFailed retryHref={retryHref} retryLabel={retryLabel} />;
   }
 
   if (isLoading || outcome === 'pending') {
@@ -116,7 +108,7 @@ export default function PaystackReturnStatus({ reference }: { reference: string 
   }
 
   if (outcome === 'failed') {
-    return <PaymentFailed message={data?.message} />;
+    return <PaymentFailed message={data?.message} retryHref={retryHref} retryLabel={retryLabel} />;
   }
 
   const paymentData = data?.data;
@@ -135,6 +127,9 @@ export default function PaystackReturnStatus({ reference }: { reference: string 
     <PaymentConfirmed
       transactionId={transactionId}
       orderNumber={orderNumber}
+      message={message}
+      continueHref={continueHref}
+      continueLabel={continueLabel}
       details={{
         amount: paymentData?.amount ?? transaction?.amount,
         currency: paymentData?.currency ?? transaction?.currency,

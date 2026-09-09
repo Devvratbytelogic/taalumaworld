@@ -298,7 +298,7 @@ export default function CartSummary({
 
       <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
         <Lock className="h-3.5 w-3.5 shrink-0" />
-        {total > 0 ? 'Secure M-Pesa checkout' : 'No payment required'}
+        {total > 0 ? 'Secure Paystack checkout' : 'No payment required'}
       </p>
     </div>
   );

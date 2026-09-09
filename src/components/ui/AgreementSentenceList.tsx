@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { AgreementCheckbox } from '@/components/ui/AgreementCheckbox';
 import { AgreementLinkedText } from '@/components/ui/AgreementLinkedText';
 import { useGetAgreementsByTouchpointQuery } from '@/store/rtkQueries/agreementAPIs';
@@ -15,7 +15,36 @@ type AgreementSentenceListProps = {
   disabled?: boolean;
   className?: string;
   defaultChecked?: boolean;
+  containerRef?: Ref<HTMLDivElement>;
 };
+
+function getScrollableYParent(element: HTMLElement): HTMLElement | null {
+  let parent = element.parentElement;
+  while (parent && parent !== document.body) {
+    const { overflowY } = window.getComputedStyle(parent);
+    const canScroll =
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') &&
+      parent.scrollHeight > parent.clientHeight + 1;
+    if (canScroll) return parent;
+    parent = parent.parentElement;
+  }
+  return null;
+}
+
+export function scrollToAgreementSection(element: HTMLElement | null) {
+  if (!element) return;
+
+  const scrollParent = getScrollableYParent(element);
+  if (scrollParent) {
+    const parentRect = scrollParent.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    const nextTop = scrollParent.scrollTop + (elementRect.top - parentRect.top) - 12;
+    scrollParent.scrollTo({ top: Math.max(0, nextTop), behavior: 'smooth' });
+    return;
+  }
+
+  element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+}
 
 export function AgreementSentenceList({
   touchpoint,
@@ -27,6 +56,7 @@ export function AgreementSentenceList({
   disabled,
   className,
   defaultChecked = false,
+  containerRef,
 }: AgreementSentenceListProps) {
   const { data: sentencesResponse, isSuccess } = useGetAgreementsByTouchpointQuery(touchpoint, {
     skip: !touchpoint,
@@ -85,7 +115,7 @@ export function AgreementSentenceList({
   if (sentences.length === 0) return null;
 
   return (
-    <div className={className ?? 'space-y-3'}>
+    <div ref={containerRef} className={className ?? 'space-y-3'}>
       {sentences.map((sentence) => (
         <AgreementCheckbox
           key={sentence._id}

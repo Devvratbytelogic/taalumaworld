@@ -28,6 +28,9 @@ interface PaymentConfirmedProps {
   transactionId?: string | null;
   orderNumber?: string | null;
   details?: PaymentConfirmedDetails | null;
+  message?: string;
+  continueHref?: string;
+  continueLabel?: string;
 }
 
 function DetailRow({ label, value }: { label: string; value?: ReactNode }) {
@@ -57,6 +60,9 @@ export default function PaymentConfirmed({
   transactionId,
   orderNumber,
   details,
+  message = 'Your blueprints are now unlocked and ready to read. Head to your dashboard to start exploring.',
+  continueHref,
+  continueLabel = 'Go to Dashboard',
 }: PaymentConfirmedProps) {
   const router = useRouter();
   const referenceId = details?.reference || transactionId || orderNumber;
@@ -67,6 +73,7 @@ export default function PaymentConfirmed({
   const amountLabel = formatAmount(details?.amount, details?.currency);
   const paidAtLabel = formatPaidAt(details?.paidAt);
   const hasDetails = Boolean(details);
+  const nextHref = continueHref ?? getUserDashboardRoutePath();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12">
@@ -115,10 +122,16 @@ export default function PaymentConfirmed({
           ) : null}
 
           <p className="mb-8 text-muted-foreground">
-            Your blueprints are now unlocked and ready to read. Head to your dashboard to start
-            exploring.
+            {message}
           </p>
           <div className="space-y-3">
+            <Button
+              size="lg"
+              className="global_btn rounded_full bg_primary w-full"
+              onPress={() => router.push(nextHref)}
+            >
+              {continueLabel}
+            </Button>
             {details?.orderId ? (
               <Button
                 size="lg"
@@ -128,13 +141,6 @@ export default function PaymentConfirmed({
                 View Order
               </Button>
             ) : null}
-            <Button
-              size="lg"
-              className="global_btn rounded_full bg_primary w-full"
-              onPress={() => router.push(getUserDashboardRoutePath())}
-            >
-              Go to Dashboard
-            </Button>
           </div>
         </div>
       </div>

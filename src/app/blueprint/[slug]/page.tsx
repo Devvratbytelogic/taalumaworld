@@ -5,11 +5,14 @@ import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetail
 import BlueprintReviews from '@/components/blueprint/BlueprintReviews';
 import LoginRequiredGate from '@/components/auth/LoginRequiredGate';
 import ChapterPurchaseGate from '@/components/pages-components/chapter/ChapterPurchaseGate';
+import DirectPurchasePaymentModal from '@/components/payments/DirectPurchasePaymentModal';
 import { getSingleBlueprintServerAPI } from '@/store/server-api/serverSideAPIs';
+import { getDirectPurchasePaystackReference } from '@/utils/paystackReturn';
 
 
 type PageProps = {
     params: Promise<{ slug: string }>;
+    searchParams: Promise<{ reference?: string | string[]; trxref?: string | string[] }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -40,8 +43,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-export default async function SingleBlueprintPage({ params }: PageProps) {
+export default async function SingleBlueprintPage({ params, searchParams }: PageProps) {
     const { slug } = await params;
+    const query = await searchParams;
+    const paystackReference = getDirectPurchasePaystackReference(query);
     const response = await getSingleBlueprintServerAPI({ slug });
     const data = response?.data;
     const cookieStore = await cookies();
@@ -57,8 +62,24 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
                 />
             )}
 
-            <LoginRequiredGate isAuthenticated={isAuthenticated} action="view" itemType="chapter" />
-            <ChapterPurchaseGate isAuthenticated={isAuthenticated} chapter={data ?? null} />
+            <LoginRequiredGate
+                isAuthenticated={isAuthenticated}
+                action="view"
+                itemType="chapter"
+                skip={Boolean(paystackReference)}
+            />
+            <ChapterPurchaseGate
+                isAuthenticated={isAuthenticated}
+                chapter={data ?? null}
+                skip={Boolean(paystackReference)}
+            />
+            {paystackReference ? (
+                <DirectPurchasePaymentModal
+                    reference={paystackReference}
+                    kind="blueprint"
+                    slug={slug}
+                />
+            ) : null}
 
             <div className="space-y-10 space_top">
                 <BlueprintPublicHero data={data ?? null} />

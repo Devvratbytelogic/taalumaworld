@@ -13,12 +13,7 @@ import CartNoData from './CartNoData';
 import CartSummary from './CartSummary';
 import PaymentConfirmed from './PaymentConfirmed';
 import PaystackReturnStatus from './PaystackReturnStatus';
-
-function getPaystackReturnReference(searchParams: URLSearchParams): string | null {
-  const reference = searchParams.get('reference')?.trim();
-  const trxref = searchParams.get('trxref')?.trim();
-  return reference || trxref || null;
-}
+import { getPaystackReturnReference } from '@/utils/paystackReturn';
 
 function CheckoutSteps({ current }: { current: 'cart' | 'checkout' }) {
   const steps = [

@@ -13,6 +13,7 @@ export type PaystackPayPayload = {
   book_id?: string;
   type?: string;
   accepted_agreement_ids?: string[];
+  callback_url?: string;
 };
 
 type PaystackPayResult = {
@@ -52,6 +53,7 @@ type PaystackPayButtonProps = {
   chapterID?: string;
   type?: string;
   acceptedAgreementIds?: string[];
+  callbackUrl?: string;
   isDisabled?: boolean;
   label?: string;
   className?: string;
@@ -95,6 +97,7 @@ export function PaystackPayButton({
   chapterID,
   type,
   acceptedAgreementIds = [],
+  callbackUrl,
   isDisabled = false,
   label = 'Pay with Paystack',
   className,
@@ -116,6 +119,7 @@ export function PaystackPayButton({
     const payload: PaystackPayPayload = {
       type,
       accepted_agreement_ids: acceptedAgreementIds,
+      ...(callbackUrl ? { callback_url: callbackUrl } : {}),
       ...(cartID ? { cart_id: cartID } : {}),
       ...(chapterID
         ? type === VISIBLE.BOOK

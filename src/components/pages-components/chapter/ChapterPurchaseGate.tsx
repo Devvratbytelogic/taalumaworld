@@ -8,18 +8,20 @@ import type { ISingleChapterAPIResponseData } from '@/types/user/singleChapter';
 interface ChapterPurchaseGateProps {
   isAuthenticated: boolean;
   chapter: ISingleChapterAPIResponseData | null;
+  skip?: boolean;
 }
 
 /** Renders nothing; opens the ChapterPurchaseModal on mount when a signed-in reader can't yet access this blueprint. */
-export default function ChapterPurchaseGate({ isAuthenticated, chapter }: ChapterPurchaseGateProps) {
+export default function ChapterPurchaseGate({ isAuthenticated, chapter, skip = false }: ChapterPurchaseGateProps) {
   const dispatch = useDispatch();
   const canRead = chapter?.canRead;
 
   useEffect(() => {
+    if (skip) return;
     if (isAuthenticated && chapter && !canRead) {
       dispatch(openModal({ componentName: 'ChapterPurchaseModal', data: { chapter } }));
     }
-  }, [isAuthenticated, canRead, chapter, dispatch]);
+  }, [isAuthenticated, canRead, chapter, dispatch, skip]);
 
   return null;
 }

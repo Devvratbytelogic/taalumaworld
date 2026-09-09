@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { BadgeCheck, BookOpen, Lock, Tag, User } from 'lucide-react';
@@ -11,10 +11,9 @@ import AddToCartButton from '@/components/ui/AddToCartButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
-import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
 import { PaystackPayButton } from '@/components/payments/PaystackPayButton';
 import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
-import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
+import { AgreementSentenceList, scrollToAgreementSection } from '@/components/ui/AgreementSentenceList';
 import ChapterPurchaseAddresses from '@/components/pages-components/chapter/ChapterPurchaseAddresses';
 import { closeModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
@@ -38,7 +37,7 @@ export default function ChapterPurchaseModal() {
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [agreementTouched, setAgreementTouched] = useState(false);
-  const [isMpesaPaying, setIsMpesaPaying] = useState(false);
+  const agreementSectionRef = useRef<HTMLDivElement>(null);
   const [isWalletPaying, setIsWalletPaying] = useState(false);
   const [isPaystackPaying, setIsPaystackPaying] = useState(false);
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
@@ -46,7 +45,7 @@ export default function ChapterPurchaseModal() {
   const isBook = data?.type === 'series';
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
-  const isPaymentBusy = isMpesaPaying || isWalletPaying || isPaystackPaying;
+  const isPaymentBusy = isWalletPaying || isPaystackPaying;
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const checkoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
@@ -85,6 +84,7 @@ export default function ChapterPurchaseModal() {
     if (!isAddressAvailable) return false;
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
+      scrollToAgreementSection(agreementSectionRef.current);
       return false;
     }
     return true;
@@ -264,6 +264,7 @@ export default function ChapterPurchaseModal() {
               onBlur={() => setAgreementTouched(true)}
               disabled={isPaymentBusy}
               className="space-y-3 border-t pt-3"
+              containerRef={agreementSectionRef}
             />
           </ModalBody>
 
@@ -277,25 +278,17 @@ export default function ChapterPurchaseModal() {
                 onSuccess={handlePurchaseSuccess}
                 onLoadingChange={setIsWalletPaying}
               />
-              <MpesaPayButton
+              <PaystackPayButton
                 chapterID={purchaseId}
                 type={purchaseType}
                 acceptedAgreementIds={acceptedAgreementIds}
+                callbackUrl={typeof window !== 'undefined' ? window.location.href : undefined}
                 label={`Buy Now - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
                 isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
                 onBeforePay={validatePurchase}
                 onSuccess={handlePurchaseSuccess}
-                onLoadingChange={setIsMpesaPaying}
-              />
-              {/* <PaystackPayButton
-                chapterID={purchaseId}
-                type={purchaseType}
-                acceptedAgreementIds={acceptedAgreementIds}
-                isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
-                onBeforePay={validatePurchase}
-                onSuccess={handlePurchaseSuccess}
                 onLoadingChange={setIsPaystackPaying}
-              /> */}
+              />
             </div>
 
             <AddToCartButton

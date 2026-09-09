@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
+import { useRef, useState } from 'react';
+import { AgreementSentenceList, scrollToAgreementSection } from '@/components/ui/AgreementSentenceList';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
-import { MpesaPayButton } from '@/components/payments/MpesaPayButton';
 import { PaystackPayButton } from '@/components/payments/PaystackPayButton';
 import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
@@ -26,11 +25,11 @@ export default function CartPayment({
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [agreementTouched, setAgreementTouched] = useState(false);
+  const agreementSectionRef = useRef<HTMLDivElement>(null);
   const [addressTouched, setAddressTouched] = useState(false);
-  const [isMpesaPaying, setIsMpesaPaying] = useState(false);
   const [isWalletPaying, setIsWalletPaying] = useState(false);
   const [isPaystackPaying, setIsPaystackPaying] = useState(false);
-  const isPaymentBusy = isMpesaPaying || isWalletPaying || isPaystackPaying;
+  const isPaymentBusy = isWalletPaying || isPaystackPaying;
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const checkoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
@@ -53,6 +52,7 @@ export default function CartPayment({
     }
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
+      scrollToAgreementSection(agreementSectionRef.current);
       return false;
     }
     return true;
@@ -85,6 +85,7 @@ export default function CartPayment({
           touched={agreementTouched}
           onBlur={() => setAgreementTouched(true)}
           disabled={isPaymentBusy}
+          containerRef={agreementSectionRef}
         />
       </div>
 
@@ -107,15 +108,6 @@ export default function CartPayment({
             });
           }}
           onLoadingChange={setIsWalletPaying}
-        />
-        <MpesaPayButton
-          cartID={cartId}
-          type="cart"
-          acceptedAgreementIds={acceptedAgreementIds}
-          isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
-          onBeforePay={validateCheckout}
-          onSuccess={onPaymentSuccess}
-          onLoadingChange={setIsMpesaPaying}
         />
         <PaystackPayButton
           cartID={cartId}

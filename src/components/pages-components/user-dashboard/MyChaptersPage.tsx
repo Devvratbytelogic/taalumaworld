@@ -17,9 +17,8 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { cn } from '@/components/ui/utils';
 import { useGetMyChaptersQuery } from '@/store/rtkQueries/userGetAPI';
 import type { ItemsEntity } from '@/types/user/myChapters';
-import { getHomeRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getPurchasedBlueprintRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
-import MyBlueprintReader from './MyBlueprintReader';
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
 import { openModal } from '@/store/slices/allModalSlice';
@@ -33,7 +32,6 @@ export function MyChaptersPage() {
   const dispatch = useDispatch();
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
-  const [selectedChapter, setSelectedChapter] = useState<ItemsEntity | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
@@ -56,15 +54,6 @@ export function MyChaptersPage() {
     setFilter(nextFilter);
     setPage(1);
   };
-
-  if (selectedChapter) {
-    return (
-      <MyBlueprintReader
-        chapter={selectedChapter}
-        onBack={() => setSelectedChapter(null)}
-      />
-    );
-  }
 
   if (!hasMounted || isLoading) {
     return (
@@ -275,7 +264,9 @@ export function MyChaptersPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => setSelectedChapter(chapter)}
+                          onPress={() =>
+                            router.push(getPurchasedBlueprintRoutePath(chapter.slug || chapter.chapterId))
+                          }
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readLabel}

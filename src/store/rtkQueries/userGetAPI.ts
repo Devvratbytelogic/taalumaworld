@@ -169,18 +169,30 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: ['AllChapters', 'Cart'],
         }),
-        /** single chapter */
         getSingleChapter: builder.query<ISingleChapterAPIResponse, string>({
             query: (id) => ({
-                url: `/user/content/blueprint/${id}`,
+                url: `/user/content/blueprint/${encodeURIComponent(id)}`,
                 method: 'GET',
             }),
             providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
         }),
-        /** single book */
         getSingleBook: builder.query<ISingleBookAPIResponse, string>({
             query: (id) => ({
-                url: `/user/content/book/${id}`,
+                url: `/user/content/series/${encodeURIComponent(id)}`,
+                method: 'GET',
+            }),
+            providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
+        }),
+        getPurchasedBlueprint: builder.query<ISingleChapterAPIResponse, string>({
+            query: (id) => ({
+                url: `/user/purchased/blueprint/${encodeURIComponent(id)}`,
+                method: 'GET',
+            }),
+            providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
+        }),
+        getPurchasedSeries: builder.query<ISingleBookAPIResponse, string>({
+            query: (id) => ({
+                url: `/user/purchased/series/${encodeURIComponent(id)}`,
                 method: 'GET',
             }),
             providesTags: (_, __, id) => [{ type: 'SingleChapter', id }],
@@ -421,6 +433,8 @@ export const {
     useGetSingleChapterQuery,
     useLazyGetSingleChapterQuery,
     useGetSingleBookQuery,
+    useGetPurchasedBlueprintQuery,
+    useGetPurchasedSeriesQuery,
     useGetUserAllCategoriesQuery,
     useGetUserAllAuthorsQuery,
     useGetAllTagsQuery,

@@ -27,6 +27,7 @@ export interface IHomeAllChaptersItemsEntity {
   tags?: (string)[] | null;
   canRead: boolean;
   isPurchased: boolean;
+  content_type?: string;
   isCart: boolean;
   isWishlisted: boolean;
   shareable_link?: string;

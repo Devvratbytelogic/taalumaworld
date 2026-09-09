@@ -1,31 +1,54 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetails';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
-import type { ItemsEntity } from '@/types/user/myChapters';
+import { useGetPurchasedBlueprintQuery } from '@/store/rtkQueries/userGetAPI';
+import { getUserDashboardMyChaptersRoutePath } from '@/routes/routes';
 
-interface MyBlueprintReaderProps {
-  chapter: ItemsEntity;
-  onBack: () => void;
-}
+export default function MyBlueprintReader({ slug }: { slug: string }) {
+  const router = useRouter();
+  const { data: response, isLoading, isError } = useGetPurchasedBlueprintQuery(slug, { skip: !slug });
+  const data = response?.data;
 
-export default function MyBlueprintReader({ chapter, onBack }: MyBlueprintReaderProps) {
+  if (isLoading) {
+    return <div className="h-96 animate-pulse rounded-lg border border-gray-200 bg-white" />;
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="space-y-6">
+        <Link
+          href={getUserDashboardMyChaptersRoutePath()}
+          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to My Blueprints
+        </Link>
+        <div className="rounded-lg border border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500">
+          Blueprint not found in your library.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <UserDashboardPageHeader
-        title={chapter.title}
+        title={data.title}
         description={
-          chapter.seriesTitle || chapter.bookTitle
-            ? `From ${chapter.seriesTitle || chapter.bookTitle}`
-            : `Blueprint ${chapter.blueprintNumber || chapter.chapterNumber}`
+          data.seriesTitle || data.bookTitle
+            ? `From ${data.seriesTitle || data.bookTitle}`
+            : `Blueprint ${data.blueprintNumber || data.chapterNumber}`
         }
       >
         <Button
           type="button"
           className="global_btn rounded_full outline_primary"
-          onPress={onBack}
+          onPress={() => router.push(getUserDashboardMyChaptersRoutePath())}
           startContent={<ArrowLeft className="h-4 w-4" />}
         >
           Back to My Blueprints
@@ -33,19 +56,7 @@ export default function MyBlueprintReader({ chapter, onBack }: MyBlueprintReader
       </UserDashboardPageHeader>
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
-        <BlueprintPublicDetails
-          data={{
-            id: chapter.chapterId,
-            title: chapter.title,
-            chapterNumber: chapter.chapterNumber,
-            content: chapter.content,
-            pdf: chapter.pdf,
-            canRead: true,
-            completed: chapter.completed,
-            percentage: chapter.completed ? 100 : chapter.percentage,
-          }}
-          hideMentorDetails={true}
-        />
+        <BlueprintPublicDetails data={data} hideMentorDetails />
       </div>
     </div>
   );

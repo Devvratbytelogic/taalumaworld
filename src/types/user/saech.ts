@@ -38,6 +38,7 @@ export interface BlueprintsEntity {
     effectivePrice: number;
     pricingAccessType: string;
     isFree: boolean;
+    content_type?: string;
     seriesId: string;
     seriesTitle: string;
     isPurchased: boolean;

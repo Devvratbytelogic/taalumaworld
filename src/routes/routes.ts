@@ -282,8 +282,16 @@ export function getUserDashboardMyChaptersRoutePath(): string {
   return '/user-dashboard/my-chapters';
 }
 
+export function getPurchasedBlueprintRoutePath(id: string): string {
+  return `/user-dashboard/my-chapters/${id}`;
+}
+
 export function getUserDashboardMyBooksRoutePath(): string {
   return '/user-dashboard/my-books';
+}
+
+export function getPurchasedSeriesRoutePath(id: string): string {
+  return `/user-dashboard/my-books/${id}`;
 }
 
 export function getUserDashboardMyWishlistRoutePath(): string {

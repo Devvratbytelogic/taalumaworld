@@ -114,6 +114,13 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                       />
                     </div>
                   )}
+                  {!hasContent && !hasPdf && (
+                    <div className="px-6 py-16 text-center sm:px-8 sm:py-20">
+                      <p className="text-sm text-[#6B6B6B]">
+                        No content available for this blueprint.
+                      </p>
+                    </div>
+                  )}
                 </> : (
                   <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center sm:px-8 sm:py-20">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#ECECEC] bg-[#FAFAFA]">

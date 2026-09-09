@@ -17,7 +17,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { cn } from '@/components/ui/utils';
 import { useGetMySeriesQuery } from '@/store/rtkQueries/userGetAPI';
 import type { ItemsEntity } from '@/types/user/mySeries';
-import { getHomeRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getPurchasedSeriesRoutePath } from '@/routes/routes';
 import MyBooksPageSkeleton from '@/components/skeleton-loader/MyBooksPageSkeleton';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 
@@ -224,7 +224,7 @@ export function MyBooksPage() {
                         <Button
                           type="button"
                           className="global_btn rounded_full bg_primary w-full"
-                          onPress={() => router.push(getSeriesRoutePath(item.slug ?? item.id ?? ''))}
+                          onPress={() => router.push(getPurchasedSeriesRoutePath(item.slug ?? item.id ?? ''))}
                         >
                           <ReadIcon className="h-4 w-4" />
                           {readLabel}

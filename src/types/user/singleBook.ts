@@ -78,6 +78,7 @@ export interface IChapterEntity {
     pricingAccessType: string;
     isFree: boolean;
     coverImage: string;
+    content_type?: string;
     canRead: boolean;
     isPurchased: boolean;
     isCart: boolean;

@@ -14,7 +14,7 @@ import { MentorTypeModal } from './MentorTypeModal';
 import moment from 'moment';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminMentorTypesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminMentorTypesSkeleton } from '@/components/skeleton-loader/admin';
 
 const MODEL = 'Mentor Tier';
 
@@ -221,8 +221,24 @@ export function AdminMentorTypesTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminMentorTypesSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor Tiers"
+          description="Configure mentor tiers, revenue share, and rank used to grade mentor performance."
+        >
+          {canAdd ? (
+            <Button className="global_btn rounded_full bg_primary" onPress={() => setIsCreateOpen(true)} startContent={<Plus className="h-4 w-4" />}>
+              Add mentor tier
+            </Button>
+          ) : null}
+        </AdminPageHeader>
+        <AdminMentorTypesSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <>

@@ -14,7 +14,7 @@ import { useGetAllAdminReviewsQuery } from '@/store/rtkQueries/adminReviewsApi';
 import { AdminReviewsSearch } from './AdminReviewsSearch';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminReviewsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminReviewsSkeleton } from '@/components/skeleton-loader/admin';
 
 const REVIEWS_MODEL = 'Reviews';
 
@@ -278,8 +278,21 @@ export function AdminReviewsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminReviewsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminPageHeader
+          title="Reviews & ratings"
+          description="Monitor and moderate Blueprint reviews. Super Admin and staff can reject a review without a report."
+        >
+          <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
+            Total reviews: {total}
+          </Badge>
+        </AdminPageHeader>
+        <AdminReviewsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

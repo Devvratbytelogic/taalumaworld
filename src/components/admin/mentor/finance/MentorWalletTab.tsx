@@ -225,7 +225,18 @@ export function MentorWalletTab() {
     },
   ];
 
-  if (isProfileLoading) return <MentorWalletSkeleton />;
+  if (isProfileLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Performance & Revenue"
+          title="Wallet & Payouts"
+          description="Real-time balance, refunds, and chargebacks."
+        />
+        <MentorWalletSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

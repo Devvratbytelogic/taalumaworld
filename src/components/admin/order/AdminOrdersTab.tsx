@@ -15,7 +15,7 @@ import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getViewOrderRoutePath, isMentorPanelPath } from '@/routes/routes';
 import moment from 'moment';
 import { IAllOrdersAPIResponseDataEntityItemEntityItemItems } from '@/types/order';
-import { AdminOrdersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminOrdersSkeleton } from '@/components/skeleton-loader/admin';
 
 const ORDERS_MODEL = 'Orders';
 
@@ -248,8 +248,28 @@ export function AdminOrdersTab() {
         },
     ];
 
-    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-    if (showPageSkeleton) return <AdminOrdersSkeleton />;
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <div className="admin-surface p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <ShoppingBag className="h-7 w-7 text-primary" />
+                                <h1 className="text-3xl font-bold text-foreground">Orders</h1>
+                            </div>
+                            <p className="text-muted-foreground">
+                                {isMentor
+                                    ? 'View orders for your series and blueprints'
+                                    : 'View and manage all customer orders'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <AdminOrdersSkeleton />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

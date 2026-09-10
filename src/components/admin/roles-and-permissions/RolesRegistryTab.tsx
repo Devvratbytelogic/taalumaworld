@@ -13,7 +13,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { cn } from '@/components/ui/utils';
 import CommonDataTable from '../CommonDataTable';
-import { AdminSearchPanelSkeleton, AdminTableSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminSearchPanelSkeleton, AdminTableSkeleton } from '@/components/skeleton-loader/admin';
 
 const ROLES_MODEL = 'Roles';
 
@@ -144,8 +144,7 @@ export function RolesRegistryTab() {
         },
     ];
 
-    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(res));
-    if (showPageSkeleton) {
+    if (isLoading) {
         return (
             <div className="space-y-6">
                 <AdminSearchPanelSkeleton />

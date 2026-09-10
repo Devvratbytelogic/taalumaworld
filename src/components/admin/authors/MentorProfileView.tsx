@@ -159,7 +159,7 @@ export function MentorProfileView() {
         toast.success(res.message ?? `"${suspendMentor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
       }
     } catch {
-      toast.error(`Failed to update "${suspendMentor.name}"`);
+      // Error toast handled by API layer
     } finally {
       setSuspendMentor(null);
     }

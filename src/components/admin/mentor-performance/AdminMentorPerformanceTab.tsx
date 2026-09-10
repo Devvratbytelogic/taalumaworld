@@ -19,7 +19,7 @@ import { useGetMentorPerformanceQuery } from '@/store/rtkQueries/dashboard';
 import { useGetAllMentorTiersQuery } from '@/store/rtkQueries/mentorApis';
 import type { IMentorPerformanceEntity } from '@/types/dashboard';
 import { AdminMentorPerformanceSearch } from './AdminMentorPerformanceSearch';
-import { AdminMentorPerformanceSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminMentorPerformanceSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -178,8 +178,18 @@ export function AdminMentorPerformanceTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminMentorPerformanceSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor Performance"
+          description="Sales, revenue share, and AI quality scores across mentors."
+        />
+        <AdminMentorPerformanceSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

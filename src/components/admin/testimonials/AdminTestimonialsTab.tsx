@@ -22,7 +22,7 @@ import { StarRating } from './StarRating';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { refreshAfterTestimonialChange } from '@/store/server-api/refreshCache';
-import { AdminTestimonialsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminTestimonialsSkeleton } from '@/components/skeleton-loader/admin';
 
 const TESTIMONIAL_MODEL = 'Testimonial';
 
@@ -212,8 +212,18 @@ export function AdminTestimonialsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminTestimonialsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminTestimonialsHeader
+          totalCount={totalTestimonials}
+          canAdd={canAdd}
+          onAddTestimonial={() => { setShowAddForm(true); setEditingId(null); }}
+        />
+        <AdminTestimonialsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

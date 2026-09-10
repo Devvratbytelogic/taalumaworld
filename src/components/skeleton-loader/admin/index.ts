@@ -13,6 +13,7 @@ export {
   AdminPreviewSectionSkeleton,
   AdminListPageSkeleton,
   AdminDetailPageSkeleton,
+  AdminPageFallbackSkeleton,
 } from './primitives';
 
 export {
@@ -87,5 +88,3 @@ export {
   MentorReferralWalletSkeleton,
   MentorFollowersSkeleton,
 } from './pages';
-
-export { useAdminPageSkeleton } from './useAdminPageSkeleton';

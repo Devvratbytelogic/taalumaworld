@@ -19,7 +19,7 @@ import { IMentorReferralsAPIResponseDataEntity, MentorReferralStatus } from '@/t
 import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
-import { MentorReferralsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { MentorReferralsSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_FILTER_OPTIONS: { label: string; value: MentorReferralStatus | '' }[] = [
   { label: 'All statuses', value: '' },
@@ -219,8 +219,27 @@ export function MentorReferralsTab() {
     }
   };
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <MentorReferralsSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Growth"
+          title="Referral Link Performance"
+          description="Registrations and conversions from your mentor referral link."
+        >
+          <Button
+            className="global_btn rounded_full bg_primary"
+            onPress={handleExportCsv}
+            isLoading={isExporting}
+            startContent={!isExporting ? <Download className="h-4 w-4" /> : undefined}
+          >
+            Export CSV
+          </Button>
+        </AdminPageHeader>
+        <MentorReferralsSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

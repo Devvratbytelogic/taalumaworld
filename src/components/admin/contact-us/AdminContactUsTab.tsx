@@ -10,7 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import type { IAllContactusDataAPIResponseData } from '@/types/contactData';
 import { formatConsentType } from '@/utils/agreementConsent';
 import moment from 'moment';
-import { AdminContactUsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminContactUsSkeleton } from '@/components/skeleton-loader/admin';
 
 export function AdminContactUsTab() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -104,8 +104,27 @@ export function AdminContactUsTab() {
         },
     ];
 
-    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-    if (showPageSkeleton) return <AdminContactUsSkeleton />;
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <div className="admin-surface p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-foreground mb-2">Contact Us</h1>
+                            <p className="text-muted-foreground">
+                                View all contact form submissions
+                            </p>
+                        </div>
+                        <div className="bg-accent rounded-2xl px-5 py-3 text-center">
+                            <p className="text-2xl font-bold text-primary">{totalEntries}</p>
+                            <p className="text-xs text-muted-foreground">Total Messages</p>
+                        </div>
+                    </div>
+                </div>
+                <AdminContactUsSkeleton />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

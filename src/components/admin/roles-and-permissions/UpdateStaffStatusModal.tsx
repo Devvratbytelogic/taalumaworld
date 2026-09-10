@@ -48,7 +48,7 @@ export function UpdateStaffStatusModal() {
                     onClose();
                 }
             } catch {
-                toast.error('Failed to update status');
+                // Error toast handled by API layer
             }
         },
     });

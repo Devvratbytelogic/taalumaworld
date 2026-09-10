@@ -10,7 +10,7 @@ import { AdminTransactionsSearch } from './AdminTransactionsSearch';
 import { TransactionStats } from './TransactionStats';
 import { useGetAllTransactionsQuery } from '@/store/rtkQueries/adminGetApi';
 import { IAllTransactionsDataEntity } from '@/types/transaction';
-import { AdminTransactionsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminTransactionsSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   completed: 'bg-green-50 text-green-700 border-green-200',
@@ -146,8 +146,14 @@ export function AdminTransactionsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminTransactionsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminTransactionsHeader />
+        <AdminTransactionsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

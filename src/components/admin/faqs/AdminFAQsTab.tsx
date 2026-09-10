@@ -21,7 +21,7 @@ import { AdminFAQsSearch } from './AdminFAQsSearch';
 import { FAQForm, type FAQFormValues } from './FAQForm';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { refreshAfterFaqChange } from '@/store/server-api/refreshCache';
-import { AdminFaqsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminFaqsSkeleton } from '@/components/skeleton-loader/admin';
 
 const FAQS_MODEL = 'FAQs';
 
@@ -208,8 +208,18 @@ export function AdminFAQsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminFaqsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminFAQsHeader
+          totalCount={totalFAQs}
+          canAdd={canAdd}
+          onAddFAQ={() => { setShowAddForm(true); setEditingId(null); }}
+        />
+        <AdminFaqsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

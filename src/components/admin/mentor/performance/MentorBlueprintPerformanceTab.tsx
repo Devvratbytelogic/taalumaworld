@@ -13,7 +13,7 @@ import {
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetBlueprintPerformanceQuery } from '@/store/rtkQueries/dashboard';
-import { MentorBlueprintPerformanceSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { MentorBlueprintPerformanceSkeleton } from '@/components/skeleton-loader/admin';
 
 const columns: GridColDef[] = [
   { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 200, sortable: false },
@@ -65,8 +65,18 @@ export function MentorBlueprintPerformanceTab() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <MentorBlueprintPerformanceSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Performance & Revenue"
+          title="Blueprint Performance"
+          description="Views, sales, conversion, and AI quality scores across your blueprints."
+        />
+        <MentorBlueprintPerformanceSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

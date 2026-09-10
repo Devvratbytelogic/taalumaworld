@@ -72,7 +72,17 @@ export function AdminReferralSettingTab() {
 
   const busy = isLoading || isSaving;
 
-  if (isLoading) return <AdminReferralSettingSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          title="Referral Setting"
+          description="Set the default commission for affiliate referrals."
+        />
+        <AdminReferralSettingSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

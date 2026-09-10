@@ -14,7 +14,7 @@ import type { IWithdrawalDataEntity } from '@/types/wallet';
 import { AdminWithdrawalsSearch } from './AdminWithdrawalsSearch';
 import { WithdrawalReviewModal } from './WithdrawalReviewModal';
 import moment from 'moment';
-import { AdminWithdrawalsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminWithdrawalsSkeleton } from '@/components/skeleton-loader/admin';
 
 const WITHDRAWAL_MODEL = 'Withdrawal';
 
@@ -199,8 +199,18 @@ export function AdminWithdrawalsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminWithdrawalsSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Commerce"
+          title="Withdrawals"
+          description="Review and process mentor and affiliate withdrawal requests."
+        />
+        <AdminWithdrawalsSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

@@ -204,6 +204,7 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                   checked={values.can_block}
                   onCheckedChange={(checked) => setFieldValue('can_block', !!checked)}
                   disabled={isSubmitting}
+                  className='mr-2'
                 />
                 Can block — users who have not accepted the latest version cannot complete linked touchpoints
               </label>

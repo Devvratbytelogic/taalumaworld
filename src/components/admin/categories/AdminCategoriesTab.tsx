@@ -14,7 +14,7 @@ import { CategoryListing } from './CategoryListing';
 import { AddCategoryModal } from './AddCategoryModal';
 import { EditCategoryModal } from './EditCategoryModal';
 import { DeleteCategoryDialog } from './DeleteCategoryDialog';
-import { AdminCategoriesListSkeleton, AdminCategoriesPageSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminCategoriesListSkeleton, AdminCategoriesPageSkeleton } from '@/components/skeleton-loader/admin';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminPage, AdminStatCard } from '@/components/admin/layout/AdminContent';
 
@@ -97,8 +97,14 @@ export function AdminCategoriesTab() {
     }
   };
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(categoriesResponse));
-  if (showPageSkeleton) return <AdminCategoriesPageSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminCategoriesHeader onCreateCategory={() => setIsCreateModalOpen(true)} />
+        <AdminCategoriesPageSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

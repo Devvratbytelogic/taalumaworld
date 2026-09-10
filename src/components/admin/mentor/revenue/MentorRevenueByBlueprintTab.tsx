@@ -14,7 +14,7 @@ import CommonDataTable from '@/components/admin/CommonDataTable';
 import { formatKes } from '@/constants/common';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetBlueprintRevenueQuery } from '@/store/rtkQueries/dashboard';
-import { MentorRevenueByBlueprintSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { MentorRevenueByBlueprintSkeleton } from '@/components/skeleton-loader/admin';
 
 const columns: GridColDef[] = [
   { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 200, sortable: false },
@@ -58,8 +58,18 @@ export function MentorRevenueByBlueprintTab() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <MentorRevenueByBlueprintSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Performance & Revenue"
+          title="Revenue by Blueprint"
+          description="Earned and pending revenue broken down per blueprint."
+        />
+        <MentorRevenueByBlueprintSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

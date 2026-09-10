@@ -234,11 +234,8 @@ export function AdminPreviewSectionSkeleton({
   );
 }
 
+/** Content-only list skeleton — the page keeps its real header. */
 export function AdminListPageSkeleton({
-  showEyebrow = false,
-  showAction = false,
-  titleWidth,
-  descriptionWidth,
   filters = 0,
   tabs,
   statCount,
@@ -246,10 +243,6 @@ export function AdminListPageSkeleton({
   tableRows = 8,
   tableColumns = 6,
 }: {
-  showEyebrow?: boolean;
-  showAction?: boolean;
-  titleWidth?: string;
-  descriptionWidth?: string;
   filters?: number;
   tabs?: number;
   statCount?: number;
@@ -259,17 +252,22 @@ export function AdminListPageSkeleton({
 }) {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton
-        showAction={showAction}
-        showEyebrow={showEyebrow}
-        titleWidth={titleWidth}
-        descriptionWidth={descriptionWidth}
-      />
       {tabs ? <AdminTabBarSkeleton count={tabs} /> : null}
       {statCount ? <AdminStatCardsSkeleton count={statCount} /> : null}
       {extra}
       <AdminSearchPanelSkeleton filters={filters} />
       <AdminTableSkeleton rows={tableRows} columns={tableColumns} />
+    </AdminPageSkeleton>
+  );
+}
+
+/** Layout Suspense fallback while an admin page is suspending. */
+export function AdminPageFallbackSkeleton() {
+  return (
+    <AdminPageSkeleton>
+      <AdminPageHeaderSkeleton />
+      <AdminSearchPanelSkeleton />
+      <AdminTableSkeleton />
     </AdminPageSkeleton>
   );
 }

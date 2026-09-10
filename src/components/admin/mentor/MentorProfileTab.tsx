@@ -1206,7 +1206,7 @@ function AgreementsCard() {
       await acceptAgreement({ accepted_agreement_ids: acceptedAgreementIds }).unwrap();
       toast.success('Agreement accepted successfully!');
     } catch {
-      toast.error('Failed to accept agreement. Please try again.');
+      // Error toast handled by API layer
     } finally {
       setAcceptingId(null);
     }
@@ -1218,7 +1218,7 @@ function AgreementsCard() {
       await acceptAllAgreements(undefined).unwrap();
       toast.success('All agreements accepted successfully!');
     } catch {
-      toast.error('Failed to accept agreements. Please try again.');
+      // Error toast handled by API layer
     } finally {
       setAcceptingAll(false);
     }
@@ -1307,7 +1307,19 @@ function AgreementsCard() {
 export function MentorProfileTab() {
   const { data: profileData, isLoading } = useGetAdminProfileQuery();
 
-  if (isLoading) return <MentorProfileSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <MentorVerificationHeader
+          eyebrow="Account"
+          title="My Profile"
+          description="Manage your mentor profile, bio, and public information."
+          showAccountStatus={false}
+        />
+        <MentorProfileSkeleton />
+      </AdminPage>
+    );
+  }
 
   const profile = profileData?.data;
 

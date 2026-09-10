@@ -191,7 +191,7 @@ export function GeneralSettingsCard() {
           toast.success(res.message ?? 'Settings updated successfully');
         }
       } catch {
-        toast.error('Failed to update settings. Please try again.');
+        // Error toast handled by API layer
       }
     },
   });

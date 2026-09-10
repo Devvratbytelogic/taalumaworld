@@ -89,7 +89,6 @@ export function BlueprintAccessTab() {
                             }
                         } catch (error) {
                             console.error('Error removing blueprint access', error);
-                            toast.error('Failed to remove blueprint access');
                         }
                     },
                 },
@@ -109,7 +108,6 @@ export function BlueprintAccessTab() {
             }
         } catch (error) {
             console.error('Error saving blueprint access', error);
-            toast.error('Failed to save blueprint access');
         }
     };
 

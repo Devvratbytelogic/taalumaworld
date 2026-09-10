@@ -58,20 +58,6 @@ export function AdminCategoriesListSkeleton() {
 export function AdminDashboardSkeleton() {
   return (
     <AdminPageSkeleton>
-      <div className={cn(adminSkeletonPanelClass, 'relative overflow-hidden p-6')}>
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <Bone className="h-3 w-20 bg-slate-100" />
-            <Bone className="mt-2 h-8 w-64" />
-            <Bone className="mt-2 h-4 w-72 bg-slate-100" />
-          </div>
-          <div className="flex flex-wrap items-end gap-3">
-            <Bone className="h-9 w-24 rounded-md bg-slate-100" />
-            <Bone className="h-9 w-40 rounded-lg bg-slate-100" />
-            <Bone className="h-9 w-40 rounded-lg bg-slate-100" />
-          </div>
-        </div>
-      </div>
       <AdminStatCardsSkeleton count={8} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -108,11 +94,6 @@ export function AdminDashboardSkeleton() {
 export function MentorDashboardSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton showEyebrow showAction titleWidth="w-48" />
-      <div className={cn(adminSkeletonPanelClass, 'p-5')}>
-        <Bone className="mb-4 h-5 w-32" />
-        <Bone className="h-24 w-full rounded-md bg-slate-100" />
-      </div>
       <div className="flex justify-end gap-3">
         <Bone className="h-9 w-40 rounded-lg bg-slate-100" />
         <Bone className="h-9 w-40 rounded-lg bg-slate-100" />
@@ -129,8 +110,6 @@ export function MentorDashboardSkeleton() {
 export function AdminAnalyticsSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton showEyebrow titleWidth="w-64" descriptionWidth="w-96" />
-      <AdminSearchPanelSkeleton filters={2} />
       {Array.from({ length: 4 }).map((_, i) => (
         <AdminChartPanelSkeleton key={i} />
       ))}
@@ -141,7 +120,6 @@ export function AdminAnalyticsSkeleton() {
 export function AdminRolesPermissionsSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-60" descriptionWidth="w-96" />
       <AdminTabBarSkeleton count={3} />
       <AdminTableSkeleton />
     </AdminPageSkeleton>
@@ -164,18 +142,11 @@ export function AdminPermissionsMatrixSkeleton() {
 }
 
 export function AdminStaffSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-40" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminOrdersSkeleton() {
-  return (
-    <AdminListPageSkeleton
-      titleWidth="w-32"
-      tabs={3}
-      statCount={4}
-      filters={3}
-    />
-  );
+  return <AdminListPageSkeleton tabs={3} statCount={4} filters={3} />;
 }
 
 export function AdminOrderDetailSkeleton() {
@@ -183,26 +154,16 @@ export function AdminOrderDetailSkeleton() {
 }
 
 export function AdminTransactionsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-44" statCount={4} filters={3} />;
+  return <AdminListPageSkeleton statCount={4} filters={3} />;
 }
 
 export function AdminCouponsSkeleton() {
-  return (
-    <AdminListPageSkeleton
-      showAction
-      titleWidth="w-32"
-      tabs={2}
-      statCount={4}
-      filters={2}
-    />
-  );
+  return <AdminListPageSkeleton tabs={2} statCount={4} filters={2} />;
 }
 
 export function AdminTaxesSkeleton() {
   return (
     <AdminListPageSkeleton
-      showAction
-      titleWidth="w-20"
       extra={
         <div className={cn(adminSkeletonPanelClass, 'p-5')}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -220,15 +181,15 @@ export function AdminTaxesSkeleton() {
 }
 
 export function AdminWithdrawalsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-52" statCount={3} filters={3} />;
+  return <AdminListPageSkeleton statCount={3} filters={3} />;
 }
 
 export function AdminPaymentsSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-32" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminUsersSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-56" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminUserDetailSkeleton() {
@@ -236,13 +197,12 @@ export function AdminUserDetailSkeleton() {
 }
 
 export function AdminCampaignUsersSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-48" />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminInstitutionsSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton showEyebrow titleWidth="w-64" descriptionWidth="w-96" />
       <AdminTabBarSkeleton count={4} />
       <AdminSearchPanelSkeleton />
       <AdminTableSkeleton />
@@ -307,7 +267,7 @@ export function AdminRegistrationPromptSkeleton() {
 }
 
 export function AdminAuthorsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-28" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminMentorProfileViewSkeleton() {
@@ -340,53 +300,47 @@ export function AdminMentorProfileViewSkeleton() {
 }
 
 export function AdminMentorPerformanceSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-52" filters={1} />;
+  return <AdminListPageSkeleton filters={1} />;
 }
 
 export function AdminMentorRevenueSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-44" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminMentorApplicationsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-56" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminMentorTypesSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-40" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminMentorVerificationSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-56" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminMentorTierUpgradesSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-64" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminMentorEquitySkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-40" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminAffiliateApplicationsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-56" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminSeriesSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-24" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminBlueprintsSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-32" filters={3} tableColumns={7} />;
+  return <AdminListPageSkeleton filters={3} tableColumns={7} />;
 }
 
 export function AdminBlueprintFormSkeleton() {
-  return (
-    <AdminPageSkeleton>
-      <AdminBackLinkSkeleton />
-      <AdminPageHeaderSkeleton titleWidth="w-56" />
-      <AdminFormPanelSkeleton fields={8} showHeading={false} />
-    </AdminPageSkeleton>
-  );
+  return <AdminFormPanelSkeleton fields={8} showHeading={false} />;
 }
 
 export function AdminBlueprintFormFieldsSkeleton() {
@@ -400,7 +354,6 @@ export function AdminBlueprintDetailSkeleton() {
 export function AdminCategoriesPageSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton showAction titleWidth="w-40" />
       <AdminStatCardsSkeleton count={3} />
       <AdminSearchPanelSkeleton />
       <AdminCategoriesListSkeleton />
@@ -409,11 +362,11 @@ export function AdminCategoriesPageSkeleton() {
 }
 
 export function AdminReviewsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-24" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminReviewReportsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-40" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminReviewReportDetailSkeleton() {
@@ -421,31 +374,31 @@ export function AdminReviewReportDetailSkeleton() {
 }
 
 export function AdminAgreementsSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-36" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminAgreementTypesSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-48" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminSentencesSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-32" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminConsentRecordsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-48" statCount={3} />;
+  return <AdminListPageSkeleton statCount={3} />;
 }
 
 export function AdminTestimonialsSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-40" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminFaqsSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-20" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminInboxSkeleton() {
-  return <AdminListPageSkeleton showAction titleWidth="w-24" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminContactUsSkeleton() {
@@ -458,7 +411,7 @@ export function AdminContactUsSkeleton() {
 }
 
 export function AdminSubscribersSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-36" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminSettingsFormSkeleton() {
@@ -466,29 +419,19 @@ export function AdminSettingsFormSkeleton() {
 }
 
 export function AdminSettingsPageSkeleton() {
-  return (
-    <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-48" />
-      <AdminSettingsFormSkeleton />
-    </AdminPageSkeleton>
-  );
+  return <AdminSettingsFormSkeleton />;
 }
 
 export function AdminReferralSettingSkeleton() {
-  return (
-    <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-44" />
-      <AdminFormPanelSkeleton fields={2} columns={2} />
-    </AdminPageSkeleton>
-  );
+  return <AdminFormPanelSkeleton fields={2} columns={2} />;
 }
 
 export function AdminReferralPerformanceSkeleton() {
-  return <AdminListPageSkeleton showAction showEyebrow titleWidth="w-56" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }
 
 export function AdminAuditLogsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-32" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function AdminAuditLogDetailSkeleton() {
@@ -498,7 +441,6 @@ export function AdminAuditLogDetailSkeleton() {
 export function AdminProfileSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-32" />
       <div className={cn(adminSkeletonPanelClass, 'p-6')}>
         <div className="flex items-start gap-4">
           <Bone className="h-20 w-20 rounded-full" />
@@ -524,7 +466,6 @@ export function AdminProfileSkeleton() {
 export function MentorProfileSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton showEyebrow titleWidth="w-36" />
       <AdminFormPanelSkeleton fields={8} />
       <div className="grid gap-6 lg:grid-cols-2">
         <AdminFormPanelSkeleton fields={4} columns={1} />
@@ -548,7 +489,6 @@ export function MentorProfileSkeleton() {
 export function AdminPagesSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-44" />
       <AdminTabBarSkeleton count={5} />
       <AdminFormPanelSkeleton fields={6} />
     </AdminPageSkeleton>
@@ -558,7 +498,6 @@ export function AdminPagesSkeleton() {
 export function AdminReportsSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-28" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className={cn(adminSkeletonPanelClass, 'p-6')}>
@@ -582,7 +521,6 @@ export function AdminReportsSkeleton() {
 export function AdminModerationSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton titleWidth="w-36" />
       <AdminSearchPanelSkeleton />
       <Bone className="h-14 w-full rounded-xl bg-amber-100" />
       <AdminTableSkeleton rows={5} />
@@ -591,39 +529,34 @@ export function AdminModerationSkeleton() {
 }
 
 export function AdminActivityLogsSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-36" />;
+  return <AdminListPageSkeleton />;
 }
 
 export function MentorBlueprintPerformanceSkeleton() {
   return (
-    <AdminListPageSkeleton
-      showEyebrow
-      titleWidth="w-56"
-      statCount={4}
-    />
+    <AdminListPageSkeleton statCount={4} />
   );
 }
 
 export function MentorCouponPerformanceSkeleton() {
-  return <AdminListPageSkeleton showEyebrow titleWidth="w-52" statCount={4} />;
+  return <AdminListPageSkeleton statCount={4} />;
 }
 
 export function MentorSalesVolumeSkeleton() {
-  return <AdminListPageSkeleton showEyebrow titleWidth="w-36" statCount={3} />;
+  return <AdminListPageSkeleton statCount={3} />;
 }
 
 export function MentorRevenueEarnedSkeleton() {
-  return <AdminListPageSkeleton showEyebrow titleWidth="w-44" statCount={4} />;
+  return <AdminListPageSkeleton statCount={4} />;
 }
 
 export function MentorRevenueByBlueprintSkeleton() {
-  return <AdminListPageSkeleton showEyebrow titleWidth="w-56" statCount={3} />;
+  return <AdminListPageSkeleton statCount={3} />;
 }
 
 export function MentorWalletSkeleton() {
   return (
     <AdminPageSkeleton>
-      <AdminPageHeaderSkeleton showAction titleWidth="w-48" />
       <AdminStatCardsSkeleton count={4} />
       <div className={cn(adminSkeletonPanelClass, 'p-5')}>
         <Bone className="mb-4 h-5 w-32" />
@@ -643,20 +576,15 @@ export function MentorWalletSkeleton() {
 }
 
 export function MentorReferralsSkeleton() {
-  return <AdminListPageSkeleton showAction showEyebrow titleWidth="w-32" statCount={4} />;
+  return <AdminListPageSkeleton statCount={4} />;
 }
 
 export function MentorReferralWalletSkeleton() {
   return (
-    <AdminListPageSkeleton
-      showEyebrow
-      titleWidth="w-48"
-      statCount={4}
-      filters={1}
-    />
+    <AdminListPageSkeleton statCount={4} filters={1} />
   );
 }
 
 export function MentorFollowersSkeleton() {
-  return <AdminListPageSkeleton titleWidth="w-32" filters={2} />;
+  return <AdminListPageSkeleton filters={2} />;
 }

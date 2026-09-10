@@ -17,7 +17,7 @@ import { formatKes } from '@/constants/common';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetCouponPerformanceQuery } from '@/store/rtkQueries/couponApis';
 import type { ICouponPerformanceEntity } from '@/types/coupon';
-import { MentorCouponPerformanceSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { MentorCouponPerformanceSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -161,8 +161,20 @@ export function MentorCouponPerformanceTab({ hideHeader = false }: { hideHeader?
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton && !hideHeader) return <MentorCouponPerformanceSkeleton />;
+  if (isLoading && !hideHeader) {
+    return (
+      <AdminPage>
+        {!hideHeader && (
+          <AdminPageHeader
+            eyebrow="Performance & Revenue"
+            title="Coupon Performance"
+            description="Redemptions, discounts, and revenue from your coupons."
+          />
+        )}
+        <MentorCouponPerformanceSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

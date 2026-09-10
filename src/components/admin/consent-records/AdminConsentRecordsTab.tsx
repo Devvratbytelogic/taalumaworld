@@ -14,7 +14,7 @@ import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminConsentRecordsSearch } from './AdminConsentRecordsSearch';
-import { AdminConsentRecordsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminConsentRecordsSkeleton } from '@/components/skeleton-loader/admin';
 
 export function AdminConsentRecordsTab() {
   const [search, setSearch] = useState('');
@@ -129,8 +129,28 @@ export function AdminConsentRecordsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminConsentRecordsSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Legal"
+          title="Consent records"
+          description="Which agreement version each person accepted, and when."
+        >
+          <Button
+            className="global_btn rounded_full bg_primary"
+            onPress={handleExportCsv}
+            isDisabled={isExporting}
+            isLoading={isExporting}
+            startContent={!isExporting ? <Download className="h-4 w-4" /> : undefined}
+          >
+            Export CSV
+          </Button>
+        </AdminPageHeader>
+        <AdminConsentRecordsSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

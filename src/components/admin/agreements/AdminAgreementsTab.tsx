@@ -19,7 +19,7 @@ import { AgreementViewModal } from './AgreementViewModal';
 import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { refreshAfterPolicyChange } from '@/store/server-api/refreshCache';
-import { AdminAgreementsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminAgreementsSkeleton } from '@/components/skeleton-loader/admin';
 
 const AGREEMENTS_MODEL = 'Agreements';
 
@@ -212,8 +212,20 @@ export function AdminAgreementsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(agreementsResponse));
-  if (showPageSkeleton) return <AdminAgreementsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminAgreementsHeader
+          canAdd={canAdd}
+          onCreateAgreement={() => {
+            setEditingAgreementId(null);
+            setIsModalOpen(true);
+          }}
+        />
+        <AdminAgreementsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

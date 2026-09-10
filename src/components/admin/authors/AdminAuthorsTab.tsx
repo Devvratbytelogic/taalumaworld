@@ -23,7 +23,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
-import { AdminAuthorsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminAuthorsSkeleton } from '@/components/skeleton-loader/admin';
 
 const MENTORS_MODEL = 'Mentors';
 const MENTOR_TIER_MODEL = 'Mentor Tier';
@@ -95,7 +95,7 @@ export function AdminAuthorsTab() {
         toast.success(res.message ?? `Password reset link sent for "${author.name}"`);
       }
     } catch {
-      toast.error(`Failed to generate password reset link for "${author.name}"`);
+      // Error toast handled by API layer
     } finally {
       setResettingPasswordId(null);
     }
@@ -118,7 +118,7 @@ export function AdminAuthorsTab() {
           toast.success(res.message ?? `"${suspendAuthor.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
         }
       } catch {
-        toast.error(`Failed to update "${suspendAuthor.name}"`);
+        // Error toast handled by API layer
       } finally {
         setSuspendAuthor(null);
       }
@@ -311,8 +311,14 @@ export function AdminAuthorsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(authorsResponse));
-  if (showPageSkeleton) return <AdminAuthorsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminAuthorsHeader />
+        <AdminAuthorsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

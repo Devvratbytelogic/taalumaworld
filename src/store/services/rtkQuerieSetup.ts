@@ -2,8 +2,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { Mutex } from 'async-mutex';
 import Cookies from "js-cookie";
-import { addToast } from '@heroui/react';
 import { API_BASE_URL } from '@/utils/config';
+import { showApiErrorToast } from '@/utils/toast';
 import { isBrowserOnline, NETWORK_MESSAGES } from '@/utils/network';
 import { AUTH_COOKIE_NAME, hasAuthCookie } from '@/utils/authCookies';
 import {
@@ -186,7 +186,7 @@ const baseQueryWithAuth: BaseQueryFn<
             }
 
             if (!isPendingApprovalError(message, httpStatus)) {
-                addToast({ title: 'Error', description: message, color: 'danger', timeout: 2000 });
+                showApiErrorToast(message);
             }
             return {
                 error: {
@@ -216,12 +216,7 @@ const baseQueryWithAuth: BaseQueryFn<
                 error: error.message,
             };
 
-            addToast({
-                title: 'Error',
-                description: toToastMessage(errorResponse?.error, 'An unexpected error occurred'),
-                color: 'danger',
-                timeout: 2000,
-            });
+            showApiErrorToast(toToastMessage(errorResponse?.error, 'An unexpected error occurred'));
         } else {
             errorResponse = {
                 status: "CUSTOM_ERROR",

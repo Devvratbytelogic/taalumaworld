@@ -32,7 +32,7 @@ import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminStatCard } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '../CommonDataTable';
 import moment from 'moment';
-import { AdminTableSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminTableSkeleton } from '@/components/skeleton-loader/admin';
 
 const INSTITUTIONS_MODEL = 'Institutions';
 
@@ -336,8 +336,27 @@ export function InstitutionRegistryTab() {
         },
     ];
 
-    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(response));
-    if (showPageSkeleton) return <AdminTableSkeleton />;
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-lg font-semibold text-slate-900">Partner Institutions</h2>
+                        <p className="text-sm text-slate-500">Manage registered universities and their access status.</p>
+                    </div>
+
+                    <Button
+                        className={`global_btn rounded_full ${isTrashView ? 'outline_primary' : 'danger_outline'}`}
+                        onPress={handleToggleTrash}
+                        startContent={isTrashView ? <ArrowLeft className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                    >
+                        {isTrashView ? 'Back to institutions' : 'Trash'}
+                    </Button>
+                </div>
+                <AdminTableSkeleton />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

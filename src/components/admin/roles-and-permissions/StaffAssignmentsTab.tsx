@@ -19,7 +19,7 @@ import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { ViewProfileModal } from '@/components/admin/users/ViewProfileModal';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminStaffSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminStaffSkeleton } from '@/components/skeleton-loader/admin';
 
 const STAFF_MODEL = 'Staff';
 
@@ -70,7 +70,7 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
         toast.success(res.message ?? `Password reset link sent for "${member.name}"`);
       }
     } catch {
-      toast.error(`Failed to generate password reset link for "${member.name}"`);
+      // Error toast handled by API layer
     } finally {
       setResettingPasswordId(null);
     }
@@ -250,8 +250,23 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(staffData));
-  if (showPageSkeleton && !embedded) return <AdminStaffSkeleton />;
+  if (isLoading && !embedded) {
+    return (
+      <div className="space-y-6">
+        {!embedded ? (
+          <AdminPageHeader
+            title="Staff management"
+            description="View and manage staff members and role assignments"
+          >
+            <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
+              Total staff: {totalStaff}
+            </Badge>
+          </AdminPageHeader>
+        ) : null}
+        <AdminStaffSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

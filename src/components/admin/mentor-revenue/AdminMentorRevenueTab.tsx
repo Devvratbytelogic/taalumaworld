@@ -23,7 +23,7 @@ import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminMentorRevenueSearch } from './AdminMentorRevenueSearch';
-import { AdminMentorRevenueSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminMentorRevenueSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -225,8 +225,27 @@ export function AdminMentorRevenueTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminMentorRevenueSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor Revenue"
+          description="Gross, discounts, and revenue share across mentors."
+        >
+          <Button
+            className="global_btn rounded_full bg_primary"
+            onPress={handleExportCsv}
+            isLoading={isExporting}
+            startContent={isExporting ? null : <Download className="h-4 w-4" />}
+          >
+            Export CSV
+          </Button>
+        </AdminPageHeader>
+        <AdminMentorRevenueSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

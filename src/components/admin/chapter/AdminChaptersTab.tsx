@@ -28,7 +28,7 @@ import toast from '@/utils/toast';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { AdminBlueprintsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminBlueprintsSkeleton } from '@/components/skeleton-loader/admin';
 
 const BLUEPRINTS_MODEL = 'Blueprints';
 
@@ -462,8 +462,18 @@ export function AdminChaptersTab() {
         },
     ];
 
-    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(chaptersResponse));
-    if (showPageSkeleton) return <AdminBlueprintsSkeleton />;
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <AdminChaptersHeader
+                    isTrashView={isTrashView}
+                    onToggleTrash={() => setIsTrashView((prev) => !prev)}
+                    canAdd={canAdd}
+                />
+                <AdminBlueprintsSkeleton />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

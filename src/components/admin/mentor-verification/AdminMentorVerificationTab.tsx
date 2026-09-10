@@ -30,7 +30,7 @@ import {
   VERIFIED_MENTOR_PROOF_TYPE,
 } from '@/constants/verifiedMentorApplication';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminMentorVerificationSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminMentorVerificationSkeleton } from '@/components/skeleton-loader/admin';
 
 const MODEL = 'Mentor Verification';
 
@@ -260,8 +260,18 @@ export function AdminMentorVerificationTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminMentorVerificationSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor Verification"
+          description="Review mentor applications for Verified Mentor status."
+        />
+        <AdminMentorVerificationSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

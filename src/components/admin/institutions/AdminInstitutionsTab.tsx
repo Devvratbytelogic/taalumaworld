@@ -54,7 +54,18 @@ export function AdminInstitutionsTab() {
         if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
     }, [isLoading, visibleTabs, activeTab]);
 
-    if (isLoading) return <AdminInstitutionsSkeleton />;
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <AdminPageHeader
+                    eyebrow="Institutional Access"
+                    title="University Partnerships"
+                    description="Manage partner universities, promotional periods, and student access"
+                />
+                <AdminInstitutionsSkeleton />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

@@ -74,7 +74,7 @@ export default function ApplyVerifiedMentorModal() {
                     if (/agreement updated/i.test(message)) {
                         dispatch(rtkQuerieSetup.util.invalidateTags(['UserAgreementSentences']));
                     }
-                    if (!message) toast.error('Failed to submit verification application. Please try again.');
+                    // Error toast handled by API layer
                 }
             },
         });

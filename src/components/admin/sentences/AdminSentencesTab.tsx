@@ -21,7 +21,7 @@ import { SentenceModal, type SentenceFormValues } from './SentenceModal';
 import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AGREEMENT_TOUCHPOINT_OPTIONS } from '@/constants/agreements';
-import { AdminSentencesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminSentencesSkeleton } from '@/components/skeleton-loader/admin';
 
 const SENTENCES_MODEL = 'Agreements';
 
@@ -259,8 +259,20 @@ export function AdminSentencesTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(sentencesResponse));
-  if (showPageSkeleton) return <AdminSentencesSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminSentencesHeader
+          canAdd={canAdd}
+          onCreateSentence={() => {
+            setEditingSentence(null);
+            setIsModalOpen(true);
+          }}
+        />
+        <AdminSentencesSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

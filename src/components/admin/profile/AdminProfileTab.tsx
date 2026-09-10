@@ -115,7 +115,7 @@ export function AdminProfileTab() {
           toast.success(res.message ?? 'Profile updated successfully!');
         }
       } catch {
-        toast.error('Failed to update profile. Please try again.');
+        // Error toast handled by API layer
       }
     },
   });
@@ -144,7 +144,18 @@ export function AdminProfileTab() {
     setIsEditing(false);
   };
 
-  if (isLoading) return <AdminProfileSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="System"
+          title="My Profile"
+          description="Manage your administrator account information."
+        />
+        <AdminProfileSkeleton />
+      </AdminPage>
+    );
+  }
 
   const displayPhoto = tempPhoto || profile?.profile_pic || '';
   const displayName = values.name || profile?.name || 'Admin';

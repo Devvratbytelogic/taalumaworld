@@ -36,7 +36,7 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
       await acceptAgreement({ accepted_agreement_ids: acceptedAgreementIds }).unwrap();
       toast.success('Agreement accepted successfully!');
     } catch {
-      toast.error('Failed to accept agreement. Please try again.');
+      // Error toast handled by API layer
     } finally {
       setAcceptingId(null);
     }
@@ -48,7 +48,7 @@ export function ProfileAgreementsCard({ userType = AGREEMENT_VISIBLE_USER_TYPES.
       await acceptAllAgreements(undefined).unwrap();
       toast.success('All agreements accepted successfully!');
     } catch {
-      toast.error('Failed to accept agreements. Please try again.');
+      // Error toast handled by API layer
     } finally {
       setAcceptingAll(false);
     }

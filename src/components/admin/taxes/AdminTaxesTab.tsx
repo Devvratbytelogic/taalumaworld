@@ -21,7 +21,7 @@ import { AdminTaxesSearch } from './AdminTaxesSearch';
 import { DefaultTaxRateCard } from './DefaultTaxRateCard';
 import { TaxModal, type TaxFormValues } from './TaxModal';
 import toast from '@/utils/toast';
-import { AdminTaxesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminTaxesSkeleton } from '@/components/skeleton-loader/admin';
 
 const TAXES_MODEL = 'Taxes';
 
@@ -235,8 +235,20 @@ export function AdminTaxesTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(taxesResponse));
-  if (showPageSkeleton) return <AdminTaxesSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminTaxesHeader
+          canAdd={canAdd}
+          onCreateTax={() => {
+            setEditingTax(null);
+            setIsModalOpen(true);
+          }}
+        />
+        <AdminTaxesSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

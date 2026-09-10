@@ -45,7 +45,17 @@ export function AdminRolesPermissionsTab() {
     if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
   }, [isLoading, visibleTabs, activeTab]);
 
-  if (isLoading) return <AdminRolesPermissionsSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          title="Roles & Permissions"
+          description="Central RBAC — manage roles, permissions, and user segments across the platform"
+        />
+        <AdminRolesPermissionsSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

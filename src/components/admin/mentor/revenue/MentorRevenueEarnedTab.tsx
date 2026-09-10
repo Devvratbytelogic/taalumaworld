@@ -14,7 +14,7 @@ import CommonDataTable from '@/components/admin/CommonDataTable';
 import { formatKes } from '@/constants/common';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetMentorEconomyRevenueQuery } from '@/store/rtkQueries/dashboard';
-import { MentorRevenueEarnedSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { MentorRevenueEarnedSkeleton } from '@/components/skeleton-loader/admin';
 
 const columns: GridColDef[] = [
   { field: 'month', headerName: 'Month', flex: 1, minWidth: 160, sortable: false },
@@ -70,8 +70,18 @@ export function MentorRevenueEarnedTab() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <MentorRevenueEarnedSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Performance & Revenue"
+          title="Revenue Earned"
+          description="Total earnings after platform share and discounts, by month."
+        />
+        <MentorRevenueEarnedSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

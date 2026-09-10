@@ -38,7 +38,7 @@ import {
   VERIFIED_MENTOR_APPLICATION_STATUS,
 } from '@/constants/verifiedMentorApplication';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminMentorApplicationsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminMentorApplicationsSkeleton } from '@/components/skeleton-loader/admin';
 
 const MODEL = 'Mentor Application';
 
@@ -254,8 +254,18 @@ export function AdminMentorApplicationsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminMentorApplicationsSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor Applications"
+          description="Review Career Architect → Mentor conversion requests."
+        />
+        <AdminMentorApplicationsSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

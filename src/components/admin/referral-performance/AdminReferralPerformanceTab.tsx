@@ -20,7 +20,7 @@ import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminReferralPerformanceSearch } from './AdminReferralPerformanceSearch';
-import { AdminReferralPerformanceSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminReferralPerformanceSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -175,8 +175,27 @@ export function AdminReferralPerformanceTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminReferralPerformanceSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Configuration"
+          title="Referral Performance"
+          description="Registrations, conversions, and commission across referrers."
+        >
+          <Button
+            className="global_btn rounded_full bg_primary"
+            onPress={handleExportCsv}
+            isLoading={isExporting}
+            startContent={!isExporting ? <Download className="h-4 w-4" /> : undefined}
+          >
+            Export CSV
+          </Button>
+        </AdminPageHeader>
+        <AdminReferralPerformanceSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

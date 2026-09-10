@@ -26,7 +26,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminUserDetailRoutePath } from '@/routes/routes';
-import { AdminUsersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminUsersSkeleton } from '@/components/skeleton-loader/admin';
 
 const USERS_MODEL = 'Users';
 
@@ -86,7 +86,7 @@ export function AdminUsersTab() {
         toast.success(res.message ?? `Password reset link sent for "${user.name}"`);
       }
     } catch {
-      toast.error(`Failed to generate password reset link for "${user.name}"`);
+      // Error toast handled by API layer
     } finally {
       setResettingPasswordId(null);
     }
@@ -108,7 +108,7 @@ export function AdminUsersTab() {
           toast.success(res.message ?? `"${suspendUser.name}" has been ${newStatus === 'suspended' ? 'suspended' : 'activated'}`);
         }
       } catch {
-        toast.error(`Failed to update "${suspendUser.name}"`);
+        // Error toast handled by API layer
       } finally {
         setSuspendUser(null);
       }
@@ -265,8 +265,14 @@ export function AdminUsersTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(usersResponse));
-  if (showPageSkeleton) return <AdminUsersSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminUsersHeader totalCount={totalUsers} />
+        <AdminUsersSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

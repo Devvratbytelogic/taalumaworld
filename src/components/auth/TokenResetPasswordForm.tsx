@@ -47,7 +47,7 @@ export function TokenResetPasswordForm({ token }: TokenResetPasswordFormProps) {
           router.push(getHomeRoutePath());
         }
       } catch {
-        toast.error('Failed to reset password. The link may have expired.');
+        // Error toast handled by API layer
       }
     },
   });

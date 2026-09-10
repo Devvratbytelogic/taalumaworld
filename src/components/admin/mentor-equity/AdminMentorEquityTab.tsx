@@ -13,7 +13,7 @@ import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AdminMentorEquitySearch } from './AdminMentorEquitySearch';
 import type { IMentorEquityEntity, MentorEquityListStatus } from '@/types/mentorEquity';
-import { AdminMentorEquitySkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminMentorEquitySkeleton } from '@/components/skeleton-loader/admin';
 
 function formatYesNo(value?: boolean) {
   return value ? 'Yes' : 'No';
@@ -154,8 +154,22 @@ export function AdminMentorEquityTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminMentorEquitySkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Mentor Management"
+          title="Mentor equity"
+          description="Equity eligibility flags only — this does not issue shares."
+        >
+          <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
+            Total: {total}
+          </Badge>
+        </AdminPageHeader>
+        <AdminMentorEquitySkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

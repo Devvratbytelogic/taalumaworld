@@ -17,7 +17,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { AdminReviewReportsSearch } from './AdminReviewReportsSearch';
 import type { IAdminReviewReportEntity } from '@/types/adminReviewReports';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminReviewReportsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminReviewReportsSkeleton } from '@/components/skeleton-loader/admin';
 
 const REVIEW_REPORTS_MODEL = 'Review Reports';
 
@@ -223,8 +223,21 @@ export function AdminReviewReportsTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminReviewReportsSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminPageHeader
+          title="Review reports"
+          description="Accept a report to hide the review, or ignore it if it is not a policy violation."
+        >
+          <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
+            Total reports: {total}
+          </Badge>
+        </AdminPageHeader>
+        <AdminReviewReportsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -17,7 +17,7 @@ import { formatConsentType } from '@/utils/agreementConsent';
 import { validateEmail } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { AdminInboxSearch } from './AdminInboxSearch';
-import { AdminInboxSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminInboxSkeleton } from '@/components/skeleton-loader/admin';
 
 const INBOX_TYPE_LABELS: Record<InboxEntryType, string> = {
   newsletter: 'Newsletter',
@@ -184,8 +184,28 @@ export function AdminInboxTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
-  if (showPageSkeleton) return <AdminInboxSkeleton />;
+  if (isLoading) {
+    return (
+      <AdminPage>
+        <AdminPageHeader
+          eyebrow="Community"
+          title="Inbox"
+          description="Newsletter subscribers and contact-us submissions in one list."
+        >
+          <Button
+            className="global_btn rounded_full bg_primary"
+            onPress={handleExportCsv}
+            isDisabled={isExporting}
+            isLoading={isExporting}
+            startContent={!isExporting ? <Download className="h-4 w-4" /> : undefined}
+          >
+            Export CSV
+          </Button>
+        </AdminPageHeader>
+        <AdminInboxSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

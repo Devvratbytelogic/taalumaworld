@@ -33,7 +33,7 @@ import {
 import { getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
 import { DashboardCharts } from './DashboardCharts';
 import { formatKes } from '@/constants/common';
-import { AdminDashboardSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminDashboardSkeleton } from '@/components/skeleton-loader/admin';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
@@ -249,8 +249,22 @@ export default function AdminDashboardTab() {
   const mentorPerformanceSummary = mentorPerformanceData?.data?.summary;
   const topMentors = mentorPerformanceData?.data?.data?.data ?? [];
 
-  const showPageSkeleton = useAdminPageSkeleton(dashboardLoading, Boolean(dashboardData));
-  if (showPageSkeleton) return <AdminDashboardSkeleton />;
+  if (dashboardLoading) {
+    return (
+      <AdminPage>
+        <DashboardWelcomeHeader
+          userName={userName}
+          contentMode={contentMode}
+          fromDate={fromDate}
+          toDate={toDate}
+          onFromDateChange={setFromDate}
+          onToDateChange={setToDate}
+          onClearDateFilter={clearDateFilter}
+        />
+        <AdminDashboardSkeleton />
+      </AdminPage>
+    );
+  }
 
   return (
     <AdminPage>

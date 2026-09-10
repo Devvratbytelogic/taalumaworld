@@ -64,7 +64,7 @@ export default function FooterSubscribe() {
       if (/agreement updated/i.test(message)) {
         dispatch(rtkQuerieSetup.util.invalidateTags(['UserAgreementSentences']));
       }
-      if (!message) toast.error('Failed to subscribe. Please try again.');
+      // Error toast handled by API layer
     }
   };
 

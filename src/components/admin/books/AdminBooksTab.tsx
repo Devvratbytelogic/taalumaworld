@@ -32,7 +32,7 @@ import {
 import toast from '@/utils/toast';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { AdminSeriesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
+import { AdminSeriesSkeleton } from '@/components/skeleton-loader/admin';
 
 const SERIES_MODEL = 'Series';
 
@@ -136,7 +136,7 @@ export function AdminBooksTab() {
         toast.success(res.message ?? `Series marked as ${status}`);
       }
     } catch {
-      toast.error('Failed to update status');
+      // Error toast handled by API layer
     } finally {
       setUpdatingId(null);
     }
@@ -361,8 +361,19 @@ export function AdminBooksTab() {
     },
   ];
 
-  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(booksResponse));
-  if (showPageSkeleton) return <AdminSeriesSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <AdminBooksHeader
+          onCreateBook={() => setIsCreateModalOpen(true)}
+          isTrashView={isTrashView}
+          onToggleTrash={() => setIsTrashView((prev) => !prev)}
+          canAdd={canAdd}
+        />
+        <AdminSeriesSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

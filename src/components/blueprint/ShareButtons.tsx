@@ -5,13 +5,16 @@ import { Check, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { FacebookIcon, LinkedinIcon, TwitterIcon, WhatsAppIcon } from '@/components/ui/AllSVG';
 import { VISIBLE } from '@/constants/contentMode';
+import { useAuth } from '@/hooks/useAuth';
 import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
+import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import { APP_SITE_URL } from '@/utils/config';
 
 interface ShareButtonsProps {
     referralCode?: string | null;
     type: string;
     slug: string;
+    title?: string | null;
     size?: 'sm' | 'md' | 'lg';
     showCopyLink?: boolean;
 }
@@ -27,11 +30,22 @@ export default function ShareButtons({
     type,
     size = 'md',
     slug,
+    title,
     showCopyLink = true,
 }: ShareButtonsProps) {
     const [copied, setCopied] = useState(false);
+    const { isAuthenticated } = useAuth();
+    const { data: profileRes } = useGetUserProfileQuery(undefined, { skip: !isAuthenticated });
+    const loggedInReferralCode = isAuthenticated ? (profileRes?.data?.short_code?.trim() || '') : '';
+    const effectiveReferralCode = loggedInReferralCode || referralCode?.trim() || '';
     const basePath = type === VISIBLE.BOOK ? getSeriesRoutePath(slug) : getBlueprintRoutePath(slug);
-    const shareableLink = referralCode ? `${APP_SITE_URL}${basePath}?referralCode=${referralCode}` : `${APP_SITE_URL}${basePath}`;
+    const shareableLink = effectiveReferralCode
+        ? `${APP_SITE_URL}${basePath}?referralCode=${effectiveReferralCode}`
+        : `${APP_SITE_URL}${basePath}`;
+    const shareTitle = title?.trim() ?? '';
+    const xShareHref = shareTitle
+        ? `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareableLink)}&text=${encodeURIComponent(shareTitle)}`
+        : `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareableLink)}`;
 
     const shareLinks = [
         {
@@ -52,7 +66,7 @@ export default function ShareButtons({
         {
             label: 'X',
             icon: TwitterIcon,
-            href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareableLink)}`,
+            href: xShareHref,
         },
     ];
 
@@ -74,7 +88,7 @@ export default function ShareButtons({
                     key={label}
                     type="button"
                     aria-label={`Share on ${label}`}
-                    onClick={() => window.open(href, '_blank', 'noopener,noreferrer,width=600,height=500')}
+                    onClick={() => window.open(href, '_blank', 'noopener,noreferrer')}
                     className={`${sizeClasses[size]} flex items-center justify-center rounded-full border border-border bg-white text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors`}
                 >
                     <Icon className="h-4 w-4" />

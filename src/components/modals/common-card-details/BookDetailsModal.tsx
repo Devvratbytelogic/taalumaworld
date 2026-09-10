@@ -173,6 +173,7 @@ export default function BookDetailsModal() {
                         <ShareButtons
                             referralCode={book?.mentor?.short_code ?? ''}
                             slug={book?.slug ?? ''}
+                            title={book?.title}
                             type={VISIBLE.BOOK}
                             size="sm"
                             showCopyLink={true}

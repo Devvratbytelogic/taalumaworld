@@ -222,6 +222,7 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
                   <ShareButtons
                     referralCode={mentor?.short_code ?? ''}
                     slug={slug ?? ''}
+                    title={bookDetails?.title}
                     type={VISIBLE.BOOK}
                     size="md"
                   />

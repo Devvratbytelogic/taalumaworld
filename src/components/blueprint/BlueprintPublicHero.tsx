@@ -168,6 +168,7 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                 <ShareButtons
                   referralCode={data?.createdBy?.short_code ?? ''}
                   slug={data?.slug ?? ''}
+                  title={data?.title}
                   type={VISIBLE.CHAPTER}
                   size="md"
                 />

@@ -210,6 +210,7 @@ export default function ChapterDetailsModal() {
             <ShareButtons
               referralCode={chapter?.mentor?.short_code ?? ''}
               slug={chapter?.slug ?? ''}
+              title={chapter?.title}
               type={VISIBLE.CHAPTER}
               size="sm"
               showCopyLink={true}

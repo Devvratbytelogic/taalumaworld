@@ -19,7 +19,12 @@ interface ShareButtonsProps {
     showCopyLink?: boolean;
 }
 
-const sizeClasses = {
+const hitAreaClasses = {
+    sm: 'h-11 w-11 -m-1.5',
+    md: 'h-11 w-11 -m-1',
+    lg: 'h-11 w-11 -m-0.5',
+};
+const visualSizeClasses = {
     sm: 'h-8 w-8',
     md: 'h-9 w-9',
     lg: 'h-10 w-10',
@@ -89,9 +94,11 @@ export default function ShareButtons({
                     type="button"
                     aria-label={`Share on ${label}`}
                     onClick={() => window.open(href, '_blank', 'noopener,noreferrer')}
-                    className={`${sizeClasses[size]} flex items-center justify-center rounded-full border border-border bg-white text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors`}
+                    className={`${hitAreaClasses[size]} group flex items-center justify-center text-muted-foreground hover:text-primary`}
                 >
-                    <Icon className="h-4 w-4" />
+                    <span className={`${visualSizeClasses[size]} flex items-center justify-center rounded-full border border-border bg-white transition-colors group-hover:border-primary/30`}>
+                        <Icon className="h-4 w-4" />
+                    </span>
                 </button>
             ))}
             {showCopyLink && (
@@ -99,9 +106,11 @@ export default function ShareButtons({
                     type="button"
                     aria-label="Copy link"
                     onClick={copyLink}
-                    className={`${sizeClasses[size]} flex items-center justify-center rounded-full border border-border bg-white text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors`}
+                    className={`${hitAreaClasses[size]} group flex items-center justify-center text-muted-foreground hover:text-primary`}
                 >
-                    {copied ? <Check className="h-4 w-4 text-success" /> : <Link2 className="h-4 w-4" />}
+                    <span className={`${visualSizeClasses[size]} flex items-center justify-center rounded-full border border-border bg-white transition-colors group-hover:border-primary/30`}>
+                        {copied ? <Check className="h-4 w-4 text-success" /> : <Link2 className="h-4 w-4" />}
+                    </span>
                 </button>
             )}
         </div>

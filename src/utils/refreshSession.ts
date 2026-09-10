@@ -4,14 +4,17 @@ import {
     getAdminPortalLoginRoutePath,
     getHomeRoutePath,
     getMentorLoginRoutePath,
+    isMentorPanelPath,
 } from '@/routes/routes'
 import { API_BASE_URL } from '@/utils/config'
 import {
     AUTH_COOKIE_NAME,
     clearAuthCookies,
     getUserRole,
+    hasAuthCookie,
     setAccessToken,
 } from '@/utils/authCookies'
+import { broadcastLogout } from '@/utils/authSync'
 import toast from '@/utils/toast'
 
 export type AuthApiPrefix = '/admin' | '/user'
@@ -108,6 +111,47 @@ export function refreshAccessToken(requestUrl?: string): Promise<string | null> 
     return refreshPromise
 }
 
+/** Match proxy auth gates so a remote logout leaves the same pages a refresh would. */
+function getAuthGatedRedirect(pathname: string): string | null {
+    if (pathname === '/user-dashboard' || pathname.startsWith('/user-dashboard/')) {
+        return getHomeRoutePath()
+    }
+    if (isMentorPanelPath(pathname)) {
+        return getMentorLoginRoutePath()
+    }
+    if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+        return getAdminPortalLoginRoutePath()
+    }
+    return null
+}
+
+/**
+ * Other-tab logout: never call the logout API again (already done).
+ * Skip if this tab still has a token — e.g. the user re-logged in before the event arrived.
+ */
+export function applyRemoteLogout(): void {
+    if (typeof window === 'undefined' || isEndingSession) return
+    if (hasAuthCookie()) return
+
+    const redirectTo = getAuthGatedRedirect(window.location.pathname)
+    if (redirectTo) {
+        isEndingSession = true
+        clearAuthCookies({ refetchQueries: false })
+        window.location.href = redirectTo
+        return
+    }
+
+    clearAuthCookies({ refetchQueries: true })
+}
+
+/** Backup if the storage/BroadcastChannel event is missed: gated tabs drop stale UI on focus. */
+export function applyLogoutIfAuthCookieGone(): void {
+    if (typeof window === 'undefined' || isEndingSession) return
+    if (hasAuthCookie()) return
+    if (!getAuthGatedRedirect(window.location.pathname)) return
+    applyRemoteLogout()
+}
+
 export async function signOut(options?: { redirectTo?: string }): Promise<void> {
     if (typeof window === 'undefined') return
     isEndingSession = true
@@ -125,6 +169,7 @@ export async function signOut(options?: { redirectTo?: string }): Promise<void> 
     }
     // Full page navigation remounts as guest — do not invalidate or mounted queries refetch with no token.
     clearAuthCookies({ refetchQueries: false })
+    broadcastLogout()
     window.location.href = redirectTo
 }
 

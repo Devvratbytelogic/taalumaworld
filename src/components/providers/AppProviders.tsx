@@ -9,6 +9,7 @@ import { Toaster } from '@/utils/toast';
 import AllModal from '../modals/AllModal';
 import { PendingAgreementsGate } from '@/components/agreements/PendingAgreementsGate';
 import SocialOAuthCallbackHandler from '@/components/auth/SocialOAuthCallbackHandler';
+import { AuthSessionSync } from '@/components/providers/AuthSessionSync';
 import { CampaignAttributionCapture } from '@/components/providers/CampaignAttributionCapture';
 // import { NetworkStatusBanner } from '../network/NetworkStatusBanner';
 
@@ -29,6 +30,7 @@ export function AppProviders({ children }: ProvidersProps) {
                             showSpinner={false}
                         />
                         <CampaignAttributionCapture />
+                        <AuthSessionSync />
                         <AllModal />
                         <Suspense fallback={null}>
                             <SocialOAuthCallbackHandler provider="linkedin" />

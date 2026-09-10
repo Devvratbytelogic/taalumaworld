@@ -4,28 +4,30 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { X } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
-import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import {
   ADMIN_SIDEBAR_WIDTH,
   SidebarNavGroups,
+  SidebarNavSkeleton,
   SidebarRoleCard,
   type SidebarNavGroup,
 } from '@/components/admin/layout/PanelSidebar';
 
 interface AdminSidebarProps {
   groups: SidebarNavGroup[];
+  isNavLoading?: boolean;
   mobileMenuOpen: boolean;
   onCloseMobileMenu: () => void;
 }
 
-export function AdminSidebar({ groups, mobileMenuOpen, onCloseMobileMenu }: AdminSidebarProps) {
+export function AdminSidebar({ groups, isNavLoading = false, mobileMenuOpen, onCloseMobileMenu }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
-  const { data: profileData } = useGetAdminProfileQuery();
+  const { displayName, roleName, profile } = useAdminPermissions();
 
-  const name = profileData?.data?.name ?? 'Admin User';
-  const role = profileData?.data?.role?.name ?? 'Admin';
-  const avatar = profileData?.data?.profile_pic ?? '';
+  const name = displayName;
+  const role = roleName;
+  const avatar = profile?.profile_pic ?? '';
 
   useEffect(() => {
     if (mobileMenuOpen) setIsMounted(true);
@@ -51,7 +53,7 @@ export function AdminSidebar({ groups, mobileMenuOpen, onCloseMobileMenu }: Admi
       >
         <div className="shrink-0 p-3">{roleCard}</div>
         <div className="custom_scrollbar min-h-0 flex-1 overflow-y-auto px-2 pb-4">
-          {navGroups}
+          {isNavLoading ? <SidebarNavSkeleton /> : navGroups}
         </div>
       </aside>
 
@@ -88,7 +90,7 @@ export function AdminSidebar({ groups, mobileMenuOpen, onCloseMobileMenu }: Admi
             </div>
             <div className="custom_scrollbar flex-1 overflow-y-auto p-3">
               {roleCard}
-              {navGroups}
+              {isNavLoading ? <SidebarNavSkeleton /> : navGroups}
             </div>
           </div>
         </>

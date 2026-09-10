@@ -18,6 +18,40 @@ function getInitials(name?: string) {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
+function HeroContact({
+  href,
+  icon: Icon,
+  label,
+  value,
+}: {
+  href?: string;
+  icon: typeof Mail;
+  label: string;
+  value: string;
+}) {
+  const inner = (
+    <>
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="text-left">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="font-medium text-foreground">{value}</p>
+      </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className="flex items-center gap-2.5 transition-colors hover:opacity-80">
+        {inner}
+      </a>
+    );
+  }
+
+  return <div className="flex items-center gap-2.5">{inner}</div>;
+}
+
 interface MentorProfileHeroProps {
   mentor: IMentorInfo | null;
   totalBooks: number;
@@ -133,27 +167,21 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
               </div>
 
               {mentor?.email && (
-                <a href={`mailto:${mentor.email}`} className="flex items-center gap-2.5 transition-colors hover:opacity-80">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="font-medium text-foreground">{mentor.email}</p>
-                  </div>
-                </a>
+                <HeroContact
+                  href={mentor.email.includes('*') ? undefined : `mailto:${mentor.email}`}
+                  icon={Mail}
+                  label="Email"
+                  value={mentor.email}
+                />
               )}
 
               {mentor?.phone && (
-                <a href={`tel:${mentor.phone}`} className="flex items-center gap-2.5 transition-colors hover:opacity-80">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs text-muted-foreground">Phone</p>
-                    <p className="font-medium text-foreground">{mentor.phone}</p>
-                  </div>
-                </a>
+                <HeroContact
+                  href={mentor.phone.includes('*') ? undefined : `tel:${mentor.phone}`}
+                  icon={Phone}
+                  label="Phone"
+                  value={mentor.phone}
+                />
               )}
             </div>
 

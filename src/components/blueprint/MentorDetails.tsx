@@ -12,6 +12,34 @@ interface MentorDetailsProps {
 }
 
 
+function ContactRow({
+    href,
+    icon: Icon,
+    value,
+}: {
+    href?: string;
+    icon: typeof Globe;
+    value: string;
+}) {
+    const className = `flex items-center gap-3 rounded-xl border border-[#ECECEC] px-3 py-2.5 text-sm text-[#1A1A1A]${
+        href ? ' transition-colors hover:border-primary/30 hover:bg-primary/5' : ''
+    }`;
+    const inner = (
+        <>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon className="h-4 w-4" />
+            </span>
+            <span className="min-w-0 truncate">{value}</span>
+        </>
+    );
+
+    if (href) {
+        return <a href={href} className={className}>{inner}</a>;
+    }
+
+    return <div className={className}>{inner}</div>;
+}
+
 function SocialLink({ href, label, icon: Icon, }: {
     href: string;
     label: string;
@@ -106,27 +134,19 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
                         </p>
 
                         {data?.email && (
-                            <a
-                                href={`mailto:${data.email}`}
-                                className="flex items-center gap-3 rounded-xl border border-[#ECECEC] px-3 py-2.5 text-sm text-[#1A1A1A] transition-colors hover:border-primary/30 hover:bg-primary/5"
-                            >
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                    <Mail className="h-4 w-4" />
-                                </span>
-                                <span className="min-w-0 truncate">{data.email}</span>
-                            </a>
+                            <ContactRow
+                                href={data.email.includes('*') ? undefined : `mailto:${data.email}`}
+                                icon={Mail}
+                                value={data.email}
+                            />
                         )}
 
                         {data?.phone && (
-                            <a
-                                href={`tel:${data?.phone}`}
-                                className="flex items-center gap-3 rounded-xl border border-[#ECECEC] px-3 py-2.5 text-sm text-[#1A1A1A] transition-colors hover:border-primary/30 hover:bg-primary/5"
-                            >
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                    <Phone className="h-4 w-4" />
-                                </span>
-                                <span className="min-w-0 truncate">{data.phone}</span>
-                            </a>
+                            <ContactRow
+                                href={data.phone.includes('*') ? undefined : `tel:${data.phone}`}
+                                icon={Phone}
+                                value={data.phone}
+                            />
                         )}
                     </div>
                 )}
@@ -137,8 +157,12 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
                             Connect
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            <SocialLink href={data?.linkedin ?? ''} label="LinkedIn" icon={Linkedin} />
-                            <SocialLink href={data?.facebook ?? ''} label="Facebook" icon={Facebook} />
+                            {data?.linkedin && (
+                                <SocialLink href={data?.linkedin} label="LinkedIn" icon={Linkedin} />
+                            )}
+                            {data?.facebook && (
+                                <SocialLink href={data?.facebook} label="Facebook" icon={Facebook} />
+                            )}
                         </div>
                     </div>
                 )}

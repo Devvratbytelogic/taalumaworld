@@ -8,7 +8,6 @@ import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
-import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { BlueprintScoringEventsBridge } from '@/components/admin/chapter/BlueprintScoringEventsBridge';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
@@ -97,8 +96,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 export default function AdminAppLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { data: profileData } = useGetAdminProfileQuery();
-    const { hasAccess } = useAdminPermissions();
+    const { hasAccess, isLoading: isPermissionsLoading, profile } = useAdminPermissions();
 
 
 
@@ -126,9 +124,13 @@ export default function AdminAppLayout({ children }: { children: React.ReactNode
             style={{ '--admin-sidebar-width': ADMIN_SIDEBAR_WIDTH } as React.CSSProperties}
         >
             <BlueprintScoringEventsBridge />
-            <AdminHeader profileData={profileData as IAdminProfileAPIResponse} onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)} />
+            <AdminHeader
+                profileData={{ data: profile } as IAdminProfileAPIResponse}
+                onMobileMenuToggle={() => setMobileMenuOpen((open) => !open)}
+            />
             <AdminSidebar
                 groups={visibleNavGroups}
+                isNavLoading={isPermissionsLoading}
                 mobileMenuOpen={mobileMenuOpen}
                 onCloseMobileMenu={() => setMobileMenuOpen(false)}
             />

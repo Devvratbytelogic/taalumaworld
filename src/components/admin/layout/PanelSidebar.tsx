@@ -41,8 +41,16 @@ export function SidebarRoleCard({
           className="h-9 w-9 shrink-0 ring-1 ring-slate-200/80"
         />
         <div className="min-w-0">
-          <p className="truncate text-base font-semibold tracking-tight text-slate-900">{name}</p>
-          <p className="truncate text-sm text-slate-500">{role}</p>
+          {name ? (
+            <p className="truncate text-base font-semibold tracking-tight text-slate-900">{name}</p>
+          ) : (
+            <span className="mb-1 block h-4 w-28 animate-pulse rounded bg-slate-100" aria-hidden />
+          )}
+          {role ? (
+            <p className="truncate text-sm text-slate-500">{role}</p>
+          ) : (
+            <span className="block h-3.5 w-24 animate-pulse rounded bg-slate-100" aria-hidden />
+          )}
         </div>
       </div>
     </div>
@@ -96,6 +104,23 @@ export function SidebarNavLink({
 /** A link is a match for the current path if it's an exact match, or the path is a child route of it (e.g. `/admin/orders/123` for `/admin/orders`). */
 function isPathMatch(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function SidebarNavSkeleton() {
+  return (
+    <div className="space-y-5 pt-4" aria-hidden="true">
+      {[0, 1, 2].map((group) => (
+        <div key={group} className="space-y-2">
+          <div className="mx-3 h-3 w-16 animate-pulse rounded bg-slate-100" />
+          <div className="space-y-1.5">
+            {[0, 1, 2].map((row) => (
+              <div key={row} className="mx-1 h-9 animate-pulse rounded-sm bg-slate-100" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function SidebarNavGroups({

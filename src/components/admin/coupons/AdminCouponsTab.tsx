@@ -17,8 +17,9 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
-import { adminPanelClass, AdminStatCard } from '@/components/admin/layout/AdminContent';
+import { adminPanelClass, AdminEmptyState, AdminStatCard } from '@/components/admin/layout/AdminContent';
 import { cn } from '@/components/ui/utils';
+import Button from '@/components/ui/Button';
 import { AdminCouponsHeader } from './AdminCouponsHeader';
 import { AdminCouponsSearch } from './AdminCouponsSearch';
 import { MentorCouponPerformanceTab } from '@/components/admin/mentor/performance/MentorCouponPerformanceTab';
@@ -65,21 +66,33 @@ export function AdminCouponsTab() {
   const canDelete = hasPermission(COUPON_MODEL, 'delete');
 
   const debouncedSearch = useDebounce(search, 500);
+  const skipSsr = typeof window === 'undefined';
 
-  const { data: couponsResponse, isLoading } = useGetAdminAllCouponsQuery({
-    page: paginationModel.page + 1,
-    limit: paginationModel.pageSize,
-    search: debouncedSearch,
-    ...(statusFilter ? { status: statusFilter } : {}),
-    ...(scopeFilter ? { type: scopeFilter } : {}),
-    ...(isTrashView ? { isDeleted: true } : {}),
+  const { data: couponsResponse, isLoading, isError, isFetching, isUninitialized, refetch } = useGetAdminAllCouponsQuery(
+    {
+      page: paginationModel.page + 1,
+      limit: paginationModel.pageSize,
+      search: debouncedSearch,
+      ...(statusFilter ? { status: statusFilter } : {}),
+      ...(scopeFilter ? { type: scopeFilter } : {}),
+      ...(isTrashView ? { isDeleted: true } : {}),
+    },
+    {
+      skip: skipSsr,
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const { data: performanceResponse } = useGetCouponPerformanceQuery(undefined, {
+    skip: skipSsr,
+    refetchOnMountOrArgChange: true,
   });
-  const { data: performanceResponse } = useGetCouponPerformanceQuery();
   const summary = performanceResponse?.data?.summary;
 
   const couponsData = couponsResponse?.data;
   const coupons = couponsData?.data ?? [];
   const totalCoupons = couponsData?.total ?? 0;
+
+  const couponsPending = skipSsr || isUninitialized || isLoading;
 
   const [deleteCoupon] = useDeleteCouponMutation();
   const [restoreCoupon] = useRestoreCouponMutation();
@@ -295,7 +308,7 @@ export function AdminCouponsTab() {
     },
   ];
 
-  if (isLoading) {
+  if (couponsPending) {
     return (
       <div className="space-y-6">
         <AdminCouponsHeader
@@ -308,6 +321,39 @@ export function AdminCouponsTab() {
           }}
         />
         <AdminCouponsSkeleton />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <AdminCouponsHeader
+          isTrashView={isTrashView}
+          onToggleTrash={handleToggleTrash}
+          canAdd={canAdd}
+          onCreateCoupon={() => {
+            setEditingCoupon(null);
+            setIsModalOpen(true);
+          }}
+        />
+        <div className={adminPanelClass}>
+          <AdminEmptyState
+            icon={Tag}
+            title="Couldn't load coupons"
+            description="The coupons list didn't load. Try again — this is usually a temporary session issue, not missing coupons."
+            action={
+              <Button
+                className="global_btn rounded_full bg_primary"
+                onPress={() => void refetch()}
+                isLoading={isFetching}
+                startContent={<RotateCcw className="h-4 w-4" />}
+              >
+                Try again
+              </Button>
+            }
+          />
+        </div>
       </div>
     );
   }

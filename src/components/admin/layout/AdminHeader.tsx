@@ -27,6 +27,7 @@ import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { USER_TYPE } from '@/constants/common';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
 interface AdminHeaderProps {
     profileData: IAdminProfileAPIResponse;
@@ -126,22 +127,30 @@ function TopBarContentMode({
 export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProps) {
     const router = useRouter();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
-    const { data: globalSettings, isFetching: isSettingsLoading } = useGetAdminGlobalSettingsQuery();
-    
- 
+    const { data: globalSettings, isFetching: isSettingsFetching, isLoading: isSettingsLoading, isUninitialized: isSettingsUninitialized } = useGetAdminGlobalSettingsQuery(
+        undefined,
+        {
+            skip: typeof window === 'undefined',
+            refetchOnMountOrArgChange: true,
+        },
+    );
+    const { displayName, roleName, isMentor } = useAdminPermissions();
+
+    const settingsPending = isSettingsUninitialized || isSettingsLoading || (isSettingsFetching && !globalSettings?.data);
     const visible = globalSettings?.data?.visible ?? 'chapter';
     const logo = globalSettings?.data?.logo as string | null | undefined;
-    const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || 'TaalumaWorld';
+    const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || (!settingsPending ? 'TaalumaWorld' : '');
 
     const adminUser = {
-        name: profileData?.data?.name ?? 'Admin User',
+        name: profileData?.data?.name ?? displayName,
         email: profileData?.data?.email ?? '',
         avatar: profileData?.data?.profile_pic ?? '',
-        role: profileData?.data?.role?.name,
+        role: profileData?.data?.role?.name ?? roleName,
     };
 
-    const isAuthor = adminUser.role === USER_TYPE.MENTOR || getUserRole() === USER_TYPE.MENTOR;
-    const roleLabel = isAuthor ? 'Mentor' : (profileData?.data?.role?.name ?? 'Admin');
+    const isAuthor = isMentor || adminUser.role === USER_TYPE.MENTOR || getUserRole() === USER_TYPE.MENTOR;
+    const roleLabel = isAuthor ? 'Mentor' : adminUser.role;
+    const identityReady = Boolean(adminUser.name);
     const showWebsiteLink = !isAuthor || Boolean(profileData?.data?.is_verified);
 
     const onContentModeToggle = async (isBooks: boolean) => {
@@ -174,7 +183,11 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                                     {isAuthor ? 'Mentor Panel' : 'Admin Panel'}
                                 </span>
                                 <span aria-hidden className="text-white/30">·</span>
-                                <span className="truncate font-normal text-white/70">{brandName}</span>
+                                {brandName ? (
+                                    <span className="truncate font-normal text-white/70">{brandName}</span>
+                                ) : (
+                                    <span className="inline-block h-2.5 w-28 animate-pulse rounded-full bg-white/20" aria-hidden />
+                                )}
                             </p>
                             <p className="truncate text-sm font-semibold leading-none text-white sm:hidden">
                                 {isAuthor ? 'Mentor Panel' : 'Admin Panel'}
@@ -184,8 +197,8 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                         {!isAuthor && (
                             <TopBarContentMode
                                 visible={visible}
-                                isInitialLoading={isSettingsLoading && !globalSettings?.data}
-                                isUpdating={isToggling || (isSettingsLoading && !!globalSettings?.data)}
+                                isInitialLoading={settingsPending}
+                                isUpdating={isToggling || (isSettingsFetching && !!globalSettings?.data)}
                                 onToggle={onContentModeToggle}
                             />
                         )}
@@ -211,7 +224,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                             >
                                 {logo ? (
                                     <div className="h-9 w-35 sm:h-10 sm:w-40">
-                                        <ImageComponent src={logo} alt={brandName} object_cover={false} />
+                                        <ImageComponent src={logo} alt={brandName || 'Admin'} object_cover={false} />
                                     </div>
                                 ) : (
                                     <>
@@ -219,7 +232,11 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                                             <BookOpen className="h-5 w-5 text-white" />
                                         </div>
                                         <div className="hidden min-w-0 sm:block">
-                                            <p className="truncate text-sm font-semibold leading-none text-slate-900">{brandName}</p>
+                                            {brandName ? (
+                                                <p className="truncate text-sm font-semibold leading-none text-slate-900">{brandName}</p>
+                                            ) : (
+                                                <span className="mt-0.5 block h-2.5 w-24 animate-pulse rounded-full bg-slate-200" aria-hidden />
+                                            )}
                                             <p className="mt-0.5 text-xs text-slate-500">{isAuthor ? 'Mentor' : 'Admin'}</p>
                                         </div>
                                     </>
@@ -254,12 +271,21 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                                             'group max-w-52 gap-2.5 pl-1 pr-2.5 data-[state=open]:border-primary/30 data-[state=open]:bg-primary/5',
                                         )}
                                     >
-                                        <Avatar
-                                            src={adminUser.avatar}
-                                            name={adminUser.name}
-                                            className="h-7 w-7 shrink-0"
-                                        />
-                                        <span className="hidden truncate md:inline">{adminUser.name}</span>
+                                        {identityReady ? (
+                                            <>
+                                                <Avatar
+                                                    src={adminUser.avatar}
+                                                    name={adminUser.name}
+                                                    className="h-7 w-7 shrink-0"
+                                                />
+                                                <span className="hidden truncate md:inline">{adminUser.name}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="h-7 w-7 shrink-0 animate-pulse rounded-full bg-slate-200" aria-hidden />
+                                                <span className="hidden h-2.5 w-28 animate-pulse rounded-full bg-slate-200 md:inline" aria-hidden />
+                                            </>
+                                        )}
                                         <ChevronDown className="hidden h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 group-data-[state=open]:rotate-180 md:inline" />
                                     </button>
                                 </DropdownMenuTrigger>
@@ -276,9 +302,11 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                                                 <p className="truncate text-xs text-slate-500">{adminUser.email}</p>
                                             </div>
                                         </div>
-                                        <span className="mt-3 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                                            {roleLabel}
-                                        </span>
+                                        {roleLabel ? (
+                                            <span className="mt-3 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                                                {roleLabel}
+                                            </span>
+                                        ) : null}
                                     </div>
 
                                     <div className="p-1.5">

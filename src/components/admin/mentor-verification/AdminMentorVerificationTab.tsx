@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import UiButton from '@/components/ui/Button';
 import { cn } from '@/components/ui/utils';
+import { fieldInvalidClassName } from '@/components/ui/field-styles';
 import toast from '@/utils/toast';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import { AdminPage, AdminPageHeader, AdminSearchInput, AdminSearchPanel, adminFilterPillClass, adminSelectClass, } from '@/components/admin/layout/AdminContent';
@@ -26,6 +27,7 @@ import type { IApplicationsEntity } from '@/types/verifiedMentorApplication';
 import {
   VERIFIED_MENTOR_APPLICATION_ACTION,
   VERIFIED_MENTOR_APPLICATION_STATUS,
+  VERIFIED_MENTOR_PROOF_TYPE,
 } from '@/constants/verifiedMentorApplication';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
@@ -72,6 +74,7 @@ export function AdminMentorVerificationTab() {
   const [reviewApplication, setReviewApplication] = useState<IApplicationsEntity | null>(null);
   const [action, setAction] = useState<string>(VERIFIED_MENTOR_APPLICATION_ACTION.APPROVE);
   const [decisionReason, setDecisionReason] = useState('');
+  const [reasonError, setReasonError] = useState('');
   const { hasPermission } = useAdminPermissions();
 
   const canView = hasPermission(MODEL, 'view');
@@ -111,15 +114,21 @@ export function AdminMentorVerificationTab() {
         : VERIFIED_MENTOR_APPLICATION_ACTION.APPROVE,
     );
     setDecisionReason(app.decision_reason ?? '');
+    setReasonError('');
   };
 
   const closeReview = () => {
     setReviewApplication(null);
     setDecisionReason('');
+    setReasonError('');
   };
 
   const handleSubmitReview = async () => {
     if (!reviewApplication) return;
+    if (action === VERIFIED_MENTOR_APPLICATION_ACTION.REJECT && !decisionReason.trim()) {
+      setReasonError('Decision reason is required');
+      return;
+    }
     try {
       const res = await reviewVerifiedMentorApplication({
         id: reviewApplication._id,
@@ -174,13 +183,22 @@ export function AdminMentorVerificationTab() {
       ),
     },
     {
-      field: 'portfolio_url',
-      headerName: 'Portfolio',
-      minWidth: 160,
+      field: 'proof',
+      headerName: 'Proof',
+      minWidth: 180,
       flex: 1,
       sortable: false,
-      renderCell: (params) =>
-        params.row.portfolio_url ? (
+      renderCell: (params) => {
+        const isDocument = params.row.type === VERIFIED_MENTOR_PROOF_TYPE.DOCUMENT;
+        const files = params.row.documents ?? [];
+        if (isDocument) {
+          return (
+            <span className="text-sm text-slate-700">
+              {files.length ? `${files.length} file${files.length === 1 ? '' : 's'}` : '—'}
+            </span>
+          );
+        }
+        return params.row.portfolio_url ? (
           <a
             href={params.row.portfolio_url}
             target="_blank"
@@ -192,7 +210,8 @@ export function AdminMentorVerificationTab() {
           </a>
         ) : (
           <span className="text-sm text-slate-400">—</span>
-        ),
+        );
+      },
     },
     {
       field: 'submitted_at',
@@ -344,7 +363,30 @@ export function AdminMentorVerificationTab() {
                   </p>
                 </div>
 
-                {reviewApplication.portfolio_url ? (
+                {reviewApplication.type === VERIFIED_MENTOR_PROOF_TYPE.DOCUMENT ? (
+                  <div className="space-y-1.5">
+                    <Label>Documents</Label>
+                    {(reviewApplication.documents ?? []).length ? (
+                      <ul className="space-y-1 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
+                        {reviewApplication.documents?.map((doc) => (
+                          <li key={doc.url}>
+                            <a
+                              href={doc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                            >
+                              {doc.name || doc.url}
+                              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-slate-400">—</p>
+                    )}
+                  </div>
+                ) : reviewApplication.portfolio_url ? (
                   <p>
                     <span className="text-slate-500">Portfolio:</span>{' '}
                     <a
@@ -371,7 +413,10 @@ export function AdminMentorVerificationTab() {
                       <select
                         id="decision-select"
                         value={action}
-                        onChange={(e) => setAction(e.target.value)}
+                        onChange={(e) => {
+                          setAction(e.target.value);
+                          setReasonError('');
+                        }}
                         className={cn(adminSelectClass, 'w-full')}
                       >
                         {DECISION_OPTIONS.map((item) => (
@@ -388,9 +433,14 @@ export function AdminMentorVerificationTab() {
                         id="decision-reason"
                         rows={3}
                         value={decisionReason}
-                        onChange={(e) => setDecisionReason(e.target.value)}
+                        onChange={(e) => {
+                          setDecisionReason(e.target.value);
+                          if (reasonError) setReasonError('');
+                        }}
                         placeholder="Share context that will be visible to the mentor..."
+                        className={reasonError ? fieldInvalidClassName : ''}
                       />
+                      {reasonError ? <p className="text-sm text-red-600">{reasonError}</p> : null}
                     </div>
                   </>
                 ) : null}
@@ -406,7 +456,6 @@ export function AdminMentorVerificationTab() {
                     className={`global_btn rounded_full ${action === VERIFIED_MENTOR_APPLICATION_ACTION.REJECT ? 'danger_outline' : 'bg_primary'}`}
                     onPress={handleSubmitReview}
                     isLoading={isReviewing}
-                    disabled={action === VERIFIED_MENTOR_APPLICATION_ACTION.REJECT && !decisionReason.trim()}
                   >
                     {action === VERIFIED_MENTOR_APPLICATION_ACTION.REJECT ? (
                       <><ShieldX className="h-4 w-4" /> Reject</>

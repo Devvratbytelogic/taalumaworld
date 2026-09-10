@@ -1,3 +1,10 @@
+export interface IVerifiedMentorDocument {
+  url: string;
+  name: string;
+  mime_type?: string;
+  size?: number;
+}
+
 export interface IMyVerifiedMentorApplicationAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -10,8 +17,10 @@ export interface IMyVerifiedMentorApplicationAPIResponseData {
   _id: string;
   user_id: string;
   status: string;
+  type?: string | null;
   application_statement: string;
-  portfolio_url: string;
+  portfolio_url?: string | null;
+  documents?: IVerifiedMentorDocument[] | null;
   admin_notes?: string | null;
   decision_reason?: string | null;
   reviewed_by?: string | null;
@@ -38,8 +47,10 @@ export interface IApplicationsEntity {
   _id: string;
   user_id: IUserIdEntity;
   status: string;
+  type?: string | null;
   application_statement: string;
-  portfolio_url: string;
+  portfolio_url?: string | null;
+  documents?: IVerifiedMentorDocument[] | null;
   admin_notes?: null;
   decision_reason?: null;
   reviewed_by?: null;

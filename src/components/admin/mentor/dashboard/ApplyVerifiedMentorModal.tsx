@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { useFormik } from 'formik';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, X } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeModal } from '@/store/slices/allModalSlice';
@@ -14,15 +14,21 @@ import { Label } from '@/components/ui/label';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { fieldInvalidClassName } from '@/components/ui/field-styles';
 import toast from '@/utils/toast';
+import { getApiErrorMessage } from '@/utils/agreementConsent';
 import { verifiedMentorApplicationSchema } from '@/utils/formValidation';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
+import { VERIFIED_MENTOR_PROOF_TYPE } from '@/constants/verifiedMentorApplication';
 import { useSubmitVerifiedMentorApplicationMutation } from '@/store/rtkQueries/verifiedMentorApplicationApis';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
+
+const DOCUMENT_ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,.doc,.docx';
 
 export default function ApplyVerifiedMentorModal() {
     const dispatch = useDispatch();
     const { isOpen } = useSelector((state: RootState) => state.allModal);
     const onClose = () => dispatch(closeModal());
     const requiredAcceptedRef = useRef(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [submitVerifiedMentorApplication, { isLoading }] = useSubmitVerifiedMentorApplicationMutation();
 
@@ -30,7 +36,9 @@ export default function ApplyVerifiedMentorModal() {
         useFormik({
             initialValues: {
                 applicationStatement: '',
+                proofType: VERIFIED_MENTOR_PROOF_TYPE.PORTFOLIO as 'portfolio' | 'document',
                 portfolioUrl: '',
+                documents: [] as File[],
                 accepted_agreement_ids: [] as string[],
             },
             validationSchema: verifiedMentorApplicationSchema,
@@ -39,16 +47,34 @@ export default function ApplyVerifiedMentorModal() {
             },
             onSubmit: async (formValues) => {
                 try {
-                    const res = await submitVerifiedMentorApplication({
-                        application_statement: formValues.applicationStatement.trim(),
-                        portfolio_url: formValues.portfolioUrl.trim(),
-                        accepted_agreement_ids: formValues.accepted_agreement_ids,
-                    }).unwrap();
+                    const statement = formValues.applicationStatement.trim();
+                    const ids = formValues.accepted_agreement_ids;
+                    let res;
+                    if (formValues.proofType === VERIFIED_MENTOR_PROOF_TYPE.DOCUMENT) {
+                        const body = new FormData();
+                        body.append('type', VERIFIED_MENTOR_PROOF_TYPE.DOCUMENT);
+                        body.append('application_statement', statement);
+                        body.append('accepted_agreement_ids', JSON.stringify(ids));
+                        formValues.documents.forEach((file) => body.append('documents', file));
+                        res = await submitVerifiedMentorApplication(body).unwrap();
+                    } else {
+                        res = await submitVerifiedMentorApplication({
+                            type: VERIFIED_MENTOR_PROOF_TYPE.PORTFOLIO,
+                            portfolio_url: formValues.portfolioUrl.trim(),
+                            application_statement: statement,
+                            accepted_agreement_ids: ids,
+                        }).unwrap();
+                    }
                     toast.success(res?.message ?? 'Verification application submitted. teamtaaluma@taaluma.world will review within a few business days.');
                     resetForm();
+                    if (fileInputRef.current) fileInputRef.current.value = '';
                     onClose();
                 } catch (error) {
-                    console.error('Failed to submit verification application. Please try again.', error);
+                    const message = getApiErrorMessage(error);
+                    if (/agreement updated/i.test(message)) {
+                        dispatch(rtkQuerieSetup.util.invalidateTags(['UserAgreementSentences']));
+                    }
+                    if (!message) toast.error('Failed to submit verification application. Please try again.');
                 }
             },
         });
@@ -56,9 +82,11 @@ export default function ApplyVerifiedMentorModal() {
     const wordCount = values.applicationStatement.trim() ? values.applicationStatement.trim().split(/\s+/).length : 0;
     const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
     const busy = isLoading || isSubmitting;
+    const isPortfolio = values.proofType === VERIFIED_MENTOR_PROOF_TYPE.PORTFOLIO;
 
     const handleClose = () => {
         resetForm();
+        if (fileInputRef.current) fileInputRef.current.value = '';
         onClose();
     };
 
@@ -111,23 +139,104 @@ export default function ApplyVerifiedMentorModal() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="portfolioUrl" className="text-sm font-semibold text-slate-800">
-                                    Portfolio URL <span className="font-normal text-slate-400">(optional)</span>
+                                <Label className="text-sm font-semibold text-slate-800">
+                                    Proof type <span className="text-red-500">*</span>
                                 </Label>
-                                <Input
-                                    id="portfolioUrl"
-                                    name="portfolioUrl"
-                                    value={values.portfolioUrl}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    placeholder="https://your-portfolio.com"
-                                    className={touched.portfolioUrl && errors.portfolioUrl ? fieldInvalidClassName : ''}
-                                    disabled={busy}
-                                />
-                                {touched.portfolioUrl && errors.portfolioUrl ? (
-                                    <p className="text-sm text-red-600">{errors.portfolioUrl}</p>
-                                ) : null}
+                                <div className="flex flex-wrap gap-4">
+                                    <label className="inline-flex items-center text-sm font-normal text-slate-700">
+                                        <input
+                                            type="radio"
+                                            name="proofType"
+                                            value={VERIFIED_MENTOR_PROOF_TYPE.PORTFOLIO}
+                                            checked={isPortfolio}
+                                            onChange={handleChange}
+                                            disabled={busy}
+                                            className="mr-2 h-4 w-4 accent-primary"
+                                        />
+                                        Portfolio URL
+                                    </label>
+                                    <label className="inline-flex items-center text-sm font-normal text-slate-700">
+                                        <input
+                                            type="radio"
+                                            name="proofType"
+                                            value={VERIFIED_MENTOR_PROOF_TYPE.DOCUMENT}
+                                            checked={!isPortfolio}
+                                            onChange={handleChange}
+                                            disabled={busy}
+                                            className="mr-2 h-4 w-4 accent-primary"
+                                        />
+                                        Documents
+                                    </label>
+                                </div>
                             </div>
+
+                            {isPortfolio ? (
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="portfolioUrl" className="text-sm font-semibold text-slate-800">
+                                        Portfolio URL <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Input
+                                        id="portfolioUrl"
+                                        name="portfolioUrl"
+                                        value={values.portfolioUrl}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        placeholder="https://your-portfolio.com"
+                                        className={touched.portfolioUrl && errors.portfolioUrl ? fieldInvalidClassName : ''}
+                                        disabled={busy}
+                                    />
+                                    {touched.portfolioUrl && errors.portfolioUrl ? (
+                                        <p className="text-sm text-red-600">{errors.portfolioUrl}</p>
+                                    ) : null}
+                                </div>
+                            ) : (
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="documents" className="text-sm font-semibold text-slate-800">
+                                        Documents <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Input
+                                        ref={fileInputRef}
+                                        id="documents"
+                                        name="documents"
+                                        type="file"
+                                        multiple
+                                        accept={DOCUMENT_ACCEPT}
+                                        onChange={(e) => {
+                                            setFieldValue('documents', Array.from(e.target.files ?? []).slice(0, 10));
+                                            setFieldTouched('documents', true);
+                                        }}
+                                        onBlur={handleBlur}
+                                        className={touched.documents && errors.documents ? fieldInvalidClassName : ''}
+                                        disabled={busy}
+                                    />
+                                    <p className="text-xs text-slate-400">PDF, JPG, PNG, WEBP, DOC, DOCX. Max 10 files.</p>
+                                    {values.documents.length ? (
+                                        <ul className="space-y-1">
+                                            {values.documents.map((file, index) => (
+                                                <li key={`${file.name}-${index}`} className="flex items-center gap-2 text-sm text-slate-700">
+                                                    <span className="min-w-0 truncate">{file.name}</span>
+                                                    <button
+                                                        type="button"
+                                                        className="shrink-0 text-slate-400 hover:text-red-600"
+                                                        title="Remove file"
+                                                        disabled={busy}
+                                                        onClick={() => {
+                                                            const next = values.documents.filter((_, i) => i !== index);
+                                                            setFieldValue('documents', next);
+                                                            if (!next.length && fileInputRef.current) fileInputRef.current.value = '';
+                                                        }}
+                                                    >
+                                                        <X className="h-3.5 w-3.5" />
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : null}
+                                    {touched.documents && errors.documents ? (
+                                        <p className="text-sm text-red-600">{String(errors.documents)}</p>
+                                    ) : null}
+                                </div>
+                            )}
                         </div>
 
                         <AgreementSentenceList

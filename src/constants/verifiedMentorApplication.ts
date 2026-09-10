@@ -10,3 +10,8 @@ export const VERIFIED_MENTOR_APPLICATION_ACTION = {
   APPROVE: 'approve',
   REJECT: 'reject',
 } as const;
+
+export const VERIFIED_MENTOR_PROOF_TYPE = {
+  PORTFOLIO: 'portfolio',
+  DOCUMENT: 'document',
+} as const;

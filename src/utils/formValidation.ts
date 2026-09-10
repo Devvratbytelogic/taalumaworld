@@ -576,7 +576,17 @@ export const verifiedMentorApplicationSchema = Yup.object({
       if (!value) return true;
       return value.split(/\s+/).filter(Boolean).length <= 300;
     }),
-  portfolioUrl: optionalUrl,
+  proofType: Yup.string().oneOf(['portfolio', 'document']).required('Select portfolio or documents'),
+  portfolioUrl: Yup.string().when('proofType', {
+    is: 'portfolio',
+    then: (schema) => schema.trim().required('Portfolio URL is required').url('Enter a valid URL'),
+    otherwise: (schema) => schema.optional(),
+  }),
+  documents: Yup.array().when('proofType', {
+    is: 'document',
+    then: (schema) => schema.min(1, 'At least one document is required').max(10, 'Maximum 10 files'),
+    otherwise: (schema) => schema,
+  }),
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
 });
 

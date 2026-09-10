@@ -63,7 +63,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const skipOgImagePrefillRef = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
-  const { data: chapterResponse, isLoading: isChapterLoading } = useGetChapterByIdQuery(chapterId);
+  const { data: chapterResponse, isLoading: isChapterLoading, error } = useGetChapterByIdQuery(chapterId);
   const requiredAcceptedRef = useRef(false);
   const [requiredAgreementsAccepted, setRequiredAgreementsAccepted] = useState(false);
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
@@ -323,6 +323,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
   if (isChapterLoading) return <AdminBlueprintFormFieldsSkeleton />;
+
+  if (error) {
+    const message = 'error' in error ? error.error : 'Blueprint not found.';
+    return <p className="py-10 text-center text-sm text-slate-500">{message}</p>;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">

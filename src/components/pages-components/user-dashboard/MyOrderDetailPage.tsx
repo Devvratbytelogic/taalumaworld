@@ -59,7 +59,7 @@ function PanelTitle({ children }: { children: ReactNode }) {
 }
 
 export function MyOrderDetailPage({ orderId }: { orderId: string }) {
-  const { data, isLoading } = useUserGetOrderByIdQuery(orderId);
+  const { data, isLoading, error } = useUserGetOrderByIdQuery(orderId);
   const [fetchTransactionInvoice] = useLazyGetTransactionInvoiceQuery();
   const [isDownloading, setIsDownloading] = useState(false);
   const order = data?.data;
@@ -87,7 +87,8 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
     return <DashboardOrderDetailSkeleton />;
   }
 
-  if (!order) {
+  if (error || !order) {
+    const message = error && 'error' in error ? error.error : 'Order not found.';
     return (
       <div className="space-y-6">
         <Link
@@ -97,7 +98,7 @@ export function MyOrderDetailPage({ orderId }: { orderId: string }) {
           <ArrowLeft className="h-4 w-4" />
           Back to orders
         </Link>
-        <Panel className="py-12 text-center text-sm text-gray-500">Order not found.</Panel>
+        <Panel className="py-12 text-center text-sm text-gray-500">{message}</Panel>
       </div>
     );
   }

@@ -66,17 +66,18 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   const isMentor = isMentorPanelPath(pathname);
   const { hasPermission } = useAdminPermissions();
   const canEdit = hasPermission(BLUEPRINTS_MODEL, 'edit');
-  const { data, isLoading } = useGetChapterByIdQuery(chapterId);
+  const { data, isLoading, error } = useGetChapterByIdQuery(chapterId);
   const chapter = data?.data;
 
   if (isLoading) {
     return <AdminBlueprintDetailSkeleton />;
   }
 
-  if (!chapter) {
+  if (error || !chapter) {
+    const message = error && 'error' in error ? error.error : 'Blueprint not found.';
     return (
       <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Blueprint not found.</AdminPanel>
+        <AdminPanel className="p-10 text-center text-sm text-slate-500">{message}</AdminPanel>
       </AdminPage>
     );
   }

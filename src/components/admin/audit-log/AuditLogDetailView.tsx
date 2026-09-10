@@ -30,17 +30,18 @@ interface AuditLogDetailViewProps {
 }
 
 export function AuditLogDetailView({ auditLogId }: AuditLogDetailViewProps) {
-  const { data, isLoading } = useGetAuditLogByIdQuery(auditLogId);
+  const { data, isLoading, error } = useGetAuditLogByIdQuery(auditLogId);
   const log = data?.data;
 
   if (isLoading) {
     return <AdminAuditLogDetailSkeleton />;
   }
 
-  if (!log) {
+  if (error || !log) {
+    const message = error && 'error' in error ? error.error : 'Audit log not found.';
     return (
       <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Audit log not found.</AdminPanel>
+        <AdminPanel className="p-10 text-center text-sm text-slate-500">{message}</AdminPanel>
       </AdminPage>
     );
   }

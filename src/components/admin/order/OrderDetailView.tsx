@@ -103,17 +103,18 @@ interface OrderDetailViewProps {
 export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   const pathname = usePathname();
   const isMentor = isMentorPanelPath(pathname);
-  const { data, isLoading } = useGetOrderByIdQuery(orderId);
+  const { data, isLoading, error } = useGetOrderByIdQuery(orderId);
   const order = data?.data;
 
   if (isLoading) {
     return <AdminOrderDetailSkeleton />;
   }
 
-  if (!order) {
+  if (error || !order) {
+    const message = error && 'error' in error ? error.error : 'Order not found.';
     return (
       <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Order not found.</AdminPanel>
+        <AdminPanel className="p-10 text-center text-sm text-slate-500">{message}</AdminPanel>
       </AdminPage>
     );
   }

@@ -74,7 +74,7 @@ export function ReviewReportDetailView({ reportId }: ReviewReportDetailViewProps
   const isMentor = isMentorPanelPath(pathname);
   const { hasPermission } = useAdminPermissions();
   const canProcessReports = hasPermission(REVIEW_REPORTS_MODEL, 'edit');
-  const { data, isLoading, isError } = useGetAdminReviewReportByIdQuery(reportId);
+  const { data, isLoading, error } = useGetAdminReviewReportByIdQuery(reportId);
   const report = data?.data;
   const listHref = getReviewReportsListRoutePath(isMentor);
 
@@ -82,7 +82,8 @@ export function ReviewReportDetailView({ reportId }: ReviewReportDetailViewProps
     return <AdminReviewReportDetailSkeleton />;
   }
 
-  if (isError || !report) {
+  if (error || !report) {
+    const message = error && 'error' in error ? error.error : 'Report not found, or you are not allowed to access this report.';
     return (
       <AdminPage>
         <Link
@@ -92,9 +93,7 @@ export function ReviewReportDetailView({ reportId }: ReviewReportDetailViewProps
           <ArrowLeft className="h-4 w-4" />
           Back to review reports
         </Link>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">
-          Report not found, or you are not allowed to access this report.
-        </AdminPanel>
+        <AdminPanel className="p-10 text-center text-sm text-slate-500">{message}</AdminPanel>
       </AdminPage>
     );
   }

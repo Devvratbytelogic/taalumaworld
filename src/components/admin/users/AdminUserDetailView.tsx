@@ -36,7 +36,7 @@ interface AdminUserDetailViewProps {
 export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
-  const { data, isLoading, isFetching, isError } = useGetUserByIdQuery(userId, { skip: !userId });
+  const { data, isLoading, isFetching, error } = useGetUserByIdQuery(userId, { skip: !userId });
 
   const user = data?.data;
   const agreement = user?.agreement_status;
@@ -56,7 +56,7 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
     return <AdminUserDetailSkeleton />;
   }
 
-  if (isError || !user) {
+  if (error || !user) {
     return (
       <AdminPage>
         {backLink}
@@ -64,7 +64,7 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
           <AdminEmptyState
             icon={UserX}
             title="Customer not found"
-            description="This customer may have been removed, or the link is invalid."
+            description={error && 'error' in error ? error.error : 'This customer may have been removed, or the link is invalid.'}
             action={
               <Link
                 href={getAdminSectionRoutePath('users')}

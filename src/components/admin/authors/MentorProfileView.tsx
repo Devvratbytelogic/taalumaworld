@@ -137,7 +137,7 @@ export function MentorProfileView() {
   const { hasPermission } = useAdminPermissions();
   const canAssignTier = hasPermission('Mentor Tier', 'edit');
 
-  const { data: mentorResponse, isLoading } = useGetUserByIdQuery(mentorId ?? '', { skip: !mentorId });
+  const { data: mentorResponse, isLoading, error } = useGetUserByIdQuery(mentorId ?? '', { skip: !mentorId });
   const [updateMentorStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
 
   const mentor = mentorResponse?.data ?? null;
@@ -177,7 +177,7 @@ export function MentorProfileView() {
     </Link>
   );
 
-  if (!mentor) {
+  if (error || !mentor) {
     return (
       <AdminPage>
         {backLink}
@@ -185,7 +185,7 @@ export function MentorProfileView() {
           <AdminEmptyState
             icon={UserX}
             title="Mentor not found"
-            description="This mentor may have been removed, suspended beyond this list, or the link is invalid."
+            description={error && 'error' in error ? error.error : 'This mentor may have been removed, suspended beyond this list, or the link is invalid.'}
             action={
               <Button
                 onPress={() => router.push(getAdminSectionRoutePath('authors'))}

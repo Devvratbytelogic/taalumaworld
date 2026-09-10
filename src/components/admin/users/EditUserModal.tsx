@@ -64,7 +64,7 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
         try {
           const formData = new FormData();
           formData.append('name', formValues.name.trim());
-          formData.append('email', formValues.email.trim());
+          formData.append('email', (user.email ?? formValues.email).trim());
           formData.append('phone', formValues.phone.trim());
           formData.append('facebook', formValues.facebook.trim());
           formData.append('linkedin', formValues.linkedin.trim());
@@ -182,23 +182,17 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-user-email">
-                Email <span className="text-red-500">*</span>
-              </Label>
+              <Label htmlFor="edit-user-email">Email</Label>
               <Input
                 id="edit-user-email"
                 name="email"
                 type="email"
                 value={values.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="name@example.com"
-                disabled={isLoading}
-                className={errors.email && touched.email ? 'border-red-500' : undefined}
+                readOnly
+                disabled
+                className="bg-slate-50 text-slate-600"
               />
-              {touched.email && errors.email ? (
-                <p className="text-sm text-red-600">{errors.email}</p>
-              ) : null}
+              <p className="text-xs text-slate-400">Email cannot be changed</p>
             </div>
 
             <div className="space-y-2">

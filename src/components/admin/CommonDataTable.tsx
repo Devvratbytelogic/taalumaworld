@@ -40,6 +40,7 @@ export default function CommonDataTable({
             pageSizeOptions={pageSizeOptions}
             hideFooter={hideFooter}
             disableRowSelectionOnClick
+            autoHeight
             getRowHeight={() => 'auto'}
             sx={{
                 border: 'none',

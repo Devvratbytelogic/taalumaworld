@@ -72,7 +72,7 @@ export function SuspendUserDialog({
             <textarea
               id="status_reason"
               name="status_reason"
-              className={`${inputCls} min-h-[100px] resize-y`}
+              className={`${inputCls} min-h-25 resize-y`}
               value={values.status_reason}
               onChange={handleChange}
               onBlur={handleBlur}

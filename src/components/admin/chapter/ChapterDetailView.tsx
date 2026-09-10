@@ -17,6 +17,7 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import { useGetChapterByIdQuery } from '@/store/rtkQueries/adminGetApi';
 import { getChaptersListRoutePath, getEditChapterRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { AdminBlueprintDetailSkeleton } from '@/components/skeleton-loader/admin';
 import { BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import type { AiCriteria } from '@/types/singleChapter';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
@@ -69,11 +70,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   const chapter = data?.data;
 
   if (isLoading) {
-    return (
-      <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Loading blueprint...</AdminPanel>
-      </AdminPage>
-    );
+    return <AdminBlueprintDetailSkeleton />;
   }
 
   if (!chapter) {

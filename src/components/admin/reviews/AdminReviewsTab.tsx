@@ -14,6 +14,7 @@ import { useGetAllAdminReviewsQuery } from '@/store/rtkQueries/adminReviewsApi';
 import { AdminReviewsSearch } from './AdminReviewsSearch';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminReviewsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const REVIEWS_MODEL = 'Reviews';
 
@@ -276,6 +277,9 @@ export function AdminReviewsTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminReviewsSkeleton />;
 
   return (
     <div className="space-y-6">

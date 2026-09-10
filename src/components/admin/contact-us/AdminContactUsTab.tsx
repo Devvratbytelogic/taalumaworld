@@ -10,6 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import type { IAllContactusDataAPIResponseData } from '@/types/contactData';
 import { formatConsentType } from '@/utils/agreementConsent';
 import moment from 'moment';
+import { AdminContactUsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 export function AdminContactUsTab() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -102,6 +103,9 @@ export function AdminContactUsTab() {
             ),
         },
     ];
+
+    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+    if (showPageSkeleton) return <AdminContactUsSkeleton />;
 
     return (
         <div className="space-y-6">

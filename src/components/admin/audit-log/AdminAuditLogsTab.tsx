@@ -13,6 +13,7 @@ import { useGetAllAuditLogsQuery } from '@/store/rtkQueries/auditLogApi';
 import type { IAllAuditLogsAPIResponseDataEntity } from '@/types/auditLog';
 import { getViewAuditLogRoutePath } from '@/routes/routes';
 import { AdminAuditLogsSearch } from './AdminAuditLogsSearch';
+import { AdminAuditLogsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
   chapter: 'blueprints',
@@ -203,6 +204,9 @@ export function AdminAuditLogsTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminAuditLogsSkeleton />;
 
   return (
     <AdminPage>

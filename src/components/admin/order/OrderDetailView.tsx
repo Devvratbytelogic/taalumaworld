@@ -16,6 +16,7 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import { useGetOrderByIdQuery } from '@/store/rtkQueries/adminGetApi';
 import { getOrdersListRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { AdminOrderDetailSkeleton } from '@/components/skeleton-loader/admin';
 import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 
@@ -106,11 +107,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   const order = data?.data;
 
   if (isLoading) {
-    return (
-      <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Loading order...</AdminPanel>
-      </AdminPage>
-    );
+    return <AdminOrderDetailSkeleton />;
   }
 
   if (!order) {

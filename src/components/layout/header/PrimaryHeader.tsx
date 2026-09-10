@@ -17,7 +17,7 @@ import HeaderToolbar from './HeaderToolbar';
 import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorLoginRoutePath, getMentorSignupRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { signOut } from '@/utils/refreshSession';
 import ImageComponent from '@/components/ui/ImageComponent';
-import { isMentorRole, isStaffAdminRole } from '@/constants/common';
+import { DEFAULT_BRAND_LOGO, isMentorRole, isStaffAdminRole } from '@/constants/common';
 
 interface PrimaryHeaderProps {
   isAuthenticated: boolean;
@@ -175,7 +175,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
           <div className="relative flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3">
             <Link href={getHomeRoutePath()} className="flex min-w-0 shrink items-center">
               <div className="h-8 w-30 sm:h-10 sm:w-50">
-                <ImageComponent src={logo || '/images/logo.webp'} alt={brandName} object_cover={false} />
+                <ImageComponent src={logo || DEFAULT_BRAND_LOGO} alt={brandName} object_cover={false} />
               </div>
             </Link>
 

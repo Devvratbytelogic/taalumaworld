@@ -13,6 +13,7 @@ import type { IMentorLedgerWalletDataEntity } from '@/types/wallet';
 import MentorWithdrawalModal from './MentorWithdrawalModal';
 import { MentorWalletSearch } from './MentorWalletSearch';
 import moment from 'moment';
+import { MentorWalletSkeleton } from '@/components/skeleton-loader/admin';
 
 function displayValue(value?: string | null) {
   const trimmed = value?.trim();
@@ -223,6 +224,8 @@ export function MentorWalletTab() {
       },
     },
   ];
+
+  if (isProfileLoading) return <MentorWalletSkeleton />;
 
   return (
     <AdminPage>

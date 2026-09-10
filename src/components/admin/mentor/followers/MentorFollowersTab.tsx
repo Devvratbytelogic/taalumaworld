@@ -10,6 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useGetAllFollowersQuery } from '@/store/rtkQueries/mentorApis';
 import type { IFollowsAPIResponseDataEntity } from '@/types/follows';
 import { MentorFollowersSearch } from './MentorFollowersSearch';
+import { MentorFollowersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 export function MentorFollowersTab() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -109,6 +110,9 @@ export function MentorFollowersTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <MentorFollowersSkeleton />;
 
   return (
     <div className="space-y-6">

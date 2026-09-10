@@ -20,6 +20,7 @@ import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminReferralPerformanceSearch } from './AdminReferralPerformanceSearch';
+import { AdminReferralPerformanceSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -173,6 +174,9 @@ export function AdminReferralPerformanceTab() {
       renderCell: (params) => formatKes(params.row.commission ?? 0),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminReferralPerformanceSkeleton />;
 
   return (
     <AdminPage>

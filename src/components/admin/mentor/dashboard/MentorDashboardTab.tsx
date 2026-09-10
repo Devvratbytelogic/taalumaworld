@@ -37,6 +37,7 @@ import {
   getMentorRevenueEarnedRoutePath,
   getMentorSalesVolumeRoutePath,
 } from '@/routes/routes';
+import { MentorDashboardSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 /** Dashboard previews are static (no in-grid paging) — "View all" links to the full, paginated list. */
 const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
@@ -163,6 +164,14 @@ export function MentorDashboardTab() {
     ...row,
     id: `${row.month}-${idx}`,
   }));
+
+  const showPageSkeleton = useAdminPageSkeleton(
+    performanceLoading && salesVolumeLoading && revenueEarnedLoading && economyRevenueLoading,
+    Boolean(blueprintPerformanceData || salesVolumeData || revenueEarnedData || economyRevenueData),
+  );
+  if (showPageSkeleton) {
+    return <MentorDashboardSkeleton />;
+  }
 
   return (
     <AdminPage>

@@ -41,6 +41,7 @@ import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminMentorProfileViewSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -126,19 +127,6 @@ function StatTile({
   );
 }
 
-function ProfileSkeleton() {
-  return (
-    <AdminPage>
-      <div className={cn(adminPanelClass, 'h-9 w-40 animate-pulse')} />
-      <div className={cn(adminPanelClass, 'h-32 animate-pulse')} />
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className={cn(adminPanelClass, 'h-96 animate-pulse xl:col-span-1')} />
-        <div className={cn(adminPanelClass, 'h-96 animate-pulse xl:col-span-2')} />
-      </div>
-    </AdminPage>
-  );
-}
-
 export function MentorProfileView() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -177,7 +165,7 @@ export function MentorProfileView() {
     }
   };
 
-  if (isLoading) return <ProfileSkeleton />;
+  if (isLoading) return <AdminMentorProfileViewSkeleton />;
 
   const backLink = (
     <Link

@@ -21,6 +21,7 @@ import { SentenceModal, type SentenceFormValues } from './SentenceModal';
 import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AGREEMENT_TOUCHPOINT_OPTIONS } from '@/constants/agreements';
+import { AdminSentencesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const SENTENCES_MODEL = 'Agreements';
 
@@ -257,6 +258,9 @@ export function AdminSentencesTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(sentencesResponse));
+  if (showPageSkeleton) return <AdminSentencesSkeleton />;
 
   return (
     <div className="space-y-6">

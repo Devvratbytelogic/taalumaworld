@@ -7,6 +7,7 @@ import { PermissionsMatrixTab } from './PermissionsMatrixTab';
 import { StaffAssignmentsTab } from './StaffAssignmentsTab';
 import { AdminEmptyState, AdminPage, AdminPageHeader, adminPanelClass } from '@/components/admin/layout/AdminContent';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminRolesPermissionsSkeleton } from '@/components/skeleton-loader/admin';
 
 type Tab = 'roles' | 'permissions' | 'staff';
 
@@ -43,6 +44,8 @@ export function AdminRolesPermissionsTab() {
     if (isLoading || visibleTabs.some((tab) => tab.id === activeTab)) return;
     if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
   }, [isLoading, visibleTabs, activeTab]);
+
+  if (isLoading) return <AdminRolesPermissionsSkeleton />;
 
   return (
     <AdminPage>

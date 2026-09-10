@@ -8,7 +8,6 @@ import type { PaymentEntry } from './PaymentListing';
 import { AdminPaymentsHeader } from './AdminPaymentsHeader';
 import { AdminPaymentsSearch } from './AdminPaymentsSearch';
 import { PaymentListing } from './PaymentListing';
-
 interface AdminPaymentsTabProps {
   contentMode?: 'chapters' | 'books';
 }

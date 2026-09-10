@@ -19,6 +19,7 @@ import { IMentorReferralsAPIResponseDataEntity, MentorReferralStatus } from '@/t
 import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
+import { MentorReferralsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_FILTER_OPTIONS: { label: string; value: MentorReferralStatus | '' }[] = [
   { label: 'All statuses', value: '' },
@@ -217,6 +218,9 @@ export function MentorReferralsTab() {
       setIsExporting(false);
     }
   };
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <MentorReferralsSkeleton />;
 
   return (
     <AdminPage>

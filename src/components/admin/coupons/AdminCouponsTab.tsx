@@ -25,6 +25,7 @@ import { MentorCouponPerformanceTab } from '@/components/admin/mentor/performanc
 import toast from '@/utils/toast';
 import { IAdminCouponEntity } from '@/types/coupon';
 import { CouponModal } from './CouponModal';
+import { AdminCouponsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const COUPON_MODEL = 'Coupon';
 
@@ -293,6 +294,9 @@ export function AdminCouponsTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(couponsResponse));
+  if (showPageSkeleton) return <AdminCouponsSkeleton />;
 
   return (
     <div className="space-y-6">

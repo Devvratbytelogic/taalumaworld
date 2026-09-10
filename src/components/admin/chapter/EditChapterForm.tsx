@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
 import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { cn } from '@/components/ui/utils';
+import { AdminBlueprintFormFieldsSkeleton } from '@/components/skeleton-loader/admin';
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
@@ -62,7 +63,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const skipOgImagePrefillRef = useRef(false);
 
   const { data: booksResponse } = useGetAllBooksQuery();
-  const { data: chapterResponse } = useGetChapterByIdQuery(chapterId);
+  const { data: chapterResponse, isLoading: isChapterLoading } = useGetChapterByIdQuery(chapterId);
   const requiredAcceptedRef = useRef(false);
   const [requiredAgreementsAccepted, setRequiredAgreementsAccepted] = useState(false);
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
@@ -320,6 +321,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   );
 
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
+
+  if (isChapterLoading) return <AdminBlueprintFormFieldsSkeleton />;
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">

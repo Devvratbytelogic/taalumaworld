@@ -19,6 +19,7 @@ import { useGetMentorPerformanceQuery } from '@/store/rtkQueries/dashboard';
 import { useGetAllMentorTiersQuery } from '@/store/rtkQueries/mentorApis';
 import type { IMentorPerformanceEntity } from '@/types/dashboard';
 import { AdminMentorPerformanceSearch } from './AdminMentorPerformanceSearch';
+import { AdminMentorPerformanceSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200!',
@@ -176,6 +177,9 @@ export function AdminMentorPerformanceTab() {
       renderCell: (params) => `${params.row.scoredBlueprintCount ?? 0} / ${params.row.blueprintCount ?? 0}`,
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminMentorPerformanceSkeleton />;
 
   return (
     <AdminPage>

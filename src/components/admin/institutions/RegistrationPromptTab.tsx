@@ -8,6 +8,7 @@ import { useGetInstituteMessagesQuery, useAddInstituteMessageMutation, } from '@
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import toast from '@/utils/toast';
 import { registrationPromptSchema } from '@/utils/formValidation';
+import { AdminRegistrationPromptSkeleton } from '@/components/skeleton-loader/admin';
 
 const REGISTRATION_PROMPT_MODEL = 'Institute Registration Prompt';
 
@@ -57,6 +58,8 @@ export function RegistrationPromptTab() {
             },
         });
 
+
+    if (isLoading) return <AdminRegistrationPromptSkeleton />;
 
     return (
        <>

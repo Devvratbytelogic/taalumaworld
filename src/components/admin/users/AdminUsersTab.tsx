@@ -26,6 +26,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminUserDetailRoutePath } from '@/routes/routes';
+import { AdminUsersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const USERS_MODEL = 'Users';
 
@@ -263,6 +264,9 @@ export function AdminUsersTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(usersResponse));
+  if (showPageSkeleton) return <AdminUsersSkeleton />;
 
   return (
     <div className="space-y-6">

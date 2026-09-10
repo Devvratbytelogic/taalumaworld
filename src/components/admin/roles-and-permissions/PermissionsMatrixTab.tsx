@@ -17,6 +17,7 @@ import { cn } from '@/components/ui/utils';
 import toast from '@/utils/toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminPermissionsMatrixSkeleton } from '@/components/skeleton-loader/admin';
 
 type PermissionMatrix = Record<string, string[]>;
 
@@ -199,16 +200,7 @@ export function PermissionsMatrixTab() {
     const isInitialLoading = isLoadingRoles || isLoadingModels || isLoadingPermissions;
 
     if (isInitialLoading) {
-        return (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div className="space-y-2 lg:col-span-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
-                    ))}
-                </div>
-                <div className="lg:col-span-3 h-96 bg-gray-100 rounded-xl animate-pulse" />
-            </div>
-        );
+        return <AdminPermissionsMatrixSkeleton />;
     }
 
     return (

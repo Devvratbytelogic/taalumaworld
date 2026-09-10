@@ -6,23 +6,23 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon, PinterestIcon, WhatsAppIcon, TikTokIcon } from '@/components/ui/AllSVG';
 import FooterSubscribe from '@/components/layout/footer/FooterSubscribe';
 import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
-import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { DEFAULT_BRAND_LOGO } from '@/constants/common';
+import type { IGlobalSettings } from '@/types/globalSettings';
 
-export default function PrimaryFooter() {
+export default function PrimaryFooter({
+    settings,
+}: {
+    settings: IGlobalSettings | null;
+}) {
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';
 
-    const { data: globalSettings } = useGetGlobalSettingsQuery();
-    const settings = globalSettings?.data;
-
     const brandName = settings?.marketplace_name || settings?.platformName || 'TaalumaWorld';
-    const description = settings?.platformDescription || settings?.meta_description || '';
     const email = settings?.supportEmail || settings?.email || '';
     const phone = settings?.phone || '';
     const address = settings?.address || '';
     const copyRight = settings?.copy_right_text || '';
-    const logo = settings?.logo as string | null | undefined;
 
 
     // Ordered: LinkedIn → YouTube → Instagram → TikTok (priority channels for a knowledge platform)
@@ -47,13 +47,15 @@ export default function PrimaryFooter() {
                         {/* About Section */}
                         <div>
                             <div className="mb-4">
-                                {logo ? (
-                                    <div className="h-10 w-40">
-                                        <ImageComponent src={logo} alt={brandName} object_cover={false} />
+                                <Link href={getHomeRoutePath()} aria-label={brandName} className="inline-block">
+                                    <div className="h-10 w-40 overflow-hidden rounded-sm bg-white px-1.5 py-1">
+                                        <ImageComponent
+                                            src={settings?.logo || DEFAULT_BRAND_LOGO}
+                                            alt={brandName}
+                                            object_cover={false}
+                                        />
                                     </div>
-                                ) : (
-                                    <h3 className="text-white font-bold text-lg">{brandName}</h3>
-                                )}
+                                </Link>
                             </div>
                             <div className="mb-4 space-y-1">
                                 <p className="text-sm text-gray-300">The Global Marketplace for Mentorship, Learning &amp; Career Architecture.</p>

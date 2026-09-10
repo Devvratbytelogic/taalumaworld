@@ -17,6 +17,7 @@ import { formatConsentType } from '@/utils/agreementConsent';
 import { validateEmail } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { AdminInboxSearch } from './AdminInboxSearch';
+import { AdminInboxSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const INBOX_TYPE_LABELS: Record<InboxEntryType, string> = {
   newsletter: 'Newsletter',
@@ -182,6 +183,9 @@ export function AdminInboxTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminInboxSkeleton />;
 
   return (
     <AdminPage>

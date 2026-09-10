@@ -14,6 +14,7 @@ import { MentorTypeModal } from './MentorTypeModal';
 import moment from 'moment';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminMentorTypesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const MODEL = 'Mentor Tier';
 
@@ -219,6 +220,9 @@ export function AdminMentorTypesTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminMentorTypesSkeleton />;
 
   return (
     <>

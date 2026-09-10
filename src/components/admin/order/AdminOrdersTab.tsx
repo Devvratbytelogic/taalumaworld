@@ -15,6 +15,7 @@ import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getViewOrderRoutePath, isMentorPanelPath } from '@/routes/routes';
 import moment from 'moment';
 import { IAllOrdersAPIResponseDataEntityItemEntityItemItems } from '@/types/order';
+import { AdminOrdersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const ORDERS_MODEL = 'Orders';
 
@@ -246,6 +247,9 @@ export function AdminOrdersTab() {
             },
         },
     ];
+
+    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+    if (showPageSkeleton) return <AdminOrdersSkeleton />;
 
     return (
         <div className="space-y-6">

@@ -17,6 +17,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { useGetAdminReviewReportByIdQuery } from '@/store/rtkQueries/adminReviewReportsApi';
 import { openModal } from '@/store/slices/allModalSlice';
 import { getReviewReportsListRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { AdminReviewReportDetailSkeleton } from '@/components/skeleton-loader/admin';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
 const REVIEW_REPORTS_MODEL = 'Review Reports';
@@ -78,11 +79,7 @@ export function ReviewReportDetailView({ reportId }: ReviewReportDetailViewProps
   const listHref = getReviewReportsListRoutePath(isMentor);
 
   if (isLoading) {
-    return (
-      <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Loading report...</AdminPanel>
-      </AdminPage>
-    );
+    return <AdminReviewReportDetailSkeleton />;
   }
 
   if (isError || !report) {

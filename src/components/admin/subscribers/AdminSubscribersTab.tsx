@@ -18,6 +18,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { formatConsentType } from '@/utils/agreementConsent';
 import { validateEmail } from '@/utils/formValidation';
+import { AdminSubscribersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const STATUS_OPTIONS = ['Active', 'Inactive'];
 
@@ -144,6 +145,9 @@ export function AdminSubscribersTab() {
             ),
         },
     ];
+
+    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+    if (showPageSkeleton) return <AdminSubscribersSkeleton />;
 
     return (
         <div className="space-y-6">

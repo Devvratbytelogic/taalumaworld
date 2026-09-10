@@ -6,6 +6,7 @@ import ConditionalSiteLayout from "@/components/layout/ConditionalSiteLayout";
 import { ContentProtection } from "@/components/ContentProtection";
 import Script from "next/script";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
+import { DEFAULT_BRAND_LOGO } from "@/constants/common";
 
 export const revalidate = 300;
 
@@ -69,8 +70,7 @@ export default async function RootLayout({
 }>) {
   const res = await getGlobalSettingsServerAPI();
   const globalSettings = res?.data ?? null;
-  const logo = globalSettings?.logo ?? '';
-  // const logo = '/images/new-logo.webp';
+  const logo = globalSettings?.logo || DEFAULT_BRAND_LOGO;
   const contentMode = globalSettings?.visible ?? '';
 
   return (
@@ -111,7 +111,7 @@ export default async function RootLayout({
           <ContentProtection />
         )}
         <AppProviders>
-          <ConditionalSiteLayout logo={logo} contentMode={contentMode}>
+          <ConditionalSiteLayout logo={logo} contentMode={contentMode} settings={globalSettings}>
             {children}
           </ConditionalSiteLayout>
         </AppProviders>

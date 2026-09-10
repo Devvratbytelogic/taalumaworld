@@ -9,6 +9,7 @@ import { BlueprintAccessTab } from './BlueprintAccessTab';
 import { UsageReportTab } from './UsageReportTab';
 import { RegistrationPromptTab } from './RegistrationPromptTab';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminInstitutionsSkeleton } from '@/components/skeleton-loader/admin';
 
 type Tab = 'registry' | 'blueprints' | 'usage' | 'prompt';
 
@@ -52,6 +53,8 @@ export function AdminInstitutionsTab() {
         if (isLoading || visibleTabs.some((tab) => tab.id === activeTab)) return;
         if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
     }, [isLoading, visibleTabs, activeTab]);
+
+    if (isLoading) return <AdminInstitutionsSkeleton />;
 
     return (
         <div className="space-y-6">

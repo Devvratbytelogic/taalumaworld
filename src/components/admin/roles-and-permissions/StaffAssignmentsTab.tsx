@@ -19,6 +19,7 @@ import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { ViewProfileModal } from '@/components/admin/users/ViewProfileModal';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminStaffSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const STAFF_MODEL = 'Staff';
 
@@ -248,6 +249,9 @@ export function StaffAssignmentsTab({ embedded = false }: { embedded?: boolean }
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(staffData));
+  if (showPageSkeleton && !embedded) return <AdminStaffSkeleton />;
 
   return (
     <div className="space-y-6">

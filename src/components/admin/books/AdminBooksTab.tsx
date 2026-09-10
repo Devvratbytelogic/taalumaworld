@@ -32,6 +32,7 @@ import {
 import toast from '@/utils/toast';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminSeriesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const SERIES_MODEL = 'Series';
 
@@ -359,6 +360,9 @@ export function AdminBooksTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(booksResponse));
+  if (showPageSkeleton) return <AdminSeriesSkeleton />;
 
   return (
     <div className="space-y-6">

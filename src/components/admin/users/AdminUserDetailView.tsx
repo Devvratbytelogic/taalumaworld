@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useGetUserByIdQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
+import { AdminUserDetailSkeleton } from '@/components/skeleton-loader/admin';
 import type { ItemsEntity } from '@/types/rolesPermissions';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -52,12 +53,7 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
   );
 
   if (isLoading) {
-    return (
-      <AdminPage>
-        {backLink}
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Loading customer...</AdminPanel>
-      </AdminPage>
-    );
+    return <AdminUserDetailSkeleton />;
   }
 
   if (isError || !user) {

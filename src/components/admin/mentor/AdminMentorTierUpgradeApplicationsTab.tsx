@@ -42,6 +42,7 @@ import {
   MENTOR_TIER_UPGRADE_APPLICATION_STATUS,
 } from '@/constants/mentorTierUpgradeApplication';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminMentorTierUpgradesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const MODEL = 'Mentor Tier Upgrade';
 
@@ -445,6 +446,9 @@ export function AdminMentorTierUpgradeApplicationsTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminMentorTierUpgradesSkeleton />;
 
   return (
     <AdminPage>

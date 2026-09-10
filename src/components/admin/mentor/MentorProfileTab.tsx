@@ -60,6 +60,7 @@ import ReactSelect from 'react-select';
 import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
+import { MentorProfileSkeleton } from '@/components/skeleton-loader/admin';
 
 const PAYOUT_FREQUENCIES = ["monthly", "quarterly", "annually"] as const;
 const PAYSTACK_SETTLEMENT_OPTIONS = ["mpesa", "bank"] as const;
@@ -211,16 +212,6 @@ function PrivacyToggle({
   );
 }
 
-function ProfileSkeleton() {
-  return (
-    <AdminPage>
-      <div className={cn(adminPanelClass, 'animate-pulse p-6 h-28')} />
-      <div className={cn(adminPanelClass, 'animate-pulse p-6 h-80')} />
-      <div className={cn(adminPanelClass, 'animate-pulse p-6 h-64')} />
-      <div className={cn(adminPanelClass, 'animate-pulse p-6 h-40')} />
-    </AdminPage>
-  );
-}
 
 /** Small icon badge used to lead a card header title, e.g. a house-style icon next to "Payout details". */
 function SectionIcon({ icon: Icon, tone = 'primary' }: { icon: React.ComponentType<{ className?: string }>; tone?: 'primary' | 'slate' }) {
@@ -1316,7 +1307,7 @@ function AgreementsCard() {
 export function MentorProfileTab() {
   const { data: profileData, isLoading } = useGetAdminProfileQuery();
 
-  if (isLoading) return <ProfileSkeleton />;
+  if (isLoading) return <MentorProfileSkeleton />;
 
   const profile = profileData?.data;
 

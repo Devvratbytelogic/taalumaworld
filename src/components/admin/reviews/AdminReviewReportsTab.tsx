@@ -17,6 +17,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import { AdminReviewReportsSearch } from './AdminReviewReportsSearch';
 import type { IAdminReviewReportEntity } from '@/types/adminReviewReports';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminReviewReportsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const REVIEW_REPORTS_MODEL = 'Review Reports';
 
@@ -221,6 +222,9 @@ export function AdminReviewReportsTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminReviewReportsSkeleton />;
 
   return (
     <div className="space-y-6">

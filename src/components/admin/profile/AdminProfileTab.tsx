@@ -21,6 +21,7 @@ import { useUpdateAdminProfileMutation } from '@/store/rtkQueries/adminPostApi';
 import { mentorProfileDetailsSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
+import { AdminProfileSkeleton } from '@/components/skeleton-loader/admin';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
@@ -69,14 +70,6 @@ function PrivacyToggle({
   );
 }
 
-function ProfileSkeleton() {
-  return (
-    <AdminPage>
-      <div className={cn(adminPanelClass, 'animate-pulse p-6 h-28')} />
-      <div className={cn(adminPanelClass, 'animate-pulse p-6 h-80')} />
-    </AdminPage>
-  );
-}
 
 export function AdminProfileTab() {
   const [isEditing, setIsEditing] = useState(false);
@@ -151,7 +144,7 @@ export function AdminProfileTab() {
     setIsEditing(false);
   };
 
-  if (isLoading) return <ProfileSkeleton />;
+  if (isLoading) return <AdminProfileSkeleton />;
 
   const displayPhoto = tempPhoto || profile?.profile_pic || '';
   const displayName = values.name || profile?.name || 'Admin';

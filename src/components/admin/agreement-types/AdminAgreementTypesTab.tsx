@@ -21,6 +21,7 @@ import { AdminAgreementTypesSearch } from './AdminAgreementTypesSearch';
 import { AgreementTypeModal, type AgreementTypeFormValues } from './AgreementTypeModal';
 import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminAgreementTypesSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const AGREEMENT_TYPES_MODEL = 'Agreement Types';
 
@@ -261,6 +262,9 @@ export function AdminAgreementTypesTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(agreementTypesResponse));
+  if (showPageSkeleton) return <AdminAgreementTypesSkeleton />;
 
   return (
     <div className="space-y-6">

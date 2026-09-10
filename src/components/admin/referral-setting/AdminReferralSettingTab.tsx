@@ -17,6 +17,7 @@ import {
 } from '@/store/rtkQueries/affiliateReferralApis';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import toast from '@/utils/toast';
+import { AdminReferralSettingSkeleton } from '@/components/skeleton-loader/admin';
 
 const REFERRAL_SETTING_MODEL = 'Referral Setting';
 
@@ -70,6 +71,8 @@ export function AdminReferralSettingTab() {
   };
 
   const busy = isLoading || isSaving;
+
+  if (isLoading) return <AdminReferralSettingSkeleton />;
 
   return (
     <AdminPage>

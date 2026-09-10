@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatKes } from '@/constants/common';
 import { useGetReferralWalletLedgerQuery } from '@/store/rtkQueries/dashboard';
 import type { IReferralWalletLedgerEntry } from '@/types/referralWallet';
+import { MentorReferralWalletSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const TYPE_FILTER_OPTIONS = [
   { label: 'All entries', value: '' },
@@ -203,6 +204,9 @@ export function MentorReferralWalletTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <MentorReferralWalletSkeleton />;
 
   return (
     <AdminPage>

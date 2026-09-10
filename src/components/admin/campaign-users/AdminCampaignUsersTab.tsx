@@ -12,6 +12,7 @@ import { useGetCampaignUsersQuery } from '@/store/rtkQueries/adminGetApi';
 import { CAMPAIGN_USERS_MODEL } from '@/constants/campaignAttribution';
 import type { ICampaignUser } from '@/types/campaignUsers';
 import { AdminCampaignUsersSearch } from './AdminCampaignUsersSearch';
+import { AdminCampaignUsersSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const EMPTY_COPY =
   'No campaign signups yet. Users appear here only when they register from a URL with UTM or a click id.';
@@ -144,6 +145,9 @@ export function AdminCampaignUsersTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (isLoadingPermissions || showPageSkeleton) return <AdminCampaignUsersSkeleton />;
 
   if (!isLoadingPermissions && !canView) {
     return (

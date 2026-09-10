@@ -23,6 +23,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
+import { AdminAuthorsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const MENTORS_MODEL = 'Mentors';
 const MENTOR_TIER_MODEL = 'Mentor Tier';
@@ -309,6 +310,9 @@ export function AdminAuthorsTab() {
       },
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(authorsResponse));
+  if (showPageSkeleton) return <AdminAuthorsSkeleton />;
 
   return (
     <div className="space-y-6">

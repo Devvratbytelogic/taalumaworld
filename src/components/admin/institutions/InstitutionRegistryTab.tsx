@@ -32,6 +32,7 @@ import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminStatCard } from '@/components/admin/layout/AdminContent';
 import CommonDataTable from '../CommonDataTable';
 import moment from 'moment';
+import { AdminTableSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 const INSTITUTIONS_MODEL = 'Institutions';
 
@@ -334,6 +335,9 @@ export function InstitutionRegistryTab() {
             },
         },
     ];
+
+    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(response));
+    if (showPageSkeleton) return <AdminTableSkeleton />;
 
     return (
         <div className="space-y-6">

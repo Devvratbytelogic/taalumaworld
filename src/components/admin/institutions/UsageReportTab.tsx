@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useDebounce } from '@/hooks/useDebounce';
 import CommonDataTable from '../CommonDataTable';
 import moment from 'moment';
+import { AdminInstitutionUsageSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 export function UsageReportTab() {
     const [search, setSearch] = useState('');
@@ -154,6 +155,9 @@ export function UsageReportTab() {
             },
         },
     ];
+
+    const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(response));
+    if (showPageSkeleton) return <AdminInstitutionUsageSkeleton />;
 
     return (
         <div className="space-y-6">

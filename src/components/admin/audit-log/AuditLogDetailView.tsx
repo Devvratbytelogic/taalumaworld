@@ -12,6 +12,7 @@ import {
 } from '@/components/admin/layout/AdminContent';
 import { useGetAuditLogByIdQuery } from '@/store/rtkQueries/auditLogApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
+import { AdminAuditLogDetailSkeleton } from '@/components/skeleton-loader/admin';
 
 function DetailRow({ label, value }: { label: string; value?: ReactNode }) {
   return (
@@ -33,11 +34,7 @@ export function AuditLogDetailView({ auditLogId }: AuditLogDetailViewProps) {
   const log = data?.data;
 
   if (isLoading) {
-    return (
-      <AdminPage>
-        <AdminPanel className="p-10 text-center text-sm text-slate-500">Loading audit log...</AdminPanel>
-      </AdminPage>
-    );
+    return <AdminAuditLogDetailSkeleton />;
   }
 
   if (!log) {

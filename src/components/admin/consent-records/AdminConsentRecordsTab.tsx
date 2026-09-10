@@ -14,6 +14,7 @@ import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminConsentRecordsSearch } from './AdminConsentRecordsSearch';
+import { AdminConsentRecordsSkeleton, useAdminPageSkeleton } from '@/components/skeleton-loader/admin';
 
 export function AdminConsentRecordsTab() {
   const [search, setSearch] = useState('');
@@ -127,6 +128,9 @@ export function AdminConsentRecordsTab() {
       ),
     },
   ];
+
+  const showPageSkeleton = useAdminPageSkeleton(isLoading, Boolean(data));
+  if (showPageSkeleton) return <AdminConsentRecordsSkeleton />;
 
   return (
     <AdminPage>

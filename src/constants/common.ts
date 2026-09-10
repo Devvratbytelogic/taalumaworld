@@ -1,3 +1,5 @@
+export const DEFAULT_BRAND_LOGO = '/images/new-logo.webp';
+
 export const USER_TYPE = {
   INSTITUTIONAL_CAREER_ARCHITECT: 'Institutional Career Architect',
   CAREER_ARCHITECT: 'Career Architect',

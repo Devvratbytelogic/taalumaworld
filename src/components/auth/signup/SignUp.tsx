@@ -265,7 +265,7 @@ export default function SignUp() {
             onClose={handleCancel}
             size="2xl"
             className="modal_container"
-            scrollBehavior="inside"
+            scrollBehavior="outside"
             classNames={{ body: 'py-4' }}
         >
             <ModalContent>
@@ -359,7 +359,7 @@ export default function SignUp() {
                                         }
                                     }}
                                     onBlur={handleBlur}
-                                    className="mt-0.5"
+                                    className="mt-0.5 mr-2"
                                     disabled={isSubmitting}
                                 />
                                 <div className="flex-1 min-w-0 space-y-1">

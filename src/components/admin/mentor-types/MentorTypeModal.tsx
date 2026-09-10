@@ -423,7 +423,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
             </Button>
             <Button type="submit" className="global_btn bg_primary rounded_full" isLoading={isSaving}>
               <Save className="h-4 w-4" />
-              {isEditing ? 'Save changes' : 'Create tier'}
+              {isEditing ? 'Update tier' : 'Create tier'}
             </Button>
           </DialogFooter>
         </form>

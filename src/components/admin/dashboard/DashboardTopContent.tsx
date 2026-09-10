@@ -4,6 +4,7 @@ import {
   AdminSectionHeader,
   AdminTextLink,
 } from '@/components/admin/layout/AdminContent';
+import { getAdminSectionRoutePath } from '@/routes/routes';
 import type { ContentMode } from '../../../types/admin';
 
 export interface TopContentItem {
@@ -22,7 +23,7 @@ interface DashboardTopContentProps {
 
 export function DashboardTopContent({ items, contentMode, isLoading }: DashboardTopContentProps) {
   const maxRevenue = items.length > 0 ? Math.max(...items.map((i) => i.revenue), 1) : 1;
-  const listHref = contentMode === 'chapters' ? '/admin/chapters' : '/admin/books';
+  const listHref = getAdminSectionRoutePath(contentMode === 'chapters' ? 'chapters' : 'books');
 
   return (
     <AdminPanel>

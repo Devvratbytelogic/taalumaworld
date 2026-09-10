@@ -70,6 +70,7 @@ export function SignInForm({ variant }: SignInFormProps) {
         <AuthPageShell
             title={title}
             subtitle={subtitle}
+            fullViewport={isAdmin}
             icon={isAdmin ? <Shield className="h-6 w-6 text-primary" /> : undefined}
             footer={
                 isMentor ?

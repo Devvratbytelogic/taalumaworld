@@ -39,12 +39,7 @@ import {
   getPdfSizeLimitMessage,
   isAllowedImageFile,
 } from '@/constants/fileUpload';
-
-
-
-function slugFromTitle(title: string): string {
-  return title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
+import { slugify } from '@/utils/slugify';
 
 interface EditChapterFormProps {
   chapterId: string;
@@ -139,9 +134,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         twitterImage: vals.twitter_image,
       });
       vals.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
-      formData.append('slug', vals.slug);
+      // Keep the stored slug unless the admin edited it — rewriting would break live URLs.
+      const slug = slugManuallyEdited.current ? slugify(vals.slug) : (vals.slug ?? '');
+      formData.append('slug', slug);
       const baseUrl = APP_SITE_URL.replace(/\/$/, '');
-      formData.append('shareable_link', `${baseUrl}${getBlueprintRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
+      formData.append('shareable_link', `${baseUrl}${getBlueprintRoutePath(slug)}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
       await appendUserIpToFormData(formData);
       try {
         const res = await updateChapter({ id: chapterId, values: formData }).unwrap();
@@ -377,7 +374,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               onChange={(e) => {
                 handleChange(e);
                 if (!slugManuallyEdited.current) {
-                  setFieldValue('slug', slugFromTitle(e.target.value));
+                  setFieldValue('slug', slugify(e.target.value));
                 }
               }}
               onBlur={handleBlur}
@@ -398,9 +395,14 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             value={values.slug}
             onChange={(e) => {
               slugManuallyEdited.current = true;
-              setFieldValue('slug', slugFromTitle(e.target.value));
+              setFieldValue('slug', slugify(e.target.value, { allowTrailingHyphen: true }));
             }}
-            onBlur={handleBlur}
+            onBlur={(e) => {
+              if (slugManuallyEdited.current) {
+                setFieldValue('slug', slugify(e.target.value));
+              }
+              handleBlur(e);
+            }}
             disabled={isSubmittingState}
             placeholder="e.g., introduction-to-leadership"
           />

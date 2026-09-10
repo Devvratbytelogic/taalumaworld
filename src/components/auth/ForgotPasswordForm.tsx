@@ -78,6 +78,7 @@ export function ForgotPasswordForm() {
         <AuthPageShell
             title={shellContent[step].title}
             subtitle={shellContent[step].subtitle}
+            fullViewport={false}
             footer={
                 <p>
                     Remember your password?{' '}

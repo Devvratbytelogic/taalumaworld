@@ -50,6 +50,7 @@ export function ResetPasswordForm() {
         <AuthPageShell
             title="Set a New Password"
             subtitle="Choose a strong password to secure your account"
+            fullViewport={false}
             footer={
                 <p>
                     Remembered your password?{' '}

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '@/components/ui/utils';
 
 type AuthPageShellProps = {
     title: string;
@@ -7,11 +8,17 @@ type AuthPageShellProps = {
     children: ReactNode;
     footer?: ReactNode;
     wide?: boolean;
+    fullViewport?: boolean;
 };
 
-export function AuthPageShell({ title, subtitle, icon, children, footer, wide }: AuthPageShellProps) {
+export function AuthPageShell({ title, subtitle, icon, children, footer, wide, fullViewport = true }: AuthPageShellProps) {
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-linear-to-b from-primary/5 to-background">
+        <div
+            className={cn(
+                'flex items-center justify-center px-4 py-12 bg-linear-to-b from-primary/5 to-background',
+                fullViewport && 'min-h-screen',
+            )}
+        >
             <div className={`w-full ${wide ? 'max-w-xl' : 'max-w-md'} bg-white rounded-md border p-8 sm:p-10`}>
                 <div className="text-center mb-8">
                     {icon && (

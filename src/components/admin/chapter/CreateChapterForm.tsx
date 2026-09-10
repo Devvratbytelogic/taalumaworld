@@ -42,6 +42,7 @@ import {
   getPdfSizeLimitMessage,
   isAllowedImageFile,
 } from '@/constants/fileUpload';
+import { slugify } from '@/utils/slugify';
 
 const initialFormValues = {
   bookId: '',
@@ -66,10 +67,6 @@ const initialFormValues = {
   json_ld: '',
   accepted_agreement_ids: [] as string[],
 };
-
-function slugFromTitle(title: string): string {
-  return title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
 
 export function CreateChapterForm() {
   const router = useRouter();
@@ -128,9 +125,10 @@ export function CreateChapterForm() {
         twitterImage: vals.twitter_image,
       });
       vals.accepted_agreement_ids.forEach((id, index) => formData.append(`accepted_agreement_ids[${index}]`, id));
-      formData.append('slug', vals.slug);
+      const slug = slugify(vals.slug);
+      formData.append('slug', slug);
       const baseUrl = APP_SITE_URL.replace(/\/$/, '');
-      formData.append('shareable_link', `${baseUrl}${getBlueprintRoutePath(vals.slug ?? '')}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
+      formData.append('shareable_link', `${baseUrl}${getBlueprintRoutePath(slug)}?createdBy=${getUserId() ?? ''}&role=${getUserRole() ?? ''}`);
       await appendUserIpToFormData(formData);
       try {
         const res = await addChapter(formData).unwrap();
@@ -330,7 +328,7 @@ export function CreateChapterForm() {
               onChange={(e) => {
                 handleChange(e);
                 if (!slugManuallyEdited.current) {
-                  setFieldValue('slug', slugFromTitle(e.target.value));
+                  setFieldValue('slug', slugify(e.target.value));
                 }
               }}
               onBlur={handleBlur}
@@ -351,9 +349,12 @@ export function CreateChapterForm() {
             value={values.slug}
             onChange={(e) => {
               slugManuallyEdited.current = true;
-              setFieldValue('slug', slugFromTitle(e.target.value));
+              setFieldValue('slug', slugify(e.target.value, { allowTrailingHyphen: true }));
             }}
-            onBlur={handleBlur}
+            onBlur={(e) => {
+              setFieldValue('slug', slugify(e.target.value));
+              handleBlur(e);
+            }}
             disabled={isSubmittingState}
             placeholder="e.g., introduction-to-leadership"
           />

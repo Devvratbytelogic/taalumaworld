@@ -107,6 +107,7 @@ export function SignUpForm() {
     return (
         <AuthPageShell
             wide
+            fullViewport={false}
             title="Create Account"
             subtitle="Register as a mentor on TaalumaWorld"
             footer={

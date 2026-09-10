@@ -18,6 +18,7 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { agreementSchema } from '@/utils/formValidation';
 import { AGREEMENT_STATUS_OPTIONS } from '@/constants/agreements';
 import { useGetAgreementByIdQuery } from '@/store/rtkQueries/agreementAPIs';
+import { slugify } from '@/utils/slugify';
 
 export type AgreementFormValues = {
   title: string;
@@ -36,10 +37,6 @@ const emptyValues: AgreementFormValues = {
   status: 'active',
   can_block: false,
 };
-
-function toSlug(value: string) {
-  return value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
 
 interface AgreementModalProps {
   open: boolean;
@@ -71,7 +68,10 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
     validationSchema: agreementSchema,
     enableReinitialize: true,
     onSubmit: async (formValues) => {
-      await onSubmit(formValues, agreementId ?? undefined);
+      const storedSlug = agreement?.slug ?? '';
+      const slugChanged = formValues.slug !== storedSlug;
+      const slug = !isEditing || slugChanged ? slugify(formValues.slug) : formValues.slug;
+      await onSubmit({ ...formValues, slug }, agreementId ?? undefined);
     },
   });
 
@@ -111,8 +111,8 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                     value={values.title}
                     onChange={(e) => {
                       handleChange(e);
-                      if (!values.slug || values.slug === toSlug(values.title)) {
-                        setFieldValue('slug', toSlug(e.target.value));
+                      if (!values.slug || values.slug === slugify(values.title)) {
+                        setFieldValue('slug', slugify(e.target.value));
                       }
                     }}
                     onBlur={handleBlur}
@@ -130,8 +130,15 @@ export function AgreementModal({ open, agreementId, agreementTypeOptions, onOpen
                     name="slug"
                     placeholder="e.g., privacy-policy"
                     value={values.slug}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      setFieldValue('slug', slugify(e.target.value, { allowTrailingHyphen: true }));
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value.endsWith('-')) {
+                        setFieldValue('slug', slugify(e.target.value));
+                      }
+                      handleBlur(e);
+                    }}
                     disabled={isSubmitting}
                     className={errors.slug && touched.slug ? 'border-red-500' : ''}
                   />

@@ -13,7 +13,7 @@ export default function ReaderTestimonials({ testimonials }: ReaderTestimonialsP
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold mb-3">Insights from the Career Architects</h2>
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        See how thousands of young professionals are upgrading their Career Operating Systems to stay ahead of the AI shift.
+                        See how young professionals are upgrading their Career Operating Systems to stay ahead of the AI shift.
                     </p>
                 </div>
 

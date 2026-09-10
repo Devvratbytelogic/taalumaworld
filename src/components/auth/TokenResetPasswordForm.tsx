@@ -57,6 +57,7 @@ export function TokenResetPasswordForm({ token }: TokenResetPasswordFormProps) {
       <AuthPageShell
         title="Invalid Reset Link"
         subtitle="This password reset link is missing or invalid."
+        fullViewport={false}
         footer={
           <p>
             <Link href={getHomeRoutePath()} className="font-medium text-primary hover:text-primary/80">
@@ -76,6 +77,7 @@ export function TokenResetPasswordForm({ token }: TokenResetPasswordFormProps) {
     <AuthPageShell
       title="Set a New Password"
       subtitle="Choose a strong password to secure your account"
+      fullViewport={false}
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">

@@ -86,11 +86,11 @@ export const agreementAPIs = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
         }),
-        getAllAgreementSentences: builder.query<IAllAgreementSentencesAPIResponse, { touchpoint?: string } | void>({
+        getAllAgreementSentences: builder.query<IAllAgreementSentencesAPIResponse, { page?: number; limit?: number; search?: string; status?: string; touchpoint?: string } | void>({
             query: (params) => ({
                 url: `/admin/agreements/sentences`,
                 method: 'GET',
-                params: params?.touchpoint ? { touchpoint: params.touchpoint } : {},
+                params: params ? { ...params } : {},
             }),
             providesTags: ['AdminAgreementSentences'],
         }),

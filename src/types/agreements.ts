@@ -113,11 +113,18 @@ export interface IAgreementsByTouchpointAPIResponse {
   message: string;
   timestamp: string;
 }
+export interface IAllAgreementSentencesData {
+  data?: IAgreementSentenceEntity[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 export interface IAllAgreementSentencesAPIResponse {
   http_status_code: number;
   http_status_msg: string;
   success: boolean;
-  data: IAgreementSentenceEntity[] | IAgreementsByTouchpointData;
+  data: IAllAgreementSentencesData;
   message: string;
   timestamp: string;
 }

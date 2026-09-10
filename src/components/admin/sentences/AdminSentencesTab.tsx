@@ -11,8 +11,9 @@ import {
   useDeleteAgreementSentenceMutation,
   useGetAllAgreementTypesQuery,
 } from '@/store/rtkQueries/agreementAPIs';
-import type { IAgreementSentenceEntity, IAgreementSentenceLink, IAgreementsByTouchpointData } from '@/types/agreements';
+import type { IAgreementSentenceEntity, IAgreementSentenceLink } from '@/types/agreements';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminSentencesHeader } from './AdminSentencesHeader';
@@ -30,11 +31,6 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
   inactive: 'bg-slate-100 text-slate-600 border-slate-200!',
 };
 
-function normalizeSentences(data: IAgreementSentenceEntity[] | IAgreementsByTouchpointData | undefined): IAgreementSentenceEntity[] {
-  if (!data) return [];
-  return Array.isArray(data) ? data : (data.sentences ?? []);
-}
-
 function getLinkTypeName(link: IAgreementSentenceLink): string {
   if (typeof link.agreementType === 'object' && link.agreementType?.name) return link.agreementType.name;
   return link.agreement?.agreement_type?.name ?? link.agreement?.title ?? '';
@@ -42,6 +38,8 @@ function getLinkTypeName(link: IAgreementSentenceLink): string {
 
 export function AdminSentencesTab() {
   const dispatch = useDispatch();
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [touchpointFilter, setTouchpointFilter] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,29 +50,45 @@ export function AdminSentencesTab() {
   const canEdit = hasPermission(SENTENCES_MODEL, 'edit');
   const canDelete = hasPermission(SENTENCES_MODEL, 'delete');
 
+  const debouncedSearch = useDebounce(search, 500);
+
   const { data: agreementTypesResponse } = useGetAllAgreementTypesQuery({ limit: 100, status: 'active' });
   const agreementTypeOptions = useMemo(
     () => (agreementTypesResponse?.data?.data ?? []).map((type) => ({ value: type._id, label: type.name })),
     [agreementTypesResponse],
   );
 
-  const { data: sentencesResponse, isLoading } = useGetAllAgreementSentencesQuery(
-    touchpointFilter ? { touchpoint: touchpointFilter } : undefined,
-  );
-  const sentences = normalizeSentences(sentencesResponse?.data);
-  const totalSentences = sentences.length;
-  const pagedSentences = sentences.slice(
-    paginationModel.page * paginationModel.pageSize,
-    paginationModel.page * paginationModel.pageSize + paginationModel.pageSize,
-  );
+  const { data: sentencesResponse, isLoading } = useGetAllAgreementSentencesQuery({
+    page: paginationModel.page + 1,
+    limit: paginationModel.pageSize,
+    search: debouncedSearch,
+    ...(statusFilter ? { status: statusFilter } : {}),
+    ...(touchpointFilter ? { touchpoint: touchpointFilter } : {}),
+  });
+
+  const sentencesData = sentencesResponse?.data;
+  const sentences = sentencesData?.data ?? [];
+  const totalSentences = sentencesData?.total ?? 0;
 
   const [addSentence] = useAddAgreementSentenceMutation();
   const [updateSentence] = useUpdateAgreementSentenceMutation();
   const [deleteSentence] = useDeleteAgreementSentenceMutation();
 
+  const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    resetToFirstPage();
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    resetToFirstPage();
+  };
+
   const handleTouchpointChange = (value: string) => {
     setTouchpointFilter(value);
-    setPaginationModel((prev) => ({ ...prev, page: 0 }));
+    resetToFirstPage();
   };
 
   const handleSave = async (values: SentenceFormValues, id?: string) => {
@@ -284,11 +298,18 @@ export function AdminSentencesTab() {
         }}
       />
 
-      <AdminSentencesSearch selectedTouchpoint={touchpointFilter} onTouchpointChange={handleTouchpointChange} />
+      <AdminSentencesSearch
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        selectedTouchpoint={touchpointFilter}
+        onTouchpointChange={handleTouchpointChange}
+        selectedStatus={statusFilter}
+        onStatusChange={handleStatusChange}
+      />
 
       <div className="border border-gray-200 rounded-md overflow-hidden">
         <CommonDataTable
-          rows={pagedSentences}
+          rows={sentences}
           columns={columns}
           getRowId={(row) => row._id}
           loading={isLoading}

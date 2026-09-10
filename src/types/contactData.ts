@@ -1,3 +1,5 @@
+import type { IConsentType } from '@/types/agreements';
+
 export interface IAllContactusDataAPIResponse {
     http_status_code: number;
     http_status_msg: string;
@@ -21,6 +23,7 @@ export interface IAllContactusDataAPIResponse {
     message: string;
     createdAt: string;
     updatedAt: string;
+    consent_type?: IConsentType[] | null;
     id: number;
     __v: number;
   }

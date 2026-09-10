@@ -10,6 +10,7 @@ import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 import { IAllTransactionsAPIResponse } from '@/types/transaction';
 import { IAllContactusDataAPIResponse } from '@/types/contactData';
 import { IAllSubscribersAPIResponse } from '@/types/subscribers';
+import { IGetInboxParams, IInboxAPIResponse } from '@/types/inbox';
 import { IAllOrdersAPIResponse, ISingleOrderAPIResponse } from '@/types/order';
 import { ISingleChapterAPIResponse } from '@/types/singleChapter';
 import { IPaystackBanksAPIResponse } from '@/types/paystackBanks';
@@ -140,6 +141,16 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             providesTags: ['AdminSubscribers'],
         }),
 
+        /** Combined inbox (newsletter + contact-us) */
+        getInbox: builder.query<IInboxAPIResponse, IGetInboxParams | void>({
+            query: (params) => ({
+                url: `/admin/inbox`,
+                method: 'GET',
+                params: params ? { ...params } : {},
+            }),
+            providesTags: ['AdminInbox'],
+        }),
+
         /** Orders (optional `type`: 'books' | 'chapter'; omit for all) */
         getAllOrders: builder.query<IAllOrdersAPIResponse, {
             type?: 'books' | 'chapter';
@@ -198,6 +209,7 @@ export const {
     useGetAllTransactionsQuery,
     useGetAllContactusDataQuery,
     useGetAllSubscribersQuery,
+    useGetInboxQuery,
     useGetAllOrdersQuery,
     useGetOrderByIdQuery,
     useGetPaystackBanksQuery,

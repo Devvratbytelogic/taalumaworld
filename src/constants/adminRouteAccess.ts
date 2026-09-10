@@ -56,6 +56,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/faqs', models: ['FAQs'] },
   { path: '/admin/all-contact-us', models: ['Contact Us'] },
   { path: '/admin/subscribers', models: ['Subscribers'] },
+  { path: '/admin/inbox', models: ['Contact Us', 'Subscribers'] },
 ];
 
 /**

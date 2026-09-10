@@ -25,5 +25,6 @@ export type AdminSection =
   | 'faqs'
   | 'contact_us'
   | 'subscribers'
+  | 'inbox'
   | 'institutions'
   | 'roles_permissions';

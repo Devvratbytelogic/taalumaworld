@@ -1,5 +1,6 @@
 'use client'
 import React, { useRef, useState } from 'react'
+import { useDispatch } from 'react-redux';
 import toast from '@/utils/toast';
 import { useFormik } from 'formik';
 import { contactFormSchema } from '@/utils/formValidation';
@@ -9,6 +10,8 @@ import Button from '../ui/Button';
 import { usePostContactUsMutation } from '@/store/rtkQueries/userPostAPI';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
+import { getApiErrorMessage } from '@/utils/agreementConsent';
 
 const INQUIRY_OPTIONS = [
     'I want to become a Mentor',
@@ -21,6 +24,7 @@ const INQUIRY_OPTIONS = [
 ]
 
 export default function ContactUsPageForm() {
+    const dispatch = useDispatch();
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [postContactUs, { isLoading }] = usePostContactUsMutation();
     const requiredAcceptedRef = useRef(false);
@@ -55,8 +59,12 @@ export default function ContactUsPageForm() {
                         resetForm();
                     }, 3000);
                 }
-            } catch {
-                toast.error('Failed to send message. Please try again.');
+            } catch (error) {
+                const message = getApiErrorMessage(error);
+                if (/agreement updated/i.test(message)) {
+                    dispatch(rtkQuerieSetup.util.invalidateTags(['UserAgreementSentences']));
+                }
+                if (!message) toast.error('Failed to send message. Please try again.');
             }
         },
     });
@@ -175,7 +183,7 @@ export default function ContactUsPageForm() {
                     </div>
 
                     <AgreementSentenceList
-                        touchpoint={AGREEMENT_TOUCHPOINTS.CONTACT_FORM}
+                        touchpoint={AGREEMENT_TOUCHPOINTS.CONTACT_US}
                         onAcceptedAgreementIdsChange={(ids) => formik.setFieldValue('accepted_agreement_ids', ids)}
                         onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
                         error={typeof formik.errors.accepted_agreement_ids === 'string' ? formik.errors.accepted_agreement_ids : undefined}

@@ -196,7 +196,8 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                 <Checkbox
                   checked={values.is_required}
                   onCheckedChange={(checked) => setFieldValue('is_required', !!checked)}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting} 
+                  className='mr-2'
                 />
                 Required — user must check this sentence to proceed
               </label>
@@ -250,7 +251,7 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                         ))}
                       </select>
                     </div>
-                    <div className="flex items-end">
+                    <div className="flex items-center">
                       <button
                         type="button"
                         className="delete_button"
@@ -277,7 +278,7 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
               <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50/60 p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Live preview</p>
                 <label className="flex items-start gap-3 text-sm text-slate-700">
-                  <Checkbox checked disabled className="mt-0.5" />
+                  <Checkbox checked disabled className="mt-0.5 mr-2" />
                   <span>
                     {values.text ? (
                       <AgreementLinkedText text={values.text} links={previewLinks} />

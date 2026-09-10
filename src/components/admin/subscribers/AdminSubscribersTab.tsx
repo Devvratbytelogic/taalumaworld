@@ -16,6 +16,7 @@ import {
     adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
 import { useDebounce } from '@/hooks/useDebounce';
+import { formatConsentType } from '@/utils/agreementConsent';
 import { validateEmail } from '@/utils/formValidation';
 
 const STATUS_OPTIONS = ['Active', 'Inactive'];
@@ -127,6 +128,18 @@ export function AdminSubscribersTab() {
             renderCell: (params) => (
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
                     {params.row.unsubscribedAt}
+                </p>
+            ),
+        },
+        {
+            field: 'consent_type',
+            headerName: 'Consent',
+            minWidth: 260,
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground whitespace-normal">
+                    {formatConsentType(params.row.consent_type)}
                 </p>
             ),
         },

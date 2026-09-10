@@ -167,3 +167,13 @@ export interface IGetUserConsentStatusAgreementType {
   _id: string;
   name: string;
 }
+
+export interface IConsentType {
+  type: string;
+  title: string;
+  agreement_id: string;
+  agreement_code: string;
+  version: string;
+  latest_version: string;
+  accepted_at: string;
+}

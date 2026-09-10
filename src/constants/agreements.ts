@@ -9,7 +9,7 @@ export const AGREEMENT_TOUCHPOINTS = {
   CHECKOUT: 'checkout',
   MENTOR_PAYOUT_SETUP: 'mentor_payout_setup',
   NEWSLETTER: 'newsletter',
-  CONTACT_FORM: 'contact_form',
+  CONTACT_US: 'contact_us',
   VERIFIED_MENTOR_APPLICATION: 'verified_mentor_application',
   AUDIO_VIDEO_MENTORING: 'audio_video_mentoring',
 };
@@ -23,7 +23,7 @@ export const AGREEMENT_TOUCHPOINT_OPTIONS = [
   { value: AGREEMENT_TOUCHPOINTS.CHECKOUT, label: 'Checkout' },
   { value: AGREEMENT_TOUCHPOINTS.MENTOR_PAYOUT_SETUP, label: 'Mentor Payout Setup' },
   { value: AGREEMENT_TOUCHPOINTS.NEWSLETTER, label: 'Newsletter Signup' },
-  { value: AGREEMENT_TOUCHPOINTS.CONTACT_FORM, label: 'Contact Form' },
+  { value: AGREEMENT_TOUCHPOINTS.CONTACT_US, label: 'Contact Us' },
   { value: AGREEMENT_TOUCHPOINTS.VERIFIED_MENTOR_APPLICATION, label: 'Verified Mentor Application' },
   { value: AGREEMENT_TOUCHPOINTS.AUDIO_VIDEO_MENTORING, label: 'Audio/Video Mentoring' },
 ];

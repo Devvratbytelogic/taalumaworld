@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
 import type { IAllContactusDataAPIResponseData } from '@/types/contactData';
+import { formatConsentType } from '@/utils/agreementConsent';
 import moment from 'moment';
 
 export function AdminContactUsTab() {
@@ -85,6 +86,18 @@ export function AdminContactUsTab() {
             renderCell: (params) => (
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
                     {params.row.createdAt ? moment(params.row.createdAt).format('DD/MM/YYYY HH:mm') : '—'}
+                </p>
+            ),
+        },
+        {
+            field: 'consent_type',
+            headerName: 'Consent',
+            minWidth: 260,
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <p className="text-sm text-muted-foreground whitespace-normal">
+                    {formatConsentType(params.row.consent_type)}
                 </p>
             ),
         },

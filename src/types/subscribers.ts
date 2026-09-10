@@ -1,3 +1,5 @@
+import type { IConsentType } from '@/types/agreements';
+
 export interface SubscriberEntry {
     _id: string;
     id: number;
@@ -7,6 +9,7 @@ export interface SubscriberEntry {
     createdAt: string;
     updatedAt: string;
     unsubscribedAt: string;
+    consent_type?: IConsentType[] | null;
     __v: number;
 }
 

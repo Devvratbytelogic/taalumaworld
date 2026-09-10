@@ -1,11 +1,14 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Input } from '@/components/ui/input';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { useSubscribeToNewsletterMutation } from '@/store/rtkQueries/userPostAPI';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
+import { getApiErrorMessage } from '@/utils/agreementConsent';
 import { EMAIL_VALIDATION_MESSAGE, normalizeEmail, validateEmail } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 
@@ -15,6 +18,7 @@ export default function FooterSubscribe() {
   const [acceptedAgreementIds, setAcceptedAgreementIds] = useState<string[]>([]);
   const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [agreementTouched, setAgreementTouched] = useState(false);
+  const dispatch = useDispatch();
   const [subscribeToNewsletter, { isLoading: isSubscribing }] = useSubscribeToNewsletterMutation();
 
   const trimmedEmail = newsletterEmail.trim();
@@ -47,7 +51,6 @@ export default function FooterSubscribe() {
       const res = await subscribeToNewsletter({
         email,
         accepted_agreement_ids: acceptedAgreementIds,
-        send_updates: acceptedAgreementIds.length > 0,
       }).unwrap();
 
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
@@ -56,8 +59,12 @@ export default function FooterSubscribe() {
         setEmailTouched(false);
         setAgreementTouched(false);
       }
-    } catch {
-      toast.error('Failed to subscribe. Please try again.');
+    } catch (error) {
+      const message = getApiErrorMessage(error);
+      if (/agreement updated/i.test(message)) {
+        dispatch(rtkQuerieSetup.util.invalidateTags(['UserAgreementSentences']));
+      }
+      if (!message) toast.error('Failed to subscribe. Please try again.');
     }
   };
 
@@ -99,7 +106,6 @@ export default function FooterSubscribe() {
       <div className="[&_label]:text-gray-300 [&_label_.text-muted-foreground]:text-gray-500">
         <AgreementSentenceList
           touchpoint={AGREEMENT_TOUCHPOINTS.NEWSLETTER}
-          defaultChecked
           onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
           onRequiredAcceptedChange={setAllRequiredAccepted}
           error={agreementError}

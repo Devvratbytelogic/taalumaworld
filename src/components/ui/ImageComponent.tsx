@@ -1,12 +1,14 @@
 'use client'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getInitials } from '@/utils/getInitials'
 
 interface ImageComponentProps {
   src: string | undefined;
   alt: string | undefined;
   object_cover: boolean;
+  priority?: boolean;
+  fallbackSrc?: string;
 }
 
 function resolveImageSrc(src: string | undefined): string | null {
@@ -29,16 +31,21 @@ export default function ImageComponent({
   src,
   alt,
   object_cover,
+  priority = false,
+  fallbackSrc,
 }: ImageComponentProps) {
 
   const resolvedSrc = resolveImageSrc(src);
-  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const resolvedFallback = resolveImageSrc(fallbackSrc);
+  const [activeSrc, setActiveSrc] = useState<string | null>(resolvedSrc);
+  const [hasError, setHasError] = useState(false);
 
-  const hasLoaded = loadedSrc === resolvedSrc;
-  const hasError = failedSrc === resolvedSrc;
+  useEffect(() => {
+    setActiveSrc(resolvedSrc);
+    setHasError(false);
+  }, [resolvedSrc]);
 
-  if (hasError || !resolvedSrc) {
+  if (hasError || !activeSrc) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-sky-600 text-sm font-semibold uppercase">
         {getInitials(alt ?? '', 'NA')}
@@ -48,14 +55,20 @@ export default function ImageComponent({
 
   return (
     <Image
-      src={resolvedSrc}
+      src={activeSrc}
       width={1000}
       height={1000}
       alt={alt || 'image'}
       title={alt || 'image'}
-      className={`w-full h-full ${object_cover ? 'object-cover' : 'object-contain'} ${hasLoaded ? '' : 'invisible'}`}
-      onLoad={() => setLoadedSrc(resolvedSrc)}
-      onError={() => setFailedSrc(resolvedSrc)}
+      priority={priority}
+      className={`w-full h-full ${object_cover ? 'object-cover' : 'object-contain'}`}
+      onError={() => {
+        if (resolvedFallback && resolvedFallback !== activeSrc) {
+          setActiveSrc(resolvedFallback);
+          return;
+        }
+        setHasError(true);
+      }}
     />
   )
 }

@@ -25,7 +25,7 @@ import { useUpdateGlobalSettingsMutation } from '@/store/rtkQueries/adminPostApi
 import { refreshAfterSettingsChange } from '@/store/server-api/refreshCache';
 import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import ImageComponent from '@/components/ui/ImageComponent';
-import { USER_TYPE } from '@/constants/common';
+import { DEFAULT_BRAND_LOGO, USER_TYPE } from '@/constants/common';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 
@@ -224,7 +224,13 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                             >
                                 {logo ? (
                                     <div className="h-9 w-35 sm:h-10 sm:w-40">
-                                        <ImageComponent src={logo} alt={brandName || 'Admin'} object_cover={false} />
+                                        <ImageComponent
+                                            src={logo}
+                                            fallbackSrc={DEFAULT_BRAND_LOGO}
+                                            alt={brandName || 'Admin'}
+                                            object_cover={false}
+                                            priority
+                                        />
                                     </div>
                                 ) : (
                                     <>

@@ -51,6 +51,7 @@ export default function PrimaryFooter({
                                     <div className="h-10 w-40 overflow-hidden rounded-sm bg-white px-1.5 py-1">
                                         <ImageComponent
                                             src={settings?.logo || DEFAULT_BRAND_LOGO}
+                                            fallbackSrc={DEFAULT_BRAND_LOGO}
                                             alt={brandName}
                                             object_cover={false}
                                         />

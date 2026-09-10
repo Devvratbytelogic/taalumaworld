@@ -4,7 +4,7 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 export const institutionApi = rtkQuerieSetup.injectEndpoints({
     endpoints: (builder) => ({
         /** Institutions */
-        getAllInstitutions: builder.query<IAllInstitutionsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; isDeleted?: boolean } | void>({
+        getAllInstitutions: builder.query<IAllInstitutionsAPIResponse, { page?: number; limit?: number; search?: string; status?: string; isExpired?: boolean; isDeleted?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/institutions`,
                 method: 'GET',
@@ -51,7 +51,7 @@ export const institutionApi = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Institution Usage Report */
-        getInstitutionKpis: builder.query<IInstitutionKpisAPIResponse, { page?: number; limit?: number; search?: string; status?: string } | void>({
+        getInstitutionKpis: builder.query<IInstitutionKpisAPIResponse, { page?: number; limit?: number; search?: string; status?: string; isExpired?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/institutions/kpis`,
                 method: 'GET',

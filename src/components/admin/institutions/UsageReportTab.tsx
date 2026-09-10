@@ -15,6 +15,7 @@ import { AdminInstitutionUsageSkeleton } from '@/components/skeleton-loader/admi
 export function UsageReportTab() {
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
+    const [isExpired, setIsExpired] = useState('');
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const debouncedSearch = useDebounce(search, 500);
 
@@ -23,6 +24,7 @@ export function UsageReportTab() {
         limit: paginationModel.pageSize,
         ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
         ...(status ? { status } : {}),
+        ...(isExpired !== '' ? { isExpired: isExpired === 'true' } : {}),
     });
 
     const summary = response?.data?.summary;
@@ -38,6 +40,11 @@ export function UsageReportTab() {
 
     const handleStatusChange = (value: string) => {
         setStatus(value);
+        resetToFirstPage();
+    };
+
+    const handleExpiredChange = (value: string) => {
+        setIsExpired(value);
         resetToFirstPage();
     };
 
@@ -186,6 +193,15 @@ export function UsageReportTab() {
                     <option value="">All statuses</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
+                </select>
+                <select
+                    value={isExpired}
+                    onChange={(e) => handleExpiredChange(e.target.value)}
+                    className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                    <option value="">All promo periods</option>
+                    <option value="true">Expired</option>
+                    <option value="false">Not expired</option>
                 </select>
             </div>
 

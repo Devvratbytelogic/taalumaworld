@@ -15,34 +15,50 @@ type SiteLayoutProps = {
     settings: IGlobalSettings | null;
 };
 
+function isChromeHiddenPath(pathname: string) {
+    return pathname.startsWith('/admin') || pathname.startsWith('/portal') || pathname.startsWith('/auth/');
+}
+
 export default function ConditionalSiteLayout({
     children,
     logo,
     contentMode,
     settings,
 }: SiteLayoutProps) {
+    const pathname = usePathname();
+    const hideChromeByPath = isChromeHiddenPath(pathname);
+
+    if (pathname === '/') {
+        return (
+            <Suspense
+                fallback={
+                    <SiteChrome logo={logo} contentMode={contentMode} settings={settings} hideChrome={false}>
+                        {children}
+                    </SiteChrome>
+                }
+            >
+                <HomeSiteChrome logo={logo} contentMode={contentMode} settings={settings}>
+                    {children}
+                </HomeSiteChrome>
+            </Suspense>
+        );
+    }
+
     return (
-        <Suspense fallback={<SiteChrome logo={logo} contentMode={contentMode} settings={settings} hideChrome={false}>{children}</SiteChrome>}>
-            <SiteChromeWithOAuth logo={logo} contentMode={contentMode} settings={settings}>
-                {children}
-            </SiteChromeWithOAuth>
-        </Suspense>
+        <SiteChrome logo={logo} contentMode={contentMode} settings={settings} hideChrome={hideChromeByPath}>
+            {children}
+        </SiteChrome>
     );
 }
 
-function SiteChromeWithOAuth({
+function HomeSiteChrome({
     children,
     logo,
     contentMode,
     settings,
 }: SiteLayoutProps) {
-    const pathname = usePathname();
     const searchParams = useSearchParams();
-    const isAdminRoute = pathname.startsWith('/admin');
-    const isPortalRoute = pathname.startsWith('/portal');
-    const isAuthCallbackRoute = pathname.startsWith('/auth/');
-    const isLinkedInOriginCallback = pathname === '/' && hasSocialOAuthCallbackParams(searchParams);
-    const hideChrome = isAdminRoute || isPortalRoute || isAuthCallbackRoute || isLinkedInOriginCallback;
+    const hideChrome = hasSocialOAuthCallbackParams(searchParams);
 
     return (
         <SiteChrome logo={logo} contentMode={contentMode} settings={settings} hideChrome={hideChrome}>

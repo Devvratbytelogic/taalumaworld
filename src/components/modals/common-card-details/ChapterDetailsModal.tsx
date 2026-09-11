@@ -28,7 +28,6 @@ export default function ChapterDetailsModal() {
   const router = useRouter();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const chapter = data?.chapter
-  console.log('chapter', chapter);
 
   const onClose = () => dispatch(closeModal());
 

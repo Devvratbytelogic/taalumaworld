@@ -31,14 +31,17 @@ export default async function PolicyPage({ params }: PageProps) {
   const { slug } = await params;
   const response = await getAgreementBySlugServerAPI({ slug });
   const agreement = response?.data;
+  console.log('response', response);
 
   if (!agreement || agreement.status !== 'active') {
     notFound();
   }
 
+  const versionLabel = agreement.version ? `Version ${agreement.version}` : null;
   const lastUpdated = agreement.updatedAt
-    ? moment(agreement.updatedAt).format('MMMM D, YYYY')
+    ? `Last updated: ${moment(agreement.updatedAt).format('MMMM D, YYYY')}`
     : null;
+  const meta = [versionLabel, lastUpdated].filter(Boolean).join(' · ');
 
   return (
     <div className="min-h-screen">
@@ -54,11 +57,11 @@ export default async function PolicyPage({ params }: PageProps) {
             <h1 className="text-4xl font-bold leading-tight text-foreground md:text-5xl lg:text-6xl">
               {agreement.title}
             </h1>
-            {(agreement.text || lastUpdated) && (
+            {(agreement.text || meta) && (
               <p className="text-lg leading-relaxed text-muted-foreground">
                 {agreement.text}
-                {agreement.text && lastUpdated ? ' · ' : ''}
-                {lastUpdated ? `Last updated: ${lastUpdated}` : ''}
+                {agreement.text && meta ? ' · ' : ''}
+                {meta}
               </p>
             )}
           </div>

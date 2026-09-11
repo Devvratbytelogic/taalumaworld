@@ -29,6 +29,7 @@ const AUTH_DEPENDENT_TAGS = [
     'MyChapters',
     'Wishlist',
     'UserProfile',
+    'AdminProfile',
     'FollowedMentors',
     'ReadingHistory',
     'UserOrders',
@@ -104,23 +105,17 @@ export function hasAuthCookie(): boolean {
     return !!getAuthToken()
 }
 
-/** Clear auth cookies on logout */
+/** Clear cookies and browser storage on logout. */
 export function clearAuthCookies(options?: { refetchQueries?: boolean }): void {
-    Cookies.remove(AUTH_COOKIE_NAME, { path: '/' })
-    Cookies.remove('userID', { path: '/' })
-    Cookies.remove('user_role', { path: '/' })
-    Cookies.remove('user_email', { path: '/' })
+    Object.keys(Cookies.get()).forEach((name) => Cookies.remove(name, { path: '/' }))
+    if (typeof window !== 'undefined') {
+        localStorage.clear()
+        sessionStorage.clear()
+    }
     dispatchAuthChanged()
     if (options?.refetchQueries !== false) {
         invalidateAuthDependentQueries()
     }
-}
-
-/** Clear all cookies for the current domain and reload the page (e.g. after logout). */
-export function clearAllCookiesAndReload(homePath: string = '/'): void {
-    const all = Cookies.get()
-    Object.keys(all).forEach((name) => Cookies.remove(name, { path: '/' }))
-    window.location.href = homePath
 }
 
 /**

@@ -108,6 +108,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             query: () => ({
                 url: `/admin/get-profile`,
                 method: 'GET',
+                cache: 'no-store',
             }),
             providesTags: ['AdminProfile'],
         }),

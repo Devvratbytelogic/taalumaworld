@@ -81,7 +81,7 @@ export function AddEditInstitutionModal() {
         name: formValues.name.trim(),
         domains: formValues.domains
           .split(',')
-          .map((domain) => domain.trim())
+          .map((domain) => domain.trim().toLowerCase())
           .filter(Boolean),
         promo_start: formValues.promo_start,
         promo_end: formValues.promo_end,
@@ -171,7 +171,9 @@ export function AddEditInstitutionModal() {
               {touched.domains && errors.domains ? (
                 <p className="text-sm text-red-600">{errors.domains}</p>
               ) : null}
-              <p className="text-xs text-slate-500">Comma-separated. Domain matching is case-insensitive.</p>
+              <p className="text-xs text-slate-500">
+                Comma-separated domains only (e.g. example.com). Emails and URLs are not allowed.
+              </p>
             </div>
 
             <div className="space-y-3">

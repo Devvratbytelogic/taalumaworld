@@ -66,6 +66,17 @@ export function validateEmail(email: unknown): boolean {
 
 export const EMAIL_VALIDATION_MESSAGE = 'Please enter a valid email address'
 
+/** Bare host only: example.com. Rejects emails, URLs, and single-label values. */
+export function isValidInstitutionDomain(value: unknown): boolean {
+  if (typeof value !== 'string') return false
+  const domain = value.trim().toLowerCase()
+  if (!domain || domain.length > MAX_DOMAIN_LENGTH) return false
+  if (domain.includes('@') || domain.includes('/') || domain.includes(':') || domain.includes(' ')) return false
+  return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(domain)
+}
+
+const INSTITUTION_DOMAIN_MESSAGE = 'Enter domain names only (e.g. example.com), not email addresses or URLs'
+
 const emailRules = Yup.string()
   .required('Email is required')
   .test('strict-email', EMAIL_VALIDATION_MESSAGE, (v) => !v || validateEmail(v))
@@ -635,7 +646,16 @@ export const verifiedMentorApplicationSchema = Yup.object({
 export const institutionSchema = Yup.object({
   name: withSafeShortText(Yup.string().trim().required('Institution name is required')),
   contact_email: emailRules.label('Contact email'),
-  domains: Yup.string().trim().required('At least one email domain is required'),
+  domains: Yup.string()
+    .trim()
+    .required('At least one email domain is required')
+    .test('valid-domains', INSTITUTION_DOMAIN_MESSAGE, (value) => {
+      const parts = (value ?? '')
+        .split(',')
+        .map((domain) => domain.trim())
+        .filter(Boolean)
+      return parts.length > 0 && parts.every((domain) => isValidInstitutionDomain(domain))
+    }),
   promo_start: Yup.string().required('Start date is required'),
   promo_end: Yup.string()
     .required('End date is required')

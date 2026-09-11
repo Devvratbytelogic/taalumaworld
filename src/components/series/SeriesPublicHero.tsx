@@ -75,18 +75,9 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
       return (
         <>
           KSH {resolvedPrice.toFixed(2)}
-          {bookDetails?.pricingModel === VISIBLE.BOOK && (
-            <span className="ml-1.5 text-sm font-normal text-muted-foreground">(complete series)</span>
-          )}
+          <span className="ml-1.5 text-sm font-normal text-muted-foreground">(complete series)</span>
         </>
       );
-    }
-
-    if (isPricingModelChapter) {
-      if (bookDetails?.priceLabel) return bookDetails.priceLabel;
-      const fromPrice = Number(bookDetails?.fromPrice) || 0;
-      if (fromPrice > 0) return <>From KSH {fromPrice.toFixed(2)}</>;
-      return 'Priced by blueprint';
     }
 
     return (
@@ -122,13 +113,15 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
               {bookDetails?.title}
             </h1>
 
-            <p className="mt-4 font-ubuntu text-2xl font-bold tracking-tight text-primary">
-              {accessPending ? (
-                <span className="inline-block h-8 w-40 animate-pulse rounded bg-muted" />
-              ) : (
-                renderPriceLabel()
-              )}
-            </p>
+            {!isPricingModelChapter && (
+              <p className="mt-4 font-ubuntu text-2xl font-bold tracking-tight text-primary">
+                {accessPending ? (
+                  <span className="inline-block h-8 w-40 animate-pulse rounded bg-muted" />
+                ) : (
+                  renderPriceLabel()
+                )}
+              </p>
+            )}
 
             {bookDetails?.description && (
               <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground line-clamp-6">
@@ -195,7 +188,7 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
 
             <div className="mt-6 space-y-4">
               {showPurchaseActions && isPricingModelChapter && (
-                <p className="flex items-start gap-2.5 text-sm leading-6 text-muted-foreground">
+                <p className="flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
                   <Lock className="mt-0.5 h-4 w-4 shrink-0" />
                   This series is priced by blueprint. Purchase individual blueprints below to get access.
                 </p>

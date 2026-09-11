@@ -108,9 +108,11 @@ export default function CommonCard({ data }: CommonCardProps) {
                     </div>
 
                     {isBook
-                        ? (displayPrice > 0
-                            ? <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</p>
-                            : <p className="font-semibold text-lg text-primary">FREE</p>
+                        ? (isPricingModelChapter
+                            ? <p className="text-sm font-medium text-primary">{'Priced by blueprint'}</p>
+                            : displayPrice > 0
+                                ? <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</p>
+                                : <p className="font-semibold text-lg text-primary">FREE</p>
                         )
                         : (data?.isFree
                             ? <p className="font-medium text-success tracking-tight">Free to Read</p>

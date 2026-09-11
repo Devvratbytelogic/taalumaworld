@@ -43,7 +43,7 @@ export default function ShareButtons({
     const { data: profileRes } = useGetUserProfileQuery(undefined, { skip: !isAuthenticated });
     const loggedInReferralCode = isAuthenticated ? (profileRes?.data?.short_code?.trim() || '') : '';
     const effectiveReferralCode = loggedInReferralCode || referralCode?.trim() || '';
-    const basePath = type === VISIBLE.BOOK ? getSeriesRoutePath(slug) : getBlueprintRoutePath(slug);
+    const basePath = type === (VISIBLE.BOOK) ? getSeriesRoutePath(slug) : getBlueprintRoutePath(slug);
     const shareableLink = effectiveReferralCode
         ? `${APP_SITE_URL}${basePath}?referralCode=${effectiveReferralCode}`
         : `${APP_SITE_URL}${basePath}`;

@@ -110,7 +110,7 @@ export default function ChapterPurchaseModal() {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} className="modal_container" size="2xl" scrollBehavior='outside' classNames={modalClassNames}>
+      <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} className="modal_container" size="2xl" scrollBehavior='outside' classNames={modalClassNames}>
         <ModalContent>
           {chapter?.coverImage && (
             <div className="relative shrink-0 bg-muted flex justify-center py-4">
@@ -234,12 +234,12 @@ export default function ChapterPurchaseModal() {
             )}
 
             <div className="border-t pt-3">
-              <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Blueprint</h3>
+              <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this {isBook ? 'Series' : 'Blueprint'}</h3>
               <ShareButtons
                 referralCode={chapter?.createdBy?.short_code ?? ''}
                 slug={chapter?.slug ?? ''}
                 title={chapter?.title}
-                type={VISIBLE.CHAPTER}
+                type={isBook ? VISIBLE.BOOK : VISIBLE.CHAPTER}
                 size="sm"
                 showCopyLink={true}
               />

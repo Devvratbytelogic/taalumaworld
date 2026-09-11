@@ -23,6 +23,12 @@ const INQUIRY_OPTIONS = [
     'General enquiry',
 ]
 
+const DEFAULT_INQUIRY_TYPE = 'General enquiry'
+
+function RequiredMark() {
+    return <span className="text-red-500"> *</span>
+}
+
 export default function ContactUsPageForm() {
     const dispatch = useDispatch();
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -32,7 +38,7 @@ export default function ContactUsPageForm() {
         initialValues: {
             name: '',
             email: '',
-            inquiryType: '',
+            inquiryType: DEFAULT_INQUIRY_TYPE,
             subject: '',
             message: '',
             accepted_agreement_ids: [] as string[],
@@ -85,7 +91,7 @@ export default function ContactUsPageForm() {
                     {/* Name Field */}
                     <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-medium">
-                            Your Name
+                            Your Name<RequiredMark />
                         </label>
                         <Input
                             id="name"
@@ -105,7 +111,7 @@ export default function ContactUsPageForm() {
                     {/* Email Field */}
                     <div className="space-y-2">
                         <label htmlFor="email" className="text-sm font-medium">
-                            Email Address
+                            Email Address<RequiredMark />
                         </label>
                         <Input
                             id="email"
@@ -125,7 +131,7 @@ export default function ContactUsPageForm() {
                     {/* Inquiry Type */}
                     <div className="space-y-2">
                         <label htmlFor="inquiryType" className="text-sm font-medium">
-                            How Can We Help?
+                            How Can We Help?<RequiredMark />
                         </label>
                         <select
                             id="inquiryType"
@@ -140,12 +146,15 @@ export default function ContactUsPageForm() {
                                 <option key={opt} value={opt}>{opt}</option>
                             ))}
                         </select>
+                        {formik.touched.inquiryType && formik.errors.inquiryType && (
+                            <p className="text-sm text-red-500">{formik.errors.inquiryType}</p>
+                        )}
                     </div>
 
                     {/* Subject Field */}
                     <div className="space-y-2">
                         <label htmlFor="subject" className="text-sm font-medium">
-                            Subject
+                            Subject<RequiredMark />
                         </label>
                         <Input
                             id="subject"
@@ -165,7 +174,7 @@ export default function ContactUsPageForm() {
                     {/* Message Field */}
                     <div className="space-y-2">
                         <label htmlFor="message" className="text-sm font-medium">
-                            Message
+                            Message<RequiredMark />
                         </label>
                         <textarea
                             id="message"

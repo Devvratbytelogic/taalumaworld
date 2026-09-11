@@ -229,7 +229,7 @@ export default function ContactUsContent() {
             </section>
 
             {/* Partner With Taaluma */}
-            <section className="pt-4 sm:pt-8 bg-background">
+            <section className="py-4 sm:py-8 bg-background">
                 <div className="container">
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-primary rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
@@ -254,18 +254,21 @@ export default function ContactUsContent() {
             </section>
 
             {/* FAQ Preview */}
-            <section className="pt-4 sm:py-8 bg-accent/30">
+            <section className="py-12 sm:py-16 bg-accent/30">
                 <div className="container">
-                    <div className="max-w-3xl mx-auto text-center space-y-4">
+                    <div className="max-w-3xl mx-auto text-center space-y-6">
                         <h2 className="text-3xl md:text-4xl font-bold">Have Questions?</h2>
                         <p className="text-lg text-muted-foreground">
                             Most answers can be found in our Frequently Asked Questions section.
                         </p>
-                        <Link href={getFAQRoutePath()}>
-                            <Button className='global_btn rounded_full outline_primary hover-lift'>
+                        <div className="flex justify-center pt-2">
+                            <Button
+                                className="global_btn rounded_full outline_primary hover-lift w_fit"
+                                onPress={() => router.push(getFAQRoutePath())}
+                            >
                                 Visit FAQs
                             </Button>
-                        </Link>
+                        </div>
                     </div>
                 </div>
             </section>

@@ -153,6 +153,7 @@ export const contactFormSchema = Yup.object({
     .min(2, 'Name must be at least 2 characters')
     .required('Name is required'),
   email: emailRules,
+  inquiryType: Yup.string().trim().required('Please select how we can help'),
   subject: Yup.string()
     .min(5, 'Subject must be at least 5 characters')
     .required('Subject is required'),

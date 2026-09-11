@@ -70,6 +70,24 @@ const emailRules = Yup.string()
   .required('Email is required')
   .test('strict-email', EMAIL_VALIDATION_MESSAGE, (v) => !v || validateEmail(v))
 
+/**
+ * Junk symbols that do not belong in titles/names (and that slugify would
+ * turn into words like "percent"). Do not use this on emails, passwords,
+ * URLs, descriptions, rich text, or messages — those need punctuation.
+ */
+export const UNSAFE_SHORT_TEXT_MESSAGE =
+  'Please remove special characters such as % * { } [ ] < >'
+
+const UNSAFE_SHORT_TEXT_CHARS = /[%^*$_{}[\]\\<>~`|]/
+
+function withSafeShortText(schema: Yup.StringSchema) {
+  return schema.test(
+    'safe-short-text',
+    UNSAFE_SHORT_TEXT_MESSAGE,
+    (value) => !value || !UNSAFE_SHORT_TEXT_CHARS.test(value),
+  )
+}
+
 // Sign In Validation Schema
 export const signInSchema = Yup.object({
   email: emailRules,
@@ -79,9 +97,11 @@ export const signInSchema = Yup.object({
 });
 
 const signUpBaseSchema = {
-  name: Yup.string()
-    .min(2, 'Name must be at least 2 characters')
-    .required('Name is required'),
+  name: withSafeShortText(
+    Yup.string()
+      .min(2, 'Name must be at least 2 characters')
+      .required('Name is required'),
+  ),
   email: emailRules,
   password: passwordRules,
   confirmPassword: Yup.string()
@@ -130,9 +150,11 @@ export const otpVerificationSchema = Yup.object({
 
 // Checkout Payment Validation Schema
 export const checkoutSchema = Yup.object({
-  cardHolder: Yup.string()
-    .min(2, 'Name must be at least 2 characters')
-    .required('Cardholder name is required'),
+  cardHolder: withSafeShortText(
+    Yup.string()
+      .min(2, 'Name must be at least 2 characters')
+      .required('Cardholder name is required'),
+  ),
   cardNumber: Yup.string()
     .required('Card number is required')
     .test('cardNumber', 'Enter a valid 16-digit card number', (val) =>
@@ -149,9 +171,11 @@ export const checkoutSchema = Yup.object({
 
 // Contact Form Validation Schema
 export const contactFormSchema = Yup.object({
-  name: Yup.string()
-    .min(2, 'Name must be at least 2 characters')
-    .required('Name is required'),
+  name: withSafeShortText(
+    Yup.string()
+      .min(2, 'Name must be at least 2 characters')
+      .required('Name is required'),
+  ),
   email: emailRules,
   inquiryType: Yup.string().trim().required('Please select how we can help'),
   subject: Yup.string()
@@ -200,9 +224,11 @@ const openGraphFieldsSchema = {
 
 // Add Book Modal Validation Schema (matches API: title, description, pricingModel, price, status, slug, cover_image, tags)
 export const addBookSchema = Yup.object({
-  title: Yup.string()
-    .trim()
-    .required('Please enter a series title'),
+  title: withSafeShortText(
+    Yup.string()
+      .trim()
+      .required('Please enter a series title'),
+  ),
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
@@ -223,9 +249,11 @@ export const addBookSchema = Yup.object({
 });
 // Edit Book Modal Validation Schema — cover_image is optional (null = keep existing)
 export const editBookSchema = Yup.object({
-  title: Yup.string()
-    .trim()
-    .required('Please enter a series title'),
+  title: withSafeShortText(
+    Yup.string()
+      .trim()
+      .required('Please enter a series title'),
+  ),
   description: Yup.string()
     .trim()
     .required('Please enter a description'),
@@ -287,9 +315,11 @@ export function isBlueprintFormComplete(
 
 export const addChapterSchema = Yup.object({
   bookId: Yup.string().required('Please select a series'),
-  title: Yup.string()
-    .trim()
-    .required('Please enter a blueprint title'),
+  title: withSafeShortText(
+    Yup.string()
+      .trim()
+      .required('Please enter a blueprint title'),
+  ),
   description: Yup.string()
     .trim()
     .required('Please enter a blueprint description'),
@@ -326,18 +356,22 @@ export const addChapterSchema = Yup.object({
 
 // Add / Edit Category Modal Validation Schema
 export const categorySchema = Yup.object({
-  name: Yup.string()
-    .trim()
-    .required('Please enter a category name'),
+  name: withSafeShortText(
+    Yup.string()
+      .trim()
+      .required('Please enter a category name'),
+  ),
   subcategories: Yup.array().of(Yup.string().trim().required()),
 });
 
 // Add / Edit Address Modal Validation Schema (matches API: full_name, phone, address_line1, address_line2, landmark, city, state, country, postal_code, isDefault)
 export const addressSchema = Yup.object({
-  full_name: Yup.string()
-    .trim()
-    .min(2, 'Name must be at least 2 characters')
-    .required('Full name is required'),
+  full_name: withSafeShortText(
+    Yup.string()
+      .trim()
+      .min(2, 'Name must be at least 2 characters')
+      .required('Full name is required'),
+  ),
   phone: Yup.string()
     .trim()
     .test(
@@ -357,10 +391,12 @@ export const addressSchema = Yup.object({
 
 // Update Profile Validation Schema
 export const updateProfileSchema = Yup.object({
-  fullName: Yup.string()
-    .trim()
-    .min(2, 'Name must be at least 2 characters')
-    .required('Name is required'),
+  fullName: withSafeShortText(
+    Yup.string()
+      .trim()
+      .min(2, 'Name must be at least 2 characters')
+      .required('Name is required'),
+  ),
   phone: Yup.string()
     .trim()
     .test(
@@ -372,7 +408,9 @@ export const updateProfileSchema = Yup.object({
 
 // Mentor Profile Tab — Profile details (name, bio, social links) Validation Schema
 export const mentorProfileDetailsSchema = Yup.object({
-  name: Yup.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be at most 60 characters').required('Name is required'),
+  name: withSafeShortText(
+    Yup.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be at most 60 characters').required('Name is required'),
+  ),
   phone: Yup.string()
     .trim()
     .test(
@@ -444,7 +482,7 @@ export const mentorPayoutDetailsSchema = Yup.object({
 const urlSchema = Yup.string().url('Must be a valid URL (https://...)');
 export const globalSettingsSchema = Yup.object({
   // Platform
-  platformName: Yup.string().trim().required('Platform name is required'),
+  platformName: withSafeShortText(Yup.string().trim().required('Platform name is required')),
   platformDescription: Yup.string().trim(),
   supportEmail: emailRules.label('Support email'),
   email: Yup.string().test('strict-email', 'Enter a valid contact email', (v) => !v || validateEmail(v)),
@@ -490,8 +528,8 @@ export const globalSettingsSchema = Yup.object({
 
 // Testimonial Form Validation Schema
 export const testimonialSchema = Yup.object({
-  name: Yup.string().trim().required('Name is required'),
-  title: Yup.string().trim().required('Title / role is required'),
+  name: withSafeShortText(Yup.string().trim().required('Name is required')),
+  title: withSafeShortText(Yup.string().trim().required('Title / role is required')),
   message: Yup.string().trim().required('Message is required'),
   rating: Yup.number()
     .typeError('Rating must be a number')
@@ -508,15 +546,17 @@ export const testimonialSchema = Yup.object({
 });
 
 export const inviteMentorSchema = Yup.object({
-  fullName: Yup.string().trim(),
+  fullName: withSafeShortText(Yup.string().trim()),
   email: emailRules,
 });
 
 // Add / Edit Author (Thought Leader) Modal Validation Schema
 export const authorSchema = Yup.object({
-  fullName: Yup.string()
-    .trim()
-    .required('Please enter full name'),
+  fullName: withSafeShortText(
+    Yup.string()
+      .trim()
+      .required('Please enter full name'),
+  ),
   email: emailRules,
   professionalBio: Yup.string().trim(),
   status: Yup.string()
@@ -593,7 +633,7 @@ export const verifiedMentorApplicationSchema = Yup.object({
 
 // Add / Edit Institution Modal Validation Schema
 export const institutionSchema = Yup.object({
-  name: Yup.string().trim().required('Institution name is required'),
+  name: withSafeShortText(Yup.string().trim().required('Institution name is required')),
   contact_email: emailRules.label('Contact email'),
   domains: Yup.string().trim().required('At least one email domain is required'),
   promo_start: Yup.string().required('Start date is required'),
@@ -635,7 +675,7 @@ export const registrationPromptSchema = Yup.object({
 
 // Add / Edit Role Modal Validation Schema
 export const roleSchema = Yup.object({
-  name: Yup.string().trim().required('Role name is required'),
+  name: withSafeShortText(Yup.string().trim().required('Role name is required')),
   description: Yup.string().trim(),
   number_of_users: Yup.number()
     .transform((v) => (v === '' || v == null || Number.isNaN(Number(v)) ? undefined : Number(v)))
@@ -650,7 +690,7 @@ export const staffStatusSchema = Yup.object({
 
 // Edit platform user (admin users module) — PUT /admin/update-users/:id (form-data)
 export const editUserSchema = Yup.object({
-  name: Yup.string().trim().required('Full name is required'),
+  name: withSafeShortText(Yup.string().trim().required('Full name is required')),
   email: emailRules.label('Email'),
   phone: Yup.string()
     .trim()
@@ -680,7 +720,7 @@ export const editStaffSchema = staffSchema;
 
 // Add / Edit Agreement Type Modal Validation Schema
 export const agreementTypeSchema = Yup.object({
-  name: Yup.string().trim().min(2, 'Name is required').required('Name is required'),
+  name: withSafeShortText(Yup.string().trim().min(2, 'Name is required').required('Name is required')),
   description: Yup.string().trim().min(2, 'Description is required').required('Description is required'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
 });
@@ -693,7 +733,7 @@ export const taxSchema = Yup.object({
     .uppercase()
     .matches(/^[A-Z]{2}$/, 'Country code must be a 2-letter ISO code')
     .required('Country code is required'),
-  tax_name: Yup.string().trim().min(2, 'Tax name is required').required('Tax name is required'),
+  tax_name: withSafeShortText(Yup.string().trim().min(2, 'Tax name is required').required('Tax name is required')),
   tax_percent: Yup.number()
     .typeError('Tax percent must be a number')
     .min(0, 'Tax percent must be 0 or more')
@@ -803,7 +843,7 @@ export const couponSchema = Yup.object({
 
 // Add / Edit Agreement Modal Validation Schema
 export const agreementSchema = Yup.object({
-  title: Yup.string().trim().min(2, 'Title is required').required('Title is required'),
+  title: withSafeShortText(Yup.string().trim().min(2, 'Title is required').required('Title is required')),
   slug: Yup.string().trim().required('Slug is required'),
   content: Yup.string().trim().required('Agreement content is required'),
   agreementType: Yup.string().required('Please select an agreement type'),

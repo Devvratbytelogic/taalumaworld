@@ -20,6 +20,7 @@ import {
 } from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { categorySchema } from '@/utils/formValidation';
+import { slugify } from '@/utils/slugify';
 import type { IAllCategoriesAPIResponseData } from '@/types/categories';
 
 function getInitialValuesFromCategory(category: IAllCategoriesAPIResponseData | null) {
@@ -94,11 +95,7 @@ export function EditCategoryModal({
     enableReinitialize: true,
     onSubmit: async () => {
       if (!category) return;
-      const slug = values.name
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+      const slug = slugify(values.name);
       await onSubmit(category.id, {
         name: values.name.trim(),
         slug,

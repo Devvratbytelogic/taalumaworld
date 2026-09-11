@@ -20,6 +20,7 @@ import {
 } from '../../ui/dropdown-menu';
 import toast from '@/utils/toast';
 import { categorySchema } from '@/utils/formValidation';
+import { slugify } from '@/utils/slugify';
 import { IAllCategoriesAPIResponseData } from '@/types/categories';
 
 const initialFormValues = {
@@ -28,11 +29,7 @@ const initialFormValues = {
 };
 
 function slugFromName(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
+  return slugify(name);
 }
 
 /** All categories and nested subcategories with id + name, for the subcategories selector */

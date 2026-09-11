@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'nextjs-toploader/app';
 import { BadgeCheck, BookOpen, Eye, ShoppingCart, Tag, User } from 'lucide-react';
@@ -37,11 +38,6 @@ export default function BookDetailsModal() {
     // Series priced per-chapter can't be added to cart as a whole book; the user must
     // open the series and add individual blueprints instead.
     const isPricingModelChapter = book?.pricingModel === VISIBLE.CHAPTER;
-
-    const viewFullDetails = () => {
-        onClose();
-        router.push(getSeriesRoutePath(book?.slug ?? ''));
-    };
 
     const viewMentorProfile = () => {
         const mentorId = book?.mentor?.short_code || book?.mentor?.id;
@@ -183,14 +179,22 @@ export default function BookDetailsModal() {
 
                 <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
                     {canAccessFull ? (
-                        <Button className="global_btn rounded_full bg_primary w-full" onPress={viewFullDetails} startContent={<BookOpen className="h-4 w-4" />}>
+                        <Button
+                            as={Link}
+                            href={getSeriesRoutePath(book?.slug ?? '')}
+                            className="global_btn rounded_full bg_primary w-full"
+                            onPress={onClose}
+                            startContent={<BookOpen className="h-4 w-4" />}
+                        >
                             Start Reading
                         </Button>
                     ) : isPricingModelChapter ? (
                         // This series is priced per blueprint, so it can't be added to cart as a whole.
                         <Button
+                            as={Link}
+                            href={getSeriesRoutePath(book?.slug ?? '')}
                             className="global_btn rounded_full bg_primary w-full"
-                            onPress={viewFullDetails}
+                            onPress={onClose}
                             startContent={<Eye className="h-4 w-4" />}
                         >
                             View Details
@@ -198,8 +202,10 @@ export default function BookDetailsModal() {
                     ) : (
                         <>
                             <Button
+                                as={Link}
+                                href={getSeriesRoutePath(book?.slug ?? '')}
                                 className="global_btn rounded_full outline_primary shrink-0"
-                                onPress={viewFullDetails}
+                                onPress={onClose}
                                 startContent={<Eye className="h-4 w-4" />}
                             >
                                 View Details

@@ -1,8 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'nextjs-toploader/app';
-import { BadgeCheck, BookOpen, Eye, Lock, ShoppingCart, Tag, User } from 'lucide-react';
+import { BadgeCheck, BookOpen, Eye, Lock, Tag, User } from 'lucide-react';
 import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
@@ -42,11 +43,6 @@ export default function ChapterDetailsModal() {
       ? chapter?.effectivePrice
       : (isPricingModelChapter ? chapter?.effectivePrice : chapter?.series?.effectivePrice)
   ) || 0
-
-  const viewFullDetails = () => {
-    dispatch(closeModal());
-    router.push(getBlueprintRoutePath(chapter?.slug ?? chapter?.id));
-  };
 
   const viewSeriesDetails = () => {
     dispatch(closeModal());
@@ -231,14 +227,22 @@ export default function ChapterDetailsModal() {
 
         <ModalFooter className="flex gap-3 p-4 border-t bg-white shrink-0">
           {chapter?.canRead ? (
-            <Button className="global_btn rounded_full bg_primary w-full" onPress={viewFullDetails} startContent={<BookOpen className="h-4 w-4" />}>
+            <Button
+              as={Link}
+              href={getBlueprintRoutePath(chapter?.slug ?? chapter?.id)}
+              className="global_btn rounded_full bg_primary w-full"
+              onPress={onClose}
+              startContent={<BookOpen className="h-4 w-4" />}
+            >
               Read Free Blueprint
             </Button>
           ) : (
             <>
               <Button
+                as={Link}
+                href={getBlueprintRoutePath(chapter?.slug ?? chapter?.id)}
                 className="global_btn rounded_full outline_primary shrink-0"
-                onPress={viewFullDetails}
+                onPress={onClose}
                 startContent={<Eye className="h-4 w-4" />}
               >
                 View Details

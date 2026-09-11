@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import toast from '@/utils/toast';
+import { refreshAfterBlueprintChange, refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { addChapterSchema, isBlueprintFormComplete } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { APP_SITE_URL } from '@/utils/config';
@@ -144,6 +145,8 @@ export function CreateChapterForm() {
           resetForm({ values: initialFormValues });
           slugManuallyEdited.current = false;
           toast.success(res.message ?? 'Blueprint created successfully');
+          void refreshAfterBlueprintChange(slug);
+          void refreshAfterSeriesChange(books.find((b) => b.id === vals.bookId)?.slug);
           router.push(getChaptersListRoutePath(isMentor));
         }
       } catch (err) {

@@ -17,15 +17,16 @@ const PdfReader = dynamic(() => import('./PdfReader'), {
 interface BlueprintPublicDetailsProps {
   data?: Partial<ISingleChapterAPIResponseData> | null;
   hideMentorDetails?: boolean;
+  accessPending?: boolean;
 }
 
-export default function BlueprintPublicDetails({ data, hideMentorDetails = false }: BlueprintPublicDetailsProps) {
+export default function BlueprintPublicDetails({ data, hideMentorDetails = false, accessPending = false }: BlueprintPublicDetailsProps) {
 // console.log('data', data);
 
   const contentType = data?.content_type || (data?.pdf ? 'pdf' : 'editor');
   const hasContent = contentType === 'editor' && Boolean(data?.content);
   const hasPdf = contentType === 'pdf' && Boolean(data?.pdf);
-  const canRead = data?.canRead;
+  const canRead = accessPending ? false : data?.canRead;
   const isCompleted = Boolean(data?.completed);
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
   const savedProgress = isCompleted ? 100 : Math.max(0, Math.min(100, data?.percentage ?? 0));
@@ -86,16 +87,25 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                         {readingProgress}% viewed
                       </p>
                     )}
-                    {!canRead && (
+                    {accessPending ? (
+                      <span className="h-6 w-16 shrink-0 animate-pulse rounded-full bg-[#F4F4F4]" />
+                    ) : !canRead ? (
                       <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#ECECEC] bg-[#FAFAFA] px-3 py-1 text-xs font-medium text-[#6B6B6B]">
                         <Lock className="h-3 w-3" />
                         Locked
                       </span>
-                    )}
+                    ) : null}
                   </div>
                 </div>
 
-                {canRead ? <>
+                {accessPending ? (
+                  <div className="space-y-3 px-6 py-10 sm:px-8 sm:py-14">
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-[#F4F4F4]" />
+                    <div className="h-4 w-full animate-pulse rounded bg-[#F4F4F4]" />
+                    <div className="h-4 w-5/6 animate-pulse rounded bg-[#F4F4F4]" />
+                    <div className="h-4 w-2/3 animate-pulse rounded bg-[#F4F4F4]" />
+                  </div>
+                ) : canRead ? <>
                   {hasContent && (
                     <div ref={contentRef} className="p-6">
                       <MarkdownContent

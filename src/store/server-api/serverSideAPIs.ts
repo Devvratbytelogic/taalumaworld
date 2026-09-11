@@ -3,6 +3,7 @@ import { notFound, unstable_rethrow } from 'next/navigation';
 import { API_BASE_URL } from '@/utils/config';
 import type { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
+import type { IBlueprintListAPIResponse, ISeriesListAPIResponse } from '@/types/user/contentLists';
 import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
@@ -90,15 +91,29 @@ export async function getGlobalSettingsServerAPI() {
 }
 
 export async function getSingleBlueprintServerAPI({ slug }: { slug: string }) {
-  return serverFetch<ISingleChapterAPIResponse>(
-    `/user/content/blueprint/${encodeURIComponent(slug)}`
+  return publicFetch<ISingleChapterAPIResponse>(
+    `/user/content/blueprint/${encodeURIComponent(slug)}`,
+    { tags: [TAGS.BLUEPRINT_LIST, TAGS.blueprint(slug)] },
   );
 }
 
 export async function getSingleSeriesServerAPI({ slug }: { slug: string }) {
-  return serverFetch<ISingleBookAPIResponse>(
-    `/user/content/series/${encodeURIComponent(slug)}`
+  return publicFetch<ISingleBookAPIResponse>(
+    `/user/content/series/${encodeURIComponent(slug)}`,
+    { tags: [TAGS.SERIES_LIST, TAGS.series(slug)] },
   );
+}
+
+export async function getSeriesListServerAPI() {
+  return publicFetch<ISeriesListAPIResponse>(`/user/content/series-list`, {
+    tags: [TAGS.SERIES_LIST],
+  });
+}
+
+export async function getBlueprintListServerAPI() {
+  return publicFetch<IBlueprintListAPIResponse>(`/user/content/blueprint-list`, {
+    tags: [TAGS.BLUEPRINT_LIST],
+  });
 }
 
 export async function getAllMentorsServerAPI(params?: {

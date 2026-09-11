@@ -10,6 +10,7 @@ import { VISIBLE } from '@/constants/contentMode';
 
 interface SeriesPublicDetailsProps {
   data: ISingleBookAPIResponseData | null;
+  accessPending?: boolean;
 }
 
 function formatIndex(n?: number) {
@@ -19,10 +20,15 @@ function formatIndex(n?: number) {
 function BlueprintStatus({
   chapter,
   isPricingModelChapter,
+  accessPending,
 }: {
   chapter: IChapterEntity;
   isPricingModelChapter: boolean;
+  accessPending?: boolean;
 }) {
+  if (accessPending) {
+    return <span className="h-6 w-20 animate-pulse rounded-full bg-muted" />;
+  }
   const price = Number(chapter.effectivePrice ?? chapter.price) || 0;
 
   if (chapter.canRead || chapter.isPurchased) {
@@ -58,7 +64,7 @@ function BlueprintStatus({
   );
 }
 
-export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) {
+export default function SeriesPublicDetails({ data, accessPending = false }: SeriesPublicDetailsProps) {
   const bookDetails = data?.bookDetails ?? null;
   const chapters = data?.chapters?.data ?? [];
   const isPricingModelChapter = bookDetails?.pricingModel === VISIBLE.CHAPTER;
@@ -117,6 +123,7 @@ export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) 
                           <BlueprintStatus
                             chapter={chapter}
                             isPricingModelChapter={isPricingModelChapter}
+                            accessPending={accessPending}
                           />
                         </span>
                       </div>
@@ -136,6 +143,7 @@ export default function SeriesPublicDetails({ data }: SeriesPublicDetailsProps) 
                       <BlueprintStatus
                         chapter={chapter}
                         isPricingModelChapter={isPricingModelChapter}
+                        accessPending={accessPending}
                       />
                     </div>
 

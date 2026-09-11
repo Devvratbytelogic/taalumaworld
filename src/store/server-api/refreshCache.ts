@@ -43,3 +43,19 @@ export async function refreshAfterPolicyChange(slug?: string | null) {
   const s = slug?.trim();
   if (s) updateTag(TAGS.policy(s));
 }
+
+/** Public series-list + optional /series/[slug] ISR cache */
+export async function refreshAfterSeriesChange(slug?: string | null) {
+  await assertLoggedIn();
+  updateTag(TAGS.SERIES_LIST);
+  const s = slug?.trim();
+  if (s) updateTag(TAGS.series(s));
+}
+
+/** Public blueprint-list + optional /blueprint/[slug] ISR cache */
+export async function refreshAfterBlueprintChange(slug?: string | null) {
+  await assertLoggedIn();
+  updateTag(TAGS.BLUEPRINT_LIST);
+  const s = slug?.trim();
+  if (s) updateTag(TAGS.blueprint(s));
+}

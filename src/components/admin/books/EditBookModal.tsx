@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
+import { refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { editBookSchema } from '@/utils/formValidation';
 import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { IBook } from '@/types/books';
@@ -136,6 +137,9 @@ export function EditBookModal({
           ogImageIsObjectUrlRef.current = false;
           skipOgImagePrefillRef.current = false;
           onOpenChange(false);
+          const nextSlug = slugify(vals.title);
+          void refreshAfterSeriesChange(nextSlug);
+          if (book.slug && book.slug !== nextSlug) void refreshAfterSeriesChange(book.slug);
           toast.success(res.message ?? 'Series updated successfully');
         }
       } catch {

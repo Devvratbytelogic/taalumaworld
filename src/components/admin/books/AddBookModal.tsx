@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '../../ui/dialog';
 import toast from '@/utils/toast';
+import { refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { addBookSchema } from '@/utils/formValidation';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
@@ -103,6 +104,7 @@ export function AddBookModal({
           skipOgImagePrefillRef.current = false;
           resetForm({ values: initialFormValues });
           onOpenChange(false);
+          void refreshAfterSeriesChange(slugify(vals.title));
           toast.success(res.message ?? 'Series created successfully');
         }
       } catch {

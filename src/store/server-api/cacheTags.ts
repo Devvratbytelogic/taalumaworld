@@ -7,4 +7,8 @@ export const TAGS = {
   policy: (slug: string) => `policy:${slug}`,
   FAQS: 'faqs',
   TESTIMONIALS: 'testimonials',
+  SERIES_LIST: 'series-list',
+  series: (slug: string) => `series:${slug}`,
+  BLUEPRINT_LIST: 'blueprint-list',
+  blueprint: (slug: string) => `blueprint:${slug}`,
 } as const;

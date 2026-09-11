@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import toast from '@/utils/toast';
+import { refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminSeriesSkeleton } from '@/components/skeleton-loader/admin';
@@ -98,10 +99,11 @@ export function AdminBooksTab() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   }, [debouncedSearch, selectedLeader, filterByStatus, isTrashView, filterByIsMine]);
 
-  const onDeleteBook = async (id: string) => {
+  const onDeleteBook = async (id: string, slug?: string) => {
     try {
       const res = await deleteBook({ id }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterSeriesChange(slug);
         toast.success(res.message ?? 'Series deleted successfully');
         dispatch(closeModal());
       }
@@ -110,10 +112,11 @@ export function AdminBooksTab() {
     }
   };
 
-  const onRestoreBook = async (id: string) => {
+  const onRestoreBook = async (id: string, slug?: string) => {
     try {
       const res = await restoreBook({ id }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterSeriesChange(slug);
         toast.success(res.message ?? 'Series restored successfully');
         dispatch(closeModal());
       }
@@ -122,7 +125,7 @@ export function AdminBooksTab() {
     }
   };
 
-  const handleStatusChange = async (book: { _id?: string; id?: string; status?: string }, status: string) => {
+  const handleStatusChange = async (book: { _id?: string; id?: string; status?: string; slug?: string }, status: string) => {
     const id = book._id ?? book.id ?? '';
     if (!id || status === book.status || updatingId) return;
 
@@ -133,6 +136,7 @@ export function AdminBooksTab() {
     try {
       const res = await updateBook({ id, values: formData }).unwrap();
       if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        void refreshAfterSeriesChange(book.slug);
         toast.success(res.message ?? `Series marked as ${status}`);
       }
     } catch {
@@ -318,7 +322,7 @@ export function AdminBooksTab() {
                         componentName: 'RestoreConfirmation',
                         data: {
                           itemName: params.row.title,
-                          onRestore: () => onRestoreBook(params.row._id),
+                          onRestore: () => onRestoreBook(params.row._id, params.row.slug),
                         },
                       }))}
                     >
@@ -344,7 +348,7 @@ export function AdminBooksTab() {
                           componentName: 'DeleteConfirmation',
                           data: {
                             itemName: params.row.title,
-                            onDelete: () => onDeleteBook(params.row._id),
+                            onDelete: () => onDeleteBook(params.row._id, params.row.slug),
                           },
                         }))}
                       >

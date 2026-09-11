@@ -2,6 +2,7 @@
 
 import { BadgeCheck, BookOpen, FileText, Lock, Wallet } from 'lucide-react';
 import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
@@ -11,16 +12,18 @@ import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
 import { getSingleAuthorRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
 import { openModal } from '@/store/slices/allModalSlice';
-import { useAuth } from '@/hooks/useAuth';
+import { getAuthToken } from '@/utils/authCookies';
 
 interface SeriesPublicHeroProps {
   data: ISingleBookAPIResponseData | null;
   slug: string;
+  accessPending?: boolean;
+  liveReady?: boolean;
 }
 
-export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) {
+export default function SeriesPublicHero({ data, slug, accessPending = false, liveReady = false }: SeriesPublicHeroProps) {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useAuth();
+  const [resumePurchase, setResumePurchase] = useState(false);
 
   const bookDetails = data?.bookDetails ?? null;
   const mentor = bookDetails?.mentor ?? null;
@@ -28,29 +31,43 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
   const displayPrice = bookDetails?.effectivePrice;
   const purchaseId = bookDetails?.id;
   const purchaseType = VISIBLE.BOOK;
-  const showPurchaseActions = Boolean(bookDetails && !bookDetails.canRead);
+  const showPurchaseActions = Boolean(bookDetails && !bookDetails.canRead && !accessPending);
   const resolvedPrice = displayPrice ?? bookDetails?.price ?? 0;
   const tags = (bookDetails?.tags ?? []).filter(Boolean);
   const hasBlueprints = (data?.chapters?.data?.length ?? 0) > 0;
-  const showStartReading = Boolean(bookDetails?.canRead && hasBlueprints);
+  const showStartReading = Boolean(bookDetails?.canRead && hasBlueprints && !accessPending);
+
+  const openPurchaseModal = () => {
+    if (!bookDetails || bookDetails.canRead) return;
+    dispatch(openModal({
+      componentName: 'ChapterPurchaseModal',
+      data: { chapter: { ...bookDetails, series: bookDetails }, type: 'series' },
+    }));
+  };
+
+  useEffect(() => {
+    if (!resumePurchase || !getAuthToken() || !liveReady) return;
+    setResumePurchase(false);
+    openPurchaseModal();
+  }, [resumePurchase, liveReady, bookDetails]);
 
   const scrollToBlueprints = () => {
     document.getElementById('series-blueprints')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const openLogin = (action: string) => {
-    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType: purchaseType, onSuccess: handleBuyNow } }));
-  };
-
   const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      openLogin('purchase');
+    if (!getAuthToken()) {
+      dispatch(openModal({
+        componentName: 'LoginRequiredModal',
+        data: { action: 'purchase', itemType: purchaseType, onSuccess: () => setResumePurchase(true) },
+      }));
       return;
     }
-    dispatch(openModal({
-      componentName: 'ChapterPurchaseModal',
-      data: { chapter: { ...bookDetails, series: bookDetails }, type: 'series' },
-    }));
+    if (!liveReady) {
+      setResumePurchase(true);
+      return;
+    }
+    openPurchaseModal();
   };
 
   const renderPriceLabel = () => {
@@ -106,7 +123,11 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
             </h1>
 
             <p className="mt-4 font-ubuntu text-2xl font-bold tracking-tight text-primary">
-              {renderPriceLabel()}
+              {accessPending ? (
+                <span className="inline-block h-8 w-40 animate-pulse rounded bg-muted" />
+              ) : (
+                renderPriceLabel()
+              )}
             </p>
 
             {bookDetails?.description && (
@@ -181,7 +202,12 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
               )}
 
               <div className="flex flex-wrap justify-between items-center gap-x-6 gap-y-4">
-                {(showStartReading || (showPurchaseActions && !isPricingModelChapter && resolvedPrice > 0)) && (
+                {accessPending ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="h-11 w-48 animate-pulse rounded-full bg-muted" />
+                    <div className="h-11 w-36 animate-pulse rounded-full bg-muted" />
+                  </div>
+                ) : (showStartReading || (showPurchaseActions && !isPricingModelChapter && resolvedPrice > 0)) ? (
                   <div className="flex flex-wrap items-center gap-3">
                     {showStartReading && (
                       <Button
@@ -213,7 +239,7 @@ export default function SeriesPublicHero({ data, slug }: SeriesPublicHeroProps) 
                       </>
                     )}
                   </div>
-                )}
+                ) : null}
 
                 <div className="flex flex-wrap items-center gap-3">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">

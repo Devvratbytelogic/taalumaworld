@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getEditChapterRoutePath, getViewChapterRoutePath, isMentorPanelPath } from '@/routes/routes';
 import toast from '@/utils/toast';
+import { refreshAfterBlueprintChange, refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -148,10 +149,12 @@ export function AdminChaptersTab() {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
     }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine, filterByContentFlagged, filterByReviewBlueprint]);
 
-    const onDeleteChapter = async (id: string) => {
+    const onDeleteChapter = async (id: string, slug?: string) => {
         try {
             const res = await deleteChapter({ id }).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                void refreshAfterBlueprintChange(slug);
+                void refreshAfterSeriesChange(chapters.find((chapter) => chapter.id === id)?.series?.slug);
                 toast.success(res.message ?? 'Blueprint deleted successfully');
                 dispatch(closeModal());
             }
@@ -160,10 +163,12 @@ export function AdminChaptersTab() {
         }
     };
 
-    const onRestoreChapter = async (id: string) => {
+    const onRestoreChapter = async (id: string, slug?: string) => {
         try {
             const res = await restoreChapter({ id }).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                void refreshAfterBlueprintChange(slug);
+                void refreshAfterSeriesChange(chapters.find((chapter) => chapter.id === id)?.series?.slug);
                 toast.success(res.message ?? 'Blueprint restored successfully');
                 dispatch(closeModal());
             }
@@ -192,6 +197,8 @@ export function AdminChaptersTab() {
         try {
             const res = await updateChapter({ id: chapter.id, values: formData }).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+                void refreshAfterBlueprintChange(chapter.slug);
+                void refreshAfterSeriesChange(chapter.series?.slug);
                 toast.success(res.message ?? `Blueprint marked as ${status}`);
             }
         } catch (error) {
@@ -419,7 +426,7 @@ export function AdminChaptersTab() {
                                                 componentName: 'RestoreConfirmation',
                                                 data: {
                                                     itemName: params.row.title,
-                                                    onRestore: () => onRestoreChapter(params.row.id),
+                                                    onRestore: () => onRestoreChapter(params.row.id, params.row.slug),
                                                 },
                                             }))}
                                         >
@@ -445,7 +452,7 @@ export function AdminChaptersTab() {
                                                     componentName: 'DeleteConfirmation',
                                                     data: {
                                                         itemName: params.row.title,
-                                                        onDelete: () => onDeleteChapter(params.row.id),
+                                                        onDelete: () => onDeleteChapter(params.row.id, params.row.slug),
                                                     },
                                                 }))}
                                             >

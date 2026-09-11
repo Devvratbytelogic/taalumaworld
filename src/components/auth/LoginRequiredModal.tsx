@@ -1,12 +1,13 @@
-import React from 'react'
+'use client';
+
+import { useEffect } from 'react';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { Modal, ModalContent, ModalBody, } from '@heroui/react'
 import { useDispatch, useSelector } from 'react-redux';
 import { BookOpen, ShoppingCart, Lock, LogIn, UserPlus, Heart } from 'lucide-react';
 import Button from '../ui/Button';
-
-
+import { getAuthToken } from '@/utils/authCookies';
 
 export default function LoginRequiredModal() {
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
@@ -15,6 +16,10 @@ export default function LoginRequiredModal() {
   const itemType = data?.itemType;
   const onCancel = data?.onCancel;
   const onSuccess = data?.onSuccess;
+
+  useEffect(() => {
+    if (isOpen && getAuthToken()) dispatch(closeModal());
+  }, [isOpen, dispatch]);
 
   const itemLabel = itemType === 'chapter' ? 'blueprint' : itemType === 'book' ? 'series' : itemType;
 

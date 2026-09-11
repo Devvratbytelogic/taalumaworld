@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { BadgeCheck, BookOpen, Lock, Tag, User } from 'lucide-react';
@@ -16,12 +16,13 @@ import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPay
 import { AgreementSentenceList, scrollToAgreementSection } from '@/components/ui/AgreementSentenceList';
 import ChapterPurchaseAddresses from '@/components/pages-components/chapter/ChapterPurchaseAddresses';
 import { closeModal } from '@/store/slices/allModalSlice';
+import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { RootState } from '@/store/store';
 import { getSeriesRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
-import { useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
+import { useGetSingleBookQuery, useGetSingleChapterQuery, useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
 
 const modalClassNames = {
   base: 'max-w-2xl rounded-3xl overflow-hidden',
@@ -43,9 +44,17 @@ export default function ChapterPurchaseModal() {
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
   const chapter = data?.chapter;
   const isBook = data?.type === 'series';
+  const liveSlug = chapter?.slug ?? '';
+  const { data: liveBook } = useGetSingleBookQuery(liveSlug, { skip: !isBook || !liveSlug });
+  const { data: liveChapter } = useGetSingleChapterQuery(liveSlug, { skip: isBook || !liveSlug });
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
   const isPaymentBusy = isWalletPaying || isPaystackPaying;
+
+  useEffect(() => {
+    const canRead = isBook ? liveBook?.data?.bookDetails?.canRead : liveChapter?.data?.canRead;
+    if (canRead) dispatch(closeModal());
+  }, [isBook, liveBook, liveChapter, dispatch]);
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const checkoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
@@ -74,6 +83,7 @@ export default function ChapterPurchaseModal() {
   };
 
   const handlePurchaseSuccess = () => {
+    dispatch(rtkQuerieSetup.util.invalidateTags(['SingleChapter', 'AllChapters', 'MyChapters']));
     toast.success('Purchase successful! You can now read this blueprint.');
     dispatch(closeModal());
     router.refresh();

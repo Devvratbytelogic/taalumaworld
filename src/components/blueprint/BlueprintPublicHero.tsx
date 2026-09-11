@@ -1,7 +1,8 @@
 'use client';
 
-import { BookOpen, FileText, ShoppingCart, Wallet, BadgeCheck } from 'lucide-react';
+import { BookOpen, FileText, Wallet, BadgeCheck } from 'lucide-react';
 import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import Button from '@/components/ui/Button';
@@ -11,15 +12,17 @@ import { getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { VISIBLE } from '@/constants/contentMode';
 import { openModal } from '@/store/slices/allModalSlice';
-import { useAuth } from '@/hooks/useAuth';
+import { getAuthToken } from '@/utils/authCookies';
 
 interface BlueprintPublicHeroProps {
   data: ISingleChapterAPIResponseData | null;
+  accessPending?: boolean;
+  liveReady?: boolean;
 }
 
-export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) {
+export default function BlueprintPublicHero({ data, accessPending = false, liveReady = false }: BlueprintPublicHeroProps) {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useAuth();
+  const [resumePurchase, setResumePurchase] = useState(false);
 
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
   const displayPrice = isPricingModelChapter
@@ -27,19 +30,33 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
     : data?.series?.effectivePrice;
   const purchaseId = isPricingModelChapter ? data?.id : data?.series?.id;
   const purchaseType = isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK;
-  const showPurchaseActions = Boolean(data && !data.canRead);
+  const showPurchaseActions = Boolean(data && !data.canRead && !accessPending);
   const resolvedPrice = displayPrice ?? data?.price ?? 0;
 
-  const openLogin = (action: string) => {
-    dispatch(openModal({ componentName: 'LoginRequiredModal', data: { action, itemType: purchaseType, onSuccess: handleBuyNow } }));
+  const openPurchaseModal = () => {
+    if (!data || data.canRead) return;
+    dispatch(openModal({ componentName: 'ChapterPurchaseModal', data: { chapter: data } }));
   };
 
+  useEffect(() => {
+    if (!resumePurchase || !getAuthToken() || !liveReady) return;
+    setResumePurchase(false);
+    openPurchaseModal();
+  }, [resumePurchase, liveReady, data]);
+
   const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      openLogin('purchase');
+    if (!getAuthToken()) {
+      dispatch(openModal({
+        componentName: 'LoginRequiredModal',
+        data: { action: 'purchase', itemType: purchaseType, onSuccess: () => setResumePurchase(true) },
+      }));
       return;
     }
-    dispatch(openModal({ componentName: 'ChapterPurchaseModal', data: { chapter: data } }));
+    if (!liveReady) {
+      setResumePurchase(true);
+      return;
+    }
+    openPurchaseModal();
   };
 
   const renderPriceLabel = () => {
@@ -82,7 +99,13 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                     {data?.category?.name}
                   </span>
                 )} */}
-                <p className="font-semibold text-lg text-primary">{renderPriceLabel()}</p>
+                <p className="font-semibold text-lg text-primary">
+                  {accessPending ? (
+                    <span className="inline-block h-6 w-32 animate-pulse rounded bg-muted" />
+                  ) : (
+                    renderPriceLabel()
+                  )}
+                </p>
                 {/* {!data?.isFree && (
                   <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
                     {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
@@ -140,7 +163,12 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                 )}
               </div>
 
-              {showPurchaseActions && (
+              {accessPending ? (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="h-11 w-full animate-pulse rounded-full bg-muted sm:w-48" />
+                  <div className="h-11 w-full animate-pulse rounded-full bg-muted sm:w-48" />
+                </div>
+              ) : showPurchaseActions ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Button
                     className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
@@ -161,7 +189,7 @@ export default function BlueprintPublicHero({ data }: BlueprintPublicHeroProps) 
                   />
 
                 </div>
-              )}
+              ) : null}
 
               <div>
                 <p className="mb-3 text-sm font-medium text-foreground">Share this blueprint</p>

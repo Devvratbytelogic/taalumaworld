@@ -1,14 +1,23 @@
 import type { Metadata } from 'next';
-import SeriesPublicHero from '@/components/series/SeriesPublicHero';
-import SeriesPublicDetails from '@/components/series/SeriesPublicDetails';
-import DirectPurchasePaymentModal from '@/components/payments/DirectPurchasePaymentModal';
-import { getSingleSeriesServerAPI } from '@/store/server-api/serverSideAPIs';
-import { getDirectPurchasePaystackReference } from '@/utils/paystackReturn';
+import SeriesPageClient from '@/components/series/SeriesPageClient';
+import { getSeriesListServerAPI, getSingleSeriesServerAPI } from '@/store/server-api/serverSideAPIs';
+
+export const revalidate = 300;
+export const dynamicParams = true;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ reference?: string | string[]; trxref?: string | string[] }>;
 };
+
+export async function generateStaticParams() {
+  const response = await getSeriesListServerAPI();
+  const series = response?.data ?? [];
+
+  return series
+    .map((item) => item.slug)
+    .filter((slug): slug is string => Boolean(slug))
+    .map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -47,10 +56,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function SingleSeriesPage({ params, searchParams }: PageProps) {
+export default async function SingleSeriesPage({ params }: PageProps) {
   const { slug } = await params;
-  const query = await searchParams;
-  const paystackReference = getDirectPurchasePaystackReference(query);
   const response = await getSingleSeriesServerAPI({ slug });
   const data = response?.data ?? null;
 
@@ -63,18 +70,7 @@ export default async function SingleSeriesPage({ params, searchParams }: PagePro
         />
       )}
 
-      {paystackReference ? (
-        <DirectPurchasePaymentModal
-          reference={paystackReference}
-          kind="series"
-          slug={slug}
-        />
-      ) : null}
-
-      <div className="space_top">
-        <SeriesPublicHero data={data} slug={slug} />
-        <SeriesPublicDetails data={data} />
-      </div>
+      <SeriesPageClient slug={slug} initialData={data} />
     </>
   );
 }

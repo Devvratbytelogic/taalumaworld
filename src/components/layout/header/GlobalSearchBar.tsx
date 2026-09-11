@@ -9,6 +9,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/components/ui/utils';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { getBlueprintRoutePath, getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
+import { VISIBLE } from '@/constants/contentMode';
 
 interface GlobalSearchBarProps {
   onSelect: () => void;
@@ -190,6 +191,8 @@ function SearchResultPriceBadge({ isPurchased, price }: { isPurchased: boolean; 
 }
 
 function SeriesResultRow({ item }: { item: SeriesEntity }) {
+  const isPricedByBlueprint = item.pricingModel === VISIBLE.CHAPTER;
+
   return (
     <>
       <SearchResultThumbnail src={item.coverImage} alt={item.title} />
@@ -197,7 +200,13 @@ function SeriesResultRow({ item }: { item: SeriesEntity }) {
         <p className="truncate text-sm font-medium text-gray-900">{item.title}</p>
         <p className="truncate text-xs text-gray-500">Series</p>
       </div>
-      <SearchResultPriceBadge isPurchased={item.isPurchased} price={item.effectivePrice} />
+      {isPricedByBlueprint ? (
+        <span className="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-600">
+          Priced by blueprint
+        </span>
+      ) : (
+        <SearchResultPriceBadge isPurchased={item.isPurchased} price={item.effectivePrice} />
+      )}
     </>
   );
 }

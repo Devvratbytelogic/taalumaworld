@@ -198,9 +198,15 @@ export default function ChapterDetailsModal() {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-primary">
-                  {Number(chapter?.series?.effectivePrice) > 0 ? `KSH ${Number(chapter?.series?.effectivePrice).toFixed(2)}` : 'FREE'}
+                  {isPricingModelChapter
+                    ? 'Priced by blueprint'
+                    : Number(chapter?.series?.effectivePrice) > 0
+                      ? `KSH ${Number(chapter?.series?.effectivePrice).toFixed(2)}`
+                      : 'FREE'}
                 </p>
-                <p className="text-xs text-muted-foreground">Full Series</p>
+                <p className="text-xs text-muted-foreground">
+                  {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                </p>
               </div>
             </div>
           )}

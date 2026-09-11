@@ -96,14 +96,16 @@ export function MyWishlistPage() {
           {items.length > 0 ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {items && items?.map((item) => {
-                const isBlueprint = item.type === 'Chapter';
+                const isBlueprint = item.type?.toLowerCase() === VISIBLE.CHAPTER;
                 const title = isBlueprint ? item.blueprint?.title : item.series?.title;
                 const description = isBlueprint ? item.blueprint?.description : item.series?.description;
                 const coverImage = isBlueprint ? item.blueprint?.coverImage : item.series?.coverImage;
                 const routePath = isBlueprint ? getBlueprintRoutePath(item.blueprint?.slug ?? '') : getSeriesRoutePath(item.series?.slug ?? '');
                 const price = isBlueprint ? item.blueprint?.price ?? 0 : item.series?.price ?? 0;
-                const isFree = isBlueprint ? item.blueprint?.isFree : price === 0;
                 const isChapterPriced = item.series?.pricingModel === VISIBLE.CHAPTER;
+                const isFree = isBlueprint
+                  ? item.blueprint?.isFree
+                  : !isChapterPriced && price === 0;
                 return (
                   <article
                     key={item._id}
@@ -173,7 +175,9 @@ export function MyWishlistPage() {
 
                       <div className="mt-4 flex items-end justify-between gap-2 border-t border-gray-100 pt-3">
                         <div>
-                          {isFree ? (
+                          {!isBlueprint && isChapterPriced ? (
+                            <p className="text-sm font-bold text-primary">Priced by blueprint</p>
+                          ) : isFree ? (
                             <p className="text-lg font-bold text-primary">Free</p>
                           ) : (
                             <p className="text-lg font-bold text-primary">KSH {price?.toFixed(2) ?? 0}</p>

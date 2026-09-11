@@ -3,6 +3,7 @@ import { FileText } from 'lucide-react';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { getSeriesRoutePath } from '@/routes/routes';
 import type { IMentorBookEntity } from '@/types/user/mentorDetails';
+import { VISIBLE } from '@/constants/contentMode';
 
 interface MentorBookCardProps {
   book: IMentorBookEntity;
@@ -29,7 +30,7 @@ export default function MentorBookCard({ book, index }: MentorBookCardProps) {
       <div className="flex flex-1 flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {book?.pricingModel === 'chapter' ? 'By Blueprint' : 'Full Series'}
+            {book?.pricingModel === VISIBLE.CHAPTER ? 'By Blueprint' : 'Full Series'}
           </span>
           {book?.status && (
             <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
@@ -46,8 +47,12 @@ export default function MentorBookCard({ book, index }: MentorBookCardProps) {
 
         <div className="mt-4 flex flex-1 items-end justify-between border-t border-border-subtle pt-4">
           <span className="text-sm text-muted-foreground">View series</span>
-          <span className="font-semibold text-primary">
-            {book?.price > 0 ? `KSH ${book?.price.toFixed(2)}` : 'FREE'}
+          <span className="text-sm font-semibold text-primary">
+            {book?.pricingModel === VISIBLE.CHAPTER
+              ? 'Priced by blueprint'
+              : book?.price > 0
+                ? `KSH ${book?.price.toFixed(2)}`
+                : 'FREE'}
           </span>
         </div>
       </div>

@@ -111,7 +111,9 @@ export type IAnalyticsMentorsAPIResponse = IAnalyticsEnvelope<IAnalyticsMentorsD
 
 export interface IAnalyticsInstitutionMetrics {
   registrations: number;
+  /** Unique partner students counted as active in the selected range (all time if none). */
   activeUsers: number;
+  /** Blueprint opens in that range. Not completions. */
   consumption: number;
   conversions: number;
   conversionRate: number;

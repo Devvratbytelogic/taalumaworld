@@ -94,6 +94,7 @@ export function UsageReportTab() {
         {
             field: 'activeUsers',
             headerName: 'Active Users',
+            description: 'Unique partner students counted as active. This report has no date filter.',
             width: 120,
             sortable: false,
             align: 'right',
@@ -103,6 +104,7 @@ export function UsageReportTab() {
         {
             field: 'blueprintViews',
             headerName: 'Blueprint Views',
+            description: 'Times a blueprint was opened. Not a completion count.',
             width: 140,
             sortable: false,
             align: 'right',
@@ -174,6 +176,9 @@ export function UsageReportTab() {
                 <AdminStatCard label="Paid Conversions" value={summary?.paidConversions ?? 0} icon={CreditCard} tone="orange" />
                 <AdminStatCard label="Avg. Conversion Rate" value={`${summary?.averageConversionRate ?? 0}%`} icon={Percent} tone="slate" />
             </div>
+            <p className="text-xs text-slate-500">
+                Active Users are unique partner students counted as active. This report has no date filter, so the figure is not limited to a selected period. Blueprint Views are times a blueprint was opened — not completions.
+            </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">

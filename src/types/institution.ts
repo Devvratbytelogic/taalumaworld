@@ -170,7 +170,9 @@ export interface IInstitutionKpisData {
 }
 export interface IInstitutionKpisSummary {
   totalRegistrations: number;
+  /** Unique partner students counted as active. This KPI request has no date range. */
   activeUsers: number;
+  /** Blueprint open events. Not completions. */
   blueprintViews: number;
   paidConversions: number;
   averageConversionRate: number;
@@ -180,7 +182,9 @@ export interface IInstitutionKpiEntity {
   name: string;
   status: string;
   registrations: number;
+  /** Unique partner students counted as active. This KPI request has no date range. */
   activeUsers: number;
+  /** Blueprint open events. Not completions. */
   blueprintViews: number;
   conversions: number;
   conversionRate: number;

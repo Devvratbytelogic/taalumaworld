@@ -11,6 +11,7 @@ export type AgreementCheckboxProps = {
     disabled?: boolean
     error?: string
     touched?: boolean
+    isRequired?: boolean
     children: React.ReactNode
 }
 
@@ -22,9 +23,12 @@ export function AgreementCheckbox({
     disabled,
     error,
     touched,
+    isRequired = false,
     children,
 }: AgreementCheckboxProps) {
-    const hasError = Boolean(error && touched)
+    // Group-level agreement errors should only mark remaining required boxes.
+    // A checked item is already accepted, so it must not inherit the red error color.
+    const hasError = Boolean(error && touched && isRequired && !checked)
     return (
         <div className="flex items-start gap-3">
             <Checkbox
@@ -34,7 +38,7 @@ export function AgreementCheckbox({
                 onBlur={onBlur}
                 disabled={disabled}
                 aria-invalid={hasError}
-                className={`mt-0.5 rounded-md ${hasError ? 'border-red-500! data-[state=checked]:border-red-500!' : ''}`}
+                className={`mt-0.5 rounded-md ${hasError ? 'border-red-500!' : ''}`}
             />
             <label
                 htmlFor={id}

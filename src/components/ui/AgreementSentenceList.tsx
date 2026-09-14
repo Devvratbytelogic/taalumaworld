@@ -108,14 +108,22 @@ export function AgreementSentenceList({
     if (lastIdsKeyRef.current === acceptedIdsKey && lastRequiredRef.current === allRequiredAccepted) return;
     lastIdsKeyRef.current = acceptedIdsKey;
     lastRequiredRef.current = allRequiredAccepted;
-    onIdsChangeRef.current(acceptedAgreementIds);
     onRequiredChangeRef.current?.(allRequiredAccepted);
+    onIdsChangeRef.current(acceptedAgreementIds);
   }, [acceptedAgreementIds, acceptedIdsKey, allRequiredAccepted]);
 
   if (sentences.length === 0) return null;
 
   return (
-    <div ref={containerRef} className={className ?? 'space-y-3'}>
+    <div
+      ref={containerRef}
+      className={className ?? 'space-y-3'}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          onBlur?.();
+        }
+      }}
+    >
       {sentences.map((sentence) => (
         <AgreementCheckbox
           key={sentence._id}
@@ -123,6 +131,7 @@ export function AgreementSentenceList({
           checked={resolvedCheckedIds.includes(sentence._id)}
           error={error}
           touched={touched}
+          isRequired={sentence.is_required}
           disabled={disabled}
           onCheckedChange={(checked) => {
             setCheckedSentenceIds((prev) => {
@@ -132,7 +141,6 @@ export function AgreementSentenceList({
                 : current.filter((id) => id !== sentence._id);
             });
           }}
-          onBlur={onBlur}
         >
           <AgreementLinkedText text={sentence.text} links={sentence.links} />
           {sentence.is_required ? <span className="font-medium text-red-500"> *</span> : null}

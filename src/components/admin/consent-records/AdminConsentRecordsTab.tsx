@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import moment from 'moment';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Download, FileSignature, UserRound, Users } from 'lucide-react';
@@ -23,7 +23,12 @@ export function AdminConsentRecordsTab() {
   const [agreementTypeId, setAgreementTypeId] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isExporting, setIsExporting] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const { data: typesResponse } = useGetAllAgreementTypesQuery({ limit: 10, status: 'active' });
   const agreementTypeOptions = useMemo(
@@ -129,7 +134,7 @@ export function AdminConsentRecordsTab() {
     },
   ];
 
-  if (isLoading) {
+  if (!hasMounted || isLoading) {
     return (
       <AdminPage>
         <AdminPageHeader

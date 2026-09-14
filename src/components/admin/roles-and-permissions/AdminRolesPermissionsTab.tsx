@@ -39,13 +39,18 @@ export function AdminRolesPermissionsTab() {
   const { hasAccess, isLoading } = useAdminPermissions();
   const visibleTabs = TABS.filter((tab) => hasAccess(tab.model));
   const [activeTab, setActiveTab] = useState<Tab>('roles');
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    if (isLoading || visibleTabs.some((tab) => tab.id === activeTab)) return;
-    if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
-  }, [isLoading, visibleTabs, activeTab]);
+    setHasMounted(true);
+  }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!hasMounted || isLoading || visibleTabs.some((tab) => tab.id === activeTab)) return;
+    if (visibleTabs.length > 0) setActiveTab(visibleTabs[0].id);
+  }, [hasMounted, isLoading, visibleTabs, activeTab]);
+
+  if (!hasMounted || isLoading) {
     return (
       <AdminPage>
         <AdminPageHeader

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Award, Edit2, Plus, X } from 'lucide-react';
 import { AdminPage, AdminPageHeader, AdminSearchInput, AdminSearchPanel, adminFilterPillClass, adminSelectClass } from '@/components/admin/layout/AdminContent';
@@ -31,7 +31,12 @@ export function AdminMentorTypesTab() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingTier, setEditingTier] = useState<IAllMentorTiersEntity | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
   const { hasPermission } = useAdminPermissions();
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const canAdd = hasPermission(MODEL, 'add');
   const canEdit = hasPermission(MODEL, 'edit');
@@ -221,7 +226,7 @@ export function AdminMentorTypesTab() {
     },
   ];
 
-  if (isLoading) {
+  if (!hasMounted || isLoading) {
     return (
       <AdminPage>
         <AdminPageHeader

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
 import { ArrowUpCircle, CheckCircle2, Circle, Eye, ExternalLink, Save, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -216,7 +216,12 @@ export function AdminMentorTierUpgradeApplicationsTab() {
   const [action, setAction] = useState<string>(MENTOR_TIER_UPGRADE_APPLICATION_ACTION.APPROVE);
   const [reviewNotes, setReviewNotes] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
+  const [hasMounted, setHasMounted] = useState(false);
   const { hasPermission } = useAdminPermissions();
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const canView = hasPermission(MODEL, 'view');
   const canEdit = hasPermission(MODEL, 'edit');
@@ -447,7 +452,7 @@ export function AdminMentorTierUpgradeApplicationsTab() {
     },
   ];
 
-  if (isLoading) {
+  if (!hasMounted || isLoading) {
     return (
       <AdminPage>
         <AdminPageHeader

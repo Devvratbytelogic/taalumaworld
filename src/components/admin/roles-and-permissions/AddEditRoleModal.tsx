@@ -13,6 +13,10 @@ const inputCls =
     'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
 const labelCls = 'block text-sm font-medium text-gray-700 mb-1';
 
+function normalizeRoleName(name: string) {
+    return name.trim().toLowerCase();
+}
+
 export function AddEditRoleModal() {
     const dispatch = useDispatch();
     const { isOpen, data } = useSelector((state: RootState) => state.allModal);
@@ -33,15 +37,19 @@ export function AddEditRoleModal() {
         },
         validationSchema: roleSchema,
         onSubmit: async (formValues) => {
+            const payload = {
+                ...formValues,
+                name: normalizeRoleName(formValues.name),
+            };
             try {
                 if (isEdit) {
-                    const res = await updateRole({ id: role._id, payload: formValues }).unwrap();
+                    const res = await updateRole({ id: role._id, payload }).unwrap();
                     if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                         toast.success(res?.message ?? 'Role updated successfully');
                         onClose();
                     }
                 } else {
-                    const res = await addRole(formValues).unwrap();
+                    const res = await addRole(payload).unwrap();
                     if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                         toast.success(res?.message ?? 'Role created successfully');
                         onClose();
@@ -78,10 +86,14 @@ export function AddEditRoleModal() {
                                 name="name"
                                 className={inputCls}
                                 value={values.name}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                placeholder="e.g. Content Moderator"
+                                onChange={(e) => setFieldValue('name', e.target.value.toLowerCase())}
+                                onBlur={(e) => {
+                                    setFieldValue('name', normalizeRoleName(e.target.value));
+                                    handleBlur(e);
+                                }}
+                                placeholder="e.g. content moderator"
                             />
+                            <p className="mt-1 text-xs text-muted-foreground">Role names are saved in lowercase.</p>
                             {touched.name && errors.name && typeof errors.name === 'string' ? (
                                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
                             ) : null}
@@ -93,7 +105,7 @@ export function AddEditRoleModal() {
                             <textarea
                                 id="description"
                                 name="description"
-                                className={`${inputCls} min-h-[80px] resize-y`}
+                                className={`${inputCls} min-h-20 resize-y`}
                                 value={values.description}
                                 onChange={handleChange}
                                 onBlur={handleBlur}

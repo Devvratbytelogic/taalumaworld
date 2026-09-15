@@ -63,16 +63,11 @@ function CartPageContent() {
   const searchParams = useSearchParams();
   const isCheckoutPage = pathname === getCartCheckoutRoutePath();
   const paystackReference = getPaystackReturnReference(searchParams);
-  const [hasMounted, setHasMounted] = useState(false);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
-  const { data: cartResponse, isLoading } = useGetCartQuery();
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+  const { data: cartResponse, isLoading, isUninitialized } = useGetCartQuery();
 
   const cartData = cartResponse?.data?.[0];
   const cartItems = cartData?.cart_item ?? [];
@@ -83,7 +78,7 @@ function CartPageContent() {
   const total = cartData?.total_amount ?? 0;
   const itemCount = cartData?.item_count ?? 0;
 
-  if (!hasMounted || isLoading) {
+  if (isUninitialized || isLoading) {
     return <CartPageSkeleton />;
   }
 
@@ -205,6 +200,18 @@ function CartPageContent() {
 }
 
 export default function CartPage() {
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  // Keep CartPageContent off the server tree. useSearchParams + get-cart during SSR
+  // hydrate as a different tree (React #418) and the page slot stays empty.
+  if (!hasMounted) {
+    return <CartPageSkeleton />;
+  }
+
   return (
     <Suspense fallback={<CartPageSkeleton />}>
       <CartPageContent />

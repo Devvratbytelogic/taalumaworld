@@ -37,7 +37,7 @@ import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { AdminEmptyState, AdminPage, AdminPanel, AdminSectionHeader, adminPanelClass, } from '@/components/admin/layout/AdminContent';
 import { MentorTierUpgradeModal } from '@/components/admin/mentor/MentorTierUpgradeModal';
-import { MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
+import { MentorTierStatus, MentorVerificationHeader } from '@/components/admin/mentor/dashboard/MentorVerificationHeader';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { AgreementLinkedText } from '@/components/ui/AgreementLinkedText';
 import { useGetAdminProfileQuery, useGetPaystackBanksQuery } from '@/store/rtkQueries/adminGetApi';
@@ -429,19 +429,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
             </div>
             <div className="rounded-md border border-slate-200/80 bg-white/80 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Mentor tier</p>
-              {isTierPending ? (
-                <>
-                  <div className="mt-1 h-5 w-24 animate-pulse rounded bg-slate-100" />
-                  <div className="mt-1.5 h-3 w-32 animate-pulse rounded bg-slate-100" />
-                </>
-              ) : (
-                <>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">{tier?.code ?? '—'}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
-                  </p>
-                </>
-              )}
+              <MentorTierStatus isPending={isTierPending} tier={tier} compact />
               {isTierUpgradePending ? (
                 <div className="mt-1.5 space-y-1">
                   <p className="flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-amber-700">

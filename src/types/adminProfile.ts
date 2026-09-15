@@ -120,6 +120,7 @@ export interface Tier {
   mentor_share_percent: number;
   platform_share_percent: number;
   rank: number;
+  badge?: string | null;
 }
 export interface Wallet {
   enabled: boolean;

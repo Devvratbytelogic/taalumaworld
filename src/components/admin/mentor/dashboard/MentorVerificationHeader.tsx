@@ -6,6 +6,7 @@ import { Clock, ShieldCheck, ShieldX, Wallet } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { cn } from '@/components/ui/utils';
 import { AdminPageHeader, AdminPanel, AdminSectionHeader } from '@/components/admin/layout/AdminContent';
+import ImageComponent from '@/components/ui/ImageComponent';
 import { VERIFIED_MENTOR_APPLICATION_STATUS } from '@/constants/verifiedMentorApplication';
 import { openModal } from '@/store/slices/allModalSlice';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
@@ -16,7 +17,17 @@ function AccountStatusSkeleton() {
   return <div className="mt-1 h-7 w-24 animate-pulse rounded bg-slate-100" />;
 }
 
-function MentorTierStatus({ isPending, tier }: { isPending: boolean; tier?: Tier }) {
+function MentorTierBadge({ badge, code }: { badge?: string | null; code?: string }) {
+  if (!badge) return null;
+
+  return (
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-primary/10">
+      <ImageComponent src={badge} alt={`${code ?? 'Tier'} badge`} object_cover={false} />
+    </span>
+  );
+}
+
+export function MentorTierStatus({ isPending, tier, compact = false }: { isPending: boolean; tier?: Tier; compact?: boolean }) {
   if (isPending) {
     return (
       <>
@@ -28,7 +39,12 @@ function MentorTierStatus({ isPending, tier }: { isPending: boolean; tier?: Tier
 
   return (
     <>
-      <p className="mt-1 text-lg font-semibold text-slate-900">{tier?.code ?? '—'}</p>
+      <div className="mt-1 flex items-center gap-2">
+        <MentorTierBadge badge={tier?.badge} code={tier?.code} />
+        <p className={cn('font-semibold text-slate-900', compact ? 'text-sm' : 'text-lg')}>
+          {tier?.code ?? '—'}
+        </p>
+      </div>
       <p className="mt-0.5 text-xs text-slate-500">
         {tier?.mentor_share_percent != null ? `${tier.mentor_share_percent}% revenue share` : '—'}
       </p>

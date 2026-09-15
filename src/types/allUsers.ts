@@ -103,6 +103,7 @@ export interface Tier {
   mentor_share_percent: number;
   platform_share_percent: number;
   is_verified_tier: boolean;
+  badge?: string | null;
 }
 export interface Wallet {
   enabled: boolean;

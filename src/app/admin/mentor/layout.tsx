@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { ClientOnly, PageMountFallback } from '@/components/ClientOnly';
 import Link from 'next/link';
 import {
   AlertTriangle,
@@ -88,6 +90,8 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 ];
 
 export default function MentorLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [hasMounted, setHasMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const { data: profileData, refetch: refetchProfile } = useGetAdminProfileQuery();
@@ -114,6 +118,14 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
     setShowOtpModal(false);
     refetchProfile();
   };
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return <div className="min-h-screen bg-slate-50/80" />;
+  }
 
   return (
     <div
@@ -180,7 +192,7 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
             // aria-disabled={isAccountBlocked}
             // inert={isAccountBlocked ? true : undefined}
           >
-            {children}
+            <ClientOnly key={pathname} fallback={<PageMountFallback />}>{children}</ClientOnly>
           </div>
         </div>
       </main>

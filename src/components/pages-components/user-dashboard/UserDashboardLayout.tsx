@@ -1,11 +1,12 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BookOpen, Book, User, Settings, GraduationCap, Heart, MapPin, Users, Star, Link2, ShoppingBag, Wallet, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
+import { ClientOnly } from '@/components/ClientOnly';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
 import { USER_TYPE, UserTypeValue } from '@/constants/common';
 import {
@@ -77,6 +78,7 @@ export default function UserDashboardAppLayout({
   initialRole?: string;
 }) {
   const pathname = usePathname();
+  const [hasMounted, setHasMounted] = useState(false);
   const { data: profileData } = useGetUserProfileQuery();
   const userName = profileData?.data?.name ?? 'User';
   const userPhoto = profileData?.data?.profile_pic ?? '';
@@ -86,6 +88,14 @@ export default function UserDashboardAppLayout({
     ...group,
     items: group.items.filter((item) => !item.roles || item.roles.includes(userRole as UserTypeValue)),
   })).filter((group) => group.items.length > 0);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return <div className="min-h-screen bg-white" />;
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -144,7 +154,9 @@ export default function UserDashboardAppLayout({
           </aside>
 
           <div className="min-w-0 flex-1">
-            <Suspense fallback={<UserDashboardSkeleton />}>{children}</Suspense>
+            <Suspense fallback={<UserDashboardSkeleton />}>
+              <ClientOnly key={pathname} fallback={<UserDashboardSkeleton />}>{children}</ClientOnly>
+            </Suspense>
           </div>
         </div>
       </div>

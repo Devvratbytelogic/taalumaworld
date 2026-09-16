@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, History, Inbox, LayoutDashboard, LineChart, Link2, Mail, Megaphone, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
 import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorEquityRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
@@ -10,6 +10,7 @@ import { KshIcon } from '@/components/ui/AllSVG';
 import { ADMIN_SIDEBAR_WIDTH, type SidebarNavGroup } from '@/components/admin/layout/PanelSidebar';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { BlueprintScoringEventsBridge } from '@/components/admin/chapter/BlueprintScoringEventsBridge';
+import { ClientOnly, PageMountFallback } from '@/components/ClientOnly';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
 
 const NAV_GROUPS: SidebarNavGroup[] = [
@@ -95,10 +96,13 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 
 export default function AdminAppLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const [hasMounted, setHasMounted] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { hasAccess, isLoading: isPermissionsLoading, profile } = useAdminPermissions();
 
-
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     if (isMentorPanelPath(pathname)) {
         return (
@@ -107,6 +111,10 @@ export default function AdminAppLayout({ children }: { children: React.ReactNode
                 {children}
             </>
         );
+    }
+
+    if (!hasMounted) {
+        return <div className="min-h-screen bg-slate-50/80" />;
     }
 
     const visibleNavGroups = NAV_GROUPS
@@ -136,7 +144,9 @@ export default function AdminAppLayout({ children }: { children: React.ReactNode
             />
 
             <main className="min-w-0 lg:ml-(--admin-sidebar-width)">
-                <div className="mx-auto w-full max-w-360 px-4 py-6 sm:px-6 lg:py-7">{children}</div>
+                <div className="mx-auto w-full max-w-360 px-4 py-6 sm:px-6 lg:py-7">
+                    <ClientOnly key={pathname} fallback={<PageMountFallback />}>{children}</ClientOnly>
+                </div>
             </main>
         </div>
     );

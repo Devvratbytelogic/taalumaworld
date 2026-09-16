@@ -80,6 +80,7 @@ export function MentorVerificationHeader({
   const onApply = () => dispatch(openModal({ componentName: 'ApplyVerifiedMentorModal' }));
 
   const canApplyForVerification = !!profile?.is_verified && profile?.status === 'active';
+  console.log('canApplyForVerification', canApplyForVerification);
 
   const isApprovedDecision = verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.APPROVED;
   const decisionBanner = isApprovedDecision

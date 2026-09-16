@@ -16,6 +16,7 @@ export const notificationApis = rtkQuerieSetup.injectEndpoints({
                 params,
             }),
             providesTags: ['AdminNotifications'],
+            // keepUnusedDataFor: 300,
         }),
         markNotificationRead: builder.mutation<unknown, string>({
             query: (id) => ({

@@ -24,7 +24,10 @@ export function useAdminPermissions() {
         undefined,
         {
             skip: typeof window === 'undefined',
-            refetchOnMountOrArgChange: true,
+            // Reuse the layout-level cache. This hook is also used by almost every
+            // admin page, and those pages remount on navigation (`ClientOnly key={pathname}`).
+            // refetchOnMountOrArgChange would re-hit `/admin/get-profile` on every route.
+            refetchOnMountOrArgChange: false,
         },
     );
     const profile = data?.data;

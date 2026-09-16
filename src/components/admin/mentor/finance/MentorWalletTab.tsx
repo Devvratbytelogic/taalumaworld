@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { type GridColDef } from '@mui/x-data-grid';
 import { ArrowDownToLine, Wallet } from 'lucide-react';
 import { AdminPage, AdminPageHeader, AdminPanel, AdminStatCard } from '@/components/admin/layout/AdminContent';
@@ -9,6 +10,7 @@ import Button from '@/components/ui/Button';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { useGetWithdrawalLedgerQuery } from '@/store/rtkQueries/walletAPIs';
 import { formatKes } from '@/constants/common';
+import { getViewOrderRoutePath } from '@/routes/routes';
 import type { IMentorLedgerWalletDataEntity } from '@/types/wallet';
 import MentorWithdrawalModal from './MentorWithdrawalModal';
 import { MentorWalletSearch } from './MentorWalletSearch';
@@ -179,9 +181,22 @@ export function MentorWalletTab() {
       headerName: 'Order',
       width: 130,
       sortable: false,
-      renderCell: (params) => (
-        <span className="font-mono text-xs text-slate-600">{displayValue(params.value)}</span>
-      ),
+      renderCell: (params) => {
+        const order = params.value;
+        const orderNumber = displayValue(order?.order_number ?? '-');
+        const orderId = order?._id;
+        if (!orderId) {
+          return <span className="font-mono text-xs text-slate-600">{orderNumber}</span>;
+        }
+        return (
+          <Link
+            href={getViewOrderRoutePath(orderId, true)}
+            className="font-mono text-xs text-slate-600 hover:text-primary hover:underline"
+          >
+            {orderNumber}
+          </Link>
+        );
+      },
     },
     {
       field: 'amount',

@@ -12,7 +12,6 @@ export function useAdminNotifications() {
     const [page, setPage] = useState(1);
     const query = useGetAdminNotificationsQuery(
         { page, limit: ADMIN_NOTIFICATIONS_PAGE_SIZE },
-        { refetchOnFocus: true, refetchOnReconnect: true },
     );
     const [markNotificationRead, markReadState] = useMarkNotificationReadMutation();
     const [markAllNotificationsRead, markAllState] = useMarkAllNotificationsReadMutation();

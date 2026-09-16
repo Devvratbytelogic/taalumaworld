@@ -51,11 +51,7 @@ export function AdminNotificationBell() {
 
     const handleOpenChange = (nextOpen: boolean) => {
         setOpen(nextOpen);
-        if (nextOpen) {
-            void refetch();
-        } else {
-            resetPage();
-        }
+        if (!nextOpen) resetPage();
     };
 
     const handleOpenItem = async (item: AdminNotificationItem) => {

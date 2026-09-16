@@ -26,6 +26,11 @@ export interface IMentorLedgerWalletSummary {
   available_balance: number;
 }
 
+export interface IMentorLedgerWalletOrder {
+  _id: string;
+  order_number?: string | null;
+}
+
 export interface IMentorLedgerWalletDataEntity {
   id: string;
   type: string;
@@ -36,7 +41,7 @@ export interface IMentorLedgerWalletDataEntity {
   balance_after: number;
   payout_method?: string | null;
   description: string;
-  order_id: string;
+  order_id?: IMentorLedgerWalletOrder | null;
   date: string;
 }
 

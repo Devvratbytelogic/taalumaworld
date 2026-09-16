@@ -90,6 +90,13 @@ const blueprintPerformanceColumns: GridColDef[] = [
   },
   { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
   {
+    field: 'revenue',
+    headerName: 'Revenue',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
+  {
     field: 'conversion',
     headerName: 'Conversion',
     width: 120,

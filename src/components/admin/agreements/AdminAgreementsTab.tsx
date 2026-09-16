@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Edit2, Eye, FileSignature } from 'lucide-react';
+import { /* Edit2, */ Eye, FileSignature } from 'lucide-react';
 import {
   useGetAllAgreementsQuery,
   useAddAgreementMutation,
@@ -176,7 +176,7 @@ export function AdminAgreementsTab() {
       width: 130,
       sortable: false,
       renderCell: (params) => {
-        const isEditable = params.row.isEditable !== false;
+        // const isEditable = params.row.isEditable !== false;
         if (!canView && !canEdit) return null;
         return (
           <div className="action_buttons">
@@ -190,7 +190,7 @@ export function AdminAgreementsTab() {
                 <Eye className="h-4 w-4" />
               </button>
             ) : null}
-            {canEdit ? (
+            {/* {canEdit ? (
               <button
                 type="button"
                 className={`edit_button${!isEditable ? ' cursor-not-allowed! opacity-40 hover:bg-transparent! hover:text-primary!' : ''}`}
@@ -205,7 +205,7 @@ export function AdminAgreementsTab() {
               >
                 <Edit2 className="h-4 w-4" />
               </button>
-            ) : null}
+            ) : null} */}
           </div>
         );
       },

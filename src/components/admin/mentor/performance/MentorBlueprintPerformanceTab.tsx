@@ -13,6 +13,7 @@ import {
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGetBlueprintPerformanceQuery } from '@/store/rtkQueries/dashboard';
+import { formatKes } from '@/constants/common';
 import { MentorBlueprintPerformanceSkeleton } from '@/components/skeleton-loader/admin';
 
 const columns: GridColDef[] = [
@@ -26,6 +27,13 @@ const columns: GridColDef[] = [
     renderCell: (params) => (params.value ?? 0).toLocaleString(),
   },
   { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
+  {
+    field: 'revenue',
+    headerName: 'Revenue',
+    width: 140,
+    sortable: false,
+    renderCell: (params) => formatKes(params.value ?? 0),
+  },
   {
     field: 'conversion',
     headerName: 'Conversion',

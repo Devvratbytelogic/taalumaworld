@@ -2,11 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { type GridColDef } from '@mui/x-data-grid';
-import { /* Edit2, */ Eye, FileSignature } from 'lucide-react';
+import { Eye, FileSignature } from 'lucide-react';
 import {
   useGetAllAgreementsQuery,
-  useAddAgreementMutation,
-  useUpdateAgreementMutation,
   useGetAllAgreementTypesQuery,
 } from '@/store/rtkQueries/agreementAPIs';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -14,11 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { AdminAgreementsHeader } from './AdminAgreementsHeader';
 import { AdminAgreementsSearch } from './AdminAgreementsSearch';
-import { AgreementModal, type AgreementFormValues } from './AgreementModal';
 import { AgreementViewModal } from './AgreementViewModal';
-import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { refreshAfterPolicyChange } from '@/store/server-api/refreshCache';
 import { AdminAgreementsSkeleton } from '@/components/skeleton-loader/admin';
 
 const AGREEMENTS_MODEL = 'Agreements';
@@ -33,14 +28,11 @@ export function AdminAgreementsTab() {
   const [statusFilter, setStatusFilter] = useState('');
   const [agreementTypeFilter, setAgreementTypeFilter] = useState('');
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAgreementId, setEditingAgreementId] = useState<string | null>(null);
   const [viewingAgreementId, setViewingAgreementId] = useState<string | null>(null);
   const { hasPermission } = useAdminPermissions();
 
   const canView = hasPermission(AGREEMENTS_MODEL, 'view');
   const canAdd = hasPermission(AGREEMENTS_MODEL, 'add');
-  const canEdit = hasPermission(AGREEMENTS_MODEL, 'edit');
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -62,9 +54,6 @@ export function AdminAgreementsTab() {
   const agreements = agreementsData?.data ?? [];
   const totalAgreements = agreementsData?.total ?? 0;
 
-  const [addAgreement] = useAddAgreementMutation();
-  const [updateAgreement] = useUpdateAgreementMutation();
-
   const resetToFirstPage = () => setPaginationModel((prev) => ({ ...prev, page: 0 }));
 
   const handleSearchChange = (value: string) => {
@@ -80,22 +69,6 @@ export function AdminAgreementsTab() {
   const handleAgreementTypeChange = (value: string) => {
     setAgreementTypeFilter(value);
     resetToFirstPage();
-  };
-
-  const handleSave = async (values: AgreementFormValues, id?: string) => {
-    try {
-      const res = id
-        ? await updateAgreement({ agreementId: id, values }).unwrap()
-        : await addAgreement(values).unwrap();
-      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-        void refreshAfterPolicyChange(values.slug);
-        toast.success(res.message ?? (id ? 'Agreement updated successfully' : 'Agreement created successfully'));
-        setIsModalOpen(false);
-        setEditingAgreementId(null);
-      }
-    } catch (error) {
-      console.error('Error saving agreement', error);
-    }
   };
 
   const columns: GridColDef[] = [
@@ -176,36 +149,17 @@ export function AdminAgreementsTab() {
       width: 130,
       sortable: false,
       renderCell: (params) => {
-        // const isEditable = params.row.isEditable !== false;
-        if (!canView && !canEdit) return null;
+        if (!canView) return null;
         return (
           <div className="action_buttons">
-            {canView ? (
-              <button
-                type="button"
-                className="active_button"
-                title="View agreement"
-                onClick={() => setViewingAgreementId(params.row._id)}
-              >
-                <Eye className="h-4 w-4" />
-              </button>
-            ) : null}
-            {/* {canEdit ? (
-              <button
-                type="button"
-                className={`edit_button${!isEditable ? ' cursor-not-allowed! opacity-40 hover:bg-transparent! hover:text-primary!' : ''}`}
-                title={isEditable ? 'Edit agreement' : 'This agreement cannot be edited'}
-                disabled={!isEditable}
-                aria-disabled={!isEditable}
-                onClick={() => {
-                  if (!isEditable) return;
-                  setEditingAgreementId(params.row._id);
-                  setIsModalOpen(true);
-                }}
-              >
-                <Edit2 className="h-4 w-4" />
-              </button>
-            ) : null} */}
+            <button
+              type="button"
+              className="active_button"
+              title="View agreement"
+              onClick={() => setViewingAgreementId(params.row._id)}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
           </div>
         );
       },
@@ -215,13 +169,7 @@ export function AdminAgreementsTab() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <AdminAgreementsHeader
-          canAdd={canAdd}
-          onCreateAgreement={() => {
-            setEditingAgreementId(null);
-            setIsModalOpen(true);
-          }}
-        />
+        <AdminAgreementsHeader canAdd={canAdd} />
         <AdminAgreementsSkeleton />
       </div>
     );
@@ -229,13 +177,7 @@ export function AdminAgreementsTab() {
 
   return (
     <div className="space-y-6">
-      <AdminAgreementsHeader
-        canAdd={canAdd}
-        onCreateAgreement={() => {
-          setEditingAgreementId(null);
-          setIsModalOpen(true);
-        }}
-      />
+      <AdminAgreementsHeader canAdd={canAdd} />
 
       <AdminAgreementsSearch
         searchQuery={search}
@@ -259,19 +201,6 @@ export function AdminAgreementsTab() {
           onPaginationModelChange={setPaginationModel}
         />
       </div>
-
-      {(canAdd || canEdit) ? (
-        <AgreementModal
-          open={isModalOpen}
-          agreementId={editingAgreementId}
-          agreementTypeOptions={agreementTypeOptions}
-          onOpenChange={(open) => {
-            setIsModalOpen(open);
-            if (!open) setEditingAgreementId(null);
-          }}
-          onSubmit={handleSave}
-        />
-      ) : null}
 
       {canView ? (
         <AgreementViewModal

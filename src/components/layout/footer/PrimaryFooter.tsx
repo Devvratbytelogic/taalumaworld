@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon, LinkedinIcon, PinterestIcon, WhatsAppIcon, TikTokIcon } from '@/components/ui/AllSVG';
 import FooterSubscribe from '@/components/layout/footer/FooterSubscribe';
-import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPoliciesRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { DEFAULT_BRAND_LOGO } from '@/constants/common';
 import type { IGlobalSettings } from '@/types/globalSettings';
@@ -122,6 +122,11 @@ export default function PrimaryFooter({
                                         Terms of Service
                                     </Link>
                                 </li>
+                                <li>
+                                    <Link href={getPoliciesRoutePath()} className="hover:text-primary transition-colors">
+                                        All Policies
+                                    </Link>
+                                </li>
                                 {isAuthenticated && isAdmin && (
                                     <li className="pt-2">
                                         <Link
@@ -188,6 +193,10 @@ export default function PrimaryFooter({
                                 <span className="text-gray-600">•</span>
                                 <Link href={getTermsOfServiceRoutePath()} className="hover:text-primary transition-colors">
                                     Terms of Service
+                                </Link>
+                                <span className="text-gray-600">•</span>
+                                <Link href={getPoliciesRoutePath()} className="hover:text-primary transition-colors">
+                                    All Policies
                                 </Link>
                                 <span className="text-gray-600">•</span>
                                 <Link href={getContactUsRoutePath()} className="hover:text-primary transition-colors">

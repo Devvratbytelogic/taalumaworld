@@ -26,15 +26,19 @@ export function getFAQRoutePath(): string {
   return '/faq';
 }
 
+export function getPoliciesRoutePath(): string {
+  return '/policies';
+}
+
 export function getPolicyBySlugRoutePath(slug: string): string {
-  return `/policies/${slug}`;
+  return `${getPoliciesRoutePath()}#${slug}`;
 }
 export function getPrivacyPolicyRoutePath(): string {
-  return '/policies/privacy-policy';
+  return getPolicyBySlugRoutePath('privacy-policy');
 }
 
 export function getTermsOfServiceRoutePath(): string {
-  return '/policies/terms-of-service';
+  return getPolicyBySlugRoutePath('terms-of-service');
 }
 
 export function getAdminRoutePath(): string {
@@ -222,6 +226,10 @@ export function getAdminSectionRoutePath(section: string): string {
     referral_setting: '/admin/referral-setting',
   };
   return map[section] ?? '/admin/dashboard';
+}
+
+export function getCreateAgreementRoutePath(): string {
+  return '/admin/agreements/create';
 }
 
 export function getCreateChapterRoutePath(isMentor: boolean = false): string {

@@ -50,6 +50,7 @@ export default function ChapterPurchaseModal() {
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
   const isPaymentBusy = isWalletPaying || isPaystackPaying;
+  // console.log('liveChapter', liveChapter);
 
   useEffect(() => {
     const canRead = isBook ? liveBook?.data?.bookDetails?.canRead : liveChapter?.data?.canRead;

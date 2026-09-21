@@ -7,7 +7,7 @@ import type { IBlueprintListAPIResponse, ISeriesListAPIResponse } from '@/types/
 import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
 import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
-import { IAgreementAPIResponse } from '@/types/user/agreement';
+import { IAgreementAPIResponse, ILatestAgreementsAPIResponse } from '@/types/user/agreement';
 import {
   IFAQAPIResponse,
   ITestimonialsAPIResponse,
@@ -152,6 +152,12 @@ export async function getAgreementBySlugServerAPI({ slug }: { slug: string }) {
     `/user/agreements/${encodeURIComponent(slug)}`,
     { tags: [TAGS.POLICIES, TAGS.policy(slug)] }
   );
+}
+
+export async function getLatestAgreementsServerAPI() {
+  return publicFetch<ILatestAgreementsAPIResponse>(`/user/agreements/latest`, {
+    tags: [TAGS.POLICIES],
+  });
 }
 
 export async function getFAQsServerAPI(params?: {

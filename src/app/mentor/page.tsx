@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { ShieldCheck, ArrowRight, Globe2, Users2 } from 'lucide-react';
-import Button from '@/components/ui/Button';
 import MentorsDirectory from '@/components/pages-components/mentor/MentorsDirectory';
 import { getAllMentorsServerAPI } from '@/store/server-api/serverSideAPIs';
 import { getMentorSignupRoutePath } from '@/routes/routes';
@@ -106,13 +106,13 @@ export default async function AllMentorsPage() {
                                     </p>
                                 </div>
 
-                                <Button
+                                <Link
                                     href={getMentorSignupRoutePath()}
                                     className="global_btn rounded_full bg_primary w_fit shrink-0 shadow-lg shadow-primary/30"
                                 >
                                     Become a mentor
                                     <ArrowRight className="ml-1.5 h-4 w-4" />
-                                </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>

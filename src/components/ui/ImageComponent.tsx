@@ -60,7 +60,8 @@ export default function ImageComponent({
       height={1000}
       alt={alt || 'image'}
       title={alt || 'image'}
-      priority={priority}
+      // priority={priority}
+      preload
       className={`w-full h-full ${object_cover ? 'object-cover' : 'object-contain'}`}
       onError={() => {
         if (resolvedFallback && resolvedFallback !== activeSrc) {

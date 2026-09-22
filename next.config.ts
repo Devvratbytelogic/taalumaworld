@@ -5,12 +5,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*",
+        hostname: "dev-api.taaluma.world",
       },
-      {
-        protocol: "http",
-        hostname: "*",
-      },
+      // {
+      //   protocol: "http",
+      //   hostname: "*",
+      // },
     ],
     unoptimized: false,
   },

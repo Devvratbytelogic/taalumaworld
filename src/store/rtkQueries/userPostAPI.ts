@@ -121,7 +121,8 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['Address', 'Cart'],
+            // Tax is charged on the address country, so prices have to be re-read.
+            invalidatesTags: ['Address', 'Cart', 'SingleChapter'],
         }),
         /** edit an existing address */
         editUserAddress: builder.mutation({
@@ -130,7 +131,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'PUT',
                 body,
             }),
-            invalidatesTags: ['Address', 'Cart'],
+            invalidatesTags: ['Address', 'Cart', 'SingleChapter'],
         }),
         /** mark an address as the default one */
         setDefaultUserAddress: builder.mutation({
@@ -138,7 +139,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/addresses/${id}/set-default`,
                 method: 'PUT',
             }),
-            invalidatesTags: ['Address'],
+            invalidatesTags: ['Address', 'Cart', 'SingleChapter'],
         }),
         /** delete an address */
         deleteUserAddress: builder.mutation({
@@ -146,7 +147,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/addresses/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['Address'],
+            invalidatesTags: ['Address', 'Cart', 'SingleChapter'],
         }),
         /** create a review for a blueprint (POST /user/reviews) */
         createReview: builder.mutation({

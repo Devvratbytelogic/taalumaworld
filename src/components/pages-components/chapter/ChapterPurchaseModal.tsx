@@ -65,7 +65,8 @@ export default function ChapterPurchaseModal() {
     ? (chapter?.pricingModel === VISIBLE.CHAPTER)
     : (chapter?.series?.pricingModel === VISIBLE.CHAPTER);
 
-  const taxPrice = chapter?.tax ?? 0;
+  // Tax follows the address country, so read it from the live fetch, not the modal snapshot.
+  const taxPrice = (isBook ? liveBook?.data?.bookDetails?.tax : liveChapter?.data?.tax) ?? chapter?.tax ?? 0;
 
   const displayPrice = isBook
     ? chapter?.effectivePrice // from BlueprintPublicHero.tsx and serieshero both send its data as chapter object
@@ -77,6 +78,8 @@ export default function ChapterPurchaseModal() {
   const subtotal = Number(displayPrice ?? 0);
   const taxPercent = subtotal > 0 ? Math.round((taxPrice / subtotal) * 100) : 0;
   const totalPaymentRequired = subtotal + taxPrice;
+  // Without an address the API falls back to the default rate, so the total is not final yet.
+  const isTaxEstimated = !isLoading && !isAddressAvailable && taxPrice > 0;
 
   const agreementError =
     agreementTouched && !allRequiredAccepted
@@ -310,6 +313,11 @@ export default function ChapterPurchaseModal() {
                   <span>Total</span>
                   <span className="text-primary">KSH {totalPaymentRequired.toFixed(2)}</span>
                 </div>
+                {isTaxEstimated && (
+                  <p className="text-xs text-muted-foreground">
+                    Add a delivery address to confirm the tax for your country.
+                  </p>
+                )}
               </div>
             )}
 

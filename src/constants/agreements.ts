@@ -35,6 +35,20 @@ export const AGREEMENT_VISIBLE_USER_TYPES = {
   MENTOR: 'Mentor'
 };
 
+/** Roles an agreement type can be exposed to (`visible_to` on the agreement type). */
+export const AGREEMENT_VISIBLE_TO_OPTIONS = [
+  { value: AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT, label: 'Career Architect' },
+  { value: AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA, label: 'Institutional Career Architect' },
+  { value: AGREEMENT_VISIBLE_USER_TYPES.MENTOR, label: 'Mentor' },
+];
+
+/** `visible_to` may come back as an array or a comma-separated string. */
+export function parseVisibleTo(visibleTo?: string[] | string | null): string[] {
+  if (!visibleTo) return [];
+  const values = Array.isArray(visibleTo) ? visibleTo : visibleTo.split(',');
+  return values.map((value) => value.trim()).filter(Boolean);
+}
+
 export const AGREEMENT_STATUS_OPTIONS = ['active', 'inactive'];
 
 export function getAgreementConsentUserType(role?: string | null): string | undefined {

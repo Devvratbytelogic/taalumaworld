@@ -743,6 +743,11 @@ export const agreementTypeSchema = Yup.object({
   name: withSafeShortText(Yup.string().trim().min(2, 'Name is required').required('Name is required')),
   description: Yup.string().trim().min(2, 'Description is required').required('Description is required'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
+  visible_to: Yup.array()
+    .of(Yup.string())
+    .min(1, 'Select at least one role')
+    .required('Select at least one role'),
+  can_block: Yup.boolean(),
 });
 
 // Add / Edit Tax Modal Validation Schema
@@ -868,7 +873,6 @@ export const agreementSchema = Yup.object({
   content: Yup.string().trim().required('Agreement content is required'),
   agreementType: Yup.string().required('Please select an agreement type'),
   status: Yup.string().oneOf(['active', 'inactive'], 'Status must be Active or Inactive').required('Status is required'),
-  can_block: Yup.boolean(),
 });
 
 export const agreementSentenceSchema = Yup.object({

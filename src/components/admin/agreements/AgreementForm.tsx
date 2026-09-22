@@ -7,7 +7,6 @@ import { Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { agreementSchema } from '@/utils/formValidation';
 import { AGREEMENT_STATUS_OPTIONS } from '@/constants/agreements';
@@ -23,7 +22,6 @@ export type AgreementFormValues = {
   content: string;
   agreementType: string;
   status: 'active' | 'inactive';
-  can_block: boolean;
 };
 
 const initialValues: AgreementFormValues = {
@@ -32,7 +30,6 @@ const initialValues: AgreementFormValues = {
   content: '',
   agreementType: '',
   status: 'active',
-  can_block: false,
 };
 
 export function AgreementForm() {
@@ -138,6 +135,9 @@ export function AgreementForm() {
           {errors.agreementType && touched.agreementType ? (
             <p className="text-sm text-red-600">{errors.agreementType}</p>
           ) : null}
+          <p className="text-xs text-slate-500">
+            Visibility and blocking are inherited from the agreement type.
+          </p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="agreement-status">
@@ -173,16 +173,6 @@ export function AgreementForm() {
         />
         {errors.content && touched.content ? <p className="text-sm text-red-600">{errors.content}</p> : null}
       </div>
-
-      <label className="flex items-center gap-2 text-sm text-slate-700">
-        <Checkbox
-          checked={values.can_block}
-          onCheckedChange={(checked) => setFieldValue('can_block', !!checked)}
-          disabled={isSubmitting}
-          className="mr-2"
-        />
-        Can block — users who have not accepted the latest version cannot complete linked touchpoints
-      </label>
 
       <div className="form-footer">
         <Button

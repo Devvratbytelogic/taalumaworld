@@ -12,6 +12,7 @@ import {
   useRestoreAgreementTypeMutation,
 } from '@/store/rtkQueries/agreementAPIs';
 import type { IAllAgreementTypesDataEntity } from '@/types/agreementTypes';
+import { parseVisibleTo } from '@/constants/agreements';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Badge } from '@/components/ui/badge';
@@ -157,13 +158,44 @@ export function AdminAgreementTypesTab() {
     {
       field: 'description',
       headerName: 'Description',
-      minWidth: 260,
-      flex: 1.4,
+      minWidth: 220,
+      flex: 1,
       sortable: false,
       renderCell: (params) => (
         <p className="truncate text-sm text-slate-600" title={params.row.description}>
           {params.row.description}
         </p>
+      ),
+    },
+    {
+      field: 'visible_to',
+      headerName: 'Visible to',
+      minWidth: 200,
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => {
+        const roles = parseVisibleTo(params.row.visible_to);
+        if (roles.length === 0) return <span className="text-sm text-slate-400">—</span>;
+        return (
+          <div className="flex flex-wrap items-center gap-1" title={roles.join(', ')}>
+            {roles.map((role) => (
+              <Badge key={role} variant="outline" className="border-slate-200 text-slate-600">
+                {role}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      field: 'can_block',
+      headerName: 'Can block',
+      width: 110,
+      sortable: false,
+      renderCell: (params) => (
+        <Badge variant="outline" className={params.row.can_block ? STATUS_BADGE_CLASS.active : STATUS_BADGE_CLASS.inactive}>
+          {params.row.can_block ? 'Yes' : 'No'}
+        </Badge>
       ),
     },
     {

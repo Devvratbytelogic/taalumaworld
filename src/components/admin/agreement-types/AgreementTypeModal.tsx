@@ -2,11 +2,13 @@
 
 import { useEffect } from 'react';
 import { useFormik } from 'formik';
+import ReactSelect, { type StylesConfig } from 'react-select';
 import { Save, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -16,18 +18,37 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { agreementTypeSchema } from '@/utils/formValidation';
+import { AGREEMENT_VISIBLE_TO_OPTIONS, parseVisibleTo } from '@/constants/agreements';
+import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
 import type { IAllAgreementTypesDataEntity } from '@/types/agreementTypes';
+
+const MULTI_SELECT_STYLES: StylesConfig<SelectOption, true> = {
+  ...(SELECT_STYLES as unknown as StylesConfig<SelectOption, true>),
+  multiValue: (base) => ({
+    ...base,
+    borderRadius: 'var(--radius-sm)',
+    backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+  }),
+  multiValueLabel: (base) => ({
+    ...base,
+    color: 'var(--primary)',
+  }),
+};
 
 export type AgreementTypeFormValues = {
   name: string;
   description: string;
   status: 'active' | 'inactive';
+  visible_to: string[];
+  can_block: boolean;
 };
 
 const emptyValues: AgreementTypeFormValues = {
   name: '',
   description: '',
   status: 'active',
+  visible_to: [],
+  can_block: true,
 };
 
 interface AgreementTypeModalProps {
@@ -40,7 +61,7 @@ interface AgreementTypeModalProps {
 export function AgreementTypeModal({ open, agreementType, onOpenChange, onSubmit }: AgreementTypeModalProps) {
   const isEditing = !!agreementType;
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, resetForm } = useFormik({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm } = useFormik({
     initialValues: emptyValues,
     validationSchema: agreementTypeSchema,
     enableReinitialize: true,
@@ -57,6 +78,8 @@ export function AgreementTypeModal({ open, agreementType, onOpenChange, onSubmit
             name: agreementType.name,
             description: agreementType.description,
             status: (agreementType.status as 'active' | 'inactive') ?? 'active',
+            visible_to: parseVisibleTo(agreementType.visible_to),
+            can_block: agreementType.can_block ?? true,
           }
         : emptyValues,
     });
@@ -80,7 +103,7 @@ export function AgreementTypeModal({ open, agreementType, onOpenChange, onSubmit
         </DialogHeader>
 
         <form noValidate onSubmit={handleSubmit} className="flex min-h-0 flex-col admin_panel">
-          <div className="space-y-4 py-4">
+          <div className="custom_scrollbar max-h-[60vh] space-y-4 overflow-y-auto py-4">
             <div className="space-y-2">
               <Label htmlFor="agreement-type-name">
                 Name<span className="text-red-500">*</span>
@@ -135,6 +158,48 @@ export function AgreementTypeModal({ open, agreementType, onOpenChange, onSubmit
                 <option value="inactive">Inactive</option>
               </select>
               {errors.status && touched.status ? <p className="text-sm text-red-600">{errors.status}</p> : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="agreement-type-visible-to">
+                Visible to<span className="text-red-500">*</span>
+              </Label>
+              <ReactSelect
+                inputId="agreement-type-visible-to"
+                name="visible_to"
+                isMulti
+                classNamePrefix="react-select"
+                options={AGREEMENT_VISIBLE_TO_OPTIONS}
+                value={AGREEMENT_VISIBLE_TO_OPTIONS.filter((option) => values.visible_to.includes(option.value))}
+                onChange={(selected) => setFieldValue('visible_to', selected.map((option) => option.value))}
+                onBlur={() => setFieldTouched('visible_to', true)}
+                placeholder="Select roles"
+                isDisabled={isSubmitting}
+                menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                menuPosition="fixed"
+                styles={MULTI_SELECT_STYLES}
+              />
+              <p className="text-xs text-slate-500">Only these roles see agreements under this type.</p>
+              {errors.visible_to && touched.visible_to ? (
+                <p className="text-sm text-red-600">{errors.visible_to as string}</p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="agreement-type-can-block"
+                  checked={values.can_block}
+                  onCheckedChange={(checked) => setFieldValue('can_block', checked)}
+                  disabled={isSubmitting}
+                />
+                <Label htmlFor="agreement-type-can-block" className="cursor-pointer">
+                  Can block
+                </Label>
+              </div>
+              <p className="text-xs text-slate-500">
+                The latest version of this type blocks login and required gates until it is accepted.
+              </p>
             </div>
           </div>
 

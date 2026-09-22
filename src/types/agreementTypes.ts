@@ -17,6 +17,8 @@ export interface IAllAgreementTypesDataEntity {
   name: string;
   description: string;
   status: string;
+  visible_to?: (string)[] | string | null;
+  can_block?: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -40,6 +42,8 @@ export interface IAddAgreementTypeData {
   name: string;
   description: string;
   status: string;
+  visible_to?: (string)[] | string | null;
+  can_block?: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;

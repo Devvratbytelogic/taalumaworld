@@ -319,75 +319,39 @@ export function ProfilePage() {
       ) : null}
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        {/* Mobile profile banner — stacked, no overlap */}
-        <div className="sm:hidden">
-          <div className="h-16 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90" />
-          <div className="relative px-4 pb-1 pt-0">
-            <div className="-mt-8 rounded-lg border border-primary/20 bg-white p-4 shadow-none">
-              <div className="flex items-start gap-3">
-                <ProfileAvatarUpload
-                  src={displayPhoto}
-                  name={values.fullName || displayName}
-                  size="md"
-                  ringClassName="ring-2 ring-white"
-                />
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-base font-medium text-gray-900">{profile?.name ?? '—'}</h2>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
-                    <span className="break-all">{profile?.email ?? '—'}</span>
-                  </p>
-                  {lastUpdatedLabel ? (
-                    <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
-                      <Clock className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
-                      <span>Updated {lastUpdatedLabel}</span>
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary">
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                {profile?.role?.name ?? 'User'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop profile banner — original placement */}
-        <div className="relative hidden h-24 bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90 sm:block">
-          <span className="absolute right-6 bottom-0 inline-flex translate-y-1/2 items-center gap-1.5 rounded-full border border-primary/20 bg-white/95 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-primary backdrop-blur-sm sm:right-8">
-            <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {profile?.role?.name ?? 'User'}
-          </span>
-
-          <div className="absolute left-6 bottom-0 z-10 flex max-w-[calc(100%-10rem)] translate-y-1/2 items-end gap-4 rounded-2xl border border-primary/20 bg-white/75 py-2.5 pl-2.5 pr-4 ring-1 ring-white/80 ring-inset backdrop-blur-sm sm:left-8 sm:max-w-[calc(100%-12rem)] sm:gap-5 sm:pr-5">
+        <div className="bg-linear-to-br from-primary/10 via-primary/5 to-gray-50/90 px-4 py-5 sm:px-8 sm:py-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
             <ProfileAvatarUpload
               src={displayPhoto}
               name={values.fullName || displayName}
-              size="md"
-              ringClassName="ring-4 ring-white"
+              size="lg"
+              showHint={false}
+              ringClassName="ring-2 ring-white sm:ring-4"
             />
-
-            <div className="min-w-0 pb-0.5">
-              <h2 className="truncate text-lg font-medium tracking-tight text-gray-900 sm:text-xl">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-medium tracking-tight wrap-break-word text-gray-900 sm:truncate sm:text-xl">
                 {profile?.name ?? '—'}
               </h2>
-              <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-gray-500">
-                <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
-                {profile?.email ?? '—'}
+              <p className="mt-1 flex min-w-0 items-start gap-1.5 text-sm text-gray-500">
+                <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+                <span className="min-w-0 break-all">{profile?.email ?? '—'}</span>
               </p>
               {lastUpdatedLabel ? (
-                <p className="mt-1 flex items-center gap-1.5 truncate text-sm text-gray-500">
-                  <Clock className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
-                  Updated {lastUpdatedLabel}
+                <p className="mt-1 flex min-w-0 items-start gap-1.5 text-sm text-gray-500">
+                  <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+                  <span>Updated {lastUpdatedLabel}</span>
                 </p>
               ) : null}
             </div>
+            <span className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-primary/20 bg-white/95 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary sm:px-3.5 sm:py-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {profile?.role?.name ?? 'User'}
+            </span>
           </div>
         </div>
 
-        <div className="relative px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-16">
-          <div className="mt-2 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:mt-6 lg:grid-cols-4">
+        <div className="px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
+          <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-4">
             {kpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
               <Link
                 key={label}
@@ -439,8 +403,8 @@ export function ProfilePage() {
                       </span>
                       Email address
                     </dt>
-                    <dd className="sm:text-right">
-                      <p className="text-base font-medium text-gray-900">{profile?.email ?? '—'}</p>
+                    <dd className="min-w-0 sm:text-right">
+                      <p className="break-all text-base font-medium text-gray-900">{profile?.email ?? '—'}</p>
                       <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
                     </dd>
                   </div>

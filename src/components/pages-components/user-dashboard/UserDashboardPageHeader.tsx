@@ -27,7 +27,7 @@ export function UserDashboardPageHeader({
       </div>
 
       {children ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 sm:mt-0 sm:ml-auto sm:border-t-0 sm:pt-0">
+        <div className="mt-4 flex w-full flex-col gap-2 border-t border-gray-100 pt-4 sm:mt-0 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:border-t-0 sm:pt-0">
           {children}
         </div>
       ) : null}

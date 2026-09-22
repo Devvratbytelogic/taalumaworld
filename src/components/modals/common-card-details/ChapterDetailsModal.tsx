@@ -50,7 +50,7 @@ export default function ChapterDetailsModal() {
   };
 
   const viewMentorProfile = () => {
-    const mentorId = chapter?.mentor?.short_code || chapter?.mentor?.id;
+    const mentorId = chapter?.mentor?.short_code || chapter?.mentor?._id || chapter?.mentor?.id;
     if (!mentorId) return;
     dispatch(closeModal());
     router.push(getSingleAuthorRoutePath(mentorId));

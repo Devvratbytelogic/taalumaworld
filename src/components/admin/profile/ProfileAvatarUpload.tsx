@@ -20,6 +20,7 @@ interface ProfileAvatarUploadProps {
   ringClassName?: string;
   /** Public mentor page cache clear after avatar upload */
   publicMentorShortCode?: string | null;
+  showHint?: boolean;
 }
 
 const SIZE_CLASSES: Record<AvatarSize, { wrap: string; icon: string; showLabel: boolean }> = {
@@ -35,6 +36,7 @@ export function ProfileAvatarUpload({
   className,
   ringClassName = 'ring-4 ring-white',
   publicMentorShortCode,
+  showHint = true,
 }: ProfileAvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [updateProfilePic, { isLoading }] = useUpdateProfilePicMutation();
@@ -116,7 +118,9 @@ export function ProfileAvatarUpload({
           disabled={isLoading}
         />
       </div>
-      <FileUploadLimitHint kind="image" className="mt-1" />
+      {showHint ? (
+        <FileUploadLimitHint kind="image" className="mt-1 max-w-24 text-center whitespace-normal" />
+      ) : null}
     </div>
   );
 }

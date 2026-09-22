@@ -20,6 +20,7 @@ export interface IBookDetails {
     coverImage: string;
     price: number;
     effectivePrice: number;
+    tax: number;
     pricingAccessType: string;
     pricingModel: string;
     status: string;

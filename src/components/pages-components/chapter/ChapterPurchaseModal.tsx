@@ -50,7 +50,7 @@ export default function ChapterPurchaseModal() {
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
   const isPaymentBusy = isWalletPaying || isPaystackPaying;
-  // console.log('liveChapter', liveChapter);
+  // console.log('chapter', chapter);
 
   useEffect(() => {
     const canRead = isBook ? liveBook?.data?.bookDetails?.canRead : liveChapter?.data?.canRead;
@@ -65,13 +65,18 @@ export default function ChapterPurchaseModal() {
     ? (chapter?.pricingModel === VISIBLE.CHAPTER)
     : (chapter?.series?.pricingModel === VISIBLE.CHAPTER);
 
+  const taxPrice = chapter?.tax ?? 0;
+
   const displayPrice = isBook
-    ? chapter?.effectivePrice
+    ? chapter?.effectivePrice // from BlueprintPublicHero.tsx and serieshero both send its data as chapter object
     : (isPricingModelChapter ? chapter?.effectivePrice : chapter?.series?.effectivePrice);
 
   const purchaseId = isPricingModelChapter ? chapter?.id : chapter?.series?.id;
   const purchaseType = isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK;
-  const totalPaymentRequired = Number(displayPrice ?? 0);
+
+  const subtotal = Number(displayPrice ?? 0);
+  const taxPercent = subtotal > 0 ? Math.round((taxPrice / subtotal) * 100) : 0;
+  const totalPaymentRequired = subtotal + taxPrice;
 
   const agreementError =
     agreementTouched && !allRequiredAccepted
@@ -287,6 +292,27 @@ export default function ChapterPurchaseModal() {
           </ModalBody>
 
           <ModalFooter className="flex flex-col gap-2 p-2 sm:p-4 border-t bg-white shrink-0">
+            {subtotal > 0 && (
+              <div className="space-y-1.5 rounded-md border border-border bg-muted/30 px-3 py-2.5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium">KSH {subtotal.toFixed(2)}</span>
+                </div>
+                {taxPrice > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      Tax{taxPercent > 0 ? ` (${taxPercent}%)` : ''}
+                    </span>
+                    <span className="font-medium">KSH {taxPrice.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between border-t border-border/70 pt-1.5 text-sm font-semibold">
+                  <span>Total</span>
+                  <span className="text-primary">KSH {totalPaymentRequired.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
               <ReferralWalletPayButton
                 totalPaymentRequired={totalPaymentRequired}
@@ -301,7 +327,7 @@ export default function ChapterPurchaseModal() {
                 type={purchaseType}
                 acceptedAgreementIds={acceptedAgreementIds}
                 callbackUrl={typeof window !== 'undefined' ? window.location.href : undefined}
-                label={`Buy Now - KSH ${displayPrice?.toFixed(2) ?? '0.00'}`}
+                label={`Buy Now - KSH ${totalPaymentRequired.toFixed(2)}`}
                 isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
                 onBeforePay={validatePurchase}
                 onSuccess={handlePurchaseSuccess}

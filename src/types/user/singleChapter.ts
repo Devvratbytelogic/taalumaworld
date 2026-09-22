@@ -22,6 +22,7 @@ export interface ISingleChapterAPIResponseData {
   pdf: string;
   price: number;
   effectivePrice: number;
+  tax: number;
   pricingAccessType: string;
   isFree: boolean;
   coverImage: string;

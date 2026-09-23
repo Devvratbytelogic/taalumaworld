@@ -76,6 +76,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     {
         title: 'Community',
         items: [
+            { model: 'Followers', id: 'followers', label: 'Followers', href: getAdminSectionRoutePath('followers'), icon: Users },
             { model: 'Testimonial', id: 'testimonials', label: 'Testimonials', href: getAdminSectionRoutePath('testimonials'), icon: MessageSquare },
             { model: 'FAQs', id: 'faqs', label: 'FAQs', href: getAdminSectionRoutePath('faqs'), icon: FileEdit },
             { model: 'Contact Us', submodel: ['Subscribers'], id: 'inbox', label: 'Inbox', href: getAdminSectionRoutePath('inbox'), icon: Inbox },

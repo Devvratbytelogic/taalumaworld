@@ -67,6 +67,7 @@ import {
     getMentorWalletRoutePath,
     getMentorReferralsRoutePath,
     getMentorReferralWalletRoutePath,
+    getMentorFollowersRoutePath,
     getMentorReviewsRoutePath,
     getMentorReviewReportsRoutePath,
     getMentorOrdersRoutePath,
@@ -90,6 +91,7 @@ const ADMIN_ROUTES: AdminNavRoute[] = [
     { label: 'Create Blueprint', description: 'Add a new blueprint', path: getCreateChapterRoutePath(), icon: Plus, keywords: ['new blueprint', 'add blueprint'] },
     { label: 'Categories', description: 'Manage categories', path: getAdminSectionRoutePath('categories'), icon: FolderTree, keywords: ['category', 'tag'] },
     { label: 'Mentors', description: 'Manage mentors', path: getAdminSectionRoutePath('authors'), icon: Users, keywords: ['author', 'leader', 'thought', 'mentor'] },
+    { label: 'Followers', description: 'People following mentors across TaalumaWorld', path: getAdminSectionRoutePath('followers'), icon: Users, keywords: ['follower', 'follow', 'audience'] },
     { label: 'Mentor Performance', description: 'Track mentor sales, revenue, and AI scores', path: getAdminMentorPerformanceRoutePath(), icon: BarChart3, keywords: ['mentor', 'performance', 'sales', 'revenue', 'ai score'] },
     { label: 'Mentor Revenue', description: 'Track mentor revenue, discounts, and share split', path: getAdminMentorRevenueRoutePath(), icon: Wallet, keywords: ['mentor', 'revenue', 'gross', 'discount', 'share', 'csv'] },
     { label: 'Mentor Types', description: 'Configure mentor categories and revenue share', path: getAdminMentorTypesRoutePath(), icon: Award, keywords: ['mentor type', 'mentor category', 'founding', 'revenue share', 'badge'] },
@@ -128,6 +130,7 @@ const MENTOR_ROUTES: AdminNavRoute[] = [
     { label: 'Wallet & Payouts', description: 'Manage wallet and payouts', path: getMentorWalletRoutePath(), icon: Wallet, keywords: ['wallet', 'payout', 'withdraw'] },
     { label: 'Referral Performance', description: 'Track referral performance', path: getMentorReferralsRoutePath(), icon: Link2, keywords: ['referral', 'growth'] },
     { label: 'Referral Wallet', description: 'Referral commission ledger', path: getMentorReferralWalletRoutePath(), icon: Wallet, keywords: ['referral', 'wallet', 'commission', 'ledger', 'credit', 'debit'] },
+    { label: 'Followers', description: 'People who follow your mentor profile', path: getMentorFollowersRoutePath(), icon: Users, keywords: ['follower', 'follow', 'audience'] },
     { label: 'Users', description: 'Manage your users', path: getMentorUsersRoutePath(), icon: UserCircle, keywords: ['user', 'member', 'account'] },
     { label: 'My Profile', description: 'Edit your mentor profile', path: getMentorProfileRoutePath(), icon: UserCircle, keywords: ['profile', 'me', 'account'] },
 ];

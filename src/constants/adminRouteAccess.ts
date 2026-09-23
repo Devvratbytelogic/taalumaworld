@@ -42,6 +42,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/mentor-equity', models: ['Mentor Equity'] },
   { path: '/admin/affiliate-applications', models: ['Affiliate Application'] },
   { path: '/admin/authors', models: ['Mentors'] },
+  { path: '/admin/followers', models: ['Followers'] },
   { path: '/admin/mentors/performance', models: ['Mentor Performance'] },
   { path: '/admin/mentors/revenue', models: ['Mentor Revenue'] },
   { path: '/admin/series', models: ['Series'] },

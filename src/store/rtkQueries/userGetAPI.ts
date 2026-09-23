@@ -73,6 +73,7 @@ import { UserTypeValue } from '@/constants/common';
 import { IInstituteMessageAPIResponse, IPartnerInstitutionsAPIResponse } from '@/types/institution';
 import { IMyMentorApplicationAPIResponse } from '@/types/user/mentorApplication';
 import { IFollowedMentorsAPIResponse } from '@/types/follows';
+import { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
 import { IMyReviewsAPIResponse, IUserReviewsAPIResponse } from '@/types/user/reviews';
 import { IAllOrdersAPIResponse } from '@/types/user/allOrders';
 import { ISingleOrderAPIResponse } from '@/types/order';
@@ -378,6 +379,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
             }),
             providesTags: (_, __, id) => [{ type: 'Address', id }],
         }),
+        /** signed-in mentor profile, including isFollowed and unmasked contact */
+        getMentorDetails: builder.query<IUserMentorDetailsAPIResponse, string>({
+            query: (id) => ({
+                url: `/user/mentors/${encodeURIComponent(id)}`,
+                method: 'GET',
+            }),
+            providesTags: ['MentorDetails'],
+        }),
         /** get mentors the current user follows */
         getFollowedMentors: builder.query<IFollowedMentorsAPIResponse, IGetFollowedMentorsParams | void>({
             query: (params) => ({
@@ -462,6 +471,7 @@ export const {
     useGetMentorApplicationsQuery,
     useGetUserAddressesQuery,
     useGetUserAddressByIdQuery,
+    useGetMentorDetailsQuery,
     useGetFollowedMentorsQuery,
     useGetContentReviewsQuery,
     useGetMyReviewsQuery,

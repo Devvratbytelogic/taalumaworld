@@ -12,7 +12,18 @@ import type { IFollowsAPIResponseDataEntity } from '@/types/follows';
 import { MentorFollowersSearch } from './MentorFollowersSearch';
 import { MentorFollowersSkeleton } from '@/components/skeleton-loader/admin';
 
-export function MentorFollowersTab() {
+function getFollowedMentorName(mentorId: IFollowsAPIResponseDataEntity['mentorId']) {
+  if (!mentorId || typeof mentorId === 'string') return '';
+  return mentorId.name?.trim() ?? '';
+}
+
+export function MentorFollowersTab({
+  description = 'People who follow your mentor profile.',
+  showMentor = false,
+}: {
+  description?: string;
+  showMentor?: boolean;
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -70,6 +81,19 @@ export function MentorFollowersTab() {
         );
       },
     },
+    ...(showMentor
+      ? [{
+          field: 'mentorId',
+          headerName: 'Mentor',
+          minWidth: 180,
+          flex: 1,
+          sortable: false,
+          valueGetter: (_value: unknown, row: IFollowsAPIResponseDataEntity) => getFollowedMentorName(row.mentorId),
+          renderCell: (params: { row: IFollowsAPIResponseDataEntity }) => (
+            <span className="text-sm truncate">{getFollowedMentorName(params.row.mentorId) || '—'}</span>
+          ),
+        } satisfies GridColDef<IFollowsAPIResponseDataEntity>]
+      : []),
     {
       field: 'email',
       headerName: 'Email',
@@ -116,7 +140,7 @@ export function MentorFollowersTab() {
       <div className="space-y-6">
         <AdminPageHeader
           title="Followers"
-          description="People who follow your mentor profile."
+          description={description}
         />
         <MentorFollowersSkeleton />
       </div>
@@ -127,7 +151,7 @@ export function MentorFollowersTab() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Followers"
-        description="People who follow your mentor profile."
+        description={description}
       />
 
       <MentorFollowersSearch

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ShieldCheck, Linkedin, Facebook, BookOpen, Phone, Mail, Users, UserPlus, UserMinus } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageComponent from '@/components/ui/ImageComponent';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { useGetMentorDetailsQuery } from '@/store/rtkQueries/userGetAPI';
 import { useFollowMentorMutation } from '@/store/rtkQueries/userPostAPI';
 import { openModal } from '@/store/slices/allModalSlice';
 import type { IMentorInfo } from '@/types/user/mentorDetails';
@@ -18,16 +19,22 @@ function getInitials(name?: string) {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
+function HeroSkeleton({ className }: { className: string }) {
+  return <div className={`animate-pulse bg-muted ${className}`} aria-hidden />;
+}
+
 function HeroContact({
   href,
   icon: Icon,
   label,
   value,
+  loading = false,
 }: {
   href?: string;
   icon: typeof Mail;
   label: string;
   value: string;
+  loading?: boolean;
 }) {
   const inner = (
     <>
@@ -36,7 +43,11 @@ function HeroContact({
       </div>
       <div className="text-left">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="font-medium text-foreground">{value}</p>
+        {loading ? (
+          <HeroSkeleton className="mt-1 h-4 w-28 rounded" />
+        ) : (
+          <p className="font-medium text-foreground">{value}</p>
+        )}
       </div>
     </>
   );
@@ -60,11 +71,32 @@ interface MentorProfileHeroProps {
 export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileHeroProps) {
   const dispatch = useDispatch();
   const { isAuthenticated } = useAuth();
-  const [isFollowing, setIsFollowing] = useState(Boolean(mentor?.isFollowed));
+  const mentorKey = mentor?.short_code || mentor?._id || mentor?.id || '';
+  const { data: authedMentor, isFetching: isLoadingFollowState } = useGetMentorDetailsQuery(mentorKey, {
+    skip: !isAuthenticated || !mentorKey,
+  });
+  const viewer = authedMentor?.data?.mentor_info;
+  const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(mentor?.followerCount ?? 0);
   const [followMentor, { isLoading: isUpdatingFollow }] = useFollowMentorMutation();
 
   const mentorId = mentor?._id || mentor?.id || '';
+  const email = viewer?.email ?? mentor?.email;
+  const phone = viewer?.phone ?? mentor?.phone;
+  const followStatePending = isAuthenticated && isLoadingFollowState && !viewer;
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsFollowing(false);
+      setFollowerCount(mentor?.followerCount ?? 0);
+      return;
+    }
+    if (!viewer) return;
+    setIsFollowing(Boolean(viewer.isFollowed));
+    if (typeof viewer.followerCount === 'number') {
+      setFollowerCount(viewer.followerCount);
+    }
+  }, [isAuthenticated, viewer, mentor?.followerCount]);
 
   const handleToggleFollow = async () => {
     if (!mentorId) return;
@@ -123,20 +155,24 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
                 {mentor?.name}
               </h1>
 
-              <Button
-                onPress={isAuthenticated ? handleToggleFollow : openLogin}
-                isLoading={isUpdatingFollow}
-                className={`global_btn rounded_full w_fit shrink-0 ${isFollowing ? 'outline_primary' : 'bg_primary'}`}
-                startContent={
-                  isUpdatingFollow ? undefined : isFollowing ? (
-                    <UserMinus className="h-4 w-4" />
-                  ) : (
-                    <UserPlus className="h-4 w-4" />
-                  )
-                }
-              >
-                {isFollowing ? 'Unfollow' : 'Follow'}
-              </Button>
+              {followStatePending ? (
+                <HeroSkeleton className="h-10 w-28 shrink-0 rounded-full" />
+              ) : (
+                <Button
+                  onPress={isAuthenticated ? handleToggleFollow : openLogin}
+                  isLoading={isUpdatingFollow}
+                  className={`global_btn rounded_full w_fit shrink-0 ${isFollowing ? 'outline_primary' : 'bg_primary'}`}
+                  startContent={
+                    isUpdatingFollow ? undefined : isFollowing ? (
+                      <UserMinus className="h-4 w-4" />
+                    ) : (
+                      <UserPlus className="h-4 w-4" />
+                    )
+                  }
+                >
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </Button>
+              )}
             </div>
 
             {mentor?.professionalBio && (
@@ -162,27 +198,35 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Followers</p>
-                  <p className="font-medium text-foreground">{followerCount.toLocaleString()}</p>
+                  {followStatePending ? (
+                    <HeroSkeleton className="mt-1 h-4 w-10 rounded" />
+                  ) : (
+                    <p className="font-medium text-foreground">{followerCount.toLocaleString()}</p>
+                  )}
                 </div>
               </div>
 
-              {mentor?.email && (
+              {followStatePending && mentor?.email ? (
+                <HeroContact icon={Mail} label="Email" value="" loading />
+              ) : email ? (
                 <HeroContact
-                  href={mentor.email.includes('*') ? undefined : `mailto:${mentor.email}`}
+                  href={email.includes('*') ? undefined : `mailto:${email}`}
                   icon={Mail}
                   label="Email"
-                  value={mentor.email}
+                  value={email}
                 />
-              )}
+              ) : null}
 
-              {mentor?.phone && (
+              {followStatePending && mentor?.phone ? (
+                <HeroContact icon={Phone} label="Phone" value="" loading />
+              ) : phone ? (
                 <HeroContact
-                  href={mentor.phone.includes('*') ? undefined : `tel:${mentor.phone}`}
+                  href={phone.includes('*') ? undefined : `tel:${phone}`}
                   icon={Phone}
                   label="Phone"
-                  value={mentor.phone}
+                  value={phone}
                 />
-              )}
+              ) : null}
             </div>
 
             {(mentor?.linkedin || mentor?.facebook) && (

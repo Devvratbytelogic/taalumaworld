@@ -15,9 +15,16 @@ export interface IFollowsAPIResponseData {
     limit: number;
     totalPages: number;
 }
+export interface IFollowMentorRef {
+    _id?: string;
+    id?: string;
+    name?: string;
+    profile_pic?: string;
+    email?: string;
+}
 export interface IFollowsAPIResponseDataEntity {
     _id: string;
-    mentorId: string;
+    mentorId: string | IFollowMentorRef;
     userId: IFollowsAPIResponseDataEntityUserId;
     createdAt: string;
     updatedAt: string;

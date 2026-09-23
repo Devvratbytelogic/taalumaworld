@@ -244,6 +244,7 @@ export const rtkQuerieSetup = createApi({
         'Cart',
         'Wishlist',
         'FollowedMentors',
+        'MentorDetails',
         'Reviews',
         'UserOrders',
         'UserProfile',

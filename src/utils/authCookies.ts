@@ -31,6 +31,7 @@ const AUTH_DEPENDENT_TAGS = [
     'UserProfile',
     'AdminProfile',
     'FollowedMentors',
+    'MentorDetails',
     'ReadingHistory',
     'UserOrders',
     'Address',

@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { notFound, unstable_rethrow } from 'next/navigation';
 import { API_BASE_URL } from '@/utils/config';
 import type { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
@@ -13,23 +12,6 @@ import {
   ITestimonialsAPIResponse,
 } from '@/types/user/testimonial';
 import { TAGS } from '@/store/server-api/cacheTags';
-
-async function getHeaders() {
-  const cookieStore = await cookies();
-
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-    device: cookieStore.get('device')?.value ?? '',
-    userID: cookieStore.get('userID')?.value ?? '',
-  };
-
-  const token = cookieStore.get('auth_token')?.value;
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  return headers;
-}
 
 type PublicFetchOptions = {
   revalidate?: number;
@@ -62,20 +44,6 @@ export async function publicFetch<T>(
         revalidate,
         ...(tags?.length ? { tags } : {}),
       },
-    });
-    return await readJsonOrNotFound<T>(res, urlString);
-  } catch (error) {
-    unstable_rethrow(error);
-    return null;
-  }
-}
-
-export async function serverFetch<T>(path: string): Promise<T | null> {
-  try {
-    const urlString = `${API_BASE_URL}${path}`;
-    const res = await fetch(urlString, {
-      method: 'GET',
-      headers: await getHeaders(),
     });
     return await readJsonOrNotFound<T>(res, urlString);
   } catch (error) {
@@ -142,8 +110,9 @@ export async function getMentorDetailsServerAPI(
   if (params?.limit) query.set('limit', String(params.limit));
   const queryString = query.toString();
 
-  return serverFetch<IUserMentorDetailsAPIResponse>(
-    `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`
+  return publicFetch<IUserMentorDetailsAPIResponse>(
+    `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`,
+    { tags: [TAGS.MENTORS, TAGS.mentor(shortCode)] },
   );
 }
 

@@ -187,6 +187,7 @@ export function getAdminSectionRoutePath(section: string): string {
     chapters: '/admin/blueprints',
     categories: '/admin/categories',
     authors: '/admin/authors',
+    followers: '/admin/followers',
     mentor_performance: '/admin/mentors/performance',
     mentor_revenue: '/admin/mentors/revenue',
     referral_performance: '/admin/referrals/performance',

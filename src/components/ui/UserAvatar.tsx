@@ -1,3 +1,5 @@
+import ImageComponent from '@/components/ui/ImageComponent'
+
 interface UserAvatarProps {
   userName: string;
   userPhoto?: string;
@@ -11,6 +13,13 @@ export function UserAvatar({ userName, userPhoto, size = 'md', className = '' }:
     md: 'h-10 w-10 text-base',
     lg: 'h-12 w-12 text-lg',
     xl: 'h-14 w-14 text-xl',
+  };
+
+  const photoSizes = {
+    sm: '32px',
+    md: '40px',
+    lg: '48px',
+    xl: '56px',
   };
 
   // Get first letter of name
@@ -39,11 +48,15 @@ export function UserAvatar({ userName, userPhoto, size = 'md', className = '' }:
 
   if (userPhoto) {
     return (
-      <img
-        src={userPhoto}
-        alt={userName}
-        className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
-      />
+      <div className={`relative overflow-hidden rounded-full ${sizeClasses[size]} ${className}`}>
+        <ImageComponent
+          src={userPhoto}
+          alt={userName}
+          object_cover
+          sizes={photoSizes[size]}
+          quality={60}
+        />
+      </div>
     );
   }
 

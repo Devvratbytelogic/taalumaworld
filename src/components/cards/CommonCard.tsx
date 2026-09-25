@@ -45,7 +45,12 @@ export default function CommonCard({ data }: CommonCardProps) {
             {/* Cover Image */}
             <div className="aspect-2/2 overflow-hidden bg-muted relative shrink-0">
                 <div className="w-full h-full transition-transform group-hover/card:scale-105">
-                    <ImageComponent src={data?.coverImage ?? ''} alt={data?.title ?? ''} object_cover={true} />
+                    <ImageComponent
+                        src={data?.coverImage ?? ''}
+                        alt={data?.title ?? ''}
+                        object_cover={true}
+                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, (max-width: 1280px) 30vw, 22vw"
+                    />
                 </div>
 
                 <MentorCardReveal

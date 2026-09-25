@@ -8,6 +8,7 @@ import { getMentorDashboardRoutePath, getMentorSignupRoutePath, getUserDashboard
 import { getUserRole, hasAuthCookie } from '@/utils/authCookies'
 import { isCareerArchitectRole, isMentorRole } from '@/constants/common'
 import ActiveReadersSkeleton from '@/components/skeleton-loader/ActiveReadersSkeleton'
+import homeBanner from '../../../../public/images/banner/home-banner2.webp'
 
 const AVATAR_COLORS = ['#0A66C2', '#8B5CF6', '#10B981', '#004182']
 
@@ -78,43 +79,47 @@ export default function HeroBanner() {
                             </div>
 
                             {/* Active Readers Stats */}
-                            {isActiveReadersLoading && <ActiveReadersSkeleton />}
-                            {!isActiveReadersLoading && activeReadersData?.data && activeReadersData.data.totalReaders > 0 &&
-                                <div className="flex items-center gap-2 pt-2">
-                                    <div className="flex -space-x-2">
-                                        {users.map((user, index) => (
-                                            user.profilePic ? (
-                                                <div
-                                                    key={user.id}
-                                                    className="w-8 h-8 rounded-full border border-gray-200 overflow-hidden"
-                                                >
-                                                    <ImageComponent
-                                                        src={user.profilePic}
-                                                        alt={user.name}
-                                                        object_cover={true}
-                                                    />
+                            <div className="min-h-10">
+                                {isActiveReadersLoading && <ActiveReadersSkeleton />}
+                                {!isActiveReadersLoading && activeReadersData?.data && activeReadersData.data.totalReaders > 0 &&
+                                    <div className="flex items-center gap-2 pt-2">
+                                        <div className="flex -space-x-2">
+                                            {users.map((user, index) => (
+                                                user.profilePic ? (
+                                                    <div
+                                                        key={user.id}
+                                                        className="w-8 h-8 rounded-full border border-gray-200 overflow-hidden"
+                                                    >
+                                                        <ImageComponent
+                                                            src={user.profilePic}
+                                                            alt={user.name}
+                                                            object_cover={true}
+                                                            sizes="32px"
+                                                            quality={60}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        key={user.id}
+                                                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border border-gray-200"
+                                                        style={{ backgroundColor: AVATAR_COLORS[index % AVATAR_COLORS.length] }}
+                                                    >
+                                                        {user.name?.charAt(0)?.toUpperCase() ?? '?'}
+                                                    </div>
+                                                )
+                                            ))}
+                                            {remaining > 0 && (
+                                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium border border-gray-200 bg-primary">
+                                                    +{remaining}
                                                 </div>
-                                            ) : (
-                                                <div
-                                                    key={user.id}
-                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border border-gray-200"
-                                                    style={{ backgroundColor: AVATAR_COLORS[index % AVATAR_COLORS.length] }}
-                                                >
-                                                    {user.name?.charAt(0)?.toUpperCase() ?? '?'}
-                                                </div>
-                                            )
-                                        ))}
-                                        {remaining > 0 && (
-                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium border border-gray-200 bg-primary">
-                                                +{remaining}
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
+                                        <span className="text-sm font-medium text-foreground">
+                                            {total.toLocaleString()}+ Strategic Career Architects
+                                        </span>
                                     </div>
-                                    <span className="text-sm font-medium text-foreground">
-                                        {total.toLocaleString()}+ Strategic Career Architects
-                                    </span>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
 
                         {/* Right Column - Image */}
@@ -126,9 +131,12 @@ export default function HeroBanner() {
                             {/* Main image */}
                             <div className="relative z-10 rounded-md sm:rounded-xl overflow-hidden ring-1 ring-black/5 aspect-4/3">
                                 <ImageComponent
-                                    src="/images/banner/home-banner2.webp"
+                                    src={homeBanner}
                                     alt="Teen reading on laptop"
                                     object_cover={true}
+                                    priority
+                                    sizes="(max-width: 1024px) 90vw, 45vw"
+                                    // placeholder="blur"
                                 />
                             </div>
                         </div>

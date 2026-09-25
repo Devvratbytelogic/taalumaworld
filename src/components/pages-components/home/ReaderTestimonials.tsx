@@ -43,6 +43,8 @@ export default function ReaderTestimonials({ testimonials }: ReaderTestimonialsP
                                         src={testimonial.photo ?? undefined}
                                         alt={testimonial.name}
                                         object_cover={true}
+                                        sizes="40px"
+                                        quality={60}
                                     />
                                 </div>
                                 <div>

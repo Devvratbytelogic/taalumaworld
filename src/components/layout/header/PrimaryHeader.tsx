@@ -181,6 +181,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                   alt={brandName}
                   object_cover={false}
                   priority
+                  sizes="(max-width: 640px) 120px, 200px"
                 />
               </div>
             </Link>

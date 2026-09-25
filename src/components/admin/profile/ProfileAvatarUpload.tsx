@@ -7,8 +7,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from '@/utils/toast';
 import { cn } from '@/components/ui/utils';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
-import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_LIMIT_LABEL, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
-import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
+import { ALLOWED_IMAGE_ACCEPT, ALLOWED_IMAGE_TYPES_LABEL, IMAGE_UPLOAD_LIMIT_LABEL, IMAGE_UPLOAD_MAX_BYTES, IMAGE_UPLOAD_MAX_MB, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 type AvatarSize = 'md' | 'lg' | 'xl';
 
@@ -70,7 +69,7 @@ export function ProfileAvatarUpload({
   };
 
   return (
-    <div className="relative z-10 flex shrink-0 flex-col items-center">
+    <div className={cn('flex shrink-0 flex-col items-center', showHint && 'w-28')}>
       <div className={cn('overflow-hidden rounded-full border bg-white', sizeConfig.wrap, className)}>
         <button
           type="button"
@@ -119,7 +118,11 @@ export function ProfileAvatarUpload({
         />
       </div>
       {showHint ? (
-        <FileUploadLimitHint kind="image" className="mt-1 max-w-24 text-center whitespace-normal" />
+        <p className="mt-2 w-full text-center text-[11px] leading-snug text-muted-foreground">
+          {ALLOWED_IMAGE_TYPES_LABEL}
+          <br />
+          max {IMAGE_UPLOAD_MAX_MB}MB
+        </p>
       ) : null}
     </div>
   );

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, User } from 'lucide-react'
 import ImageComponent from '../ui/ImageComponent'
 import { FacebookIcon, LinkedinIcon } from '../ui/AllSVG'
@@ -20,17 +21,38 @@ interface MentorCardRevealProps {
 }
 
 export default function MentorCardReveal({ name, avatar, bio, social, ctaLabel, onCtaClick }: MentorCardRevealProps) {
+    const rootRef = useRef<HTMLDivElement>(null)
+    const [showPhoto, setShowPhoto] = useState(false)
     const linkedin = social?.linkedin?.trim() ?? ''
     const facebook = social?.facebook?.trim() ?? ''
     const hasMentor = Boolean(name || avatar)
 
+    useEffect(() => {
+        const card = rootRef.current?.closest('.group\\/card')
+        if (!card) return
+
+        const reveal = () => setShowPhoto(true)
+        card.addEventListener('pointerenter', reveal)
+        card.addEventListener('focusin', reveal)
+        return () => {
+            card.removeEventListener('pointerenter', reveal)
+            card.removeEventListener('focusin', reveal)
+        }
+    }, [])
+
     return (
-        <div className="absolute inset-0 z-1 flex flex-col items-center justify-center gap-2 p-4 text-center text-white bg-black/75 opacity-0 invisible pointer-events-none transition-all duration-200 group-hover/card:opacity-100 group-hover/card:visible">
+        <div ref={rootRef} className="absolute inset-0 z-1 flex flex-col items-center justify-center gap-2 p-4 text-center text-white bg-black/75 opacity-0 invisible pointer-events-none transition-all duration-200 group-hover/card:opacity-100 group-hover/card:visible">
             {hasMentor ? (
                 <>
-                    {avatar ? (
+                    {avatar && showPhoto ? (
                         <div className="w-12 h-12 rounded-full overflow-hidden border border-white/50 shrink-0">
-                            <ImageComponent src={avatar ?? ''} alt={name ?? ''} object_cover={true} />
+                            <ImageComponent
+                                src={avatar}
+                                alt={name ?? ''}
+                                object_cover={true}
+                                sizes="48px"
+                                quality={60}
+                            />
                         </div>
                     ) : (
                         <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center shrink-0">

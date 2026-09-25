@@ -182,6 +182,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
                   fallbackSrc={DEFAULT_BRAND_LOGO}
                   alt={brandName}
                   object_cover={false}
+                  sizes="132px"
                 />
               </div>
             </Link>

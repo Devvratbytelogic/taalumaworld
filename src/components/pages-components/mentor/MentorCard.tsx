@@ -41,7 +41,13 @@ export default function MentorCard({ mentor, index }: MentorCardProps) {
                 <div className="relative -mt-10 mb-3">
                     <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-card bg-muted shadow-md">
                         {mentor?.profile_pic ? (
-                            <ImageComponent src={mentor?.profile_pic} alt={mentor?.name} object_cover />
+                            <ImageComponent
+                                src={mentor?.profile_pic}
+                                alt={mentor?.name}
+                                object_cover
+                                sizes="80px"
+                                quality={60}
+                            />
                         ) : (
                             <div
                                 className={`flex h-full w-full items-center justify-center bg-linear-to-br ${gradient} text-lg font-bold text-white`}

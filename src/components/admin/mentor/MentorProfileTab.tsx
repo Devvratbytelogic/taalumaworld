@@ -235,6 +235,8 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
   const [isEditing, setIsEditing] = useState(false);
   const [tempPhoto, setTempPhoto] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoRemoved, setPhotoRemoved] = useState(false);
+  const [photoInputKey, setPhotoInputKey] = useState(0);
   const [isTierModalOpen, setIsTierModalOpen] = useState(false);
   const [updateAdminProfile] = useUpdateAdminProfileMutation();
   const { data: tierUpgradeData } = useGetMyMentorTierUpgradeApplicationQuery();
@@ -269,11 +271,13 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
         formData.append('isNamePrivate', 'false');
         formData.append('isPhonePrivate', String(formValues.isPhonePrivate));
         if (photoFile) formData.append('profile_pic', photoFile);
+        else if (photoRemoved) formData.append('profile_pic', '');
 
         const res = await updateAdminProfile(formData).unwrap();
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
           setTempPhoto('');
           setPhotoFile(null);
+          setPhotoRemoved(false);
           setIsEditing(false);
           void refreshAfterMentorChange(profile?.short_code);
           toast.success(res.message ?? 'Profile updated successfully!');
@@ -286,6 +290,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
     if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
       toast.error(getImageSizeLimitMessage('Photo'));
@@ -295,20 +300,29 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
       toast.error(getImageTypeErrorMessage());
       return;
     }
+    setPhotoRemoved(false);
     setPhotoFile(file);
     const reader = new FileReader();
     reader.onloadend = () => setTempPhoto(reader.result as string);
     reader.readAsDataURL(file);
   };
 
+  const handleRemovePhoto = () => {
+    setTempPhoto('');
+    setPhotoFile(null);
+    setPhotoRemoved(true);
+    setPhotoInputKey((key) => key + 1);
+  };
+
   const handleCancel = () => {
     resetForm();
     setTempPhoto('');
     setPhotoFile(null);
+    setPhotoRemoved(false);
     setIsEditing(false);
   };
 
-  const displayPhoto = tempPhoto || profile?.profile_pic || '';
+  const displayPhoto = photoRemoved ? '' : (tempPhoto || profile?.profile_pic || '');
   const displayName = values.name || profile?.name || 'Mentor';
   const referralCode = profile?.short_code?.trim() || '';
 
@@ -329,9 +343,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
     <>
       <AdminPanel padding={false} className="overflow-hidden">
         <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-6 py-8">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
             <ProfileAvatarUpload
-              src={profile?.profile_pic ?? ''}
+              src={isEditing && (photoRemoved || tempPhoto) ? displayPhoto : (profile?.profile_pic ?? '')}
               name={displayName}
               publicMentorShortCode={profile?.short_code}
             />
@@ -594,7 +608,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center">
-                <Avatar src={displayPhoto} name={displayName} className="h-16 w-16 shrink-0 text-xl" />
+                <Avatar src={displayPhoto || undefined} name={displayName} className="h-16 w-16 shrink-0 text-xl" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 inline-flex items-center gap-1.5">
                     Profile photo
@@ -602,7 +616,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <label>
-                      <input type="file" accept={ALLOWED_IMAGE_ACCEPT} onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
+                      <input key={photoInputKey} type="file" accept={ALLOWED_IMAGE_ACCEPT} onChange={handlePhotoUpload} className="hidden" disabled={isSubmitting} />
                       <span className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
                         <Camera className="h-4 w-4" />
                         {displayPhoto ? 'Change photo' : 'Upload photo'}
@@ -611,9 +625,9 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
                     {displayPhoto ? (
                       <button
                         type="button"
-                        onClick={() => { setTempPhoto(''); setPhotoFile(null); }}
+                        onClick={handleRemovePhoto}
                         disabled={isSubmitting}
-                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 px-3 text-sm font-medium text-red-600 hover:bg-red-50"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200! px-3 text-sm font-medium text-red-600 hover:bg-red-50"
                       >
                         <X className="h-4 w-4" />
                         Remove

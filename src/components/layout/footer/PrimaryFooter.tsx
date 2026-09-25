@@ -54,6 +54,7 @@ export default function PrimaryFooter({
                                             fallbackSrc={DEFAULT_BRAND_LOGO}
                                             alt={brandName}
                                             object_cover={false}
+                                            sizes="160px"
                                         />
                                     </div>
                                 </Link>

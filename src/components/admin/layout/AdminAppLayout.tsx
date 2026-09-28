@@ -89,7 +89,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
             { model: 'Referral Performance', id: 'referral_performance', label: 'Referral Performance', href: getAdminReferralPerformanceRoutePath(), icon: TrendingUp },
-            { model: 'Referral Setting', id: 'referral_setting', label: 'Referral Setting', href: getAdminSectionRoutePath('referral_setting'), icon: Link2 },
+            // { model: 'Referral Setting', id: 'referral_setting', label: 'Referral Setting', href: getAdminSectionRoutePath('referral_setting'), icon: Link2 },
             { model: 'Audit Log', id: 'audit_logs', label: 'Audit Logs', href: getAdminSectionRoutePath('audit_logs'), icon: ScrollText },
         ],
     },

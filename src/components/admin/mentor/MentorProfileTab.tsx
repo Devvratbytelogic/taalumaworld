@@ -61,6 +61,7 @@ import { SELECT_STYLES, type SelectOption } from '@/constants/selectStyle';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 import { MentorProfileSkeleton } from '@/components/skeleton-loader/admin';
+import { WebPushSettingsCard } from '@/components/notifications/WebPushSettingsCard';
 
 const PAYOUT_FREQUENCIES = ["monthly", "quarterly", "annually"] as const;
 const PAYSTACK_SETTLEMENT_OPTIONS = ["mpesa", "bank"] as const;
@@ -1334,6 +1335,7 @@ export function MentorProfileTab() {
         showAccountStatus={false}
       />
       <ProfileDetailsCard profile={profile} />
+      <WebPushSettingsCard appearance="panel" />
       <div className="grid gap-6 lg:grid-cols-2">
         <PayoutDetailsCard mentorInfo={profile?.mentor_info} />
         <AgreementsCard />

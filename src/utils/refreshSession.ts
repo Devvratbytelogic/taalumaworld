@@ -154,6 +154,12 @@ export function applyLogoutIfAuthCookieGone(): void {
 
 export async function signOut(options?: { redirectTo?: string }): Promise<void> {
     if (typeof window === 'undefined') return
+    try {
+        const { unsubscribeCurrentWebPush } = await import('@/utils/webPush')
+        await unsubscribeCurrentWebPush()
+    } catch {
+        // Local sign-out still continues if push unsubscribe fails.
+    }
     isEndingSession = true
     const prefix = getAuthApiPrefix()
     const redirectTo = options?.redirectTo ?? getHomeRoutePath()

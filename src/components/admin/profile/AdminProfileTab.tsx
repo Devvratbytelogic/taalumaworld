@@ -25,6 +25,7 @@ import { AdminProfileSkeleton } from '@/components/skeleton-loader/admin';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
+import { WebPushSettingsCard } from '@/components/notifications/WebPushSettingsCard';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -194,6 +195,8 @@ export function AdminProfileTab() {
           </Button>
         ) : null}
       </AdminPageHeader>
+
+      <WebPushSettingsCard appearance="panel" />
 
       <AdminPanel padding={false} className="overflow-hidden">
         <div className="border-b border-slate-100 bg-linear-to-r from-primary/5 via-slate-50 to-white px-6 py-8">

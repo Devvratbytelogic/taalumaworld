@@ -14,6 +14,7 @@ import { signOut } from '@/utils/refreshSession';
 import { getHomeRoutePath } from '@/routes/routes';
 import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 import { DashboardSettingsSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
+import { WebPushSettingsCard } from '@/components/notifications/WebPushSettingsCard';
 
 export function SettingsPage() {
   const { data: profileRes, isLoading: isLoadingProfile } = useGetUserProfileQuery();
@@ -279,6 +280,8 @@ export function SettingsPage() {
             )}
           </div>
         </section>
+
+        <WebPushSettingsCard />
 
         <section className="border-t border-gray-100 px-4 py-5 sm:px-8 sm:py-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">

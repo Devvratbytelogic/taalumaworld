@@ -181,17 +181,17 @@ export function AdminMentorTypesTab() {
         </span>
       ),
     },
-    {
-      field: 'is_verified_tier',
-      headerName: 'Verified Tier',
-      width: 120,
-      sortable: false,
-      renderCell: (params) => (
-        <Badge variant="outline" className={params.row.is_verified_tier ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}>
-          {params.row.is_verified_tier ? 'Yes' : 'No'}
-        </Badge>
-      ),
-    },
+    // {
+    //   field: 'is_verified_tier',
+    //   headerName: 'Verified Tier',
+    //   width: 120,
+    //   sortable: false,
+    //   renderCell: (params) => (
+    //     <Badge variant="outline" className={params.row.is_verified_tier ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}>
+    //       {params.row.is_verified_tier ? 'Yes' : 'No'}
+    //     </Badge>
+    //   ),
+    // },
     {
       field: 'status',
       headerName: 'Status',

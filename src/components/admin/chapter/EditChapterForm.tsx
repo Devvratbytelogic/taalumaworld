@@ -41,6 +41,9 @@ import {
   isAllowedImageFile,
 } from '@/constants/fileUpload';
 import { slugify } from '@/utils/slugify';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const BLUEPRINTS_MODEL = 'Blueprints';
 
 interface EditChapterFormProps {
   chapterId: string;
@@ -65,6 +68,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const blueprintBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD);
   const [updateChapter, { isLoading: isUpdating }] = useUpdateChapterMutation();
+  const { hasPermission, isLoading: isPermissionsLoading } = useAdminPermissions();
+  const canEdit = hasPermission(BLUEPRINTS_MODEL, 'edit');
 
   const booksData = booksResponse?.data;
   const books = booksData?.data ?? [];
@@ -322,7 +327,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
 
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
-  if (isChapterLoading) return <AdminBlueprintFormFieldsSkeleton />;
+  if (isPermissionsLoading || isChapterLoading) return <AdminBlueprintFormFieldsSkeleton />;
+
+  if (!canEdit) {
+    return <p className="py-10 text-center text-sm text-slate-500">You do not have edit access to Blueprints</p>;
+  }
 
   if (error) {
     const message = 'error' in error ? error.error : 'Blueprint not found.';

@@ -44,6 +44,10 @@ import {
   isAllowedImageFile,
 } from '@/constants/fileUpload';
 import { slugify } from '@/utils/slugify';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { AdminBlueprintFormFieldsSkeleton } from '@/components/skeleton-loader/admin';
+
+const BLUEPRINTS_MODEL = 'Blueprints';
 
 const initialFormValues = {
   bookId: '',
@@ -87,6 +91,8 @@ export function CreateChapterForm() {
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const blueprintBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD);
   const [addChapter, { isLoading: isAdding }] = useAddChapterMutation();
+  const { hasPermission, isLoading: isPermissionsLoading } = useAdminPermissions();
+  const canAdd = hasPermission(BLUEPRINTS_MODEL, 'add');
 
   const booksData = booksResponse?.data;
   const books = booksData?.data ?? [];
@@ -282,6 +288,12 @@ export function CreateChapterForm() {
   );
 
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
+
+  if (isPermissionsLoading) return <AdminBlueprintFormFieldsSkeleton />;
+
+  if (!canAdd) {
+    return <p className="py-10 text-center text-sm text-slate-500">You do not have add access to Blueprints</p>;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">

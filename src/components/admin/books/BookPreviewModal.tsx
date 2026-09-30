@@ -35,7 +35,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
     {
       icon: Wallet,
       label: 'Pricing Model',
-      value: book.pricingModel === 'book' ? 'Series' : (book.pricingModel ?? 'N/A'),
+      value: book.pricingModel === 'book' ? 'Series' : 'Blueprint',
     },
     { icon: CalendarDays, label: 'Created', value: moment(book.createdAt).format('DD MMM YYYY') },
   ];

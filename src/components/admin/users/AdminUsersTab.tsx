@@ -296,6 +296,7 @@ export function AdminUsersTab() {
       {canEdit ? (
         <EditUserModal
           user={editUser}
+          label="Customer"
           open={!!editUser}
           onOpenChange={(open) => !open && setEditUser(null)}
         />

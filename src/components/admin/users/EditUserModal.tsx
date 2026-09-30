@@ -21,7 +21,6 @@ import { editUserSchema } from '@/utils/formValidation';
 import { useUpdateUserMutation } from '@/store/rtkQueries/rolesPermissionsApi';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import toast from '@/utils/toast';
-import { USER_TYPE } from '@/constants/common';
 import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
@@ -30,9 +29,11 @@ interface EditUserModalProps {
   user: IAllUsersEntity | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** "Mentor" on the Mentors screen, "Customer" on the Customers screen. */
+  label?: 'Mentor' | 'Customer';
 }
 
-export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) {
+export function EditUserModal({ user, open, onOpenChange, label = 'Customer' }: EditUserModalProps) {
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
@@ -75,10 +76,8 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
 
           const res = await updateUser({ id: user._id, payload: formData }).unwrap();
           if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-            const isMentor =
-              user.user_type === USER_TYPE.MENTOR || user.role?.name === USER_TYPE.MENTOR;
-            if (isMentor) void refreshAfterMentorChange(user.short_code);
-            toast.success(res.message ?? 'Customer updated successfully');
+            if (label === 'Mentor') void refreshAfterMentorChange(user.short_code);
+            toast.success(res.message ?? `${label} updated successfully`);
             resetForm();
             setProfilePicFile(null);
             setProfilePicPreview(null);
@@ -123,17 +122,17 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
       <DialogContent className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <form noValidate onSubmit={handleSubmit} className="flex max-h-[90vh] flex-col">
           <DialogHeader className="shrink-0 border-b border-slate-100 px-6 pb-4 pt-6 pr-12">
-            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogTitle>Edit {label}</DialogTitle>
             <DialogDescription>
-              Update profile details for {user?.name ?? 'this customer'}.
+              Update profile details for {user?.name ?? `this ${label.toLowerCase()}`}.
             </DialogDescription>
           </DialogHeader>
 
           <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto p-6!">
             <div className="flex items-center gap-4">
               <Avatar className="border h-16 w-16 shrink-0">
-                <AvatarImage src={previewSrc} alt={values.name || 'Customer'} />
-                <AvatarFallback>{values.name?.[0]?.toUpperCase() ?? 'C'}</AvatarFallback>
+                <AvatarImage src={previewSrc} alt={values.name || label} />
+                <AvatarFallback>{values.name?.[0]?.toUpperCase() ?? label[0]}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1 space-y-2">
                 <Label htmlFor="edit-user-profile-pic">

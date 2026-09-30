@@ -356,6 +356,7 @@ export function AdminAuthorsTab() {
       {canEdit ? (
         <EditUserModal
           user={editAuthor}
+          label="Mentor"
           open={!!editAuthor}
           onOpenChange={(open) => !open && setEditAuthor(null)}
         />

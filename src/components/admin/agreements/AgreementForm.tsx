@@ -15,6 +15,9 @@ import { refreshAfterPolicyChange } from '@/store/server-api/refreshCache';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import { slugify } from '@/utils/slugify';
 import toast from '@/utils/toast';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
+const AGREEMENTS_MODEL = 'Agreements';
 
 export type AgreementFormValues = {
   title: string;
@@ -35,6 +38,8 @@ const initialValues: AgreementFormValues = {
 export function AgreementForm() {
   const router = useRouter();
   const [addAgreement] = useAddAgreementMutation();
+  const { hasPermission, isLoading: isPermissionsLoading } = useAdminPermissions();
+  const canAdd = hasPermission(AGREEMENTS_MODEL, 'add');
 
   const { data: agreementTypesResponse } = useGetAllAgreementTypesQuery({ limit: 100, status: 'active' });
   const agreementTypeOptions = useMemo(
@@ -61,6 +66,12 @@ export function AgreementForm() {
       }
     },
   });
+
+  if (isPermissionsLoading) return null;
+
+  if (!canAdd) {
+    return <p className="py-10 text-center text-sm text-slate-500">You do not have add access to Agreements</p>;
+  }
 
   return (
     <form noValidate onSubmit={handleSubmit} className="space-y-5">

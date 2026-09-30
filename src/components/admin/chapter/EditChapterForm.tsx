@@ -697,6 +697,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
         </p>
       ) : null} */}
 
+      {chapterData?.status === 'Published' ? (
+        <div className="flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
+          <Info className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>Saving these changes will unpublish this blueprint and send it for re-review. Do you want to continue?</span>
+        </div>
+      ) : null}
+
       <div className="form-footer">
         <Button
           type="submit"

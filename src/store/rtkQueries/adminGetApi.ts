@@ -49,7 +49,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
         }),
 
         /** Chapters */
-        getAllAdminChapters: builder.query<IAllChaptersAPIResponse, { page?: number; limit?: number; search?: string; bookId?: string; status?: string; isDeleted?: boolean; isMine?: boolean; isContentFlagged?: boolean; reviewBlueprint?: boolean } | void>({
+        getAllAdminChapters: builder.query<IAllChaptersAPIResponse, { page?: number; limit?: number; search?: string; bookId?: string; mentor_id?: string; status?: string; isDeleted?: boolean; isMine?: boolean; isContentFlagged?: boolean; reviewBlueprint?: boolean } | void>({
             query: (params) => ({
                 url: `/admin/blueprints`,
                 method: 'GET',

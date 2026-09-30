@@ -6,6 +6,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2, Flag, Info } from 'lucide-react';
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
+import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useDeleteChapterMutation, useUpdateChapterMutation, useRestoreChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import type { IChapter } from '@/types/chapter';
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
@@ -79,6 +80,7 @@ export function AdminChaptersTab() {
     const canDelete = hasPermission(BLUEPRINTS_MODEL, 'delete');
     const [search, setSearch] = useState('');
     const [filterByBook, setFilterByBook] = useState('');
+    const [filterByMentor, setFilterByMentor] = useState('');
     const [filterByStatus, setFilterByStatus] = useState('');
     const [isTrashView, setIsTrashView] = useState(false);
     const [filterByIsMine, setFilterByIsMine] = useState(false);
@@ -127,6 +129,7 @@ export function AdminChaptersTab() {
         limit: paginationModel.pageSize,
         search: debouncedSearch,
         ...(filterByBook ? { bookId: filterByBook } : {}),
+        ...(isSuperAdmin && filterByMentor ? { mentor_id: filterByMentor } : {}),
         ...(filterByStatus ? { status: filterByStatus } : {}),
         ...(isTrashView ? { isDeleted: true } : {}),
         ...(isSuperAdmin && filterByIsMine ? { isMine: true } : {}),
@@ -136,6 +139,15 @@ export function AdminChaptersTab() {
 
     const { data: booksResponse } = useGetAllBooksQuery();
     const bookOptions = (booksResponse?.data?.data ?? []).map((b) => ({ id: b._id ?? b.id, title: b.title }));
+
+    const { data: mentorsResponse } = useGetAllUsersQuery(
+        { user_type: 'mentor' },
+        { skip: !isSuperAdmin },
+    );
+    const mentorOptions = (mentorsResponse?.data?.data ?? []).map((mentor) => ({
+        value: mentor._id,
+        label: mentor.name,
+    }));
 
     const chaptersData = chaptersResponse?.data;
     const chapters = chaptersData?.data ?? [];
@@ -147,7 +159,7 @@ export function AdminChaptersTab() {
 
     useEffect(() => {
         setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    }, [debouncedSearch, filterByBook, filterByStatus, isTrashView, filterByIsMine, filterByContentFlagged, filterByReviewBlueprint]);
+    }, [debouncedSearch, filterByBook, filterByMentor, filterByStatus, isTrashView, filterByIsMine, filterByContentFlagged, filterByReviewBlueprint]);
 
     const onDeleteChapter = async (id: string, slug?: string) => {
         try {
@@ -496,6 +508,10 @@ export function AdminChaptersTab() {
                 books={bookOptions}
                 selectedBook={filterByBook}
                 onBookChange={setFilterByBook}
+                mentors={mentorOptions}
+                selectedMentor={filterByMentor}
+                onMentorChange={setFilterByMentor}
+                showMentorFilter={isSuperAdmin}
                 selectedStatus={filterByStatus}
                 onStatusChange={setFilterByStatus}
                 isMine={filterByIsMine}

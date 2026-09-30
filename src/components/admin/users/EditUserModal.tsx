@@ -84,7 +84,7 @@ export function EditUserModal({ user, open, onOpenChange }: EditUserModalProps) 
             setProfilePicPreview(null);
             onOpenChange(false);
           }
-        } catch(error) {
+        } catch (error) {
           console.error('Failed to update user', error);
         }
       },

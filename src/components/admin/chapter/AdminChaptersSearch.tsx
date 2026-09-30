@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import ReactSelect, { type StylesConfig } from 'react-select';
 import {
   AdminSearchInput,
   AdminSearchPanel,
@@ -6,7 +7,9 @@ import {
   adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
 import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/components/ui/utils';
 import { BLUEPRINT_STATUSES } from '@/constants/blueprint';
+import { filterSelectStyles, type FilterOption } from '@/constants/filterSelectStyle';
 
 interface BookOption {
   id: string;
@@ -19,6 +22,11 @@ interface AdminChaptersSearchProps {
   books: BookOption[];
   selectedBook: string;
   onBookChange: (value: string) => void;
+  mentors: FilterOption[];
+  selectedMentor: string;
+  onMentorChange: (value: string) => void;
+  /** Mentor picker is only for Super Administrators. */
+  showMentorFilter?: boolean;
   selectedStatus: string;
   onStatusChange: (value: string) => void;
   isMine: boolean;
@@ -33,12 +41,30 @@ interface AdminChaptersSearchProps {
 
 const STATUS_OPTIONS = BLUEPRINT_STATUSES;
 
+const filterSelectClass = cn(adminSelectClass, 'w-full min-w-0');
+
+const mentorSelectStyles: StylesConfig<FilterOption, false> = {
+  ...filterSelectStyles,
+  container: (base, state) => ({
+    ...(filterSelectStyles.container?.(base, state) ?? base),
+    width: '100%',
+    minWidth: 0,
+  }),
+};
+
+const filterToggleClass =
+  'flex h-9 w-full min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer sm:w-auto';
+
 export function AdminChaptersSearch({
   searchQuery,
   onSearchChange,
   books,
   selectedBook,
   onBookChange,
+  mentors,
+  selectedMentor,
+  onMentorChange,
+  showMentorFilter = false,
   selectedStatus,
   onStatusChange,
   isMine,
@@ -49,10 +75,13 @@ export function AdminChaptersSearch({
   onReviewBlueprintChange,
   showMineFilter = false,
 }: AdminChaptersSearchProps) {
-  const hasActiveFilters = selectedBook || selectedStatus || (showMineFilter && isMine) || isContentFlagged || reviewBlueprint;
+  const hasActiveFilters = selectedBook || (showMentorFilter && selectedMentor) || selectedStatus || (showMineFilter && isMine) || isContentFlagged || reviewBlueprint;
+
+  const menuPortalTarget = typeof document !== 'undefined' ? document.body : null;
 
   const clearAll = () => {
     onBookChange('');
+    onMentorChange('');
     onStatusChange('');
     onIsMineChange(false);
     onContentFlaggedChange(false);
@@ -60,19 +89,27 @@ export function AdminChaptersSearch({
   };
 
   return (
-    <AdminSearchPanel>
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+    <AdminSearchPanel className="p-3 sm:p-5">
+      <div className="flex min-w-0 flex-col gap-3">
         <AdminSearchInput
           value={searchQuery}
           onChange={onSearchChange}
           placeholder="Search blueprints by title..."
+          className="w-full min-w-0 flex-none"
         />
 
-        <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+        <div
+          className={cn(
+            'grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2',
+            showMentorFilter ? 'md:grid-cols-3' : 'md:grid-cols-2',
+            'sm:[&>*:last-child:nth-child(odd)]:col-span-2',
+            showMentorFilter && 'md:[&>*:last-child:nth-child(odd)]:col-span-1',
+          )}
+        >
           <select
             value={selectedBook}
             onChange={(e) => onBookChange(e.target.value)}
-            className={adminSelectClass}
+            className={filterSelectClass}
           >
             <option value="">All series</option>
             {books.map((b) => (
@@ -80,17 +117,35 @@ export function AdminChaptersSearch({
             ))}
           </select>
 
+          {showMentorFilter ? (
+            <ReactSelect<FilterOption, false>
+              inputId="chapters-filter-mentor"
+              classNamePrefix="react-select"
+              options={mentors}
+              value={mentors.find((mentor) => mentor.value === selectedMentor) ?? null}
+              onChange={(option) => onMentorChange(option?.value ?? '')}
+              placeholder="All mentors"
+              isClearable
+              isSearchable
+              menuPortalTarget={menuPortalTarget}
+              menuPosition="fixed"
+              styles={mentorSelectStyles}
+            />
+          ) : null}
+
           <select
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value)}
-            className={adminSelectClass}
+            className={filterSelectClass}
           >
             <option value="">All statuses</option>
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+        </div>
 
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           {showMineFilter ? (
             <div
               role="button"
@@ -102,7 +157,7 @@ export function AdminChaptersSearch({
                   onIsMineChange(!isMine);
                 }
               }}
-              className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+              className={filterToggleClass}
             >
               <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
               <span className="font-normal">My blueprints</span>
@@ -119,7 +174,7 @@ export function AdminChaptersSearch({
                 onContentFlaggedChange(!isContentFlagged);
               }
             }}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+            className={filterToggleClass}
           >
             <Checkbox checked={isContentFlagged} tabIndex={-1} className="pointer-events-none" />
             <span className="font-normal">Flagged content</span>
@@ -135,7 +190,7 @@ export function AdminChaptersSearch({
                 onReviewBlueprintChange(!reviewBlueprint);
               }
             }}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+            className={filterToggleClass}
           >
             <Checkbox checked={reviewBlueprint} tabIndex={-1} className="pointer-events-none" />
             <span className="font-normal">Blueprints to review</span>
@@ -145,7 +200,7 @@ export function AdminChaptersSearch({
             <button
               type="button"
               onClick={clearAll}
-              className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200! px-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+              className="inline-flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200! px-3 text-sm text-red-600 transition-colors hover:bg-red-50 sm:w-auto sm:justify-start"
             >
               <X className="h-3.5 w-3.5" />
               Clear
@@ -160,6 +215,14 @@ export function AdminChaptersSearch({
             <span className={adminFilterPillClass}>
               {books.find((b) => b.id === selectedBook)?.title}
               <button type="button" onClick={() => onBookChange('')} className="hover:text-primary/70">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ) : null}
+          {showMentorFilter && selectedMentor ? (
+            <span className={adminFilterPillClass}>
+              {mentors.find((mentor) => mentor.value === selectedMentor)?.label}
+              <button type="button" onClick={() => onMentorChange('')} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
             </span>

@@ -14,6 +14,8 @@ interface AdminBooksSearchProps {
   onStatusChange: (value: string) => void;
   isMine: boolean;
   onIsMineChange: (value: boolean) => void;
+  /** Mentor picker is only for Super Administrators. */
+  showMentorFilter?: boolean;
 }
 
 const STATUS_OPTIONS: FilterOption[] = [
@@ -31,8 +33,9 @@ export function AdminBooksSearch({
   onStatusChange,
   isMine,
   onIsMineChange,
+  showMentorFilter = false,
 }: AdminBooksSearchProps) {
-  const hasActiveFilters = Boolean(selectedLeader || selectedStatus || isMine);
+  const hasActiveFilters = Boolean((showMentorFilter && selectedLeader) || selectedStatus || isMine);
 
   const menuPortalTarget = typeof document !== 'undefined' ? document.body : null;
 
@@ -52,19 +55,21 @@ export function AdminBooksSearch({
         />
 
         <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
-          <ReactSelect<FilterOption, false>
-            inputId="books-filter-mentor"
-            classNamePrefix="react-select"
-            options={leaders}
-            value={leaders.find((l) => l.value === selectedLeader) ?? null}
-            onChange={(option) => onLeaderChange(option?.value ?? '')}
-            placeholder="All mentors"
-            isClearable
-            isSearchable
-            menuPortalTarget={menuPortalTarget}
-            menuPosition="fixed"
-            styles={filterSelectStyles}
-          />
+          {showMentorFilter ? (
+            <ReactSelect<FilterOption, false>
+              inputId="books-filter-mentor"
+              classNamePrefix="react-select"
+              options={leaders}
+              value={leaders.find((l) => l.value === selectedLeader) ?? null}
+              onChange={(option) => onLeaderChange(option?.value ?? '')}
+              placeholder="All mentors"
+              isClearable
+              isSearchable
+              menuPortalTarget={menuPortalTarget}
+              menuPosition="fixed"
+              styles={filterSelectStyles}
+            />
+          ) : null}
 
           <ReactSelect<FilterOption, false>
             inputId="books-filter-status"
@@ -111,7 +116,7 @@ export function AdminBooksSearch({
 
       {hasActiveFilters ? (
         <div className="flex flex-wrap gap-2">
-          {selectedLeader ? (
+          {showMentorFilter && selectedLeader ? (
             <span className={adminFilterPillClass}>
               {leaders.find((l) => l.value === selectedLeader)?.label}
               <button type="button" onClick={() => onLeaderChange('')} className="hover:text-primary/70">

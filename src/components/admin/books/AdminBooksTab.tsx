@@ -54,7 +54,7 @@ const STATUSES = ['Published', 'Draft'] as const;
 
 export function AdminBooksTab() {
   const dispatch = useDispatch();
-  const { hasPermission } = useAdminPermissions();
+  const { hasPermission, isSuperAdmin } = useAdminPermissions();
   const canView = hasPermission(SERIES_MODEL, 'view');
   const canAdd = hasPermission(SERIES_MODEL, 'add');
   const canEdit = hasPermission(SERIES_MODEL, 'edit');
@@ -76,13 +76,16 @@ export function AdminBooksTab() {
     page: paginationModel.page + 1,
     limit: paginationModel.pageSize,
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
-    ...(selectedLeader ? { mentor_id: selectedLeader } : {}),
+    ...(isSuperAdmin && selectedLeader ? { mentor_id: selectedLeader } : {}),
     ...(filterByStatus ? { status: filterByStatus } : {}),
     ...(isTrashView ? { isDeleted: true } : {}),
     ...(filterByIsMine ? { isMine: true } : {}),
   });
 
-  const { data: leadersResponse } = useGetAllUsersQuery({ user_type: 'mentor' });
+  const { data: leadersResponse } = useGetAllUsersQuery(
+    { user_type: 'mentor' },
+    { skip: !isSuperAdmin },
+  );
 
   const books = booksResponse?.data?.data ?? [];
   const thoughtLeaders = leadersResponse?.data?.data ?? [];
@@ -398,6 +401,7 @@ export function AdminBooksTab() {
         onStatusChange={setFilterByStatus}
         isMine={filterByIsMine}
         onIsMineChange={setFilterByIsMine}
+        showMentorFilter={isSuperAdmin}
       />
 
       <div className="border border-gray-200 rounded-md overflow-hidden">

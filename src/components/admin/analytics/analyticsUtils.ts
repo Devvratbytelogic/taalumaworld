@@ -89,10 +89,10 @@ export function normalizeNamedCounts(
   if (!value) return [];
   if (Array.isArray(value)) {
     return value.map((item, index) => {
-      const key = String(item.key ?? item.status ?? item.name ?? index);
+      const key = String(item.key ?? item.classification ?? item.status ?? item.name ?? index);
       return {
         key,
-        name: item.name || humanizeKey(item.status ?? item.key) || key,
+        name: item.name || item.classification || humanizeKey(item.status ?? item.key) || key,
         count: Number(item.count ?? item.registrations ?? 0),
       };
     });

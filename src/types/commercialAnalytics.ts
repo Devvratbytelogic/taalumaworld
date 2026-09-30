@@ -26,6 +26,7 @@ export interface IAnalyticsNamedCount {
   conversionRate?: number;
   avgScore?: number;
   status?: string;
+  classification?: string;
 }
 
 export interface IAiScoreDistribution {

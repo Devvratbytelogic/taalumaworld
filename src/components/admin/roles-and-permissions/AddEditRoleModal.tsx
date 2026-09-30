@@ -117,7 +117,7 @@ export function AddEditRoleModal() {
                         </div>
                         <div>
                             <label className={labelCls} htmlFor="number_of_users">
-                                Number of Users <span className="text-red-500">*</span>
+                                Max Users <span className="text-red-500">*</span>
                             </label>
                             <input
                                 id="number_of_users"

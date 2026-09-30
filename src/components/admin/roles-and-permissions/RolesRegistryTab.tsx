@@ -105,7 +105,7 @@ export function RolesRegistryTab() {
         // },
         {
             field: 'number_of_users',
-            headerName: 'Number of Users',
+            headerName: 'Max Users',
             width: 100,
             flex: 1,
             sortable: false,

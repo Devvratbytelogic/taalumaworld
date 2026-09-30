@@ -700,8 +700,8 @@ export const roleSchema = Yup.object({
   number_of_users: Yup.number()
     .transform((v) => (v === '' || v == null || Number.isNaN(Number(v)) ? undefined : Number(v)))
     .integer('Must be a whole number')
-    .min(1, 'Number of users must be at least 1')
-    .required('Number of users is required'),
+    .min(1, 'Max users must be at least 1')
+    .required('Max users is required'),
 });
 
 export const staffStatusSchema = Yup.object({

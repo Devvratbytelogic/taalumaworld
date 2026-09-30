@@ -17,12 +17,14 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'TaalumaWorld';
   const body = data.body || data.message || data.msg || '';
   const url = data.url || data.link || '/';
+  const tag = typeof data.tag === 'string' ? data.tag.trim() : '';
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon: '/images/logo.webp',
       data: { url },
+      ...(tag ? { tag, renotify: data.renotify === true } : {}),
     }),
   );
 });

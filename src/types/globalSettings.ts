@@ -66,6 +66,7 @@ export interface IGlobalSettings {
   twitter_description?: string;
   twitter_image?: string;
   default_tax_rate: number;
+  minimum_content_price: number;
   mentor_section_visibility: boolean;
   contentViewMode: string;
 }

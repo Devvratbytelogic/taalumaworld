@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import moment from 'moment';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Book, CalendarDays, ClipboardCheck, Eye, FileText, Flag, GraduationCap, Shield, ShoppingCart, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react';
 import {
@@ -31,6 +32,7 @@ import {
   type IDashboardDateRangeParams,
 } from '@/store/rtkQueries/dashboard';
 import { getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminSectionRoutePath } from '@/routes/routes';
+import { useGetAllAuditLogsQuery } from '@/store/rtkQueries/auditLogApi';
 import { DashboardCharts } from './DashboardCharts';
 import { formatKes } from '@/constants/common';
 import { AdminDashboardSkeleton } from '@/components/skeleton-loader/admin';
@@ -244,6 +246,20 @@ export default function AdminDashboardTab() {
   const performanceSummary = performanceData?.data?.summary;
   const topPerformingBlueprints = performanceData?.data?.data?.data ?? [];
 
+  const { data: auditLogsData, isLoading: auditLogsLoading } = useGetAllAuditLogsQuery({ page: 1, limit: 5 });
+  const recentActivity = (auditLogsData?.data?.data ?? []).slice(0, 5).map((log, index) => ({
+    id: index + 1,
+    user: log.actor_name || log.actor_id?.name || 'System',
+    action: log.action_label || log.action || 'performed an action',
+    item: log.entity_label || '',
+    time: log.createdAt ? moment(log.createdAt).format('DD/MM/YYYY HH:mm') : '',
+  }));
+  const topContent = topPerformingBlueprints.slice(0, 5).map((item) => ({
+    id: item.id,
+    title: item.title,
+    sales: item.sales ?? 0,
+  }));
+
   const salesVolumeSummary = salesVolumeData?.data?.summary;
   const salesByMonth = (salesVolumeData?.data?.data?.data ?? []).map((row, idx) => ({
     ...row,
@@ -408,8 +424,8 @@ export default function AdminDashboardTab() {
         </AdminPanel>
       </div>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <DashboardRecentActivity items={[]} />
-        <DashboardTopContent items={[]} contentMode={contentMode} />
+        <DashboardRecentActivity items={recentActivity} isLoading={auditLogsLoading} />
+        <DashboardTopContent items={topContent} isLoading={performanceLoading} />
       </div>
     </AdminPage>
   );

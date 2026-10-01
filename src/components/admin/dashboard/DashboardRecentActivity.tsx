@@ -4,6 +4,7 @@ import {
   AdminSectionHeader,
   AdminTextLink,
 } from '@/components/admin/layout/AdminContent';
+import { getAdminSectionRoutePath } from '@/routes/routes';
 
 export interface ActivityItem {
   id: number;
@@ -21,7 +22,7 @@ interface DashboardRecentActivityProps {
 export function DashboardRecentActivity({ items, isLoading }: DashboardRecentActivityProps) {
   return (
     <AdminPanel>
-      <AdminSectionHeader title="Recent activity" action={<AdminTextLink href="/admin/users">View all</AdminTextLink>} />
+      <AdminSectionHeader title="Recent activity" action={<AdminTextLink href={getAdminSectionRoutePath('audit_logs')}>View all</AdminTextLink>} />
 
       <div className="space-y-1">
         {isLoading

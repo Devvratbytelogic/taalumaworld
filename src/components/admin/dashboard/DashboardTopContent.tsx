@@ -5,30 +5,26 @@ import {
   AdminTextLink,
 } from '@/components/admin/layout/AdminContent';
 import { getAdminSectionRoutePath } from '@/routes/routes';
-import type { ContentMode } from '../../../types/admin';
 
 export interface TopContentItem {
-  id: number;
+  id: string;
   title: string;
   sales: number;
-  revenue: number;
-  trend: number;
 }
 
 interface DashboardTopContentProps {
   items: TopContentItem[];
-  contentMode: ContentMode;
   isLoading?: boolean;
 }
 
-export function DashboardTopContent({ items, contentMode, isLoading }: DashboardTopContentProps) {
-  const maxRevenue = items.length > 0 ? Math.max(...items.map((i) => i.revenue), 1) : 1;
-  const listHref = getAdminSectionRoutePath(contentMode === 'chapters' ? 'chapters' : 'books');
+export function DashboardTopContent({ items, isLoading }: DashboardTopContentProps) {
+  const maxSales = items.length > 0 ? Math.max(...items.map((i) => i.sales), 1) : 1;
+  const listHref = getAdminSectionRoutePath('chapters');
 
   return (
     <AdminPanel>
       <AdminSectionHeader
-        title={`Top ${contentMode === 'chapters' ? 'blueprints' : 'series'}`}
+        title="Top blueprints"
         action={<AdminTextLink href={listHref}>View all</AdminTextLink>}
       />
 
@@ -57,16 +53,11 @@ export function DashboardTopContent({ items, contentMode, isLoading }: Dashboard
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-slate-900">{item.title}</p>
-                        <p className="text-xs text-slate-500">KSh {item.revenue.toLocaleString()}</p>
+                        <p className="text-xs text-slate-500">{item.sales.toLocaleString()} sales</p>
                       </div>
                     </div>
-                    <span
-                      className={`shrink-0 text-xs font-medium ${item.trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
-                    >
-                      {item.trend >= 0 ? '+' : ''}{item.trend}%
-                    </span>
                   </div>
-                  <Progress value={(item.revenue / maxRevenue) * 100} className="h-1.5" />
+                  <Progress value={(item.sales / maxSales) * 100} className="h-1.5" />
                 </div>
               ))}
       </div>

@@ -505,6 +505,10 @@ export const globalSettingsSchema = Yup.object({
     .typeError('Default tax rate must be a number')
     .min(0, 'Default tax rate cannot be negative')
     .max(100, 'Default tax rate cannot exceed 100'),
+  minimum_content_price: Yup.number()
+    .typeError('Minimum content price must be a number')
+    .min(0, 'Minimum content price cannot be negative')
+    .required('Minimum content price is required'),
   // Header
   header_text: Yup.string().trim(),
   header_text_status: Yup.boolean(),

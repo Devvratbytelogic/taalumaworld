@@ -70,7 +70,7 @@ export default function FooterSubscribe() {
 
   return (
     <form className="space-y-3" noValidate onSubmit={handleSubscribe}>
-      <p className="text-sm font-medium text-white">Subscribe to The Taaluma Signal</p>
+      <p className="text-sm font-medium text-white">Subscribe to The Taaluma World</p>
       <div className="flex gap-2">
         <Input
           id="footer-newsletter-email"

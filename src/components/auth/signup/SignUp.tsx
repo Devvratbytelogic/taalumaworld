@@ -158,6 +158,7 @@ export default function SignUp() {
     }
 
     const requiredAcceptedRef = useRef(false)
+    const [allRequiredAccepted, setAllRequiredAccepted] = useState(false)
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, setFieldValue, setFieldTouched } = useFormik({
         initialValues: {
@@ -246,6 +247,14 @@ export default function SignUp() {
     }, [isOpen, setFieldValue, values.referralCode])
 
     const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined
+
+    const isRequiredFieldsFilled =
+        values.name.trim() !== '' &&
+        values.email.trim() !== '' &&
+        values.password.trim() !== '' &&
+        values.confirmPassword.trim() !== '' &&
+        (!values.isPartnerStudent || values.university.trim() !== '') &&
+        allRequiredAccepted
 
     const { data: partnerInstitutionsResponse, isFetching: isLoadingPartnerInstitutions } = useGetPartnerInstitutionsQuery(undefined, { skip: !values.isPartnerStudent })
     const partnerInstitutions = partnerInstitutionsResponse?.data ?? []
@@ -394,7 +403,7 @@ export default function SignUp() {
                                 {values.isPartnerStudent && (
                                     <div className="space-y-1.5">
                                         <label htmlFor="signup-university" className="text-sm font-medium text-foreground">
-                                            Select University
+                                            Select University<span className="text-red-500"> *</span>
                                         </label>
                                         <Select
                                             inputId="signup-university"
@@ -450,7 +459,7 @@ export default function SignUp() {
 
                                 <div className="space-y-1.5">
                                     <label htmlFor="signup-name" className="text-sm font-medium text-foreground">
-                                        Full Name
+                                        Full Name<span className="text-red-500"> *</span>
                                     </label>
                                     <div className="relative">
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -474,6 +483,7 @@ export default function SignUp() {
                                 <div className="space-y-1.5">
                                     <label htmlFor="signup-email" className="text-sm font-medium text-foreground">
                                         {values.isPartnerStudent ? 'University Email Address' : 'Email Address'}
+                                        <span className="text-red-500"> *</span>
                                     </label>
                                     <div className="relative">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -502,7 +512,7 @@ export default function SignUp() {
                             <div className="grid gap-3 sm:grid-cols-2">
                                 <div className="space-y-1.5">
                                     <label htmlFor="signup-password" className="text-sm font-medium text-foreground">
-                                        Password
+                                        Password<span className="text-red-500"> *</span>
                                     </label>
                                     <div className="relative">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -534,7 +544,7 @@ export default function SignUp() {
 
                                 <div className="space-y-1.5">
                                     <label htmlFor="signup-confirmPassword" className="text-sm font-medium text-foreground">
-                                        Confirm Password
+                                        Confirm Password<span className="text-red-500"> *</span>
                                     </label>
                                     <div className="relative">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -596,7 +606,10 @@ export default function SignUp() {
                                 key={values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION}
                                 touchpoint={values.isPartnerStudent ? AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION : AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION}
                                 onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
-                                onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted }}
+                                onRequiredAcceptedChange={(accepted) => {
+                                    requiredAcceptedRef.current = accepted
+                                    setAllRequiredAccepted(accepted)
+                                }}
                                 error={agreementsError}
                                 touched={touched.accepted_agreement_ids}
                                 onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
@@ -607,7 +620,7 @@ export default function SignUp() {
                         <Button
                             type="submit"
                             className="global_btn bg_primary w-full"
-                            disabled={isSubmitting || isRegistering}
+                            isDisabled={isSubmitting || isRegistering || !isRequiredFieldsFilled}
                             isLoading={isSubmitting || isRegistering}
                         >
                             Create Account

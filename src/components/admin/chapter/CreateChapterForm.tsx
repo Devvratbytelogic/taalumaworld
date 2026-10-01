@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { useRouter, usePathname } from 'next/navigation';
 import { Save, X, Upload, Info } from 'lucide-react';
@@ -19,6 +19,7 @@ import {
   useAddChapterMutation,
 } from '@/store/rtkQueries/adminPostApi';
 import {
+  useGetAdminGlobalSettingsQuery,
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
@@ -97,10 +98,13 @@ export function CreateChapterForm() {
   const booksData = booksResponse?.data;
   const books = booksData?.data ?? [];
   const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
+  const { data: globalSettings } = useGetAdminGlobalSettingsQuery();
+  const minimumContentPrice = globalSettings?.data?.minimum_content_price ?? 0;
+  const chapterValidationSchema = useMemo(() => addChapterSchema(minimumContentPrice), [minimumContentPrice]);
 
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
-    validationSchema: addChapterSchema,
+    validationSchema: chapterValidationSchema,
     validate: () => {
       return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
     },
@@ -277,6 +281,7 @@ export function CreateChapterForm() {
   const isRequiredComplete = isBlueprintFormComplete(values, {
     chapterPricingEnabled,
     agreementsAccepted: requiredAgreementsAccepted,
+    minimumContentPrice,
   });
 
   const handleContentChange = useCallback(

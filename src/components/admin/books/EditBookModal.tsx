@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
@@ -18,6 +18,7 @@ import {
 import toast from '@/utils/toast';
 import { refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { editBookSchema } from '@/utils/formValidation';
+import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { IBook } from '@/types/books';
 import { slugify } from '@/utils/slugify';
@@ -66,6 +67,9 @@ export function EditBookModal({
   const coverIsObjectUrlRef = useRef(false);
   const ogImageIsObjectUrlRef = useRef(false);
   const skipOgImagePrefillRef = useRef(false);
+  const { data: globalSettings } = useGetAdminGlobalSettingsQuery();
+  const minimumContentPrice = globalSettings?.data?.minimum_content_price ?? 0;
+  const bookValidationSchema = useMemo(() => editBookSchema(minimumContentPrice), [minimumContentPrice]);
 
   const initialValues = {
     title: book?.title ?? '',
@@ -99,7 +103,7 @@ export function EditBookModal({
     resetForm,
   } = useFormik({
     initialValues,
-    validationSchema: editBookSchema,
+    validationSchema: bookValidationSchema,
     enableReinitialize: true,
     onSubmit: async (vals) => {
       if (!book) return;

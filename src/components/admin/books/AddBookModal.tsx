@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { useFormik } from 'formik';
 import { Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
@@ -17,6 +17,7 @@ import {
 import toast from '@/utils/toast';
 import { refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { addBookSchema } from '@/utils/formValidation';
+import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { slugify } from '@/utils/slugify';
@@ -63,10 +64,13 @@ export function AddBookModal({
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const skipOgImagePrefillRef = useRef(false);
+  const { data: globalSettings } = useGetAdminGlobalSettingsQuery();
+  const minimumContentPrice = globalSettings?.data?.minimum_content_price ?? 0;
+  const bookValidationSchema = useMemo(() => addBookSchema(minimumContentPrice), [minimumContentPrice]);
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
-    validationSchema: addBookSchema,
+    validationSchema: bookValidationSchema,
     onSubmit: async (vals) => {
       const formData = new FormData();
       formData.append('title', vals.title);

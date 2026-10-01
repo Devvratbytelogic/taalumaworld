@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useFormik } from 'formik';
 import { useRouter, usePathname } from 'next/navigation';
 import { Save, X, Upload, FileText, Info } from 'lucide-react';
@@ -16,7 +16,7 @@ import { appendUserIpToFormData } from '@/utils/clientIp';
 import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
 import { useUpdateChapterMutation, } from '@/store/rtkQueries/adminPostApi';
-import { useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
+import { useGetAdminGlobalSettingsQuery, useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
 import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
@@ -74,6 +74,9 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const booksData = booksResponse?.data;
   const books = booksData?.data ?? [];
   const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
+  const { data: globalSettings } = useGetAdminGlobalSettingsQuery();
+  const minimumContentPrice = globalSettings?.data?.minimum_content_price ?? 0;
+  const chapterValidationSchema = useMemo(() => addChapterSchema(minimumContentPrice), [minimumContentPrice]);
 
   const chapterData = chapterResponse?.data;
 
@@ -103,7 +106,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   };
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
-    validationSchema: addChapterSchema,
+    validationSchema: chapterValidationSchema,
     enableReinitialize: true,
     validate: () => {
       return requiredAcceptedRef.current ? {} : { accepted_agreement_ids: 'Please accept all required agreements before submitting.' };
@@ -315,6 +318,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const isRequiredComplete = isBlueprintFormComplete(values, {
     chapterPricingEnabled,
     agreementsAccepted: requiredAgreementsAccepted,
+    minimumContentPrice,
   });
 
   const handleContentChange = useCallback(

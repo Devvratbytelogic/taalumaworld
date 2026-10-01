@@ -233,8 +233,22 @@ const openGraphFieldsSchema = {
     }),
 };
 
+function minimumContentPriceFloor(minimumContentPrice: number) {
+  const minimum = Number(minimumContentPrice);
+  return Number.isFinite(minimum) && minimum >= 0 ? minimum : 0;
+}
+
+function priceAboveMinimum(minimumContentPrice: number, requiredMessage: string) {
+  const minimum = minimumContentPriceFloor(minimumContentPrice);
+  return Yup.number()
+    .transform((v) => (v === '' || v == null || Number.isNaN(Number(v)) ? undefined : Number(v)))
+    .moreThan(minimum, `Price must be greater than ${minimum}`)
+    .required(requiredMessage);
+}
+
 // Add Book Modal Validation Schema (matches API: title, description, pricingModel, price, status, slug, cover_image, tags)
-export const addBookSchema = Yup.object({
+export function addBookSchema(minimumContentPrice: number) {
+  return Yup.object({
   title: withSafeShortText(
     Yup.string()
       .trim()
@@ -253,13 +267,15 @@ export const addBookSchema = Yup.object({
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
     .when('pricingModel', {
       is: 'book',
-      then: (schema) => schema.min(1, 'Price must be greater than 1').required('Price is required'),
+      then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
       otherwise: (schema) => schema.optional(),
     }),
   ...openGraphFieldsSchema,
-});
+  });
+}
 // Edit Book Modal Validation Schema — cover_image is optional (null = keep existing)
-export const editBookSchema = Yup.object({
+export function editBookSchema(minimumContentPrice: number) {
+  return Yup.object({
   title: withSafeShortText(
     Yup.string()
       .trim()
@@ -279,11 +295,12 @@ export const editBookSchema = Yup.object({
     .transform((v) => (v === '' || v == null ? undefined : Number(v)))
     .when('pricingModel', {
       is: 'book',
-      then: (schema) => schema.min(1, 'Price must be greater than 1').required('Price is required'),
+      then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
       otherwise: (schema) => schema.optional(),
     }),
   ...openGraphFieldsSchema,
-});
+  });
+}
 
 // Add Chapter Modal Validation Schema (matches API form-data: book, number, title, description, content, isFree, price, cover_image, page)
 function isRichTextEmpty(html: string | undefined | null): boolean {
@@ -310,21 +327,23 @@ type BlueprintRequiredFields = {
 
 export function isBlueprintFormComplete(
   values: BlueprintRequiredFields,
-  options: { chapterPricingEnabled: boolean; agreementsAccepted: boolean },
+  options: { chapterPricingEnabled: boolean; agreementsAccepted: boolean; minimumContentPrice?: number },
 ): boolean {
+  const minimum = minimumContentPriceFloor(options.minimumContentPrice ?? 0);
   if (!values.bookId) return false;
   if (!values.title?.trim()) return false;
   if (!values.description?.trim()) return false;
   if (values.content_type === 'editor' && isRichTextEmpty(values.content)) return false;
   if (values.content_type === 'pdf' && (values.pdf_file == null || values.pdf_file === '')) return false;
-  if (options.chapterPricingEnabled && !values.isFree && !(typeof values.price === 'number' && values.price >= 1)) {
+  if (options.chapterPricingEnabled && !values.isFree && !(typeof values.price === 'number' && values.price > minimum)) {
     return false;
   }
   if (values.cover_image == null || values.cover_image === '') return false;
   return options.agreementsAccepted;
 }
 
-export const addChapterSchema = Yup.object({
+export function addChapterSchema(minimumContentPrice: number) {
+  return Yup.object({
   bookId: Yup.string().required('Please select a series'),
   title: withSafeShortText(
     Yup.string()
@@ -352,10 +371,7 @@ export const addChapterSchema = Yup.object({
     .when('isFree', {
       is: true,
       then: (schema) => schema.min(0).optional(),
-      otherwise: (schema) =>
-        schema
-          .min(1, 'Price must be greater than 0 for paid blueprints')
-          .required('Price is required when blueprint is not free'),
+      otherwise: () => priceAboveMinimum(minimumContentPrice, 'Price is required when blueprint is not free'),
     }),
   status: Yup.string().oneOf([...BLUEPRINT_STATUSES], 'Select a valid status'),
   cover_image: Yup.mixed()
@@ -363,7 +379,8 @@ export const addChapterSchema = Yup.object({
     .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
   accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
   ...openGraphFieldsSchema,
-});
+  });
+}
 
 // Add / Edit Category Modal Validation Schema
 export const categorySchema = Yup.object({

@@ -54,7 +54,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && onSelect()}
-          placeholder="Search series, blueprints, mentors..."
+          placeholder="Search series, books, mentors..."
           className="h-6 w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
         />
         {query && (
@@ -99,7 +99,7 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
               />
               <SearchResultSection
                 icon={FileText}
-                label="Blueprints"
+                label="Books"
                 items={blueprints}
                 onSelect={onSelect}
                 getHref={(item) => getBlueprintRoutePath(item?.slug ?? item?.id ?? '')}
@@ -202,7 +202,7 @@ function SeriesResultRow({ item }: { item: SeriesEntity }) {
       </div>
       {isPricedByBlueprint ? (
         <span className="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-600">
-          Priced by blueprint
+          Priced by book
         </span>
       ) : (
         <SearchResultPriceBadge isPurchased={item.isPurchased} price={item.effectivePrice} />

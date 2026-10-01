@@ -16,7 +16,7 @@ const traits = [
     {
         icon: BookOpen,
         title: 'Continuously Learning',
-        description: 'They seek knowledge from those ahead of them — through Blueprints, mentors and real-world experience.',
+        description: 'They seek knowledge from those ahead of them — through Books, mentors and real-world experience.',
         iconBg: 'bg-secondary-accent/10',
         iconColor: 'text-secondary-accent',
     },

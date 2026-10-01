@@ -78,7 +78,7 @@ export default function MentorCard({ mentor, index }: MentorCardProps) {
                 ) : null}
 
                 <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                    {mentor?.professionalBio || 'Sharing real-world experience through Blueprints on TaalumaWorld.'}
+                    {mentor?.professionalBio || 'Sharing real-world experience through Books on TaalumaWorld.'}
                 </p>
 
                 <div className="mt-5 flex w-full items-center justify-between border-t border-border-subtle pt-4">

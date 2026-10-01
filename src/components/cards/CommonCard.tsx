@@ -58,7 +58,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                     avatar={data?.mentor?.profile_pic ?? undefined}
                     bio={data?.mentor?.professionalBio}
                     social={{ linkedin: data?.mentor?.linkedin ?? '', facebook: data?.mentor?.facebook ?? '' }}
-                    ctaLabel={isBook ? 'View Series' : 'View Blueprint'}
+                    ctaLabel={isBook ? 'View Series' : 'View Book'}
                     onCtaClick={handleOpen}
                 />
 
@@ -73,7 +73,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                 <div className="flex items-center gap-2 flex-wrap">
 
                     <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs text-primary border-primary/20`}>
-                        {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                        {isPricingModelChapter ? 'By Book' : 'Full Series'}
                     </Badge>
                     {data?.isFree ? (
                         <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs">
@@ -107,14 +107,14 @@ export default function CommonCard({ data }: CommonCardProps) {
                         {isBook && !!data?.chapterCount &&
                             <>
                                 <BookOpen className="h-4 w-4" />
-                                <span>{data?.chapterCount} blueprints</span>
+                                <span>{data?.chapterCount} books</span>
                             </>
                         }
                     </div>
 
                     {isBook
                         ? (isPricingModelChapter
-                            ? <p className="text-sm font-medium text-primary">{'Priced by blueprint'}</p>
+                            ? <p className="text-sm font-medium text-primary">{'Priced by book'}</p>
                             : displayPrice > 0
                                 ? <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</p>
                                 : <p className="font-semibold text-lg text-primary">FREE</p>

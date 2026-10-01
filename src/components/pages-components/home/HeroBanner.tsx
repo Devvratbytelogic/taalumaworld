@@ -58,7 +58,7 @@ export default function HeroBanner() {
                                     <span className="gradient_text">Behind.</span>
                                 </h1>
                                 <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
-                                    Connect with mentors, discover practical blueprints, and build the skills needed to thrive in a rapidly changing world.
+                                    Connect with mentors, discover practical books, and build the skills needed to thrive in a rapidly changing world.
                                 </p>
                             </div>
 

@@ -21,7 +21,7 @@ const audiences = [
     {
         icon: Award,
         title: "I'm an Experienced Professional",
-        description: 'Share your expertise, publish Blueprints, earn from your knowledge and impact the next generation.',
+        description: 'Share your expertise, publish Books, earn from your knowledge and impact the next generation.',
         iconBg: 'bg-success/10',
         iconColor: 'text-success',
         border: 'hover:border-success/30',

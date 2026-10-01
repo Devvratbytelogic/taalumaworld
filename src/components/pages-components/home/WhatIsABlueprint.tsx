@@ -43,9 +43,9 @@ export default function WhatIsABlueprint() {
                     <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full mb-4">
                         <span className="text-sm font-medium text-primary">Understanding the Product</span>
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">What is a Blueprint?</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">What is a Book?</h2>
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        A Blueprint is a short, practical guide written by experienced practitioners to help you solve a
+                        A Book is a short, practical guide written by experienced practitioners to help you solve a
                         specific career, business, life, or leadership challenge.
                     </p>
                 </div>
@@ -69,7 +69,7 @@ export default function WhatIsABlueprint() {
                 {/* Attributes */}
                 <div className="bg-primary rounded-md p-8 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
                     <div className="flex-1">
-                        <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-2">Every Blueprint is</p>
+                        <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-2">Every Book is</p>
                         <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                             {attributes.map((attr) => (
                                 <span

@@ -42,7 +42,7 @@ export default function FilterOptions({
         filters.mentorIds.length +
         filters.tags.length;
 
-    const contentLabel = viewMode === VISIBLE.BOOK ? 'series' : 'blueprints';
+    const contentLabel = viewMode === VISIBLE.BOOK ? 'series' : 'books';
 
     return (
         <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -42,7 +42,7 @@ export function SignInForm({ variant }: SignInFormProps) {
                 const res = await adminLogin({
                     email: vals.email,
                     password: vals.password,
-                    type: isAdmin ? 'super admin' : 'mentor',
+                    type: isAdmin ? 'admin' : 'mentor',
                 }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     if (res?.message === LOGIN_OTP_MESSAGE) {

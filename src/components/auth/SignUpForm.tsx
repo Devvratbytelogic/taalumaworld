@@ -31,6 +31,7 @@ export function SignUpForm() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [registerMentor, { isLoading: isRegistering }] = useRegisterMentorMutation();
     const requiredAcceptedRef = useRef(false);
+    const [requiredAccepted, setRequiredAccepted] = useState(false);
 
     const handleAvatarClick = () => fileInputRef.current?.click();
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,6 +105,14 @@ export function SignUpForm() {
 
     const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
 
+    const isRequiredFieldsFilled =
+        values.name.trim() !== '' &&
+        values.email.trim() !== '' &&
+        values.password !== '' &&
+        values.confirmPassword !== '' &&
+        values.password === values.confirmPassword &&
+        requiredAccepted;
+
     return (
         <AuthPageShell
             wide
@@ -155,7 +164,7 @@ export function SignUpForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <label htmlFor="signup-name" className="text-sm font-medium text-foreground">Full Name</label>
+                    <label htmlFor="signup-name" className="text-sm font-medium text-foreground">Full Name<span className="text-red-500"> *</span></label>
                     <div className="relative">
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input id="signup-name" name="name" type="text" placeholder="John Doe" className={`user_input_style ${errors.name && touched.name ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.name} onChange={handleChange} onBlur={handleBlur} />
@@ -164,7 +173,7 @@ export function SignUpForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <label htmlFor="signup-email" className="text-sm font-medium text-foreground">Email Address</label>
+                    <label htmlFor="signup-email" className="text-sm font-medium text-foreground">Email Address<span className="text-red-500"> *</span></label>
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input id="signup-email" name="email" type="email" placeholder="you@example.com" className={`user_input_style ${errors.email && touched.email ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.email} onChange={handleChange} onBlur={handleBlur} />
@@ -174,7 +183,7 @@ export function SignUpForm() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                        <label htmlFor="signup-password" className="text-sm font-medium text-foreground">Password</label>
+                        <label htmlFor="signup-password" className="text-sm font-medium text-foreground">Password<span className="text-red-500"> *</span></label>
                         <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input id="signup-password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Create a password" className={`pl-12 pr-12 h-12 rounded-md ${errors.password && touched.password ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.password} onChange={handleChange} onBlur={handleBlur} />
@@ -186,7 +195,7 @@ export function SignUpForm() {
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="signup-confirmPassword" className="text-sm font-medium text-foreground">Confirm Password</label>
+                        <label htmlFor="signup-confirmPassword" className="text-sm font-medium text-foreground">Confirm Password<span className="text-red-500"> *</span></label>
                         <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input id="signup-confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="Re-enter your password" className={`pl-12 pr-12 h-12 rounded-md ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : ''}`} disabled={isSubmitting} value={values.confirmPassword} onChange={handleChange} onBlur={handleBlur} />
@@ -220,7 +229,10 @@ export function SignUpForm() {
                     <AgreementSentenceList
                         touchpoint={AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION}
                         onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
-                        onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+                        onRequiredAcceptedChange={(accepted) => {
+                            requiredAcceptedRef.current = accepted;
+                            setRequiredAccepted(accepted);
+                        }}
                         error={agreementsError}
                         touched={touched.accepted_agreement_ids}
                         onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
@@ -228,7 +240,7 @@ export function SignUpForm() {
                     />
                 </div>
 
-                <Button type="submit" className="global_btn bg_primary w-full" disabled={isSubmitting || isRegistering} isLoading={isSubmitting || isRegistering}>
+                <Button type="submit" className="global_btn bg_primary w-full" isDisabled={!isRequiredFieldsFilled || isSubmitting || isRegistering} isLoading={isSubmitting || isRegistering}>
                     Register as Mentor
                 </Button>
             </form>

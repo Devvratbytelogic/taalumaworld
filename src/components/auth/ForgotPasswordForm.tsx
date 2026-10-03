@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import Cookies from 'js-cookie';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { forgotPasswordSchema, resetPasswordSchema } from '@/utils/formValidation';
@@ -13,11 +13,14 @@ import { useAdminForgotPasswordMutation, useAdminResetPasswordMutation } from '@
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
-import { getMentorLoginRoutePath } from '@/routes/routes';
+import { getAdminPortalLoginRoutePath, getMentorLoginRoutePath } from '@/routes/routes';
 
 type ForgotPasswordStep = 'email' | 'otp' | 'reset';
+type ForgotPasswordVariant = 'mentor' | 'admin';
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ variant = 'mentor' }: { variant?: ForgotPasswordVariant }) {
+    const isAdmin = variant === 'admin';
+    const loginPath = isAdmin ? getAdminPortalLoginRoutePath() : getMentorLoginRoutePath();
     const router = useRouter();
     const [step, setStep] = useState<ForgotPasswordStep>('email');
     const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +34,10 @@ export function ForgotPasswordForm() {
         validationSchema: forgotPasswordSchema,
         onSubmit: async (formValues) => {
             try {
-                const res = await adminForgotPassword({ user_id: formValues.email }).unwrap();
+                const res = await adminForgotPassword({
+                    user_id: formValues.email,
+                    type: isAdmin ? 'super admin' : 'mentor',
+                }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res.message ?? 'Verification code sent to your email.');
                     setStep('otp');
@@ -60,7 +66,7 @@ export function ForgotPasswordForm() {
                     toast.success(res.message ?? 'Password updated successfully!');
                     Cookies.remove('author_reset_password_token');
                     clearResetForm();
-                    router.push(getMentorLoginRoutePath());
+                    router.push(loginPath);
                 }
             } catch {
                 console.log('Failed to reset password. Please try again.');
@@ -78,11 +84,12 @@ export function ForgotPasswordForm() {
         <AuthPageShell
             title={shellContent[step].title}
             subtitle={shellContent[step].subtitle}
-            fullViewport={false}
+            fullViewport={isAdmin}
+            icon={isAdmin ? <Shield className="h-6 w-6 text-primary" /> : undefined}
             footer={
                 <p>
                     Remember your password?{' '}
-                    <Link href={getMentorLoginRoutePath()} className="font-medium text-primary hover:text-primary/80">
+                    <Link href={loginPath} className="font-medium text-primary hover:text-primary/80">
                         Sign In
                     </Link>
                 </p>
@@ -100,7 +107,7 @@ export function ForgotPasswordForm() {
                                 id="forgot-email"
                                 name="email"
                                 type="email"
-                                placeholder="you@example.com"
+                                placeholder={isAdmin ? 'you@taaluma.world' : 'you@example.com'}
                                 className={`user_input_style ${emailForm.errors.email && emailForm.touched.email ? 'border-red-500' : ''}`}
                                 disabled={emailForm.isSubmitting}
                                 value={emailForm.values.email}
@@ -128,7 +135,7 @@ export function ForgotPasswordForm() {
                 <CommonOTPVerification
                     email={emailForm.values.email}
                     type="forgot_password"
-                    isAdmin={false}
+                    isAdmin={isAdmin}
                     onVerified={() => setStep('reset')}
                 />
             )}

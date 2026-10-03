@@ -142,6 +142,10 @@ export function getAdminPortalLoginRoutePath(): string {
   return '/portal/login';
 }
 
+export function getAdminPortalForgotPasswordRoutePath(): string {
+  return '/portal/forgot-password';
+}
+
 export function getAdminMentorTypesRoutePath(): string {
   return '/admin/types/mentor-types';
 }

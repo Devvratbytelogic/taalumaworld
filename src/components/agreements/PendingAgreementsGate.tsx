@@ -18,6 +18,7 @@ import {
 } from '@/store/rtkQueries/agreementAPIs';
 import {
   getHomeRoutePath,
+  getAdminPortalForgotPasswordRoutePath,
   getMentorForgotPasswordRoutePath,
   getMentorLoginRoutePath,
   getMentorSignupRoutePath,
@@ -28,6 +29,7 @@ import { getLinkedAgreementIds, isPendingRequiredSentence } from '@/utils/agreem
 function isExemptPath(pathname: string): boolean {
   if (pathname === '/policies' || pathname.startsWith('/policies/')) return true;
   if (pathname.startsWith('/portal/login')) return true;
+  if (pathname === getAdminPortalForgotPasswordRoutePath() || pathname.startsWith(`${getAdminPortalForgotPasswordRoutePath()}/`)) return true;
   if (pathname === getMentorLoginRoutePath() || pathname.startsWith(`${getMentorLoginRoutePath()}/`)) return true;
   if (pathname === getMentorSignupRoutePath() || pathname.startsWith(`${getMentorSignupRoutePath()}/`)) return true;
   if (pathname === getMentorForgotPasswordRoutePath() || pathname.startsWith(`${getMentorForgotPasswordRoutePath()}/`)) {

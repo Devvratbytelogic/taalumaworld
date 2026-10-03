@@ -19,7 +19,7 @@ const ADMIN_PANEL_PREFIX = '/admin';
 const USER_DASHBOARD_PREFIX = '/user-dashboard';
 
 /** Login / signup pages that must stay reachable no matter the auth state, to avoid redirect loops. */
-const PUBLIC_AUTH_ROUTES = ['/portal/login', '/mentor/login', '/mentor/signup', '/mentor/forgot-password'];
+const PUBLIC_AUTH_ROUTES = ['/portal/login', '/portal/forgot-password', '/mentor/login', '/mentor/signup', '/mentor/forgot-password'];
 
 function isPublicAuthRoute(pathname: string): boolean {
   return PUBLIC_AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));

@@ -12,7 +12,7 @@ import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
-import { getAdminDashboardRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath } from '@/routes/routes';
+import { getAdminDashboardRoutePath, getAdminPortalForgotPasswordRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath } from '@/routes/routes';
 import usePreventRefresh from '@/hooks/preventRefresh';
 import { setAuthCookies } from '@/utils/authCookies';
 
@@ -39,7 +39,11 @@ export function SignInForm({ variant }: SignInFormProps) {
         validationSchema: signInSchema,
         onSubmit: async (vals) => {
             try {
-                const res = await adminLogin({ email: vals.email, password: vals.password }).unwrap();
+                const res = await adminLogin({
+                    email: vals.email,
+                    password: vals.password,
+                    type: isAdmin ? 'super admin' : 'mentor',
+                }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     if (res?.message === LOGIN_OTP_MESSAGE) {
                         setShowOtp(true);
@@ -146,11 +150,14 @@ export function SignInForm({ variant }: SignInFormProps) {
                         )}
                     </div>
 
-                    {isMentor && <div className="text-right">
-                        <Link href={getMentorForgotPasswordRoutePath()} className="text-sm text-primary hover:text-primary/80 font-medium">
+                    <div className="text-right">
+                        <Link
+                            href={isAdmin ? getAdminPortalForgotPasswordRoutePath() : getMentorForgotPasswordRoutePath()}
+                            className="text-sm text-primary hover:text-primary/80 font-medium"
+                        >
                             Forgot Password?
                         </Link>
-                    </div>}
+                    </div>
 
                     <Button
                         type="submit"

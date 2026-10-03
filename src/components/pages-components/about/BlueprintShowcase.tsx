@@ -20,7 +20,7 @@ export default function BlueprintShowcase() {
                     <BookOpen className="w-4 h-4 text-primary" />
                     <span className="text-sm font-medium text-primary">The Product</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-3">Featured Blueprints</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-3">Featured Books</h2>
                 <p className="text-lg text-muted-foreground max-w-xl mx-auto">
                     People trust products more than promises.
                 </p>
@@ -49,7 +49,7 @@ export default function BlueprintShowcase() {
             ) : (
                 <div className="text-center py-12 text-muted-foreground">
                     <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p className="text-base">Blueprints coming soon.</p>
+                    <p className="text-base">Books coming soon.</p>
                 </div>
             )}
 
@@ -59,7 +59,7 @@ export default function BlueprintShowcase() {
                     className="global_btn rounded_full bg_primary w_fit m-auto"
                     onPress={() => router.push('/')}
                 >
-                    Browse All Blueprints
+                    Browse All Books
                 </Button>
             </div>
         </div>

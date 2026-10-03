@@ -27,10 +27,10 @@ export default function MyBlueprintReader({ slug }: { slug: string }) {
           className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to My Blueprints
+          Back to My Books
         </Link>
         <div className="rounded-lg border border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500">
-          Blueprint not found in your library.
+          Book not found in your library.
         </div>
       </div>
     );
@@ -43,7 +43,7 @@ export default function MyBlueprintReader({ slug }: { slug: string }) {
         description={
           data.seriesTitle || data.bookTitle
             ? `From ${data.seriesTitle || data.bookTitle}`
-            : `Blueprint ${data.blueprintNumber || data.chapterNumber}`
+            : `Book ${data.blueprintNumber || data.chapterNumber}`
         }
       >
         <Button
@@ -52,7 +52,7 @@ export default function MyBlueprintReader({ slug }: { slug: string }) {
           onPress={() => router.push(getUserDashboardMyChaptersRoutePath())}
           startContent={<ArrowLeft className="h-4 w-4" />}
         >
-          Back to My Blueprints
+          Back to My Books
         </Button>
       </UserDashboardPageHeader>
 

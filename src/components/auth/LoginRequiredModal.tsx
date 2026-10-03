@@ -21,7 +21,7 @@ export default function LoginRequiredModal() {
     if (isOpen && getAuthToken()) dispatch(closeModal());
   }, [isOpen, dispatch]);
 
-  const itemLabel = itemType === 'chapter' ? 'blueprint' : itemType === 'book' ? 'series' : itemType;
+  const itemLabel = itemType === 'chapter' ? 'book' : itemType === 'book' ? 'series' : itemType;
 
   const handleCancel = () => {
     if (typeof onCancel === 'function') {
@@ -68,7 +68,7 @@ export default function LoginRequiredModal() {
         return {
           icon: <UserPlus className="h-6 w-6 text-primary" />,
           title: 'Sign In to Follow',
-          description: 'Create an account or sign in to follow mentors and stay updated with their Blueprints.',
+          description: 'Create an account or sign in to follow mentors and stay updated with their Books.',
         };
       case 'wishlist':
         return {
@@ -110,7 +110,7 @@ export default function LoginRequiredModal() {
               <ul className="space-y-1 text-xs text-muted-foreground">
                 <li className="flex items-start gap-1.5">
                   <span className="mt-0.5 text-primary">✓</span>
-                  <span>Access your purchased blueprints and series anytime</span>
+                  <span>Access your purchased books and series anytime</span>
                 </li>
                 <li className="flex items-start gap-1.5">
                   <span className="mt-0.5 text-primary">✓</span>

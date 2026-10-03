@@ -98,7 +98,7 @@ export function MyPurchasedSeriesPage({ slug }: { slug: string }) {
             })}
           </div>
         ) : (
-          <p className="px-6 py-12 text-center text-sm text-gray-500">No blueprints available yet.</p>
+          <p className="px-6 py-12 text-center text-sm text-gray-500">No books available yet.</p>
         )}
       </div>
     </div>

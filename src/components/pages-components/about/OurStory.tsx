@@ -6,7 +6,7 @@ const phases = [
         number: '01',
         phase: 'Phase 1',
         title: 'Learn',
-        description: 'Access mentor-created Blueprints.',
+        description: 'Access mentor-created Books.',
         status: 'Current',
         statusStyle: 'bg-success/10 text-success border border-success/20',
         icon: BookOpen,

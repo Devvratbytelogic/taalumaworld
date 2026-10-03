@@ -72,7 +72,7 @@ export function AddReviewModal() {
           <p className="text-sm font-normal text-muted-foreground">
             {itemTitle
               ? `Share your thoughts on “${itemTitle}”.`
-              : 'Share your thoughts on this blueprint.'}
+              : 'Share your thoughts on this book.'}
           </p>
         </ModalHeader>
 

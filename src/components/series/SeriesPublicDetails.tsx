@@ -86,7 +86,7 @@ export default function SeriesPublicDetails({ data, accessPending = false }: Ser
                 In this series
               </p>
               <h2 className="mt-2 font-ubuntu text-2xl font-bold tracking-tight text-foreground">
-                Blueprints
+                Books
               </h2>
             </div>
             {chapters.length > 0 && (
@@ -154,7 +154,7 @@ export default function SeriesPublicDetails({ data, accessPending = false }: Ser
             </ol>
           ) : (
             <p className="border-t border-border pt-8 text-sm text-muted-foreground">
-              No blueprints available yet.
+              No books available yet.
             </p>
           )}
         </div>

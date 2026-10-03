@@ -193,7 +193,7 @@ export function MyBooksPage() {
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
-                          <span>{item.chapterCount} blueprints</span>
+                          <span>{item.chapterCount} books</span>
                         </div>
 
                         <h3 className="line-clamp-2 text-base font-medium text-gray-900">{item.title}</h3>

@@ -16,7 +16,7 @@ export function useCart() {
   const addToCart = (chapterId: string, bookId: string, ownedChapters?: string[]) => {
     // Check if already owned
     if (ownedChapters && ownedChapters.includes(chapterId)) {
-      toast('Already Owned — You already own this blueprint.');
+      toast('Already Owned — You already own this book.');
       return;
     }
     // Check if already in cart

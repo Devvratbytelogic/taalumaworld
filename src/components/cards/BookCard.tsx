@@ -27,7 +27,7 @@ export function BookCard({ book, author, chaptersCount, onClick }: BookCardProps
           {/* Pricing Type Badge on Image */}
           <div className="absolute top-3.5 right-3.5">
             <Badge className="text-primary border-primary/20 backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-sm font-medium">
-              {book?.type === 'full-book' ? 'Full Series' : 'By Blueprint'}
+              {book?.type === 'full-book' ? 'Full Series' : 'By Book'}
             </Badge>
           </div>
         </div>
@@ -74,13 +74,13 @@ export function BookCard({ book, author, chaptersCount, onClick }: BookCardProps
         <div className="flex items-center justify-between pt-2 border-t border-border">
           <div className="flex items-center gap-2 text-sm text-muted-foreground tracking-tight">
             <BookOpen className="h-4 w-4" />
-            <span>{chaptersCount} blueprints</span>
+            <span>{chaptersCount} books</span>
           </div>
 
           {book.type === 'full-book' && book.price !== undefined ? (
             <span className="font-semibold text-lg text-primary">${book.price?.toString() ?? '0'}</span>
           ) : (
-            <span className="font-medium text-sm text-muted-foreground tracking-tight">View Blueprints</span>
+            <span className="font-medium text-sm text-muted-foreground tracking-tight">View Books</span>
           )}
         </div>
       </CardContent>

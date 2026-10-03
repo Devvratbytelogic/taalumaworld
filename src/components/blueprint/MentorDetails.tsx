@@ -123,7 +123,7 @@ export default function MentorDetails({ data }: MentorDetailsProps) {
                     <p className="text-sm leading-7 text-[#4A4A4A]">{data?.professionalBio}</p>
                 ) : (
                     <p className="text-sm leading-7 text-[#6B6B6B]">
-                        This mentor guides learners through practical, real-world Blueprint content.
+                        This mentor guides learners through practical, real-world Book content.
                     </p>
                 )}
 

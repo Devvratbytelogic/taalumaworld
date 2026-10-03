@@ -216,7 +216,7 @@ export default function BlueprintReviews({
             <div className="rounded-2xl border border-[#ECECEC] bg-white px-6 py-14 text-center">
               <p className="text-sm font-medium text-[#1A1A1A]">No reviews yet</p>
               <p className="mt-1 text-sm text-[#6B6B6B]">
-                Be the first to share your thoughts on this blueprint.
+                Be the first to share your thoughts on this book.
               </p>
             </div>
           )}

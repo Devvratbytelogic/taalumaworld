@@ -79,7 +79,7 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                     <div>
                       <p className="text-sm font-medium text-[#1A1A1A]">{data?.title}</p>
                       <p className="mt-1 text-xs text-[#6B6B6B]">
-                        Blueprint {data?.chapterNumber}
+                        Book {data?.chapterNumber}
                       </p>
                     </div>
                     {(hasContent || hasPdf) && canRead && (
@@ -110,7 +110,7 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                     <div ref={contentRef} className="p-6">
                       <MarkdownContent
                         content={data?.content ?? ''}
-                        emptyMessage="No content available for this blueprint."
+                        emptyMessage="No content available for this book."
                         className="prose-headings:font-ubuntu prose-headings:tracking-tight prose-p:text-[#333333] prose-p:leading-8"
                       />
                     </div>
@@ -127,7 +127,7 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                   {!hasContent && !hasPdf && (
                     <div className="px-6 py-16 text-center sm:px-8 sm:py-20">
                       <p className="text-sm text-[#6B6B6B]">
-                        No content available for this blueprint.
+                        No content available for this book.
                       </p>
                     </div>
                   )}
@@ -137,11 +137,11 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                       <Lock className="h-6 w-6 text-[#6B6B6B]" />
                     </div>
                     <div className="max-w-sm space-y-2">
-                      <p className="text-sm font-medium text-[#1A1A1A]">This blueprint is locked</p>
+                      <p className="text-sm font-medium text-[#1A1A1A]">This book is locked</p>
                       <p className="text-sm leading-relaxed text-[#6B6B6B]">
                         {isPricingModelChapter
-                          ? 'Purchase this blueprint to unlock the full content.'
-                          : 'Purchase the complete series to unlock this blueprint.'}
+                          ? 'Purchase this book to unlock the full content.'
+                          : 'Purchase the complete series to unlock this book.'}
                       </p>
                     </div>
                   </div>

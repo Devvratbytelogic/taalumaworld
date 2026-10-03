@@ -128,7 +128,7 @@ export function ProfilePage() {
         href: getUserDashboardMyBooksRoutePath(),
       },
       {
-        label: 'Blueprints',
+        label: 'Books',
         value: chaptersData?.data?.summary?.totalChapters ?? 0,
         icon: BookMarked,
         iconClass: 'text-primary',

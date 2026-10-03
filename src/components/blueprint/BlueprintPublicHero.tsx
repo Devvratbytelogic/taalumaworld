@@ -92,7 +92,7 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
             <div className="min-w-0 flex-1 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 {/* <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  Blueprint {data?.chapterNumber}
+                  Book {data?.chapterNumber}
                 </span> */}
                 {/* {data?.category?.name && (
                   <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
@@ -108,7 +108,7 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
                 </p>
                 {/* {!data?.isFree && (
                   <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
-                    {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                    {isPricingModelChapter ? 'By Book' : 'Full Series'}
                   </span>
                 )} */}
               </div>
@@ -192,7 +192,7 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
               ) : null}
 
               <div>
-                <p className="mb-3 text-sm font-medium text-foreground">Share this blueprint</p>
+                <p className="mb-3 text-sm font-medium text-foreground">Share this book</p>
                 <ShareButtons
                   referralCode={data?.createdBy?.short_code ?? ''}
                   slug={data?.slug ?? ''}
@@ -211,7 +211,7 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-3 bg-muted p-6 text-center">
                     <FileText className="h-10 w-10 text-muted-foreground/40" />
-                    <p className="text-xs font-medium text-muted-foreground">Blueprint {data?.chapterNumber}</p>
+                    <p className="text-xs font-medium text-muted-foreground">Book {data?.chapterNumber}</p>
                   </div>
                 )}
               </div>

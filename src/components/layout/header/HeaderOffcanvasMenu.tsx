@@ -66,7 +66,7 @@ const accountLinks: { label: string; href: string; icon: typeof User; roles?: Us
   { label: 'Profile', href: getUserDashboardProfileRoutePath(), icon: User },
   { label: 'Address', href: getUserDashboardAddressRoutePath(), icon: MapPin },
   { label: 'Settings', href: getUserDashboardSettingsRoutePath(), icon: Settings },
-  { label: 'My Blueprints', href: getUserDashboardMyChaptersRoutePath(), icon: BookOpen },
+  { label: 'My Books', href: getUserDashboardMyChaptersRoutePath(), icon: BookOpen },
   { label: 'My Series', href: getUserDashboardMyBooksRoutePath(), icon: Book },
   { label: 'My Orders', href: getUserDashboardMyOrdersRoutePath(), icon: ShoppingBag },
   { label: 'Reading History', href: getUserDashboardHistoryRoutePath(), icon: Clock },
@@ -109,7 +109,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
   const userPhoto = user?.photo?.trim() || undefined;
   const libraryHref =
     contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath();
-  const libraryLabel = contentMode === VISIBLE.BOOK ? 'My Series' : 'My Blueprints';
+  const libraryLabel = contentMode === VISIBLE.BOOK ? 'My Series' : 'My Books';
   const accountHref = isStaff ? getAdminRoutePath() : getUserDashboardRoutePath();
   const visibleAccountLinks = accountLinks.filter(
     (item) => !item.roles || item.roles.includes(user?.role as UserTypeValue),

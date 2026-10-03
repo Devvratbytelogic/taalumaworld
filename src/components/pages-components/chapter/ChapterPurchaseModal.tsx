@@ -93,7 +93,7 @@ export default function ChapterPurchaseModal() {
 
   const handlePurchaseSuccess = () => {
     dispatch(rtkQuerieSetup.util.invalidateTags(['SingleChapter', 'AllChapters', 'MyChapters']));
-    toast.success('Purchase successful! You can now read this blueprint.');
+    toast.success('Purchase successful! You can now read this book.');
     dispatch(closeModal());
     router.refresh();
   };
@@ -132,7 +132,7 @@ export default function ChapterPurchaseModal() {
           <ModalBody className="py-3 px-4! sm:p-6! space-y-2 sm:space-y-4 gap-y-0! overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
-                {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                {isPricingModelChapter ? 'By Book' : 'Full Series'}
               </Badge>
               {!isBook && chapter?.seriesTitle && (
                 <Badge variant="outline" className="rounded-full px-3 py-1 text-xs max-w-40">
@@ -166,7 +166,7 @@ export default function ChapterPurchaseModal() {
                       <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">Blueprint Mentor</p>
+                  <p className="text-xs text-muted-foreground">Book Mentor</p>
                 </div>
 
                 {(chapter?.mentor?.linkedin || chapter?.mentor?.facebook) && (
@@ -236,20 +236,20 @@ export default function ChapterPurchaseModal() {
                 <div className="text-right shrink-0">
                   <p className="text-sm font-semibold text-primary">
                     {isPricingModelChapter
-                      ? 'Priced by blueprint'
+                      ? 'Priced by book'
                       : chapter?.series?.effectivePrice > 0
                         ? `KSH ${chapter?.series?.effectivePrice?.toFixed(2)}`
                         : 'FREE'}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                    {isPricingModelChapter ? 'By Book' : 'Full Series'}
                   </p>
                 </div>
               </div>
             )}
 
             <div className="border-t pt-3">
-              <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this {isBook ? 'Series' : 'Blueprint'}</h3>
+              <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this {isBook ? 'Series' : 'Book'}</h3>
               <ShareButtons
                 referralCode={chapter?.createdBy?.short_code ?? ''}
                 slug={chapter?.slug ?? ''}
@@ -264,8 +264,8 @@ export default function ChapterPurchaseModal() {
               <Lock className="h-4 w-4 shrink-0" />
               <span>
                 {isPricingModelChapter
-                  ? 'Purchase this blueprint to unlock full access.'
-                  : 'You have to purchase the complete series to access this blueprint.'}
+                  ? 'Purchase this book to unlock full access.'
+                  : 'You have to purchase the complete series to access this book.'}
               </span>
             </div>
 

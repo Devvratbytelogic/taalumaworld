@@ -12,7 +12,7 @@ export default function TodayOnTaaluma() {
         {
             icon: BookOpen,
             value: blueprintCount ? `${blueprintCount}+` : '5+',
-            label: 'Published Blueprints',
+            label: 'Published Books',
             iconBg: 'bg-primary/10',
             iconColor: 'text-primary',
             valueColor: 'text-primary',

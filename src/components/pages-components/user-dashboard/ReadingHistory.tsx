@@ -166,7 +166,7 @@ export function ReadingHistory() {
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
-                          <span>Blueprint {item.chapterNumber}</span>
+                          <span>Book {item.chapterNumber}</span>
                           <span className="hidden text-gray-300 sm:inline" aria-hidden>
                             ·
                           </span>
@@ -222,14 +222,14 @@ export function ReadingHistory() {
                 <h3 className="mb-2 text-base font-semibold text-gray-900">No reading history</h3>
                 <p className="mb-6 text-sm text-gray-500">
                   Start reading to build your history. Your recently read{' '}
-                  {displayMode === 'chapters' ? 'blueprints' : 'series'} will appear here.
+                  {displayMode === 'chapters' ? 'books' : 'series'} will appear here.
                 </p>
                 <Button
                   type="button"
                   onPress={() => router.push(getHomeRoutePath())}
                   className="global_btn rounded_full bg_primary"
                 >
-                  {displayMode === 'chapters' ? 'Browse Blueprints' : 'Browse Series'}
+                  {displayMode === 'chapters' ? 'Browse Books' : 'Browse Series'}
                 </Button>
               </div>
             </div>

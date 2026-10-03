@@ -35,7 +35,7 @@ function formatStatusLabel(status?: string) {
 }
 
 function formatTypeLabel(type?: string) {
-  if (type === 'Chapter') return 'Blueprint';
+  if (type === 'Chapter') return 'Book';
   if (type === 'Book') return 'Series';
   return type || 'Item';
 }
@@ -244,7 +244,7 @@ export function MyReviewsPage() {
                 <p className="mb-6 text-sm text-gray-500">
                   {hasActiveFilters
                     ? 'Try adjusting the status or date range.'
-                    : 'After you review a blueprint, it will show up here.'}
+                    : 'After you review a book, it will show up here.'}
                 </p>
                 {hasActiveFilters ? (
                   <Button

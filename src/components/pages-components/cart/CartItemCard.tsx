@@ -54,7 +54,7 @@ export default function CartItemCard({ item, compact = false }: CartItemCardProp
 
         <div className="min-w-0 flex-1">
           <Badge className="mb-1 rounded-full border-primary/20 bg-primary/10 px-2.5 py-0 text-[11px] text-primary">
-            {isBlueprint ? 'Blueprint' : 'Full Series'}
+            {isBlueprint ? 'Book' : 'Full Series'}
           </Badge>
           <button type="button" onClick={handleViewDetails} className="block w-full text-left">
             <p className="line-clamp-1 text-sm font-semibold tracking-tight transition-colors hover:text-primary sm:text-base">
@@ -93,7 +93,7 @@ export default function CartItemCard({ item, compact = false }: CartItemCardProp
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="min-w-0 flex-1 space-y-1.5">
               <Badge className="rounded-full border-primary/20 bg-primary/10 px-3 py-0.5 text-xs text-primary">
-                {isBlueprint ? 'Blueprint' : 'Full Series'}
+                {isBlueprint ? 'Book' : 'Full Series'}
               </Badge>
 
               <button type="button" onClick={handleViewDetails} className="block text-left">

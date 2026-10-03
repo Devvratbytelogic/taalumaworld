@@ -62,7 +62,7 @@ export default function DirectPurchasePaymentModal({
   const continueHref =
     kind === 'series' ? getPurchasedSeriesRoutePath(slug) : getPurchasedBlueprintRoutePath(slug);
   const continueLabel = kind === 'series' ? 'Open Series' : 'Start Reading';
-  const itemLabel = kind === 'series' ? 'series' : 'blueprint';
+  const itemLabel = kind === 'series' ? 'series' : 'book';
 
   useEffect(() => {
     if (isError || outcome === 'completed' || outcome === 'failed') {

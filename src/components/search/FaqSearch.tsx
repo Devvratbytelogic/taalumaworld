@@ -11,7 +11,7 @@ import type { IFAQAPIResponseDataEntity } from '@/types/user/testimonial'
 
 const categories = [
     { id: 'all', label: 'All Questions', icon: HelpCircle },
-    { id: 'reading', label: 'Reading & Blueprints', icon: BookOpen },
+    { id: 'reading', label: 'Reading & Books', icon: BookOpen },
     { id: 'payment', label: 'Payments & Pricing', icon: CreditCard },
     { id: 'account', label: 'Account & Settings', icon: Users },
 ]

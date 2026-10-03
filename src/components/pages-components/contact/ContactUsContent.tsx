@@ -102,7 +102,7 @@ export default function ContactUsContent() {
                                 <h3 className="text-xl font-bold text-foreground mb-1">Share What You Know</h3>
                                 <p className="text-sm text-primary font-medium mb-2">Become a Mentor on Taaluma.World.</p>
                                 <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Publish Blueprints. Build your reputation. Earn from your expertise. Impact the next generation.
+                                    Publish Books. Build your reputation. Earn from your expertise. Impact the next generation.
                                 </p>
                             </div>
                             <Button

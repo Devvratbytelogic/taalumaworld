@@ -60,7 +60,7 @@ export default function PaymentConfirmed({
   transactionId,
   orderNumber,
   details,
-  message = 'Your blueprints are now unlocked and ready to read. Head to your dashboard to start exploring.',
+  message = 'Your books are now unlocked and ready to read. Head to your dashboard to start exploring.',
   continueHref,
   continueLabel = 'Go to Dashboard',
 }: PaymentConfirmedProps) {

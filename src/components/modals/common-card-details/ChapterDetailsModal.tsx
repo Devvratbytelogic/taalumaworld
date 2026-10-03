@@ -70,7 +70,7 @@ export default function ChapterDetailsModal() {
         <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
-              {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+              {isPricingModelChapter ? 'By Book' : 'Full Series'}
             </Badge>
             {chapter?.isFree ? (
               <Badge className="text-success border-success/20 bg-success/10 rounded-full px-4 py-1 text-xs">
@@ -120,7 +120,7 @@ export default function ChapterDetailsModal() {
                     <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">Blueprint Mentor</p>
+                <p className="text-xs text-muted-foreground">Book Mentor</p>
               </div>
 
               {(chapter?.mentor?.linkedin || chapter?.mentor?.facebook) && (
@@ -194,20 +194,20 @@ export default function ChapterDetailsModal() {
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-primary">
                   {isPricingModelChapter
-                    ? 'Priced by blueprint'
+                    ? 'Priced by book'
                     : Number(chapter?.series?.effectivePrice) > 0
                       ? `KSH ${Number(chapter?.series?.effectivePrice).toFixed(2)}`
                       : 'FREE'}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                  {isPricingModelChapter ? 'By Book' : 'Full Series'}
                 </p>
               </div>
             </div>
           )}
 
           <div className="border-t pt-3">
-            <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Blueprint</h3>
+            <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this Book</h3>
             <ShareButtons
               referralCode={chapter?.mentor?.short_code ?? ''}
               slug={chapter?.slug ?? ''}
@@ -220,7 +220,7 @@ export default function ChapterDetailsModal() {
           {!isPricingModelChapter ? (
             <div className="relative flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
               <Lock className="h-4 w-4 shrink-0" />
-              <span>You have to purchase the complete series to access this blueprint</span>
+              <span>You have to purchase the complete series to access this book</span>
             </div>
           ) : null}
         </ModalBody>
@@ -234,7 +234,7 @@ export default function ChapterDetailsModal() {
               onPress={onClose}
               startContent={<BookOpen className="h-4 w-4" />}
             >
-              Read Free Blueprint
+              Read Free Book
             </Button>
           ) : (
             <>

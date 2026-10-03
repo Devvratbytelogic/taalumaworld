@@ -20,21 +20,21 @@ const PAGE_LIMIT = 8;
 const filterTabs: { key: FilterType; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'Book', label: 'Series' },
-  { key: 'Chapter', label: 'Blueprints' },
+  { key: 'Chapter', label: 'Books' },
 ];
 
 const emptyStateCopy: Record<FilterType, { title: string; description: string }> = {
   all: {
     title: 'Your wishlist is empty',
-    description: 'Save series and blueprints you love so you can pick up where you left off.',
+    description: 'Save series and books you love so you can pick up where you left off.',
   },
   Book: {
     title: 'No series saved',
     description: 'Series you save for later will show up here.',
   },
   Chapter: {
-    title: 'No blueprints saved',
-    description: 'Blueprints you save for later will show up here.',
+    title: 'No books saved',
+    description: 'Books you save for later will show up here.',
   },
 };
 
@@ -62,7 +62,7 @@ export function MyWishlistPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <UserDashboardPageHeader title="My Wishlist" description="Series and blueprints you have saved for later" />
+        <UserDashboardPageHeader title="My Wishlist" description="Series and books you have saved for later" />
         <DashboardWishlistSkeleton />
       </div>
     );
@@ -70,7 +70,7 @@ export function MyWishlistPage() {
 
   return (
     <div className="space-y-6">
-      <UserDashboardPageHeader title="My Wishlist" description="Series and blueprints you have saved for later" />
+      <UserDashboardPageHeader title="My Wishlist" description="Series and books you have saved for later" />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -138,7 +138,7 @@ export function MyWishlistPage() {
                         {isBlueprint ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                             <BookMarked className="h-3 w-3" aria-hidden />
-                            Blueprint
+                            Book
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
@@ -159,7 +159,7 @@ export function MyWishlistPage() {
                             Part of <span className="font-medium text-gray-500">{item.series?.title}</span>
                           </>
                         ) : isChapterPriced ? (
-                          'Priced per blueprint'
+                          'Priced per book'
                         ) : (
                           'Full series bundle'
                         )}
@@ -176,7 +176,7 @@ export function MyWishlistPage() {
                       <div className="mt-4 flex items-end justify-between gap-2 border-t border-gray-100 pt-3">
                         <div>
                           {!isBlueprint && isChapterPriced ? (
-                            <p className="text-sm font-bold text-primary">Priced by blueprint</p>
+                            <p className="text-sm font-bold text-primary">Priced by book</p>
                           ) : isFree ? (
                             <p className="text-lg font-bold text-primary">Free</p>
                           ) : (

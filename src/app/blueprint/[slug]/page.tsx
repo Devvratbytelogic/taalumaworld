@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!data) {
         return {
-            title: 'Blueprint Not Found | TaalumaWorld',
+            title: 'Book Not Found | TaalumaWorld',
             description: '',
         };
     }

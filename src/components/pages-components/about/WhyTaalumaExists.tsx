@@ -109,7 +109,7 @@ export default function WhyTaalumaExists() {
             {/* Through Blueprints + Not List */}
             <div className="space-y-3">
                 <p className="text-base text-muted-foreground leading-relaxed">
-                    Through Blueprints, mentorship, and practical learning experiences, we make real-world wisdom accessible to anyone, anywhere.
+                    Through Books, mentorship, and practical learning experiences, we make real-world wisdom accessible to anyone, anywhere.
                 </p>
 
                 <div className="flex flex-wrap gap-3">

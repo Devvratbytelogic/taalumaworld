@@ -11,14 +11,14 @@ import {
 export const metadata: Metadata = {
   title: 'Page not found | TaalumaWorld',
   description:
-    'This page does not exist or may have been moved. Browse blueprints, meet mentors, or visit the Help & Trust Center.',
+    'This page does not exist or may have been moved. Browse books, meet mentors, or visit the Help & Trust Center.',
 };
 
 const destinations = [
   {
     href: getHomeRoutePath(),
     icon: BookOpen,
-    title: 'Browse Blueprints',
+    title: 'Browse Books',
     description: 'Practical guidance from people who have walked the path.',
   },
   {
@@ -86,7 +86,7 @@ export default function NotFound() {
                 href={getHomeRoutePath()}
                 className="global_btn rounded_full bg_primary w-full justify-center sm:w-auto"
               >
-                Browse Blueprints
+                Browse Books
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
               <Link

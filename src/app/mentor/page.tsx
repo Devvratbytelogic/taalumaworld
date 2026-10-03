@@ -11,7 +11,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
     title: 'Meet Our Mentors | TaalumaWorld',
     description:
-        'Explore verified, real-world mentors from around the globe sharing their journeys through Blueprints on TaalumaWorld.',
+        'Explore verified, real-world mentors from around the globe sharing their journeys through Books on TaalumaWorld.',
 };
 
 const PAGE_LIMIT = 12;
@@ -41,7 +41,7 @@ export default async function AllMentorsPage() {
 
                             <h1 className="mt-6 font-ubuntu text-4xl leading-tight font-bold text-foreground md:text-5xl lg:text-6xl">
                                 Meet the minds behind the{' '}
-                                <span className="gradient_text">Blueprints</span>
+                                <span className="gradient_text">Books</span>
                             </h1>
 
                             <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
@@ -101,7 +101,7 @@ export default async function AllMentorsPage() {
                                         Have expertise worth sharing?
                                     </h2>
                                     <p className="mt-2 max-w-md text-sm text-white/60 md:text-base">
-                                        Join a growing community of mentors turning their experience into Blueprints that
+                                        Join a growing community of mentors turning their experience into Books that
                                         change careers.
                                     </p>
                                 </div>

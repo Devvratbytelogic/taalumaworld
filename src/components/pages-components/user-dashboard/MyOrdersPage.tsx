@@ -39,7 +39,7 @@ const TYPE_TABS: { key: OrderTypeFilter; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'cart', label: 'Cart' },
   { key: 'book', label: 'Series' },
-  { key: 'chapter', label: 'Blueprints' },
+  { key: 'chapter', label: 'Books' },
 ];
 
 const PAYMENT_STATUS_OPTIONS = [
@@ -67,7 +67,7 @@ function formatOrderType(type?: string | null) {
   if (!type) return 'Order';
   const key = type.toLowerCase();
   if (key === 'book' || key === 'books') return 'Series';
-  if (key === 'chapter' || key === 'chapters') return 'Blueprint';
+  if (key === 'chapter' || key === 'chapters') return 'Book';
   if (key === 'cart') return 'Cart';
   return formatLabel(type);
 }
@@ -77,7 +77,7 @@ function formatItemTitle(item: OrderItemsEntity) {
     item.blueprint?.title ||
     item.series?.title ||
     (item.type?.toLowerCase() === 'chapter' || item.legacyType?.toLowerCase() === 'chapter'
-      ? 'Blueprint'
+      ? 'Book'
       : item.type?.toLowerCase() === 'book' || item.legacyType?.toLowerCase() === 'book'
         ? 'Series'
         : 'Item')
@@ -390,7 +390,7 @@ export function MyOrdersPage() {
                 <p className="mb-6 text-sm text-gray-500">
                   {hasActiveFilters
                     ? 'Try adjusting search, payment, type, or date range.'
-                    : 'When you purchase a series or blueprint, your orders will show up here.'}
+                    : 'When you purchase a series or book, your orders will show up here.'}
                 </p>
                 {hasActiveFilters ? (
                   <Button

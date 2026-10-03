@@ -38,7 +38,7 @@ export default function MeetOurTeam() {
                                     <p className="text-primary font-medium mb-4">Founder & Principal Strategist · Taaluma.world                                    </p>
                                 </div>
                                 <p className="text-muted-foreground leading-relaxed">
-                                    Daniel Muchika is the strategist behind Taaluma.world, engineered from twenty years of experience at the intersection of global finance and human potential. His journey is a rare blend of elite academic credentials and 'real-world' scars. Daniel's mission is to equip the next generation of professionals with the <b>internal muscle</b> and <b>strategic blueprints</b> required to out-pace the noise of the AI revolution and own their professional destiny.</p>
+                                    Daniel Muchika is the strategist behind Taaluma.world, engineered from twenty years of experience at the intersection of global finance and human potential. His journey is a rare blend of elite academic credentials and 'real-world' scars. Daniel's mission is to equip the next generation of professionals with the <b>internal muscle</b> and <b>strategic books</b> required to out-pace the noise of the AI revolution and own their professional destiny.</p>
                             </div>
                         </div>
 
@@ -49,7 +49,7 @@ export default function MeetOurTeam() {
                                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                                     <span className="text-2xl">🎓</span>
                                 </div>
-                                <h4 className="font-semibold text-foreground mb-2">Global Academic Blueprint</h4>
+                                <h4 className="font-semibold text-foreground mb-2">Global Academic Book</h4>
                                 <p className="text-sm text-muted-foreground leading-relaxed">Alumnus of Friends School Kamusinga, University of Nairobi, Strathmore, IESE Barcelona, and Stockholm School of Economics.
 </p>
                             </div>

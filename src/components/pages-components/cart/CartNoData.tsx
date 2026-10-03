@@ -18,7 +18,7 @@ export default function CartNoData() {
 
           <h2 className="mb-2 text-xl font-bold tracking-tight sm:text-2xl">Your cart is empty</h2>
           <p className="mx-auto mb-8 max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Start adding blueprints to your cart to begin your reading journey.
+            Start adding books to your cart to begin your reading journey.
           </p>
 
           <div className="flex justify-center">
@@ -27,7 +27,7 @@ export default function CartNoData() {
               onPress={() => router.push(getHomeRoutePath())}
               endContent={<ArrowRight className="h-4 w-4" />}
             >
-              Browse Blueprints
+              Browse Books
             </Button>
           </div>
         </div>

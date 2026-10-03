@@ -58,7 +58,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
   const userPhoto = userData?.data?.profile_pic || undefined;
 
   const libraryHref = contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath();
-  const libraryLabel = contentMode === VISIBLE.BOOK ? 'My Series' : 'My Blueprints';
+  const libraryLabel = contentMode === VISIBLE.BOOK ? 'My Series' : 'My Books';
 
   const navItems = [
     { label: 'Home', href: getHomeRoutePath() },

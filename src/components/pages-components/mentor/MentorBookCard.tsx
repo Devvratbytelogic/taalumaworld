@@ -30,7 +30,7 @@ export default function MentorBookCard({ book, index }: MentorBookCardProps) {
       <div className="flex flex-1 flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {book?.pricingModel === VISIBLE.CHAPTER ? 'By Blueprint' : 'Full Series'}
+            {book?.pricingModel === VISIBLE.CHAPTER ? 'By Book' : 'Full Series'}
           </span>
           {book?.status && (
             <span className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
@@ -49,7 +49,7 @@ export default function MentorBookCard({ book, index }: MentorBookCardProps) {
           <span className="text-sm text-muted-foreground">View series</span>
           <span className="text-sm font-semibold text-primary">
             {book?.pricingModel === VISIBLE.CHAPTER
-              ? 'Priced by blueprint'
+              ? 'Priced by book'
               : book?.price > 0
                 ? `KSH ${book?.price.toFixed(2)}`
                 : 'FREE'}

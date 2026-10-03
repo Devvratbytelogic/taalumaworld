@@ -60,8 +60,8 @@ export function MyChaptersPage() {
     return (
       <div className="space-y-6">
         <UserDashboardPageHeader
-          title="My Blueprints"
-          description="Your personal collection of purchased blueprints"
+          title="My Books"
+          description="Your personal collection of purchased books"
         />
         <DashboardLibraryListSkeleton />
       </div>
@@ -69,7 +69,7 @@ export function MyChaptersPage() {
   }
 
   const statItems = [
-    { icon: BookOpen, label: 'Total blueprints', value: summary?.totalChapters ?? 0, iconClass: 'text-primary' },
+    { icon: BookOpen, label: 'Total books', value: summary?.totalChapters ?? 0, iconClass: 'text-primary' },
     { icon: TrendingUp, label: 'In progress', value: summary?.inProgress ?? 0, iconClass: 'text-primary' },
     { icon: CheckCircle, label: 'Completed', value: summary?.completed ?? 0, iconClass: 'text-green-600' },
     { icon: CircleDashed, label: 'Unread', value: summary?.unread ?? 0, iconClass: 'text-gray-500' },
@@ -84,28 +84,28 @@ export function MyChaptersPage() {
 
   const emptyStateCopy: Record<FilterType, { title: string; description: string }> = {
     all: {
-      title: 'No blueprints yet',
-      description: "You haven't purchased any blueprints yet. Start exploring and build your collection.",
+      title: 'No books yet',
+      description: "You haven't purchased any books yet. Start exploring and build your collection.",
     },
     inProgress: {
-      title: 'No blueprints in progress',
-      description: 'Blueprints you start reading will show up here.',
+      title: 'No books in progress',
+      description: 'Books you start reading will show up here.',
     },
     completed: {
-      title: 'No completed blueprints',
-      description: 'Blueprints you finish reading will show up here.',
+      title: 'No completed books',
+      description: 'Books you finish reading will show up here.',
     },
     unread: {
-      title: 'No unread blueprints',
-      description: "You've started reading all of your blueprints.",
+      title: 'No unread books',
+      description: "You've started reading all of your books.",
     },
   };
 
   return (
     <div className="space-y-6">
       <UserDashboardPageHeader
-        title="My Blueprints"
-        description="Your personal collection of purchased blueprints"
+        title="My Books"
+        description="Your personal collection of purchased books"
       />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
@@ -138,7 +138,7 @@ export function MyChaptersPage() {
             ))}
           </div>
           <p className="text-sm text-gray-500">
-            {pagination?.totalItems ?? 0} blueprint{(pagination?.totalItems ?? 0) !== 1 ? 's' : ''}
+            {pagination?.totalItems ?? 0} book{(pagination?.totalItems ?? 0) !== 1 ? 's' : ''}
           </p>
         </div>
 
@@ -286,7 +286,7 @@ export function MyChaptersPage() {
                     onPress={() => router.push(getHomeRoutePath())}
                     className="global_btn rounded_full bg_primary"
                   >
-                    Browse Blueprints
+                    Browse Books
                   </Button>
                 ) : (
                   <Button
@@ -294,7 +294,7 @@ export function MyChaptersPage() {
                     onPress={() => handleFilterChange('all')}
                     className="global_btn rounded_full outline_primary"
                   >
-                    Show All Blueprints
+                    Show All Books
                   </Button>
                 )}
               </div>

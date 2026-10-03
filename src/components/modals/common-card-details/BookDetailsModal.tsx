@@ -60,7 +60,7 @@ export default function BookDetailsModal() {
                 <ModalBody className="p-6! space-y-4 overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                         <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
-                            {isPricingModelChapter ? 'By Blueprint' : 'Full Series'}
+                            {isPricingModelChapter ? 'By Book' : 'Full Series'}
                         </Badge>
                         {book?.isFree ? (
                             <Badge className="text-success border-success/20 bg-success/10 rounded-full px-4 py-1 text-xs">
@@ -70,7 +70,7 @@ export default function BookDetailsModal() {
                         {!!book?.chapterCount && (
                             <Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
                                 <BookOpen className="h-3 w-3 mr-1 shrink-0" />
-                                <span>{book?.chapterCount} blueprints</span>
+                                <span>{book?.chapterCount} books</span>
                             </Badge>
                         )}
                     </div>
@@ -110,7 +110,7 @@ export default function BookDetailsModal() {
                                         <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
                                     )}
                                 </div>
-                                <p className="text-xs text-muted-foreground">Blueprint Mentor</p>
+                                <p className="text-xs text-muted-foreground">Book Mentor</p>
                             </div>
 
                             {(book?.mentor?.linkedin || book?.mentor?.facebook) && (

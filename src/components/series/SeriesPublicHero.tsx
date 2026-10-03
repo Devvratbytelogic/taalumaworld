@@ -164,9 +164,9 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
 
               {!!bookDetails?.chapterCount && (
                 <div>
-                  <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Blueprints</p>
+                  <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Books</p>
                   <p className="font-medium text-foreground">
-                    {bookDetails.chapterCount} {bookDetails.chapterCount === 1 ? 'blueprint' : 'blueprints'}
+                    {bookDetails.chapterCount} {bookDetails.chapterCount === 1 ? 'book' : 'books'}
                   </p>
                 </div>
               )}
@@ -181,7 +181,7 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
               <div>
                 <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Access</p>
                 <p className="font-medium text-foreground">
-                  {isPricingModelChapter ? 'By blueprint' : 'Full series'}
+                  {isPricingModelChapter ? 'By book' : 'Full series'}
                 </p>
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
               {showPurchaseActions && isPricingModelChapter && (
                 <p className="flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
                   <Lock className="mt-0.5 h-4 w-4 shrink-0" />
-                  This series is priced by blueprint. Purchase individual blueprints below to get access.
+                  This series is priced by book. Purchase individual books below to get access.
                 </p>
               )}
 

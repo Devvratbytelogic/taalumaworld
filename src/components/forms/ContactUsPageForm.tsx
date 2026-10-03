@@ -160,7 +160,7 @@ export default function ContactUsPageForm() {
                             id="subject"
                             name="subject"
                             type="text"
-                            placeholder="Which blueprint or pain point is this about?"
+                            placeholder="Which book or pain point is this about?"
                             value={formik.values.subject}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}

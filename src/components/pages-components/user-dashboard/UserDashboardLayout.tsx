@@ -47,7 +47,7 @@ const NAV_GROUPS: {
     {
       title: 'Library',
       items: [
-        { href: getUserDashboardMyChaptersRoutePath(), label: 'My Blueprints', icon: BookOpen },
+        { href: getUserDashboardMyChaptersRoutePath(), label: 'My Books', icon: BookOpen },
         { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
         { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
         { href: getUserDashboardMyOrdersRoutePath(), label: 'My Orders', icon: ShoppingBag },

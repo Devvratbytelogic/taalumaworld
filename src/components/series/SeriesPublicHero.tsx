@@ -93,10 +93,10 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
       <div className="container">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
           <div className="mx-auto w-52 shrink-0 sm:w-56 lg:mx-0 lg:w-64">
-            <div className="relative aspect-3/4 overflow-hidden rounded-xl border border-border bg-muted">
+            <div className="relative aspect-2/2 overflow-hidden rounded-xl border border-border bg-muted">
               <span className="absolute inset-y-0 left-0 z-1 w-1.5 bg-foreground" aria-hidden />
               {bookDetails?.coverImage ? (
-                <ImageComponent src={bookDetails.coverImage} alt={bookDetails.title} object_cover={false} />
+                <ImageComponent src={bookDetails.coverImage} alt={bookDetails.title} object_cover={true} />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                   <FileText className="h-10 w-10 text-muted-foreground/40" />

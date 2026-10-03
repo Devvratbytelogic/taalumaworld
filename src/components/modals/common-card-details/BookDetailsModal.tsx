@@ -51,8 +51,8 @@ export default function BookDetailsModal() {
             <ModalContent>
                 {book?.coverImage && (
                     <div className="relative shrink-0 bg-muted flex justify-center py-6">
-                        <div className="w-40 aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
-                            <ImageComponent src={book?.coverImage} alt={book?.title} object_cover={false} />
+                        <div className="w-40 aspect-2/2 rounded-2xl overflow-hidden shadow-lg">
+                            <ImageComponent src={book?.coverImage} alt={book?.title} object_cover={true} />
                         </div>
                     </div>
                 )}

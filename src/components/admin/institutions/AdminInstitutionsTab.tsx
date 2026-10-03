@@ -24,9 +24,9 @@ const TABS: { id: Tab; model: string; label: string; icon: React.ElementType; de
     {
         model: 'Institution Access',
         id: 'blueprints',
-        label: 'Blueprint Access',
+        label: 'Book Access',
         icon: BookOpen,
-        description: 'Configure blueprints per institution',
+        description: 'Configure books per institution',
     },
     {
         model: 'Institute Usage Report',

@@ -17,7 +17,7 @@ import { formatKes } from '@/constants/common';
 import { MentorBlueprintPerformanceSkeleton } from '@/components/skeleton-loader/admin';
 
 const columns: GridColDef[] = [
-  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 200, sortable: false },
+  { field: 'title', headerName: 'Book', flex: 1, minWidth: 200, sortable: false },
   { field: 'status', headerName: 'Status', width: 130, sortable: false },
   {
     field: 'views',
@@ -78,8 +78,8 @@ export function MentorBlueprintPerformanceTab() {
       <AdminPage>
         <AdminPageHeader
           eyebrow="Performance & Revenue"
-          title="Blueprint Performance"
-          description="Views, sales, conversion, and AI quality scores across your blueprints."
+          title="Book Performance"
+          description="Views, sales, conversion, and AI quality scores across your books."
         />
         <MentorBlueprintPerformanceSkeleton />
       </AdminPage>
@@ -90,22 +90,22 @@ export function MentorBlueprintPerformanceTab() {
     <AdminPage>
       <AdminPageHeader
         eyebrow="Performance & Revenue"
-        title="Blueprint Performance"
-        description="Views, sales, conversion, and AI quality scores across your blueprints."
+        title="Book Performance"
+        description="Views, sales, conversion, and AI quality scores across your books."
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <AdminStatCard label="Total views" value={(summary?.totalViews ?? 0).toLocaleString()} icon={Eye} tone="blue" />
         <AdminStatCard label="Total sales" value={summary?.totalSales ?? 0} icon={ShoppingCart} tone="green" />
         <AdminStatCard label="Avg. conversion" value={`${summary?.avgConversion ?? 0}%`} icon={TrendingUp} tone="purple" />
-        <AdminStatCard label="High Value blueprints" value={summary?.highValueBlueprints ?? 0} icon={Sparkles} tone="orange" />
+        <AdminStatCard label="High Value books" value={summary?.highValueBlueprints ?? 0} icon={Sparkles} tone="orange" />
       </div>
 
       <AdminSearchPanel>
         <AdminSearchInput
           value={search}
           onChange={handleSearchChange}
-          placeholder="Search by blueprint title…"
+          placeholder="Search by book title…"
         />
       </AdminSearchPanel>
 

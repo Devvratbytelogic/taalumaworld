@@ -35,7 +35,7 @@ interface AdminChaptersSearchProps {
   onContentFlaggedChange: (value: boolean) => void;
   reviewBlueprint: boolean;
   onReviewBlueprintChange: (value: boolean) => void;
-  /** "My blueprints" filter is only relevant/visible for Super Administrators. */
+  /** "My books" filter is only relevant/visible for Super Administrators. */
   showMineFilter?: boolean;
 }
 
@@ -94,7 +94,7 @@ export function AdminChaptersSearch({
         <AdminSearchInput
           value={searchQuery}
           onChange={onSearchChange}
-          placeholder="Search blueprints by title..."
+          placeholder="Search books by title..."
           className="w-full min-w-0 flex-none"
         />
 
@@ -160,7 +160,7 @@ export function AdminChaptersSearch({
               className={filterToggleClass}
             >
               <Checkbox checked={isMine} tabIndex={-1} className="pointer-events-none" />
-              <span className="font-normal">My blueprints</span>
+              <span className="font-normal">My books</span>
             </div>
           ) : null}
 
@@ -193,7 +193,7 @@ export function AdminChaptersSearch({
             className={filterToggleClass}
           >
             <Checkbox checked={reviewBlueprint} tabIndex={-1} className="pointer-events-none" />
-            <span className="font-normal">Blueprints to review</span>
+            <span className="font-normal">Books to review</span>
           </div>
 
           {hasActiveFilters ? (
@@ -237,7 +237,7 @@ export function AdminChaptersSearch({
           ) : null}
           {showMineFilter && isMine ? (
             <span className={adminFilterPillClass}>
-              My blueprints
+              My books
               <button type="button" onClick={() => onIsMineChange(false)} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>
@@ -253,7 +253,7 @@ export function AdminChaptersSearch({
           ) : null}
           {reviewBlueprint ? (
             <span className={adminFilterPillClass}>
-              Blueprints to review
+              Books to review
               <button type="button" onClick={() => onReviewBlueprintChange(false)} className="hover:text-primary/70">
                 <X className="h-3 w-3" />
               </button>

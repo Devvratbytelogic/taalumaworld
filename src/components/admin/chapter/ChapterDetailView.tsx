@@ -74,7 +74,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   }
 
   if (error || !chapter) {
-    const message = error && 'error' in error ? error.error : 'Blueprint not found.';
+    const message = error && 'error' in error ? error.error : 'Book not found.';
     return (
       <AdminPage>
         <AdminPanel className="p-10 text-center text-sm text-slate-500">{message}</AdminPanel>
@@ -99,14 +99,14 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
         className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to blueprints
+        Back to books
       </Link>
 
-      <AdminPageHeader title="Blueprint details" description="Full details for this blueprint.">
+      <AdminPageHeader title="Book details" description="Full details for this book.">
         {/* {canEdit ? (
           <Link href={getEditChapterRoutePath(chapter.id, isMentor)}>
             <Button type="button" className="global_btn rounded_full bg_primary" startContent={<Edit2 className="h-4 w-4" />}>
-              Edit Blueprint
+              Edit Book
             </Button>
           </Link>
         ) : null} */}
@@ -151,7 +151,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
 
             <div className="flex flex-wrap items-center gap-2 pt-1">
               {chapter.isFree ? (
-                <Badge variant="secondary">Free Blueprint</Badge>
+                <Badge variant="secondary">Free Book</Badge>
               ) : (
                 <p className="text-xl font-bold text-primary">KSH {Number(chapter.price ?? 0).toFixed(2)}</p>
               )}
@@ -172,11 +172,11 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
           {/* <DetailRow label="Blueprint ID" value={chapter.id} /> */}
           {/* <DetailRow label="Referral code" value={chapter.short_code} /> */}
           <DetailRow label="Slug" value={chapter.slug} />
-          <DetailRow label="Blueprint Number" value={chapter.number} />
+          <DetailRow label="Book Number" value={chapter.number} />
           <DetailRow label="Series" value={chapter.series?.title} />
           <DetailRow label="Series slug" value={chapter.series?.slug} />
           <DetailRow label="Status" value={chapter.status} />
-          <DetailRow label="Free Blueprint" value={chapter.isFree ? 'Yes' : 'No'} />
+          <DetailRow label="Free Book" value={chapter.isFree ? 'Yes' : 'No'} />
           <DetailRow label="Price" value={`KSH ${Number(chapter.price ?? 0).toFixed(2)}`} />
           {/* <DetailRow label="Pages" value={chapter.page} /> */}
           <DetailRow

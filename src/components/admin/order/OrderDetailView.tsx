@@ -29,7 +29,7 @@ function isPercentCouponType(couponType?: string | null) {
 function getOrderTypeLabel(type?: string | null) {
   const value = (type ?? '').toLowerCase();
   if (value === 'books' || value === 'book') return 'Series';
-  if (value === 'chapter' || value === 'blueprint') return 'Blueprint';
+  if (value === 'chapter' || value === 'blueprint') return 'Book';
   if (!value) return 'Cart';
   return type;
 }

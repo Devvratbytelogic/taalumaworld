@@ -16,7 +16,7 @@ import { AdminAuditLogsSearch } from './AdminAuditLogsSearch';
 import { AdminAuditLogsSkeleton } from '@/components/skeleton-loader/admin';
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
-  chapter: 'blueprints',
+  chapter: 'books',
   book: 'series',
 };
 

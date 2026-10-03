@@ -103,8 +103,8 @@ export function UsageReportTab() {
         },
         {
             field: 'blueprintViews',
-            headerName: 'Blueprint Views',
-            description: 'Times a blueprint was opened. Not a completion count.',
+            headerName: 'Book Views',
+            description: 'Times a book was opened. Not a completion count.',
             width: 140,
             sortable: false,
             align: 'right',
@@ -172,12 +172,12 @@ export function UsageReportTab() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 <AdminStatCard label="Total Registrations" value={summary?.totalRegistrations ?? 0} icon={Users} tone="blue" />
                 <AdminStatCard label="Active Users" value={summary?.activeUsers ?? 0} icon={UserCheck} tone="green" />
-                <AdminStatCard label="Blueprint Views" value={summary?.blueprintViews ?? 0} icon={Eye} tone="purple" />
+                <AdminStatCard label="Book Views" value={summary?.blueprintViews ?? 0} icon={Eye} tone="purple" />
                 <AdminStatCard label="Paid Conversions" value={summary?.paidConversions ?? 0} icon={CreditCard} tone="orange" />
                 <AdminStatCard label="Avg. Conversion Rate" value={`${summary?.averageConversionRate ?? 0}%`} icon={Percent} tone="slate" />
             </div>
             <p className="text-xs text-slate-500">
-                Active Users are unique partner students counted as active. This report has no date filter, so the figure is not limited to a selected period. Blueprint Views are times a blueprint was opened — not completions.
+                Active Users are unique partner students counted as active. This report has no date filter, so the figure is not limited to a selected period. Book Views are times a book was opened — not completions.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">

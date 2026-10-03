@@ -62,7 +62,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     title: 'Content Management',
     items: [
       { id: 'books', label: 'Series', href: getMentorBooksRoutePath(), icon: Book },
-      { id: 'chapters', label: 'Blueprints', href: getMentorChaptersRoutePath(), icon: FileText },
+      { id: 'chapters', label: 'Books', href: getMentorChaptersRoutePath(), icon: FileText },
       { id: 'reviews', label: 'Reviews', href: getMentorReviewsRoutePath(), icon: Star },
       { id: 'review_reports', label: 'Review reports', href: getMentorReviewReportsRoutePath(), icon: Flag },
     ],
@@ -71,11 +71,11 @@ const NAV_GROUPS: SidebarNavGroup[] = [
     title: 'Performance & Revenue',
     items: [
       { id: 'orders', label: 'Orders', href: getMentorOrdersRoutePath(), icon: ShoppingBag },
-      { id: 'blueprint_performance', label: 'Blueprint Performance', href: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3 },
+      { id: 'blueprint_performance', label: 'Book Performance', href: getMentorBlueprintPerformanceRoutePath(), icon: BarChart3 },
       { id: 'coupon_performance', label: 'Coupon Performance', href: getMentorCouponPerformanceRoutePath(), icon: Tag },
       { id: 'sales_volume', label: 'Sales Volume', href: getMentorSalesVolumeRoutePath(), icon: ShoppingCart },
       { id: 'revenue_earned', label: 'Revenue Earned', href: getMentorRevenueEarnedRoutePath(), icon: KshIcon },
-      { id: 'revenue_by_blueprint', label: 'Revenue by Blueprint', href: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp },
+      { id: 'revenue_by_blueprint', label: 'Revenue by Book', href: getMentorRevenueByBlueprintRoutePath(), icon: TrendingUp },
       { id: 'wallet', label: 'Wallet & Payouts', href: getMentorWalletRoutePath(), icon: Wallet },
     ],
   },

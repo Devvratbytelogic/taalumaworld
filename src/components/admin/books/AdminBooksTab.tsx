@@ -216,7 +216,7 @@ export function AdminBooksTab() {
       sortable: false,
       renderCell: (params) => (
         <span className="text-sm capitalize whitespace-nowrap">
-          {params.value === 'book' ? 'Series' : 'Blueprint'}
+          {params.value === 'book' ? 'Series' : 'Book'}
         </span>
       ),
     },

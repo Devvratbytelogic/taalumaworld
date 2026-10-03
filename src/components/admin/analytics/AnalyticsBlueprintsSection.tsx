@@ -16,7 +16,7 @@ const columns: GridColDef[] = [
   { field: 'rank', headerName: '#', width: 70, sortable: false },
   {
     field: 'title',
-    headerName: 'Blueprint',
+    headerName: 'Book',
     flex: 1,
     minWidth: 200,
     sortable: false,
@@ -85,11 +85,11 @@ export function AnalyticsBlueprintsSection({ params }: { params: IAnalyticsTopLi
   const items = payload?.items ?? [];
 
   return (
-    <AnalyticsBlock title="Blueprint performance" interval={payload?.interval}>
+    <AnalyticsBlock title="Book performance" interval={payload?.interval}>
       {isError ? (
         <AnalyticsEmpty message={queryErrorMessage(error)} />
       ) : !pending && items.length === 0 ? (
-        <AnalyticsEmpty message="No paid blueprint sales in this range." />
+        <AnalyticsEmpty message="No paid book sales in this range." />
       ) : (
         <AnalyticsDataTable
           rows={items}

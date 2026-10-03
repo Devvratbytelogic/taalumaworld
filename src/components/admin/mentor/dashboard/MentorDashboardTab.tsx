@@ -44,7 +44,7 @@ const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
 const noopPaginationChange = () => { };
 
 const performanceColumns: GridColDef[] = [
-  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'title', headerName: 'Book', flex: 1, minWidth: 160, sortable: false },
   { field: 'status', headerName: 'Status', width: 130, sortable: false },
   { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
   {
@@ -77,7 +77,7 @@ const salesVolumeColumns: GridColDef[] = [
 ];
 
 const blueprintRevenueColumns: GridColDef[] = [
-  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'title', headerName: 'Book', flex: 1, minWidth: 160, sortable: false },
   { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
   {
     field: 'earned',
@@ -222,7 +222,7 @@ export function MentorDashboardTab() {
 
       <AdminPanel>
         <AdminSectionHeader
-          title="Blueprint performance"
+          title="Book performance"
           action={<AdminTextLink href={getMentorBlueprintPerformanceRoutePath()}>View all</AdminTextLink>}
         />
         <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -234,7 +234,7 @@ export function MentorDashboardTab() {
             tone="purple"
           />
           <AdminStatCard
-            label="High Value blueprints"
+            label="High Value books"
             value={performanceSummary?.highValueBlueprints ?? 0}
             icon={Sparkles}
             tone="orange"
@@ -242,7 +242,7 @@ export function MentorDashboardTab() {
         </div>
         <AdminTableShell>
           {performanceError ? (
-            <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint performance right now.</p>
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load book performance right now.</p>
           ) : !performanceLoading && topBlueprints.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No performance data available yet.</p>
           ) : (
@@ -292,7 +292,7 @@ export function MentorDashboardTab() {
 
         <AdminPanel>
           <AdminSectionHeader
-            title="Blueprint revenue"
+            title="Book revenue"
             action={<AdminTextLink href={getMentorRevenueByBlueprintRoutePath()}>View all</AdminTextLink>}
           />
           <div className="mb-5 grid grid-cols-2 gap-4">
@@ -300,7 +300,7 @@ export function MentorDashboardTab() {
             <AdminStatCard label="Pending" value={formatKes(revenueEarnedSummary?.totalPending ?? 0)} icon={TrendingUp} tone="orange" />
           </div>
           {revenueEarnedError ? (
-            <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint revenue right now.</p>
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load book revenue right now.</p>
           ) : !revenueEarnedLoading && topEarningBlueprints.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No revenue data available yet.</p>
           ) : (

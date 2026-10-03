@@ -450,7 +450,7 @@ export function EditBookModal({
                   disabled={isSubmitting}
                   className={nativeSelectClassName}
                 >
-                  <option value="chapter">blueprint</option>
+                  <option value="chapter">book</option>
                   <option value="book">series</option>
                 </select>
               </div>

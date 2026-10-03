@@ -167,7 +167,7 @@ function EligibilitySnapshot({
             {ratingGate ? formatRating(required.min_rating ?? requestedTier?.min_rating) : '—'}
           </p>
           <p>
-            <span className="text-slate-500">Qualifying Blueprints:</span>{' '}
+            <span className="text-slate-500">Qualifying Books:</span>{' '}
             {eligibility.qualifying_blueprint_count ?? '—'}
           </p>
         </div>
@@ -183,7 +183,7 @@ function EligibilitySnapshot({
               <span className="text-slate-500">Min days since published:</span> {formatGate(minDays)}
             </p>
             <p>
-              <span className="text-slate-500">Min words per blueprint:</span> {formatGate(minWords)}
+              <span className="text-slate-500">Min words per book:</span> {formatGate(minWords)}
             </p>
           </div>
         </div>
@@ -199,7 +199,7 @@ function EligibilitySnapshot({
           {hasBlueprintGate ? (
             <EligibilityCheckRow
               passed={Boolean(checks.qualifying_blueprint)}
-              label={`At least one Blueprint meeting ${blueprintParts.join(', ')}`}
+              label={`At least one Book meeting ${blueprintParts.join(', ')}`}
             />
           ) : null}
         </ul>
@@ -375,7 +375,7 @@ export function AdminMentorTierUpgradeApplicationsTab() {
     },
     {
       field: 'qualifying',
-      headerName: 'Qualifying Blueprints',
+      headerName: 'Qualifying Books',
       minWidth: 160,
       sortable: false,
       renderCell: (params) => (

@@ -31,7 +31,7 @@ const TAB_TO_TYPE: Record<OrderTab, 'books' | 'chapter' | undefined> = {
 const SEARCH_PLACEHOLDERS: Record<OrderTab, string> = {
     all: 'Search by customer, email, item, or status...',
     books: 'Search series orders by customer, email, or item...',
-    blueprints: 'Search blueprint orders by customer, email, or item...',
+    blueprints: 'Search book orders by customer, email, or item...',
 };
 
 export function AdminOrdersTab() {
@@ -168,7 +168,7 @@ export function AdminOrdersTab() {
                 const value = String(params.row.legacyType ?? '').toLowerCase();
                 const isSeries = value === 'books' || value === 'book';
                 const isBlueprint = value === 'chapter' || value === 'blueprint';
-                const label = isSeries ? 'Series' : isBlueprint ? 'Blueprint' : params.row.legacyType || 'Cart';
+                const label = isSeries ? 'Series' : isBlueprint ? 'Book' : params.row.legacyType || 'Cart';
                 return (
                     <Badge
                         variant="outline"
@@ -260,7 +260,7 @@ export function AdminOrdersTab() {
                             </div>
                             <p className="text-muted-foreground">
                                 {isMentor
-                                    ? 'View orders for your series and blueprints'
+                                    ? 'View orders for your series and books'
                                     : 'View and manage all customer orders'}
                             </p>
                         </div>
@@ -284,7 +284,7 @@ export function AdminOrdersTab() {
                         </div>
                         <p className="text-muted-foreground">
                             {isMentor
-                                ? 'View orders for your series and blueprints'
+                                ? 'View orders for your series and books'
                                 : 'View and manage all customer orders'}
                         </p>
                     </div>
@@ -322,7 +322,7 @@ export function AdminOrdersTab() {
                     )}
                 >
                     <FileText className="h-4 w-4" />
-                    Blueprint Orders
+                    Book Orders
                     {activeTab === 'blueprints' && totalOrders > 0 && (
                         <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
                             {totalOrders}

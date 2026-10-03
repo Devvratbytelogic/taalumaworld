@@ -97,7 +97,7 @@ export function AnalyticsAiQualitySection({ params }: { params: IAnalyticsRangeP
         <>
           <AnalyticsSummary
             items={[
-              { label: 'Blueprints scored', value: (ai?.scored ?? 0).toLocaleString() },
+              { label: 'Books scored', value: (ai?.scored ?? 0).toLocaleString() },
               { label: 'Avg. AI score', value: formatScore(ai?.avgScore, 2) },
               { label: 'Flagged', value: (ai?.flagged ?? 0).toLocaleString() },
               { label: 'Mentors', value: (quality?.mentors ?? 0).toLocaleString() },

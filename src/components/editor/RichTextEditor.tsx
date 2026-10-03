@@ -64,7 +64,7 @@ function fileToDataUrl(file: File): Promise<string> {
 function RichTextEditorComponent({
   value,
   onChange,
-  placeholder = 'Write your blueprint content here...',
+  placeholder = 'Write your book content here...',
   disabled = false,
   // Match Textarea `min-h-28` so the empty state feels like a normal multi-line field.
   minHeight = '10rem',

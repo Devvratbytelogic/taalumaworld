@@ -90,7 +90,7 @@ function TopBarContentMode({
                                         : 'text-white/65 hover:text-white',
                                 )}
                             >
-                                Blueprints
+                                Books
                             </button>
                             <button
                                 type="button"

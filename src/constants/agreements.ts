@@ -19,7 +19,7 @@ export const AGREEMENT_TOUCHPOINT_OPTIONS = [
   { value: AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION, label: 'Institutional Career Architect Registration' },
   { value: AGREEMENT_TOUCHPOINTS.UNIVERSITY_REGISTRATION, label: 'University Registration' },
   { value: AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION, label: 'Mentor Registration' },
-  { value: AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD, label: 'Blueprint Upload' },
+  { value: AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD, label: 'Book Upload' },
   { value: AGREEMENT_TOUCHPOINTS.CHECKOUT, label: 'Checkout' },
   { value: AGREEMENT_TOUCHPOINTS.MENTOR_PAYOUT_SETUP, label: 'Mentor Payout Setup' },
   { value: AGREEMENT_TOUCHPOINTS.NEWSLETTER, label: 'Newsletter Signup' },

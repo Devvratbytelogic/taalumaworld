@@ -40,7 +40,7 @@ function SelectedTierRequirements({ tier }: { tier: IAllMentorTiersEntity }) {
   if (!ratingGate && blueprintParts.length === 0) {
     return (
       <p className="text-xs text-slate-500">
-        {tier.code} has no extra rating or Blueprint gates. Submit to send this request for review.
+        {tier.code} has no extra rating or Book gates. Submit to send this request for review.
       </p>
     );
   }
@@ -51,7 +51,7 @@ function SelectedTierRequirements({ tier }: { tier: IAllMentorTiersEntity }) {
       <ul className="mt-2 list-disc space-y-1 pl-4">
         {ratingGate ? <li>Overall rating of at least {tier.min_rating}</li> : null}
         {blueprintParts.length > 0 ? (
-          <li>At least one published Blueprint meeting {blueprintParts.join(', ')}</li>
+          <li>At least one published Book meeting {blueprintParts.join(', ')}</li>
         ) : null}
       </ul>
     </div>
@@ -98,7 +98,7 @@ export function MentorTierUpgradeModal({ open, currentTierId, onOpenChange, onSu
             Request tier upgrade
           </DialogTitle>
           <DialogDescription>
-            Select a higher tier. Apply is blocked if your rating or Blueprint gates are not met — the API message will explain what is missing.
+            Select a higher tier. Apply is blocked if your rating or Book gates are not met — the API message will explain what is missing.
           </DialogDescription>
         </DialogHeader>
 

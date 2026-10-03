@@ -56,7 +56,7 @@ export function MentorSalesVolumeTab() {
         <AdminPageHeader
           eyebrow="Performance & Revenue"
           title="Sales Volume"
-          description="Blueprint purchases over time."
+          description="Book purchases over time."
         />
         <MentorSalesVolumeSkeleton />
       </AdminPage>
@@ -68,7 +68,7 @@ export function MentorSalesVolumeTab() {
       <AdminPageHeader
         eyebrow="Performance & Revenue"
         title="Sales Volume"
-        description="Blueprint purchases over time."
+        description="Book purchases over time."
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">

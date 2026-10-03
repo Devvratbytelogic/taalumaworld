@@ -163,7 +163,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           skipOgImagePrefillRef.current = false;
           resetForm({ values: initialFormValues });
           slugManuallyEdited.current = false;
-          toast.success(res.message ?? 'Blueprint updated successfully');
+          toast.success(res.message ?? 'Book updated successfully');
           void refreshAfterBlueprintChange(slug);
           void refreshAfterSeriesChange(books.find((b) => b.id === vals.bookId)?.slug);
           router.push(getChaptersListRoutePath(isMentor));
@@ -334,11 +334,11 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   if (isPermissionsLoading || isChapterLoading) return <AdminBlueprintFormFieldsSkeleton />;
 
   if (!canEdit) {
-    return <p className="py-10 text-center text-sm text-slate-500">You do not have edit access to Blueprints</p>;
+    return <p className="py-10 text-center text-sm text-slate-500">You do not have edit access to Books</p>;
   }
 
   if (error) {
-    const message = 'error' in error ? error.error : 'Blueprint not found.';
+    const message = 'error' in error ? error.error : 'Book not found.';
     return <p className="py-10 text-center text-sm text-slate-500">{message}</p>;
   }
 
@@ -428,13 +428,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           <Label htmlFor="chapter-desc">
             Description <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Career Architects can see this without paying for the blueprint)
+              &nbsp;(Career Architects can see this without paying for the book)
             </span>
           </Label>
           <Textarea
             id="chapter-desc"
             name="description"
-            placeholder="Brief description of the blueprint..."
+            placeholder="Brief description of the book..."
             value={values.description}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -451,7 +451,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           <Label htmlFor="chapter-content-type">
             Content type <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Visible only after purchasing the blueprint)
+              &nbsp;(Visible only after purchasing the book)
             </span>
           </Label>
           <select
@@ -464,19 +464,19 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             className={cn(nativeSelectClassName, 'max-w-md')}
           >
             <option value="pdf">PDF</option>
-            <option value="editor">Blueprint Content</option>
+            <option value="editor">Book Content</option>
           </select>
         </div>
 
         {values.content_type === 'editor' && (
           <div className="space-y-2">
             <Label>
-              Blueprint content <span className="text-red-500">*</span>
+              Book content <span className="text-red-500">*</span>
             </Label>
             <RichTextEditor
               value={values.content}
               onChange={handleContentChange}
-              placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
+              placeholder="Write your book content here. Use the toolbar for headings, bold, lists, etc."
               disabled={isSubmittingState}
             />
             {errors.content && touched.content ? (
@@ -557,7 +557,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                     disabled={isSubmittingState}
                   />
                   <Label htmlFor="chapter-free" className="cursor-pointer">
-                    Free blueprint
+                    Free book
                   </Label>
                 </div>
               </div>
@@ -594,7 +594,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           ) : (
             <div className="flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>Pricing is set at series level; this blueprint has no separate price.</span>
+              <span>Pricing is set at series level; this book has no separate price.</span>
             </div>
           )}
         </div>
@@ -628,7 +628,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <div className="image-preview">
                 <img
                   src={featuredImagePreviewUrl}
-                  alt="Blueprint preview"
+                  alt="Book preview"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -704,7 +704,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       {chapterData?.status === 'Published' ? (
         <div className="flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
           <Info className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>Saving these changes will unpublish this blueprint and send it for re-review. Do you want to continue?</span>
+          <span>Saving these changes will unpublish this book and send it for re-review. Do you want to continue?</span>
         </div>
       ) : null}
 
@@ -716,7 +716,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           isDisabled={isSubmittingState || books.length === 0 || !isRequiredComplete}
           isLoading={isSubmittingState}
         >
-          Update Blueprint
+          Update Book
         </Button>
         <Button
           type="button"

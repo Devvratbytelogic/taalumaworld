@@ -255,7 +255,7 @@ export function DashboardCharts({
                   { header: 'Date', value: (row) => row.date },
                   { header: 'Period', value: (row) => row.label },
                   { header: 'Books', value: (row) => row.book },
-                  { header: 'Blueprints', value: (row) => row.chapter },
+                  { header: 'Books', value: (row) => row.chapter },
                   { header: 'Other', value: (row) => row.other },
                   { header: 'Total', value: (row) => row.total },
                 ]}
@@ -273,7 +273,7 @@ export function DashboardCharts({
               <ChartSummary
                 items={[
                   { label: 'Books', value: (salesVolume?.summary.book ?? 0).toLocaleString() },
-                  { label: 'Blueprints', value: (salesVolume?.summary.chapter ?? 0).toLocaleString() },
+                  { label: 'Books', value: (salesVolume?.summary.chapter ?? 0).toLocaleString() },
                   { label: 'Total', value: (salesVolume?.summary.total ?? 0).toLocaleString() },
                 ]}
               />
@@ -286,7 +286,7 @@ export function DashboardCharts({
                     <Tooltip contentStyle={tooltipStyle} />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
                     <Bar dataKey="book" name="Books" fill={CHART_COLORS.book} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="chapter" name="Blueprints" fill={CHART_COLORS.chapter} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="chapter" name="Books" fill={CHART_COLORS.chapter} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

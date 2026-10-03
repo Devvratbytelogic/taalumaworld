@@ -12,12 +12,12 @@ export default function MentorCreateChapterPage() {
         className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to blueprints
+        Back to books
       </Link>
 
       <AdminPageHeader
-        title="Create new blueprint"
-        description="Add blueprint content, metadata, and an optional PDF attachment."
+        title="Create new book"
+        description="Add book content, metadata, and an optional PDF attachment."
       />
 
       <AdminPanel className="p-6 md:p-7" padding={false}>

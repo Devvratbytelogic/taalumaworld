@@ -171,7 +171,7 @@ export function AdminMentorPerformanceTab() {
     },
     {
       field: 'blueprintCount',
-      headerName: 'Blueprints',
+      headerName: 'Books',
       width: 110,
       sortable: false,
       renderCell: (params) => `${params.row.scoredBlueprintCount ?? 0} / ${params.row.blueprintCount ?? 0}`,

@@ -101,7 +101,7 @@ export function AdminMentorEquityTab() {
     },
     {
       field: 'qualifying',
-      headerName: 'Qualifying Blueprints',
+      headerName: 'Qualifying Books',
       minWidth: 160,
       sortable: false,
       renderCell: (params) => (

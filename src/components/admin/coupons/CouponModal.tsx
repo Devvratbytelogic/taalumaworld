@@ -377,7 +377,7 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
                 <div>
                   <Label>Applicability (optional)</Label>
                   <p className="text-xs text-slate-500">
-                    Restrict this coupon to specific series or blueprints. Leave empty to apply to all.
+                    Restrict this coupon to specific series or books. Leave empty to apply to all.
                   </p>
                 </div>
 
@@ -405,7 +405,7 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
 
                   <div className="space-y-2">
                     <Label htmlFor="chapters" className="text-xs text-slate-500">
-                      Blueprints
+                      Books
                     </Label>
                     <ReactSelect
                       inputId="chapters"
@@ -416,7 +416,7 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
                       value={chapterOptions.filter((option) => values.chapters.includes(option.value))}
                       onChange={(selected) => setFieldValue('chapters', selected.map((option) => option.value))}
                       onBlur={() => setFieldTouched('chapters', true)}
-                      placeholder={values.books.length ? 'All blueprints in selected series' : 'Select series first'}
+                      placeholder={values.books.length ? 'All books in selected series' : 'Select series first'}
                       isDisabled={isSubmitting || values.books.length === 0}
                       menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                       menuPosition="fixed"

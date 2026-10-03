@@ -346,7 +346,7 @@ export function MentorTypeModal({ open, mentorTier, onOpenChange, onSuccess }: M
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="min_words_per_blueprint">Min words per blueprint</Label>
+                    <Label htmlFor="min_words_per_blueprint">Min words per book</Label>
                     <Input
                       id="min_words_per_blueprint"
                       name="min_words_per_blueprint"

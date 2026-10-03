@@ -25,7 +25,7 @@ const STATUS_OPTIONS = [
 
 const TYPE_OPTIONS = [
   { value: '', label: 'All types' },
-  { value: 'Chapter', label: 'Blueprint' },
+  { value: 'Chapter', label: 'Book' },
   { value: 'Book', label: 'Series' },
 ];
 
@@ -35,7 +35,7 @@ function formatStatusLabel(value: string) {
 }
 
 function formatTypeLabel(value: string) {
-  if (value === 'Chapter') return 'Blueprint';
+  if (value === 'Chapter') return 'Book';
   if (value === 'Book') return 'Series';
   return value;
 }

@@ -348,15 +348,15 @@ export function addChapterSchema(minimumContentPrice: number) {
   title: withSafeShortText(
     Yup.string()
       .trim()
-      .required('Please enter a blueprint title'),
+      .required('Please enter a book title'),
   ),
   description: Yup.string()
     .trim()
-    .required('Please enter a blueprint description'),
+    .required('Please enter a book description'),
   content_type: Yup.string().oneOf(['pdf', 'editor']),
   content: Yup.string().when('content_type', {
     is: 'editor',
-    then: (schema) => schema.test('required-content', 'Please add blueprint content', (v) => !isRichTextEmpty(v)),
+    then: (schema) => schema.test('required-content', 'Please add book content', (v) => !isRichTextEmpty(v)),
     otherwise: (schema) => schema.optional(),
   }),
   pdf_file: Yup.mixed()
@@ -371,7 +371,7 @@ export function addChapterSchema(minimumContentPrice: number) {
     .when('isFree', {
       is: true,
       then: (schema) => schema.min(0).optional(),
-      otherwise: () => priceAboveMinimum(minimumContentPrice, 'Price is required when blueprint is not free'),
+      otherwise: () => priceAboveMinimum(minimumContentPrice, 'Price is required when book is not free'),
     }),
   status: Yup.string().oneOf([...BLUEPRINT_STATUSES], 'Select a valid status'),
   cover_image: Yup.mixed()

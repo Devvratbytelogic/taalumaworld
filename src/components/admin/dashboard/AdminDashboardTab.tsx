@@ -81,7 +81,7 @@ const mentorPerformanceColumns: GridColDef[] = [
 ];
 
 const blueprintPerformanceColumns: GridColDef[] = [
-  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'title', headerName: 'Book', flex: 1, minWidth: 160, sortable: false },
   { field: 'status', headerName: 'Status', width: 130, sortable: false },
   {
     field: 'views',
@@ -121,7 +121,7 @@ const salesVolumeColumns: GridColDef[] = [
 ];
 
 const blueprintRevenueColumns: GridColDef[] = [
-  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 160, sortable: false },
+  { field: 'title', headerName: 'Book', flex: 1, minWidth: 160, sortable: false },
   { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
   {
     field: 'earned',
@@ -210,7 +210,7 @@ export default function AdminDashboardTab() {
       href: getAdminSectionRoutePath('roles_permissions'),
     },
     {
-      title: contentMode === 'chapters' ? 'Total blueprints' : 'Total series',
+      title: contentMode === 'chapters' ? 'Total books' : 'Total series',
       value: contentMode === 'chapters'
         ? (statsData?.total_blueprints ?? 0).toLocaleString()
         : (statsData?.total_series ?? 0).toLocaleString(),
@@ -219,7 +219,7 @@ export default function AdminDashboardTab() {
       href: getAdminSectionRoutePath(contentMode === 'chapters' ? 'chapters' : 'books'),
     },
     {
-      title: contentMode === 'chapters' ? 'Total series' : 'Total blueprints',
+      title: contentMode === 'chapters' ? 'Total series' : 'Total books',
       value: contentMode === 'chapters'
         ? (statsData?.total_series ?? 0).toLocaleString()
         : (statsData?.total_blueprints ?? 0).toLocaleString(),
@@ -235,7 +235,7 @@ export default function AdminDashboardTab() {
       href: `${getAdminSectionRoutePath('chapters')}?isContentFlagged=true`,
     },
     {
-      title: 'Blueprints to review',
+      title: 'Books to review',
       value: (statsData?.reviewBlueprint ?? 0).toLocaleString(),
       icon: ClipboardCheck,
       color: 'purple',
@@ -343,16 +343,16 @@ export default function AdminDashboardTab() {
       </AdminPanel>
 
       <AdminPanel>
-        <AdminSectionHeader title="Blueprint performance" />
+        <AdminSectionHeader title="Book performance" />
         <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
           <AdminStatCard label="Total views" value={(performanceSummary?.totalViews ?? 0).toLocaleString()} icon={Eye} tone="blue" />
           <AdminStatCard label="Total sales" value={performanceSummary?.totalSales ?? 0} icon={ShoppingCart} tone="green" />
           <AdminStatCard label="Avg. conversion" value={`${performanceSummary?.avgConversion ?? 0}%`} icon={TrendingUp} tone="purple" />
-          <AdminStatCard label="High Value blueprints" value={performanceSummary?.highValueBlueprints ?? 0} icon={Sparkles} tone="orange" />
+          <AdminStatCard label="High Value books" value={performanceSummary?.highValueBlueprints ?? 0} icon={Sparkles} tone="orange" />
         </div>
         <AdminTableShell>
           {performanceError ? (
-            <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint performance right now.</p>
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load book performance right now.</p>
           ) : !performanceLoading && topPerformingBlueprints.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No performance data available yet.</p>
           ) : (
@@ -398,13 +398,13 @@ export default function AdminDashboardTab() {
         </AdminPanel>
 
         <AdminPanel>
-          <AdminSectionHeader title="Blueprint revenue" />
+          <AdminSectionHeader title="Book revenue" />
           <div className="mb-5 grid grid-cols-2 gap-4">
             <AdminStatCard label="Earned" value={formatKes(revenueSummary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
             <AdminStatCard label="Pending" value={formatKes(revenueSummary?.totalPending ?? 0)} icon={TrendingUp} tone="orange" />
           </div>
           {revenueError ? (
-            <p className="py-8 text-center text-sm text-slate-500">Unable to load blueprint revenue right now.</p>
+            <p className="py-8 text-center text-sm text-slate-500">Unable to load book revenue right now.</p>
           ) : !revenueLoading && topEarningBlueprints.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">No revenue data available yet.</p>
           ) : (

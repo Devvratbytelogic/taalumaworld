@@ -30,7 +30,7 @@ function formatStatusLabel(status?: string) {
 }
 
 function formatTypeLabel(type?: string) {
-  if (type === 'Chapter') return 'Blueprint';
+  if (type === 'Chapter') return 'Book';
   if (type === 'Book') return 'Series';
   return type || '—';
 }
@@ -283,7 +283,7 @@ export function AdminReviewsTab() {
       <div className="space-y-6">
         <AdminPageHeader
           title="Reviews & ratings"
-          description="Monitor and moderate Blueprint reviews. Super Admin and staff can reject a review without a report."
+          description="Monitor and moderate Book reviews. Super Admin and staff can reject a review without a report."
         >
           <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
             Total reviews: {total}
@@ -298,7 +298,7 @@ export function AdminReviewsTab() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Reviews & ratings"
-        description="Monitor and moderate Blueprint reviews. Super Admin and staff can reject a review without a report."
+        description="Monitor and moderate Book reviews. Super Admin and staff can reject a review without a report."
       >
         <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
           Total reviews: {total}

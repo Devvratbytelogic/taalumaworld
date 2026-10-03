@@ -47,7 +47,7 @@ export function DashboardWelcomeHeader({
         <div className="flex flex-col gap-3 lg:items-end">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600">
-              {contentMode === 'chapters' ? 'Blueprint mode' : 'Series mode'}
+              {contentMode === 'chapters' ? 'Book mode' : 'Series mode'}
             </span>
             <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600">
               {today}

@@ -135,7 +135,7 @@ export function MentorVerificationHeader({
         eyebrow={eyebrow ?? 'Overview'}
         title={title ?? `Welcome back, ${mentorName}`}
         description={
-          description ?? 'Track blueprint performance, sales, revenue, payouts, referrals, and compliance.'
+          description ?? 'Track book performance, sales, revenue, payouts, referrals, and compliance.'
         }
       >
         {verificationStatus === VERIFIED_MENTOR_APPLICATION_STATUS.PENDING_REVIEW ? (

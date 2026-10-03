@@ -84,7 +84,7 @@ export function BlueprintAccessTab() {
                                 : null;
                             if (!existing || res?.http_status_code === 200 || res?.http_status_code === 201) {
                                 setLocalSelected((prev) => prev.filter((id) => id !== bp._id));
-                                toast.success(res?.message ?? 'Blueprint access removed');
+                                toast.success(res?.message ?? 'Book access removed');
                                 dispatch(closeModal());
                             }
                         } catch (error) {
@@ -104,7 +104,7 @@ export function BlueprintAccessTab() {
                 values: { chapter_ids: localSelected },
             }).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
-                toast.success('Blueprint access updated');
+                toast.success('Book access updated');
             }
         } catch (error) {
             console.error('Error saving blueprint access', error);
@@ -149,9 +149,9 @@ export function BlueprintAccessTab() {
                                     }`}
                             >
                                 <p className="text-sm font-medium">{inst?.name}</p>
-                                <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                <p className="text-xs text-muted-foreground truncate max-w-50">
                                     {selectedInstitutionId === inst?._id
-                                        ? `${localSelected?.length} blueprint(s) enabled`
+                                        ? `${localSelected?.length} book(s) enabled`
                                         : inst?.contact_email}
                                 </p>
                             </button>
@@ -165,7 +165,7 @@ export function BlueprintAccessTab() {
                         <div className="flex flex-col items-center justify-center h-64 text-center gap-3">
                             <BookOpen className="h-12 w-12 text-gray-300" />
                             <p className="text-muted-foreground text-sm">
-                                Select an institution to configure blueprint access
+                                Select an institution to configure book access
                             </p>
                         </div>
                     ) : (
@@ -174,7 +174,7 @@ export function BlueprintAccessTab() {
                                 <div>
                                     <p className="font-semibold">{selectedInstitution?.name}</p>
                                     <p className="text-xs text-muted-foreground">
-                                        {localSelected?.length} / {blueprints?.length ?? 0} blueprints enabled
+                                        {localSelected?.length} / {blueprints?.length ?? 0} books enabled
                                     </p>
                                 </div>
                                 <div className="flex gap-2">
@@ -195,7 +195,7 @@ export function BlueprintAccessTab() {
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    placeholder="Search blueprints..."
+                                    placeholder="Search books..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="pl-10"
@@ -209,7 +209,7 @@ export function BlueprintAccessTab() {
                                     ))
                                 ) : blueprints?.length === 0 ? (
                                     <p className="text-sm text-muted-foreground py-4 text-center">
-                                        No blueprints match your search.
+                                        No books match your search.
                                     </p>
                                 ) : (
                                     blueprints?.length > 0 && blueprints?.map((bp) => {
@@ -321,7 +321,7 @@ export function BlueprintAccessTab() {
                                                                 handleRemoveAccess(bp);
                                                             }}
                                                             className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors hover:bg-red-100 hover:text-red-600"
-                                                            aria-label="Remove blueprint access"
+                                                            aria-label="Remove book access"
                                                         >
                                                             <X className="h-4 w-4" />
                                                         </button>

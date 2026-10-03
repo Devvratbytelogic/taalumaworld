@@ -8,7 +8,7 @@ import { cn } from '@/components/ui/utils';
 
 const CHECK_LABELS: Record<string, string> = {
   min_rating: 'Minimum rating',
-  qualifying_blueprint: 'Qualifying Blueprints',
+  qualifying_blueprint: 'Qualifying Books',
 };
 
 function formatCheckLabel(key: string) {
@@ -97,7 +97,7 @@ export function MentorEquityStatusCard() {
               </p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Qualifying Blueprints</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Qualifying Books</p>
               <p className="mt-1 text-sm font-medium text-slate-900">
                 {eligibility?.qualifying_blueprint_count ?? '—'}
               </p>

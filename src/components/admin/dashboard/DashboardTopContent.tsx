@@ -24,7 +24,7 @@ export function DashboardTopContent({ items, isLoading }: DashboardTopContentPro
   return (
     <AdminPanel>
       <AdminSectionHeader
-        title="Top blueprints"
+        title="Top books"
         action={<AdminTextLink href={listHref}>View all</AdminTextLink>}
       />
 

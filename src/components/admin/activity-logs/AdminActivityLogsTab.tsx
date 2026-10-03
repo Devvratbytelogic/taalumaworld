@@ -23,7 +23,7 @@ const mockLogs: ActivityLogEntry[] = [
   {
     id: 2,
     user: 'Sarah Johnson',
-    action: 'Purchased blueprint',
+    action: 'Purchased book',
     resource: 'Leadership Fundamentals',
     time: '15 min ago',
     type: 'purchase',

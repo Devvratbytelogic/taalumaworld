@@ -37,7 +37,7 @@ const columns: GridColDef[] = [
   {
     field: 'consumption',
     headerName: 'Consumption',
-    description: 'Blueprint opens in the selected range. Not completions.',
+    description: 'Book opens in the selected range. Not completions.',
     width: 140,
     sortable: false,
     renderCell: (params) => (params.value ?? 0).toLocaleString(),
@@ -84,7 +84,7 @@ export function AnalyticsInstitutionsSection({ params }: { params: IAnalyticsRan
             ]}
           />
           <p className="mb-4 text-xs text-slate-500">
-            Active users are unique partner students counted as active in the selected range (all time if no range). Consumption is blueprint opens in that range, not completions.
+            Active users are unique partner students counted as active in the selected range (all time if no range). Consumption is book opens in that range, not completions.
           </p>
           {!pending && items.length === 0 ? (
             <AnalyticsEmpty message="No university activity in this range." />

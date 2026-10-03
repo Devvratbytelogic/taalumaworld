@@ -16,12 +16,12 @@ export default async function EditChapterPage({ params }: Props) {
         className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to blueprints
+        Back to books
       </Link>
 
       <AdminPageHeader
-        title="Edit blueprint"
-        description="Update blueprint content, metadata, and attachments."
+        title="Edit book"
+        description="Update book content, metadata, and attachments."
       />
 
       <AdminPanel className="p-6 md:p-7" padding={false}>

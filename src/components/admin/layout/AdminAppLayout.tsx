@@ -59,7 +59,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         title: 'Content Management',
         items: [
             { model: 'Series', id: 'books', label: 'Series', href: getAdminSectionRoutePath('books'), icon: Book },
-            { model: 'Blueprints', id: 'chapters', label: 'Blueprints', href: getAdminSectionRoutePath('chapters'), icon: FileText },
+            { model: 'Blueprints', id: 'chapters', label: 'Books', href: getAdminSectionRoutePath('chapters'), icon: FileText },
             { model: 'Reviews', id: 'reviews', label: 'Reviews', href: getAdminSectionRoutePath('reviews'), icon: Star },
             { model: 'Review Reports', id: 'review_reports', label: 'Review reports', href: getAdminSectionRoutePath('review_reports'), icon: Flag },
         ],

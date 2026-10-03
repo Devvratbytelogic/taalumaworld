@@ -167,7 +167,7 @@ export function AdminChaptersTab() {
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 void refreshAfterBlueprintChange(slug);
                 void refreshAfterSeriesChange(chapters.find((chapter) => chapter.id === id)?.series?.slug);
-                toast.success(res.message ?? 'Blueprint deleted successfully');
+                toast.success(res.message ?? 'Book deleted successfully');
                 dispatch(closeModal());
             }
         } catch (error) {
@@ -181,7 +181,7 @@ export function AdminChaptersTab() {
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 void refreshAfterBlueprintChange(slug);
                 void refreshAfterSeriesChange(chapters.find((chapter) => chapter.id === id)?.series?.slug);
-                toast.success(res.message ?? 'Blueprint restored successfully');
+                toast.success(res.message ?? 'Book restored successfully');
                 dispatch(closeModal());
             }
         } catch (error) {
@@ -193,7 +193,7 @@ export function AdminChaptersTab() {
         if (status === chapter.status || updatingId) return;
         if (!isSuperAdmin) {
             if (status === 'Published' && !chapter.isPublishAllowed) {
-                toast.error('This blueprint cannot be published yet');
+                toast.error('This book cannot be published yet');
                 return;
             }
             if (chapter.isPublishAllowed && (status === 'Pending' || status === 'Review')) {
@@ -211,7 +211,7 @@ export function AdminChaptersTab() {
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 void refreshAfterBlueprintChange(chapter.slug);
                 void refreshAfterSeriesChange(chapter.series?.slug);
-                toast.success(res.message ?? `Blueprint marked as ${status}`);
+                toast.success(res.message ?? `Book marked as ${status}`);
             }
         } catch (error) {
             console.error('Error updating status:', error);
@@ -239,7 +239,7 @@ export function AdminChaptersTab() {
         },
         {
             field: 'title',
-            headerName: 'Blueprint Title',
+            headerName: 'Book Title',
             minWidth: 240,
             flex: 1,
             sortable: false,
@@ -420,7 +420,7 @@ export function AdminChaptersTab() {
                             <button
                                 type="button"
                                 className="active_button"
-                                title="View blueprint"
+                                title="View book"
                                 onClick={() => router.push(getViewChapterRoutePath(params.row.id, isMentor))}
                             >
                                 <Eye className="h-4 w-4" />
@@ -433,7 +433,7 @@ export function AdminChaptersTab() {
                                         <button
                                             type="button"
                                             className="active_button"
-                                            title="Restore blueprint"
+                                            title="Restore book"
                                             onClick={() => dispatch(openModal({
                                                 componentName: 'RestoreConfirmation',
                                                 data: {

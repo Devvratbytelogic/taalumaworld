@@ -154,7 +154,7 @@ export function CreateChapterForm() {
           skipOgImagePrefillRef.current = false;
           resetForm({ values: initialFormValues });
           slugManuallyEdited.current = false;
-          toast.success(res.message ?? 'Blueprint created successfully');
+          toast.success(res.message ?? 'Book created successfully');
           void refreshAfterBlueprintChange(slug);
           void refreshAfterSeriesChange(books.find((b) => b.id === vals.bookId)?.slug);
           router.push(getChaptersListRoutePath(isMentor));
@@ -297,7 +297,7 @@ export function CreateChapterForm() {
   if (isPermissionsLoading) return <AdminBlueprintFormFieldsSkeleton />;
 
   if (!canAdd) {
-    return <p className="py-10 text-center text-sm text-slate-500">You do not have add access to Blueprints</p>;
+    return <p className="py-10 text-center text-sm text-slate-500">You do not have add access to Books</p>;
   }
 
   return (
@@ -384,13 +384,13 @@ export function CreateChapterForm() {
           <Label htmlFor="chapter-desc">
             Description <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Career Architects can see this without paying for the blueprint)
+              &nbsp;(Career Architects can see this without paying for the book)
             </span>
           </Label>
           <Textarea
             id="chapter-desc"
             name="description"
-            placeholder="Brief description of the blueprint..."
+            placeholder="Brief description of the book..."
             value={values.description}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -407,7 +407,7 @@ export function CreateChapterForm() {
           <Label htmlFor="chapter-content-type">
             Content type <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Visible only after purchasing the blueprint)
+              &nbsp;(Visible only after purchasing the book)
             </span>
           </Label>
           <select
@@ -420,19 +420,19 @@ export function CreateChapterForm() {
             className={cn(nativeSelectClassName, 'max-w-md')}
           >
             <option value="pdf">PDF</option>
-            <option value="editor">Blueprint Content</option>
+            <option value="editor">Book Content</option>
           </select>
         </div>
 
         {values.content_type === 'editor' && (
           <div className="space-y-2">
             <Label>
-              Blueprint content <span className="text-red-500">*</span>
+              Book content <span className="text-red-500">*</span>
             </Label>
             <RichTextEditor
               value={values.content}
               onChange={handleContentChange}
-              placeholder="Write your blueprint content here. Use the toolbar for headings, bold, lists, etc."
+              placeholder="Write your book content here. Use the toolbar for headings, bold, lists, etc."
               disabled={isSubmittingState}
             />
             {errors.content && touched.content ? (
@@ -491,7 +491,7 @@ export function CreateChapterForm() {
                     disabled={isSubmittingState}
                   />
                   <Label htmlFor="chapter-free" className="cursor-pointer">
-                    Free blueprint
+                    Free book
                   </Label>
                 </div>
               </div>
@@ -528,7 +528,7 @@ export function CreateChapterForm() {
           ) : (
             <div className="flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary w-full">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>Pricing is set at series level; this blueprint has no separate price.</span>
+              <span>Pricing is set at series level; this book has no separate price.</span>
             </div>
           )}
         </div>
@@ -562,7 +562,7 @@ export function CreateChapterForm() {
               <div className="image-preview">
                 <img
                   src={featuredImagePreviewUrl}
-                  alt="Blueprint preview"
+                  alt="Book preview"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -644,7 +644,7 @@ export function CreateChapterForm() {
           isDisabled={isSubmittingState || books.length === 0 || !isRequiredComplete}
           isLoading={isSubmittingState}
         >
-          Create Blueprint
+          Create Book
         </Button>
         <Button
           type="button"

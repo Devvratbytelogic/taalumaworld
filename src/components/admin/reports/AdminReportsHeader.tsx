@@ -13,7 +13,7 @@ export function AdminReportsHeader({ contentMode }: AdminReportsHeaderProps) {
       description="Generate and download detailed reports"
     >
       <Badge variant="outline" className="border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700">
-        {contentMode === 'chapters' ? 'Blueprint mode' : 'Series mode'}
+        {contentMode === 'chapters' ? 'Book mode' : 'Series mode'}
       </Badge>
     </AdminPageHeader>
   );

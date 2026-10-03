@@ -19,7 +19,7 @@ export function ContentModeSettingsCard({ contentMode, onContentModeChange }: Co
         <div className="flex-1">
           <h3 className="font-semibold text-lg mb-1">Content Mode</h3>
           <p className="text-sm text-muted-foreground">
-            Control whether the platform operates in Blueprint-focused or Series-focused mode
+            Control whether the platform operates in Book-focused or Series-focused mode
           </p>
         </div>
       </div>
@@ -28,7 +28,7 @@ export function ContentModeSettingsCard({ contentMode, onContentModeChange }: Co
           <div>
             <p className="font-medium">Current Mode</p>
             <p className="text-sm text-muted-foreground">
-              Platform is currently in {contentMode === 'chapters' ? 'Blueprint' : 'Series'} Mode
+              Platform is currently in {contentMode === 'chapters' ? 'Book' : 'Series'} Mode
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -36,7 +36,7 @@ export function ContentModeSettingsCard({ contentMode, onContentModeChange }: Co
               'text-sm font-medium transition-all duration-200',
               contentMode === 'chapters' ? 'text-primary' : 'text-muted-foreground'
             )}>
-              Blueprints
+              Books
             </span>
             <Switch
               checked={contentMode === 'books'}
@@ -53,7 +53,7 @@ export function ContentModeSettingsCard({ contentMode, onContentModeChange }: Co
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
           <p className="text-sm text-blue-900">
             <strong>Note:</strong> Changing the content mode will affect how content is displayed
-            across the entire platform. Users will see {contentMode === 'chapters' ? 'individual blueprints' : 'complete series'}
+            across the entire platform. Users will see {contentMode === 'chapters' ? 'individual books' : 'complete series'}
             as the primary content type.
           </p>
         </div>

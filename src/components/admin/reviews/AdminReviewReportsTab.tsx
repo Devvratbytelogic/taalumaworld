@@ -33,7 +33,7 @@ function formatStatusLabel(status?: string) {
 }
 
 function formatTypeLabel(type?: string) {
-  if (type === 'Chapter') return 'Blueprint';
+  if (type === 'Chapter') return 'Book';
   if (type === 'Book') return 'Series';
   return type || '—';
 }

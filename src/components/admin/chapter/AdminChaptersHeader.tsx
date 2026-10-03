@@ -22,20 +22,20 @@ export function AdminChaptersHeader({
 
   return (
     <AdminPageHeader
-      title={isTrashView ? 'Trash' : 'Blueprints management'}
-      description={isTrashView ? 'View deleted blueprints' : 'Manage all blueprints across all series'}
+      title={isTrashView ? 'Trash' : 'Books management'}
+      description={isTrashView ? 'View deleted books' : 'Manage all books across all series'}
     >
       <Button
         className={cn('global_btn rounded_full', isTrashView ? 'outline_primary' : 'danger_outline')}
         onPress={onToggleTrash}
         startContent={isTrashView ? <ArrowLeft className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
       >
-        {isTrashView ? 'Back to blueprints' : 'Trash'}
+        {isTrashView ? 'Back to books' : 'Trash'}
       </Button>
       {!isTrashView && canAdd ? (
         <Button as={Link} href={getCreateChapterRoutePath(isMentor)} className="global_btn rounded_full bg_primary">
           <Plus className="h-4 w-4" />
-          Create new blueprint
+          Create new book
         </Button>
       ) : null}
     </AdminPageHeader>

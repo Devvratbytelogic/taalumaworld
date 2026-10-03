@@ -35,7 +35,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
     {
       icon: Wallet,
       label: 'Pricing Model',
-      value: book.pricingModel === 'book' ? 'Series' : 'Blueprint',
+      value: book.pricingModel === 'book' ? 'Series' : 'Book',
     },
     { icon: CalendarDays, label: 'Created', value: moment(book.createdAt).format('DD MMM YYYY') },
   ];
@@ -87,7 +87,7 @@ export function BookPreviewModal({ book, open, onOpenChange }: BookPreviewModalP
               ) : (
                 <div className="pt-1">
                   <Badge variant="secondary" className="capitalize">
-                    Priced per blueprint
+                    Priced per book
                   </Badge>
                 </div>
               )}

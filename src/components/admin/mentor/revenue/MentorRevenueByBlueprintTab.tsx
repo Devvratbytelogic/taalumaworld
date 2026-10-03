@@ -17,7 +17,7 @@ import { useGetBlueprintRevenueQuery } from '@/store/rtkQueries/dashboard';
 import { MentorRevenueByBlueprintSkeleton } from '@/components/skeleton-loader/admin';
 
 const columns: GridColDef[] = [
-  { field: 'title', headerName: 'Blueprint', flex: 1, minWidth: 200, sortable: false },
+  { field: 'title', headerName: 'Book', flex: 1, minWidth: 200, sortable: false },
   { field: 'status', headerName: 'Status', width: 130, sortable: false },
   { field: 'sales', headerName: 'Sales', width: 90, sortable: false },
   {
@@ -63,8 +63,8 @@ export function MentorRevenueByBlueprintTab() {
       <AdminPage>
         <AdminPageHeader
           eyebrow="Performance & Revenue"
-          title="Revenue by Blueprint"
-          description="Earned and pending revenue broken down per blueprint."
+          title="Revenue by Book"
+          description="Earned and pending revenue broken down per book."
         />
         <MentorRevenueByBlueprintSkeleton />
       </AdminPage>
@@ -75,12 +75,12 @@ export function MentorRevenueByBlueprintTab() {
     <AdminPage>
       <AdminPageHeader
         eyebrow="Performance & Revenue"
-        title="Revenue by Blueprint"
-        description="Earned and pending revenue broken down per blueprint."
+        title="Revenue by Book"
+        description="Earned and pending revenue broken down per book."
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <AdminStatCard label="Blueprints" value={summary?.blueprints ?? 0} icon={FileText} tone="purple" />
+        <AdminStatCard label="Books" value={summary?.blueprints ?? 0} icon={FileText} tone="purple" />
         <AdminStatCard label="Total sales" value={summary?.totalSales ?? 0} icon={TrendingUp} tone="blue" />
         <AdminStatCard label="Total earned" value={formatKes(summary?.totalEarned ?? 0)} icon={Wallet} tone="green" />
         <AdminStatCard label="Total pending" value={formatKes(summary?.totalPending ?? 0)} icon={Wallet} tone="orange" />
@@ -90,7 +90,7 @@ export function MentorRevenueByBlueprintTab() {
         <AdminSearchInput
           value={search}
           onChange={handleSearchChange}
-          placeholder="Search by blueprint title…"
+          placeholder="Search by book title…"
         />
       </AdminSearchPanel>
 

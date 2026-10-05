@@ -35,7 +35,7 @@ export function shouldSkipTokenRefresh(url: string): boolean {
 }
 
 /**
- * Mentors and staff log in via /admin; Career Architects via /user.
+ * Mentors and staff log in via /admin; Mentees via /user.
  * Role is the source of truth so a mentor shopping on /user APIs still hits /admin/refresh.
  */
 export function getAuthApiPrefix(requestUrl = ''): AuthApiPrefix {

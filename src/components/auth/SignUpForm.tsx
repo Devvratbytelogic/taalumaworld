@@ -215,7 +215,7 @@ export function SignUpForm() {
                         id="professionalBio"
                         name="professionalBio"
                         rows={4}
-                        placeholder="Tell Career Architects about your expertise..."
+                        placeholder="Tell Mentees about your expertise..."
                         className={`rounded-md ${errors.professionalBio && touched.professionalBio ? 'border-red-500' : ''}`}
                         disabled={isSubmitting}
                         value={values.professionalBio}

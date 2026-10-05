@@ -186,13 +186,22 @@ export default function SignIn() {
                             </button>
                         </div>
                         <div className="w-full text-center text-sm text-muted-foreground">
-                            <Link
-                                href={getMentorLoginRoutePath()}
-                                className="font-medium text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => dispatch(closeModal())}
-                            >
-                                Sign in as Mentor
-                            </Link>
+                            <div className="mt-2 w-full text-center">
+                                <div className="mb-3 flex items-center gap-3">
+                                    <div className="h-px flex-1 bg-gray-200" />
+                                    <span className="text-xs font-medium text-gray-400">MENTOR?</span>
+                                    <div className="h-px flex-1 bg-gray-200" />
+                                </div>
+
+                                <Link
+                                    href={getMentorLoginRoutePath()}
+                                    onClick={() => dispatch(closeModal())}
+                                    className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+                                >
+                                    Sign in as Mentor
+                                    <span aria-hidden="true">→</span>
+                                </Link>
+                            </div>
                         </div>
                     </ModalFooter>
                 </ModalBody>

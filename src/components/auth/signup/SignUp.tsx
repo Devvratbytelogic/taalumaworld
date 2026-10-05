@@ -640,13 +640,26 @@ export default function SignUp() {
                             Sign In
                         </button>
                     </div>
-                    <div className="w-full text-center text-sm">
+                    <div className="mt-1 w-full text-center">
+                        <div className="mb-3 flex items-center gap-3">
+                            <div className="h-px flex-1 bg-slate-200" />
+
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                Mentor Access
+                            </span>
+
+                            <div className="h-px flex-1 bg-slate-200" />
+                        </div>
+
                         <Link
                             href={getMentorSignupRoutePath()}
-                            className="font-medium text-primary hover:text-primary/80 transition-colors"
                             onClick={() => dispatch(closeModal())}
+                            className="group inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors duration-200 hover:text-primary/80"
                         >
-                            Register as Mentor →
+                            Register as Mentor
+                            <span className="transition-transform duration-200 group-hover:translate-x-1">
+                                →
+                            </span>
                         </Link>
                     </div>
                 </ModalFooter>

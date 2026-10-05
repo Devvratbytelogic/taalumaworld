@@ -18,7 +18,7 @@ export default function HeroBanner() {
     const signedInRole = hasAuthCookie() ? getUserRole() : undefined
     const isMentor = isMentorRole(signedInRole)
 
-    /** Signed-in Career Architects apply in-dashboard; mentors go to their panel; guests sign up. */
+    /** Signed-in Mentees apply in-dashboard; mentors go to their panel; guests sign up. */
     const goToBecomeMentor = () => {
         if (isMentor) {
             router.push(getMentorDashboardRoutePath())
@@ -115,7 +115,7 @@ export default function HeroBanner() {
                                             )}
                                         </div>
                                         <span className="text-sm font-medium text-foreground">
-                                            {total.toLocaleString()}+ Strategic Career Architects
+                                            {total.toLocaleString()}+ Strategic Mentees
                                         </span>
                                     </div>
                                 }

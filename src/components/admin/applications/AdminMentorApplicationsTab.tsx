@@ -358,7 +358,7 @@ export function AdminMentorApplicationsTab() {
                   </Badge>
                 </div>
 
-                <p><span className="text-slate-500">Previous role:</span> {reviewApplication.previous_role || '—'}</p>
+                <p><span className="text-slate-500">Previous role:</span> {ROLE_NAME_MAP[reviewApplication.previous_role ?? ''] || '—'}</p>
 
                 <div className="space-y-1.5">
                   <div className="flex items-baseline justify-between gap-3">

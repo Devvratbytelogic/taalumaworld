@@ -14,6 +14,7 @@ import type { IAllAuditLogsAPIResponseDataEntity } from '@/types/auditLog';
 import { getViewAuditLogRoutePath } from '@/routes/routes';
 import { AdminAuditLogsSearch } from './AdminAuditLogsSearch';
 import { AdminAuditLogsSkeleton } from '@/components/skeleton-loader/admin';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
   chapter: 'books',
@@ -120,7 +121,7 @@ export function AdminAuditLogsTab() {
       renderCell: (params) => (
         params.row.actor_role ? (
           <Badge variant="outline" className="capitalize border-slate-200 bg-slate-50 text-slate-700">
-            {params.row.actor_role}
+            {ROLE_NAME_MAP[params.row.actor_role ?? ''] || '—'}
           </Badge>
         ) : <span className="text-sm text-muted-foreground">—</span>
       ),

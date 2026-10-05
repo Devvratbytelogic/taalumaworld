@@ -332,7 +332,7 @@ export function CreateChapterForm() {
               styles={SELECT_STYLES}
             />
             {books.length === 0 && (
-              <p className="text-sm text-muted-foreground">Create a series first from the <Link href={getMentorBooksRoutePath()} className="text-primary underline">Admin Series</Link> section.</p>
+              <p className="text-sm text-muted-foreground">Create a series first from the <Link href={getMentorBooksRoutePath()} className="text-primary underline">Series</Link> section.</p>
             )}
             {errors.bookId && touched.bookId && (
               <p className="text-sm text-red-600">{errors.bookId}</p>

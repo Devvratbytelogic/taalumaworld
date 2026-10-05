@@ -17,7 +17,7 @@ import { APP_SITE_URL } from '@/utils/config';
 import { getUserId, getUserRole } from '@/utils/authCookies';
 import { useUpdateChapterMutation, } from '@/store/rtkQueries/adminPostApi';
 import { useGetAdminGlobalSettingsQuery, useGetAllBooksQuery, useGetChapterByIdQuery, } from '@/store/rtkQueries/adminGetApi';
-import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath, getMentorBooksRoutePath } from '@/routes/routes';
 import Link from 'next/link';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
@@ -372,7 +372,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               styles={SELECT_STYLES}
             />
             {books.length === 0 && (
-              <p className="text-sm text-muted-foreground">Create a series first from the Admin Series section.</p>
+              <p className="text-sm text-muted-foreground">Create a series first from the <Link href={getMentorBooksRoutePath()} className="text-primary underline">Series</Link> section.</p>
             )}
             {errors.bookId && touched.bookId && (
               <p className="text-sm text-red-600">{errors.bookId}</p>

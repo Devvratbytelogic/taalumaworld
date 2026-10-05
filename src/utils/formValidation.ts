@@ -249,56 +249,56 @@ function priceAboveMinimum(minimumContentPrice: number, requiredMessage: string)
 // Add Book Modal Validation Schema (matches API: title, description, pricingModel, price, status, slug, cover_image, tags)
 export function addBookSchema(minimumContentPrice: number) {
   return Yup.object({
-  title: withSafeShortText(
-    Yup.string()
+    title: withSafeShortText(
+      Yup.string()
+        .trim()
+        .required('Please enter a series title'),
+    ),
+    description: Yup.string()
       .trim()
-      .required('Please enter a series title'),
-  ),
-  description: Yup.string()
-    .trim()
-    .required('Please enter a description'),
-  cover_image: Yup.mixed<File>()
-    .required('Please select a cover image')
-    .test('is-file', 'Please select a cover image', (v) => v instanceof File)
-    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
-  pricingModel: Yup.string().oneOf(['book', 'chapter']),
-  status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
-  price: Yup.number()
-    .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-    .when('pricingModel', {
-      is: 'book',
-      then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
-      otherwise: (schema) => schema.optional(),
-    }),
-  ...openGraphFieldsSchema,
+      .required('Please enter a description'),
+    cover_image: Yup.mixed<File>()
+      .required('Please select a cover image')
+      .test('is-file', 'Please select a cover image', (v) => v instanceof File)
+      .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
+    pricingModel: Yup.string().oneOf(['book', 'chapter']),
+    status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
+    price: Yup.number()
+      .transform((v) => (v === '' || v == null ? undefined : Number(v)))
+      .when('pricingModel', {
+        is: 'book',
+        then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
+        otherwise: (schema) => schema.optional(),
+      }),
+    ...openGraphFieldsSchema,
   });
 }
 // Edit Book Modal Validation Schema — cover_image is optional (null = keep existing)
 export function editBookSchema(minimumContentPrice: number) {
   return Yup.object({
-  title: withSafeShortText(
-    Yup.string()
+    title: withSafeShortText(
+      Yup.string()
+        .trim()
+        .required('Please enter a series title'),
+    ),
+    description: Yup.string()
       .trim()
-      .required('Please enter a series title'),
-  ),
-  description: Yup.string()
-    .trim()
-    .required('Please enter a description'),
-  cover_image: Yup.mixed<File>()
-    .nullable()
-    .optional()
-    .test('is-file-or-null', 'Please select a valid image file', (v) => v == null || v instanceof File)
-    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
-  pricingModel: Yup.string().oneOf(['book', 'chapter']),
-  status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
-  price: Yup.number()
-    .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-    .when('pricingModel', {
-      is: 'book',
-      then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
-      otherwise: (schema) => schema.optional(),
-    }),
-  ...openGraphFieldsSchema,
+      .required('Please enter a description'),
+    cover_image: Yup.mixed<File>()
+      .nullable()
+      .optional()
+      .test('is-file-or-null', 'Please select a valid image file', (v) => v == null || v instanceof File)
+      .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
+    pricingModel: Yup.string().oneOf(['book', 'chapter']),
+    status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
+    price: Yup.number()
+      .transform((v) => (v === '' || v == null ? undefined : Number(v)))
+      .when('pricingModel', {
+        is: 'book',
+        then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
+        otherwise: (schema) => schema.optional(),
+      }),
+    ...openGraphFieldsSchema,
   });
 }
 
@@ -344,41 +344,41 @@ export function isBlueprintFormComplete(
 
 export function addChapterSchema(minimumContentPrice: number) {
   return Yup.object({
-  bookId: Yup.string().required('Please select a series'),
-  title: withSafeShortText(
-    Yup.string()
+    bookId: Yup.string().required('Please select a series'),
+    title: withSafeShortText(
+      Yup.string()
+        .trim()
+        .required('Please enter a book title'),
+    ),
+    description: Yup.string()
       .trim()
-      .required('Please enter a book title'),
-  ),
-  description: Yup.string()
-    .trim()
-    .required('Please enter a book description'),
-  content_type: Yup.string().oneOf(['pdf', 'editor']),
-  content: Yup.string().when('content_type', {
-    is: 'editor',
-    then: (schema) => schema.test('required-content', 'Please add book content', (v) => !isRichTextEmpty(v)),
-    otherwise: (schema) => schema.optional(),
-  }),
-  pdf_file: Yup.mixed()
-    .nullable()
-    .when('content_type', {
-      is: 'pdf',
-      then: (schema) => schema.test('pdf-required', 'Please upload a PDF', (v) => v != null && v !== ''),
+      .required('Please enter a book description'),
+    content_type: Yup.string().oneOf(['pdf', 'editor']),
+    content: Yup.string().when('content_type', {
+      is: 'editor',
+      then: (schema) => schema.test('required-content', 'Please add book content', (v) => !isRichTextEmpty(v)),
       otherwise: (schema) => schema.optional(),
     }),
-  isFree: Yup.boolean(),
-  price: Yup.number()
-    .when('isFree', {
-      is: true,
-      then: (schema) => schema.min(0).optional(),
-      otherwise: () => priceAboveMinimum(minimumContentPrice, 'Price is required when book is not free'),
-    }),
-  status: Yup.string().oneOf([...BLUEPRINT_STATUSES], 'Select a valid status'),
-  cover_image: Yup.mixed()
-    .required('Cover image is required')
-    .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
-  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
-  ...openGraphFieldsSchema,
+    pdf_file: Yup.mixed()
+      .nullable()
+      .when('content_type', {
+        is: 'pdf',
+        then: (schema) => schema.test('pdf-required', 'Please upload a PDF', (v) => v != null && v !== ''),
+        otherwise: (schema) => schema.optional(),
+      }),
+    isFree: Yup.boolean(),
+    price: Yup.number()
+      .when('isFree', {
+        is: true,
+        then: (schema) => schema.min(0).optional(),
+        otherwise: () => priceAboveMinimum(minimumContentPrice, 'Price is required when book is not free'),
+      }),
+    status: Yup.string().oneOf([...BLUEPRINT_STATUSES], 'Select a valid status'),
+    cover_image: Yup.mixed()
+      .required('Cover image is required')
+      .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
+    accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
+    ...openGraphFieldsSchema,
   });
 }
 
@@ -460,25 +460,60 @@ export const mentorProfileDetailsSchema = Yup.object({
 
 // Mentor Profile Tab — Payout details (bank / M-Pesa / tax) Validation Schema
 export const mentorPayoutDetailsSchema = Yup.object({
+  paystack_preferred_settlement: Yup.string()
+    .oneOf(['mpesa', 'bank'], 'Select a valid settlement method')
+    .required('Preferred settlement method is required'),
+
   bank_name: Yup.string()
     .trim()
-    .min(2, 'Bank name must be at least 2 characters')
-    .max(120, 'Too long')
-    .required('Bank name is required'),
+    .when('paystack_preferred_settlement', {
+      is: 'bank',
+      then: (schema) =>
+        schema
+          .min(2, 'Bank name must be at least 2 characters')
+          .max(120, 'Too long')
+          .required('Bank name is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
+  paystack_bank_code: Yup.string().when('paystack_preferred_settlement', {
+    is: 'bank',
+    then: (schema) => schema.required('Please select a bank'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
   bank_number: Yup.string()
     .trim()
-    .matches(/^[0-9]+$/, 'Account number must contain only digits')
-    .min(6, 'Account number must be at least 6 digits')
-    .max(20, 'Account number must be at most 20 digits')
-    .required('Account number is required'),
+    .when('paystack_preferred_settlement', {
+      is: 'bank',
+      then: (schema) =>
+        schema
+          .matches(/^[0-9]+$/, 'Account number must contain only digits')
+          .min(6, 'Account number must be at least 6 digits')
+          .max(20, 'Account number must be at most 20 digits')
+          .required('Account number is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
   bank_branch: Yup.string()
     .trim()
     .max(120, 'Too long')
-    .optional(),
+    .notRequired(),
+
   mpesa_number: Yup.string()
     .trim()
-    .required('M-Pesa number is required')
-    .matches(/^\+?[0-9]{9,15}$/, 'Enter a valid M-Pesa number (9–15 digits)'),
+    .when('paystack_preferred_settlement', {
+      is: 'mpesa',
+      then: (schema) =>
+        schema
+          .required('M-Pesa number is required')
+          .matches(
+            /^\+?[0-9]{9,15}$/,
+            'Enter a valid M-Pesa number (9–15 digits)',
+          ),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
   tax_id: Yup.string()
     .trim()
     .test(
@@ -486,13 +521,16 @@ export const mentorPayoutDetailsSchema = Yup.object({
       'Enter a valid KRA PIN (e.g. A123456789Z)',
       (value) => !value || /^[A-Za-z]\d{9}[A-Za-z]$/.test(value),
     ),
+
   preferred_payment_frequency: Yup.string()
-    .oneOf(['monthly', 'quarterly', 'annually'], 'Select a valid payout frequency')
+    .oneOf(
+      ['monthly', 'quarterly', 'annually'],
+      'Select a valid payout frequency',
+    )
     .required('Preferred payout frequency is required'),
-  paystack_preferred_settlement: Yup.string()
-    .oneOf(['mpesa', 'bank'], 'Select a valid settlement method')
-    .required('Preferred settlement method is required'),
+
   is_vat_registered: Yup.boolean().required(),
+
   vat_number: Yup.string()
     .trim()
     .when('is_vat_registered', {
@@ -500,10 +538,16 @@ export const mentorPayoutDetailsSchema = Yup.object({
       then: (schema) =>
         schema
           .required('VAT number is required')
-          .matches(/^[0-9]{9,14}$/, 'Enter a valid VAT number (9–14 digits)'),
-      otherwise: (schema) => schema.optional(),
+          .matches(
+            /^[0-9]{9,14}$/,
+            'Enter a valid VAT number (9–14 digits)',
+          ),
+      otherwise: (schema) => schema.notRequired(),
     }),
-  accepted_agreement_ids: Yup.array().of(Yup.string().required()).default([]),
+
+  accepted_agreement_ids: Yup.array()
+    .of(Yup.string().required())
+    .default([]),
 });
 
 // Global Settings Validation Schema

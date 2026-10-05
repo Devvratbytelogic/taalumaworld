@@ -870,6 +870,15 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
           <dl className="grid gap-6 sm:grid-cols-2">
             <div>
               <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                <Wallet className="h-3.5 w-3.5" />
+                Preferred settlement
+              </dt>
+              <dd className="mt-1 text-sm font-medium text-slate-900">
+                {formatSettlementLabel(mentorInfo?.paystack_preferred_settlement)}
+              </dd>
+            </div>
+            <div>
+              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
                 <Landmark className="h-3.5 w-3.5" />
                 Bank name
               </dt>
@@ -911,15 +920,6 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
               <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.preferred_payment_frequency || '—'}</dd>
             </div>
             <div>
-              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
-                <Wallet className="h-3.5 w-3.5" />
-                Preferred settlement
-              </dt>
-              <dd className="mt-1 text-sm font-medium text-slate-900">
-                {formatSettlementLabel(mentorInfo?.paystack_preferred_settlement)}
-              </dd>
-            </div>
-            <div>
               <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">VAT registered</dt>
               <dd className="mt-1.5">
                 <span
@@ -959,10 +959,12 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                   <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Settlement country</dt>
                   <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.settlement_country || '—'}</dd>
                 </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Bank code</dt>
-                  <dd className="mt-1 text-sm font-medium font-mono text-slate-900">{mentorInfo?.paystack_bank_code || '—'}</dd>
-                </div>
+                {mentorInfo?.paystack_preferred_settlement === 'bank' && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Bank code</dt>
+                    <dd className="mt-1 text-sm font-medium font-mono text-slate-900">{mentorInfo?.paystack_bank_code || '—'}</dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Last synced</dt>
                   <dd className="mt-1 text-sm font-medium text-slate-900">
@@ -971,12 +973,14 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                       : '—'}
                   </dd>
                 </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Bank subaccount code</dt>
-                  <dd className="mt-1 text-sm font-medium font-mono text-slate-900">
-                    {mentorInfo?.paystack_bank_subaccount_code || '—'}
-                  </dd>
-                </div>
+                {mentorInfo?.paystack_preferred_settlement === 'bank' && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Bank subaccount code</dt>
+                    <dd className="mt-1 text-sm font-medium font-mono text-slate-900">
+                      {mentorInfo?.paystack_bank_subaccount_code || '—'}
+                    </dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">M-Pesa subaccount code</dt>
                   <dd className="mt-1 text-sm font-medium font-mono text-slate-900">
@@ -998,66 +1002,102 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="bank_name">
-                  Bank name
+                <Label htmlFor="paystack_preferred_settlement">
+                  Preferred settlement
                   <span className="text-red-500"> *</span>
                 </Label>
-                <ReactSelect
-                  inputId="bank_name"
-                  name="bank_name"
-                  classNamePrefix="react-select"
-                  options={bankOptions}
-                  value={selectedBankOption}
-                  onChange={(option) => {
-                    const bankName = option?.value ?? '';
-                    const bankCode = banks.find((bank) => bank.name === bankName)?.code ?? '';
-                    setFieldValue('bank_name', bankName);
-                    setFieldValue('paystack_bank_code', bankCode);
-                    setFieldTouched('bank_name', true);
-                    setFieldTouched('paystack_bank_code', true);
-                  }}
-                  onBlur={() => setFieldTouched('bank_name', true)}
-                  placeholder={isBanksLoading ? 'Loading banks...' : 'Select bank'}
-                  isLoading={isBanksLoading}
-                  isDisabled={isSubmitting || isBanksLoading}
-                  isClearable
-                  isSearchable
-                  menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-                  menuPosition="fixed"
-                  styles={SELECT_STYLES}
-                />
-                {(touched.bank_name && errors.bank_name) || (touched.paystack_bank_code && errors.paystack_bank_code) ? (
-                  <p className="text-sm text-red-600">{errors.bank_name || errors.paystack_bank_code}</p>
+                <select
+                  id="paystack_preferred_settlement"
+                  name="paystack_preferred_settlement"
+                  value={values.paystack_preferred_settlement}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  className={cn(
+                    nativeSelectClassName,
+                    touched.paystack_preferred_settlement && errors.paystack_preferred_settlement ? 'border-red-500' : '',
+                  )}
+                >
+                  <option value="">Select settlement method</option>
+                  {PAYSTACK_SETTLEMENT_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option === 'mpesa' ? 'M-Pesa' : 'Bank'}
+                    </option>
+                  ))}
+                </select>
+                {touched.paystack_preferred_settlement && errors.paystack_preferred_settlement ? (
+                  <p className="text-sm text-red-600">{errors.paystack_preferred_settlement}</p>
                 ) : null}
               </div>
-              <FormField
-                id="bank_number"
-                label="Account number"
-                value={values.bank_number}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={isSubmitting}
-                error={touched.bank_number ? errors.bank_number : undefined}
-              />
-              <FormField
-                id="bank_branch"
-                label="Bank branch"
-                value={values.bank_branch}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={isSubmitting}
-                required={false}
-                error={touched.bank_branch ? errors.bank_branch : undefined}
-              />
-              <FormField
-                id="mpesa_number"
-                label="M-Pesa number"
-                value={values.mpesa_number}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={isSubmitting}
-                error={touched.mpesa_number ? errors.mpesa_number : undefined}
-              />
+              {/* Bank fields */}
+              {values.paystack_preferred_settlement === 'bank' && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="bank_name">
+                      Bank name
+                      <span className="text-red-500"> *</span>
+                    </Label>
+                    <ReactSelect
+                      inputId="bank_name"
+                      name="bank_name"
+                      classNamePrefix="react-select"
+                      options={bankOptions}
+                      value={selectedBankOption}
+                      onChange={(option) => {
+                        const bankName = option?.value ?? '';
+                        const bankCode = banks.find((bank) => bank.name === bankName)?.code ?? '';
+                        setFieldValue('bank_name', bankName);
+                        setFieldValue('paystack_bank_code', bankCode);
+                        setFieldTouched('bank_name', true);
+                        setFieldTouched('paystack_bank_code', true);
+                      }}
+                      onBlur={() => setFieldTouched('bank_name', true)}
+                      placeholder={isBanksLoading ? 'Loading banks...' : 'Select bank'}
+                      isLoading={isBanksLoading}
+                      isDisabled={isSubmitting || isBanksLoading}
+                      isClearable
+                      isSearchable
+                      menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                      menuPosition="fixed"
+                      styles={SELECT_STYLES}
+                    />
+                    {(touched.bank_name && errors.bank_name) || (touched.paystack_bank_code && errors.paystack_bank_code) ? (
+                      <p className="text-sm text-red-600">{errors.bank_name || errors.paystack_bank_code}</p>
+                    ) : null}
+                  </div>
+                  <FormField
+                    id="bank_number"
+                    label="Account number"
+                    value={values.bank_number}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    error={touched.bank_number ? errors.bank_number : undefined}
+                  />
+                  <FormField
+                    id="bank_branch"
+                    label="Bank branch"
+                    value={values.bank_branch}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting}
+                    required={false}
+                    error={touched.bank_branch ? errors.bank_branch : undefined}
+                  />
+                </>
+              )}
+              {/* M-Pesa field */}
+              {values.paystack_preferred_settlement === 'mpesa' && (
+                <FormField
+                  id="mpesa_number"
+                  label="M-Pesa number"
+                  value={values.mpesa_number}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting}
+                  error={touched.mpesa_number ? errors.mpesa_number : undefined}
+                />
+              )}
               <FormField
                 id="tax_id"
                 label="Tax ID (KRA PIN)"
@@ -1094,35 +1134,6 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 </select>
                 {touched.preferred_payment_frequency && errors.preferred_payment_frequency ? (
                   <p className="text-sm text-red-600">{errors.preferred_payment_frequency}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="paystack_preferred_settlement">
-                  Preferred settlement
-                  <span className="text-red-500"> *</span>
-                </Label>
-                <select
-                  id="paystack_preferred_settlement"
-                  name="paystack_preferred_settlement"
-                  value={values.paystack_preferred_settlement}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting}
-                  className={cn(
-                    nativeSelectClassName,
-                    touched.paystack_preferred_settlement && errors.paystack_preferred_settlement ? 'border-red-500' : '',
-                  )}
-                >
-                  <option value="">Select settlement method</option>
-                  {PAYSTACK_SETTLEMENT_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option === 'mpesa' ? 'M-Pesa' : 'Bank'}
-                    </option>
-                  ))}
-                </select>
-                {touched.paystack_preferred_settlement && errors.paystack_preferred_settlement ? (
-                  <p className="text-sm text-red-600">{errors.paystack_preferred_settlement}</p>
                 ) : null}
               </div>
 

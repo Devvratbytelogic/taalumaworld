@@ -121,7 +121,7 @@ export function AdminAuditLogsTab() {
       renderCell: (params) => (
         params.row.actor_role ? (
           <Badge variant="outline" className="capitalize border-slate-200 bg-slate-50 text-slate-700">
-            {ROLE_NAME_MAP[params.row.actor_role ?? ''] || '—'}
+            {ROLE_NAME_MAP[params.row.actor_role ?? ''] || params.row.actor_role}
           </Badge>
         ) : <span className="text-sm text-muted-foreground">—</span>
       ),

@@ -181,7 +181,7 @@ export function AdminAgreementTypesTab() {
           <div className="flex flex-wrap items-center gap-1" title={roles.join(', ')}>
             {roles.map((role) => (
               <Badge key={role} variant="outline" className="border-slate-200 text-slate-600">
-                {ROLE_NAME_MAP[role] || '—'}
+                {ROLE_NAME_MAP[role ?? ''] || role}
               </Badge>
             ))}
           </div>

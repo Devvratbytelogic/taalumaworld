@@ -98,7 +98,7 @@ export function AdminConsentRecordsTab() {
           </p>
           <p className="truncate text-xs text-slate-500">
             {params.row.user?.email || params.row.guest_email || '—'}
-            {params.row.user?.role ? ` · ${ROLE_NAME_MAP[params.row.user.role ?? ''] || '—'}` : ''}
+            {params.row.user?.role ? ` · ${ROLE_NAME_MAP[params.row.user.role ?? ''] || params.row.user.role}` : ''}
           </p>
         </div>
       ),

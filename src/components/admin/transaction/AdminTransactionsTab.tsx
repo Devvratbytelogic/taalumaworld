@@ -103,7 +103,7 @@ export function AdminTransactionsTab() {
       sortable: false,
       renderCell: (params) => (
         <Badge variant="outline" className="capitalize">
-          {params.row.type}
+          {params.row.type?.toLowerCase() === 'chapter' ? 'Book' : params.row.type?.toLowerCase() === 'book' ? 'Series' : params.row.type}
         </Badge>
       ),
     },

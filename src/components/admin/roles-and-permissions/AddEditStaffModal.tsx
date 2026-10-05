@@ -20,7 +20,7 @@ import { staffSchema } from '@/utils/formValidation';
 import toast from '@/utils/toast';
 import ReactSelect from 'react-select';
 import { SELECT_STYLES } from '@/constants/selectStyle';
-import { USER_TYPE } from '@/constants/common';
+import { ROLE_NAME_MAP, USER_TYPE } from '@/constants/common';
 import { cn } from '@/components/ui/utils';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
@@ -63,7 +63,7 @@ export function AddEditStaffModal() {
   const roles = rolesData?.data?.data ?? [];
   const roleOptions = roles.map((r) => ({
     value: r._id,
-    label: r.name,
+    label: ROLE_NAME_MAP[r.name ?? ''] || r.name,
     isDisabled: DISABLED_ROLE_NAMES.has(r.name),
   }));
   const [addStaff, { isLoading: isAdding }] = useAddStaffMutation();

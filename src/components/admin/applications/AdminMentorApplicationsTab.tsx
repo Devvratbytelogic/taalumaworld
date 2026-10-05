@@ -197,7 +197,7 @@ export function AdminMentorApplicationsTab() {
       flex: 1,
       sortable: false,
       renderCell: (params) => (
-        <span className="truncate text-sm text-slate-700">{ROLE_NAME_MAP[params.row.previous_role ?? ''] || '—'}</span>
+        <span className="truncate text-sm text-slate-700">{ROLE_NAME_MAP[params.row.previous_role ?? ''] || params.row.previous_role}</span>
       ),
     },
     {
@@ -358,7 +358,7 @@ export function AdminMentorApplicationsTab() {
                   </Badge>
                 </div>
 
-                <p><span className="text-slate-500">Previous role:</span> {ROLE_NAME_MAP[reviewApplication.previous_role ?? ''] || '—'}</p>
+                <p><span className="text-slate-500">Previous role:</span> {ROLE_NAME_MAP[reviewApplication.previous_role ?? ''] || reviewApplication.previous_role}</p>
 
                 <div className="space-y-1.5">
                   <div className="flex items-baseline justify-between gap-3">

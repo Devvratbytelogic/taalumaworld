@@ -71,7 +71,7 @@ export function RolesRegistryTab() {
                 return (
                     <div className="flex items-center gap-2 whitespace-nowrap">
                         <Shield className="h-4 w-4 shrink-0 text-primary" />
-                        <span className="text-sm font-medium">{ROLE_NAME_MAP[params.value ?? ''] || '—'}</span>
+                        <span className="text-sm font-medium">{ROLE_NAME_MAP[params.value ?? ''] || params.value}</span>
                         {protectedRole ? (
                             <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
                                 System

@@ -23,7 +23,7 @@ import {
   useGetAllBooksQuery,
   useGetAllAuthorLeadersQuery,
 } from '@/store/rtkQueries/adminGetApi';
-import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { getChaptersListRoutePath, getBlueprintRoutePath, isMentorPanelPath, getMentorBooksRoutePath } from '@/routes/routes';
 import { AgreementSentenceList } from '@/components/ui/AgreementSentenceList';
 import { Label } from '@/components/ui/label';
 import ReactSelect from 'react-select';
@@ -47,6 +47,7 @@ import {
 import { slugify } from '@/utils/slugify';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminBlueprintFormFieldsSkeleton } from '@/components/skeleton-loader/admin';
+import Link from 'next/link';
 
 const BLUEPRINTS_MODEL = 'Blueprints';
 
@@ -331,7 +332,7 @@ export function CreateChapterForm() {
               styles={SELECT_STYLES}
             />
             {books.length === 0 && (
-              <p className="text-sm text-muted-foreground">Create a series first from the Admin Series section.</p>
+              <p className="text-sm text-muted-foreground">Create a series first from the <Link href={getMentorBooksRoutePath()} className="text-primary underline">Admin Series</Link> section.</p>
             )}
             {errors.bookId && touched.bookId && (
               <p className="text-sm text-red-600">{errors.bookId}</p>

@@ -12,7 +12,7 @@ import {
 import CommonDataTable from '@/components/admin/CommonDataTable';
 import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
-import { formatKes } from '@/constants/common';
+import { formatKes, ROLE_NAME_MAP } from '@/constants/common';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
 import { useGetReferralPerformanceQuery } from '@/store/rtkQueries/dashboard';
 import type { IReferralPerformanceEntity, ReferralPerformanceUserType } from '@/types/dashboard';
@@ -124,7 +124,7 @@ export function AdminReferralPerformanceTab() {
       minWidth: 180,
       sortable: false,
       renderCell: (params) => (
-        <span className="text-sm text-slate-700">{params.row.role ?? '—'}</span>
+        <span className="text-sm text-slate-700">{ ROLE_NAME_MAP[params.row.role ?? ''] || params.row.role }</span>
       ),
     },
     {

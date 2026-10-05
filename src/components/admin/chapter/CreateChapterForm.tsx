@@ -120,6 +120,8 @@ export function CreateChapterForm() {
       if (chapterPricingEnabled) {
         formData.append('isFree', String(vals.isFree));
         formData.append('price', String(!vals.isFree ? (vals.price ?? 0) : 0));
+      } else {
+        formData.append('price', '0');
       }
       formData.append('status', DEFAULT_BLUEPRINT_STATUS);
       // formData.append('page', String(vals.page ?? 1));

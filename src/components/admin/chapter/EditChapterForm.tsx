@@ -121,6 +121,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       if (chapterPricingEnabled) {
         formData.append('isFree', String(vals.isFree));
         formData.append('price', String(!vals.isFree ? (vals.price ?? 0) : 0));
+      } else {
+        formData.append('price', '0');
       }
       // formData.append('status', vals.status);
       // formData.append('page', String(vals.page ?? 1));

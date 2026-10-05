@@ -220,7 +220,16 @@ export function AddBookModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="xl" className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 max-w-2xl">
+      <DialogContent
+        size="xl"
+        className="admin_panel flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 max-w-2xl"
+        onPointerDownOutside={(event) => {
+          if (document.querySelector('[data-guide-root]')) event.preventDefault();
+        }}
+        onInteractOutside={(event) => {
+          if (document.querySelector('[data-guide-root]')) event.preventDefault();
+        }}
+      >
         <DialogHeader className="shrink-0 border-b! border-slate-100 px-6 pb-4 pt-6 pr-12">
           <DialogTitle>Create New Series</DialogTitle>
           <DialogDescription>
@@ -229,6 +238,7 @@ export function AddBookModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="admin_panel flex min-h-0 flex-1 flex-col">
           <div className="custom_scrollbar flex-1 space-y-4 overflow-y-auto p-6!">
+            <div data-mentor-tour="series-copy" className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="book-title">Title<span className="text-red-500">*</span></Label>
               <Input
@@ -261,6 +271,10 @@ export function AddBookModal({
               {errors.description && touched.description && (
                 <p className="text-sm text-red-600">{errors.description}</p>
               )}
+              {/* <p className="text-xs leading-relaxed text-slate-500">
+                If this series is one book, use that book’s title, description, and cover here.
+              </p> */}
+            </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
@@ -344,7 +358,7 @@ export function AddBookModal({
               </div>
             )}  */}
 
-            <div className="flex justify-between gap-4">
+            <div data-mentor-tour="series-cover" className="flex justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
                 <Label htmlFor="book-cover">
                   Cover Image<span className="text-red-500">*</span>
@@ -393,9 +407,9 @@ export function AddBookModal({
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div data-mentor-tour="series-pricing" className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="book-status">Status</Label>
+                <Label htmlFor="book-status">Status<span className="text-red-500">*</span></Label>
                 <select
                   id="book-status"
                   name="status"
@@ -413,7 +427,7 @@ export function AddBookModal({
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="book-pricingModel">Pricing model</Label>
+                <Label htmlFor="book-pricingModel">Pricing model<span className="text-red-500">*</span></Label>
                 <select
                   id="book-pricingModel"
                   name="pricingModel"
@@ -496,15 +510,17 @@ export function AddBookModal({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="global_btn rounded_full bg_primary"
-              startContent={<Save className="h-4 w-4" />}
-              isDisabled={isSubmitting}
-              isLoading={isSubmitting}
-            >
-              Create Series
-            </Button>
+            <span data-mentor-tour="series-save" className="inline-flex">
+              <Button
+                type="submit"
+                className="global_btn rounded_full bg_primary"
+                startContent={<Save className="h-4 w-4" />}
+                isDisabled={isSubmitting}
+                isLoading={isSubmitting}
+              >
+                Create Series
+              </Button>
+            </span>
           </DialogFooter>
         </form>
       </DialogContent>

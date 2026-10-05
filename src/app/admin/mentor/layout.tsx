@@ -50,6 +50,7 @@ import {
 } from '@/routes/routes';
 import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
+import { MentorContentTour } from '@/components/admin/mentor/content-tour/MentorContentTour';
 
 const NAV_GROUPS: SidebarNavGroup[] = [
   {
@@ -211,6 +212,7 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
           />
         </DialogContent>
       </Dialog>
+      <MentorContentTour />
     </div>
   );
 }

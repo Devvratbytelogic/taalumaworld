@@ -38,6 +38,7 @@ import {
   getMentorSalesVolumeRoutePath,
 } from '@/routes/routes';
 import { MentorDashboardSkeleton } from '@/components/skeleton-loader/admin';
+import { MentorAddContentGuide } from '@/components/admin/mentor/content-tour/MentorContentTour';
 
 /** Dashboard previews are static (no in-grid paging) — "View all" links to the full, paginated list. */
 const PREVIEW_PAGINATION_MODEL = { page: 0, pageSize: 5 };
@@ -177,6 +178,7 @@ export function MentorDashboardTab() {
       <AdminPage>
         <MentorVerificationHeader />
         <MentorEquityStatusCard />
+        <MentorAddContentGuide />
         <MentorDashboardSkeleton />
       </AdminPage>
     );
@@ -186,6 +188,7 @@ export function MentorDashboardTab() {
     <AdminPage>
       <MentorVerificationHeader />
       <MentorEquityStatusCard />
+      <MentorAddContentGuide />
 
         <div className="flex flex-wrap items-end justify-end gap-3">
           <div className="flex min-w-0 flex-col gap-1 sm:w-40">

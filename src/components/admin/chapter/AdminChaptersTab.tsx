@@ -25,6 +25,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getEditChapterRoutePath, getViewChapterRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { MentorContentTourButton } from '@/components/admin/mentor/content-tour/MentorContentTour';
 import toast from '@/utils/toast';
 import { refreshAfterBlueprintChange, refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } from '@/constants/blueprint';
@@ -488,6 +489,7 @@ export function AdminChaptersTab() {
                     isTrashView={isTrashView}
                     onToggleTrash={() => setIsTrashView((prev) => !prev)}
                     canAdd={canAdd}
+                    tourAction={isMentor ? <MentorContentTourButton from="books" /> : null}
                 />
                 <AdminBlueprintsSkeleton />
             </div>
@@ -500,6 +502,7 @@ export function AdminChaptersTab() {
                 isTrashView={isTrashView}
                 onToggleTrash={() => setIsTrashView((prev) => !prev)}
                 canAdd={canAdd}
+                tourAction={isMentor ? <MentorContentTourButton from="books" /> : null}
             />
 
             <AdminChaptersSearch

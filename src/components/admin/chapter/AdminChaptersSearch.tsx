@@ -37,6 +37,7 @@ interface AdminChaptersSearchProps {
   onReviewBlueprintChange: (value: boolean) => void;
   /** "My books" filter is only relevant/visible for Super Administrators. */
   showMineFilter?: boolean;
+  tourId?: string;
 }
 
 const STATUS_OPTIONS = BLUEPRINT_STATUSES;
@@ -74,6 +75,7 @@ export function AdminChaptersSearch({
   reviewBlueprint,
   onReviewBlueprintChange,
   showMineFilter = false,
+  tourId,
 }: AdminChaptersSearchProps) {
   const hasActiveFilters = selectedBook || (showMentorFilter && selectedMentor) || selectedStatus || (showMineFilter && isMine) || isContentFlagged || reviewBlueprint;
 
@@ -89,7 +91,7 @@ export function AdminChaptersSearch({
   };
 
   return (
-    <AdminSearchPanel className="p-3 sm:p-5">
+    <AdminSearchPanel tourId={tourId} className="p-3 sm:p-5">
       <div className="flex min-w-0 flex-col gap-3">
         <AdminSearchInput
           value={searchQuery}

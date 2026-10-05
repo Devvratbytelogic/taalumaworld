@@ -304,8 +304,9 @@ export function CreateChapterForm() {
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
       <div className="space-y-4">
+        <div data-mentor-tour="book-copy" className="space-y-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-2">
+          <div data-mentor-tour="book-series" className="space-y-2">
             <Label>Series <span className="text-red-500">*</span></Label>
             <ReactSelect
               inputId="chapter-series"
@@ -403,7 +404,9 @@ export function CreateChapterForm() {
             <p className="text-sm text-red-600">{errors.description}</p>
           ) : null}
         </div>
+        </div>
 
+        <div data-mentor-tour="book-content" className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="chapter-content-type">
             Content type <span className="text-red-500">*</span>
@@ -476,7 +479,9 @@ export function CreateChapterForm() {
             ) : null}
           </div>
         )}
+        </div>
 
+        <div data-mentor-tour="book-finish" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
           {chapterPricingEnabled ? (
             <>
@@ -582,6 +587,7 @@ export function CreateChapterForm() {
             </div>
           )}
 
+        </div>
         </div>
 
         <OpenGraphFieldsSection

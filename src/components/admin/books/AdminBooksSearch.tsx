@@ -16,6 +16,7 @@ interface AdminBooksSearchProps {
   onIsMineChange: (value: boolean) => void;
   /** Mentor picker is only for Super Administrators. */
   showMentorFilter?: boolean;
+  tourId?: string;
 }
 
 const STATUS_OPTIONS: FilterOption[] = [
@@ -34,6 +35,7 @@ export function AdminBooksSearch({
   isMine,
   onIsMineChange,
   showMentorFilter = false,
+  tourId,
 }: AdminBooksSearchProps) {
   const hasActiveFilters = Boolean((showMentorFilter && selectedLeader) || selectedStatus || isMine);
 
@@ -46,7 +48,7 @@ export function AdminBooksSearch({
   };
 
   return (
-    <AdminSearchPanel>
+    <AdminSearchPanel tourId={tourId}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <AdminSearchInput
           value={searchQuery}

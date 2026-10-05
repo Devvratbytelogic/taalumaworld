@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { type GridColDef } from '@mui/x-data-grid';
 import { Eye, Edit2, Trash2, RotateCcw, ChevronDown, Loader2 } from 'lucide-react';
@@ -34,6 +35,8 @@ import { refreshAfterSeriesChange } from '@/store/server-api/refreshCache';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminSeriesSkeleton } from '@/components/skeleton-loader/admin';
+import { isMentorPanelPath } from '@/routes/routes';
+import { MENTOR_SERIES_MODAL_EVENT, MentorContentTourButton, getMentorSeriesModalRequest } from '@/components/admin/mentor/content-tour/MentorContentTour';
 
 const SERIES_MODEL = 'Series';
 
@@ -53,6 +56,8 @@ const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string 
 const STATUSES = ['Published', 'Draft'] as const;
 
 export function AdminBooksTab() {
+  const pathname = usePathname();
+  const isMentor = isMentorPanelPath(pathname);
   const dispatch = useDispatch();
   const { hasPermission, isSuperAdmin } = useAdminPermissions();
   const canView = hasPermission(SERIES_MODEL, 'view');
@@ -101,6 +106,18 @@ export function AdminBooksTab() {
   useEffect(() => {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   }, [debouncedSearch, selectedLeader, filterByStatus, isTrashView, filterByIsMine]);
+
+  useEffect(() => {
+    if (!isMentor) return;
+    const requested = getMentorSeriesModalRequest();
+    if (typeof requested === 'boolean') setIsCreateModalOpen(requested);
+    const onSeriesModal = (event: Event) => {
+      const open = (event as CustomEvent<{ open?: boolean }>).detail?.open;
+      setIsCreateModalOpen(Boolean(open));
+    };
+    window.addEventListener(MENTOR_SERIES_MODAL_EVENT, onSeriesModal);
+    return () => window.removeEventListener(MENTOR_SERIES_MODAL_EVENT, onSeriesModal);
+  }, [isMentor]);
 
   const onDeleteBook = async (id: string, slug?: string) => {
     try {
@@ -376,6 +393,8 @@ export function AdminBooksTab() {
           isTrashView={isTrashView}
           onToggleTrash={() => setIsTrashView((prev) => !prev)}
           canAdd={canAdd}
+          tourAction={isMentor ? <MentorContentTourButton from="series" /> : null}
+          createTourId={isMentor ? 'series-create' : undefined}
         />
         <AdminSeriesSkeleton />
       </div>
@@ -389,6 +408,8 @@ export function AdminBooksTab() {
         isTrashView={isTrashView}
         onToggleTrash={() => setIsTrashView((prev) => !prev)}
         canAdd={canAdd}
+        tourAction={isMentor ? <MentorContentTourButton from="series" /> : null}
+        createTourId={isMentor ? 'series-create' : undefined}
       />
 
       <AdminBooksSearch

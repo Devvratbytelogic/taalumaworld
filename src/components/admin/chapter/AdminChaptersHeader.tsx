@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
@@ -10,12 +11,20 @@ interface AdminChaptersHeaderProps {
   isTrashView: boolean;
   onToggleTrash: () => void;
   canAdd?: boolean;
+  tourAction?: ReactNode;
+  headerTourId?: string;
+  trashTourId?: string;
+  createTourId?: string;
 }
 
 export function AdminChaptersHeader({
   isTrashView,
   onToggleTrash,
   canAdd = false,
+  tourAction,
+  headerTourId,
+  trashTourId,
+  createTourId,
 }: AdminChaptersHeaderProps) {
   const pathname = usePathname();
   const isMentor = isMentorPanelPath(pathname);
@@ -24,19 +33,25 @@ export function AdminChaptersHeader({
     <AdminPageHeader
       title={isTrashView ? 'Trash' : 'Books management'}
       description={isTrashView ? 'View deleted books' : 'Manage all books across all series'}
+      tourId={headerTourId}
     >
-      <Button
-        className={cn('global_btn rounded_full', isTrashView ? 'outline_primary' : 'danger_outline')}
-        onPress={onToggleTrash}
-        startContent={isTrashView ? <ArrowLeft className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-      >
-        {isTrashView ? 'Back to books' : 'Trash'}
-      </Button>
-      {!isTrashView && canAdd ? (
-        <Button as={Link} href={getCreateChapterRoutePath(isMentor)} className="global_btn rounded_full bg_primary">
-          <Plus className="h-4 w-4" />
-          Create new book
+      {tourAction}
+      <span data-mentor-tour={trashTourId} className="inline-flex">
+        <Button
+          className={cn('global_btn rounded_full', isTrashView ? 'outline_primary' : 'danger_outline')}
+          onPress={onToggleTrash}
+          startContent={isTrashView ? <ArrowLeft className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+        >
+          {isTrashView ? 'Back to books' : 'Trash'}
         </Button>
+      </span>
+      {!isTrashView && canAdd ? (
+        <span data-mentor-tour={createTourId} className="inline-flex">
+          <Button as={Link} href={getCreateChapterRoutePath(isMentor)} className="global_btn rounded_full bg_primary">
+            <Plus className="h-4 w-4" />
+            Create new book
+          </Button>
+        </span>
       ) : null}
     </AdminPageHeader>
   );

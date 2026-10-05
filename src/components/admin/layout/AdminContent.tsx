@@ -31,14 +31,16 @@ export function AdminPageHeader({
   description,
   eyebrow,
   children,
+  tourId,
 }: {
   title: string;
   description?: string;
   eyebrow?: string;
   children?: React.ReactNode;
+  tourId?: string;
 }) {
   return (
-    <div className={cn(adminPanelClass, 'p-6')}>
+    <div data-mentor-tour={tourId} className={cn(adminPanelClass, 'p-6')}>
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           {eyebrow ? (
@@ -57,22 +59,34 @@ export function AdminPanel({
   children,
   className,
   padding = true,
+  tourId,
 }: {
   children: React.ReactNode;
   className?: string;
   padding?: boolean;
+  tourId?: string;
 }) {
-  return <div className={cn(adminPanelClass, padding && 'p-5', className)}>{children}</div>;
+  return (
+    <div data-mentor-tour={tourId} className={cn(adminPanelClass, padding && 'p-5', className)}>
+      {children}
+    </div>
+  );
 }
 
 export function AdminSearchPanel({
   children,
   className,
+  tourId,
 }: {
   children: React.ReactNode;
   className?: string;
+  tourId?: string;
 }) {
-  return <div className={cn(adminPanelClass, 'space-y-4 p-5', className)}>{children}</div>;
+  return (
+    <div data-mentor-tour={tourId} className={cn(adminPanelClass, 'space-y-4 p-5', className)}>
+      {children}
+    </div>
+  );
 }
 
 export function AdminTableShell({

@@ -7,6 +7,12 @@ export const USER_TYPE = {
   SUPER_ADMIN: 'Super Administrator',
 } as const;
 
+export const ROLE_NAME_MAP: Record<string, string> = {
+  "Career Architect": "Mentee",
+  "Institutional Career Architect": 'Institutional Mentee',
+  "Mentor": 'Mentor',
+}
+
 export type UserTypeValue = (typeof USER_TYPE)[keyof typeof USER_TYPE];
 
 export function isCareerArchitectRole(role?: string | null): boolean {

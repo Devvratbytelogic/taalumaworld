@@ -13,6 +13,7 @@ import { CAMPAIGN_USERS_MODEL } from '@/constants/campaignAttribution';
 import type { ICampaignUser } from '@/types/campaignUsers';
 import { AdminCampaignUsersSearch } from './AdminCampaignUsersSearch';
 import { AdminCampaignUsersSkeleton } from '@/components/skeleton-loader/admin';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 const EMPTY_COPY =
   'No campaign signups yet. Users appear here only when they register from a URL with UTM or a click id.';
@@ -93,7 +94,7 @@ export function AdminCampaignUsersTab() {
       minWidth: 160,
       sortable: false,
       renderCell: (params) => (
-        <Badge variant="outline">{displayValue(params.row.role?.name)}</Badge>
+        <Badge variant="outline">{ROLE_NAME_MAP[params.row.role?.name ?? '-'] ?? params.row.role?.name ?? '-'}</Badge>
       ),
     },
     {

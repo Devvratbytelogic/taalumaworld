@@ -8,7 +8,7 @@ import { cn } from '@/components/ui/utils';
 import UserDashboardSkeleton from '@/components/skeleton-loader/UserDashboardSkeleton';
 import { ClientOnly } from '@/components/ClientOnly';
 import { useGetUserProfileQuery } from '@/store/rtkQueries/userGetAPI';
-import { USER_TYPE, UserTypeValue } from '@/constants/common';
+import { ROLE_NAME_MAP, USER_TYPE, UserTypeValue } from '@/constants/common';
 import {
   getUserDashboardAddressRoutePath,
   getUserDashboardBecomeMentorRoutePath,
@@ -111,7 +111,7 @@ export default function UserDashboardAppLayout({
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-gray-900">{userName}</p>
                     <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                      {profileData?.data?.role?.name ?? 'User'}
+                      {ROLE_NAME_MAP[profileData?.data?.role?.name ?? '-'] ?? profileData?.data?.role?.name ?? 'User'}
                     </span>
                   </div>
                 </div>

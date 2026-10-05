@@ -287,10 +287,11 @@ export function MentorContentTourButton({ from }: { from: MentorGuideStart }) {
 
 export function MentorAddContentGuide() {
   return (
-    <AdminPanel tourId="add-content-guide">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <AdminPanel tourId="add-content-guide" className="relative overflow-hidden">
+      <span className="absolute inset-y-0 left-0 w-1 bg-primary" aria-hidden />
+      <div className="flex flex-col gap-4 pl-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-base font-semibold text-slate-900">Add a series, then a book</h2>
+          <h2 className="text-base font-semibold text-slate-900">Create a Series, Then Add a Book</h2>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600">
             A book can be created only after its series exists. This guide opens the series form and its required fields, then the book form. If you do not have different text for the series, use the book title, description, and cover there too.
           </p>

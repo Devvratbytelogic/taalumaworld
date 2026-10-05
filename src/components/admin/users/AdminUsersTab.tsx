@@ -27,8 +27,11 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminUserDetailRoutePath } from '@/routes/routes';
 import { AdminUsersSkeleton } from '@/components/skeleton-loader/admin';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 const USERS_MODEL = 'Users';
+
+
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -173,7 +176,15 @@ export function AdminUsersTab() {
       minWidth: 200,
       flex: 1,
       sortable: false,
-      renderCell: (params) => <Badge>{params.row.role?.name ?? '-'}</Badge>,
+      renderCell: (params) => {
+        const role = params.row.role?.name;
+
+        return (
+          <Badge>
+            {ROLE_NAME_MAP[role ?? '-'] ?? role ?? '-'}
+          </Badge>
+        );
+      },
     },
     {
       field: 'createdAt',

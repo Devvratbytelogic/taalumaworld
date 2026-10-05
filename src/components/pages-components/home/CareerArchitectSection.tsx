@@ -59,12 +59,12 @@ export default function CareerArchitectSection() {
                                 A Career Architect is someone who takes deliberate ownership of designing their future.
                             </p>
                             <p className="text-base text-muted-foreground leading-relaxed">
-                                Rather than leaving career growth to chance, Career Architects actively learn, seek mentorship,
+                                Rather than leaving career growth to chance, Mentees actively learn, seek mentorship,
                                 build skills, experiment with new opportunities, and continuously adapt to changes in the economy
                                 and technology.
                             </p>
                             <p className="text-base font-semibold text-foreground">
-                                At Taaluma, every learner is a Career Architect.
+                                At Taaluma, every learner is a Mentee.
                             </p>
                         </div>
 
@@ -72,7 +72,7 @@ export default function CareerArchitectSection() {
                             className="global_btn rounded_full bg_primary"
                             onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
                         >
-                            Become a Career Architect
+                            Become a Mentee
                         </Button>
                     </div>
 

@@ -88,7 +88,7 @@ export function BlueprintAccessTab() {
                                 dispatch(closeModal());
                             }
                         } catch (error) {
-                            console.error('Error removing blueprint access', error);
+                            console.error('Error removing book access', error);
                         }
                     },
                 },
@@ -107,7 +107,7 @@ export function BlueprintAccessTab() {
                 toast.success('Book access updated');
             }
         } catch (error) {
-            console.error('Error saving blueprint access', error);
+            console.error('Error saving book access', error);
         }
     };
 

@@ -108,7 +108,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
       return redirectTo(request, getMentorLoginRoutePath());
     }
     if (!isMentorRole(role)) {
-      // Career Architects have no admin access at all; everyone else
+      // Mentees have no admin access at all; everyone else
       // authenticated here is Super Admin / staff, who belong in /admin.
       const fallback = isCareerArchitectRole(role)
         ? getHomeRoutePath()
@@ -142,7 +142,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
-  // ── Buyer dashboard: /user-dashboard/* — Career Architects and Mentors ────
+  // ── Buyer dashboard: /user-dashboard/* — Mentees and Mentors ────
   if (isUserDashboardRoute(pathname)) {
     if (!isAuthenticated) {
       return redirectTo(request, getHomeRoutePath());

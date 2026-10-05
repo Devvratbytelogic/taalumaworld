@@ -18,6 +18,7 @@ import { useGetUserByIdQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import { AdminUserDetailSkeleton } from '@/components/skeleton-loader/admin';
 import type { ItemsEntity } from '@/types/rolesPermissions';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -153,7 +154,7 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Role</dt>
             <dd className="mt-1">
-              <Badge>{user.role?.name || '—'}</Badge>
+              <Badge>{ROLE_NAME_MAP[user.role?.name ?? '-'] ?? user.role?.name ?? '-'}</Badge>
             </dd>
           </div>
           <div>

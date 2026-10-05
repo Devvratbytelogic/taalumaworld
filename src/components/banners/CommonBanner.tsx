@@ -116,7 +116,7 @@ export default function CommonBanner({ data }: CommonBannerProps) {
                                                 )}
                                             </div>
                                             <span className="text-sm font-medium text-foreground">
-                                                {total.toLocaleString()}+ Strategic Career Architects
+                                                {total.toLocaleString()}+ Strategic Mentees
                                             </span>
                                         </div>
                                     </div>

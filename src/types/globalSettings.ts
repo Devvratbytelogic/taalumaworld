@@ -59,6 +59,8 @@ export interface IGlobalSettings {
   id: string;
   __v: number;
   json_ld: string;
+  facebook_domain_verification: string;
+  bing_verification_code: string;
   og_description: string;
   og_image: string;
   og_title: string;

@@ -28,7 +28,6 @@ import { AdminBlueprintFormFieldsSkeleton } from '@/components/skeleton-loader/a
 import { SELECT_STYLES } from '@/constants/selectStyle';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
-import { DEFAULT_BLUEPRINT_STATUS } from '@/constants/blueprint';
 import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import {
@@ -428,7 +427,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           <Label htmlFor="chapter-desc">
             Description <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Career Architects can see this without paying for the book)
+              &nbsp;(Mentees can see this without paying for the book)
             </span>
           </Label>
           <Textarea

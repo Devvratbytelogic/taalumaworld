@@ -37,7 +37,7 @@ import {
 } from '@/store/rtkQueries/userGetAPI';
 import { useUserUpdateProfileMutation } from '@/store/rtkQueries/userAuthApi';
 import { AGREEMENT_VISIBLE_USER_TYPES } from '@/constants/agreements';
-import { isMentorRole } from '@/constants/common';
+import { isMentorRole, ROLE_NAME_MAP } from '@/constants/common';
 import { getUserRole } from '@/utils/authCookies';
 import { updateProfileSchema } from '@/utils/formValidation';
 import moment from 'moment';
@@ -345,7 +345,7 @@ export function ProfilePage() {
             </div>
             <span className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-primary/20 bg-white/95 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-primary sm:px-3.5 sm:py-1.5">
               <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {profile?.role?.name ?? 'User'}
+              {ROLE_NAME_MAP[profile?.role?.name ?? '-'] ?? profile?.role?.name ?? 'User'}
             </span>
           </div>
         </div>

@@ -91,7 +91,7 @@ export function BecomeMentorPage() {
     <div className="space-y-6">
       <UserDashboardPageHeader
         title="Apply to Become a Mentor"
-        description="Share your experience with Career Architects. An administrator will review your application."
+        description="Share your experience with Mentees. An administrator will review your application."
       />
 
       <form noValidate onSubmit={handleSubmit} className="overflow-hidden rounded-lg border border-gray-200 bg-white">

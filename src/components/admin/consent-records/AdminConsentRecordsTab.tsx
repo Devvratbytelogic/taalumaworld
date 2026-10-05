@@ -15,6 +15,7 @@ import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
 import { AdminConsentRecordsSearch } from './AdminConsentRecordsSearch';
 import { AdminConsentRecordsSkeleton } from '@/components/skeleton-loader/admin';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 export function AdminConsentRecordsTab() {
   const [search, setSearch] = useState('');
@@ -97,7 +98,7 @@ export function AdminConsentRecordsTab() {
           </p>
           <p className="truncate text-xs text-slate-500">
             {params.row.user?.email || params.row.guest_email || '—'}
-            {params.row.user?.role ? ` · ${params.row.user.role}` : ''}
+            {params.row.user?.role ? ` · ${ROLE_NAME_MAP[params.row.user.role ?? ''] || '—'}` : ''}
           </p>
         </div>
       ),

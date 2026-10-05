@@ -23,6 +23,7 @@ import { AgreementTypeModal, type AgreementTypeFormValues } from './AgreementTyp
 import toast from '@/utils/toast';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminAgreementTypesSkeleton } from '@/components/skeleton-loader/admin';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 const AGREEMENT_TYPES_MODEL = 'Agreement Types';
 
@@ -180,7 +181,7 @@ export function AdminAgreementTypesTab() {
           <div className="flex flex-wrap items-center gap-1" title={roles.join(', ')}>
             {roles.map((role) => (
               <Badge key={role} variant="outline" className="border-slate-200 text-slate-600">
-                {role}
+                {ROLE_NAME_MAP[role] || '—'}
               </Badge>
             ))}
           </div>

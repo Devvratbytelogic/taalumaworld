@@ -35,7 +35,7 @@ function isFacebookCancelled(error: unknown): boolean {
     return message === 'cancelled'
 }
 
-/** Google + LinkedIn + Facebook — Career Architect sign-in / sign-up only. */
+/** Google + LinkedIn + Facebook — Mentee sign-in / sign-up only. */
 export default function SocialAuthButtons({
     text = 'signin_with',
     referralCode,

@@ -49,7 +49,7 @@ const QUEUE_CONFIG: QueueConfig[] = [
     id: 'conversions',
     dataKey: 'mentorConversions',
     model: 'Mentor Application',
-    title: 'Career Architect → Mentor',
+    title: 'mentee → Mentor',
     description: 'Conversion requests awaiting review.',
     href: getAdminMentorApplicationsRoutePath(),
     tone: 'blue',

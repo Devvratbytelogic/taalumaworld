@@ -39,6 +39,7 @@ import {
 } from '@/constants/verifiedMentorApplication';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminMentorApplicationsSkeleton } from '@/components/skeleton-loader/admin';
+import { ROLE_NAME_MAP } from '@/constants/common';
 
 const MODEL = 'Mentor Application';
 
@@ -196,7 +197,7 @@ export function AdminMentorApplicationsTab() {
       flex: 1,
       sortable: false,
       renderCell: (params) => (
-        <span className="truncate text-sm text-slate-700">{params.row.previous_role || '—'}</span>
+        <span className="truncate text-sm text-slate-700">{ROLE_NAME_MAP[params.row.previous_role ?? ''] || '—'}</span>
       ),
     },
     {
@@ -260,7 +261,7 @@ export function AdminMentorApplicationsTab() {
         <AdminPageHeader
           eyebrow="Mentor Management"
           title="Mentor Applications"
-          description="Review Career Architect → Mentor conversion requests."
+          description="Review Mentees → Mentor conversion requests."
         />
         <AdminMentorApplicationsSkeleton />
       </AdminPage>
@@ -272,7 +273,7 @@ export function AdminMentorApplicationsTab() {
       <AdminPageHeader
         eyebrow="Mentor Management"
         title="Mentor Applications"
-        description="Review Career Architect → Mentor conversion requests."
+        description="Review Mentees → Mentor conversion requests."
       />
 
       <AdminSearchPanel>

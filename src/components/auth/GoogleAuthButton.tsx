@@ -17,7 +17,7 @@ interface GoogleAuthButtonProps extends SocialAuthExtras {
     buttonType?: 'standard' | 'icon'
 }
 
-/** "Continue with Google" button, used on Career Architect Sign In and Sign Up. */
+/** "Continue with Google" button, used on Mentee Sign In and Sign Up. */
 export default function GoogleAuthButton({
     text = 'signin_with',
     successMessage = 'Signed in with Google!',

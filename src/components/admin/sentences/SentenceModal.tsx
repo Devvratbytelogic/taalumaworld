@@ -65,7 +65,7 @@ interface SentenceModalProps {
 export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChange, onSubmit }: SentenceModalProps) {
   const isEditing = !!sentence;
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, resetForm } = useFormik({
+  const { values, errors, touched, submitCount, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, resetForm } = useFormik({
     initialValues: emptyValues,
     validationSchema: agreementSentenceSchema,
     enableReinitialize: true,
@@ -218,10 +218,20 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                   </Button>
                 </div>
 
-                {values.links.map((link, index) => (
+                {values.links.map((link, index) => {
+                  const linkError = Array.isArray(errors.links) ? errors.links[index] : undefined;
+                  const linkTouch = Array.isArray(touched.links) ? touched.links[index] : undefined;
+                  const phraseError = linkError && typeof linkError !== 'string' ? linkError.phrase : undefined;
+                  const typeError = linkError && typeof linkError !== 'string' ? linkError.agreementType : undefined;
+                  const showPhraseError = !!phraseError && (submitCount > 0 || !!linkTouch?.phrase);
+                  const showTypeError = !!typeError && (submitCount > 0 || !!linkTouch?.agreementType);
+
+                  return (
                   <div key={index} className="grid gap-3 rounded-lg border border-slate-200 p-3 sm:grid-cols-[1fr_1fr_auto]">
                     <div className="space-y-2">
-                      <Label htmlFor={`sentence-phrase-${index}`}>Phrase</Label>
+                      <Label htmlFor={`sentence-phrase-${index}`}>
+                        Phrase<span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         id={`sentence-phrase-${index}`}
                         name={`links.${index}.phrase`}
@@ -230,10 +240,14 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                         onChange={handleChange}
                         onBlur={handleBlur}
                         disabled={isSubmitting}
+                        className={showPhraseError ? 'border-red-500' : ''}
                       />
+                      {showPhraseError ? <p className="text-sm text-red-600">{phraseError}</p> : null}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`sentence-type-${index}`}>Agreement type</Label>
+                      <Label htmlFor={`sentence-type-${index}`}>
+                        Agreement type<span className="text-red-500">*</span>
+                      </Label>
                       <select
                         id={`sentence-type-${index}`}
                         name={`links.${index}.agreementType`}
@@ -241,7 +255,7 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                         onChange={(e) => setFieldValue(`links.${index}.agreementType`, e.target.value)}
                         onBlur={handleBlur}
                         disabled={isSubmitting}
-                        className="admin-form-trigger w-full"
+                        className={`admin-form-trigger w-full ${showTypeError ? 'border-red-500' : ''}`}
                       >
                         <option value="">Select type</option>
                         {agreementTypeOptions.map((opt) => (
@@ -250,6 +264,7 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                           </option>
                         ))}
                       </select>
+                      {showTypeError ? <p className="text-sm text-red-600">{typeError}</p> : null}
                     </div>
                     <div className="flex items-center">
                       <button
@@ -269,8 +284,9 @@ export function SentenceModal({ open, sentence, agreementTypeOptions, onOpenChan
                       </button>
                     </div>
                   </div>
-                ))}
-                {typeof errors.links === 'string' && touched.links ? (
+                  );
+                })}
+                {typeof errors.links === 'string' && (submitCount > 0 || touched.links) ? (
                   <p className="text-sm text-red-600">{errors.links}</p>
                 ) : null}
               </div>

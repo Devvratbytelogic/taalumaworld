@@ -56,7 +56,7 @@ export default async function HomePage() {
           {/* Learn From Mentors Around the World */}
           {showMentorSection ? <FeaturedMentorsSection mentors={mentors} /> : null}
 
-          {/* What is a Career Architect? */}
+          {/* What is a Mentee? */}
           <CareerArchitectSection />
 
           {/* Reader Testimonials */}

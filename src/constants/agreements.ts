@@ -15,8 +15,8 @@ export const AGREEMENT_TOUCHPOINTS = {
 };
 
 export const AGREEMENT_TOUCHPOINT_OPTIONS = [
-  { value: AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION, label: 'Career Architect Registration' },
-  { value: AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION, label: 'Institutional Career Architect Registration' },
+  { value: AGREEMENT_TOUCHPOINTS.CAREER_ARCHITECT_REGISTRATION, label: 'Mentee Registration' },
+  { value: AGREEMENT_TOUCHPOINTS.INSTITUTIONAL_CAREER_ARCHITECT_REGISTRATION, label: 'Institutional Mentee Registration' },
   { value: AGREEMENT_TOUCHPOINTS.UNIVERSITY_REGISTRATION, label: 'University Registration' },
   { value: AGREEMENT_TOUCHPOINTS.MENTOR_REGISTRATION, label: 'Mentor Registration' },
   { value: AGREEMENT_TOUCHPOINTS.BLUEPRINT_UPLOAD, label: 'Book Upload' },
@@ -37,8 +37,8 @@ export const AGREEMENT_VISIBLE_USER_TYPES = {
 
 /** Roles an agreement type can be exposed to (`visible_to` on the agreement type). */
 export const AGREEMENT_VISIBLE_TO_OPTIONS = [
-  { value: AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT, label: 'Career Architect' },
-  { value: AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA, label: 'Institutional Career Architect' },
+  { value: AGREEMENT_VISIBLE_USER_TYPES.CAREER_ARCHITECT, label: 'Mentee' },
+  { value: AGREEMENT_VISIBLE_USER_TYPES.INSTITUTIONAL_CA, label: 'Institutional Mentee' },
   { value: AGREEMENT_VISIBLE_USER_TYPES.MENTOR, label: 'Mentor' },
 ];
 

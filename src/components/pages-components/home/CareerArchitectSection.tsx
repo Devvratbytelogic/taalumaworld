@@ -53,10 +53,10 @@ export default function CareerArchitectSection() {
                         <div className="space-y-3">
                             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                                 What is a{' '}
-                                <span className="gradient_text">Career Architect?</span>
+                                <span className="gradient_text">Mentee?</span>
                             </h2>
                             <p className="text-lg text-muted-foreground leading-relaxed">
-                                A Career Architect is someone who takes deliberate ownership of designing their future.
+                                A Mentee is someone who takes deliberate ownership of designing their future.
                             </p>
                             <p className="text-base text-muted-foreground leading-relaxed">
                                 Rather than leaving career growth to chance, Mentees actively learn, seek mentorship,

@@ -52,6 +52,7 @@ const defaultValues = {
   google_analytics_id: '',
   google_tag_manager: '',
   facebook_pixel: '',
+  facebook_domain_verification: '',
   microsoft_clarity: '',
   bing_tracking_code: '',
   instagram_link: '',
@@ -146,6 +147,7 @@ export function GeneralSettingsCard() {
     google_analytics_id: data?.google_analytics_id ?? '',
     google_tag_manager: data?.google_tag_manager ?? '',
     facebook_pixel: data?.facebook_pixel ?? '',
+    facebook_domain_verification: data?.facebook_domain_verification ?? '',
     microsoft_clarity: data?.microsoft_clarity ?? '',
     bing_tracking_code: data?.bing_tracking_code ?? '',
     instagram_link: data?.instagram_link ?? '',
@@ -447,6 +449,11 @@ export function GeneralSettingsCard() {
                 <Label htmlFor="facebook_pixel">Facebook Pixel</Label>
                 <Input {...field('facebook_pixel')} placeholder="1234567890" />
                 <FieldError msg={touched.facebook_pixel ? errors.facebook_pixel : ''} />
+              </div>
+              <div>
+                <Label htmlFor="facebook_domain_verification">Facebook Domain Verification</Label>
+                <Input {...field('facebook_domain_verification')} placeholder="facebook-domain-verification" />
+                <FieldError msg={touched.facebook_domain_verification ? errors.facebook_domain_verification : ''} />
               </div>
               <div>
                 <Label htmlFor="microsoft_clarity">Microsoft Clarity</Label>

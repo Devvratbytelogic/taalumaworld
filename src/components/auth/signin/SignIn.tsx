@@ -54,7 +54,7 @@ export default function SignIn() {
         onSubmit: async (vals) => {
 
             try {
-                const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
+                const res = await userLogin({ email: vals.email, password: vals.password, type: 'user' }).unwrap()
 
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res?.message ?? 'Sign in successful!')

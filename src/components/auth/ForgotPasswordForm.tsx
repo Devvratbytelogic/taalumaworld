@@ -36,7 +36,8 @@ export function ForgotPasswordForm({ variant = 'mentor' }: { variant?: ForgotPas
             try {
                 const res = await adminForgotPassword({
                     user_id: formValues.email,
-                    type: isAdmin ? 'admin' : 'mentor',
+                    user_type: isAdmin ? 'admin' : 'mentor',
+                    type: 'forgot_password',
                 }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res.message ?? 'Verification code sent to your email.');

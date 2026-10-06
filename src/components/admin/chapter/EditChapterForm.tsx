@@ -179,6 +179,13 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const pricingModel = selectedBook?.pricingModel ?? (selectedBook as { type?: string })?.type ?? 'chapter';
   const chapterPricingEnabled = pricingModel === 'chapter';
 
+  // The series already has the price, so this book does not need one.
+  useEffect(() => {
+    if (chapterPricingEnabled) return;
+    setFieldValue('isFree', true);
+    setFieldValue('price', 0);
+  }, [chapterPricingEnabled, setFieldValue]);
+
   useEffect(() => {
     skipOgImagePrefillRef.current = false;
   }, [chapterId]);

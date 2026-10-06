@@ -13,6 +13,7 @@ import { useUserForgotPasswordMutation } from '@/store/rtkQueries/userAuthApi';
 import toast from '@/utils/toast';
 
 export default function ForgotPassword() {
+    
     const dispatch = useDispatch();
     const { isOpen } = useSelector((state: RootState) => state.allModal);
     const [userForgotPassword, { isLoading: isSending }] = useUserForgotPasswordMutation();

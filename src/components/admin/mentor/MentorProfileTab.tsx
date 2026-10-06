@@ -82,15 +82,24 @@ function getMissingProfileFields(profile?: IAdminProfileAPIResponseData) {
   return required.filter((field) => !String(field.value ?? '').trim()).map((field) => field.label);
 }
 
-/** Required payout fields, mirroring `mentorPayoutDetailsSchema`, so the card can flag an incomplete setup. */
+/** Required payout fields, matching the payout form. Bank and M-Pesa are only required for that settlement method. */
 function getMissingPayoutFields(mentorInfo?: MentorInfo | null) {
+  const settlement = mentorInfo?.paystack_preferred_settlement;
   const required: { label: string; value?: string | null }[] = [
-    { label: 'Bank name', value: mentorInfo?.bank_name },
-    { label: 'Account number', value: mentorInfo?.bank_number },
-    { label: 'M-Pesa number', value: mentorInfo?.mpesa_number },
+    { label: 'Preferred settlement', value: settlement },
     { label: 'Preferred payout frequency', value: mentorInfo?.preferred_payment_frequency },
-    { label: 'Preferred settlement', value: mentorInfo?.paystack_preferred_settlement },
   ];
+
+  if (settlement === 'bank') {
+    required.push(
+      { label: 'Bank name', value: mentorInfo?.bank_name },
+      { label: 'Account number', value: mentorInfo?.bank_number },
+    );
+  }
+
+  if (settlement === 'mpesa') {
+    required.push({ label: 'M-Pesa number', value: mentorInfo?.mpesa_number });
+  }
 
   if (mentorInfo?.is_vat_registered) {
     required.push({ label: 'VAT number', value: mentorInfo?.vat_number });

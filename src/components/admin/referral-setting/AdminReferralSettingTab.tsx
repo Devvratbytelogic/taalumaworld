@@ -124,7 +124,7 @@ export function AdminReferralSettingTab() {
 
           <div className="space-y-2">
             <Label htmlFor="referalValues">
-              Value {referalType === 'percentage' ? '(%)' : '(KES)'}
+              Value {referalType === 'percentage' ? '(%)' : '(KSH)'}
             </Label>
             <Input
               id="referalValues"

@@ -101,7 +101,7 @@ export function MentorWalletTab() {
   const accountNumber = mentorInfo?.bank_number;
   const mpesaNumber = mentorInfo?.mpesa_number;
   const taxId = mentorInfo?.tax_id;
-  const currency = profile?.mentor_economy?.wallet?.currency || 'KES';
+  const currency = profile?.mentor_economy?.wallet?.currency || 'KSH';
   const preferredFrequency = mentorInfo?.preferred_payment_frequency || '';
 
   const walletSummary = ledgerData?.data?.summary;

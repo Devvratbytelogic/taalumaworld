@@ -45,7 +45,7 @@ const SCOPE_BADGE_CLASS: Record<string, string> = {
 function formatCouponValue(coupon: IAdminCouponEntity): string {
   if (coupon.coupon_type === 'Free') return 'Free';
   if (coupon.coupon_type === 'Percentage') return `${coupon.value}%`;
-  return `KES ${coupon.value?.toLocaleString?.() ?? coupon.value}`;
+  return `KSH ${coupon.value?.toLocaleString?.() ?? coupon.value}`;
 }
 
 export function AdminCouponsTab() {

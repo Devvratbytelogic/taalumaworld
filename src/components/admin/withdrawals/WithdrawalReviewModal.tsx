@@ -153,7 +153,7 @@ export function WithdrawalReviewModal({
                   <span className="font-semibold text-primary">{formatKes(withdrawal.amount)}</span>
                 </p>
                 <p>
-                  <span className="text-slate-500">Currency:</span> {withdrawal.currency || 'KES'}
+                  <span className="text-slate-500">Currency:</span> {withdrawal.currency || 'KSH'}
                 </p>
                 <p>
                   <span className="text-slate-500">Balance at request:</span>{' '}

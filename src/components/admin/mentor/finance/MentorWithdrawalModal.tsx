@@ -92,7 +92,7 @@ export default function MentorWithdrawalModal({ open = false, onOpenChange }: Me
   const hasBank = Boolean(mentorInfo?.bank_number?.trim());
   const hasMpesa = Boolean(mentorInfo?.mpesa_number?.trim());
   const availableBalance = ledgerData?.data?.summary?.available_balance ?? 0;
-  const currency = profile?.mentor_economy?.wallet?.currency || ledgerData?.data?.summary?.currency || 'KES';
+  const currency = profile?.mentor_economy?.wallet?.currency || ledgerData?.data?.summary?.currency || 'KSH';
 
   useEffect(() => {
     if (!open) {

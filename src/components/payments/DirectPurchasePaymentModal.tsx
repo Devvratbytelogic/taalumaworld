@@ -97,7 +97,7 @@ export default function DirectPurchasePaymentModal({
   const amountLabel =
     amount == null
       ? null
-      : !currency || currency.toUpperCase() === 'KES'
+      : !currency || currency.toUpperCase() === 'KSH'
         ? formatKes(amount)
         : `${currency} ${amount.toLocaleString()}`;
 

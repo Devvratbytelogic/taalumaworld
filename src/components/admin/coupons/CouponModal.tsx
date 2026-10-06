@@ -246,7 +246,7 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="value">
-                  {isPercentage ? 'Discount Value (%)' : 'Discount Value (KES)'}
+                  {isPercentage ? 'Discount Value (%)' : 'Discount Value (KSH)'}
                   {!isFree ? <span className="text-red-500"> *</span> : null}
                 </Label>
                 <Input
@@ -331,7 +331,7 @@ export function CouponModal({ open, coupon, onOpenChange }: CouponModalProps) {
             {!isUniversity ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="minimum_cart_value">Minimum Cart Value (KES)</Label>
+                  <Label htmlFor="minimum_cart_value">Minimum Cart Value (KSH)</Label>
                   <Input
                     id="minimum_cart_value"
                     name="minimum_cart_value"

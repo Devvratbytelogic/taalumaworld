@@ -52,7 +52,7 @@ function formatPaidAt(paidAt?: string | null) {
 
 function formatAmount(amount?: number | null, currency?: string | null) {
   if (amount == null) return null;
-  if (!currency || currency.toUpperCase() === 'KES') return formatKes(amount);
+  if (!currency || currency.toUpperCase() === 'KSH') return formatKes(amount);
   return `${currency} ${amount.toLocaleString()}`;
 }
 

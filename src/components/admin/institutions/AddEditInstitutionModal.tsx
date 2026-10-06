@@ -56,7 +56,7 @@ export function AddEditInstitutionModal() {
             ? `${coupon.coupon_code} (${coupon.value}%)`
             : coupon.coupon_type === 'Free'
               ? `${coupon.coupon_code} (Free)`
-              : `${coupon.coupon_code} (KES ${coupon.value})`,
+              : `${coupon.coupon_code} (KSH ${coupon.value})`,
       })),
     [couponsResponse],
   );

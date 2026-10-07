@@ -61,6 +61,7 @@ export default async function SingleBlueprintPage({ params }: PageProps) {
     const { slug } = await params;
     const response = await getSingleBlueprintServerAPI({ slug });
     const data = response?.data ?? null;
+    // console.log('data.json_ld', data?.json_ld);
 
     return (
         <>

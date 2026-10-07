@@ -6,13 +6,13 @@ import PrimaryFooter from '@/components/layout/footer/PrimaryFooter';
 import { useAuth } from '@/hooks/useAuth';
 import { getUserRole } from '@/utils/authCookies';
 import { hasSocialOAuthCallbackParams } from '@/utils/socialAuth';
-import type { IGlobalSettings } from '@/types/globalSettings';
+import type { PublicSiteSettings } from '@/utils/publicPagePayload';
 
 type SiteLayoutProps = {
     children: ReactNode;
     logo: string;
     contentMode: string;
-    settings: IGlobalSettings | null;
+    settings: PublicSiteSettings | null;
 };
 
 function isChromeHiddenPath(pathname: string) {

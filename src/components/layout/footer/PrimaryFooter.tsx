@@ -8,12 +8,12 @@ import FooterSubscribe from '@/components/layout/footer/FooterSubscribe';
 import { getAboutUsRoutePath, getAdminRoutePath, getContactUsRoutePath, getFAQRoutePath, getHomeRoutePath, getPoliciesRoutePath, getPrivacyPolicyRoutePath, getTermsOfServiceRoutePath } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { DEFAULT_BRAND_LOGO } from '@/constants/common';
-import type { IGlobalSettings } from '@/types/globalSettings';
+import type { PublicSiteSettings } from '@/utils/publicPagePayload';
 
 export default function PrimaryFooter({
     settings,
 }: {
-    settings: IGlobalSettings | null;
+    settings: PublicSiteSettings | null;
 }) {
     const { isAuthenticated, user } = useAuth();
     const isAdmin = user?.role?.toLowerCase() === 'admin';

@@ -7,6 +7,7 @@ import { ContentProtection } from "@/components/ContentProtection";
 import Script from "next/script";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
 import { DEFAULT_BRAND_LOGO } from "@/constants/common";
+import { toPublicSiteSettings } from "@/utils/publicPagePayload";
 
 export const revalidate = 300;
 
@@ -72,6 +73,7 @@ export default async function RootLayout({
   const globalSettings = res?.data ?? null;
   const logo = globalSettings?.logo || DEFAULT_BRAND_LOGO;
   const contentMode = globalSettings?.visible ?? '';
+  const clientSettings = toPublicSiteSettings(globalSettings);
 
   return (
     <html lang="en" className={`${roboto.variable} ${ubuntu.variable}`} suppressHydrationWarning>
@@ -290,7 +292,7 @@ export default async function RootLayout({
           <ContentProtection />
         )}
         <AppProviders>
-          <ConditionalSiteLayout logo={logo} contentMode={contentMode} settings={globalSettings}>
+          <ConditionalSiteLayout logo={logo} contentMode={contentMode} settings={clientSettings}>
             {children}
           </ConditionalSiteLayout>
         </AppProviders>

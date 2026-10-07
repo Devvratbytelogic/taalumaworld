@@ -771,6 +771,7 @@ function ProfileDetailsCard({ profile }: { profile?: IAdminProfileAPIResponseDat
 /** ── Section 2: Bank / M-Pesa / tax details — POST /admin/update-mentor-info ── */
 function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [allRequiredAccepted, setAllRequiredAccepted] = useState(false);
   const [updateMentorInfo] = useUpdateMentorInfoMutation();
   const requiredAcceptedRef = useRef(false);
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
@@ -831,8 +832,12 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
 
   const handleCancel = () => {
     resetForm();
+    requiredAcceptedRef.current = false;
+    setAllRequiredAccepted(false);
     setIsEditing(false);
   };
+
+  const canSavePayout = allRequiredAccepted && mentorPayoutDetailsSchema.isValidSync(values);
 
   const selectedBankOption = bankOptions && bankOptions?.length > 0 ? bankOptions.find((option) => option.value === values.bank_name) : null;
 
@@ -857,7 +862,11 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
             type="button"
             className="global_btn rounded_full outline_primary"
             startContent={<Pencil className="h-4 w-4" />}
-            onPress={() => setIsEditing(true)}
+            onPress={() => {
+              requiredAcceptedRef.current = false;
+              setAllRequiredAccepted(false);
+              setIsEditing(true);
+            }}
           >
             Edit
           </Button>
@@ -1185,7 +1194,10 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
             <AgreementSentenceList
               touchpoint={AGREEMENT_TOUCHPOINTS.MENTOR_PAYOUT_SETUP}
               onAcceptedAgreementIdsChange={(ids) => setFieldValue('accepted_agreement_ids', ids)}
-              onRequiredAcceptedChange={(accepted) => { requiredAcceptedRef.current = accepted; }}
+              onRequiredAcceptedChange={(accepted) => {
+                requiredAcceptedRef.current = accepted;
+                setAllRequiredAccepted(accepted);
+              }}
               error={typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined}
               touched={touched.accepted_agreement_ids}
               onBlur={() => setFieldTouched('accepted_agreement_ids', true)}
@@ -1193,7 +1205,13 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
             />
 
             <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-5">
-              <Button type="submit" className="global_btn rounded_full bg_primary" isLoading={isSubmitting} startContent={<Check className="h-4 w-4" />}>
+              <Button
+                type="submit"
+                className="global_btn rounded_full bg_primary"
+                isLoading={isSubmitting}
+                isDisabled={!canSavePayout || isSubmitting}
+                startContent={<Check className="h-4 w-4" />}
+              >
                 Save changes
               </Button>
               <Button type="button" className="global_btn rounded_full outline_primary" onPress={handleCancel} disabled={isSubmitting}>

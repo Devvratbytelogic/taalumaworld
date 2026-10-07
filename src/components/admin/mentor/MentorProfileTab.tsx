@@ -895,34 +895,40 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                 {formatSettlementLabel(mentorInfo?.paystack_preferred_settlement)}
               </dd>
             </div>
-            <div>
-              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
-                <Landmark className="h-3.5 w-3.5" />
-                Bank name
-              </dt>
-              <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.bank_name || '—'}</dd>
-            </div>
-            <div>
-              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
-                <Landmark className="h-3.5 w-3.5" />
-                Account number
-              </dt>
-              <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.bank_number || '—'}</dd>
-            </div>
-            <div>
-              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
-                <Landmark className="h-3.5 w-3.5" />
-                Bank branch
-              </dt>
-              <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.bank_branch || '—'}</dd>
-            </div>
-            <div>
-              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
-                <Wallet className="h-3.5 w-3.5" />
-                M-Pesa number
-              </dt>
-              <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.mpesa_number || '—'}</dd>
-            </div>
+            {mentorInfo?.paystack_preferred_settlement === 'bank' && (
+              <>
+                <div>
+                  <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <Landmark className="h-3.5 w-3.5" />
+                    Bank name
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.bank_name || '—'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <Landmark className="h-3.5 w-3.5" />
+                    Account number
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.bank_number || '—'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <Landmark className="h-3.5 w-3.5" />
+                    Bank branch
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.bank_branch || '—'}</dd>
+                </div>
+              </>
+            )}
+            {mentorInfo?.paystack_preferred_settlement === 'mpesa' && (
+              <div>
+                <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <Wallet className="h-3.5 w-3.5" />
+                  M-Pesa number
+                </dt>
+                <dd className="mt-1 text-sm font-medium text-slate-900">{mentorInfo?.mpesa_number || '—'}</dd>
+              </div>
+            )}
             <div>
               <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500">
                 <Receipt className="h-3.5 w-3.5" />
@@ -999,12 +1005,14 @@ function PayoutDetailsCard({ mentorInfo }: { mentorInfo?: MentorInfo | null }) {
                     </dd>
                   </div>
                 )}
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">M-Pesa subaccount code</dt>
-                  <dd className="mt-1 text-sm font-medium font-mono text-slate-900">
-                    {mentorInfo?.paystack_mpesa_subaccount_code || '—'}
-                  </dd>
-                </div>
+                {mentorInfo?.paystack_preferred_settlement === 'mpesa' && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">M-Pesa subaccount code</dt>
+                    <dd className="mt-1 text-sm font-medium font-mono text-slate-900">
+                      {mentorInfo?.paystack_mpesa_subaccount_code || '—'}
+                    </dd>
+                  </div>
+                )}
                 {mentorInfo?.paystack_subaccount_error ? (
                   <div className="sm:col-span-2">
                     <dt className="text-xs font-medium uppercase tracking-wide text-red-600">Sync error</dt>

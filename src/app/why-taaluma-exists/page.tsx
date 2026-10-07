@@ -1,4 +1,5 @@
 import React from 'react'
+import type { Metadata } from 'next';
 import WhyTaalumaExistsBanner from '@/components/pages-components/about/WhyTaalumaExistsBanner';
 import WhyTaalumaExists from '@/components/pages-components/about/WhyTaalumaExists';
 import MissionVision from '@/components/pages-components/about/MissionVision';
@@ -10,6 +11,31 @@ import { getAllMentorsServerAPI, getGlobalSettingsServerAPI } from '@/store/serv
 import FeaturedMentorsSection from '@/components/pages-components/mentor/FeaturedMentorsSection';
 
 export const revalidate = 300;
+
+const title = 'Why Taaluma Exists | TaalumaWorld';
+const description =
+    'We help people learn from those ahead of them, mentor those behind them, and build the capacity needed to thrive in the AI Economy.';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const settings = (await getGlobalSettingsServerAPI())?.data;
+    const image = settings?.og_image || settings?.logo || undefined;
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            ...(image ? { images: [{ url: image }] } : {}),
+        },
+        twitter: {
+            card: image ? 'summary_large_image' : 'summary',
+            title,
+            description,
+            ...(image ? { images: [image] } : {}),
+        },
+    };
+}
 
 export default async function WhyTaalumaExistsPage() {
     const globalSettingsRes = await getGlobalSettingsServerAPI();

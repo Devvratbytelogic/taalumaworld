@@ -18,6 +18,7 @@ import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsR
 import { signOut } from '@/utils/refreshSession';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { DEFAULT_BRAND_LOGO, isMentorRole, isStaffAdminRole } from '@/constants/common';
+import { OPEN_GLOBAL_SEARCH_EVENT } from '@/utils/openGlobalSearch';
 
 interface PrimaryHeaderProps {
   isAuthenticated: boolean;
@@ -140,6 +141,12 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
       document.body.style.overflow = previousOverflow;
     };
   }, [isSearchOpen]);
+
+  useEffect(() => {
+    const openSearch = () => setIsSearchOpen(true);
+    window.addEventListener(OPEN_GLOBAL_SEARCH_EVENT, openSearch);
+    return () => window.removeEventListener(OPEN_GLOBAL_SEARCH_EVENT, openSearch);
+  }, []);
 
   // Close transient UI (search panel, user menu) on route change
   useEffect(() => {
@@ -334,7 +341,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
           )}
         >
           <div className="w-full max-w-2xl overflow-hidden rounded-md bg-white">
-            <GlobalSearchBar onSelect={() => setIsSearchOpen(false)} />
+            <GlobalSearchBar active={isSearchOpen} onSelect={() => setIsSearchOpen(false)} />
           </div>
         </div>
       </header>

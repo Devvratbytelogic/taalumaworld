@@ -50,10 +50,11 @@ export default function FilterOptions({
                 <div className="relative w-full max-w-xs">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
+                        id="content-search"
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                         placeholder="Search content..."
-                        className="h-10 rounded-full border-border pl-9 pr-9"
+                        className="h-10 scroll-mt-[200px] rounded-full border-border pl-9 pr-9"
                         aria-label="Search content"
                     />
                     {search ? (

@@ -12,6 +12,7 @@ import { getBlueprintRoutePath, getSeriesRoutePath, getSingleAuthorRoutePath } f
 import { VISIBLE } from '@/constants/contentMode';
 
 interface GlobalSearchBarProps {
+  active?: boolean;
   onSelect: () => void;
 }
 
@@ -22,7 +23,7 @@ function formatPrice(price: number) {
   return amount > 0 ? `KSH ${amount.toFixed(2)}` : 'FREE';
 }
 
-export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
+export default function GlobalSearchBar({ active = false, onSelect }: GlobalSearchBarProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const debouncedQuery = useDebounce(query.trim(), 350);
@@ -33,8 +34,9 @@ export default function GlobalSearchBar({ onSelect }: GlobalSearchBarProps) {
   });
 
   useEffect(() => {
+    if (!active) return;
     inputRef.current?.focus();
-  }, []);
+  }, [active]);
 
   const series = data?.data?.series ?? [];
   const blueprints = data?.data?.blueprints ?? [];

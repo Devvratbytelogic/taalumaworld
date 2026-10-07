@@ -4,6 +4,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { openModal } from '@/store/slices/allModalSlice'
 import Button from '@/components/ui/Button'
+import { openGlobalSearch } from '@/utils/openGlobalSearch'
 
 const traits = [
     {
@@ -79,7 +80,12 @@ export default function CareerArchitectSection() {
                     {/* Right: Trait Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {traits.map(({ icon: Icon, title, description, iconBg, iconColor }) => (
-                            <div key={title} className="bg-white rounded-md border p-5 space-y-3">
+                            <button
+                                key={title}
+                                type="button"
+                                onClick={openGlobalSearch}
+                                className="bg-white rounded-md border p-5 space-y-3 text-left transition hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            >
                                 <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center`}>
                                     <Icon className={`w-5 h-5 ${iconColor}`} />
                                 </div>
@@ -87,7 +93,7 @@ export default function CareerArchitectSection() {
                                     <h3 className="font-semibold text-foreground">{title}</h3>
                                     <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{description}</p>
                                 </div>
-                            </div>
+                            </button>
                         ))}
                     </div>
                 </div>

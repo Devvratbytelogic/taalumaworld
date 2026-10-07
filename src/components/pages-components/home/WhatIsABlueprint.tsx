@@ -1,5 +1,17 @@
+'use client'
+
 import { Clock, Zap, Target } from 'lucide-react'
 import React from 'react'
+
+function scrollToContentSearch(event: React.MouseEvent<HTMLAnchorElement>) {
+    const searchInput = document.getElementById('content-search')
+    if (!searchInput) return
+
+    event.preventDefault()
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    searchInput.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
+    searchInput.focus({ preventScroll: true })
+}
 
 const readTimes = [
     {
@@ -53,7 +65,12 @@ export default function WhatIsABlueprint() {
                 {/* Read Time Cards */}
                 <div className="grid md:grid-cols-3 gap-5 mb-10">
                     {readTimes.map(({ icon: Icon, duration, label, description, iconBg, iconColor }) => (
-                        <div key={duration} className="bg-white rounded-md p-6 border flex flex-col gap-4">
+                        <a
+                            key={duration}
+                            href="#content-search"
+                            onClick={scrollToContentSearch}
+                            className="bg-white rounded-md p-6 border flex flex-col gap-4 text-left transition hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        >
                             <div className={`w-12 h-12 rounded-full ${iconBg} flex items-center justify-center`}>
                                 <Icon className={`w-6 h-6 ${iconColor}`} />
                             </div>
@@ -62,7 +79,7 @@ export default function WhatIsABlueprint() {
                                 <h3 className="font-semibold text-lg text-foreground mt-0.5">{label}</h3>
                                 <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{description}</p>
                             </div>
-                        </div>
+                        </a>
                     ))}
                 </div>
 

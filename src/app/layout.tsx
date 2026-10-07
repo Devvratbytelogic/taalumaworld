@@ -8,6 +8,7 @@ import Script from "next/script";
 import { getGlobalSettingsServerAPI } from "@/store/server-api/serverSideAPIs";
 import { DEFAULT_BRAND_LOGO } from "@/constants/common";
 import { toPublicSiteSettings } from "@/utils/publicPagePayload";
+import { GlobalSchemaMarkup } from "@/components/seo/GlobalSchemaMarkup";
 
 export const revalidate = 300;
 
@@ -110,19 +111,9 @@ export default async function RootLayout({
         {/* SCHEMA MARKUP / JSON-LD */}
         {/* ========================================= */}
 
-        {(
-          globalSettings?.json_ld ||
-          globalSettings?.schema_markup
-        ) && (
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html:
-                  globalSettings?.json_ld ||
-                  globalSettings?.schema_markup,
-              }}
-            />
-          )}
+        <GlobalSchemaMarkup
+          markup={globalSettings?.json_ld || globalSettings?.schema_markup}
+        />
 
       </head>
       <body className="antialiased" suppressHydrationWarning>

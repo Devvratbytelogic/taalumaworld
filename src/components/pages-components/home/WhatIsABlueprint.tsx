@@ -2,16 +2,7 @@
 
 import { Clock, Zap, Target } from 'lucide-react'
 import React from 'react'
-
-function scrollToContentSearch(event: React.MouseEvent<HTMLAnchorElement>) {
-    const searchInput = document.getElementById('content-search')
-    if (!searchInput) return
-
-    event.preventDefault()
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    searchInput.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
-    searchInput.focus({ preventScroll: true })
-}
+import { scrollToContentSearch } from '@/utils/scrollToContentSearch'
 
 const readTimes = [
     {

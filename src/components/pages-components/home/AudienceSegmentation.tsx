@@ -1,5 +1,8 @@
+'use client'
+
 import { GraduationCap, Briefcase, Award, Building2 } from 'lucide-react'
 import React from 'react'
+import { scrollToContentSearch } from '@/utils/scrollToContentSearch'
 
 const audiences = [
     {
@@ -49,9 +52,11 @@ export default function AudienceSegmentation() {
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
                     {audiences.map(({ icon: Icon, title, description, iconBg, iconColor, border }) => (
-                        <div
+                        <a
                             key={title}
-                            className={`bg-white rounded-md p-6 transition-all border ${border} flex flex-col gap-4`}
+                            href="#content-search"
+                            onClick={scrollToContentSearch}
+                            className={`bg-white rounded-md p-6 transition-all border ${border} flex flex-col gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
                         >
                             <div className={`w-12 h-12 rounded-full ${iconBg} flex items-center justify-center`}>
                                 <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -60,7 +65,7 @@ export default function AudienceSegmentation() {
                                 <h3 className="font-bold text-lg text-foreground">{title}</h3>
                                 <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
                             </div>
-                        </div>
+                        </a>
                     ))}
                 </div>
             </div>

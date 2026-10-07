@@ -54,7 +54,7 @@ export default function FilterOptions({
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                         placeholder="Search content..."
-                        className="h-10 scroll-mt-[200px] rounded-full border-border pl-9 pr-9"
+                        className="h-10 scroll-mt-50 rounded-full border-border pl-9 pr-9"
                         aria-label="Search content"
                     />
                     {search ? (

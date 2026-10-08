@@ -22,10 +22,10 @@ export function AppProviders({ children }: ProvidersProps) {
     return (
         <>
             <Provider store={store}>
-                <Toaster position="bottom-right" richColors closeButton visibleToasts={3} />
+                <Toaster position="bottom-right" richColors closeButton visibleToasts={1} />
                 <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ''}>
                     <HeroUIProvider>
-                        <ToastProvider maxVisibleToasts={3} placement="bottom-right" />
+                        <ToastProvider maxVisibleToasts={1} placement="bottom-right" />
                         <NextTopLoader
                             color="#f7941d"
                             showSpinner={false}

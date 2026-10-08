@@ -1,7 +1,7 @@
 /**
  * Central toast helpers.
  * UI code uses Sonner (`toast`); API errors in RTK use HeroUI via `showApiErrorToast`.
- * Identical error messages replace/skip instead of stacking.
+ * Identical messages replace the current toast instead of stacking behind it.
  */
 import { toast as sonnerToast, Toaster } from 'sonner';
 import type { ExternalToast } from 'sonner';
@@ -31,11 +31,25 @@ export function showApiErrorToast(message: string) {
     }, API_ERROR_TOAST_MS);
 }
 
-const originalError = sonnerToast.error.bind(sonnerToast);
+type ToastMethod = typeof sonnerToast.success;
 
-sonnerToast.error = ((message, data?: ExternalToast) => {
-    const id = data?.id ?? (typeof message === 'string' ? `error:${message}` : undefined);
-    return originalError(message, { ...data, ...(id !== undefined ? { id } : {}) });
-}) as typeof sonnerToast.error;
+function withStableToastId(method: ToastMethod, prefix: string): ToastMethod {
+    return ((message, data?: ExternalToast) => {
+        const id = data?.id ?? (typeof message === 'string' ? `${prefix}:${message}` : undefined);
+        return method(message, { ...data, ...(id !== undefined ? { id } : {}) });
+    }) as ToastMethod;
+}
+
+const showSuccess = sonnerToast.success.bind(sonnerToast);
+const showError = sonnerToast.error.bind(sonnerToast);
+const showInfo = sonnerToast.info.bind(sonnerToast);
+const showWarning = sonnerToast.warning.bind(sonnerToast);
+const showMessage = sonnerToast.message.bind(sonnerToast);
+
+sonnerToast.success = withStableToastId(showSuccess, 'success');
+sonnerToast.error = withStableToastId(showError, 'error');
+sonnerToast.info = withStableToastId(showInfo, 'info');
+sonnerToast.warning = withStableToastId(showWarning, 'warning');
+sonnerToast.message = withStableToastId(showMessage, 'message');
 
 export { sonnerToast as toast, sonnerToast as default, Toaster };

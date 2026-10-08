@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { ImagePlus, Loader2, Save, Settings, X } from 'lucide-react';
+import { FileText, ImagePlus, Loader2, Save, Settings, X } from 'lucide-react';
 import { useFormik } from 'formik';
 import { Card } from '../../ui/card';
 import { Input } from '../../ui/input';
@@ -18,7 +18,18 @@ import toast from '@/utils/toast';
 import AdminSettingsSkeleton from '@/components/skeleton-loader/AdminSettingsSkeleton';
 import { appendOpenGraphFieldsToFormData, OPEN_GRAPH_FORM_FIELD_KEYS, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
-import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
+import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, PDF_UPLOAD_MAX_MB, PDF_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
+
+const MENTOR_GUIDE_ACCEPT = '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+function isMentorGuideFile(file: File) {
+  return /\.(pdf|docx)$/i.test(file.name);
+}
+
+function guideFileLabel(url: string) {
+  const name = decodeURIComponent(url.split('?')[0].split('/').pop() || '');
+  return name || 'Current mentor guide';
+}
 
 const SETTING_MODEL = 'Setting';
 
@@ -86,19 +97,24 @@ function SectionHeading({ title }: { title: string }) {
   );
 }
 
-function CheckboxField({ id, label, checked, onChange }: { id: string; label: string; checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+function NotificationToggle({
+  id,
+  label,
+  checked,
+  onCheckedChange,
+}: {
+  id: string;
+  label: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}) {
   return (
-    <label htmlFor={id} className="flex items-center gap-2 cursor-pointer select-none text-sm">
-      <input
-        id={id}
-        name={id}
-        type="checkbox"
-        className="h-4 w-4 accent-blue-600"
-        checked={checked}
-        onChange={onChange}
-      />
-      {label}
-    </label>
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-input bg-gray-50 px-4 py-3">
+      <Label htmlFor={id} className="cursor-pointer text-sm font-medium text-foreground">
+        {label}
+      </Label>
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
   );
 }
 
@@ -108,6 +124,8 @@ export function GeneralSettingsCard() {
   const { hasPermission } = useAdminPermissions();
   const canEdit = hasPermission(SETTING_MODEL, 'edit');
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [mentorGuideFile, setMentorGuideFile] = useState<File | null>(null);
+  const mentorGuideInputRef = useRef<HTMLInputElement>(null);
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogImagePreviewUrl, setOgImagePreviewUrl] = useState<string | null>(null);
   const [ogImageRemoved, setOgImageRemoved] = useState(false);
@@ -176,6 +194,7 @@ export function GeneralSettingsCard() {
           formData.append(key, String(values[key]));
         });
         if (logoFile) formData.append('logo', logoFile);
+        if (mentorGuideFile) formData.append('mentor_guide', mentorGuideFile);
         appendOpenGraphFieldsToFormData(formData, {
           meta_title: values.meta_title,
           meta_description: values.meta_description,
@@ -191,6 +210,8 @@ export function GeneralSettingsCard() {
         if (res?.http_status_code === 200 || res?.http_status_code === 201) {
           skipOgImagePrefillRef.current = false;
           setOgImageRemoved(false);
+          setMentorGuideFile(null);
+          if (mentorGuideInputRef.current) mentorGuideInputRef.current.value = '';
           void refreshAfterSettingsChange();
           toast.success(res.message ?? 'Settings updated successfully');
         }
@@ -496,33 +517,111 @@ export function GeneralSettingsCard() {
             </div>
           </section>
 
+          {/* ── Mentor guide ── */}
+          <section>
+            <SectionHeading title="Mentor Guide" />
+            <div>
+              <Label htmlFor="mentor_guide">
+                Writing and publishing guide
+                <FileUploadLimitHint kind="pdf" />
+              </Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                PDF or DOCX file for mentors. Upload replaces the current file when you save.
+              </p>
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  ref={mentorGuideInputRef}
+                  id="mentor_guide"
+                  type="file"
+                  accept={MENTOR_GUIDE_ACCEPT}
+                  className="hidden"
+                  disabled={!canEdit}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    if (!file) {
+                      setMentorGuideFile(null);
+                      return;
+                    }
+                    if (!isMentorGuideFile(file)) {
+                      toast.error('Please select a PDF or DOCX file');
+                      e.target.value = '';
+                      return;
+                    }
+                    if (file.size > PDF_UPLOAD_MAX_BYTES) {
+                      toast.error(`File must be less than ${PDF_UPLOAD_MAX_MB}MB`);
+                      e.target.value = '';
+                      return;
+                    }
+                    setMentorGuideFile(file);
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={!canEdit}
+                  onClick={() => mentorGuideInputRef.current?.click()}
+                  className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-dashed border-input bg-gray-50 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <FileText className="h-4 w-4 shrink-0" />
+                  {mentorGuideFile ? (
+                    <span className="truncate font-medium text-foreground">{mentorGuideFile.name}</span>
+                  ) : (
+                    <span>Click to select a mentor guide</span>
+                  )}
+                </button>
+                {mentorGuideFile ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMentorGuideFile(null);
+                      if (mentorGuideInputRef.current) mentorGuideInputRef.current.value = '';
+                    }}
+                    className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    Clear
+                  </button>
+                ) : null}
+              </div>
+              {typeof data?.mentor_guide === 'string' && data.mentor_guide ? (
+                <a
+                  href={data.mentor_guide}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-flex text-sm text-primary underline underline-offset-2"
+                >
+                  {mentorGuideFile ? 'Current file' : guideFileLabel(data.mentor_guide)}
+                </a>
+              ) : null}
+            </div>
+          </section>
+
           {/* ── Notifications ── */}
           <section>
             <SectionHeading title="Email Notifications" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <CheckboxField
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <NotificationToggle
                 id="emailNotificationsNewUsers"
                 label="New user registrations"
                 checked={values.emailNotificationsNewUsers}
-                onChange={handleChange}
+                onCheckedChange={(checked) => setFieldValue('emailNotificationsNewUsers', checked)}
               />
-              <CheckboxField
+              <NotificationToggle
                 id="emailNotificationsPurchases"
                 label="New purchases"
                 checked={values.emailNotificationsPurchases}
-                onChange={handleChange}
+                onCheckedChange={(checked) => setFieldValue('emailNotificationsPurchases', checked)}
               />
-              <CheckboxField
+              <NotificationToggle
                 id="dailySummaryReports"
                 label="Daily summary reports"
                 checked={values.dailySummaryReports}
-                onChange={handleChange}
+                onCheckedChange={(checked) => setFieldValue('dailySummaryReports', checked)}
               />
-              <CheckboxField
+              <NotificationToggle
                 id="alertFlaggedContent"
                 label="Alert on flagged content"
                 checked={values.alertFlaggedContent}
-                onChange={handleChange}
+                onCheckedChange={(checked) => setFieldValue('alertFlaggedContent', checked)}
               />
             </div>
           </section>

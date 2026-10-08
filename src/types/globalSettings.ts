@@ -46,6 +46,7 @@ export interface IGlobalSettings {
   emailNotificationsPurchases: boolean;
   dailySummaryReports: boolean;
   alertFlaggedContent: boolean;
+  mentor_guide?: string | null;
   logo: string;
   icon_image: string;
   instagram_logo: string;

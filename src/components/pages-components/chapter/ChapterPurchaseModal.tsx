@@ -78,8 +78,10 @@ export default function ChapterPurchaseModal() {
   const subtotal = Number(displayPrice ?? 0);
   const taxPercent = subtotal > 0 ? Math.round((taxPrice / subtotal) * 100) : 0;
   const totalPaymentRequired = subtotal + taxPrice;
+  const isFreeOrder = totalPaymentRequired <= 0;
+  const addressRequired = !isFreeOrder;
   // Without an address the API falls back to the default rate, so the total is not final yet.
-  const isTaxEstimated = !isLoading && !isAddressAvailable && taxPrice > 0;
+  const isTaxEstimated = addressRequired && !isLoading && !isAddressAvailable && taxPrice > 0;
 
   const agreementError =
     agreementTouched && !allRequiredAccepted
@@ -100,7 +102,7 @@ export default function ChapterPurchaseModal() {
 
   const validatePurchase = () => {
     // if (checkoutBlocked) return false;
-    if (!isAddressAvailable) return false;
+    if (addressRequired && !isAddressAvailable) return false;
     if (!allRequiredAccepted) {
       setAgreementTouched(true);
       scrollToAgreementSection(agreementSectionRef.current);
@@ -269,7 +271,11 @@ export default function ChapterPurchaseModal() {
               </span>
             </div>
 
-            <ChapterPurchaseAddresses addressData={addressData} isLoading={isLoading} />
+            <ChapterPurchaseAddresses
+              addressData={addressData}
+              isLoading={isLoading}
+              addressRequired={addressRequired}
+            />
 
             {/* {checkoutBlocked ? (
               <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -322,21 +328,23 @@ export default function ChapterPurchaseModal() {
             )}
 
             <div className="flex flex-col gap-2">
-              <ReferralWalletPayButton
-                totalPaymentRequired={totalPaymentRequired}
-                payload={referralWalletPayload}
-                isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
-                onBeforePay={validatePurchase}
-                onSuccess={handlePurchaseSuccess}
-                onLoadingChange={setIsWalletPaying}
-              />
+              {!isFreeOrder && (
+                <ReferralWalletPayButton
+                  totalPaymentRequired={totalPaymentRequired}
+                  payload={referralWalletPayload}
+                  isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
+                  onBeforePay={validatePurchase}
+                  onSuccess={handlePurchaseSuccess}
+                  onLoadingChange={setIsWalletPaying}
+                />
+              )}
               <PaystackPayButton
                 chapterID={purchaseId}
                 type={purchaseType}
                 acceptedAgreementIds={acceptedAgreementIds}
                 callbackUrl={typeof window !== 'undefined' ? window.location.href : undefined}
                 label={`Buy Now - KSH ${totalPaymentRequired.toFixed(2)}`}
-                isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
+                isDisabled={(addressRequired && !isAddressAvailable) || isPaymentBusy || !purchaseId}
                 onBeforePay={validatePurchase}
                 onSuccess={handlePurchaseSuccess}
                 onLoadingChange={setIsPaystackPaying}

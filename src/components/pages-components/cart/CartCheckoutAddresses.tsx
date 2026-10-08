@@ -21,12 +21,14 @@ function formatCityStateLine(address: IAddress): string {
 
 interface CartCheckoutAddressesProps {
   selectedAddressId?: string | null;
-  onSelectAddress?: (addressId: string) => void;
+  onSelectAddress?: (addressId: string | null) => void;
+  addressRequired?: boolean;
 }
 
 export default function CartCheckoutAddresses({
   selectedAddressId,
   onSelectAddress,
+  addressRequired = true,
 }: CartCheckoutAddressesProps) {
   const dispatch = useDispatch();
   const { data, isLoading, isFetching } = useGetUserAddressesQuery();
@@ -35,9 +37,17 @@ export default function CartCheckoutAddresses({
 
   const addresses = Array.isArray(data?.data) ? data.data : [];
 
-  // Pick the default address (or the first one) once the list loads.
+  // Keep the checkout selection in sync with the saved list. A deleted
+  // address must be cleared so payment stays disabled until another is chosen.
   useEffect(() => {
-    if (selectedAddressId || addresses.length === 0) return;
+    if (addresses.length === 0) {
+      if (selectedAddressId) onSelectAddress?.(null);
+      return;
+    }
+
+    const stillExists = addresses.some((address) => address._id === selectedAddressId);
+    if (stillExists) return;
+
     const defaultAddress = addresses.find((address) => address.isDefault) ?? addresses[0];
     if (defaultAddress?._id) onSelectAddress?.(defaultAddress._id);
   }, [addresses, onSelectAddress, selectedAddressId]);
@@ -191,7 +201,9 @@ export default function CartCheckoutAddresses({
           </span>
           <h3 className="mb-1 text-base font-semibold">No addresses saved yet</h3>
           <p className="mb-4 text-sm text-muted-foreground">
-            Add a billing address to continue with checkout.
+            {addressRequired
+              ? 'Add a billing address to continue with checkout.'
+              : 'A billing address is optional for this order.'}
           </p>
           <Button
             type="button"

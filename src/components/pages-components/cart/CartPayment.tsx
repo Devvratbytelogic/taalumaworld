@@ -33,6 +33,8 @@ export default function CartPayment({
   // const { isTouchpointBlocked } = useBlockedTouchpoints();
   // const checkoutBlocked = isTouchpointBlocked(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
+  const isFreeOrder = total <= 0;
+  const addressRequired = !isFreeOrder;
   const hasSelectedAddress = Boolean(selectedAddressId);
 
   const agreementError =
@@ -40,13 +42,13 @@ export default function CartPayment({
       ? 'You must accept all required agreements before checkout'
       : undefined;
   const addressError =
-    addressTouched && !hasSelectedAddress
+    addressRequired && addressTouched && !hasSelectedAddress
       ? 'Please select a delivery address before payment'
       : undefined;
 
   const validateCheckout = () => {
     // if (checkoutBlocked) return false;
-    if (!hasSelectedAddress) {
+    if (addressRequired && !hasSelectedAddress) {
       setAddressTouched(true);
       return false;
     }
@@ -89,31 +91,33 @@ export default function CartPayment({
         />
       </div>
 
-      {(addressError || !hasSelectedAddress) && (
+      {addressRequired && (addressError || !hasSelectedAddress) && (
         <p className={`mb-3 text-sm ${addressError ? 'text-danger' : 'text-muted-foreground'}`}>
           {addressError ?? 'Select a delivery address to continue with payment'}
         </p>
       )}
 
       <div className="space-y-3">
-        <ReferralWalletPayButton
-          totalPaymentRequired={total}
-          payload={referralWalletPayload}
-          isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
-          onBeforePay={validateCheckout}
-          onSuccess={(res) => {
-            const data = (res as { data?: { order_number?: string | number } } | undefined)?.data;
-            onPaymentSuccess({
-              orderNumber: data?.order_number != null ? String(data.order_number) : undefined,
-            });
-          }}
-          onLoadingChange={setIsWalletPaying}
-        />
+        {!isFreeOrder && (
+          <ReferralWalletPayButton
+            totalPaymentRequired={total}
+            payload={referralWalletPayload}
+            isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
+            onBeforePay={validateCheckout}
+            onSuccess={(res) => {
+              const data = (res as { data?: { order_number?: string | number } } | undefined)?.data;
+              onPaymentSuccess({
+                orderNumber: data?.order_number != null ? String(data.order_number) : undefined,
+              });
+            }}
+            onLoadingChange={setIsWalletPaying}
+          />
+        )}
         <PaystackPayButton
           cartID={cartId}
           type="cart"
           acceptedAgreementIds={acceptedAgreementIds}
-          isDisabled={itemCount === 0 || isPaymentBusy || !hasSelectedAddress}
+          isDisabled={itemCount === 0 || isPaymentBusy || (addressRequired && !hasSelectedAddress)}
           onBeforePay={validateCheckout}
           onSuccess={onPaymentSuccess}
           onLoadingChange={setIsPaystackPaying}

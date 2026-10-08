@@ -26,9 +26,14 @@ function formatCompactAddress(address: IAddress): string {
 interface ChapterPurchaseAddressesProps {
   addressData: IAddressListAPIResponse | undefined;
   isLoading: boolean;
+  addressRequired?: boolean;
 }
 
-export default function ChapterPurchaseAddresses({ addressData, isLoading }: ChapterPurchaseAddressesProps) {
+export default function ChapterPurchaseAddresses({
+  addressData,
+  isLoading,
+  addressRequired = true,
+}: ChapterPurchaseAddressesProps) {
   const dispatch = useDispatch();
   const purchaseModalData = useSelector((state: RootState) => state.allModal.data);
   const [setDefaultAddress, { isLoading: isSettingDefault }] = useSetDefaultUserAddressMutation();
@@ -121,7 +126,9 @@ export default function ChapterPurchaseAddresses({ addressData, isLoading }: Cha
   return (
     <div className="space-y-2 border-t pt-3">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs font-semibold tracking-tight text-muted-foreground">Delivery Address</h3>
+        <h3 className="text-xs font-semibold tracking-tight text-muted-foreground">
+          {addressRequired ? 'Delivery Address' : 'Delivery Address (optional)'}
+        </h3>
         <button
           type="button"
           onClick={openAddAddressModal}
@@ -211,7 +218,11 @@ export default function ChapterPurchaseAddresses({ addressData, isLoading }: Cha
           className="flex w-full items-center gap-2 rounded-md border border-dashed border-border bg-muted/20 px-3 py-2.5 text-left transition-colors hover:border-primary/40"
         >
           <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
-          <p className="text-xs text-muted-foreground">No addresses saved yet. Tap to add one.</p>
+          <p className="text-xs text-muted-foreground">
+            {addressRequired
+              ? 'No addresses saved yet. Tap to add one.'
+              : 'A delivery address is optional for this order.'}
+          </p>
         </button>
       )}
     </div>

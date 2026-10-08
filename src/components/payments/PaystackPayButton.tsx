@@ -145,7 +145,7 @@ export function PaystackPayButton({
       if (isOk) {
         const orderNumber =
           res?.data?.order_number != null ? String(res.data.order_number) : undefined;
-        toast.success(res?.message ?? 'Payment successful');
+        // toast.success(res?.message ?? 'Payment successful');
         await Promise.resolve(
           onSuccess?.({
             transactionId: res?.data?.transaction_id ?? res?.data?.reference,

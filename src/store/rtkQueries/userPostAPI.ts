@@ -174,7 +174,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['ReferralWalletLedger', 'Cart', 'MyChapters', 'SingleChapter'],
+            invalidatesTags: ['ReferralWalletLedger', 'Cart', 'AllChapters', 'MyChapters', 'SingleChapter'],
         }),
         /** initialize Paystack checkout (POST /user/paystack/pay) */
         paystackPayment: builder.mutation({
@@ -183,6 +183,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
+            invalidatesTags: ['Cart', 'AllChapters', 'MyChapters', 'SingleChapter'],
         }),
     }),
 });

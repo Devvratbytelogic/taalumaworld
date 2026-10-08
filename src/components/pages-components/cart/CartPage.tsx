@@ -144,13 +144,14 @@ function CartPageContent() {
                   <div>
                     <h2 className="text-base font-bold sm:text-lg">Billing Address</h2>
                     <p className="text-xs text-muted-foreground sm:text-sm">
-                      Select an address for this order
+                      {total > 0 ? 'Select an address for this order' : 'Optional for this free order'}
                     </p>
                   </div>
                 </div>
                 <CartCheckoutAddresses
                   selectedAddressId={selectedAddressId}
                   onSelectAddress={setSelectedAddressId}
+                  addressRequired={total > 0}
                 />
               </section>
             )}

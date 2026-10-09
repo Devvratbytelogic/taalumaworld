@@ -47,10 +47,11 @@ export default function LoginRequiredModal() {
   const accountBenefits = {
     benefitsHeading: 'With a TaalumaWorld account:',
     benefits: [
-      'Access your purchased books and series anytime',
-      'Track your reading progress across devices',
-      'Build your personal library of stories',
-      'Get personalized recommendations',
+      'Access your free and purchased books and series anytime.',
+      'Keep track of your reading progress across devices.',
+      'Build your personal library of books.',
+      'Discover books that match your interests.',
+      'Get free books at no cost. After signing in, complete checkout to add the book to your library. For a free book, the checkout total is zero—you will not pay.',
     ],
   };
 

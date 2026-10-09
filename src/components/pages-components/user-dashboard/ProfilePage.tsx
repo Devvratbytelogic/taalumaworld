@@ -207,34 +207,34 @@ export function ProfilePage() {
     <div className="space-y-6">
       <UserDashboardPageHeader title="Profile" description="View and update your account details">
         {!isEditing ? (
-          <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-start sm:justify-end">
+          <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
             {!isMentor && mentorApplicationStatus === 'pending_review' ? (
-              <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-200! bg-amber-50 px-4 py-2 text-center text-sm font-medium text-amber-700">
+              <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-amber-200! bg-amber-50 px-4 py-2 text-center text-sm font-medium text-balance text-amber-700 sm:w-auto sm:rounded-full sm:whitespace-nowrap">
                 <Clock className="h-4 w-4 shrink-0" />
                 Mentor Application Pending Review
               </span>
             ) : null}
             {!isMentor && mentorApplicationStatus === 'approved' ? (
-              <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-emerald-200! bg-emerald-50 px-4 py-2 text-center text-sm font-medium text-emerald-700">
+              <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-emerald-200! bg-emerald-50 px-4 py-2 text-center text-sm font-medium text-balance text-emerald-700 sm:w-auto sm:rounded-full sm:whitespace-nowrap">
                 <ShieldCheck className="h-4 w-4 shrink-0" />
                 Mentor Application Approved
               </span>
             ) : null}
             {!isMentor && mentorApplicationStatus === 'rejected' ? (
-              <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-                <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200! bg-red-50 px-4 py-2 text-center text-sm font-medium text-red-700">
-                  <ShieldX className="h-4 w-4 shrink-0" />
-                  Mentor Application Rejected
-                </span>
-                <Button
-                  type="button"
-                  className="global_btn w-full rounded_full bg_primary sm:w-auto"
-                  startContent={<GraduationCap className="h-4 w-4" />}
-                  onPress={() => router.push(getUserDashboardBecomeMentorRoutePath())}
-                >
-                  Re-apply
-                </Button>
-              </div>
+              <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-red-200! bg-red-50 px-4 py-2 text-center text-sm font-medium text-balance text-red-700 sm:w-auto sm:rounded-full sm:whitespace-nowrap">
+                <ShieldX className="h-4 w-4 shrink-0" />
+                Mentor Application Rejected
+              </span>
+            ) : null}
+            {!isMentor && mentorApplicationStatus === 'rejected' ? (
+              <Button
+                type="button"
+                className="global_btn w-full rounded_full bg_primary sm:w-auto"
+                startContent={<GraduationCap className="h-4 w-4" />}
+                onPress={() => router.push(getUserDashboardBecomeMentorRoutePath())}
+              >
+                Re-apply
+              </Button>
             ) : null}
             {!isMentor && !mentorApplicationStatus ? (
               <div className="flex flex-col items-stretch gap-1 sm:items-end">

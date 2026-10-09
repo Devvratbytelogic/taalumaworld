@@ -1,9 +1,9 @@
 'use client';
 
 import type { ComponentType } from 'react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useFormik } from 'formik';
-import { Briefcase, FileCheck, Send, Share2 } from 'lucide-react';
+import { Briefcase, Clock, FileCheck, Send, Share2, ShieldCheck } from 'lucide-react';
 // import { CreditCard } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { cn } from '@/components/ui/utils';
 import { fieldInvalidClassName } from '@/components/ui/field-styles';
 // import { nativeSelectClassName } from '@/components/ui/field-styles';
 import { mentorConversionApplicationSchema } from '@/utils/formValidation';
+import { useGetMentorApplicationsQuery } from '@/store/rtkQueries/userGetAPI';
 import { useSubmitMentorApplicationMutation } from '@/store/rtkQueries/userPostAPI';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import toast from '@/utils/toast';
@@ -41,8 +42,16 @@ function SectionHeader({ icon: Icon, title, description }: SectionHeaderProps) {
 }
 
 export function BecomeMentorPage() {
+  const { data: mentorApplicationsData, isLoading: isApplicationLoading } = useGetMentorApplicationsQuery();
   const [submitMentorApplication] = useSubmitMentorApplicationMutation();
+  const [justSubmitted, setJustSubmitted] = useState(false);
   const requiredAcceptedRef = useRef(false);
+  const mentorApplication = mentorApplicationsData?.data;
+  const applicationStatus = mentorApplication?.latest_application?.status;
+  const isPendingReview = justSubmitted || applicationStatus === 'pending_review';
+  const isApproved = applicationStatus === 'approved';
+  const isRejected = applicationStatus === 'rejected';
+  const canApply = isRejected || (mentorApplication?.can_apply ?? !applicationStatus);
 
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched } =
     useFormik({
@@ -73,6 +82,7 @@ export function BecomeMentorPage() {
             accepted_agreement_ids: formValues.accepted_agreement_ids,
           }).unwrap();
           rf();
+          setJustSubmitted(true);
           toast.success(res?.message ?? 'Application submitted for review.');
         } catch(error) {
           console.error('Failed to submit application. Please try again.', error);
@@ -86,6 +96,69 @@ export function BecomeMentorPage() {
     touched[name] && errors[name] ? fieldInvalidClassName : '';
 
   const agreementsError = typeof errors.accepted_agreement_ids === 'string' ? errors.accepted_agreement_ids : undefined;
+
+  if (isApplicationLoading) {
+    return (
+      <div className="space-y-6">
+        <UserDashboardPageHeader
+          title="Apply to Become a Mentor"
+          description="Share your experience with Mentees. An administrator will review your application."
+        />
+        <div className="h-40 animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+      </div>
+    );
+  }
+
+  if (isPendingReview || isApproved || !canApply) {
+    const isBlockedPending = isPendingReview;
+    const StatusIcon = isApproved ? ShieldCheck : Clock;
+    const title = isApproved
+      ? 'Mentor Application Approved'
+      : isBlockedPending
+        ? 'Mentor Application Pending Review'
+        : 'You cannot apply yet';
+    const description = isApproved
+      ? 'Your application has already been approved. You do not need to apply again.'
+      : isBlockedPending
+        ? 'You already have an application under review. You can apply again after an administrator decides on this one.'
+        : mentorApplication?.eligibility_reason || 'You are not eligible to submit a mentor application right now.';
+
+    return (
+      <div className="space-y-6">
+        <UserDashboardPageHeader
+          title="Apply to Become a Mentor"
+          description="Share your experience with Mentees. An administrator will review your application."
+        />
+        <div
+          className={
+            isApproved
+              ? 'rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-6 sm:px-8'
+              : isBlockedPending
+                ? 'rounded-lg border border-amber-200 bg-amber-50 px-5 py-6 sm:px-8'
+                : 'rounded-lg border border-gray-200 bg-white px-5 py-6 sm:px-8'
+          }
+        >
+          <div className="flex items-start gap-3">
+            <span
+              className={
+                isApproved
+                  ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700'
+                  : isBlockedPending
+                    ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700'
+                    : 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600'
+              }
+            >
+              <StatusIcon className="h-4 w-4" aria-hidden />
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+              <p className="mt-1 text-sm text-gray-600">{description}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

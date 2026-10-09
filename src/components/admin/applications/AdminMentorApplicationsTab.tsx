@@ -200,15 +200,15 @@ export function AdminMentorApplicationsTab() {
         <span className="truncate text-sm text-slate-700">{ROLE_NAME_MAP[params.row.previous_role ?? ''] || params.row.previous_role}</span>
       ),
     },
-    {
-      field: 'preferred_payment_frequency',
-      headerName: 'Payout frequency',
-      width: 140,
-      sortable: false,
-      renderCell: (params) => (
-        <span className="text-sm text-slate-700">{formatStatusLabel(params.row.preferred_payment_frequency)}</span>
-      ),
-    },
+    // {
+    //   field: 'preferred_payment_frequency',
+    //   headerName: 'Payout frequency',
+    //   width: 140,
+    //   sortable: false,
+    //   renderCell: (params) => (
+    //     <span className="text-sm text-slate-700">{formatStatusLabel(params.row.preferred_payment_frequency)}</span>
+    //   ),
+    // },
     {
       field: 'submitted_at',
       headerName: 'Submitted',

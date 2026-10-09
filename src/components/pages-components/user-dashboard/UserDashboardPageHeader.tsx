@@ -15,11 +15,11 @@ export function UserDashboardPageHeader({
     <div
       className={cn(
         'rounded-lg border border-gray-200 bg-white px-4 py-4 sm:px-6 sm:py-5',
-        children ? 'sm:flex sm:items-center sm:justify-between sm:gap-6' : '',
+        children ? 'sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4' : '',
         className,
       )}
     >
-      <div className="min-w-0 border-l-2 border-primary pl-3 sm:pl-4">
+      <div className="min-w-[min(100%,18rem)] flex-1 border-l-2 border-primary pl-3 sm:pl-4">
         <h1 className="text-lg font-semibold tracking-tight text-gray-900 sm:text-2xl">{title}</h1>
         {description ? (
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-500">{description}</p>
@@ -27,7 +27,7 @@ export function UserDashboardPageHeader({
       </div>
 
       {children ? (
-        <div className="mt-4 flex w-full flex-col gap-2 border-t border-gray-100 pt-4 sm:mt-0 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:border-t-0 sm:pt-0">
+        <div className="mt-4 flex w-full min-w-0 flex-col gap-2 border-t border-gray-100 pt-4 sm:mt-0 sm:ml-auto sm:w-auto sm:max-w-full sm:shrink-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:border-t-0 sm:pt-0">
           {children}
         </div>
       ) : null}

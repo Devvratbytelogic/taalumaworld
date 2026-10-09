@@ -105,6 +105,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
+            invalidatesTags: ['MyMentorApplication'],
         }),
         /** follow a mentor (POST /user/follow-mentor/:id) */
         followMentor: builder.mutation({

@@ -362,6 +362,7 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 url: `/user/mentor-applications/my`,
                 method: 'GET',
             }),
+            providesTags: ['MyMentorApplication'],
         }),
         /** get all saved addresses */
         getUserAddresses: builder.query<IAddressListAPIResponse, void>({

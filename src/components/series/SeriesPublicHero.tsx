@@ -59,7 +59,7 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
     if (!getAuthToken()) {
       dispatch(openModal({
         componentName: 'LoginRequiredModal',
-        data: { action: 'purchase', itemType: purchaseType, onSuccess: () => setResumePurchase(true) },
+        data: { action: 'cart', itemType: purchaseType, onSuccess: () => setResumePurchase(true) },
       }));
       return;
     }

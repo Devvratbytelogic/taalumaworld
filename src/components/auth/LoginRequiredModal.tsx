@@ -5,7 +5,7 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { Modal, ModalContent, ModalBody, } from '@heroui/react'
 import { useDispatch, useSelector } from 'react-redux';
-import { BookOpen, ShoppingCart, Lock, LogIn, UserPlus, Heart } from 'lucide-react';
+import { ShoppingCart, Lock, LogIn, UserPlus, Heart } from 'lucide-react';
 import Button from '../ui/Button';
 import { getAuthToken } from '@/utils/authCookies';
 
@@ -60,21 +60,21 @@ export default function LoginRequiredModal() {
       case 'cart':
         return {
           icon: <ShoppingCart className="h-6 w-6 text-primary" />,
-          title: 'Sign In to Add to Cart',
-          description: 'Create an account or sign in to start building your library and unlock amazing stories.',
-          ...accountBenefits,
-        };
-      case 'read':
-        return {
-          icon: <BookOpen className="h-6 w-6 text-primary" />,
-          title: 'Sign In to Read',
-          description: `Sign in to start reading this ${itemLabel}. All our content requires authentication to ensure the best experience.`,
-          ...accountBenefits,
+          title: `Sign in to access your ${itemLabel}`,
+          description: 'Create a free account or sign in to continue.',
+          benefitsHeading: 'With a Taaluma.World account, you can:',
+          benefits: [
+            'Access your free and purchased books and series anytime.',
+            'Keep track of your reading progress across devices.',
+            'Build your personal library of books.',
+            'Discover books that match your interests.',
+            'Get free books at no cost. After signing in, complete checkout to add the book to your library. For a free book, the checkout total is zero—you will not pay.',
+          ],
         };
       case 'view':
         return {
           icon: <Lock className="h-6 w-6 text-primary" />,
-          title: 'Sign in to access your book',
+          title: `Sign in to access your ${itemLabel}`,
           description: 'Create a free account or sign in to continue.',
           benefitsHeading: 'With a Taaluma.World account, you can:',
           benefits: [

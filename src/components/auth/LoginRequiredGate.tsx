@@ -7,7 +7,7 @@ import { RootState } from '@/store/store';
 
 interface LoginRequiredGateProps {
     isAuthenticated: boolean;
-    action?: 'cart' | 'read' | 'view' | 'wishlist';
+    action?: 'cart' | 'view' | 'wishlist';
     itemType?: string;
     skip?: boolean;
 }

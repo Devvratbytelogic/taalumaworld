@@ -32,6 +32,7 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
   const purchaseType = isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK;
   const showPurchaseActions = Boolean(data && !data.canRead && !accessPending);
   const resolvedPrice = displayPrice ?? data?.price ?? 0;
+  const isFreePurchase = resolvedPrice <= 0;
 
   const openPurchaseModal = () => {
     if (!data || data.canRead) return;
@@ -169,25 +170,32 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
                   <div className="h-11 w-full animate-pulse rounded-full bg-muted sm:w-48" />
                 </div>
               ) : showPurchaseActions ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Button
-                    className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
-                    onPress={handleBuyNow}
-                    startContent={<Wallet className="h-4 w-4" />}
-                  >
-                    Buy Now - {resolvedPrice <= 0 ? 'Free' : `KSH ${resolvedPrice.toFixed(2)}`}
-                    {data?.series?.pricingModel === VISIBLE.BOOK && (
-                      <span className="ml-1 text-xs font-normal opacity-80">(complete series)</span>
-                    )}
-                  </Button>
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <Button
+                      className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
+                      onPress={handleBuyNow}
+                      startContent={<Wallet className="h-4 w-4" />}
+                    >
+                      {isFreePurchase ? 'Get Free Book' : `Buy Now - KSH ${resolvedPrice.toFixed(2)}`}
+                      {!isFreePurchase && data?.series?.pricingModel === VISIBLE.BOOK && (
+                        <span className="ml-1 text-xs font-normal opacity-80">(complete series)</span>
+                      )}
+                    </Button>
 
-                  <AddToCartButton
-                    id={purchaseId}
-                    type={purchaseType}
-                    className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
-                    label={`Add to Cart - ${resolvedPrice <= 0 ? 'Free' : `KSH ${resolvedPrice.toFixed(2)}`}`}
-                  />
+                    <AddToCartButton
+                      id={purchaseId}
+                      type={purchaseType}
+                      className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
+                      label={isFreePurchase ? 'Add Free Book to Cart' : `Add to Cart - KSH ${resolvedPrice.toFixed(2)}`}
+                    />
+                  </div>
 
+                  {isFreePurchase && (
+                    <p className="text-sm text-muted-foreground">
+                      Free account required. Complete checkout at zero cost to access this book.
+                    </p>
+                  )}
                 </div>
               ) : null}
 

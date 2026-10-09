@@ -44,6 +44,16 @@ export default function LoginRequiredModal() {
     dispatch(openModal({ componentName: 'SignUp', data: authModalData }));
   };
 
+  const accountBenefits = {
+    benefitsHeading: 'With a TaalumaWorld account:',
+    benefits: [
+      'Access your purchased books and series anytime',
+      'Track your reading progress across devices',
+      'Build your personal library of stories',
+      'Get personalized recommendations',
+    ],
+  };
+
   const getContent = () => {
     switch (action) {
       case 'cart':
@@ -51,36 +61,49 @@ export default function LoginRequiredModal() {
           icon: <ShoppingCart className="h-6 w-6 text-primary" />,
           title: 'Sign In to Add to Cart',
           description: 'Create an account or sign in to start building your library and unlock amazing stories.',
+          ...accountBenefits,
         };
       case 'read':
         return {
           icon: <BookOpen className="h-6 w-6 text-primary" />,
           title: 'Sign In to Read',
           description: `Sign in to start reading this ${itemLabel}. All our content requires authentication to ensure the best experience.`,
+          ...accountBenefits,
         };
       case 'view':
         return {
           icon: <Lock className="h-6 w-6 text-primary" />,
-          title: 'Sign In to View Details',
-          description: `Create an account or sign in to view ${itemLabel} details and explore our full collection.`,
+          title: 'Sign in to access your book',
+          description: 'Create a free account or sign in to continue.',
+          benefitsHeading: 'With a Taaluma.World account, you can:',
+          benefits: [
+            'Access your free and purchased books and series anytime.',
+            'Keep track of your reading progress across devices.',
+            'Build your personal library of books.',
+            'Discover books that match your interests.',
+            'Get free books at no cost. After signing in, complete checkout to add the book to your library. For a free book, the checkout total is zero—you will not pay.',
+          ],
         };
       case 'follow':
         return {
           icon: <UserPlus className="h-6 w-6 text-primary" />,
           title: 'Sign In to Follow',
           description: 'Create an account or sign in to follow mentors and stay updated with their Books.',
+          ...accountBenefits,
         };
       case 'wishlist':
         return {
           icon: <Heart className="h-6 w-6 text-primary" />,
           title: 'Sign In to Add to Wishlist',
           description: 'Create an account or sign in to add items to your wishlist and save them for later.',
+          ...accountBenefits,
         };
       default:
         return {
           icon: <LogIn className="h-6 w-6 text-primary" />,
           title: 'Sign In Required',
           description: 'Please sign in to continue.',
+          ...accountBenefits,
         };
     }
   };
@@ -89,7 +112,7 @@ export default function LoginRequiredModal() {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={handleCancel} hideCloseButton size="md">
+      <Modal isOpen={isOpen} onClose={handleCancel} hideCloseButton size="md" scrollBehavior="inside">
         <ModalContent>
           <ModalBody className="gap-0 px-4 py-4 sm:px-5 sm:py-5">
             <div className="mb-3 flex justify-center">
@@ -106,24 +129,14 @@ export default function LoginRequiredModal() {
             </div>
 
             <div className="mb-3 rounded-md bg-linear-to-br from-primary/5 to-primary/10 p-3">
-              <p className="mb-1.5 text-xs font-semibold text-foreground">With a TaalumaWorld account:</p>
+              <p className="mb-1.5 text-xs font-semibold text-foreground">{content.benefitsHeading}</p>
               <ul className="space-y-1 text-xs text-muted-foreground">
-                <li className="flex items-start gap-1.5">
-                  <span className="mt-0.5 text-primary">✓</span>
-                  <span>Access your purchased books and series anytime</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <span className="mt-0.5 text-primary">✓</span>
-                  <span>Track your reading progress across devices</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <span className="mt-0.5 text-primary">✓</span>
-                  <span>Build your personal library of stories</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <span className="mt-0.5 text-primary">✓</span>
-                  <span>Get personalized recommendations</span>
-                </li>
+                {content.benefits.map((benefit) => (
+                  <li key={benefit} className="flex items-start gap-1.5">
+                    <span className="mt-0.5 text-primary">✓</span>
+                    <span>{benefit}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 

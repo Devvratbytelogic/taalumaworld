@@ -7,6 +7,7 @@ import { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IAllTestimonialsAPIResponse } from '@/types/testimonial';
 import { IAllFaqsAPIResponse } from '@/types/faqs';
 import { IAdminProfileAPIResponse } from '@/types/adminProfile';
+import { syncUserRoleCookie } from '@/utils/authCookies';
 import { IAllTransactionsAPIResponse } from '@/types/transaction';
 import { IAllContactusDataAPIResponse } from '@/types/contactData';
 import { IAllSubscribersAPIResponse } from '@/types/subscribers';
@@ -111,6 +112,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 cache: 'no-store',
             }),
             providesTags: ['AdminProfile'],
+            async onQueryStarted(_arg, { queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled
+                    syncUserRoleCookie(data?.data?.role?.name)
+                } catch {
+                    // Profile errors are surfaced by the base query.
+                }
+            },
         }),
 
         /** Transactions */

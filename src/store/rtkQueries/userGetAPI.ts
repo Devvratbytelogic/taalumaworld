@@ -57,6 +57,7 @@ import { IAddressListAPIResponse, IAddressAPIResponse } from '@/types/user/addre
 import { IHomeAllChaptersAPIResponse } from '@/types/user/HomeAllChapters';
 import { ISingleChapterAPIResponse } from '@/types/user/singleChapter';
 import { IUserProfileAPIResponse } from '@/types/user/user';
+import { syncUserRoleCookie } from '@/utils/authCookies';
 import { IMyChaptersAPIResponse } from '@/types/user/myChapters';
 import { IMySeriesAPIResponse } from '@/types/user/mySeries';
 import { IWishlistAPIResponse } from '@/types/user/wishlist';
@@ -243,6 +244,14 @@ export const clientSideGetApis = rtkQuerieSetup.injectEndpoints({
                 cache: 'no-store',
             }),
             providesTags: ['UserProfile'],
+            async onQueryStarted(_arg, { queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled
+                    syncUserRoleCookie(data?.data?.role?.name)
+                } catch {
+                    // Profile errors are surfaced by the base query.
+                }
+            },
         }),
         /** get my chapters */
         getMyChapters: builder.query<IMyChaptersAPIResponse, IGetMyChaptersParams | void>({

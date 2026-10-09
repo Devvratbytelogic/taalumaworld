@@ -94,6 +94,19 @@ export function getUserRole(): string | undefined {
     return Cookies.get('user_role')
 }
 
+/**
+ * Align `user_role` with GET /admin/get-profile (`data.role.name`).
+ * No-op when the value is unchanged, so a profile refetch cannot loop.
+ * Does not invalidate queries — callers already have the profile response.
+ */
+export function syncUserRoleCookie(role: string | null | undefined): void {
+    if (typeof window === 'undefined') return
+    const next = role?.trim()
+    if (!next || getUserRole() === next) return
+    Cookies.set('user_role', next, SESSION_COOKIE_OPTIONS)
+    dispatchAuthChanged()
+}
+
 export function getUserId(): string | undefined {
     return Cookies.get('userID')
 }

@@ -15,9 +15,6 @@ import {
 
 const mutex = new Mutex();
 
-function isPendingApprovalError(message: string, status?: number): boolean {
-    return status === 403 && (message || '').toLowerCase().includes('pending approval');
-}
 
 function getRequestUrl(args: string | FetchArgs): string {
     return typeof args === 'string' ? args : args.url ?? '';
@@ -185,9 +182,9 @@ const baseQueryWithAuth: BaseQueryFn<
                 return { error: unauthorizedQueryError(message, httpStatus) };
             }
 
-            if (!isPendingApprovalError(message, httpStatus)) {
+            // if (!isPendingApprovalError(message, httpStatus)) {
                 showApiErrorToast(message);
-            }
+            // }
             return {
                 error: {
                     status: "CUSTOM_ERROR",
@@ -199,11 +196,11 @@ const baseQueryWithAuth: BaseQueryFn<
 
         const res = result.data as IAPIResponse;
 
-        if (res && isPendingApprovalError(res.message, res.http_status_code)) {
-            return {
-                error: unauthorizedQueryError(res.message, res.http_status_code),
-            };
-        }
+        // if (res && isPendingApprovalError(res.message, res.http_status_code)) {
+        //     return {
+        //         error: unauthorizedQueryError(res.message, res.http_status_code),
+        //     };
+        // }
 
         return { data: res };
 

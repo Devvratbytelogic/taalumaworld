@@ -36,7 +36,10 @@ export function useAdminPermissions() {
     const retryAttempt = useRef(0);
 
     useEffect(() => {
-        setSessionRole(getUserRole());
+        const sync = () => setSessionRole(getUserRole());
+        sync();
+        window.addEventListener('auth-changed', sync);
+        return () => window.removeEventListener('auth-changed', sync);
     }, []);
 
     useEffect(() => {

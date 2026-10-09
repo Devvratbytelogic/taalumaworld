@@ -228,16 +228,14 @@ export function DashboardProfileSkeleton() {
         </div>
       </div>
       <div className="px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-16">
-        <div className="mt-2 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:mt-6 lg:grid-cols-4">
+        <div className="mt-2 grid grid-cols-2 gap-2.5 sm:mt-6 sm:gap-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 bg-gray-50/60 p-4">
-              <div className="flex items-center gap-3">
+            <div key={i} className="flex flex-col gap-2.5 rounded-lg border border-gray-200 bg-gray-50/60 p-3 sm:gap-3 sm:p-4">
+              <div className="flex items-center gap-2.5 sm:gap-3">
                 <Bone className="h-9 w-9 rounded-md bg-white" />
-                <div className="space-y-1.5">
-                  <Bone className="h-5 w-8" />
-                  <Bone className="h-3 w-16 bg-gray-100" />
-                </div>
+                <Bone className="h-5 w-8" />
               </div>
+              <Bone className="h-4 w-20 bg-gray-100" />
             </div>
           ))}
         </div>

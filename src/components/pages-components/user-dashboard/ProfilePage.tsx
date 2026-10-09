@@ -351,31 +351,28 @@ export function ProfilePage() {
         </div>
 
         <div className="px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
-          <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
             {kpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
               <Link
                 key={label}
                 href={href}
-                className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 transition-colors hover:border-gray-300 hover:bg-gray-50"
+                className="flex min-w-0 flex-col gap-2.5 rounded-lg border border-gray-200 bg-gray-50/60 p-3 transition-colors hover:border-gray-300 hover:bg-gray-50 sm:gap-3 sm:p-4"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 sm:gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                     <Icon className={cn('h-4 w-4', iconClass)} aria-hidden />
                   </span>
-                  <div className="min-w-0 flex-1">
-                    {isKpisLoading ? (
-                      <div className="space-y-1.5 animate-pulse">
-                        <div className="h-5 w-8 rounded bg-gray-200" />
-                        <div className="h-3 w-16 rounded bg-gray-100" />
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-xl font-semibold tracking-tight text-gray-900">{value}</p>
-                        <p className="text-sm text-gray-500">{label}</p>
-                      </>
-                    )}
-                  </div>
+                  {isKpisLoading ? (
+                    <div className="h-5 w-8 animate-pulse rounded bg-gray-200" />
+                  ) : (
+                    <p className="text-xl font-semibold leading-none tracking-tight text-gray-900">{value}</p>
+                  )}
                 </div>
+                {isKpisLoading ? (
+                  <div className="h-4 w-20 animate-pulse rounded bg-gray-100" />
+                ) : (
+                  <p className="text-sm leading-snug text-gray-500">{label}</p>
+                )}
               </Link>
             ))}
           </div>
@@ -464,14 +461,13 @@ export function ProfilePage() {
               <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50/60">
                 <form id="profile-form" onSubmit={handleSubmit} className="divide-y divide-gray-200/70">
                   <div className="px-5 py-4">
-                    <label
-                      htmlFor="fullName"
-                      className="mb-2 flex items-center gap-3 text-sm font-normal text-gray-600"
-                    >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
-                        <UserRound className="h-4 w-4 text-primary" aria-hidden />
+                    <label htmlFor="fullName" className="mb-2 block text-sm font-normal text-gray-600">
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                          <UserRound className="h-4 w-4 text-primary" aria-hidden />
+                        </span>
+                        Full name
                       </span>
-                      Full name
                     </label>
                     <div className="sm:max-w-md">
                       <Input
@@ -504,14 +500,13 @@ export function ProfilePage() {
                   </div>
 
                   <div className="px-5 py-4">
-                    <label
-                      htmlFor="phone"
-                      className="mb-2 flex items-center gap-3 text-sm font-normal text-gray-600"
-                    >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
-                        <Phone className="h-4 w-4 text-primary" aria-hidden />
+                    <label htmlFor="phone" className="mb-2 block text-sm font-normal text-gray-600">
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
+                          <Phone className="h-4 w-4 text-primary" aria-hidden />
+                        </span>
+                        Phone number
                       </span>
-                      Phone number
                     </label>
                     <div className="sm:max-w-md">
                       <Input

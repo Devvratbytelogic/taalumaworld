@@ -1014,3 +1014,45 @@
   height: auto;
   display: block;
 }
+
+/* Keep dialogs inside the viewport. A form between the dialog and its
+   header/body/footer otherwise grows past the card, so the actions paint
+   on the page behind it. */
+[data-slot="wrapper"]:has(> [role="dialog"]) {
+  align-items: safe center;
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+[data-slot="wrapper"] > [role="dialog"]:not([class~="h-[100dvh]"]) {
+  max-height: calc(var(--visual-viewport-height, 100dvh) - 2rem);
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  min-height: 0;
+  overflow: hidden;
+}
+
+[data-slot="wrapper"] > [role="dialog"] > form {
+  display: flex;
+  min-height: 0;
+  max-height: 100%;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+[data-slot="wrapper"] > [role="dialog"] header,
+[data-slot="wrapper"] > [role="dialog"] footer {
+  flex-shrink: 0;
+}
+
+[data-slot="wrapper"] > [role="dialog"] footer {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+
+[data-slot="wrapper"] > [role="dialog"] > .flex-1,
+[data-slot="wrapper"] > [role="dialog"] > form > .flex-1 {
+  min-height: 0;
+  overflow-y: auto;
+}

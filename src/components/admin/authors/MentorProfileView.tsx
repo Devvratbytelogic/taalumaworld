@@ -42,6 +42,7 @@ import { refreshAfterMentorChange } from '@/store/server-api/refreshCache';
 import moment from 'moment';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminMentorProfileViewSkeleton } from '@/components/skeleton-loader/admin';
+import { formatKes } from '@/constants/common';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
@@ -77,14 +78,14 @@ function formatCompletionFieldLabel(section: string, field: string) {
 }
 
 
-const formatCurrency = (value?: number | null, currency?: string | null) => {
-  if (value === undefined || value === null) return '-';
-  try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(value);
-  } catch {
-    return `${currency ?? ''} ${value}`.trim();
-  }
-};
+// const formatCurrency = (value?: number | null, currency?: string | null) => {
+//   if (value === undefined || value === null) return '-';
+//   try {
+//     return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(value);
+//   } catch {
+//     return `${currency ?? ''} ${value}`.trim();
+//   }
+// };
 
 function InfoRow({ label, value, fullWidth }: { label: string; value?: ReactNode; fullWidth?: boolean }) {
   return (
@@ -467,25 +468,25 @@ export function MentorProfileView() {
                     <StatTile
                       icon={Wallet}
                       label="Balance"
-                      value={formatCurrency(economy.wallet?.balance, economy.wallet?.currency)}
+                      value={formatKes(economy.wallet?.balance)}
                       tone="blue"
                     />
                     <StatTile
                       icon={TrendingUp}
                       label="Lifetime Earnings"
-                      value={formatCurrency(economy.wallet?.lifetime_earnings, economy.wallet?.currency)}
+                      value={formatKes(economy.wallet?.lifetime_earnings)}
                       tone="green"
                     />
                     <StatTile
                       icon={RotateCcw}
                       label="Lifetime Refunds"
-                      value={formatCurrency(economy.wallet?.lifetime_refunds, economy.wallet?.currency)}
+                      value={formatKes(economy.wallet?.lifetime_refunds)}
                       tone="orange"
                     />
                     <StatTile
                       icon={Target}
                       label="Payout Threshold"
-                      value={formatCurrency(economy.wallet?.payout_threshold, economy.wallet?.currency)}
+                      value={formatKes(economy.wallet?.payout_threshold)}
                       tone="purple"
                     />
                   </div>

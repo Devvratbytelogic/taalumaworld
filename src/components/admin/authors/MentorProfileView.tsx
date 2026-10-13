@@ -461,32 +461,32 @@ export function MentorProfileView() {
                           : 'bg-slate-100 text-slate-600 border-slate-200!'
                       }
                     >
-                      {economy.wallet?.enabled ? 'Enabled' : 'Disabled'} · {economy.wallet?.currency ?? '-'}
+                      {economy.wallet?.enabled ? 'Enabled' : 'Disabled'}
                     </Badge>
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <StatTile
                       icon={Wallet}
                       label="Balance"
-                      value={formatKes(economy.wallet?.balance)}
+                      value={formatKes(economy.wallet?.balance ?? 0)}
                       tone="blue"
                     />
                     <StatTile
                       icon={TrendingUp}
                       label="Lifetime Earnings"
-                      value={formatKes(economy.wallet?.lifetime_earnings)}
+                      value={formatKes(economy.wallet?.lifetime_earnings ?? 0)}
                       tone="green"
                     />
                     <StatTile
                       icon={RotateCcw}
                       label="Lifetime Refunds"
-                      value={formatKes(economy.wallet?.lifetime_refunds)}
+                      value={formatKes(economy.wallet?.lifetime_refunds ?? 0)}
                       tone="orange"
                     />
                     <StatTile
                       icon={Target}
                       label="Payout Threshold"
-                      value={formatKes(economy.wallet?.payout_threshold)}
+                      value={formatKes(economy.wallet?.payout_threshold ?? 0)}
                       tone="purple"
                     />
                   </div>

@@ -127,6 +127,21 @@ export const mentorApis = rtkQuerieSetup.injectEndpoints({
             invalidatesTags: ['AdminMentorTierUpgradeApplications', 'MyMentorTierUpgradeApplication', 'AdminMentorEquity', 'MyMentorEquity', 'AdminStaff', 'AdminProfile'],
         }),
 
+        sendMentorProfileReminder: builder.mutation({
+            query: ({ mentor_id }) => ({
+                url: `/admin/mentors/profile-reminder`,
+                method: 'POST',
+                body: { mentor_id },
+            }),
+        }),
+
+        sendMentorProfileReminderToAll: builder.mutation<{ http_status_code?: number; success?: boolean; message?: string }, void>({
+            query: () => ({
+                url: `/admin/mentors/profile-reminder/all`,
+                method: 'POST',
+            }),
+        }),
+
         /** Followers */
         getAllFollowers: builder.query<IFollowsAPIResponse, { fromDate?: string; toDate?: string; page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
@@ -152,5 +167,7 @@ export const {
     useGetMyMentorTierUpgradeApplicationQuery,
     useGetAllMentorTierUpgradeApplicationsQuery,
     useReviewMentorTierUpgradeApplicationMutation,
+    useSendMentorProfileReminderMutation,
+    useSendMentorProfileReminderToAllMutation,
     useGetAllFollowersQuery,
 } = mentorApis;

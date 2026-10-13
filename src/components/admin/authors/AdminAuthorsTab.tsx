@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { type GridColDef } from '@mui/x-data-grid';
-import { Eye, Ban, CircleCheck, BadgeCheck, Edit2, KeyRound, Loader2, Award } from 'lucide-react';
+import { Eye, Ban, CircleCheck, BadgeCheck, Edit2, KeyRound, Loader2, Award, Mail } from 'lucide-react';
 import toast from '@/utils/toast';
 import type { IAllUsersEntity } from '@/types/rolesPermissions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,6 +19,7 @@ import {
   useUpdateStaffStatusMutation,
   useGeneratePasswordResetLinkMutation,
 } from '@/store/rtkQueries/rolesPermissionsApi';
+import { useSendMentorProfileReminderMutation } from '@/store/rtkQueries/mentorApis';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { getAdminMentorDetailRoutePath } from '@/routes/routes';
@@ -31,6 +32,11 @@ const MENTOR_TIER_MODEL = 'Mentor Tier';
 const STATUS_BADGE_CLASS: Record<string, string> = {
   active: 'bg-green-50 text-green-700 border-green-200!',
   suspended: 'bg-red-50 text-red-700 border-red-200!',
+};
+
+const isProfileIncomplete = (author: IAllUsersEntity) => {
+  const percentage = author.profile_completion?.profile_completion_percentage ?? author.profile_completion_percentage ?? 0;
+  return percentage < 100;
 };
 
 const formatWalletBalance = (balance?: number | null, currency?: string | null) => {
@@ -50,6 +56,7 @@ export function AdminAuthorsTab() {
   const [suspendAuthor, setSuspendAuthor] = useState<IAllUsersEntity | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
+  const [sendingReminderId, setSendingReminderId] = useState<string | null>(null);
   const { hasPermission } = useAdminPermissions();
 
   const canView = hasPermission(MENTORS_MODEL, 'view');
@@ -67,6 +74,7 @@ export function AdminAuthorsTab() {
   });
   const [updateAuthorStatus, { isLoading: isSuspending }] = useUpdateStaffStatusMutation();
   const [generatePasswordResetLink] = useGeneratePasswordResetLinkMutation();
+  const [sendProfileReminder] = useSendMentorProfileReminderMutation();
 
   const authors = authorsResponse?.data?.data ?? [];
   const totalAuthors = authorsResponse?.data?.total ?? 0;
@@ -98,6 +106,21 @@ export function AdminAuthorsTab() {
       // Error toast handled by API layer
     } finally {
       setResettingPasswordId(null);
+    }
+  };
+
+  const handleSendProfileReminder = async (author: IAllUsersEntity) => {
+    if (sendingReminderId) return;
+    setSendingReminderId(author._id);
+    try {
+      const res = await sendProfileReminder({ mentor_id: author._id }).unwrap();
+      if (res?.http_status_code === 200 || res?.http_status_code === 201) {
+        toast.success(res.message ?? `Profile reminder sent to "${author.name}"`);
+      }
+    } catch {
+      // Error toast handled by API layer
+    } finally {
+      setSendingReminderId(null);
     }
   };
 
@@ -242,11 +265,12 @@ export function AdminAuthorsTab() {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 260,
+      width: 300,
       sortable: false,
       renderCell: (params) => {
         const isSuspended = params.row.status === 'suspended';
         const isResetting = resettingPasswordId === params.row._id;
+        const isSendingReminder = sendingReminderId === params.row._id;
         if (!canView && !canEdit && !canDelete && !canAssignTier) return null;
         return (
           <div className="action_buttons">
@@ -292,6 +316,21 @@ export function AdminAuthorsTab() {
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <KeyRound className="h-4 w-4" />
+                )}
+              </button>
+            ) : null}
+            {canEdit && isProfileIncomplete(params.row) ? (
+              <button
+                type="button"
+                className="active_button"
+                title="Send profile completion reminder"
+                disabled={!!sendingReminderId}
+                onClick={() => handleSendProfileReminder(params.row)}
+              >
+                {isSendingReminder ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="h-4 w-4" />
                 )}
               </button>
             ) : null}

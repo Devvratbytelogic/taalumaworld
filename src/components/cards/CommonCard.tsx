@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useDispatch } from 'react-redux'
 import { Card, CardContent } from '../ui/card'
 import ImageComponent from '../ui/ImageComponent'
@@ -6,6 +7,7 @@ import { Badge } from '../ui/badge'
 import { BookOpen } from 'lucide-react'
 import { openModal } from '@/store/slices/allModalSlice'
 import { VISIBLE } from '@/constants/contentMode'
+import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes'
 import MentorCardReveal from './MentorCardReveal'
 import WishlistButton from '@/components/ui/WishlistButton'
 import { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters'
@@ -27,6 +29,10 @@ export default function CommonCard({ data }: CommonCardProps) {
             ? data?.effectivePrice
             : (isPricingModelChapter ? data?.effectivePrice : data?.series?.effectivePrice)
     ) || 0
+
+    const detailPath = isBook
+        ? getSeriesRoutePath(data?.slug ?? data?.id ?? '')
+        : getBlueprintRoutePath(data?.slug ?? data?.id ?? '')
 
     const handleOpen = () => {
         dispatch(
@@ -58,7 +64,8 @@ export default function CommonCard({ data }: CommonCardProps) {
                     avatar={data?.mentor?.profile_pic ?? undefined}
                     bio={data?.mentor?.professionalBio}
                     social={{ linkedin: data?.mentor?.linkedin ?? '', facebook: data?.mentor?.facebook ?? '' }}
-                    ctaLabel={isBook ? 'View Series' : 'View Book'}
+                    // ctaLabel={isBook ? 'View Series' : 'View Book'}
+                    ctaLabel={'Quick View'}
                     onCtaClick={handleOpen}
                 />
 
@@ -102,31 +109,48 @@ export default function CommonCard({ data }: CommonCardProps) {
                 <div className="flex-1" />
 
                 {/* Footer */}
-                <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground tracking-tight">
-                        {isBook && !!data?.chapterCount &&
-                            <>
-                                <BookOpen className="h-4 w-4" />
-                                <span>{data?.chapterCount} books</span>
-                            </>
-                        }
+                <div className="flex items-end justify-between gap-3 border-t border-border pt-3">
+                    <div className="flex min-w-0 flex-col gap-1">
+                        {isBook && !!data?.chapterCount ? (
+                            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <BookOpen className="h-3.5 w-3.5 shrink-0" />
+                                {data.chapterCount} books
+                            </span>
+                        ) : null}
+                        <Link
+                            href={detailPath}
+                            onClick={(event) => event.stopPropagation()}
+                            className="text-sm font-medium text-primary hover:underline"
+                        >
+                            View Details
+                        </Link>
                     </div>
 
-                    {isBook
-                        ? (isPricingModelChapter
-                            ? <p className="text-sm font-medium text-primary">{'Priced by book'}</p>
-                            : displayPrice > 0
-                                ? <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)}</p>
-                                : <p className="font-semibold text-lg text-primary">FREE</p>
-                        )
-                        : (data?.isFree
-                            ? <p className="font-medium text-success tracking-tight">Free to Read</p>
-                            : displayPrice > 0 ? (
-                                <p className="font-semibold text-lg text-primary">KSH {displayPrice.toFixed(2)} {data?.series?.pricingModel === VISIBLE.BOOK && <span className="text-xs font-normal text-muted-foreground">(complete series)</span>}</p>
-                            ) : <p className="font-semibold text-lg text-primary">
-                                FREE{' '}<span className="text-xs font-normal text-muted-foreground">(via institutional access)</span>
-                            </p>
+                    <div className="shrink-0 text-right leading-tight">
+                        {isBook ? (
+                            isPricingModelChapter ? (
+                                <p className="text-sm font-medium text-primary">Priced by book</p>
+                            ) : displayPrice > 0 ? (
+                                <p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>
+                            ) : (
+                                <p className="text-lg font-semibold text-primary">FREE</p>
+                            )
+                        ) : data?.isFree ? (
+                            <p className="text-sm font-medium text-success">Free to Read</p>
+                        ) : displayPrice > 0 ? (
+                            <>
+                                <p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>
+                                {data?.series?.pricingModel === VISIBLE.BOOK ? (
+                                    <p className="mt-0.5 text-xs font-normal text-muted-foreground">complete series</p>
+                                ) : null}
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-lg font-semibold text-primary">FREE</p>
+                                <p className="mt-0.5 text-xs font-normal text-muted-foreground">via institutional access</p>
+                            </>
                         )}
+                    </div>
                 </div>
             </CardContent>
         </Card>

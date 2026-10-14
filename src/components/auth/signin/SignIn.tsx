@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
@@ -16,7 +15,8 @@ import { signInSchema } from '@/utils/formValidation'
 import { useUserLoginMutation } from '@/store/rtkQueries/userAuthApi'
 import { setAuthCookies } from '@/utils/authCookies'
 import { RootState } from '@/store/store'
-import { getMentorLoginRoutePath } from '@/routes/routes'
+import { getMentorDashboardRoutePath } from '@/routes/routes'
+import { isMentorRole } from '@/constants/common'
 
 
 export default function SignIn() {
@@ -54,10 +54,17 @@ export default function SignIn() {
         onSubmit: async (vals) => {
 
             try {
-                const res = await userLogin({ email: vals.email, password: vals.password, type: 'user' }).unwrap()
+                const res = await userLogin({ email: vals.email, password: vals.password }).unwrap()
 
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res?.message ?? 'Sign in successful!')
+                    if (res?.data?.requires_2fa) {
+                        dispatch(openModal({
+                            componentName: 'OtpVerification',
+                            data: { email: vals.email, type: 'login_2fa', ...authCallbackData },
+                        }))
+                        return
+                    }
                     if (res?.data?.requires_email_verification) {
                         dispatch(openModal({
                             componentName: 'OtpVerification',
@@ -68,15 +75,22 @@ export default function SignIn() {
                                 ...authCallbackData,
                             },
                         }))
-                    } else {
-                        setAuthCookies({
-                            token: res?.data?.token ?? '',
-                            user: { id: res?.data?.id, email: res?.data?.email },
-                            role: res?.data?.role?.name ?? '',
-                        })
-                        router.refresh()
-                        handleAuthSuccess()
+                        return
                     }
+
+                    const roleName = res?.data?.role?.name ?? ''
+                    setAuthCookies({
+                        token: res?.data?.token ?? '',
+                        user: { id: res?.data?.id, email: res?.data?.email },
+                        role: roleName,
+                    })
+                    if (isMentorRole(roleName)) {
+                        dispatch(closeModal())
+                        router.push(getMentorDashboardRoutePath())
+                        return
+                    }
+                    router.refresh()
+                    handleAuthSuccess()
                 }
 
             } catch (error) {
@@ -91,7 +105,7 @@ export default function SignIn() {
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">Sign In</p>
                     <p className="text-sm text-muted-foreground font-normal">
-                        Continue your learning journey with TaalumaWorld
+                        Sign in with the email and password for your account
                     </p>
                 </ModalHeader>
                 <ModalBody>
@@ -184,24 +198,6 @@ export default function SignIn() {
                             >
                                 Sign Up
                             </button>
-                        </div>
-                        <div className="w-full text-center text-sm text-muted-foreground">
-                            <div className="mt-2 w-full text-center">
-                                <div className="mb-3 flex items-center gap-3">
-                                    <div className="h-px flex-1 bg-gray-200" />
-                                    <span className="text-xs font-medium text-gray-400">MENTOR?</span>
-                                    <div className="h-px flex-1 bg-gray-200" />
-                                </div>
-
-                                <Link
-                                    href={getMentorLoginRoutePath()}
-                                    onClick={() => dispatch(closeModal())}
-                                    className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
-                                >
-                                    Sign in as Mentor
-                                    <span aria-hidden="true">→</span>
-                                </Link>
-                            </div>
                         </div>
                     </ModalFooter>
                 </ModalBody>

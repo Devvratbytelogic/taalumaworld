@@ -25,7 +25,7 @@ export default function ForgotPassword() {
         validationSchema: forgotPasswordSchema,
         onSubmit: async (formValues, { resetForm }) => {
             try {
-                const res = await userForgotPassword({ user_id: formValues.email, type: 'forgot_password', user_type: 'user' }).unwrap();
+                const res = await userForgotPassword({ user_id: formValues.email }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res?.message ?? 'Verification code sent to your email.');
                     resetForm();

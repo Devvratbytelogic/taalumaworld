@@ -273,9 +273,9 @@ export default function SignUp() {
             isOpen={isOpen}
             onClose={handleCancel}
             size="2xl"
-            className="modal_container"
+            className="modal_container modal_scroll_outside"
             scrollBehavior="outside"
-            classNames={{ body: 'py-4' }}
+            classNames={{ wrapper: 'modal_scroll_outside_wrapper', body: 'py-4' }}
         >
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-1 pb-2">

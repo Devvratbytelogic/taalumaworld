@@ -1,11 +1,10 @@
 /**
- * Central toast helpers.
- * UI code uses Sonner (`toast`); API errors in RTK use HeroUI via `showApiErrorToast`.
- * Identical messages replace the current toast instead of stacking behind it.
+ * All toasts go through Sonner so a second message stacks above the first
+ * instead of sitting in a separate layer behind it.
+ * The same message replaces the current toast instead of repeating.
  */
 import { toast as sonnerToast, Toaster } from 'sonner';
 import type { ExternalToast } from 'sonner';
-import { addToast } from '@heroui/react';
 
 const API_ERROR_TOAST_MS = 2000;
 const recentApiErrorMessages = new Set<string>();
@@ -14,12 +13,7 @@ export function showApiErrorToast(message: string) {
     if (!message || recentApiErrorMessages.has(message)) return;
 
     recentApiErrorMessages.add(message);
-    addToast({
-        title: 'Error',
-        description: message,
-        color: 'danger',
-        timeout: API_ERROR_TOAST_MS,
-    });
+    sonnerToast.error(message, { duration: API_ERROR_TOAST_MS });
 
     if (typeof window === 'undefined') {
         recentApiErrorMessages.delete(message);

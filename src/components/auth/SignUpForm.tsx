@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import { Camera, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -13,7 +14,8 @@ import { mentorSignUpSchema } from '@/utils/formValidation';
 import { useRegisterMentorMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import { getHomeRoutePath, getMentorDashboardRoutePath, getMentorLoginRoutePath, } from '@/routes/routes';
+import { getHomeRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
+import { openModal } from '@/store/slices/allModalSlice';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { setAuthCookies } from '@/utils/authCookies';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
@@ -24,6 +26,7 @@ const AVATAR_BORDER_COLOR = '#C8D7EE';
 
 export function SignUpForm() {
     const router = useRouter();
+    const dispatch = useDispatch();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -123,9 +126,13 @@ export function SignUpForm() {
                 <>
                     <p>
                         Already have an account?{' '}
-                        <Link href={getMentorLoginRoutePath()} className="font-medium text-primary hover:text-primary/80">
+                        <button
+                            type="button"
+                            className="font-medium text-primary hover:text-primary/80"
+                            onClick={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
+                        >
                             Sign In
-                        </Link>
+                        </button>
                     </p>
                     <Link href={getHomeRoutePath()} className="inline-block text-primary hover:text-primary/80">
                         Back to home

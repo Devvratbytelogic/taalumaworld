@@ -1,5 +1,16 @@
-import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
+'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getHomeRoutePath } from '@/routes/routes';
+
+/** Old mentor reset links open the shared forgot-password modal. */
 export default function MentorForgotPasswordPage() {
-    return <ForgotPasswordForm />;
+    const router = useRouter();
+
+    useEffect(() => {
+        router.replace(`${getHomeRoutePath()}?auth=forgot`);
+    }, [router]);
+
+    return null;
 }

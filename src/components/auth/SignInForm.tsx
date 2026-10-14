@@ -12,27 +12,18 @@ import { useAdminLoginMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
-import { getAdminDashboardRoutePath, getAdminPortalForgotPasswordRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath } from '@/routes/routes';
+import { getAdminDashboardRoutePath, getAdminPortalForgotPasswordRoutePath } from '@/routes/routes';
 import usePreventRefresh from '@/hooks/preventRefresh';
 import { setAuthCookies } from '@/utils/authCookies';
 
-type StaffSignInVariant = 'mentor' | 'admin';
-
-type SignInFormProps = {
-    variant: StaffSignInVariant;
-};
-
 const LOGIN_OTP_MESSAGE = 'Verification code sent to your email. Complete login with verify OTP.';
 
-export function SignInForm({ variant }: SignInFormProps) {
+export function SignInForm() {
     usePreventRefresh();
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showOtp, setShowOtp] = useState(false);
     const [adminLogin, { isLoading }] = useAdminLoginMutation();
-
-    const isMentor = variant === 'mentor';
-    const isAdmin = variant === 'admin';
 
     const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur } = useFormik({
         initialValues: { email: '', password: '' },
@@ -42,7 +33,7 @@ export function SignInForm({ variant }: SignInFormProps) {
                 const res = await adminLogin({
                     email: vals.email,
                     password: vals.password,
-                    type: isAdmin ? 'admin' : 'mentor',
+                    type: 'admin',
                 }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     if (res?.message === LOGIN_OTP_MESSAGE) {
@@ -56,7 +47,7 @@ export function SignInForm({ variant }: SignInFormProps) {
                             user: { id: res?.data?.id, email: res?.data?.email },
                             role: res?.data?.userRole?.name ?? '',
                         })
-                        router.push(isAdmin ? getAdminDashboardRoutePath() : getMentorDashboardRoutePath());
+                        router.push(getAdminDashboardRoutePath());
                     }
                 }
             } catch (error) {
@@ -65,35 +56,15 @@ export function SignInForm({ variant }: SignInFormProps) {
         },
     });
 
-    const title = isMentor ? 'Mentor Sign In' : 'Administrator Sign In';
-    const subtitle = isMentor
-        ? 'Sign in to publish and manage your content'
-        : 'Restricted access for authorized staff only';
-
     return (
         <AuthPageShell
-            title={title}
-            subtitle={subtitle}
-            fullViewport={isAdmin}
-            icon={isAdmin ? <Shield className="h-6 w-6 text-primary" /> : undefined}
-            footer={
-                isMentor ?
-                    <>
-                        <p>
-                            Don&apos;t have an account?{' '}
-                            <Link href={getMentorSignupRoutePath()} className="font-medium text-primary hover:text-primary/80">
-                                Register as Mentor
-                            </Link>
-                        </p>
-                        <Link href={getHomeRoutePath()} className="inline-block text-primary hover:text-primary/80">
-                            Back to home
-                        </Link>
-                    </>
-                    : null
-            }
+            title="Administrator Sign In"
+            subtitle="Restricted access for authorized staff only"
+            fullViewport
+            icon={<Shield className="h-6 w-6 text-primary" />}
         >
             {showOtp ? (
-                <CommonOTPVerification email={values.email} type="login_2fa" isAdmin={isAdmin} />
+                <CommonOTPVerification email={values.email} type="login_2fa" isAdmin />
             ) : (
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div className="space-y-2">
@@ -106,7 +77,7 @@ export function SignInForm({ variant }: SignInFormProps) {
                                 id="signin-email"
                                 name="email"
                                 type="email"
-                                placeholder={isAdmin ? 'you@taaluma.world' : 'you@example.com'}
+                                placeholder="you@taaluma.world"
                                 className={`user_input_style ${errors.email && touched.email ? 'border-red-500' : ''}`}
                                 disabled={isSubmitting}
                                 value={values.email}
@@ -152,7 +123,7 @@ export function SignInForm({ variant }: SignInFormProps) {
 
                     <div className="text-right">
                         <Link
-                            href={isAdmin ? getAdminPortalForgotPasswordRoutePath() : getMentorForgotPasswordRoutePath()}
+                            href={getAdminPortalForgotPasswordRoutePath()}
                             className="text-sm text-primary hover:text-primary/80 font-medium"
                         >
                             Forgot Password?

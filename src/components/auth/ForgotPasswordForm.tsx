@@ -13,14 +13,14 @@ import { useAdminForgotPasswordMutation, useAdminResetPasswordMutation } from '@
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
 import CommonOTPVerification from '@/components/auth/CommonOTPVerification';
-import { getAdminPortalLoginRoutePath, getMentorLoginRoutePath } from '@/routes/routes';
+import { getAdminPortalLoginRoutePath, getHomeRoutePath } from '@/routes/routes';
 
 type ForgotPasswordStep = 'email' | 'otp' | 'reset';
 type ForgotPasswordVariant = 'mentor' | 'admin';
 
 export function ForgotPasswordForm({ variant = 'mentor' }: { variant?: ForgotPasswordVariant }) {
     const isAdmin = variant === 'admin';
-    const loginPath = isAdmin ? getAdminPortalLoginRoutePath() : getMentorLoginRoutePath();
+    const loginPath = isAdmin ? getAdminPortalLoginRoutePath() : getHomeRoutePath();
     const router = useRouter();
     const [step, setStep] = useState<ForgotPasswordStep>('email');
     const [showPassword, setShowPassword] = useState(false);
@@ -36,8 +36,6 @@ export function ForgotPasswordForm({ variant = 'mentor' }: { variant?: ForgotPas
             try {
                 const res = await adminForgotPassword({
                     user_id: formValues.email,
-                    user_type: isAdmin ? 'admin' : 'mentor',
-                    type: 'forgot_password',
                 }).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res.message ?? 'Verification code sent to your email.');

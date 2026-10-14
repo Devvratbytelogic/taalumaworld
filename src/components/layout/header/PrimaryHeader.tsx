@@ -14,7 +14,7 @@ import { cn } from '@/components/ui/utils';
 import GlobalSearchBar from './GlobalSearchBar';
 import HeaderOffcanvasMenu from './HeaderOffcanvasMenu';
 import HeaderToolbar from './HeaderToolbar';
-import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorLoginRoutePath, getMentorSignupRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
+import { getAboutUsRoutePath, getAdminRoutePath, getCartRoutePath, getContactUsRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorForgotPasswordRoutePath, getMentorSignupRoutePath, getUserDashboardMyBooksRoutePath, getUserDashboardMyChaptersRoutePath, getUserDashboardRoutePath } from '@/routes/routes';
 import { signOut } from '@/utils/refreshSession';
 import ImageComponent from '@/components/ui/ImageComponent';
 import { DEFAULT_BRAND_LOGO, isMentorRole, isStaffAdminRole } from '@/constants/common';
@@ -36,13 +36,21 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
   const pathName = usePathname();
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('auth') !== 'forgot') return;
+
+    dispatch(openModal({ componentName: 'ForgotPassword', data: '' }));
+    params.delete('auth');
+    const query = params.toString();
+    window.history.replaceState(null, '', query ? `${pathName}?${query}` : pathName);
+  }, [pathName, dispatch]);
+
   const brandName = 'TaalumaWorld';
 
   const isStaff = isStaffAdminRole(userRole);
   const isMentor = isMentorRole(userRole);
   const isMentorAuthPage =
-    pathName === getMentorLoginRoutePath() ||
-    pathName.startsWith(`${getMentorLoginRoutePath()}/`) ||
     pathName === getMentorSignupRoutePath() ||
     pathName.startsWith(`${getMentorSignupRoutePath()}/`) ||
     pathName === getMentorForgotPasswordRoutePath() ||
@@ -193,7 +201,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               </div>
             </Link>
 
-            <nav className="hidden items-center gap-8 lg:absolute lg:left-1/2 lg:flex lg:-translate-x-1/2">
+            <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 xl:flex">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} className={navLinkClass(item.href)}>
                   {item.label}
@@ -222,7 +230,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               {isAuthenticated && !isStaff && (
                 <Link
                   href={libraryHref}
-                  className="hidden items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary lg:inline-flex"
+                  className="hidden items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary xl:inline-flex"
                 >
                   <BookMarked className="h-4 w-4 shrink-0" aria-hidden />
                   {libraryLabel}
@@ -241,7 +249,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               )}
 
               {isAuthenticated ? (
-                <div ref={userMenuRef} className="relative hidden lg:block">
+                <div ref={userMenuRef} className="relative hidden xl:block">
                   <button
                     type="button"
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -306,18 +314,19 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
                   )}
                 </div>
               ) : (
-                <div className="hidden items-center gap-1.5 lg:flex">
+                <div className="hidden items-center gap-1.5 xl:flex">
                   <Button
-                    className="global_btn rounded_full outline_primary"
+                    className="global_btn rounded_full outline_primary whitespace-nowrap"
                     onPress={() => dispatch(openModal({ componentName: 'SignIn', data: '' }))}
                   >
-                    Sign In
+                    Sign In / Register
                   </Button>
                   <Button
-                    className="global_btn rounded_full bg_primary"
-                    onPress={() => dispatch(openModal({ componentName: 'SignUp', data: '' }))}
+                    as={Link}
+                    href={getMentorSignupRoutePath()}
+                    className="global_btn rounded_full bg_primary whitespace-nowrap"
                   >
-                    Join Taaluma
+                    Become a Mentor
                   </Button>
                 </div>
               )}
@@ -325,7 +334,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(true)}
-                className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10 lg:hidden')}
+                className={cn(iconButtonClass, 'h-9 w-9 sm:h-10 sm:w-10 xl:hidden')}
                 aria-label="Open menu"
               >
                 <Menu className="h-4.5 w-4.5" />

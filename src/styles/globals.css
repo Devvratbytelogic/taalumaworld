@@ -1056,3 +1056,16 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+/* Signup grows with its form. The overlay scrolls instead of the card. */
+[data-slot="wrapper"].modal_scroll_outside_wrapper {
+  align-items: flex-start;
+  overflow-y: auto;
+}
+
+[data-slot="wrapper"] > [role="dialog"].modal_scroll_outside {
+  max-height: none;
+  margin-top: 4rem !important;
+  margin-bottom: 4rem !important;
+  overflow: visible;
+}

@@ -12,7 +12,7 @@ import { resetPasswordSchema } from '@/utils/formValidation';
 import { useAdminResetPasswordMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import { getMentorLoginRoutePath } from '@/routes/routes';
+import { getHomeRoutePath } from '@/routes/routes';
 
 export function ResetPasswordForm() {
     const router = useRouter();
@@ -38,7 +38,7 @@ export function ResetPasswordForm() {
                     toast.success(res.message ?? 'Password updated successfully!');
                     Cookies.remove('author_reset_password_token');
                     resetForm();
-                    router.push(getMentorLoginRoutePath());
+                    router.push(getHomeRoutePath());
                 }
             } catch {
                 console.log('Failed to reset password. Please try again.');
@@ -54,7 +54,7 @@ export function ResetPasswordForm() {
             footer={
                 <p>
                     Remembered your password?{' '}
-                    <Link href={getMentorLoginRoutePath()} className="font-medium text-primary hover:text-primary/80">
+                    <Link href={getHomeRoutePath()} className="font-medium text-primary hover:text-primary/80">
                         Sign In
                     </Link>
                 </p>

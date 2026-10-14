@@ -3,7 +3,6 @@ import { isCareerArchitectRole, isMentorRole } from '@/constants/common'
 import {
     getAdminPortalLoginRoutePath,
     getHomeRoutePath,
-    getMentorLoginRoutePath,
     isMentorPanelPath,
 } from '@/routes/routes'
 import { API_BASE_URL } from '@/utils/config'
@@ -35,16 +34,15 @@ export function shouldSkipTokenRefresh(url: string): boolean {
 }
 
 /**
- * Mentors and staff log in via /admin; Mentees via /user.
- * Role is the source of truth so a mentor shopping on /user APIs still hits /admin/refresh.
+ * Mentors and Career Architects use the user session. Staff use the admin session.
  */
 export function getAuthApiPrefix(requestUrl = ''): AuthApiPrefix {
     const role = getUserRole()
-    if (isCareerArchitectRole(role)) return '/user'
+    if (isCareerArchitectRole(role) || isMentorRole(role)) return '/user'
     if (role) return '/admin'
 
     const url = requestUrl || (typeof window !== 'undefined' ? window.location.pathname : '')
-    if (url.includes('/admin') || url.includes('/portal') || url.includes('/mentor')) {
+    if (url.includes('/portal') || (url.includes('/admin') && !isMentorPanelPath(url))) {
         return '/admin'
     }
     return '/user'
@@ -52,14 +50,13 @@ export function getAuthApiPrefix(requestUrl = ''): AuthApiPrefix {
 
 export function getSessionExpiredRedirectPath(): string {
     const role = getUserRole()
-    if (isMentorRole(role)) return getMentorLoginRoutePath()
-    if (isCareerArchitectRole(role)) return getHomeRoutePath()
+    if (isMentorRole(role) || isCareerArchitectRole(role)) return getHomeRoutePath()
     if (role) return getAdminPortalLoginRoutePath()
 
     if (typeof window !== 'undefined') {
         const path = window.location.pathname
         if (path.startsWith('/admin/mentor') || path.startsWith('/mentor')) {
-            return getMentorLoginRoutePath()
+            return getHomeRoutePath()
         }
         if (path.startsWith('/admin') || path.startsWith('/portal')) {
             return getAdminPortalLoginRoutePath()
@@ -117,7 +114,7 @@ function getAuthGatedRedirect(pathname: string): string | null {
         return getHomeRoutePath()
     }
     if (isMentorPanelPath(pathname)) {
-        return getMentorLoginRoutePath()
+        return getHomeRoutePath()
     }
     if (pathname === '/admin' || pathname.startsWith('/admin/')) {
         return getAdminPortalLoginRoutePath()

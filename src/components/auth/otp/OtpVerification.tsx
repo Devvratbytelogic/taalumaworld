@@ -14,6 +14,8 @@ import { setAuthCookies } from '@/utils/authCookies';
 import toast from '@/utils/toast';
 import { useOtpResendCooldown } from '@/hooks/useOtpResendCooldown';
 import { OtpResendButton } from '@/components/auth/OtpResendButton';
+import { isMentorRole } from '@/constants/common';
+import { getMentorDashboardRoutePath } from '@/routes/routes';
 
 export default function OtpVerification() {
     const dispatch = useDispatch();
@@ -43,21 +45,39 @@ export default function OtpVerification() {
         onSubmit: async (formValues, { resetForm }) => {
             if (!modalData?.email) return;
             try {
-                const res = await userVerifyOtp({
-                    email: modalData.email,
-                    code: formValues.code,
-                    type: modalData.type,
-                    through: modalData.through,
-                }).unwrap();
+                const res = await userVerifyOtp(
+                    modalData.type === 'login_2fa'
+                        ? { code: formValues.code, type: 'login_2fa' }
+                        : {
+                            email: modalData.email,
+                            code: formValues.code,
+                            type: modalData.type,
+                            through: modalData.through,
+                        },
+                ).unwrap();
                 if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                     toast.success(res?.message ?? 'Verification successful!');
                     resetForm();
 
-                    if (modalData.type === 'email_verification') {
+                    if (modalData.type === 'login_2fa') {
+                        const roleName = res?.data?.role?.name ?? '';
                         setAuthCookies({
                             token: res?.data?.token ?? '',
                             user: { id: res?.data?.id, email: res?.data?.email },
-                            role: res?.data?.userRole?.name ?? '',
+                            role: roleName,
+                        });
+                        dispatch(closeModal());
+                        if (isMentorRole(roleName)) {
+                            router.push(getMentorDashboardRoutePath());
+                            return;
+                        }
+                        router.refresh();
+                        if (typeof onSuccess === 'function') onSuccess();
+                    } else if (modalData.type === 'email_verification') {
+                        setAuthCookies({
+                            token: res?.data?.token ?? '',
+                            user: { id: res?.data?.id, email: res?.data?.email },
+                            role: res?.data?.userRole?.name ?? res?.data?.role?.name ?? '',
                         });
 
                         router.refresh()
@@ -83,7 +103,11 @@ export default function OtpVerification() {
     const handleResend = async () => {
         if (!modalData?.email || !canResend) return;
         try {
-            const res = await userResendOtp({ email: modalData.email, type: modalData.type }).unwrap();
+            const res = await userResendOtp(
+                modalData.type === 'login_2fa'
+                    ? { type: 'login_2fa' }
+                    : { email: modalData.email, type: modalData.type },
+            ).unwrap();
             if (res?.http_status_code === 200 || res?.http_status_code === 201) {
                 toast.success(res?.message ?? 'Code resent successfully!');
                 startCooldown();
@@ -98,10 +122,12 @@ export default function OtpVerification() {
             <ModalContent>
                 <ModalHeader className="flex flex-col items-center text-center gap-2">
                     <p className="text-2xl font-semibold text-foreground">
-                        Verify Your Email
+                        {modalData?.type === 'login_2fa' ? 'Enter your login code' : 'Verify Your Email'}
                     </p>
                     <p className="text-sm text-muted-foreground font-normal">
-                        Enter the 4-digit code we sent to your inbox
+                        {modalData?.type === 'login_2fa'
+                            ? 'We emailed you a code to finish signing in'
+                            : 'Enter the 4-digit code we sent to your inbox'}
                     </p>
                 </ModalHeader>
                 <ModalBody>

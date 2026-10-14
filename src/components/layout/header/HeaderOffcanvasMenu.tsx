@@ -50,6 +50,7 @@ import {
   getUserDashboardMyOrdersRoutePath,
   getUserDashboardProfileRoutePath,
   getUserDashboardRoutePath,
+  getMentorSignupRoutePath,
   getUserDashboardSettingsRoutePath,
 } from '@/routes/routes';
 import { signOut } from '@/utils/refreshSession';
@@ -280,16 +281,15 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
                   onClose();
                 }}
               >
-                Sign In
+                Sign In / Register
               </Button>
               <Button
+                as={Link}
+                href={getMentorSignupRoutePath()}
                 className="global_btn rounded_full bg_primary w-full"
-                onPress={() => {
-                  dispatch(openModal({ componentName: 'SignUp', data: '' }));
-                  onClose();
-                }}
+                onClick={onClose}
               >
-                Join Taaluma
+                Become a Mentor
               </Button>
             </div>
           )}

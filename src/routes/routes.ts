@@ -124,10 +124,6 @@ export function getMentorUsersRoutePath(): string {
   return '/admin/mentor/users';
 }
 
-export function getMentorLoginRoutePath(): string {
-  return '/mentor/login';
-}
-
 export function getMentorSignupRoutePath(): string {
   return '/mentor/signup';
 }

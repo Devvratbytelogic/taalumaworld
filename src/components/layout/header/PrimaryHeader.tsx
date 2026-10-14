@@ -201,7 +201,7 @@ export default function PrimaryHeader({ logo, isAuthenticated, userRole, content
               </div>
             </Link>
 
-            <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 xl:flex">
+            <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 xl:flex">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href} className={navLinkClass(item.href)}>
                   {item.label}

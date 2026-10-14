@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
@@ -14,7 +14,8 @@ import { mentorSignUpSchema } from '@/utils/formValidation';
 import { useRegisterMentorMutation } from '@/store/rtkQueries/adminAuth';
 import toast from '@/utils/toast';
 import { AuthPageShell } from '@/components/auth/AuthPageShell';
-import { getHomeRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
+import { getHomeRoutePath, getMentorDashboardRoutePath, getSignedInLandingPath } from '@/routes/routes';
+import { useAuth } from '@/hooks/useAuth';
 import { openModal } from '@/store/slices/allModalSlice';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { setAuthCookies } from '@/utils/authCookies';
@@ -27,6 +28,12 @@ const AVATAR_BORDER_COLOR = '#C8D7EE';
 export function SignUpForm() {
     const router = useRouter();
     const dispatch = useDispatch();
+    const { isAuthenticated, user } = useAuth();
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        router.replace(getSignedInLandingPath(user?.role));
+    }, [isAuthenticated, user?.role, router]);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -116,12 +123,18 @@ export function SignUpForm() {
         values.password === values.confirmPassword &&
         requiredAccepted;
 
+    if (isAuthenticated) return null;
+
     return (
         <AuthPageShell
             wide
             fullViewport={false}
             title="Create Account"
-            subtitle="Register as a mentor on TaalumaWorld"
+            subtitle={
+                <>
+                    Register as a <span className="font-semibold gradient_text">Mentor</span> on TaalumaWorld
+                </>
+            }
             footer={
                 <>
                     <p>

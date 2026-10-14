@@ -1,3 +1,5 @@
+import { isMentorRole, isStaffAdminRole } from '@/constants/common';
+
 // ─── Static Routes ─────────────────────────────────────────────────────────
 
 export function getHomeRoutePath(): string {
@@ -130,6 +132,13 @@ export function getMentorSignupRoutePath(): string {
 
 export function getMentorForgotPasswordRoutePath(): string {
   return '/mentor/forgot-password';
+}
+
+/** Where a signed-in user belongs. Guest registration pages use this so they cannot stay open. */
+export function getSignedInLandingPath(role?: string | null): string {
+  if (isMentorRole(role)) return getMentorDashboardRoutePath();
+  if (isStaffAdminRole(role)) return getAdminDashboardRoutePath();
+  return getHomeRoutePath();
 }
 
 

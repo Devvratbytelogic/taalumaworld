@@ -8,6 +8,7 @@ import {
   getAdminPortalLoginRoutePath,
   getHomeRoutePath,
   getMentorDashboardRoutePath,
+  getSignedInLandingPath,
   isMentorPanelPath,
 } from '@/routes/routes';
 
@@ -17,11 +18,18 @@ const ROLE_COOKIE_NAME = 'user_role';
 const ADMIN_PANEL_PREFIX = '/admin';
 const USER_DASHBOARD_PREFIX = '/user-dashboard';
 
-/** Login / signup pages that must stay reachable no matter the auth state, to avoid redirect loops. */
-const PUBLIC_AUTH_ROUTES = ['/portal/login', '/portal/forgot-password', '/mentor/signup', '/mentor/forgot-password'];
+/** Staff login pages stay reachable so an expired admin session can sign in again. */
+const PUBLIC_AUTH_ROUTES = ['/portal/login', '/portal/forgot-password'];
+
+/** Guest registration pages. A signed-in user is sent to their own area. */
+const GUEST_ONLY_ROUTES = ['/mentor/signup', '/mentor/forgot-password'];
 
 function isPublicAuthRoute(pathname: string): boolean {
   return PUBLIC_AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
+
+function isGuestOnlyRoute(pathname: string): boolean {
+  return GUEST_ONLY_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
 function isMentorPanelRoute(pathname: string): boolean {
@@ -92,14 +100,20 @@ async function staffHasRouteAccess(pathname: string, token: string): Promise<boo
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
+  const role = request.cookies.get(ROLE_COOKIE_NAME)?.value;
+  const isAuthenticated = Boolean(token);
+
+  if (isGuestOnlyRoute(pathname)) {
+    if (isAuthenticated) {
+      return redirectTo(request, getSignedInLandingPath(role));
+    }
+    return NextResponse.next();
+  }
 
   if (isPublicAuthRoute(pathname)) {
     return NextResponse.next();
   }
-
-  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
-  const role = request.cookies.get(ROLE_COOKIE_NAME)?.value;
-  const isAuthenticated = Boolean(token);
 
   // ── Mentor panel: /admin/mentor/* — Mentors only ──────────────────────────
   if (isMentorPanelRoute(pathname)) {
@@ -160,5 +174,5 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/user-dashboard/:path*'],
+  matcher: ['/admin/:path*', '/user-dashboard/:path*', '/mentor/signup', '/mentor/forgot-password'],
 };

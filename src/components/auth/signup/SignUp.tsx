@@ -281,7 +281,7 @@ export default function SignUp() {
                 <ModalHeader className="flex flex-col items-center text-center gap-1 pb-2">
                     <p className="text-2xl font-semibold text-foreground">Create Account</p>
                     <p className="text-sm text-muted-foreground font-normal">
-                        Join TaalumaWorld and start your learning journey
+                        Join TaalumaWorld as a <span className="font-semibold gradient_text">Mentee</span> and Start Your Learning Journey
                     </p>
                 </ModalHeader>
                 <ModalBody className="gap-0">

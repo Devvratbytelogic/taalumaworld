@@ -3,7 +3,7 @@ import { cn } from '@/components/ui/utils';
 
 type AuthPageShellProps = {
     title: string;
-    subtitle?: string;
+    subtitle?: ReactNode;
     icon?: ReactNode;
     children: ReactNode;
     footer?: ReactNode;

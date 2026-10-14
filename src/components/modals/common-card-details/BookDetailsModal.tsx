@@ -204,7 +204,7 @@ export default function BookDetailsModal() {
                             <Button
                                 as={Link}
                                 href={getSeriesRoutePath(book?.slug ?? '')}
-                                className="global_btn rounded_full outline_primary shrink-0"
+                                className="global_btn rounded_full outline_primary w-full sm:w-auto sm:shrink-0"
                                 onPress={onClose}
                                 startContent={<Eye className="h-4 w-4" />}
                             >
@@ -214,7 +214,7 @@ export default function BookDetailsModal() {
                             <AddToCartButton
                                 id={book?.id}
                                 type={VISIBLE.BOOK}
-                                className="global_btn rounded_full bg_primary w-full"
+                                className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
                                 label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
                                 onLoginCancel={() =>
                                     dispatch(

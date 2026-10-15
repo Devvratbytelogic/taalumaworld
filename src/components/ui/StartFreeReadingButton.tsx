@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { BookOpen } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,15 @@ import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { usePaystackPaymentMutation } from '@/store/rtkQueries/userPostAPI';
 import { getAuthToken } from '@/utils/authCookies';
 import { getLinkedAgreementIds } from '@/utils/agreementConsent';
+import {
+  beginFreeReading,
+  claimFreeReadingResume,
+  endFreeReading,
+  forgetAction,
+  rememberAction,
+  rememberActionIfBlocked,
+  rememberFreeReading,
+} from '@/utils/pendingAgreementAction';
 
 type StartFreeReadingButtonProps = {
   id?: string;
@@ -40,7 +49,7 @@ export default function StartFreeReadingButton({
   const { data: agreements, refetch } = useGetAgreementsByTouchpointQuery(AGREEMENT_TOUCHPOINTS.CHECKOUT);
 
   const startReading = async () => {
-    if (!id) return;
+    if (!id || !beginFreeReading()) return;
     try {
       const sentences = agreements?.data?.sentences
         ?? (await refetch()).data?.data?.sentences
@@ -51,27 +60,42 @@ export default function StartFreeReadingButton({
         accepted_agreement_ids: acceptedAgreementIds,
         ...(type === VISIBLE.BOOK ? { book_id: id } : { chapter_id: id }),
       }).unwrap();
-      // const checkoutUrl = res?.data?.authorization_url || res?.data?.checkout_url;
-      // if (checkoutUrl) {
-      //   window.location.assign(checkoutUrl);
-      //   return;
-      // }
+      forgetAction();
       dispatch(rtkQuerieSetup.util.invalidateTags(['SingleChapter', 'AllChapters', 'MyChapters', 'AdminUserConsentStatus']));
       toast.success(res?.message ?? 'You can now read this book.');
       router.refresh();
       onSuccess?.();
     } catch (error) {
+      rememberActionIfBlocked(error, () => { void startReading(); });
       console.error('Failed to start free reading', error);
+    } finally {
+      endFreeReading();
     }
   };
 
+  const startReadingRef = useRef(startReading);
+  startReadingRef.current = startReading;
+
+  // LinkedIn and Facebook return to this page, so the saved click runs after login.
+  useEffect(() => {
+    if (!id || !getAuthToken()) return;
+    const pending = claimFreeReadingResume();
+    if (!pending || pending.id !== id) return;
+    void startReadingRef.current();
+  }, [id]);
+
   const handlePress = () => {
     if (!getAuthToken()) {
+      if (id) rememberFreeReading(id, type);
+      rememberAction(() => { void startReadingRef.current(); });
       dispatch(openModal({
         componentName: 'SignIn',
         data: {
-          onSuccess: startReading,
-          ...(onLoginCancel ? { onCancel: onLoginCancel } : {}),
+          onSuccess: () => { void startReadingRef.current(); },
+          onCancel: () => {
+            forgetAction();
+            onLoginCancel?.();
+          },
         },
       }));
       return;

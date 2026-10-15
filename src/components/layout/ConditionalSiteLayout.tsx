@@ -3,6 +3,7 @@ import { Suspense, type ReactNode } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import PrimaryHeader from '@/components/layout/header/PrimaryHeader';
 import PrimaryFooter from '@/components/layout/footer/PrimaryFooter';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { getUserRole } from '@/utils/authCookies';
 import { hasSocialOAuthCallbackParams } from '@/utils/socialAuth';
@@ -87,8 +88,15 @@ function SiteChrome({
                     contentMode={contentMode}
                 />
             )}
-            {children}
+            <div className="pb-[calc(4rem+env(safe-area-inset-bottom,0px))] xl:pb-0">{children}</div>
             {!hideChrome && <PrimaryFooter settings={settings} />}
+            {!hideChrome && (
+                <MobileBottomNav
+                    isAuthenticated={isAuthenticated}
+                    userRole={userRole}
+                    contentMode={contentMode}
+                />
+            )}
         </>
     );
 }

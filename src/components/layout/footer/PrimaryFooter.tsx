@@ -40,7 +40,7 @@ export default function PrimaryFooter({
 
     return (
         <>
-            <footer className="bg-gray-900 text-gray-300">
+            <footer className="bg-gray-900 text-gray-300 pb-[calc(4rem+env(safe-area-inset-bottom,0px))] xl:pb-0">
                 {/* Main Footer */}
                 <div className="container py-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

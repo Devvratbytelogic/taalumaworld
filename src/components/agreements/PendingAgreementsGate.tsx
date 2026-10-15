@@ -24,7 +24,7 @@ import {
 } from '@/routes/routes';
 import type { IAgreementSentenceEntity } from '@/types/agreements';
 import { getLinkedAgreementIds, isPendingRequiredSentence } from '@/utils/agreementConsent';
-import { forgetAction, runRememberedAction } from '@/utils/pendingAgreementAction';
+import { forgetAction, runRememberedAction, watchPendingAction } from '@/utils/pendingAgreementAction';
 
 function isExemptPath(pathname: string): boolean {
   if (pathname === '/policies' || pathname.startsWith('/policies/')) return true;
@@ -43,7 +43,7 @@ export function PendingAgreementsGate() {
   const consentUserType = getAgreementConsentUserType(getUserRole());
   const skip = !isAuthenticated || !consentUserType || isExemptPath(pathname);
 
-  const { data: consentData, isLoading } = useGetUserConsentStatusQuery(
+  const { data: consentData, isLoading, isFetching, isUninitialized } = useGetUserConsentStatusQuery(
     consentUserType ? { userType: consentUserType } : undefined,
     { skip },
   );
@@ -52,7 +52,10 @@ export function PendingAgreementsGate() {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [acceptingAll, setAcceptingAll] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [savedActionTick, setSavedActionTick] = useState(0);
   const wasOpen = useRef(false);
+  const signedIn = useRef(false);
+  const sweptGuest = useRef(false);
 
   const pendingSentences = (consentData?.data?.sentences ?? [])
     .filter(isPendingRequiredSentence)
@@ -63,15 +66,25 @@ export function PendingAgreementsGate() {
     setMounted(true);
   }, []);
 
+  useEffect(() => watchPendingAction(() => setSavedActionTick((tick) => tick + 1)), []);
+
   useEffect(() => {
     if (!isAuthenticated) {
-      forgetAction()
+      if (signedIn.current || !sweptGuest.current) forgetAction()
+      sweptGuest.current = true
+      signedIn.current = false
       wasOpen.current = false
       return
     }
-    if (wasOpen.current && !open) runRememberedAction()
-    wasOpen.current = open
-  }, [open, isAuthenticated]);
+    signedIn.current = true
+    if (skip || isLoading || isFetching || isUninitialized) return
+    if (open) {
+      wasOpen.current = true
+      return
+    }
+    runRememberedAction()
+    wasOpen.current = false
+  }, [open, isAuthenticated, isLoading, isFetching, isUninitialized, skip, savedActionTick]);
 
   useEffect(() => {
     if (!open) return;

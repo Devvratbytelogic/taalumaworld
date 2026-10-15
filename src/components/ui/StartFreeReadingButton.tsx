@@ -76,12 +76,12 @@ export default function StartFreeReadingButton({
   const startReadingRef = useRef(startReading);
   startReadingRef.current = startReading;
 
-  // LinkedIn and Facebook return to this page, so the saved click runs after login.
+  // LinkedIn and Facebook return to this page. The agreements dialog runs the saved click.
   useEffect(() => {
     if (!id || !getAuthToken()) return;
     const pending = claimFreeReadingResume();
     if (!pending || pending.id !== id) return;
-    void startReadingRef.current();
+    rememberAction(() => { void startReadingRef.current(); });
   }, [id]);
 
   const handlePress = () => {
@@ -91,7 +91,6 @@ export default function StartFreeReadingButton({
       dispatch(openModal({
         componentName: 'SignIn',
         data: {
-          onSuccess: () => { void startReadingRef.current(); },
           onCancel: () => {
             forgetAction();
             onLoginCancel?.();

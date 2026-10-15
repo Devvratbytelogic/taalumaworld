@@ -3,6 +3,7 @@ const STORAGE_KEY = 'free-reading-after-login'
 let action: (() => void) | null = null
 let resumeStarted = false
 let reading = false
+const listeners = new Set<() => void>()
 
 export function beginFreeReading() {
   if (reading) return false
@@ -16,11 +17,19 @@ export function endFreeReading() {
 
 export function rememberAction(next: () => void) {
   action = next
+  listeners.forEach((listener) => listener())
+}
+
+export function watchPendingAction(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
 }
 
 export function rememberActionIfBlocked(error: unknown, next: () => void) {
   const status = (error as { data?: { httpStatus?: number } })?.data?.httpStatus
-  if (status === 403) rememberAction(next)
+  if (status === 403) action = next
 }
 
 export function runRememberedAction() {

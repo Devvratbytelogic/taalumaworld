@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import Button from '@/components/ui/Button';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 import { VISIBLE } from '@/constants/contentMode';
-import { openModal } from '@/store/slices/allModalSlice';
+import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useGetAgreementsByTouchpointQuery } from '@/store/rtkQueries/agreementAPIs';
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { usePaystackPaymentMutation } from '@/store/rtkQueries/userPostAPI';
@@ -93,7 +93,11 @@ export default function StartFreeReadingButton({
         data: {
           onCancel: () => {
             forgetAction();
-            onLoginCancel?.();
+            if (onLoginCancel) {
+              onLoginCancel();
+              return;
+            }
+            dispatch(closeModal());
           },
         },
       }));

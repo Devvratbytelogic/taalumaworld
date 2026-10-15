@@ -56,6 +56,8 @@ type PaystackPayButtonProps = {
   callbackUrl?: string;
   isDisabled?: boolean;
   label?: string;
+  /** `action` is a single Place order button. `method` is the Paystack option card. */
+  appearance?: 'method' | 'action';
   className?: string;
   /** Return false to block starting payment (e.g. missing address / agreements). */
   onBeforePay?: () => boolean;
@@ -100,6 +102,7 @@ export function PaystackPayButton({
   callbackUrl,
   isDisabled = false,
   label = 'Pay with Paystack',
+  appearance = 'method',
   className,
   onBeforePay,
   onSuccess,
@@ -162,6 +165,24 @@ export function PaystackPayButton({
       console.error('Paystack payment failed', error);
     }
   };
+
+  if (appearance === 'action') {
+    return (
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={handlePay}
+        aria-busy={isLoading}
+        className={cn(
+          'global_btn rounded_full bg_primary h-12 w-full justify-center gap-2',
+          className,
+        )}
+      >
+        {isLoading ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : null}
+        <span>{isLoading ? 'Placing order…' : label}</span>
+      </button>
+    );
+  }
 
   return (
     <button

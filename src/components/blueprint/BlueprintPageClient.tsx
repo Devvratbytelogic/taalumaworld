@@ -5,7 +5,6 @@ import BlueprintPublicHero from '@/components/blueprint/BlueprintPublicHero';
 import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetails';
 import BlueprintReviews from '@/components/blueprint/BlueprintReviews';
 import LoginRequiredGate from '@/components/auth/LoginRequiredGate';
-import ChapterPurchaseGate from '@/components/pages-components/chapter/ChapterPurchaseGate';
 import DirectPurchasePaymentModal from '@/components/payments/DirectPurchasePaymentModal';
 import { useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
 import { useAuth } from '@/hooks/useAuth';
@@ -35,7 +34,6 @@ export default function BlueprintPageClient({ slug, initialData }: BlueprintPage
   const skipGates = !searchChecked || Boolean(paystackReference);
   const accessPending = !searchChecked || (isAuthenticated && !isSuccess && !isError);
   const skipLoginGate = skipGates || isAuthenticated;
-  const skipPurchaseGate = skipGates || !isSuccess;
 
   return (
     <>
@@ -44,11 +42,6 @@ export default function BlueprintPageClient({ slug, initialData }: BlueprintPage
         action="view"
         itemType="chapter"
         skip={skipLoginGate}
-      />
-      <ChapterPurchaseGate
-        isAuthenticated={isAuthenticated}
-        chapter={isAuthenticated && isSuccess ? liveRes?.data ?? null : null}
-        skip={skipPurchaseGate}
       />
       {paystackReference ? (
         <DirectPurchasePaymentModal
@@ -59,7 +52,7 @@ export default function BlueprintPageClient({ slug, initialData }: BlueprintPage
       ) : null}
 
       <div className="space-y-10 space_top">
-        <BlueprintPublicHero data={data} accessPending={accessPending} liveReady={Boolean(isAuthenticated && isSuccess)} />
+        <BlueprintPublicHero data={data} accessPending={accessPending} />
         <BlueprintPublicDetails data={data} accessPending={accessPending} />
         <BlueprintReviews
           itemId={data?.id}

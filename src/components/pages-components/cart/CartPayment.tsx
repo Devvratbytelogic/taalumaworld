@@ -117,6 +117,8 @@ export default function CartPayment({
           cartID={cartId}
           type="cart"
           acceptedAgreementIds={acceptedAgreementIds}
+          label={isFreeOrder ? 'Place order' : 'Pay with Paystack'}
+          appearance={isFreeOrder ? 'action' : 'method'}
           isDisabled={itemCount === 0 || isPaymentBusy || (addressRequired && !hasSelectedAddress)}
           onBeforePay={validateCheckout}
           onSuccess={onPaymentSuccess}

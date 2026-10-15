@@ -2,7 +2,6 @@
 
 import { BookOpen, FileText, Wallet, BadgeCheck } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import Button from '@/components/ui/Button';
@@ -17,12 +16,10 @@ import { getAuthToken } from '@/utils/authCookies';
 interface BlueprintPublicHeroProps {
   data: ISingleChapterAPIResponseData | null;
   accessPending?: boolean;
-  liveReady?: boolean;
 }
 
-export default function BlueprintPublicHero({ data, accessPending = false, liveReady = false }: BlueprintPublicHeroProps) {
+export default function BlueprintPublicHero({ data, accessPending = false }: BlueprintPublicHeroProps) {
   const dispatch = useDispatch();
-  const [resumePurchase, setResumePurchase] = useState(false);
 
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
   const displayPrice = isPricingModelChapter
@@ -39,22 +36,12 @@ export default function BlueprintPublicHero({ data, accessPending = false, liveR
     dispatch(openModal({ componentName: 'ChapterPurchaseModal', data: { chapter: data } }));
   };
 
-  useEffect(() => {
-    if (!resumePurchase || !getAuthToken() || !liveReady) return;
-    setResumePurchase(false);
-    openPurchaseModal();
-  }, [resumePurchase, liveReady, data]);
-
   const handleBuyNow = () => {
     if (!getAuthToken()) {
       dispatch(openModal({
         componentName: 'LoginRequiredModal',
-        data: { action: 'cart', itemType: purchaseType, onSuccess: () => setResumePurchase(true) },
+        data: { action: 'cart', itemType: purchaseType },
       }));
-      return;
-    }
-    if (!liveReady) {
-      setResumePurchase(true);
       return;
     }
     openPurchaseModal();

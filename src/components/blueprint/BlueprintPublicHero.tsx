@@ -6,6 +6,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import Button from '@/components/ui/Button';
 import AddToCartButton from '@/components/ui/AddToCartButton';
+import StartFreeReadingButton from '@/components/ui/StartFreeReadingButton';
 import { ISingleChapterAPIResponseData } from '@/types/user/singleChapter';
 import { getSeriesRoutePath, getSingleAuthorRoutePath } from '@/routes/routes';
 import Link from 'next/link';
@@ -38,13 +39,6 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
 
   const handleBuyNow = () => {
     if (!getAuthToken()) {
-      if (isFreePurchase) {
-        dispatch(openModal({
-          componentName: 'SignIn',
-          data: { onSuccess: openPurchaseModal },
-        }));
-        return;
-      }
       dispatch(openModal({
         componentName: 'LoginRequiredModal',
         data: { action: 'cart', itemType: purchaseType },
@@ -166,16 +160,26 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
               ) : showPurchaseActions ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <Button
-                      className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
-                      onPress={handleBuyNow}
-                      startContent={<Wallet className="h-4 w-4" />}
-                    >
-                      {isFreePurchase ? 'Get Free Book' : `Buy Now - KSH ${resolvedPrice.toFixed(2)}`}
-                      {!isFreePurchase && data?.series?.pricingModel === VISIBLE.BOOK && (
-                        <span className="ml-1 text-xs font-normal opacity-80">(complete series)</span>
-                      )}
-                    </Button>
+                    {isFreePurchase ? (
+                      <StartFreeReadingButton
+                        id={purchaseId}
+                        type={purchaseType}
+                        label="Get Free Book"
+                        className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
+                        icon={<Wallet className="h-4 w-4" />}
+                      />
+                    ) : (
+                      <Button
+                        className="global_btn rounded_full bg_primary w-full sm:w-auto sm:min-w-48"
+                        onPress={handleBuyNow}
+                        startContent={<Wallet className="h-4 w-4" />}
+                      >
+                        {`Buy Now - KSH ${resolvedPrice.toFixed(2)}`}
+                        {data?.series?.pricingModel === VISIBLE.BOOK && (
+                          <span className="ml-1 text-xs font-normal opacity-80">(complete series)</span>
+                        )}
+                      </Button>
+                    )}
 
                     <AddToCartButton
                       id={purchaseId}
@@ -188,7 +192,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
 
                   {isFreePurchase && (
                     <p className="text-sm text-muted-foreground">
-                      Free account required. Complete checkout at zero cost to access this book.
+                      Free account required to start reading.
                     </p>
                   )}
                 </div>

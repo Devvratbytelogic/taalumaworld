@@ -8,6 +8,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
 import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
 import AddToCartButton from '@/components/ui/AddToCartButton';
+import StartFreeReadingButton from '@/components/ui/StartFreeReadingButton';
 import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
@@ -31,6 +32,13 @@ export default function ChapterDetailsModal() {
   const chapter = data?.chapter
 
   const onClose = () => dispatch(closeModal());
+
+  const reopenDetails = () => {
+    dispatch(openModal({
+      componentName: 'ChapterDetailsModal',
+      data: { chapter, type: data?.type },
+    }));
+  };
 
   const isBook = data?.type === 'series'
 
@@ -248,21 +256,26 @@ export default function ChapterDetailsModal() {
                 View Details
               </Button>
 
-              <AddToCartButton
-                id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
-                type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
-                className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
-                label={displayPrice <= 0 ? 'Start Reading' : `Add to Cart - KSH ${displayPrice.toFixed(2)}`}
-                skipLoginRequired={displayPrice <= 0}
-                onLoginCancel={() =>
-                  dispatch(
-                    openModal({
-                      componentName: 'ChapterDetailsModal',
-                      data: { chapter: chapter, type: data?.type },
-                    }),
-                  )
-                }
-              />
+              {displayPrice <= 0 ? (
+                <StartFreeReadingButton
+                  id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
+                  type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
+                  className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
+                  onLoginCancel={reopenDetails}
+                  onSuccess={() => {
+                    dispatch(closeModal());
+                    router.push(getBlueprintRoutePath(chapter?.slug ?? chapter?.id));
+                  }}
+                />
+              ) : (
+                <AddToCartButton
+                  id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
+                  type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
+                  className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
+                  label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
+                  onLoginCancel={reopenDetails}
+                />
+              )}
             </>
           )}
         </ModalFooter>

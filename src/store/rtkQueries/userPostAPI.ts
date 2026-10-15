@@ -184,7 +184,7 @@ export const clientSidePostApis = rtkQuerieSetup.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['Cart', 'AllChapters', 'MyChapters', 'SingleChapter'],
+            invalidatesTags: ['Cart', 'AllChapters', 'MyChapters', 'SingleChapter', 'AdminUserConsentStatus'],
         }),
     }),
 });

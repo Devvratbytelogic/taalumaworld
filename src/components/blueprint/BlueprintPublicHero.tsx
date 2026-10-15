@@ -38,6 +38,13 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
 
   const handleBuyNow = () => {
     if (!getAuthToken()) {
+      if (isFreePurchase) {
+        dispatch(openModal({
+          componentName: 'SignIn',
+          data: { onSuccess: openPurchaseModal },
+        }));
+        return;
+      }
       dispatch(openModal({
         componentName: 'LoginRequiredModal',
         data: { action: 'cart', itemType: purchaseType },
@@ -173,6 +180,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
                     <AddToCartButton
                       id={purchaseId}
                       type={purchaseType}
+                      skipLoginRequired={isFreePurchase}
                       className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
                       label={isFreePurchase ? 'Add Free Book to Cart' : `Add to Cart - KSH ${resolvedPrice.toFixed(2)}`}
                     />

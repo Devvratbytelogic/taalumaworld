@@ -19,8 +19,10 @@ interface AddToCartButtonProps {
     label?: string;
     goToCartLabel?: string;
     onSuccess?: () => void;
-    /** Called when user cancels the login-required modal (e.g. reopen chapter details). */
+    /** Called when the guest cancels sign-in (e.g. reopen chapter details). */
     onLoginCancel?: () => void;
+    /** Open Sign In directly. Skips the login-required prompt. */
+    skipLoginRequired?: boolean;
 }
 
 export default function AddToCartButton({
@@ -31,6 +33,7 @@ export default function AddToCartButton({
     goToCartLabel = 'Go to Cart',
     onSuccess,
     onLoginCancel,
+    skipLoginRequired = false,
 }: AddToCartButtonProps) {
     const dispatch = useDispatch();
     const router = useRouter();
@@ -48,13 +51,18 @@ export default function AddToCartButton({
 
     const openLogin = () => {
         dispatch(openModal({
-            componentName: 'LoginRequiredModal',
-            data: {
-                action: 'cart',
-                itemType: type,
-                onSuccess: handleAddToCart,
-                ...(onLoginCancel ? { onCancel: onLoginCancel } : {}),
-            },
+            componentName: skipLoginRequired ? 'SignIn' : 'LoginRequiredModal',
+            data: skipLoginRequired
+                ? {
+                    onSuccess: handleAddToCart,
+                    ...(onLoginCancel ? { onCancel: onLoginCancel } : {}),
+                }
+                : {
+                    action: 'cart',
+                    itemType: type,
+                    onSuccess: handleAddToCart,
+                    ...(onLoginCancel ? { onCancel: onLoginCancel } : {}),
+                },
         }));
     };
 

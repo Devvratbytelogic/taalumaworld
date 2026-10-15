@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import BlueprintPublicHero from '@/components/blueprint/BlueprintPublicHero';
 import BlueprintPublicDetails from '@/components/blueprint/BlueprintPublicDetails';
 import BlueprintReviews from '@/components/blueprint/BlueprintReviews';
-import LoginRequiredGate from '@/components/auth/LoginRequiredGate';
 import DirectPurchasePaymentModal from '@/components/payments/DirectPurchasePaymentModal';
 import { useGetSingleChapterQuery } from '@/store/rtkQueries/userGetAPI';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,18 +30,10 @@ export default function BlueprintPageClient({ slug, initialData }: BlueprintPage
   });
 
   const data = isAuthenticated ? liveRes?.data ?? initialData : initialData;
-  const skipGates = !searchChecked || Boolean(paystackReference);
   const accessPending = !searchChecked || (isAuthenticated && !isSuccess && !isError);
-  const skipLoginGate = skipGates || isAuthenticated;
 
   return (
     <>
-      <LoginRequiredGate
-        isAuthenticated={isAuthenticated}
-        action="view"
-        itemType="chapter"
-        skip={skipLoginGate}
-      />
       {paystackReference ? (
         <DirectPurchasePaymentModal
           reference={paystackReference}

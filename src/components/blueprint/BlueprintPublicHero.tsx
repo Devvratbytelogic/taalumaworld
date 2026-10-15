@@ -181,13 +181,14 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
                       </Button>
                     )}
 
-                    <AddToCartButton
-                      id={purchaseId}
-                      type={purchaseType}
-                      skipLoginRequired={isFreePurchase}
-                      className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
-                      label={isFreePurchase ? 'Add Free Book to Cart' : `Add to Cart - KSH ${resolvedPrice.toFixed(2)}`}
-                    />
+                    {!isFreePurchase && (
+                      <AddToCartButton
+                        id={purchaseId}
+                        type={purchaseType}
+                        className="global_btn rounded_full outline_primary w-full sm:w-auto sm:min-w-48"
+                        label={`Add to Cart - KSH ${resolvedPrice.toFixed(2)}`}
+                      />
+                    )}
                   </div>
 
                   {isFreePurchase && (

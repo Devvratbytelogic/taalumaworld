@@ -200,12 +200,14 @@ export default function ChapterPurchaseModal() {
             />
           </div>
 
-          <AddToCartButton
-            id={purchaseId}
-            type={purchaseType}
-            className="global_btn rounded_full outline_primary w-full"
-            label="Add to Cart Instead"
-          />
+          {!isFreeOrder && (
+            <AddToCartButton
+              id={purchaseId}
+              type={purchaseType}
+              className="global_btn rounded_full outline_primary w-full"
+              label="Add to Cart Instead"
+            />
+          )}
         </ModalFooter>
       </ModalContent>
     </Modal>

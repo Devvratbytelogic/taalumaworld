@@ -211,20 +211,22 @@ export default function BookDetailsModal() {
                                 View Details
                             </Button>
 
-                            <AddToCartButton
-                                id={book?.id}
-                                type={VISIBLE.BOOK}
-                                className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
-                                label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
-                                onLoginCancel={() =>
-                                    dispatch(
-                                        openModal({
-                                            componentName: 'BookDetailsModal',
-                                            data: { chapter: book, type: data?.type },
-                                        }),
-                                    )
-                                }
-                            />
+                            {displayPrice > 0 && (
+                                <AddToCartButton
+                                    id={book?.id}
+                                    type={VISIBLE.BOOK}
+                                    className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
+                                    label={`Add to Cart - KSH ${displayPrice.toFixed(2)}`}
+                                    onLoginCancel={() =>
+                                        dispatch(
+                                            openModal({
+                                                componentName: 'BookDetailsModal',
+                                                data: { chapter: book, type: data?.type },
+                                            }),
+                                        )
+                                    }
+                                />
+                            )}
                         </>
                     )}
                 </ModalFooter>

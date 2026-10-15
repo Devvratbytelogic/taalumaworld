@@ -568,7 +568,7 @@ export const globalSettingsSchema = Yup.object({
     .max(100, 'Default tax rate cannot exceed 100'),
   minimum_content_price: Yup.number()
     .typeError('Minimum content price must be a number')
-    .min(0, 'Minimum content price cannot be negative')
+    .min(1, 'Minimum content price must be at least 1')
     .required('Minimum content price is required'),
   // Header
   header_text: Yup.string().trim(),

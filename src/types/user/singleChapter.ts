@@ -55,6 +55,7 @@ export interface ISingleChapterAPIResponseData {
   blueprintNumber: number;
 }
 export interface Series {
+  tax: number;
   id: string;
   type: string;
   slug: string;

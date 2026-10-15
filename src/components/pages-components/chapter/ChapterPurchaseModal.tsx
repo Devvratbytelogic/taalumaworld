@@ -42,7 +42,9 @@ export default function ChapterPurchaseModal() {
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
   const isPaymentBusy = isWalletPaying || isPaystackPaying;
-  console.log('chapter', chapter);
+  // console.log('chapter', chapter);
+  // console.log('liveBook', liveBook);
+  // console.log('liveChapter', liveChapter);
 
   useEffect(() => {
     const canRead = isBook ? liveBook?.data?.bookDetails?.canRead : liveChapter?.data?.canRead;
@@ -58,7 +60,15 @@ export default function ChapterPurchaseModal() {
     : (chapter?.series?.pricingModel === VISIBLE.CHAPTER);
 
   // Tax follows the address country, so read it from the live fetch, not the modal snapshot.
-  const taxPrice = (isBook ? liveBook?.data?.bookDetails?.tax : liveChapter?.data?.tax) ?? chapter?.tax ?? 0;
+  const taxPrice = (isBook
+    ? liveBook?.data?.bookDetails?.tax
+    : (isPricingModelChapter
+      ? liveChapter?.data?.tax
+      : liveChapter?.data?.series?.tax))
+    ?? chapter?.tax ?? 0;
+  // console.log('taxPrice', taxPrice);
+  // console.log('isPricingModelChapter', isPricingModelChapter);
+  // console.log('isBook', isBook);
 
   const displayPrice = isBook
     ? chapter?.effectivePrice // from BlueprintPublicHero.tsx and serieshero both send its data as chapter object
@@ -139,64 +149,64 @@ export default function ChapterPurchaseModal() {
         </ModalBody>
 
         <ModalFooter className="flex flex-col gap-2 border-t p-4">
-            {subtotal > 0 && (
-              <div className="space-y-1.5 rounded-md border border-border bg-muted/30 px-3 py-2.5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">KSH {subtotal.toFixed(2)}</span>
-                </div>
-                {taxPrice > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Tax{taxPercent > 0 ? ` (${taxPercent}%)` : ''}
-                    </span>
-                    <span className="font-medium">KSH {taxPrice.toFixed(2)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between border-t border-border/70 pt-1.5 text-sm font-semibold">
-                  <span>Total</span>
-                  <span className="text-primary">KSH {totalPaymentRequired.toFixed(2)}</span>
-                </div>
-                {isTaxEstimated && (
-                  <p className="text-xs text-muted-foreground">
-                    Add a delivery address to confirm the tax for your country.
-                  </p>
-                )}
+          {subtotal > 0 && (
+            <div className="space-y-1.5 rounded-md border border-border bg-muted/30 px-3 py-2.5">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-medium">KSH {subtotal.toFixed(2)}</span>
               </div>
-            )}
-
-            <div className="flex flex-col gap-2">
-              {!isFreeOrder && (
-                <ReferralWalletPayButton
-                  totalPaymentRequired={totalPaymentRequired}
-                  payload={referralWalletPayload}
-                  isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
-                  onBeforePay={validatePurchase}
-                  onSuccess={handlePurchaseSuccess}
-                  onLoadingChange={setIsWalletPaying}
-                />
+              {taxPrice > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    Tax{taxPercent > 0 ? ` (${taxPercent}%)` : ''}
+                  </span>
+                  <span className="font-medium">KSH {taxPrice.toFixed(2)}</span>
+                </div>
               )}
-              <PaystackPayButton
-                chapterID={purchaseId}
-                type={purchaseType}
-                acceptedAgreementIds={acceptedAgreementIds}
-                callbackUrl={typeof window !== 'undefined' ? window.location.href : undefined}
-                label={`Buy Now - KSH ${totalPaymentRequired.toFixed(2)}`}
-                isDisabled={(addressRequired && !isAddressAvailable) || isPaymentBusy || !purchaseId}
+              <div className="flex justify-between border-t border-border/70 pt-1.5 text-sm font-semibold">
+                <span>Total</span>
+                <span className="text-primary">KSH {totalPaymentRequired.toFixed(2)}</span>
+              </div>
+              {isTaxEstimated && (
+                <p className="text-xs text-muted-foreground">
+                  Add a delivery address to confirm the tax for your country.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
+            {!isFreeOrder && (
+              <ReferralWalletPayButton
+                totalPaymentRequired={totalPaymentRequired}
+                payload={referralWalletPayload}
+                isDisabled={!isAddressAvailable || isPaymentBusy || !purchaseId}
                 onBeforePay={validatePurchase}
                 onSuccess={handlePurchaseSuccess}
-                onLoadingChange={setIsPaystackPaying}
+                onLoadingChange={setIsWalletPaying}
               />
-            </div>
-
-            <AddToCartButton
-              id={purchaseId}
+            )}
+            <PaystackPayButton
+              chapterID={purchaseId}
               type={purchaseType}
-              className="global_btn rounded_full outline_primary w-full"
-              label="Add to Cart Instead"
+              acceptedAgreementIds={acceptedAgreementIds}
+              callbackUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+              label={`Buy Now - KSH ${totalPaymentRequired.toFixed(2)}`}
+              isDisabled={(addressRequired && !isAddressAvailable) || isPaymentBusy || !purchaseId}
+              onBeforePay={validatePurchase}
+              onSuccess={handlePurchaseSuccess}
+              onLoadingChange={setIsPaystackPaying}
             />
-          </ModalFooter>
-        </ModalContent>
+          </div>
+
+          <AddToCartButton
+            id={purchaseId}
+            type={purchaseType}
+            className="global_btn rounded_full outline_primary w-full"
+            label="Add to Cart Instead"
+          />
+        </ModalFooter>
+      </ModalContent>
     </Modal>
   );
 }

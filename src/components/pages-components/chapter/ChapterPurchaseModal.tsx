@@ -3,14 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { BadgeCheck, BookOpen, Lock, Tag, User } from 'lucide-react';
 import { toast } from 'sonner';
-import { Modal, ModalBody, ModalContent, ModalFooter } from '@heroui/react';
-import { Badge } from '@/components/ui/badge';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
 import AddToCartButton from '@/components/ui/AddToCartButton';
-import ImageComponent from '@/components/ui/ImageComponent';
-import ShareButtons from '@/components/blueprint/ShareButtons';
-import { FacebookIcon, LinkedinIcon } from '@/components/ui/AllSVG';
 import { PaystackPayButton } from '@/components/payments/PaystackPayButton';
 import { ReferralWalletPayButton } from '@/components/payments/ReferralWalletPayButton';
 import { AgreementSentenceList, scrollToAgreementSection } from '@/components/ui/AgreementSentenceList';
@@ -18,18 +13,15 @@ import ChapterPurchaseAddresses from '@/components/pages-components/chapter/Chap
 import { closeModal } from '@/store/slices/allModalSlice';
 import { rtkQuerieSetup } from '@/store/services/rtkQuerieSetup';
 import { RootState } from '@/store/store';
-import { getSeriesRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
 import { AGREEMENT_TOUCHPOINTS } from '@/constants/agreements';
 // import { useBlockedTouchpoints } from '@/hooks/useBlockedTouchpoints';
 import { useGetSingleBookQuery, useGetSingleChapterQuery, useGetUserAddressesQuery } from '@/store/rtkQueries/userGetAPI';
 
 const modalClassNames = {
-  base: 'max-w-2xl rounded-3xl overflow-hidden',
-  wrapper: 'px-6 py-12',
-  body: 'p-0',
-  footer: 'p-0',
-  closeButton: 'z-10 bg-white/90 backdrop-blur-sm rounded-full! right-2 top-2',
+  base: 'max-w-md rounded-2xl',
+  wrapper: 'px-4 py-10 sm:px-6',
+  closeButton: 'z-10 rounded-full!',
 };
 
 export default function ChapterPurchaseModal() {
@@ -50,7 +42,7 @@ export default function ChapterPurchaseModal() {
   const { data: addressData, isLoading } = useGetUserAddressesQuery();
   const isAddressAvailable = Boolean(addressData?.data && addressData.data.length > 0);
   const isPaymentBusy = isWalletPaying || isPaystackPaying;
-  // console.log('chapter', chapter);
+  console.log('chapter', chapter);
 
   useEffect(() => {
     const canRead = isBook ? liveBook?.data?.bookDetails?.canRead : liveChapter?.data?.canRead;
@@ -88,11 +80,6 @@ export default function ChapterPurchaseModal() {
       ? 'You must accept all required agreements before purchasing'
       : undefined;
 
-  const viewSeriesDetails = () => {
-    dispatch(closeModal());
-    router.push(getSeriesRoutePath(chapter?.series?.slug ?? chapter?.series?.id ?? ''));
-  };
-
   const handlePurchaseSuccess = () => {
     dispatch(rtkQuerieSetup.util.invalidateTags(['SingleChapter', 'AllChapters', 'MyChapters']));
     toast.success('Purchase successful! You can now read this book.');
@@ -120,187 +107,38 @@ export default function ChapterPurchaseModal() {
   };
 
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} className="modal_container" size="2xl" scrollBehavior='outside' classNames={modalClassNames}>
-        <ModalContent>
-          {chapter?.coverImage && (
-            <div className="relative shrink-0 bg-muted flex justify-center py-4">
-              <div className="w-40 aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
-                <ImageComponent src={chapter?.coverImage} alt={chapter?.title} object_cover={false} />
-              </div>
-            </div>
-          )}
+    <Modal isOpen={isOpen} onClose={onClose} isDismissable={false} className="modal_container" size="md" scrollBehavior="outside" classNames={modalClassNames}>
+      <ModalContent>
+        <ModalHeader className="flex flex-col items-start gap-1 pb-0">
+          <p className="text-lg font-semibold text-foreground">Complete purchase</p>
+          <p className="text-sm font-normal text-muted-foreground">
+            {isPricingModelChapter
+              ? 'Purchase this book to unlock full access.'
+              : 'Purchase the complete series to unlock this book.'}
+          </p>
+        </ModalHeader>
 
-          <ModalBody className="py-3 px-4! sm:p-6! space-y-2 sm:space-y-4 gap-y-0! overflow-y-auto max-h-[30vh] sm:max-h-[40vh] custom_scrollbar min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
-                {isPricingModelChapter ? 'By Book' : 'Full Series'}
-              </Badge>
-              {!isBook && chapter?.seriesTitle && (
-                <Badge variant="outline" className="rounded-full px-3 py-1 text-xs max-w-40">
-                  <BookOpen className="h-3 w-3 mr-1 shrink-0" />
-                  <span className="truncate">{chapter?.seriesTitle}</span>
-                </Badge>
-              )}
-            </div>
+        <ModalBody className="gap-4 py-4">
+          <ChapterPurchaseAddresses
+            addressData={addressData}
+            isLoading={isLoading}
+            addressRequired={addressRequired}
+          />
 
-            <div>
-              <h2 className="font-semibold text-xl tracking-tight">{chapter?.title}</h2>
-              {chapter?.description && (
-                <p className="text-sm text-muted-foreground mt-1 tracking-tight">{chapter?.description}</p>
-              )}
-            </div>
+          <AgreementSentenceList
+            touchpoint={AGREEMENT_TOUCHPOINTS.CHECKOUT}
+            onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
+            onRequiredAcceptedChange={setAllRequiredAccepted}
+            error={agreementError}
+            touched={agreementTouched}
+            onBlur={() => setAgreementTouched(true)}
+            disabled={isPaymentBusy}
+            className="space-y-3"
+            containerRef={agreementSectionRef}
+          />
+        </ModalBody>
 
-            {chapter?.mentor && (
-              <div className="border flex items-center gap-3 rounded-md bg-muted/40 p-3">
-                <div className="w-11 h-11 rounded-full overflow-hidden border bg-linear-to-br from-primary/20 to-primary/5 ring-2 ring-background shrink-0 flex items-center justify-center">
-                  {chapter?.mentor?.profile_pic ? (
-                    <ImageComponent src={chapter?.mentor?.profile_pic} alt={chapter?.mentor?.name ?? ''} object_cover={true} />
-                  ) : (
-                    <User className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1">
-                    <p className="text-sm font-semibold truncate tracking-tight">{chapter?.mentor?.name}</p>
-                    {(chapter?.mentor?.is_verified || chapter?.mentor?.is_mentor_verified) && (
-                      <BadgeCheck className="h-3.5 w-3.5 text-primary shrink-0" aria-label="Verified mentor" />
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Book Mentor</p>
-                </div>
-
-                {(chapter?.mentor?.linkedin || chapter?.mentor?.facebook) && (
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {chapter?.mentor?.linkedin && (
-                      <a
-                        href={chapter?.mentor?.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${chapter?.mentor?.name} on LinkedIn`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-2 rounded-full bg-white text-muted-foreground border border-border hover:border-primary/40 hover:text-primary transition-colors"
-                      >
-                        <LinkedinIcon className="h-3.5 w-3.5" />
-                      </a>
-                    )}
-                    {chapter?.mentor?.facebook && (
-                      <a
-                        href={chapter?.mentor?.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${chapter?.mentor?.name} on Facebook`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-2 rounded-full bg-white text-muted-foreground border border-border hover:border-primary/40 hover:text-primary transition-colors"
-                      >
-                        <FacebookIcon className="h-3.5 w-3.5" />
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {chapter?.tags && chapter?.tags?.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Tag className="h-3.5 w-3.5" />
-                  <span>Topics covered</span>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {chapter?.tags?.map((tag: string) => (
-                    <Badge key={tag} variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {!isBook && chapter?.series && (
-              <div
-                className="flex items-center gap-3 rounded-md border border-border p-3 cursor-pointer hover:border-primary/50 transition-colors"
-                onClick={viewSeriesDetails}
-              >
-                {chapter?.series?.coverImage && (
-                  <div className="w-12 aspect-3/4 rounded-sm overflow-hidden shrink-0 bg-muted">
-                    <ImageComponent src={chapter?.series?.coverImage} alt={chapter?.series?.title} object_cover={true} />
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">Part of the series</p>
-                  <p className="text-sm font-semibold truncate tracking-tight">{chapter?.series?.title}</p>
-                  {chapter?.series?.description && (
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{chapter?.series?.description}</p>
-                  )}
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-semibold text-primary">
-                    {isPricingModelChapter
-                      ? 'Priced by book'
-                      : chapter?.series?.effectivePrice > 0
-                        ? `KSH ${chapter?.series?.effectivePrice?.toFixed(2)}`
-                        : 'FREE'}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {isPricingModelChapter ? 'By Book' : 'Full Series'}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="border-t pt-3">
-              <h3 className="font-semibold text-sm mb-2 tracking-tight">Share this {isBook ? 'Series' : 'Book'}</h3>
-              <ShareButtons
-                referralCode={chapter?.createdBy?.short_code ?? ''}
-                slug={chapter?.slug ?? ''}
-                title={chapter?.title}
-                type={isBook ? VISIBLE.BOOK : VISIBLE.CHAPTER}
-                size="sm"
-                showCopyLink={true}
-              />
-            </div>
-
-            <div className="relative flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="alert">
-              <Lock className="h-4 w-4 shrink-0" />
-              <span>
-                {isPricingModelChapter
-                  ? 'Purchase this book to unlock full access.'
-                  : 'You have to purchase the complete series to access this book.'}
-              </span>
-            </div>
-
-            <ChapterPurchaseAddresses
-              addressData={addressData}
-              isLoading={isLoading}
-              addressRequired={addressRequired}
-            />
-
-            {/* {checkoutBlocked ? (
-              <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                Please{' '}
-                <Link href={getUserDashboardProfileRoutePath()} className="font-medium underline">
-                  accept the latest agreements
-                </Link>{' '}
-                in your profile before purchasing.
-              </p>
-            ) : null} */}
-
-            <AgreementSentenceList
-              touchpoint={AGREEMENT_TOUCHPOINTS.CHECKOUT}
-              onAcceptedAgreementIdsChange={setAcceptedAgreementIds}
-              onRequiredAcceptedChange={setAllRequiredAccepted}
-              error={agreementError}
-              touched={agreementTouched}
-              onBlur={() => setAgreementTouched(true)}
-              disabled={isPaymentBusy}
-              className="space-y-3 border-t pt-3"
-              containerRef={agreementSectionRef}
-            />
-          </ModalBody>
-
-          <ModalFooter className="flex flex-col gap-2 p-2 sm:p-4 border-t bg-white shrink-0">
+        <ModalFooter className="flex flex-col gap-2 border-t p-4">
             {subtotal > 0 && (
               <div className="space-y-1.5 rounded-md border border-border bg-muted/30 px-3 py-2.5">
                 <div className="flex justify-between text-sm">
@@ -359,7 +197,6 @@ export default function ChapterPurchaseModal() {
             />
           </ModalFooter>
         </ModalContent>
-      </Modal>
-    </>
+    </Modal>
   );
 }

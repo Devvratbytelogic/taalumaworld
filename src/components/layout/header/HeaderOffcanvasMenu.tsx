@@ -157,7 +157,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
     <>
       <div
         className={cn(
-          'fixed inset-0 z-200 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 z-200 bg-black/50 backdrop-blur-sm transition-opacity duration-300 xl:hidden',
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={onClose}
@@ -169,7 +169,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
           if (!open) setMounted(false);
         }}
         className={cn(
-          'fixed top-0 right-0 z-201 flex h-dvh w-[min(320px,88vw)] flex-col bg-white border-l border-gray-200 transition-transform duration-300 ease-out lg:hidden',
+          'fixed top-0 right-0 z-201 flex h-dvh w-[min(320px,88vw)] flex-col bg-white border-l border-gray-200 transition-transform duration-300 ease-out xl:hidden',
           open ? 'translate-x-0' : 'translate-x-full'
         )}
         aria-hidden={!open}

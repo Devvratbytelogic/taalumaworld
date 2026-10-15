@@ -11,6 +11,7 @@ import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { useAuth } from '@/hooks/useAuth';
 import { getCartRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
+import { rememberActionIfBlocked } from '@/utils/pendingAgreementAction';
 
 interface AddToCartButtonProps {
     id?: string;
@@ -78,7 +79,7 @@ export default function AddToCartButton({
                 onSuccess?.();
             }
         } catch (error) {
-            // Errors are already surfaced to the user via the global RTK Query error toast.
+            rememberActionIfBlocked(error, handleAddToCart)
             console.error('Failed to add to cart', error);
         }
     };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import { BadgeCheck, FileSignature, LogOut } from 'lucide-react';
@@ -24,6 +24,7 @@ import {
 } from '@/routes/routes';
 import type { IAgreementSentenceEntity } from '@/types/agreements';
 import { getLinkedAgreementIds, isPendingRequiredSentence } from '@/utils/agreementConsent';
+import { forgetAction, runRememberedAction } from '@/utils/pendingAgreementAction';
 
 function isExemptPath(pathname: string): boolean {
   if (pathname === '/policies' || pathname.startsWith('/policies/')) return true;
@@ -51,6 +52,7 @@ export function PendingAgreementsGate() {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [acceptingAll, setAcceptingAll] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const wasOpen = useRef(false);
 
   const pendingSentences = (consentData?.data?.sentences ?? [])
     .filter(isPendingRequiredSentence)
@@ -60,6 +62,16 @@ export function PendingAgreementsGate() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      forgetAction()
+      wasOpen.current = false
+      return
+    }
+    if (wasOpen.current && !open) runRememberedAction()
+    wasOpen.current = open
+  }, [open, isAuthenticated]);
 
   useEffect(() => {
     if (!open) return;

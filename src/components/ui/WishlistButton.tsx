@@ -8,6 +8,7 @@ import { useAddToWishlistMutation, useRemoveFromWishlistMutation } from '@/store
 import { useGetWishlistQuery } from '@/store/rtkQueries/userGetAPI';
 import { useAuth } from '@/hooks/useAuth';
 import { openModal } from '@/store/slices/allModalSlice';
+import { rememberActionIfBlocked } from '@/utils/pendingAgreementAction';
 
 interface WishlistButtonProps {
     itemId: string;
@@ -59,6 +60,7 @@ export default function WishlistButton({
                 }
             }
         } catch (error) {
+            rememberActionIfBlocked(error, handleToggle)
             console.error('Error updating wishlist', error);
         }
     };

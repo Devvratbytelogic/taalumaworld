@@ -191,7 +191,7 @@ export default function ChapterPurchaseModal() {
               type={purchaseType}
               acceptedAgreementIds={acceptedAgreementIds}
               callbackUrl={typeof window !== 'undefined' ? window.location.href : undefined}
-              label={isFreeOrder ? 'Start Free Reading' : `Buy Now - KSH ${totalPaymentRequired.toFixed(2)}`}
+              label={isFreeOrder ? 'Start Reading' : `Buy Now - KSH ${totalPaymentRequired.toFixed(2)}`}
               appearance={isFreeOrder ? 'action' : 'method'}
               isDisabled={(addressRequired && !isAddressAvailable) || isPaymentBusy || !purchaseId}
               onBeforePay={validatePurchase}

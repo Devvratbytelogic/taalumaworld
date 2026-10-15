@@ -252,7 +252,7 @@ export default function ChapterDetailsModal() {
                 id={isPricingModelChapter ? chapter?.id : chapter?.series?.id}
                 type={isPricingModelChapter ? VISIBLE.CHAPTER : VISIBLE.BOOK}
                 className="global_btn rounded_full bg_primary w-full sm:flex-1 sm:min-w-0"
-                label={displayPrice <= 0 ? 'Start Free Reading' : `Add to Cart - KSH ${displayPrice.toFixed(2)}`}
+                label={displayPrice <= 0 ? 'Start Reading' : `Add to Cart - KSH ${displayPrice.toFixed(2)}`}
                 skipLoginRequired={displayPrice <= 0}
                 onLoginCancel={() =>
                   dispatch(

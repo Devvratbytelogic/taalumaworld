@@ -99,6 +99,10 @@ function isHttpUnauthorized(status?: number): boolean {
     return status === 401;
 }
 
+function isPendingApprovalError(message: string, httpStatus?: number): boolean {
+    return httpStatus === 403 && message === 'Your account is pending approval.';
+}
+
 function shouldAttemptRefresh(httpStatus: number | undefined, url: string): boolean {
     if (isSessionEnding() || shouldSkipTokenRefresh(url)) return false;
     if (!hasAuthCookie()) return false;
@@ -182,9 +186,9 @@ const baseQueryWithAuth: BaseQueryFn<
                 return { error: unauthorizedQueryError(message, httpStatus) };
             }
 
-            // if (!isPendingApprovalError(message, httpStatus)) {
+            if (!isPendingApprovalError(message, httpStatus)) {
                 showApiErrorToast(message);
-            // }
+            }
             return {
                 error: {
                     status: "CUSTOM_ERROR",

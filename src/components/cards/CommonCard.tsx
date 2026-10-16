@@ -61,7 +61,7 @@ export default function CommonCard({ data }: CommonCardProps) {
 
                 {data?.isPurchased ? (
                     <div className="pointer-events-none absolute top-0 right-0 z-3 h-24 w-24 overflow-hidden">
-                        <span className="absolute top-[18px] -right-9 w-[140px] rotate-45 bg-success py-1 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-white shadow-sm">
+                        <span className="absolute top-4.5 -right-9 w-35 rotate-45 bg-success py-1 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-white shadow-sm">
                             Purchased
                         </span>
                     </div>

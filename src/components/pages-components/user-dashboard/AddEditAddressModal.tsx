@@ -271,7 +271,7 @@ export function AddEditAddressModal() {
                 <Input
                   id="city"
                   name="city"
-                  placeholder="e.g., Indore"
+                  placeholder="Enter your city"
                   value={values.city}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -288,7 +288,7 @@ export function AddEditAddressModal() {
                 <Input
                   id="postal_code"
                   name="postal_code"
-                  placeholder="e.g., 452001"
+                  placeholder="Enter your postal code"
                   value={values.postal_code}
                   onChange={handleChange}
                   onBlur={handleBlur}

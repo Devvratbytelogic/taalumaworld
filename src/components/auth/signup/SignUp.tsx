@@ -415,7 +415,8 @@ export default function SignUp() {
                                             placeholder={isLoadingPartnerInstitutions ? 'Loading universities...' : 'Choose your university'}
                                             isLoading={isLoadingPartnerInstitutions}
                                             isDisabled={isSubmitting}
-                                            menuPosition="fixed"
+                                            // menuPosition="fixed"
+                                            menuPlacement='auto'
                                             // formatOptionLabel={(option, { context }) => (
                                             //     <span className="flex flex-col">
                                             //         <span>{option.label}</span>

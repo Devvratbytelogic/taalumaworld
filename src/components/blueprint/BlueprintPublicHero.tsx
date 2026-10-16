@@ -41,7 +41,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
     if (!getAuthToken()) {
       dispatch(openModal({
         componentName: 'LoginRequiredModal',
-        data: { action: 'cart', itemType: purchaseType },
+        data: { action: 'cart', itemType: purchaseType, onSuccess: openPurchaseModal },
       }));
       return;
     }

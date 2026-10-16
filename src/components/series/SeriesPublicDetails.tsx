@@ -40,7 +40,7 @@ function BlueprintStatus({
     );
   }
 
-  if (chapter.isFree) {
+  if (isPricingModelChapter && chapter.isFree) {
     return (
       <span className="inline-flex items-center rounded-full border border-border px-2.5 py-1 text-xs font-medium text-foreground">
         Free to read
@@ -132,11 +132,11 @@ export default function SeriesPublicDetails({ data, accessPending = false }: Ser
                           {chapter.description}
                         </p>
                       )}
-                      {!!chapter?.pageCount && (
+                      {/* {!!chapter?.pageCount && (
                         <p className="mt-1.5 text-xs text-muted-foreground">
                           {chapter.pageCount} {chapter.pageCount === 1 ? 'page' : 'pages'}
                         </p>
-                      )}
+                      )} */}
                     </div>
 
                     <div className="hidden shrink-0 sm:block">

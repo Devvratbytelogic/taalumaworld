@@ -29,6 +29,11 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
   const canRead = accessPending ? false : data?.canRead;
   const isCompleted = Boolean(data?.completed);
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
+  const displayPrice = isPricingModelChapter
+    ? data?.effectivePrice
+    : data?.series?.effectivePrice;
+  const resolvedPrice = displayPrice ?? data?.price ?? 0;
+  const isFreePurchase = resolvedPrice <= 0;
   const savedProgress = isCompleted ? 100 : Math.max(0, Math.min(100, data?.percentage ?? 0));
 
   const { ref: contentRef, progress: contentReadingProgress } = useReadingProgress({
@@ -140,7 +145,7 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                       <p className="text-sm font-medium text-[#1A1A1A]">This book is locked</p>
                       <p className="text-sm leading-relaxed text-[#6B6B6B]">
                         {isPricingModelChapter
-                          ? 'Purchase this book to unlock the full content.'
+                          ? isFreePurchase ? 'This book is free to read. No purchase is required.' : 'Purchase this book to unlock the full content.'
                           : 'Purchase the complete series to unlock this book.'}
                       </p>
                     </div>

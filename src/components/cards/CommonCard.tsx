@@ -23,6 +23,7 @@ export default function CommonCard({ data }: CommonCardProps) {
     const isPricingModelChapter = isBook
         ? (data?.pricingModel === VISIBLE.CHAPTER)
         : (data?.series?.pricingModel === VISIBLE.CHAPTER)
+    // console.log('isPricingModelChapter', isPricingModelChapter);
 
     const displayPrice = Number(
         isBook
@@ -90,7 +91,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                     <Badge className={`backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs text-primary border-primary/20`}>
                         {isPricingModelChapter ? 'By Book' : 'Full Series'}
                     </Badge>
-                    {data?.isFree ? (
+                    {isPricingModelChapter && data?.isFree ? (
                         <Badge className="text-success border-success/20 backdrop-blur-sm bg-white/90 rounded-full px-4 py-1 text-xs">
                             Free
                         </Badge>
@@ -143,7 +144,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                             ) : (
                                 <p className="text-lg font-semibold text-primary">FREE</p>
                             )
-                        ) : data?.isFree ? (
+                        ) : isPricingModelChapter && data?.isFree ? (
                             <p className="text-sm font-medium text-success">Free to Read</p>
                         ) : displayPrice > 0 ? (
                             <>

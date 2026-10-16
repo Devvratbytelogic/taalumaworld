@@ -80,7 +80,7 @@ export default function ChapterDetailsModal() {
             <Badge className="bg-primary/10 text-primary rounded-full px-4 py-1 text-xs border-primary/20">
               {isPricingModelChapter ? 'By Book' : 'Full Series'}
             </Badge>
-            {chapter?.isFree ? (
+            {isPricingModelChapter && chapter?.isFree ? (
               <Badge className="text-success border-success/20 bg-success/10 rounded-full px-4 py-1 text-xs">
                 Free
               </Badge>

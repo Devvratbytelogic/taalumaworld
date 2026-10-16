@@ -49,7 +49,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
   };
 
   const renderPriceLabel = () => {
-    if (data?.isFree) {
+    if (isPricingModelChapter && data?.isFree) {
       return <span className="font-medium text-success tracking-tight">Free to Read</span>;
     }
 

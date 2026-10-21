@@ -72,6 +72,7 @@ export default function LibraryContentSection() {
     return (
         <>
             <section ref={sectionRef} className="container scroll-mt-24">
+                <h2 className="mb-6 text-3xl font-bold text-foreground md:text-4xl">Popular Books</h2>
                 <div className="flex items-center justify-between mb-6">
                     <FilterOptions
                         total={total}

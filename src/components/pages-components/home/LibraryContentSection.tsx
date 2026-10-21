@@ -72,8 +72,8 @@ export default function LibraryContentSection() {
     return (
         <>
             <section ref={sectionRef} className="container scroll-mt-24">
-                <h2 className="mb-6 text-3xl font-bold text-foreground md:text-4xl">Popular Books</h2>
-                <div className="flex items-center justify-between mb-6">
+                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h2 className="shrink-0 text-3xl font-bold text-foreground md:text-4xl">Popular Books</h2>
                     <FilterOptions
                         total={total}
                         viewMode={viewMode}

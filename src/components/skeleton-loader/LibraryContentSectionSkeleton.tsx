@@ -1,11 +1,9 @@
 export default function LibraryContentSectionSkeleton() {
   return (
     <section className="container animate-pulse">
-      <div className="mb-6 h-9 w-56 rounded-lg bg-gray-200 md:h-10" />
-      {/* Filter row */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="h-10 bg-gray-200 rounded-full w-44" />
-        <div className="h-10 bg-gray-200 rounded-full w-28" />
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="h-9 w-56 rounded-lg bg-gray-200 md:h-10" />
+        <div className="h-10 w-full max-w-xs rounded-full bg-gray-200" />
       </div>
 
       {/* Cards grid */}

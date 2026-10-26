@@ -9,8 +9,7 @@
  * matching `useAdminPermissions().hasAccess(undefined) === true`.
  * `/admin/analytics` is intentionally ungated like dashboard: commercial
  * analytics is staff-only at the API (mentors / CA / ICA receive 403).
- * `/admin/wishlists` is intentionally ungated: every staff role can call it.
- * Mentors use `/admin/mentor/wishlists`, which the API scopes to their series.
+ * Mentors use `/admin/mentor/wishlists`, which is outside this map.
  */
 export interface AdminRouteModelMapping {
   /** Route prefix, matched against `pathname === path || pathname.startsWith(path + '/')`. */
@@ -51,6 +50,7 @@ export const ADMIN_ROUTE_MODEL_MAP: AdminRouteModelMapping[] = [
   { path: '/admin/blueprints', models: ['Blueprints'] },
   { path: '/admin/reviews', models: ['Reviews'] },
   { path: '/admin/review-reports', models: ['Review Reports'] },
+  { path: '/admin/wishlists', models: ['Wishlists'] },
   { path: '/admin/agreements/agreement-types', models: ['Agreement Types'] },
   { path: '/admin/agreements/sentences', models: ['Agreements'] },
   { path: '/admin/agreements/consent-records', models: ['Agreements'] },

@@ -11,6 +11,7 @@ import {
   Book,
   Flag,
   FileText,
+  Heart,
   LayoutDashboard,
   Link2,
   ShieldAlert,
@@ -44,6 +45,7 @@ import {
   getMentorRevenueEarnedRoutePath,
   getMentorReviewsRoutePath,
   getMentorReviewReportsRoutePath,
+  getMentorWishlistsRoutePath,
   getMentorOrdersRoutePath,
   getMentorSalesVolumeRoutePath,
   getMentorWalletRoutePath,
@@ -66,6 +68,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
       { id: 'chapters', label: 'Books', href: getMentorChaptersRoutePath(), icon: FileText },
       { id: 'reviews', label: 'Reviews', href: getMentorReviewsRoutePath(), icon: Star },
       { id: 'review_reports', label: 'Review reports', href: getMentorReviewReportsRoutePath(), icon: Flag },
+      { id: 'wishlists', label: 'Wishlists', href: getMentorWishlistsRoutePath(), icon: Heart },
     ],
   },
   {

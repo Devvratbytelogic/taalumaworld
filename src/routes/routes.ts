@@ -114,6 +114,10 @@ export function getMentorReviewReportsRoutePath(): string {
   return '/admin/mentor/review-reports';
 }
 
+export function getMentorWishlistsRoutePath(): string {
+  return '/admin/mentor/wishlists';
+}
+
 export function getMentorOrdersRoutePath(): string {
   return '/admin/mentor/orders';
 }
@@ -214,6 +218,7 @@ export function getAdminSectionRoutePath(section: string): string {
     orders: '/admin/orders',
     reviews: '/admin/reviews',
     review_reports: '/admin/review-reports',
+    wishlists: '/admin/wishlists',
     testimonials: '/admin/testimonials',
     faqs: '/admin/faqs',
     contact_us: '/admin/all-contact-us',

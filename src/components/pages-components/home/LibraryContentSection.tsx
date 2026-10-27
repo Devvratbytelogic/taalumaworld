@@ -9,6 +9,7 @@ import NoDataFound from '@/components/ui/NoDataFound';
 import Button from '@/components/ui/Button';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAuth } from '@/hooks/useAuth';
+import { VISIBLE } from '@/constants/contentMode';
 
 const PAGE_LIMIT = 8;
 
@@ -73,7 +74,9 @@ export default function LibraryContentSection() {
         <>
             <section ref={sectionRef} className="container scroll-mt-24">
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <h2 className="shrink-0 text-3xl font-bold text-foreground md:text-4xl">Popular Books</h2>
+                    <h2 className="shrink-0 text-3xl font-bold text-foreground md:text-4xl">
+                        Popular {viewMode === VISIBLE.BOOK || viewMode === 'series' ? 'Series' : 'Books'}
+                    </h2>
                     <FilterOptions
                         total={total}
                         viewMode={viewMode}

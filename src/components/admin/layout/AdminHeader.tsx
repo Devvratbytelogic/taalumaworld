@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useDispatch } from 'react-redux';
 import {
     BookOpen, Home, LogOut, Settings, ChevronDown, Menu,
     UserCircle,
@@ -15,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/components/ui/utils';
+import { openModal, closeModal } from '@/store/slices/allModalSlice';
 import { AdminHeaderSearch, AdminHeaderSearchProvider } from '@/components/admin/layout/AdminHeaderSearch';
 import { AdminNotificationBell } from '@/components/admin/layout/AdminNotificationBell';
 import { getAdminSectionRoutePath, getAdminProfileRoutePath, getHomeRoutePath, getMentorDashboardRoutePath, getMentorProfileRoutePath } from '@/routes/routes';
@@ -126,6 +128,7 @@ function TopBarContentMode({
 
 export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProps) {
     const router = useRouter();
+    const dispatch = useDispatch();
     const [updateGlobalSettings, { isLoading: isToggling }] = useUpdateGlobalSettingsMutation();
     const { data: globalSettings, isFetching: isSettingsFetching, isLoading: isSettingsLoading, isUninitialized: isSettingsUninitialized } = useGetAdminGlobalSettingsQuery(
         undefined,
@@ -153,14 +156,22 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
     const identityReady = Boolean(adminUser.name);
     const showWebsiteLink = !isAuthor || Boolean(profileData?.data?.is_verified);
 
-    const onContentModeToggle = async (isBooks: boolean) => {
-        const newMode = isBooks ? 'book' : 'chapter';
-        try {
-            await updateGlobalSettings({ visible: newMode }).unwrap();
-            void refreshAfterSettingsChange();
-        } catch (error) {
-            console.error('Failed to update content mode', error);
-        }
+    const onContentModeToggle = (isBooks: boolean) => {
+        dispatch(openModal({
+            componentName: 'ContentModeConfirmation',
+            data: {
+                modeLabel: isBooks ? 'Series' : 'Books',
+                onConfirm: async () => {
+                    try {
+                        await updateGlobalSettings({ visible: isBooks ? 'book' : 'chapter' }).unwrap();
+                        void refreshAfterSettingsChange();
+                        dispatch(closeModal());
+                    } catch (error) {
+                        console.error('Failed to update content mode', error);
+                    }
+                },
+            },
+        }));
     };
 
     const handleLogout = () => {

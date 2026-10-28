@@ -64,13 +64,6 @@ function toPlainText(value: string) {
     .trim();
 }
 
-function truncateAtWord(value: string, maxLength: number) {
-  if (value.length <= maxLength) return value;
-  const truncated = value.slice(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  return (lastSpace > maxLength * 0.6 ? truncated.slice(0, lastSpace) : truncated).trim();
-}
-
 export function buildOpenGraphMetadata({
   title,
   description = '',
@@ -82,14 +75,13 @@ export function buildOpenGraphMetadata({
 }): GeneratedOpenGraphFields {
   const cleanTitle = toPlainText(title);
   const cleanDescription = toPlainText(description);
-  const metaTitle = truncateAtWord(cleanTitle, 60);
-  const metaDescription = truncateAtWord(cleanDescription || cleanTitle, 160);
+  const fullDescription = cleanDescription || cleanTitle;
 
   const jsonLdObject: Record<string, string> = {
     '@context': 'https://schema.org',
     '@type': schemaType,
     name: cleanTitle,
-    description: metaDescription,
+    description: fullDescription,
   };
 
   if (schemaType === 'Article') {
@@ -97,12 +89,12 @@ export function buildOpenGraphMetadata({
   }
 
   return {
-    meta_title: metaTitle,
-    meta_description: metaDescription,
-    og_title: metaTitle,
-    og_description: metaDescription,
-    twitter_title: metaTitle,
-    twitter_description: metaDescription,
+    meta_title: cleanTitle,
+    meta_description: fullDescription,
+    og_title: cleanTitle,
+    og_description: fullDescription,
+    twitter_title: cleanTitle,
+    twitter_description: fullDescription,
     json_ld: JSON.stringify(jsonLdObject, null, 2),
   };
 }

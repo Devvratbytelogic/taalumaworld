@@ -333,7 +333,7 @@ export function EditBookModal({
                 onBlur={handleBlur}
                 disabled={isSubmitting}
                 rows={3}
-                className={errors.description && touched.description ? 'border-red-500' : ''}
+                className={`field-sizing-fixed! min-h-24! resize-y! overflow-y-auto${errors.description && touched.description ? ' border-red-500' : ''}`}
               />
               {errors.description && touched.description && (
                 <p className="text-sm text-red-600">{errors.description}</p>

@@ -105,6 +105,8 @@ function getImageSourceKey(file?: File | null, previewUrl?: string | null) {
   return null;
 }
 
+const boundedTextareaClassName = 'field-sizing-fixed! min-h-24! resize-y! overflow-y-auto';
+
 const OPEN_GRAPH_TEXT_FIELDS = [
   'meta_title',
   'meta_description',
@@ -515,7 +517,10 @@ export function OpenGraphFieldsSection({
             onBlur={handleBlur}
             disabled={disabled}
             rows={2}
-            className={errors.meta_description && touched.meta_description ? 'border-red-500' : undefined}
+            className={cn(
+              boundedTextareaClassName,
+              errors.meta_description && touched.meta_description && 'border-red-500',
+            )}
           />
           {errors.meta_description && touched.meta_description ? (
             <p className="text-sm text-red-600">{errors.meta_description}</p>
@@ -551,7 +556,10 @@ export function OpenGraphFieldsSection({
             onBlur={handleBlur}
             disabled={disabled}
             rows={2}
-            className={errors.og_description && touched.og_description ? 'border-red-500' : undefined}
+            className={cn(
+              boundedTextareaClassName,
+              errors.og_description && touched.og_description && 'border-red-500',
+            )}
           />
           {errors.og_description && touched.og_description ? (
             <p className="text-sm text-red-600">{errors.og_description}</p>
@@ -629,11 +637,10 @@ export function OpenGraphFieldsSection({
             onBlur={handleBlur}
             disabled={disabled}
             rows={2}
-            className={
-              errors.twitter_description && touched.twitter_description
-                ? 'border-red-500'
-                : undefined
-            }
+            className={cn(
+              boundedTextareaClassName,
+              errors.twitter_description && touched.twitter_description && 'border-red-500',
+            )}
           />
           {errors.twitter_description && touched.twitter_description ? (
             <p className="text-sm text-red-600">{errors.twitter_description}</p>
@@ -697,7 +704,7 @@ export function OpenGraphFieldsSection({
           disabled={disabled}
           rows={4}
           className={cn(
-            'json-ld-field',
+            'json-ld-field field-sizing-fixed! min-h-32! resize-y! overflow-y-auto',
             errors.json_ld && touched.json_ld && 'border-red-500',
           )}
         />

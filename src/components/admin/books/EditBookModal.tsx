@@ -279,6 +279,11 @@ export function EditBookModal({
     [ogImagePreviewUrl, setFieldValue],
   );
 
+  const isRequiredFieldsFilled =
+    values.title.trim() !== '' &&
+    values.description.trim() !== '' &&
+    (values.pricingModel !== 'book' || (typeof values.price === 'number' && values.price > minimumContentPrice));
+
   const closeModal = () => {
     if (coverIsObjectUrlRef.current && coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     if (ogImageIsObjectUrlRef.current && ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -526,7 +531,7 @@ export function EditBookModal({
               type="submit"
               className="global_btn rounded_full bg_primary"
               startContent={<Save className="h-4 w-4" />}
-              isDisabled={isSubmitting}
+              isDisabled={isSubmitting || !isRequiredFieldsFilled}
               isLoading={isSubmitting}
             >
               Update Series

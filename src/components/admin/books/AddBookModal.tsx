@@ -206,6 +206,12 @@ export function AddBookModal({
     [setFieldValue],
   );
 
+  const isRequiredFieldsFilled =
+    values.title.trim() !== '' &&
+    values.description.trim() !== '' &&
+    Boolean(coverFile) &&
+    (values.pricingModel !== 'book' || (typeof values.price === 'number' && values.price > minimumContentPrice));
+
   const closeModal = () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
     if (ogImagePreviewUrl) URL.revokeObjectURL(ogImagePreviewUrl);
@@ -515,7 +521,7 @@ export function AddBookModal({
                 type="submit"
                 className="global_btn rounded_full bg_primary"
                 startContent={<Save className="h-4 w-4" />}
-                isDisabled={isSubmitting}
+                isDisabled={isSubmitting || !isRequiredFieldsFilled}
                 isLoading={isSubmitting}
               >
                 Create Series

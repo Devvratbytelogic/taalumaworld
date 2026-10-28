@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ClientOnly, PageMountFallback } from '@/components/ClientOnly';
 import Link from 'next/link';
 import {
@@ -95,6 +95,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
 
 export default function MentorLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -126,6 +127,12 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!profileData || !isAccountBlocked) return;
+    if (pathname.startsWith(getMentorDashboardRoutePath()) || pathname.startsWith(getMentorProfileRoutePath())) return;
+    router.replace(getMentorDashboardRoutePath());
+  }, [profileData, isAccountBlocked, pathname, router]);
 
   if (!hasMounted) {
     return <div className="min-h-screen bg-slate-50/80" />;
@@ -191,11 +198,7 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
               </div>
             )
           )}
-          <div
-            // className={`${isAccountBlocked ? 'pointer-events-none opacity-50' : ''}`}
-            // aria-disabled={isAccountBlocked}
-            // inert={isAccountBlocked ? true : undefined}
-          >
+          <div>
             <ClientOnly key={pathname} fallback={<PageMountFallback />}>{children}</ClientOnly>
           </div>
         </div>

@@ -218,7 +218,7 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
           />
         </DialogContent>
       </Dialog>
-      <MentorContentTour />
+      {!isAccountBlocked && <MentorContentTour />}
     </div>
   );
 }

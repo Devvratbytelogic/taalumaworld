@@ -7,6 +7,7 @@ import { Compass } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { AdminPanel } from '@/components/admin/layout/AdminContent';
 import { getCreateChapterRoutePath, getMentorBooksRoutePath, getMentorDashboardRoutePath } from '@/routes/routes';
+import { useGetAdminProfileQuery } from '@/store/rtkQueries/adminGetApi';
 
 const START_EVENT = 'mentor-content-tour:start';
 export const MENTOR_SERIES_MODAL_EVENT = 'mentor-content-tour:series-modal';
@@ -286,6 +287,10 @@ export function MentorContentTourButton({ from }: { from: MentorGuideStart }) {
 }
 
 export function MentorAddContentGuide() {
+  const { data: profileData } = useGetAdminProfileQuery();
+  const isAccountBlocked = !profileData?.data?.is_verified || profileData?.data?.status !== 'active';
+  if (isAccountBlocked) return null;
+
   return (
     <AdminPanel tourId="add-content-guide" className="relative overflow-hidden">
       <span className="absolute inset-y-0 left-0 w-1 bg-primary" aria-hidden />

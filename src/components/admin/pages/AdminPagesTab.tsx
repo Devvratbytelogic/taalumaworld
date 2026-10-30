@@ -958,18 +958,46 @@ export function AdminPagesTab() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-24">Actions</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Last Modified</TableHead>
               <TableHead>Author</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredPages.map((page) => (
               <TableRow key={page.id}>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="global_btn rounded_full bg_transparent">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Page
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openEditPage(page)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      {page.type !== 'home' && (
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => handleDeletePage(page.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {page.type === 'home' ? (
@@ -1002,34 +1030,6 @@ export function AdminPagesTab() {
                   {page.lastModified}
                 </TableCell>
                 <TableCell className="text-sm">{page.author}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="global_btn rounded_full bg_transparent">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Page
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => openEditPage(page)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      {page.type !== 'home' && (
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => handleDeletePage(page.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>

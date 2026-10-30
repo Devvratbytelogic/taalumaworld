@@ -225,7 +225,7 @@ export function AdminOrdersTab() {
         },
         {
             field: 'actions',
-            headerName: '',
+            headerName: 'Action',
             width: 80,
             sortable: false,
             filterable: false,

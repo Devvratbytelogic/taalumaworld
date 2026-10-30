@@ -67,9 +67,9 @@ export function CategoryListing({
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 px-4">#</TableHead>
+              <TableHead className="w-24 px-4">Actions</TableHead>
               <TableHead className="px-4">Category</TableHead>
               <TableHead className="px-4">Subcategories</TableHead>
-              <TableHead className="w-24 px-4 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -79,6 +79,26 @@ export function CategoryListing({
               return (
                 <TableRow key={category.id}>
                   <TableCell className="px-4 text-sm text-muted-foreground">{idx + 1}</TableCell>
+                  <TableCell className="px-4">
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onEdit(category)}
+                        aria-label={`Edit ${category.name}`}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-primary transition-colors hover:bg-primary/5"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onDelete(category)}
+                        aria-label={`Delete ${category.name}`}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-red-600 transition-colors hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </TableCell>
                   <TableCell className="px-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
@@ -106,26 +126,6 @@ export function CategoryListing({
                         ))}
                       </div>
                     )}
-                  </TableCell>
-                  <TableCell className="px-4">
-                    <div className="flex justify-end gap-1">
-                      <button
-                        type="button"
-                        onClick={() => onEdit(category)}
-                        aria-label={`Edit ${category.name}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-primary transition-colors hover:bg-primary/5"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDelete(category)}
-                        aria-label={`Delete ${category.name}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-red-600 transition-colors hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
                   </TableCell>
                 </TableRow>
               );

@@ -74,8 +74,12 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   const books = booksData?.data ?? [];
   const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
   const { data: globalSettings } = useGetAdminGlobalSettingsQuery();
+  const showSeriesField = globalSettings?.data?.show_series !== false;
   const minimumContentPrice = globalSettings?.data?.minimum_content_price ?? 0;
-  const chapterValidationSchema = useMemo(() => addChapterSchema(minimumContentPrice), [minimumContentPrice]);
+  const chapterValidationSchema = useMemo(
+    () => addChapterSchema(minimumContentPrice, showSeriesField),
+    [minimumContentPrice, showSeriesField],
+  );
 
   const chapterData = chapterResponse?.data;
 
@@ -112,7 +116,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     },
     onSubmit: async (vals) => {
       const formData = new FormData();
-      formData.append('book', vals.bookId);
+      if (vals.bookId) formData.append('book', vals.bookId);
       formData.append('number', String(vals.sequence));
       formData.append('title', vals.title);
       formData.append('description', vals.description ?? '');
@@ -327,6 +331,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     chapterPricingEnabled,
     agreementsAccepted: requiredAgreementsAccepted,
     minimumContentPrice,
+    requireSeries: showSeriesField,
   });
 
   const handleContentChange = useCallback(
@@ -353,7 +358,8 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
       <div className="space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className={cn('grid grid-cols-1 gap-6', showSeriesField && 'lg:grid-cols-2')}>
+          {showSeriesField ? (
           <div className="space-y-2">
             <Label>Series <span className="text-red-500">*</span></Label>
             <ReactSelect
@@ -387,6 +393,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               <p className="text-sm text-red-600">{errors.bookId}</p>
             )}
           </div>
+          ) : null}
 
           <div className="space-y-2">
             <Label htmlFor="chapter-title">Title <span className="text-red-500">*</span></Label>
@@ -721,7 +728,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           type="submit"
           className="global_btn rounded_full bg_primary"
           startContent={<Save className="h-4 w-4" />}
-          isDisabled={isSubmittingState || books.length === 0 || !isRequiredComplete}
+          isDisabled={isSubmittingState || (showSeriesField && books.length === 0) || !isRequiredComplete}
           isLoading={isSubmittingState}
         >
           Update Book

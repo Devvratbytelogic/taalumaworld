@@ -42,12 +42,12 @@ const SERIES_MODEL = 'Series';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
   Published: {
-    badge: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+    badge: 'bg-green-50 text-green-700 border-green-200! hover:bg-green-100',
     dot: 'bg-green-500',
     label: 'Published',
   },
   Draft: {
-    badge: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
+    badge: 'bg-yellow-50 text-yellow-700 border-yellow-200! hover:bg-yellow-100',
     dot: 'bg-yellow-500',
     label: 'Draft',
   },

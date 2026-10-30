@@ -329,10 +329,10 @@ type BlueprintRequiredFields = {
 
 export function isBlueprintFormComplete(
   values: BlueprintRequiredFields,
-  options: { chapterPricingEnabled: boolean; agreementsAccepted: boolean; minimumContentPrice?: number },
+  options: { chapterPricingEnabled: boolean; agreementsAccepted: boolean; minimumContentPrice?: number; requireSeries?: boolean },
 ): boolean {
   const minimum = minimumContentPriceFloor(options.minimumContentPrice ?? 0);
-  if (!values.bookId) return false;
+  if (options.requireSeries !== false && !values.bookId) return false;
   if (!values.title?.trim()) return false;
   if (!values.description?.trim()) return false;
   if (values.content_type === 'editor' && isRichTextEmpty(values.content)) return false;
@@ -344,9 +344,9 @@ export function isBlueprintFormComplete(
   return options.agreementsAccepted;
 }
 
-export function addChapterSchema(minimumContentPrice: number) {
+export function addChapterSchema(minimumContentPrice: number, requireSeries = true) {
   return Yup.object({
-    bookId: Yup.string().required('Please select a series'),
+    bookId: requireSeries ? Yup.string().required('Please select a series') : Yup.string(),
     title: withSafeShortText(
       Yup.string()
         .trim()

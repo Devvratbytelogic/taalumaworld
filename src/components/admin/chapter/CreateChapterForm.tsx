@@ -100,8 +100,12 @@ export function CreateChapterForm() {
   const books = booksData?.data ?? [];
   const bookOptions = books && books?.length > 0 ? books?.map((book) => ({ value: book.id, label: book.title })) : [];
   const { data: globalSettings } = useGetAdminGlobalSettingsQuery();
+  const showSeriesField = globalSettings?.data?.show_series !== false;
   const minimumContentPrice = globalSettings?.data?.minimum_content_price ?? 0;
-  const chapterValidationSchema = useMemo(() => addChapterSchema(minimumContentPrice), [minimumContentPrice]);
+  const chapterValidationSchema = useMemo(
+    () => addChapterSchema(minimumContentPrice, showSeriesField),
+    [minimumContentPrice, showSeriesField],
+  );
 
   const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, resetForm, } = useFormik({
     initialValues: initialFormValues,
@@ -111,7 +115,7 @@ export function CreateChapterForm() {
     },
     onSubmit: async (vals) => {
       const formData = new FormData();
-      formData.append('book', vals.bookId);
+      if (vals.bookId) formData.append('book', vals.bookId);
       formData.append('number', String(vals.sequence));
       formData.append('title', vals.title);
       formData.append('description', vals.description ?? '');
@@ -285,6 +289,7 @@ export function CreateChapterForm() {
     chapterPricingEnabled,
     agreementsAccepted: requiredAgreementsAccepted,
     minimumContentPrice,
+    requireSeries: showSeriesField,
   });
 
   const handleContentChange = useCallback(
@@ -307,289 +312,291 @@ export function CreateChapterForm() {
     <form onSubmit={handleSubmit} className="blueprint-form space-y-6">
       <div className="space-y-4">
         <div data-mentor-tour="book-copy" className="space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div data-mentor-tour="book-series" className="space-y-2">
-            <Label>Series <span className="text-red-500">*</span></Label>
-            <ReactSelect
-              inputId="chapter-series"
-              name="bookId"
-              classNamePrefix="react-select"
-              options={bookOptions}
-              value={bookOptions?.find((o) => o.value === values.bookId) ?? null}
-              onChange={(option) => {
-                const value = option?.value ?? '';
-                setFieldValue('bookId', value);
-                setFieldTouched('bookId', true);
-                const book = books.find((b) => b.id === value);
-                const model = book?.pricingModel ?? (book as { type?: string })?.type ?? 'chapter';
-                if (model === 'book') {
-                  setFieldValue('isFree', true);
-                  setFieldValue('price', 0);
-                }
-              }}
-              onBlur={() => setFieldTouched('bookId', true)}
-              placeholder={books.length === 0 ? 'No series available' : 'Select series'}
-              isDisabled={books.length === 0 || isSubmittingState}
-              menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-              menuPosition="fixed"
-              styles={SELECT_STYLES}
-            />
-            {books.length === 0 && (
-              <p className="text-sm text-muted-foreground">Create a series first from the <Link href={getMentorBooksRoutePath()} className="text-primary underline">Series</Link> section.</p>
-            )}
-            {errors.bookId && touched.bookId && (
-              <p className="text-sm text-red-600">{errors.bookId}</p>
-            )}
+          <div className={cn('grid grid-cols-1 gap-6', showSeriesField && 'lg:grid-cols-2')}>
+            {showSeriesField ? (
+              <div data-mentor-tour="book-series" className="space-y-2">
+                <Label>Series <span className="text-red-500">*</span></Label>
+                <ReactSelect
+                  inputId="chapter-series"
+                  name="bookId"
+                  classNamePrefix="react-select"
+                  options={bookOptions}
+                  value={bookOptions?.find((o) => o.value === values.bookId) ?? null}
+                  onChange={(option) => {
+                    const value = option?.value ?? '';
+                    setFieldValue('bookId', value);
+                    setFieldTouched('bookId', true);
+                    const book = books.find((b) => b.id === value);
+                    const model = book?.pricingModel ?? (book as { type?: string })?.type ?? 'chapter';
+                    if (model === 'book') {
+                      setFieldValue('isFree', true);
+                      setFieldValue('price', 0);
+                    }
+                  }}
+                  onBlur={() => setFieldTouched('bookId', true)}
+                  placeholder={books.length === 0 ? 'No series available' : 'Select series'}
+                  isDisabled={books.length === 0 || isSubmittingState}
+                  menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                  menuPosition="fixed"
+                  styles={SELECT_STYLES}
+                />
+                {books.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Create a series first from the <Link href={getMentorBooksRoutePath()} className="text-primary underline">Series</Link> section.</p>
+                )}
+                {errors.bookId && touched.bookId && (
+                  <p className="text-sm text-red-600">{errors.bookId}</p>
+                )}
+              </div>
+            ) : null}
+
+            <div className="space-y-2">
+              <Label htmlFor="chapter-title">Title <span className="text-red-500">*</span></Label>
+              <Input
+                id="chapter-title"
+                name="title"
+                placeholder="e.g., Introduction to Leadership"
+                value={values.title}
+                onChange={(e) => {
+                  handleChange(e);
+                  if (!slugManuallyEdited.current) {
+                    setFieldValue('slug', slugify(e.target.value));
+                  }
+                }}
+                onBlur={handleBlur}
+                disabled={isSubmittingState}
+                className={errors.title && touched.title ? 'border-red-500' : undefined}
+              />
+              {errors.title && touched.title && (
+                <p className="text-sm text-red-600">{errors.title}</p>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="chapter-title">Title <span className="text-red-500">*</span></Label>
+            <Label htmlFor="chapter-slug">Slug</Label>
             <Input
-              id="chapter-title"
-              name="title"
-              placeholder="e.g., Introduction to Leadership"
-              value={values.title}
+              id="chapter-slug"
+              name="slug"
+              value={values.slug}
               onChange={(e) => {
-                handleChange(e);
-                if (!slugManuallyEdited.current) {
-                  setFieldValue('slug', slugify(e.target.value));
-                }
+                slugManuallyEdited.current = true;
+                setFieldValue('slug', slugify(e.target.value, { allowTrailingHyphen: true }));
               }}
+              onBlur={(e) => {
+                setFieldValue('slug', slugify(e.target.value));
+                handleBlur(e);
+              }}
+              disabled={isSubmittingState}
+              placeholder="e.g., introduction-to-leadership"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="chapter-desc">
+              Description <span className="text-red-500">*</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                &nbsp;(Mentees can see this without paying for the book)
+              </span>
+            </Label>
+            <Textarea
+              id="chapter-desc"
+              name="description"
+              placeholder="Brief description of the book..."
+              value={values.description}
+              onChange={handleChange}
               onBlur={handleBlur}
               disabled={isSubmittingState}
-              className={errors.title && touched.title ? 'border-red-500' : undefined}
+              rows={3}
+              className={errors.description && touched.description ? 'border-red-500' : undefined}
             />
-            {errors.title && touched.title && (
-              <p className="text-sm text-red-600">{errors.title}</p>
-            )}
+            {errors.description && touched.description ? (
+              <p className="text-sm text-red-600">{errors.description}</p>
+            ) : null}
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="chapter-slug">Slug</Label>
-          <Input
-            id="chapter-slug"
-            name="slug"
-            value={values.slug}
-            onChange={(e) => {
-              slugManuallyEdited.current = true;
-              setFieldValue('slug', slugify(e.target.value, { allowTrailingHyphen: true }));
-            }}
-            onBlur={(e) => {
-              setFieldValue('slug', slugify(e.target.value));
-              handleBlur(e);
-            }}
-            disabled={isSubmittingState}
-            placeholder="e.g., introduction-to-leadership"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="chapter-desc">
-            Description <span className="text-red-500">*</span>
-            <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Mentees can see this without paying for the book)
-            </span>
-          </Label>
-          <Textarea
-            id="chapter-desc"
-            name="description"
-            placeholder="Brief description of the book..."
-            value={values.description}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmittingState}
-            rows={3}
-            className={errors.description && touched.description ? 'border-red-500' : undefined}
-          />
-          {errors.description && touched.description ? (
-            <p className="text-sm text-red-600">{errors.description}</p>
-          ) : null}
-        </div>
         </div>
 
         <div data-mentor-tour="book-content" className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="chapter-content-type">
-            Content type <span className="text-red-500">*</span>
-            <span className="text-xs font-normal text-muted-foreground">
-              &nbsp;(Visible only after purchasing the book)
-            </span>
-          </Label>
-          <select
-            id="chapter-content-type"
-            name="content_type"
-            value={values.content_type}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmittingState}
-            className={cn(nativeSelectClassName, 'max-w-md')}
-          >
-            <option value="pdf">PDF</option>
-            <option value="editor">Book Content</option>
-          </select>
-        </div>
-
-        {values.content_type === 'editor' && (
           <div className="space-y-2">
-            <Label>
-              Book content <span className="text-red-500">*</span>
+            <Label htmlFor="chapter-content-type">
+              Content type <span className="text-red-500">*</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                &nbsp;(Visible only after purchasing the book)
+              </span>
             </Label>
-            <RichTextEditor
-              value={values.content}
-              onChange={handleContentChange}
-              placeholder="Write your book content here. Use the toolbar for headings, bold, lists, etc."
+            <select
+              id="chapter-content-type"
+              name="content_type"
+              value={values.content_type}
+              onChange={handleChange}
+              onBlur={handleBlur}
               disabled={isSubmittingState}
-            />
-            {errors.content && touched.content ? (
-              <p className="text-sm text-red-600">{errors.content}</p>
-            ) : null}
+              className={cn(nativeSelectClassName, 'max-w-md')}
+            >
+              <option value="pdf">PDF</option>
+              <option value="editor">Book Content</option>
+            </select>
           </div>
-        )}
 
-        {values.content_type === 'pdf' && (
-          <div className="blueprint-form-section">
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 inline-flex items-center">
-                Upload PDF <span className="text-red-500">*</span>
-                <FileUploadLimitHint kind="pdf" />
-              </h3>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <label
-                className={cn(
-                  'blueprint-file-picker w-fit',
-                  errors.pdf_file && touched.pdf_file && !pdfFile && 'border-red-500',
-                )}
-              >
-                <Upload className="h-4 w-4 shrink-0" />
-                <input type="file" accept="application/pdf" onChange={handlePdfChange} className="sr-only" />
-                {pdfFile ? pdfFile.name : 'Choose PDF...'}
-              </label>
-              {pdfFile ? (
-                <Button
-                  type="button"
-                  className="global_btn rounded_full outline_primary text-destructive hover:bg-destructive/10"
-                  onPress={clearPdf}
-                >
-                  Remove PDF
-                </Button>
+          {values.content_type === 'editor' && (
+            <div className="space-y-2">
+              <Label>
+                Book content <span className="text-red-500">*</span>
+              </Label>
+              <RichTextEditor
+                value={values.content}
+                onChange={handleContentChange}
+                placeholder="Write your book content here. Use the toolbar for headings, bold, lists, etc."
+                disabled={isSubmittingState}
+              />
+              {errors.content && touched.content ? (
+                <p className="text-sm text-red-600">{errors.content}</p>
               ) : null}
             </div>
-            {errors.pdf_file && touched.pdf_file ? (
-              <p className="text-sm text-red-600">{errors.pdf_file as string}</p>
-            ) : null}
-          </div>
-        )}
+          )}
+
+          {values.content_type === 'pdf' && (
+            <div className="blueprint-form-section">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 inline-flex items-center">
+                  Upload PDF <span className="text-red-500">*</span>
+                  <FileUploadLimitHint kind="pdf" />
+                </h3>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <label
+                  className={cn(
+                    'blueprint-file-picker w-fit',
+                    errors.pdf_file && touched.pdf_file && !pdfFile && 'border-red-500',
+                  )}
+                >
+                  <Upload className="h-4 w-4 shrink-0" />
+                  <input type="file" accept="application/pdf" onChange={handlePdfChange} className="sr-only" />
+                  {pdfFile ? pdfFile.name : 'Choose PDF...'}
+                </label>
+                {pdfFile ? (
+                  <Button
+                    type="button"
+                    className="global_btn rounded_full outline_primary text-destructive hover:bg-destructive/10"
+                    onPress={clearPdf}
+                  >
+                    Remove PDF
+                  </Button>
+                ) : null}
+              </div>
+              {errors.pdf_file && touched.pdf_file ? (
+                <p className="text-sm text-red-600">{errors.pdf_file as string}</p>
+              ) : null}
+            </div>
+          )}
         </div>
 
         <div data-mentor-tour="book-finish" className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
-          {chapterPricingEnabled ? (
-            <>
-              <div className="space-y-2 flex flex-col justify-end">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="chapter-free"
-                    checked={values.isFree}
-                    onCheckedChange={(checked) => {
-                      setFieldValue('isFree', checked);
-                      if (checked) setFieldValue('price', 0);
-                    }}
-                    disabled={isSubmittingState}
-                  />
-                  <Label htmlFor="chapter-free" className="cursor-pointer">
-                    Free book
-                  </Label>
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
+            {chapterPricingEnabled ? (
+              <>
+                <div className="space-y-2 flex flex-col justify-end">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="chapter-free"
+                      checked={values.isFree}
+                      onCheckedChange={(checked) => {
+                        setFieldValue('isFree', checked);
+                        if (checked) setFieldValue('price', 0);
+                      }}
+                      disabled={isSubmittingState}
+                    />
+                    <Label htmlFor="chapter-free" className="cursor-pointer">
+                      Free book
+                    </Label>
+                  </div>
                 </div>
+                {!values.isFree && (
+                  <div className="space-y-2 max-w-xs">
+                    <Label htmlFor="chapter-price">Price (KSH) <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="chapter-price"
+                      name="price"
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      placeholder="0.00"
+                      value={values.price ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          setFieldValue('price', undefined);
+                          return;
+                        }
+                        const n = Number(val);
+                        setFieldValue('price', Number.isNaN(n) ? undefined : Math.max(0, n));
+                      }}
+                      onBlur={handleBlur}
+                      disabled={isSubmittingState}
+                      className={errors.price && touched.price ? 'border-red-500' : undefined}
+                    />
+                    {errors.price && touched.price && (
+                      <p className="text-sm text-red-600">{errors.price}</p>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="col-span-full flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
+                <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>Pricing is set at series level; this book has no separate price.</span>
               </div>
-              {!values.isFree && (
-                <div className="space-y-2 max-w-xs">
-                  <Label htmlFor="chapter-price">Price (KSH) <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="chapter-price"
-                    name="price"
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    placeholder="0.00"
-                    value={values.price ?? ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === '') {
-                        setFieldValue('price', undefined);
-                        return;
-                      }
-                      const n = Number(val);
-                      setFieldValue('price', Number.isNaN(n) ? undefined : Math.max(0, n));
-                    }}
-                    onBlur={handleBlur}
-                    disabled={isSubmittingState}
-                    className={errors.price && touched.price ? 'border-red-500' : undefined}
-                  />
-                  {errors.price && touched.price && (
-                    <p className="text-sm text-red-600">{errors.price}</p>
-                  )}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="col-span-full flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
-              <Info className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>Pricing is set at series level; this book has no separate price.</span>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col sm:flex-row gap-6 items-start">
-          <div className="space-y-2 flex-1 ">
-            <Label htmlFor="chapter-image">
-              Featured image <span className="text-red-500">*</span>
-              <FileUploadLimitHint kind="image" />
-            </Label>
-            <label
-              htmlFor="chapter-image"
-              className={cn('blueprint-file-picker', errors.cover_image && touched.cover_image && 'border-red-500')}
-            >
-              <input
-                id="chapter-image"
-                type="file"
-                accept={ALLOWED_IMAGE_ACCEPT}
-                onChange={handleFeaturedImageChange}
-                className="sr-only"
-              />
-              <span className="truncate">
-                {featuredImageFile ? featuredImageFile.name : 'Select cover image...'}
-              </span>
-            </label>
-            {errors.cover_image && touched.cover_image && (
-              <p className="text-sm text-red-600">{errors.cover_image as string}</p>
             )}
           </div>
-          {featuredImagePreviewUrl ? (
-            <div className="relative inline-block">
-              <div className="image-preview">
-                <img
-                  src={featuredImagePreviewUrl}
-                  alt="Book preview"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <Button
-                type="button"
-                isIconOnly
-                className="absolute top-2 right-2 global_btn rounded_full outline_primary icon_btn fit_btn"
-                onPress={clearFeaturedImage}
+          <div className="flex flex-col sm:flex-row gap-6 items-start">
+            <div className="space-y-2 flex-1 ">
+              <Label htmlFor="chapter-image">
+                Featured image <span className="text-red-500">*</span>
+                <FileUploadLimitHint kind="image" />
+              </Label>
+              <label
+                htmlFor="chapter-image"
+                className={cn('blueprint-file-picker', errors.cover_image && touched.cover_image && 'border-red-500')}
               >
-                <X className="h-4 w-4" />
-              </Button>
+                <input
+                  id="chapter-image"
+                  type="file"
+                  accept={ALLOWED_IMAGE_ACCEPT}
+                  onChange={handleFeaturedImageChange}
+                  className="sr-only"
+                />
+                <span className="truncate">
+                  {featuredImageFile ? featuredImageFile.name : 'Select cover image...'}
+                </span>
+              </label>
+              {errors.cover_image && touched.cover_image && (
+                <p className="text-sm text-red-600">{errors.cover_image as string}</p>
+              )}
             </div>
-          ) : (
-            <div className="image-preview-placeholder">
-              <span className="px-3 text-center text-sm text-slate-400">Preview</span>
-            </div>
-          )}
+            {featuredImagePreviewUrl ? (
+              <div className="relative inline-block">
+                <div className="image-preview">
+                  <img
+                    src={featuredImagePreviewUrl}
+                    alt="Book preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  isIconOnly
+                  className="absolute top-2 right-2 global_btn rounded_full outline_primary icon_btn fit_btn"
+                  onPress={clearFeaturedImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="image-preview-placeholder">
+                <span className="px-3 text-center text-sm text-slate-400">Preview</span>
+              </div>
+            )}
 
-        </div>
+          </div>
         </div>
 
         <OpenGraphFieldsSection
@@ -650,7 +657,7 @@ export function CreateChapterForm() {
           type="submit"
           className="global_btn rounded_full bg_primary"
           startContent={<Save className="h-4 w-4" />}
-          isDisabled={isSubmittingState || books.length === 0 || !isRequiredComplete}
+          isDisabled={isSubmittingState || (showSeriesField && books.length === 0) || !isRequiredComplete}
           isLoading={isSubmittingState}
         >
           Create Book

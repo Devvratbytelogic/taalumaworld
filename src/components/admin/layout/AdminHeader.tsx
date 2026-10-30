@@ -41,12 +41,14 @@ const headerButtonClass =
 
 function TopBarContentMode({
     visible,
+    showSeries,
     isInitialLoading,
     isUpdating,
     onToggle,
     className,
 }: {
     visible: string;
+    showSeries: boolean;
     isInitialLoading: boolean;
     isUpdating: boolean;
     onToggle: (isBooks: boolean) => void;
@@ -74,9 +76,11 @@ function TopBarContentMode({
                             <span className="flex h-6 w-18 items-center justify-center rounded-full px-3">
                                 <span className="block h-2.5 w-14 animate-pulse rounded-full bg-white/20" />
                             </span>
-                            <span className="flex h-6 w-11 items-center justify-center rounded-full px-3">
-                                <span className="block h-2.5 w-8 animate-pulse rounded-full bg-white/20" />
-                            </span>
+                            {showSeries ? (
+                                <span className="flex h-6 w-11 items-center justify-center rounded-full px-3">
+                                    <span className="block h-2.5 w-8 animate-pulse rounded-full bg-white/20" />
+                                </span>
+                            ) : null}
                         </>
                     ) : (
                         <>
@@ -94,20 +98,22 @@ function TopBarContentMode({
                             >
                                 Books
                             </button>
-                            <button
-                                type="button"
-                                aria-pressed={visible === 'book'}
-                                disabled={isUpdating}
-                                onClick={() => visible !== 'book' && onToggle(true)}
-                                className={cn(
-                                    'inline-flex h-6 items-center justify-center rounded-full px-3 text-xs font-medium leading-none transition-all duration-200 disabled:cursor-not-allowed',
-                                    visible === 'book'
-                                        ? 'bg-white text-primary shadow-sm'
-                                        : 'text-white/65 hover:text-white',
-                                )}
-                            >
-                                Series
-                            </button>
+                            {showSeries ? (
+                                <button
+                                    type="button"
+                                    aria-pressed={visible === 'book'}
+                                    disabled={isUpdating}
+                                    onClick={() => visible !== 'book' && onToggle(true)}
+                                    className={cn(
+                                        'inline-flex h-6 items-center justify-center rounded-full px-3 text-xs font-medium leading-none transition-all duration-200 disabled:cursor-not-allowed',
+                                        visible === 'book'
+                                            ? 'bg-white text-primary shadow-sm'
+                                            : 'text-white/65 hover:text-white',
+                                    )}
+                                >
+                                    Series
+                                </button>
+                            ) : null}
                         </>
                     )}
                 </div>
@@ -140,7 +146,8 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
     const { displayName, roleName, isMentor } = useAdminPermissions();
 
     const settingsPending = isSettingsUninitialized || isSettingsLoading || (isSettingsFetching && !globalSettings?.data);
-    const visible = globalSettings?.data?.visible ?? 'chapter';
+    const showSeries = globalSettings?.data?.show_series !== false;
+    const visible = showSeries ? (globalSettings?.data?.visible ?? 'chapter') : 'chapter';
     const logo = globalSettings?.data?.logo as string | null | undefined;
     const brandName = globalSettings?.data?.marketplace_name || globalSettings?.data?.platformName || (!settingsPending ? 'TaalumaWorld' : '');
 
@@ -157,6 +164,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
     const showWebsiteLink = !isAuthor || Boolean(profileData?.data?.is_verified);
 
     const onContentModeToggle = (isBooks: boolean) => {
+        if (isBooks && !showSeries) return;
         dispatch(openModal({
             componentName: 'ContentModeConfirmation',
             data: {
@@ -208,6 +216,7 @@ export function AdminHeader({ profileData, onMobileMenuToggle }: AdminHeaderProp
                         {!isAuthor && (
                             <TopBarContentMode
                                 visible={visible}
+                                showSeries={showSeries}
                                 isInitialLoading={settingsPending}
                                 isUpdating={isToggling || (isSettingsFetching && !!globalSettings?.data)}
                                 onToggle={onContentModeToggle}

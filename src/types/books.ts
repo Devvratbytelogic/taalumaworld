@@ -22,6 +22,7 @@ export interface IBook {
   status: string;
   pricingModel: string;
   price: number;
+  isFree?: boolean;
   tags?: (string)[] | null;
   createdBy?: createdBy;
   deletedAt?: null;

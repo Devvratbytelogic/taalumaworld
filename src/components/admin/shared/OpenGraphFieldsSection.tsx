@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -479,16 +479,55 @@ export function OpenGraphFieldsSection({
     setFieldValue('twitter_image', null);
   };
 
-  return (
-    <div className="blueprint-form-section">
-      <div>
-        <h3 className="text-sm font-semibold text-slate-900">SEO, Open Graph, X & structured data</h3>
-        <p className="mt-1 text-sm text-slate-500">
-          Text fields fill from the title and description. On create, OG and X images fill from the
-          cover or featured image until you replace them or remove them with the X.
-        </p>
-      </div>
+  const [expanded, setExpanded] = useState(false);
+  const hasFieldError = OPEN_GRAPH_FORM_FIELD_KEYS.some(
+    (field) => Boolean(errors[field] && touched[field]),
+  );
 
+  useEffect(() => {
+    if (hasFieldError) setExpanded(true);
+  }, [hasFieldError]);
+
+  return (
+    <div className="blueprint-form-section gap-0!">
+      <button
+        type="button"
+        className="flex w-full items-start justify-between gap-3 text-left"
+        aria-expanded={expanded}
+        aria-controls={`${idPrefix}-open-graph-fields`}
+        onClick={() => setExpanded((open) => !open)}
+      >
+        <span>
+          <span className="block text-sm font-semibold text-slate-900">
+            SEO, Open Graph, X & structured data
+          </span>
+          <span className="mt-1 block text-sm font-normal text-slate-500">
+            Text fields fill from the title and description. On create, OG and X images fill from the
+            cover or featured image until you replace them or remove them with the X.
+          </span>
+        </span>
+        <ChevronDown
+          className={cn(
+            'mt-0.5 h-4 w-4 shrink-0 text-slate-500 transition-transform duration-300 ease-in-out',
+            expanded && 'rotate-180',
+          )}
+        />
+      </button>
+
+      <div
+        id={`${idPrefix}-open-graph-fields`}
+        className={cn(
+          'grid transition-[grid-template-rows] duration-300 ease-in-out motion-reduce:transition-none',
+          expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+        )}
+      >
+      <div className="overflow-hidden" inert={!expanded} aria-hidden={!expanded}>
+      <div
+        className={cn(
+          'flex flex-col gap-4 pt-4 transition-opacity duration-300 ease-in-out motion-reduce:transition-none',
+          expanded ? 'opacity-100' : 'opacity-0',
+        )}
+      >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor={`${idPrefix}-meta-title`}>Meta title</Label>
@@ -711,6 +750,9 @@ export function OpenGraphFieldsSection({
         {errors.json_ld && touched.json_ld ? (
           <p className="text-sm text-red-600">{errors.json_ld}</p>
         ) : null}
+      </div>
+      </div>
+      </div>
       </div>
     </div>
   );

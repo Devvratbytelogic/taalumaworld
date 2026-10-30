@@ -263,10 +263,11 @@ export function addBookSchema(minimumContentPrice: number) {
       .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
     pricingModel: Yup.string().oneOf(['book', 'chapter']),
     status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
+    isFree: Yup.boolean(),
     price: Yup.number()
       .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-      .when('pricingModel', {
-        is: 'book',
+      .when(['pricingModel', 'isFree'], {
+        is: (pricingModel: string, isFree: boolean) => pricingModel === 'book' && !isFree,
         then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
         otherwise: (schema) => schema.optional(),
       }),
@@ -291,10 +292,11 @@ export function editBookSchema(minimumContentPrice: number) {
       .test('image-type', getImageTypeErrorMessage(), isAllowedImageValue),
     pricingModel: Yup.string().oneOf(['book', 'chapter']),
     status: Yup.string().oneOf(['Draft', 'Published']).required('Please select a status'),
+    isFree: Yup.boolean(),
     price: Yup.number()
       .transform((v) => (v === '' || v == null ? undefined : Number(v)))
-      .when('pricingModel', {
-        is: 'book',
+      .when(['pricingModel', 'isFree'], {
+        is: (pricingModel: string, isFree: boolean) => pricingModel === 'book' && !isFree,
         then: () => priceAboveMinimum(minimumContentPrice, 'Price is required'),
         otherwise: (schema) => schema.optional(),
       }),
@@ -576,6 +578,7 @@ export const globalSettingsSchema = Yup.object({
   visible: Yup.string().oneOf(['chapter', 'book'], 'Select a valid option'),
   checkout_status: Yup.boolean(),
   mentor_section_visibility: Yup.boolean(),
+  show_series: Yup.boolean(),
   // App URLs
   android_app_url: urlSchema,
   iphone_app_url: urlSchema,

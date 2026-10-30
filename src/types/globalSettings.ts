@@ -71,5 +71,6 @@ export interface IGlobalSettings {
   default_tax_rate: number;
   minimum_content_price: number;
   mentor_section_visibility: boolean;
+  show_series?: boolean;
   contentViewMode: string;
 }

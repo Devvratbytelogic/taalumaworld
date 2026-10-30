@@ -244,9 +244,11 @@ export function AdminBooksTab() {
       sortable: false,
       renderCell: (params) => (
         <span className="text-sm font-semibold text-primary whitespace-nowrap">
-          {params.row.pricingModel === 'book' && params.value != null
-            ? `KSH ${Number(params.value).toFixed(2)}`
-            : '—'}
+          {params.row.pricingModel !== 'book' || params.value == null
+            ? '—'
+            : params.row.isFree || Number(params.value) === 0
+              ? 'Free'
+              : `KSH ${Number(params.value).toFixed(2)}`}
         </span>
       ),
     },

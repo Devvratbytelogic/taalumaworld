@@ -49,6 +49,7 @@ const defaultValues = {
   visible: 'chapter',
   checkout_status: false,
   mentor_section_visibility: true,
+  show_series: true,
   android_app_url: '',
   iphone_app_url: '',
   meta_title: '',
@@ -148,9 +149,10 @@ export function GeneralSettingsCard() {
     minimum_content_price: data?.minimum_content_price ?? 0,
     header_text: data?.header_text ?? '',
     header_text_status: data?.header_text_status ?? false,
-    visible: data?.visible ?? 'chapter',
+    visible: data?.show_series === false ? 'chapter' : (data?.visible ?? 'chapter'),
     checkout_status: data?.checkout_status ?? false,
     mentor_section_visibility: data?.mentor_section_visibility ?? true,
+    show_series: data?.show_series ?? true,
     android_app_url: data?.android_app_url ?? '',
     iphone_app_url: data?.iphone_app_url ?? '',
     meta_title: data?.meta_title ?? '',
@@ -189,9 +191,13 @@ export function GeneralSettingsCard() {
     onSubmit: async (values) => {
       try {
         const formData = new FormData();
-        (Object.keys(values) as (keyof FormValues)[]).forEach((key) => {
+        const payload: FormValues = {
+          ...values,
+          visible: values.show_series ? values.visible : 'chapter',
+        };
+        (Object.keys(payload) as (keyof FormValues)[]).forEach((key) => {
           if ((OPEN_GRAPH_FORM_FIELD_KEYS as readonly string[]).includes(key)) return;
-          formData.append(key, String(values[key]));
+          formData.append(key, String(payload[key]));
         });
         if (logoFile) formData.append('logo', logoFile);
         if (mentorGuideFile) formData.append('mentor_guide', mentorGuideFile);
@@ -436,19 +442,39 @@ export function GeneralSettingsCard() {
           {/* ── Display ── */}
           <section>
             <SectionHeading title="Display" />
-            <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-sm">Mentor Section Visibility</p>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  {values.mentor_section_visibility
-                    ? 'Mentor section is visible on the site'
-                    : 'Mentor section is hidden on the site'}
-                </p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-sm">Mentor Section Visibility</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {values.mentor_section_visibility
+                      ? 'Mentor section is visible on the site'
+                      : 'Mentor section is hidden on the site'}
+                  </p>
+                </div>
+                <Switch
+                  checked={values.mentor_section_visibility}
+                  onCheckedChange={(checked) => setFieldValue('mentor_section_visibility', checked)}
+                />
               </div>
-              <Switch
-                checked={values.mentor_section_visibility}
-                onCheckedChange={(checked) => setFieldValue('mentor_section_visibility', checked)}
-              />
+              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-sm">Show series</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {values.show_series
+                      ? 'Series are visible on the site'
+                      : 'Series are hidden on the site'}
+                  </p>
+                </div>
+                <Switch
+                  id="show_series"
+                  checked={values.show_series}
+                  onCheckedChange={(checked) => {
+                    setFieldValue('show_series', checked);
+                    if (!checked) setFieldValue('visible', 'chapter');
+                  }}
+                />
+              </div>
             </div>
           </section>
 

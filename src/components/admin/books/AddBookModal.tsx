@@ -21,6 +21,7 @@ import { useGetAdminGlobalSettingsQuery } from '@/store/rtkQueries/adminGetApi';
 import { appendUserIpToFormData } from '@/utils/clientIp';
 import { appendOpenGraphFieldsToFormData, OpenGraphFieldsSection } from '@/components/admin/shared/OpenGraphFieldsSection';
 import { slugify } from '@/utils/slugify';
+import { Switch } from '@/components/ui/switch';
 import { FileUploadLimitHint } from '@/components/ui/FileUploadLimitHint';
 import { ALLOWED_IMAGE_ACCEPT, IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
@@ -33,6 +34,7 @@ const initialFormValues = {
   tagsInput: '',
   pricingModel: 'chapter',
   status: 'Published',
+  isFree: false,
   price: '' as number | '',
   cover_image: null as File | null,
   meta_title: '',
@@ -78,9 +80,11 @@ export function AddBookModal({
       formData.append('category', vals.category);
       if (vals.subcategory) formData.append('subcategory', vals.subcategory);
       formData.append('description', vals.description ?? '');
+      const isFree = vals.pricingModel === 'book' && vals.isFree;
       formData.append('pricingModel', vals.pricingModel);
       formData.append('status', vals.status);
-      formData.append('price', String(vals.price === '' ? 0 : vals.price));
+      formData.append('isFree', String(isFree));
+      formData.append('price', String(isFree || vals.price === '' ? 0 : vals.price));
       if (coverFile) formData.append('cover_image', coverFile);
       vals.tags.forEach((tag, index) => formData.append(`tags[${index}]`, tag));
       appendOpenGraphFieldsToFormData(formData, {
@@ -210,7 +214,7 @@ export function AddBookModal({
     values.title.trim() !== '' &&
     values.description.trim() !== '' &&
     Boolean(coverFile) &&
-    (values.pricingModel !== 'book' || (typeof values.price === 'number' && values.price > minimumContentPrice));
+    (values.pricingModel !== 'book' || values.isFree || (typeof values.price === 'number' && values.price > minimumContentPrice));
 
   const closeModal = () => {
     if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
@@ -448,30 +452,50 @@ export function AddBookModal({
                 </select>
               </div>
               {values.pricingModel === 'book' && (
-                <div className="space-y-2">
-                  <Label htmlFor="book-price">Price (KSH) <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="book-price"
-                    name="price"
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    placeholder="0.00"
-                    value={values.price === '' ? '' : values.price}
-                    onChange={(e) =>
-                      setFieldValue(
-                        'price',
-                        e.target.value === '' ? '' : Number(e.target.value)
-                      )
-                    }
-                    onBlur={handleBlur}
-                    disabled={isSubmitting}
-                    className={errors.price && touched.price ? 'border-red-500' : ''}
-                  />
-                  {errors.price && touched.price && (
-                    <p className="text-sm text-red-600">{errors.price}</p>
+                <>
+                  <div className="space-y-2 flex flex-col justify-end">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        id="book-free"
+                        checked={values.isFree}
+                        onCheckedChange={(checked) => {
+                          setFieldValue('isFree', checked);
+                          if (checked) setFieldValue('price', 0);
+                        }}
+                        disabled={isSubmitting}
+                      />
+                      <Label htmlFor="book-free" className="cursor-pointer">
+                        Free series
+                      </Label>
+                    </div>
+                  </div>
+                  {!values.isFree && (
+                    <div className="space-y-2">
+                      <Label htmlFor="book-price">Price (KSH) <span className="text-red-500">*</span></Label>
+                      <Input
+                        id="book-price"
+                        name="price"
+                        type="number"
+                        min={0}
+                        step={0.01}
+                        placeholder="0.00"
+                        value={values.price === '' ? '' : values.price}
+                        onChange={(e) =>
+                          setFieldValue(
+                            'price',
+                            e.target.value === '' ? '' : Number(e.target.value)
+                          )
+                        }
+                        onBlur={handleBlur}
+                        disabled={isSubmitting}
+                        className={errors.price && touched.price ? 'border-red-500' : ''}
+                      />
+                      {errors.price && touched.price && (
+                        <p className="text-sm text-red-600">{errors.price}</p>
+                      )}
+                    </div>
                   )}
-                </div>
+                </>
               )}
             </div>
             <OpenGraphFieldsSection

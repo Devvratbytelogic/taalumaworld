@@ -83,7 +83,7 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
     return (
       <>
         FREE{' '}
-        <span className="text-sm font-normal text-muted-foreground">(via institutional access)</span>
+        {/* <span className="text-sm font-normal text-muted-foreground">(via institutional access)</span> */}
       </>
     );
   };

@@ -600,7 +600,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
               )}
             </>
           ) : (
-            <div className="flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
+            <div className="col-span-full flex items-start gap-2.5 rounded-lg border border-primary/20! bg-primary/10 px-3.5 py-3 text-sm font-medium leading-6 text-primary">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
               <span>Pricing is set at series level; this book has no separate price.</span>
             </div>

@@ -301,9 +301,9 @@ export default function AdminDashboardTab() {
         onClearDateFilter={clearDateFilter}
       />
 
+      <DashboardMentorActions stats={statsData} isLoading={dashboardLoading} />
       <DashboardStatsGrid stats={stats} isLoading={dashboardLoading} />
 
-      <DashboardMentorActions stats={statsData} isLoading={dashboardLoading} />
 
       <DashboardCharts
         year={year}

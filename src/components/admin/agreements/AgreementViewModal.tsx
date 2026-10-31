@@ -75,7 +75,7 @@ export function AgreementViewModal({ open, agreementId, onOpenChange }: Agreemen
 
             <div className="space-y-2">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Agreement content</p>
-              <RichTextEditor value={agreement.content ?? ''} onChange={() => {}} disabled minHeight="200px" />
+              <RichTextEditor value={agreement.content ?? ''} onChange={() => {}} disabled />
             </div>
           </div>
         ) : (

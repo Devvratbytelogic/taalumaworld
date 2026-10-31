@@ -465,7 +465,7 @@ export function CreateChapterForm() {
               <div className="flex flex-wrap items-center gap-3">
                 <label
                   className={cn(
-                    'blueprint-file-picker w-fit',
+                    'blueprint-file-picker pdf-file-picker w-fit',
                     errors.pdf_file && touched.pdf_file && !pdfFile && 'border-red-500',
                   )}
                 >

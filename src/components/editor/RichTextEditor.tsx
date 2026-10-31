@@ -18,6 +18,7 @@ import type { MDXEditorMethods } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { memo, useRef, useEffect, useMemo } from 'react';
 import toast from '@/utils/toast';
+import { cn } from '@/components/ui/utils';
 import { IMAGE_UPLOAD_MAX_BYTES, getImageSizeLimitMessage, getImageTypeErrorMessage, isAllowedImageFile } from '@/constants/fileUpload';
 
 function createEditorPlugins(imageUploadHandler: (file: File) => Promise<string>) {
@@ -45,8 +46,6 @@ export interface RichTextEditorProps {
   onChange: (markdown: string) => void;
   placeholder?: string;
   disabled?: boolean;
-  /** Minimum content-area height. Editor grows with content beyond this (like Textarea). */
-  minHeight?: string;
   className?: string;
   /** Optional: custom image upload. If not provided, images are embedded as base64 data URLs. */
   onImageUpload?: (file: File) => Promise<string>;
@@ -66,8 +65,6 @@ function RichTextEditorComponent({
   onChange,
   placeholder = 'Write your book content here...',
   disabled = false,
-  // Match Textarea `min-h-28` so the empty state feels like a normal multi-line field.
-  minHeight = '10rem',
   className,
   onImageUpload,
 }: RichTextEditorProps) {
@@ -116,10 +113,7 @@ function RichTextEditorComponent({
   return (
     <div
       data-slot="rich-text-editor"
-      className={`${className} resize-y overflow-auto border border-slate-200 bg-white`}
-      // style={{
-      //   minHeight,
-      // }}
+      className={cn('border border-slate-200 bg-white', className)}
     >
       <MDXEditor
         ref={ref}

@@ -99,7 +99,6 @@ export function FAQForm({ initial = {}, onSubmit, onCancel, isLoading }: FAQForm
           value={values.answer}
           onChange={(md) => setValues((p) => ({ ...p, answer: md }))}
           placeholder="Enter the answer…"
-          minHeight="150px"
         />
       </div>
       <div className="flex gap-3 justify-end">

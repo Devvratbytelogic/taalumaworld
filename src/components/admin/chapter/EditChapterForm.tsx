@@ -511,7 +511,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
             <div className="flex flex-wrap items-center gap-3">
               <label
                 className={cn(
-                  'blueprint-file-picker w-fit',
+                  'blueprint-file-picker pdf-file-picker w-fit',
                   errors.pdf_file && touched.pdf_file && !values.pdf_file && 'border-red-500',
                 )}
               >
@@ -544,7 +544,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
                   type="button"
                   isIconOnly
                   aria-label="Remove current PDF"
-                  className="global_btn rounded_full outline_primary icon_btn fit_btn h-7 w-7 min-w-7"
+                  className="global_btn outline_primary icon_btn h-7! w-7! min-h-7! min-w-7! max-h-7! max-w-7! rounded-full! p-0!"
                   onPress={removeExistingPdf}
                 >
                   <X className="h-3.5 w-3.5" />

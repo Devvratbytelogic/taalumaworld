@@ -180,7 +180,6 @@ export function AgreementForm() {
           value={values.content}
           onChange={(md) => setFieldValue('content', md)}
           placeholder="Write the full agreement text here..."
-          minHeight="320px"
         />
         {errors.content && touched.content ? <p className="text-sm text-red-600">{errors.content}</p> : null}
       </div>

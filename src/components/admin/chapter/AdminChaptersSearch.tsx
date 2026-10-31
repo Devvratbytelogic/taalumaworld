@@ -4,7 +4,6 @@ import {
   AdminSearchInput,
   AdminSearchPanel,
   adminFilterPillClass,
-  adminSelectClass,
 } from '@/components/admin/layout/AdminContent';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/components/ui/utils';
@@ -40,11 +39,12 @@ interface AdminChaptersSearchProps {
   tourId?: string;
 }
 
-const STATUS_OPTIONS = BLUEPRINT_STATUSES;
+const STATUS_OPTIONS: FilterOption[] = BLUEPRINT_STATUSES.map((status) => ({
+  value: status,
+  label: status,
+}));
 
-const filterSelectClass = cn(adminSelectClass, 'w-full min-w-0');
-
-const mentorSelectStyles: StylesConfig<FilterOption, false> = {
+const filterSelectControlStyles: StylesConfig<FilterOption, false> = {
   ...filterSelectStyles,
   container: (base, state) => ({
     ...(filterSelectStyles.container?.(base, state) ?? base),
@@ -80,6 +80,7 @@ export function AdminChaptersSearch({
   const hasActiveFilters = selectedBook || (showMentorFilter && selectedMentor) || selectedStatus || (showMineFilter && isMine) || isContentFlagged || reviewBlueprint;
 
   const menuPortalTarget = typeof document !== 'undefined' ? document.body : null;
+  const seriesOptions: FilterOption[] = books.map((book) => ({ value: book.id, label: book.title }));
 
   const clearAll = () => {
     onBookChange('');
@@ -108,16 +109,19 @@ export function AdminChaptersSearch({
             showMentorFilter && 'md:[&>*:last-child:nth-child(odd)]:col-span-1',
           )}
         >
-          <select
-            value={selectedBook}
-            onChange={(e) => onBookChange(e.target.value)}
-            className={filterSelectClass}
-          >
-            <option value="">All series</option>
-            {books.map((b) => (
-              <option key={b.id} value={b.id}>{b.title}</option>
-            ))}
-          </select>
+          <ReactSelect<FilterOption, false>
+            inputId="chapters-filter-series"
+            classNamePrefix="react-select"
+            options={seriesOptions}
+            value={seriesOptions.find((series) => series.value === selectedBook) ?? null}
+            onChange={(option) => onBookChange(option?.value ?? '')}
+            placeholder="All series"
+            isClearable
+            isSearchable
+            menuPortalTarget={menuPortalTarget}
+            menuPosition="fixed"
+            styles={filterSelectControlStyles}
+          />
 
           {showMentorFilter ? (
             <ReactSelect<FilterOption, false>
@@ -131,20 +135,23 @@ export function AdminChaptersSearch({
               isSearchable
               menuPortalTarget={menuPortalTarget}
               menuPosition="fixed"
-              styles={mentorSelectStyles}
+              styles={filterSelectControlStyles}
             />
           ) : null}
 
-          <select
-            value={selectedStatus}
-            onChange={(e) => onStatusChange(e.target.value)}
-            className={filterSelectClass}
-          >
-            <option value="">All statuses</option>
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+          <ReactSelect<FilterOption, false>
+            inputId="chapters-filter-status"
+            classNamePrefix="react-select"
+            options={STATUS_OPTIONS}
+            value={STATUS_OPTIONS.find((status) => status.value === selectedStatus) ?? null}
+            onChange={(option) => onStatusChange(option?.value ?? '')}
+            placeholder="All statuses"
+            isClearable
+            isSearchable={false}
+            menuPortalTarget={menuPortalTarget}
+            menuPosition="fixed"
+            styles={filterSelectControlStyles}
+          />
         </div>
 
         <div className="flex min-w-0 flex-wrap items-center gap-2">

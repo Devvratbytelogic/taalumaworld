@@ -16,6 +16,7 @@ import { getBlueprintRoutePath, getSeriesRoutePath, getSingleAuthorRoutePath } f
 import { closeModal, openModal } from '@/store/slices/allModalSlice';
 import { RootState } from '@/store/store';
 import { VISIBLE } from '@/constants/contentMode';
+import { useShowSeries } from '@/hooks/useShowSeries';
 
 const modalClassNames = {
   base: 'max-w-xl rounded-3xl overflow-hidden',
@@ -29,6 +30,7 @@ export default function ChapterDetailsModal() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isOpen, data } = useSelector((state: RootState) => state.allModal);
+  const showSeries = useShowSeries();
   const chapter = data?.chapter
 
   const onClose = () => dispatch(closeModal());
@@ -85,7 +87,7 @@ export default function ChapterDetailsModal() {
                 Free
               </Badge>
             ) : null}
-            {!isBook && chapter?.seriesTitle && (
+            {showSeries && !isBook && chapter?.seriesTitle && (
               <Badge variant="outline" className="rounded-full px-3 py-1 text-xs max-w-40">
                 <BookOpen className="h-3 w-3 mr-1 shrink-0" />
                 <span className="truncate">{chapter?.seriesTitle}</span>
@@ -182,7 +184,7 @@ export default function ChapterDetailsModal() {
             </div>
           )}
 
-          {!isBook && chapter?.series && (
+          {showSeries && !isBook && chapter?.series && (
             <div
               className="flex items-center gap-3 rounded-md border border-border p-3 cursor-pointer hover:border-primary/50 transition-colors"
               onClick={viewSeriesDetails}

@@ -11,6 +11,7 @@ import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes'
 import MentorCardReveal from './MentorCardReveal'
 import WishlistButton from '@/components/ui/WishlistButton'
 import { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters'
+import { useShowSeries } from '@/hooks/useShowSeries'
 
 interface CommonCardProps {
     data: IHomeAllChaptersItemsEntity;
@@ -18,6 +19,7 @@ interface CommonCardProps {
 
 export default function CommonCard({ data }: CommonCardProps) {
     const dispatch = useDispatch()
+    const showSeries = useShowSeries()
 
     const isBook = data?.type === 'series'
     const isPricingModelChapter = isBook
@@ -99,7 +101,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                         </Badge>
                     ) : null}
 
-                    {!isBook && data?.seriesTitle && (
+                    {showSeries && !isBook && data?.seriesTitle && (
                         <Badge variant="outline" className="backdrop-blur-sm bg-white/90 rounded-full px-3 py-1 text-xs max-w-40">
                             <BookOpen className="h-3 w-3 mr-1 shrink-0" />
                             <span className="truncate">{data?.seriesTitle}</span>
@@ -149,7 +151,7 @@ export default function CommonCard({ data }: CommonCardProps) {
                             : displayPrice > 0
                                     ? (<>
                                         <p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>
-                                        {data?.series?.pricingModel === VISIBLE.BOOK
+                                        {showSeries && data?.series?.pricingModel === VISIBLE.BOOK
                                             ? (<p className="mt-0.5 text-xs font-normal text-muted-foreground">complete series</p>)
                                             : null}
                                     </>)

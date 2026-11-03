@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SeriesPageClient from '@/components/series/SeriesPageClient';
 import { getSeriesListServerAPI, getSingleSeriesServerAPI } from '@/store/server-api/serverSideAPIs';
+import { isSeriesVisible, notFoundWhenSeriesHidden } from '../requireSeriesVisible';
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -10,6 +11,8 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
+  if (!(await isSeriesVisible())) return [];
+
   const response = await getSeriesListServerAPI();
   const series = response?.data ?? [];
 
@@ -20,6 +23,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  await notFoundWhenSeriesHidden();
   const { slug } = await params;
   const response = await getSingleSeriesServerAPI({ slug });
   const bookDetails = response?.data?.bookDetails;
@@ -59,6 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function SingleSeriesPage({ params }: PageProps) {
+  await notFoundWhenSeriesHidden();
   const { slug } = await params;
   const response = await getSingleSeriesServerAPI({ slug });
   const data = response?.data ?? null;

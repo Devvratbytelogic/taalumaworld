@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { VISIBLE } from '@/constants/contentMode';
 import { openModal } from '@/store/slices/allModalSlice';
 import { getAuthToken } from '@/utils/authCookies';
+import { useShowSeries } from '@/hooks/useShowSeries';
 
 interface BlueprintPublicHeroProps {
   data: ISingleChapterAPIResponseData | null;
@@ -21,6 +22,7 @@ interface BlueprintPublicHeroProps {
 
 export default function BlueprintPublicHero({ data, accessPending = false }: BlueprintPublicHeroProps) {
   const dispatch = useDispatch();
+  const showSeries = useShowSeries();
 
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
   const isBookFree = Boolean(data?.series?.isFree);
@@ -138,7 +140,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
                   </Link>
                 )}
 
-                {data?.seriesTitle && (
+                {showSeries && data?.seriesTitle && (
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                       <BookOpen className="h-4 w-4 text-muted-foreground" />

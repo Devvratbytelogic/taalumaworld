@@ -32,6 +32,7 @@ import { BLUEPRINT_STATUSES, BLUEPRINT_STATUS_CONFIG, type BlueprintStatus } fro
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { AdminBlueprintsSkeleton } from '@/components/skeleton-loader/admin';
+import { ChapterPrice } from '@/components/admin/chapter/ChapterPrice';
 
 const BLUEPRINTS_MODEL = 'Blueprints';
 
@@ -294,13 +295,9 @@ export function AdminChaptersTab() {
         {
             field: 'price',
             headerName: 'Price',
-            width: 120,
+            width: 140,
             sortable: false,
-            renderCell: (params) => (
-                <span className="text-sm font-semibold text-primary whitespace-nowrap">
-                    {params.row.isFree ? 'Free' : `KSH ${Number(params.row.price ?? 0).toFixed(2)}`}
-                </span>
-            ),
+            renderCell: (params) => <ChapterPrice chapter={params.row} />,
         },
         {
             field: 'aiScore',

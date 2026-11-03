@@ -7,6 +7,7 @@ import { ArrowLeft, Edit2, FileText, BookOpen, Flag } from 'lucide-react';
 import moment from 'moment';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
+import { ChapterPrice, getChapterPrice } from '@/components/admin/chapter/ChapterPrice';
 import ImageComponent from '@/components/ui/ImageComponent';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import {
@@ -83,6 +84,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
   }
 
   const statusConfig = BLUEPRINT_STATUS_CONFIG[chapter.status as BlueprintStatus];
+  const { isFree: isFreePrice } = getChapterPrice(chapter);
   const flagTypes = (chapter.contentFlagTypes ?? []).filter((type): type is string => Boolean(type));
   const criteriaEntries = (Object.keys(AI_CRITERIA_LABELS) as (keyof AiCriteria)[])
     .map((key) => ({
@@ -150,11 +152,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
             ) : null}
 
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              {chapter.isFree ? (
-                <Badge variant="secondary">Free Book</Badge>
-              ) : (
-                <p className="text-xl font-bold text-primary">KSH {Number(chapter.price ?? 0).toFixed(2)}</p>
-              )}
+              <ChapterPrice chapter={chapter} variant="hero" />
               {chapter.isContentFlagged ? (
                 <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200! gap-1">
                   <Flag className="h-3 w-3" />
@@ -176,8 +174,8 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
           <DetailRow label="Series" value={chapter.series?.title} />
           <DetailRow label="Series slug" value={chapter.series?.slug} />
           <DetailRow label="Status" value={chapter.status} />
-          <DetailRow label="Free Book" value={chapter.isFree ? 'Yes' : 'No'} />
-          <DetailRow label="Price" value={`KSH ${Number(chapter.price ?? 0).toFixed(2)}`} />
+          <DetailRow label="Free Book" value={isFreePrice ? 'Yes' : 'No'} />
+          <DetailRow label="Price" value={<ChapterPrice chapter={chapter} variant="detail" />} />
           {/* <DetailRow label="Pages" value={chapter.page} /> */}
           <DetailRow
             label="PDF Attachment"

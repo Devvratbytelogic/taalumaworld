@@ -67,4 +67,6 @@ export interface Series {
   slug: string;
   coverImage: string;
   id: string;
+  pricingModel: string;
+  price: number;
 }

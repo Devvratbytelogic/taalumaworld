@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import MentorProfileHero from '@/components/pages-components/mentor/MentorProfileHero';
 import MentorBooksSection from '@/components/pages-components/mentor/MentorBooksSection';
-import { getAllMentorsServerAPI, getMentorDetailsServerAPI } from '@/store/server-api/serverSideAPIs';
+import { getAllMentorsServerAPI, getMentorBlueprintsServerAPI, getMentorDetailsServerAPI } from '@/store/server-api/serverSideAPIs';
+import { isSeriesVisible } from '@/app/series/requireSeriesVisible';
+import type { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters';
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -51,6 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function MentorProfilePage({ params }: PageProps) {
     const { id } = await params;
+    const showSeries = await isSeriesVisible();
 
     const response = await getMentorDetailsServerAPI(id, {
         page: 1,
@@ -58,9 +61,22 @@ export default async function MentorProfilePage({ params }: PageProps) {
     });
 
     const mentor = response?.data?.mentor_info ?? null;
-    const books = response?.data?.books?.data ?? [];
-    const total = response?.data?.books?.total ?? 0;
-    const totalPages = response?.data?.books?.totalPages ?? 1;
+    const mentorObjectId = mentor?._id || mentor?.id || '';
+    const seriesBooks = response?.data?.books?.data ?? [];
+    const books = showSeries ? seriesBooks : [];
+    let blueprints: IHomeAllChaptersItemsEntity[] = [];
+    let total = showSeries ? (response?.data?.books?.total ?? 0) : 0;
+    let totalPages = showSeries ? (response?.data?.books?.totalPages ?? 1) : 1;
+
+    if (!showSeries && mentorObjectId) {
+        const blueprintResponse = await getMentorBlueprintsServerAPI(mentorObjectId, {
+            page: 1,
+            limit: PAGE_LIMIT,
+        });
+        blueprints = blueprintResponse?.data?.items ?? [];
+        total = blueprintResponse?.data?.total ?? 0;
+        totalPages = blueprintResponse?.data?.totalPages ?? 1;
+    }
     if (!mentor) {
         return (
             <div className="container py-24 text-center">
@@ -74,7 +90,11 @@ export default async function MentorProfilePage({ params }: PageProps) {
 
     return (
         <div className="space-y-5 space_top">
-            <MentorProfileHero mentor={mentor} totalBooks={total} />
+            <MentorProfileHero
+                mentor={mentor}
+                totalBooks={total}
+                catalogLabel={showSeries ? 'Series' : 'Books'}
+            />
 
             <Suspense
                 fallback={
@@ -91,9 +111,12 @@ export default async function MentorProfilePage({ params }: PageProps) {
                 }
             >
                 <MentorBooksSection
-                    mentorId={id}
+                    mentorId={showSeries ? id : mentorObjectId}
+                    routeId={id}
                     mentorName={mentor?.name ?? ''}
+                    showSeries={showSeries}
                     initialBooks={books}
+                    initialBlueprints={blueprints}
                     initialTotalPages={totalPages}
                 />
             </Suspense>

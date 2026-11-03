@@ -66,9 +66,10 @@ function HeroContact({
 interface MentorProfileHeroProps {
   mentor: IMentorInfo | null;
   totalBooks: number;
+  catalogLabel?: string;
 }
 
-export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileHeroProps) {
+export default function MentorProfileHero({ mentor, totalBooks, catalogLabel = 'Series' }: MentorProfileHeroProps) {
   const dispatch = useDispatch();
   const { isAuthenticated } = useAuth();
   const mentorKey = mentor?.short_code || mentor?._id || mentor?.id || '';
@@ -187,7 +188,7 @@ export default function MentorProfileHero({ mentor, totalBooks }: MentorProfileH
                   <BookOpen className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Series</p>
+                  <p className="text-xs text-muted-foreground">{catalogLabel}</p>
                   <p className="font-medium text-foreground">{totalBooks} published</p>
                 </div>
               </div>

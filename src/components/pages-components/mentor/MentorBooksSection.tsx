@@ -3,18 +3,22 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { BookOpen } from 'lucide-react';
-import MentorBookCard from '@/components/pages-components/mentor/MentorBookCard';
+import { BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import MentorBookCard, { MentorBlueprintCard } from '@/components/pages-components/mentor/MentorBookCard';
 import { API_BASE_URL } from '@/utils/config';
-import type { IMentorBookEntity, IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
+import type { IMentorBlueprintsAPIResponse, IMentorBookEntity, IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
+import type { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters';
 
 const PAGE_LIMIT = 8;
 
 type MentorBooksSectionProps = {
     mentorId: string;
+    routeId: string;
     mentorName: string;
-    initialBooks: IMentorBookEntity[];
     initialTotalPages: number;
+    showSeries: boolean;
+    initialBooks: IMentorBookEntity[];
+    initialBlueprints: IHomeAllChaptersItemsEntity[];
 };
 
 function buildHref(id: string, page: number) {
@@ -41,20 +45,25 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
 
 export default function MentorBooksSection({
     mentorId,
+    routeId,
     mentorName,
-    initialBooks,
     initialTotalPages,
+    showSeries,
+    initialBooks,
+    initialBlueprints,
 }: MentorBooksSectionProps) {
     const searchParams = useSearchParams();
     const currentPage = Math.max(1, Number(searchParams.get('page')) || 1);
 
     const [books, setBooks] = useState(initialBooks);
+    const [blueprints, setBlueprints] = useState(initialBlueprints);
     const [totalPages, setTotalPages] = useState(initialTotalPages);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (currentPage === 1) {
             setBooks(initialBooks);
+            setBlueprints(initialBlueprints);
             setTotalPages(initialTotalPages);
             return;
         }
@@ -68,15 +77,24 @@ export default function MentorBooksSection({
                     page: String(currentPage),
                     limit: String(PAGE_LIMIT),
                 });
+                const path = showSeries
+                    ? `/user/mentors/${encodeURIComponent(mentorId)}`
+                    : `/user/mentors/${encodeURIComponent(mentorId)}/blueprints`;
                 const res = await fetch(
-                    `${API_BASE_URL}/user/mentors/${encodeURIComponent(mentorId)}?${query}`,
+                    `${API_BASE_URL}${path}?${query}`,
                     { headers: { Accept: 'application/json' } },
                 );
                 if (!res.ok) return;
-                const data = (await res.json()) as IUserMentorDetailsAPIResponse;
                 if (cancelled) return;
-                setBooks(data?.data?.books?.data ?? []);
-                setTotalPages(data?.data?.books?.totalPages ?? 1);
+                if (showSeries) {
+                    const data = (await res.json()) as IUserMentorDetailsAPIResponse;
+                    setBooks(data?.data?.books?.data ?? []);
+                    setTotalPages(data?.data?.books?.totalPages ?? 1);
+                } else {
+                    const data = (await res.json()) as IMentorBlueprintsAPIResponse;
+                    setBlueprints(data?.data?.items ?? []);
+                    setTotalPages(data?.data?.totalPages ?? 1);
+                }
             } finally {
                 if (!cancelled) setIsLoading(false);
             }
@@ -86,16 +104,17 @@ export default function MentorBooksSection({
         return () => {
             cancelled = true;
         };
-    }, [currentPage, initialBooks, initialTotalPages, mentorId]);
+    }, [currentPage, initialBlueprints, initialBooks, initialTotalPages, mentorId, showSeries]);
 
-    const hasBooks = books.length > 0;
+    const hasItems = showSeries ? books.length > 0 : blueprints.length > 0;
     const pageNumbers = getPageNumbers(currentPage, totalPages);
+    const catalogLabel = showSeries ? 'Series' : 'Books';
 
     return (
         <section className="container space-y-8 pb-10">
             <div className="flex items-center gap-4">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                    Series by {mentorName}
+                    {catalogLabel} by {mentorName}
                 </p>
                 <div className="h-px flex-1 bg-border" />
             </div>
@@ -109,35 +128,40 @@ export default function MentorBooksSection({
                         />
                     ))}
                 </div>
-            ) : hasBooks ? (
+            ) : hasItems ? (
                 <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {books.map((book, index) => (
-                        <MentorBookCard key={book?.id ?? book?._id} book={book} index={index} />
-                    ))}
+                    {showSeries
+                        ? books.map((book, index) => (
+                            <MentorBookCard key={book?.id ?? book?._id} book={book} index={index} />
+                        ))
+                        : blueprints.map((item, index) => (
+                            <MentorBlueprintCard key={item?.id} item={item} index={index} />
+                        ))}
                 </div>
             ) : (
                 <div className="mx-auto flex max-w-md flex-col items-center py-16 text-center">
                     <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent">
                         <BookOpen className="h-7 w-7 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground">No series published yet</h3>
+                    <h3 className="text-lg font-semibold text-foreground">No {catalogLabel.toLowerCase()} published yet</h3>
                     <p className="mt-2 text-sm text-muted-foreground">
-                        Series from this mentor will appear here once published.
+                        {catalogLabel} from this mentor will appear here once published.
                     </p>
                 </div>
             )}
 
-            {hasBooks && totalPages > 1 && (
-                <nav className="flex items-center justify-center gap-1.5" aria-label="Mentor series pagination">
+            {hasItems && totalPages > 1 && (
+                <nav className="flex items-center justify-center gap-1.5" aria-label={`Mentor ${catalogLabel.toLowerCase()} pagination`}>
                     <Link
-                        href={buildHref(mentorId, Math.max(1, currentPage - 1))}
+                        href={buildHref(routeId, Math.max(1, currentPage - 1))}
                         aria-disabled={currentPage === 1}
-                        className={`flex h-9 min-w-9 items-center justify-center rounded-full border border-border px-6 text-sm font-medium transition-colors ${
+                        className={`flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full border border-border px-5 text-sm font-medium transition-colors ${
                             currentPage === 1
                                 ? 'pointer-events-none text-muted-foreground/40'
                                 : 'text-foreground hover:border-primary hover:text-primary'
                         }`}
                     >
+                        <ChevronLeft className="h-4 w-4" />
                         Prev
                     </Link>
 
@@ -149,7 +173,7 @@ export default function MentorBooksSection({
                         ) : (
                             <Link
                                 key={p}
-                                href={buildHref(mentorId, p)}
+                                href={buildHref(routeId, p)}
                                 className={`flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-medium transition-colors ${
                                     p === currentPage
                                         ? 'bg-primary text-white shadow-md shadow-primary/25'
@@ -162,15 +186,16 @@ export default function MentorBooksSection({
                     )}
 
                     <Link
-                        href={buildHref(mentorId, Math.min(totalPages, currentPage + 1))}
+                        href={buildHref(routeId, Math.min(totalPages, currentPage + 1))}
                         aria-disabled={currentPage === totalPages}
-                        className={`flex h-9 min-w-9 items-center justify-center rounded-full border border-border px-6 text-sm font-medium transition-colors ${
+                        className={`flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full border border-border px-5 text-sm font-medium transition-colors ${
                             currentPage === totalPages
                                 ? 'pointer-events-none text-muted-foreground/40'
                                 : 'text-foreground hover:border-primary hover:text-primary'
                         }`}
                     >
                         Next
+                        <ChevronRight className="h-4 w-4" />
                     </Link>
                 </nav>
             )}

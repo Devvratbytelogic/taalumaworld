@@ -1,3 +1,5 @@
+import type { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters';
+
 export interface IUserMentorDetailsAPIResponse {
   http_status_code: number;
   http_status_msg: string;
@@ -59,4 +61,21 @@ export interface IMentorBookEntity {
   updatedAt: string;
   __v: number;
   id: string;
+}
+
+export interface IMentorBlueprintsAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: IMentorBlueprintsData;
+  message: string;
+  timestamp: string;
+}
+
+export interface IMentorBlueprintsData {
+  items?: (IHomeAllChaptersItemsEntity)[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }

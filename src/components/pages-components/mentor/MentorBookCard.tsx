@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
 import ImageComponent from '@/components/ui/ImageComponent';
-import { getSeriesRoutePath } from '@/routes/routes';
+import { getBlueprintRoutePath, getSeriesRoutePath } from '@/routes/routes';
 import type { IMentorBookEntity } from '@/types/user/mentorDetails';
+import type { IHomeAllChaptersItemsEntity } from '@/types/user/HomeAllChapters';
 import { VISIBLE } from '@/constants/contentMode';
 
 interface MentorBookCardProps {
@@ -17,7 +18,7 @@ export default function MentorBookCard({ book, index }: MentorBookCardProps) {
       className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card animate-fade-in transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10"
       style={{ animationDelay: `${index * 40}ms` }}
     >
-      <div className="aspect-3/4 w-full overflow-hidden bg-muted">
+      <div className="aspect-2/2 w-full overflow-hidden bg-muted">
         {book?.coverImage ? (
           <ImageComponent src={book?.coverImage} alt={book?.title ?? ''} object_cover />
         ) : (
@@ -54,6 +55,58 @@ export default function MentorBookCard({ book, index }: MentorBookCardProps) {
                 ? `KSH ${book?.price.toFixed(2)}`
                 : 'FREE'}
           </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+export function MentorBlueprintCard({ item, index }: { item: IHomeAllChaptersItemsEntity; index: number }) {
+  const isPricingModelChapter = item?.series?.pricingModel === VISIBLE.CHAPTER;
+  const isFreeToRead = Boolean(item?.series?.isFree) || (isPricingModelChapter && Boolean(item?.isFree));
+  const displayPrice = Number(isPricingModelChapter ? item?.effectivePrice : item?.series?.effectivePrice) || 0;
+
+  return (
+    <Link
+      href={getBlueprintRoutePath(item?.slug ?? item?.id ?? '')}
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card animate-fade-in transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10"
+      style={{ animationDelay: `${index * 40}ms` }}
+    >
+      <div className="aspect-2/2 w-full overflow-hidden bg-muted">
+        {item?.coverImage ? (
+          <ImageComponent src={item.coverImage} alt={item?.title ?? ''} object_cover />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 text-center">
+            <FileText className="h-10 w-10 text-muted-foreground/40" />
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            {isPricingModelChapter ? 'By Book' : 'Full Series'}
+          </span>
+        </div>
+
+        <h3 className="mt-3 line-clamp-2 text-base font-semibold text-foreground">{item?.title}</h3>
+
+        {item?.description && (
+          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
+        )}
+
+        <div className="mt-4 flex flex-1 items-end justify-between gap-3 border-t border-border-subtle pt-4">
+          <span className="text-sm text-muted-foreground">View book</span>
+          {isFreeToRead ? (
+            <span className="text-sm font-medium text-success">Free to Read</span>
+          ) : displayPrice > 0 ? (
+            <span className="text-sm font-semibold text-primary">KSH {displayPrice.toFixed(2)}</span>
+          ) : (
+            <span className="text-right">
+              <span className="block text-sm font-semibold text-primary">FREE</span>
+              <span className="block text-xs font-normal text-muted-foreground">via institutional access</span>
+            </span>
+          )}
         </div>
       </div>
     </Link>

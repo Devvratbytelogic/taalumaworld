@@ -5,7 +5,7 @@ import type { ISingleBookAPIResponse } from '@/types/user/singleBook';
 import type { IBlueprintListAPIResponse, ISeriesListAPIResponse } from '@/types/user/contentLists';
 import type { IGlobalSettingsAPIResponse } from '@/types/globalSettings';
 import { IUserAllAuthorsAPIResponse } from '@/types/user/allAuthors';
-import type { IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
+import type { IMentorBlueprintsAPIResponse, IUserMentorDetailsAPIResponse } from '@/types/user/mentorDetails';
 import { IAgreementAPIResponse, ILatestAgreementsAPIResponse } from '@/types/user/agreement';
 import {
   IFAQAPIResponse,
@@ -113,6 +113,21 @@ export async function getMentorDetailsServerAPI(
   return publicFetch<IUserMentorDetailsAPIResponse>(
     `/user/mentors/${encodeURIComponent(shortCode)}${queryString ? `?${queryString}` : ''}`,
     { tags: [TAGS.MENTORS, TAGS.mentor(shortCode)] },
+  );
+}
+
+export async function getMentorBlueprintsServerAPI(
+  mentorId: string,
+  params?: { page?: number; limit?: number }
+) {
+  const query = new URLSearchParams();
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  const queryString = query.toString();
+
+  return publicFetch<IMentorBlueprintsAPIResponse>(
+    `/user/mentors/${encodeURIComponent(mentorId)}/blueprints${queryString ? `?${queryString}` : ''}`,
+    { tags: [TAGS.MENTORS, TAGS.mentor(mentorId), TAGS.BLUEPRINT_LIST] },
   );
 }
 

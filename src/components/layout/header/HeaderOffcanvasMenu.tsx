@@ -32,6 +32,7 @@ import { cn } from '@/components/ui/utils';
 import { useAppDispatch } from '@/store/hooks';
 import { openModal } from '@/store/slices/allModalSlice';
 import { useGetGlobalSettingsQuery } from '@/store/rtkQueries/userGetAPI';
+import { useShowSeries } from '@/hooks/useShowSeries';
 import { VISIBLE } from '@/constants/contentMode';
 import {
   getAboutUsRoutePath,
@@ -102,6 +103,7 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
   const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAuth();
   const { data: globalSettings } = useGetGlobalSettingsQuery();
+  const showSeries = useShowSeries();
 
   const contentMode = globalSettings?.data?.visible;
   const logo = globalSettings?.data?.logo as string | null | undefined;
@@ -112,9 +114,10 @@ export default function HeaderOffcanvasMenu({ open, onClose }: HeaderOffcanvasMe
     contentMode === VISIBLE.CHAPTER ? getUserDashboardMyChaptersRoutePath() : getUserDashboardMyBooksRoutePath();
   const libraryLabel = contentMode === VISIBLE.BOOK ? 'My Series' : 'My Books';
   const accountHref = isStaff ? getAdminRoutePath() : getUserDashboardRoutePath();
-  const visibleAccountLinks = accountLinks.filter(
-    (item) => !item.roles || item.roles.includes(user?.role as UserTypeValue),
-  );
+  const visibleAccountLinks = accountLinks.filter((item) => {
+    if (item.label === 'My Series' && !showSeries) return false;
+    return !item.roles || item.roles.includes(user?.role as UserTypeValue);
+  });
 
   useEffect(() => {
     if (open) setMounted(true);

@@ -25,10 +25,11 @@ import {
   getMentorDashboardRoutePath,
 } from '@/routes/routes';
 import ImageComponent from '@/components/ui/ImageComponent';
+import { useShowSeries } from '@/hooks/useShowSeries';
 
 const NAV_GROUPS: {
   title: string;
-  items: { href: string; label: string; icon: typeof User; roles?: UserTypeValue[] }[];
+  items: { href: string; label: string; icon: typeof User; roles?: UserTypeValue[]; requiresSeries?: boolean }[];
 }[] = [
     {
       title: 'Account',
@@ -48,7 +49,7 @@ const NAV_GROUPS: {
       title: 'Library',
       items: [
         { href: getUserDashboardMyChaptersRoutePath(), label: 'My Books', icon: BookOpen },
-        { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book },
+        { href: getUserDashboardMyBooksRoutePath(), label: 'My Series', icon: Book, requiresSeries: true },
         { href: getUserDashboardMyWishlistRoutePath(), label: 'My Wishlist', icon: Heart },
         { href: getUserDashboardMyOrdersRoutePath(), label: 'My Orders', icon: ShoppingBag },
         { href: getUserDashboardFollowedMentorsRoutePath(), label: 'Followed Mentors', icon: Users },
@@ -78,6 +79,7 @@ export default function UserDashboardAppLayout({
   initialRole?: string;
 }) {
   const pathname = usePathname();
+  const showSeries = useShowSeries();
   const [hasMounted, setHasMounted] = useState(false);
   const { data: profileData } = useGetUserProfileQuery();
   const userName = profileData?.data?.name ?? 'User';
@@ -86,7 +88,10 @@ export default function UserDashboardAppLayout({
 
   const navGroups = NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => !item.roles || item.roles.includes(userRole as UserTypeValue)),
+    items: group.items.filter((item) => {
+      if (item.requiresSeries && !showSeries) return false;
+      return !item.roles || item.roles.includes(userRole as UserTypeValue);
+    }),
   })).filter((group) => group.items.length > 0);
 
   useEffect(() => {

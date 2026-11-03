@@ -51,9 +51,11 @@ import { UserDashboardPageHeader } from './UserDashboardPageHeader';
 import { DashboardProfileSkeleton } from '@/components/skeleton-loader/userDashboardSkeletons';
 import { ProfileAvatarUpload } from '@/components/admin/profile/ProfileAvatarUpload';
 import { ProfileAgreementsCard } from './ProfileAgreementsCard';
+import { useShowSeries } from '@/hooks/useShowSeries';
 
 export function ProfilePage() {
   const router = useRouter();
+  const showSeries = useShowSeries();
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: profileData, isLoading } = useGetUserProfileQuery();
@@ -155,6 +157,7 @@ export function ProfilePage() {
     ],
     [seriesData, chaptersData, historyData]
   );
+  const visibleKpiItems = showSeries ? kpiItems : kpiItems.filter((item) => item.label !== 'Series owned');
 
   const { errors, touched, isSubmitting, values, handleSubmit, handleChange, handleBlur, resetForm } =
     useFormik({
@@ -352,7 +355,7 @@ export function ProfilePage() {
 
         <div className="px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
           <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
-            {kpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
+            {visibleKpiItems.map(({ label, value, icon: Icon, iconClass, href }) => (
               <Link
                 key={label}
                 href={href}

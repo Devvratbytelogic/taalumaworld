@@ -99,6 +99,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
     accepted_agreement_ids: [] as string[],
     meta_title: chapterData?.meta_title ?? '',
     meta_description: chapterData?.meta_description ?? '',
+    meta_keywords: chapterData?.meta_keywords ?? '',
     og_title: chapterData?.og_title ?? '',
     og_description: chapterData?.og_description ?? '',
     og_image: chapterData?.og_image ?? null as File | null,
@@ -139,6 +140,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
       appendOpenGraphFieldsToFormData(formData, {
         meta_title: vals.meta_title,
         meta_description: vals.meta_description,
+        meta_keywords: vals.meta_keywords,
         og_title: vals.og_title,
         og_description: vals.og_description,
         twitter_title: vals.twitter_title,
@@ -669,6 +671,7 @@ export function EditChapterForm({ chapterId }: EditChapterFormProps) {
           values={{
             meta_title: values.meta_title,
             meta_description: values.meta_description,
+            meta_keywords: values.meta_keywords,
             og_title: values.og_title,
             og_description: values.og_description,
             og_image: values.og_image,

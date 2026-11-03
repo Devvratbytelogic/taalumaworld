@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = bookDetails?.meta_title || bookDetails?.title || 'TaalumaWorld';
   const description = bookDetails?.meta_description || bookDetails?.description || '';
+  const keywords = bookDetails?.meta_keywords?.trim();
   const ogTitle = bookDetails?.og_title || title;
   const ogDescription = bookDetails?.og_description || description;
   const ogImage = bookDetails?.og_image || bookDetails?.coverImage || undefined;
@@ -42,6 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    ...(keywords ? { keywords } : {}),
     openGraph: {
       title: ogTitle,
       description: ogDescription,

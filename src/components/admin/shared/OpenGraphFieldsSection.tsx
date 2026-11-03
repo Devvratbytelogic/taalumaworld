@@ -19,6 +19,7 @@ import {
 export type OpenGraphFormValues = {
   meta_title: string;
   meta_description: string;
+  meta_keywords: string;
   og_title: string;
   og_description: string;
   og_image: File | string | null;
@@ -110,6 +111,7 @@ const boundedTextareaClassName = 'field-sizing-fixed! min-h-24! resize-y! overfl
 const OPEN_GRAPH_TEXT_FIELDS = [
   'meta_title',
   'meta_description',
+  'meta_keywords',
   'og_title',
   'og_description',
   'twitter_title',
@@ -151,6 +153,7 @@ export function appendOpenGraphFieldsToFormData(
   values: {
     meta_title?: string | null;
     meta_description?: string | null;
+    meta_keywords?: string | null;
     og_title?: string | null;
     og_description?: string | null;
     twitter_title?: string | null;
@@ -162,6 +165,7 @@ export function appendOpenGraphFieldsToFormData(
 ) {
   formData.append('meta_title', values.meta_title ?? '');
   formData.append('meta_description', values.meta_description ?? '');
+  formData.append('meta_keywords', values.meta_keywords ?? '');
   formData.append('og_title', values.og_title ?? '');
   formData.append('og_description', values.og_description ?? '');
   formData.append('twitter_title', values.twitter_title ?? '');
@@ -502,8 +506,9 @@ export function OpenGraphFieldsSection({
             SEO, Open Graph, X & structured data
           </span>
           <span className="mt-1 block text-sm font-normal text-slate-500">
-            Text fields fill from the title and description. On create, OG and X images fill from the
-            cover or featured image until you replace them or remove them with the X.
+            Title, description, and social text fill from the title and description. Keywords are entered
+            separately. On create, OG and X images fill from the cover or featured image until you replace
+            them or remove them with the X.
           </span>
         </span>
         <ChevronDown
@@ -565,6 +570,23 @@ export function OpenGraphFieldsSection({
             <p className="text-sm text-red-600">{errors.meta_description}</p>
           ) : null}
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={`${idPrefix}-meta-keywords`}>Meta keywords</Label>
+        <Input
+          id={`${idPrefix}-meta-keywords`}
+          name="meta_keywords"
+          placeholder="Comma-separated keywords"
+          value={values.meta_keywords ?? ''}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={disabled}
+          className={errors.meta_keywords && touched.meta_keywords ? 'border-red-500' : undefined}
+        />
+        {errors.meta_keywords && touched.meta_keywords ? (
+          <p className="text-sm text-red-600">{errors.meta_keywords}</p>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

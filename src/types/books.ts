@@ -31,6 +31,7 @@ export interface IBook {
   __v: number;
   json_ld: string;
   meta_description: string;
+  meta_keywords?: string;
   meta_title: string;
   og_description: string;
   og_image: string;

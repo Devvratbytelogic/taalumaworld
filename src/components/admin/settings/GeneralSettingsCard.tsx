@@ -54,6 +54,7 @@ const defaultValues = {
   iphone_app_url: '',
   meta_title: '',
   meta_description: '',
+  meta_keywords: '',
   og_title: '',
   og_description: '',
   og_image: null as File | string | null,
@@ -157,6 +158,7 @@ export function GeneralSettingsCard() {
     iphone_app_url: data?.iphone_app_url ?? '',
     meta_title: data?.meta_title ?? '',
     meta_description: data?.meta_description ?? '',
+    meta_keywords: data?.meta_keywords ?? '',
     og_title: data?.og_title ?? data?.og_tag ?? '',
     og_description: data?.og_description ?? '',
     og_image: data?.og_image ?? null,
@@ -204,6 +206,7 @@ export function GeneralSettingsCard() {
         appendOpenGraphFieldsToFormData(formData, {
           meta_title: values.meta_title,
           meta_description: values.meta_description,
+          meta_keywords: values.meta_keywords,
           og_title: values.og_title,
           og_description: values.og_description,
           twitter_title: values.twitter_title,
@@ -657,6 +660,7 @@ export function GeneralSettingsCard() {
             values={{
               meta_title: values.meta_title,
               meta_description: values.meta_description,
+              meta_keywords: values.meta_keywords,
               og_title: values.og_title,
               og_description: values.og_description,
               og_image: values.og_image,

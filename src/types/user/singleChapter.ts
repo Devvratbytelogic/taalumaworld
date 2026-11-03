@@ -42,6 +42,7 @@ export interface ISingleChapterAPIResponseData {
   createdBy: IMentor;
   meta_title: string;
   meta_description: string;
+  meta_keywords?: string;
   og_title: string;
   og_description: string;
   og_image: string;

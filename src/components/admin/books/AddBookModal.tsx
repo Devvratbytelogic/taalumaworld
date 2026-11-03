@@ -39,6 +39,7 @@ const initialFormValues = {
   cover_image: null as File | null,
   meta_title: '',
   meta_description: '',
+  meta_keywords: '',
   og_title: '',
   og_description: '',
   og_image: null as File | null,
@@ -90,6 +91,7 @@ export function AddBookModal({
       appendOpenGraphFieldsToFormData(formData, {
         meta_title: vals.meta_title,
         meta_description: vals.meta_description,
+        meta_keywords: vals.meta_keywords,
         og_title: vals.og_title,
         og_description: vals.og_description,
         twitter_title: vals.twitter_title,
@@ -503,6 +505,7 @@ export function AddBookModal({
               values={{
                 meta_title: values.meta_title,
                 meta_description: values.meta_description,
+                meta_keywords: values.meta_keywords,
                 og_title: values.og_title,
                 og_description: values.og_description,
                 og_image: values.og_image,

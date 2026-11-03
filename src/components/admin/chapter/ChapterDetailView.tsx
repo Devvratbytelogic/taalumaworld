@@ -283,6 +283,7 @@ export function ChapterDetailView({ chapterId }: ChapterDetailViewProps) {
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <DetailRow label="Meta Title" value={chapter.meta_title} />
           <DetailRow label="Meta Description" value={chapter.meta_description} />
+          <DetailRow label="Meta Keywords" value={chapter.meta_keywords} />
           <DetailRow label="OG Title" value={chapter.og_title} />
           <DetailRow label="OG Description" value={chapter.og_description} />
           <DetailRow

@@ -38,6 +38,7 @@ const emptyFormValues = {
   cover_image: null as File | null,
   meta_title: '',
   meta_description: '',
+  meta_keywords: '',
   og_title: '',
   og_description: '',
   og_image: null as File | string | null,
@@ -85,6 +86,7 @@ export function EditBookModal({
     cover_image: null as File | null,
     meta_title: book?.meta_title ?? '',
     meta_description: book?.meta_description ?? '',
+    meta_keywords: book?.meta_keywords ?? '',
     og_title: book?.og_title ?? '',
     og_description: book?.og_description ?? '',
     og_image: (book?.og_image ?? null) as File | string | null,
@@ -124,6 +126,7 @@ export function EditBookModal({
       appendOpenGraphFieldsToFormData(formData, {
         meta_title: vals.meta_title,
         meta_description: vals.meta_description,
+        meta_keywords: vals.meta_keywords,
         og_title: vals.og_title,
         og_description: vals.og_description,
         twitter_title: vals.twitter_title,
@@ -516,6 +519,7 @@ export function EditBookModal({
               values={{
                 meta_title: values.meta_title,
                 meta_description: values.meta_description,
+                meta_keywords: values.meta_keywords,
                 og_title: values.og_title,
                 og_description: values.og_description,
                 og_image: values.og_image,

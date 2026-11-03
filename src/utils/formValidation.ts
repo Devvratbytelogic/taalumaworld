@@ -202,6 +202,7 @@ export const contactFormSchema = Yup.object({
 const openGraphFieldsSchema = {
   meta_title: Yup.string().trim(),
   meta_description: Yup.string().trim(),
+  meta_keywords: Yup.string().trim(),
   og_title: Yup.string().trim(),
   og_description: Yup.string().trim(),
   og_image: Yup.mixed()

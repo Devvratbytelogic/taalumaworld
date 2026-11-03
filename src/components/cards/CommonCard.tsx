@@ -136,29 +136,26 @@ export default function CommonCard({ data }: CommonCardProps) {
                     </div>
 
                     <div className="shrink-0 text-right leading-tight">
-                        {isBook ? (
-                            isPricingModelChapter ? (
-                                <p className="text-sm font-medium text-primary">Priced by book</p>
-                            ) : displayPrice > 0 ? (
-                                <p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>
-                            ) : (
-                                <p className="text-lg font-semibold text-primary">FREE</p>
-                            )
-                        ) : isPricingModelChapter && data?.isFree ? (
-                            <p className="text-sm font-medium text-success">Free to Read</p>
-                        ) : displayPrice > 0 ? (
-                            <>
-                                <p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>
-                                {data?.series?.pricingModel === VISIBLE.BOOK ? (
-                                    <p className="mt-0.5 text-xs font-normal text-muted-foreground">complete series</p>
-                                ) : null}
-                            </>
-                        ) : (
-                            <>
-                                <p className="text-lg font-semibold text-primary">FREE</p>
-                                <p className="mt-0.5 text-xs font-normal text-muted-foreground">via institutional access</p>
-                            </>
-                        )}
+                        {isBook
+                            ? (isPricingModelChapter
+                                ? (<p className="text-sm font-medium text-primary">Priced by book</p>)
+                                : displayPrice > 0
+                                    ? (<p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>)
+                                    : (<p className="text-lg font-semibold text-primary">FREE</p>))
+                            : isPricingModelChapter && data?.isFree
+                                ? (<p className="text-sm font-medium text-success">Free to Read</p>)
+                                : displayPrice > 0
+                                    ? (<>
+                                        <p className="whitespace-nowrap text-lg font-semibold text-primary">KSH {displayPrice.toFixed(2)}</p>
+                                        {data?.series?.pricingModel === VISIBLE.BOOK
+                                            ? (<p className="mt-0.5 text-xs font-normal text-muted-foreground">complete series</p>)
+                                            : null}
+                                    </>)
+                                    : (<>
+                                        <p className="text-lg font-semibold text-primary">FREE</p>
+                                        <p className="mt-0.5 text-xs font-normal text-muted-foreground">via institutional access</p>
+                                    </>)
+                        }
                     </div>
                 </div>
             </CardContent>

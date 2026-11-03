@@ -8,6 +8,7 @@ import ImageComponent from '@/components/ui/ImageComponent';
 import ShareButtons from '@/components/blueprint/ShareButtons';
 import Button from '@/components/ui/Button';
 import AddToCartButton from '@/components/ui/AddToCartButton';
+import StartFreeReadingButton from '@/components/ui/StartFreeReadingButton';
 import type { ISingleBookAPIResponseData } from '@/types/user/singleBook';
 import { getSingleAuthorRoutePath } from '@/routes/routes';
 import { VISIBLE } from '@/constants/contentMode';
@@ -33,6 +34,9 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
   const purchaseType = VISIBLE.BOOK;
   const showPurchaseActions = Boolean(bookDetails && !bookDetails.canRead && !accessPending);
   const resolvedPrice = displayPrice ?? bookDetails?.price ?? 0;
+  const isSeriesFree = !isPricingModelChapter && Boolean(bookDetails?.isFree);
+  const showBuyActions = showPurchaseActions && !isPricingModelChapter && resolvedPrice > 0;
+  const showFreeSeriesButton = showPurchaseActions && isSeriesFree;
   const tags = (bookDetails?.tags ?? []).filter(Boolean);
   const hasBlueprints = (data?.chapters?.data?.length ?? 0) > 0;
   const showStartReading = Boolean(bookDetails?.canRead && hasBlueprints && !accessPending);
@@ -200,7 +204,7 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
                     <div className="h-11 w-48 animate-pulse rounded-full bg-muted" />
                     <div className="h-11 w-36 animate-pulse rounded-full bg-muted" />
                   </div>
-                ) : (showStartReading || (showPurchaseActions && !isPricingModelChapter && resolvedPrice > 0)) ? (
+                ) : (showStartReading || showBuyActions || showFreeSeriesButton) ? (
                   <div className="flex flex-wrap items-center gap-3">
                     {showStartReading && (
                       <Button
@@ -212,7 +216,17 @@ export default function SeriesPublicHero({ data, slug, accessPending = false, li
                       </Button>
                     )}
 
-                    {showPurchaseActions && !isPricingModelChapter && resolvedPrice > 0 && (
+                    {showFreeSeriesButton && (
+                      <StartFreeReadingButton
+                        id={purchaseId}
+                        type={purchaseType}
+                        label="Get Free Series"
+                        className="global_btn rounded_full bg_primary w-auto sm:min-w-48"
+                        icon={<Wallet className="h-4 w-4" />}
+                      />
+                    )}
+
+                    {showBuyActions && (
                       <>
                         <Button
                           className="global_btn rounded_full bg_primary w-auto sm:min-w-48"

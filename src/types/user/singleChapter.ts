@@ -67,6 +67,7 @@ export interface Series {
   effectivePrice: number;
   pricingAccessType: string;
   pricingModel: string;
+  isFree?: boolean;
   tags?: (string)[] | null;
   totalPages: number;
   chapterCount: number;

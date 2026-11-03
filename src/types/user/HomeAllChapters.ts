@@ -76,4 +76,6 @@ export interface IHomeAllChaptersSeries {
   coverImage: string;
   effectivePrice: number;
   pricingModel: string;
+  price?: number;
+  isFree?: boolean;
 }

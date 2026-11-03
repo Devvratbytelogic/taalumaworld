@@ -23,6 +23,7 @@ export interface IBookDetails {
     tax: number;
     pricingAccessType: string;
     pricingModel: string;
+    isFree?: boolean;
     status: string;
     tags?: (string)[] | null;
     totalPages: number;

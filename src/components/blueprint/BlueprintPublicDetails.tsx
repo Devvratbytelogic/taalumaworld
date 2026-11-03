@@ -29,6 +29,7 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
   const canRead = accessPending ? false : data?.canRead;
   const isCompleted = Boolean(data?.completed);
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
+  const isBookFree = Boolean(data?.series?.isFree);
   const displayPrice = isPricingModelChapter
     ? data?.effectivePrice
     : data?.series?.effectivePrice;
@@ -146,7 +147,9 @@ export default function BlueprintPublicDetails({ data, hideMentorDetails = false
                       <p className="text-sm leading-relaxed text-[#6B6B6B]">
                         {isPricingModelChapter
                           ? isFreePurchase ? 'This book is free to read. No purchase is required.' : 'Purchase this book to unlock the full content.'
-                          : 'Purchase the complete series to unlock this book.'}
+                          : isBookFree
+                            ? 'This series is free. Get it to unlock this book.'
+                            : 'Purchase the complete series to unlock this book.'}
                       </p>
                     </div>
                   </div>

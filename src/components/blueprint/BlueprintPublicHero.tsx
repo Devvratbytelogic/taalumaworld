@@ -23,6 +23,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
   const dispatch = useDispatch();
 
   const isPricingModelChapter = data?.series?.pricingModel === VISIBLE.CHAPTER;
+  const isBookFree = Boolean(data?.series?.isFree);
   const displayPrice = isPricingModelChapter
     ? data?.effectivePrice
     : data?.series?.effectivePrice;
@@ -49,7 +50,7 @@ export default function BlueprintPublicHero({ data, accessPending = false }: Blu
   };
 
   const renderPriceLabel = () => {
-    if (isPricingModelChapter && data?.isFree) {
+    if (isBookFree || (isPricingModelChapter && data?.isFree)) {
       return <span className="font-medium text-success tracking-tight">Free to Read</span>;
     }
 

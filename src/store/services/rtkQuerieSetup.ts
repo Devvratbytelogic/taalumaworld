@@ -261,6 +261,7 @@ export const rtkQuerieSetup = createApi({
         'AdminOrders',
         'AdminContactUs',
         'AdminInstitutions',
+        'AdminInstitutionStudents',
         'AdminInstitutionUsage',
         'AdminInstitutionAccess',
         'AdminInstituteMessages',

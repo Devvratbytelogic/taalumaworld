@@ -191,6 +191,10 @@ export function getMentorProfileRoutePath(): string {
   return '/admin/mentor/profile';
 }
 
+export function getAdminInstitutionDetailRoutePath(id: string): string {
+  return `/admin/institutions/${id}`;
+}
+
 export function getAdminMentorDetailRoutePath(id: string): string {
   return `/admin/authors/${id}`;
 }

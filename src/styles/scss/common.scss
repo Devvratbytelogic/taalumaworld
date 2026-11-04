@@ -4,7 +4,7 @@
 
 
 .action_buttons {
-    @apply flex items-center gap-2;
+    @apply flex items-center gap-1;
 
     .edit_button {
         @apply border border-primary rounded-sm p-2 text-primary hover:bg-primary hover:text-white cursor-pointer;

@@ -1,4 +1,5 @@
 import { IAllInstitutionsAPIResponse, IInstituteMessageAPIResponse, IInstitutionAccessAPIResponse, IInstitutionKpisAPIResponse, ISingleInstitutionAPIResponse } from '@/types/institution';
+import type { IAdminInstitutionStudentsAPIResponse } from '@/types/adminInstitutionStudent';
 import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 
 export const institutionApi = rtkQuerieSetup.injectEndpoints({
@@ -18,6 +19,17 @@ export const institutionApi = rtkQuerieSetup.injectEndpoints({
                 method: 'GET',
             }),
             providesTags: ['AdminInstitutions'],
+        }),
+        getInstitutionStudents: builder.query<
+            IAdminInstitutionStudentsAPIResponse,
+            { id: string; page?: number; limit?: number; search?: string; status?: string; verified?: string; from?: string; to?: string }
+        >({
+            query: ({ id, ...params }) => ({
+                url: `/admin/institutions/${id}/users`,
+                method: 'GET',
+                params,
+            }),
+            providesTags: ['AdminInstitutionStudents'],
         }),
         addInstitution: builder.mutation({
             query: (payload) => ({
@@ -135,6 +147,7 @@ export const {
     // Institutions
     useGetAllInstitutionsQuery,
     useGetInstitutionByIdQuery,
+    useGetInstitutionStudentsQuery,
     useAddInstitutionMutation,
     useUpdateInstitutionMutation,
     useDeleteInstitutionMutation,

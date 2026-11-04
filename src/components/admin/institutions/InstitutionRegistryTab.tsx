@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { Button } from '@heroui/react';
 import { type GridColDef } from '@mui/x-data-grid';
 import {
     Plus, Search, Edit2, Trash2, RotateCcw, ArrowLeft, ChevronDown, Loader2,
-    Building2, CheckCircle2, Ban,
+    Building2, CheckCircle2, Ban, Eye,
 } from 'lucide-react';
 import {
     useGetAllInstitutionsQuery,
@@ -30,6 +31,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { AdminStatCard } from '@/components/admin/layout/AdminContent';
+import { getAdminInstitutionDetailRoutePath } from '@/routes/routes';
 import CommonDataTable from '../CommonDataTable';
 import moment from 'moment';
 import { AdminTableSkeleton } from '@/components/skeleton-loader/admin';
@@ -38,12 +40,12 @@ const INSTITUTIONS_MODEL = 'Institutions';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: string; label: string }> = {
     Active: {
-        badge: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+        badge: 'bg-green-50 text-green-700 border-green-200! hover:bg-green-100',
         dot: 'bg-green-500',
         label: 'Active',
     },
     Inactive: {
-        badge: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+        badge: 'bg-amber-50 text-amber-700 border-amber-200! hover:bg-amber-100',
         dot: 'bg-amber-500',
         label: 'Inactive',
     },
@@ -173,10 +175,10 @@ export function InstitutionRegistryTab() {
             minWidth: 200,
             sortable: false,
             renderCell: (params) => (
-                <div>
-                    <p className="font-medium text-sm">{params.row.name}</p>
-                    <p className="text-xs text-muted-foreground">{params.row.contact_email}</p>
-                </div>
+                <Link href={getAdminInstitutionDetailRoutePath(params.row._id)} className="group min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-900 group-hover:text-primary group-hover:underline">{params.row.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{params.row.contact_email}</p>
+                </Link>
             ),
         },
         {
@@ -273,7 +275,7 @@ export function InstitutionRegistryTab() {
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 100,
+            width: 140,
             sortable: false,
             renderCell: (params) => {
                 if (isTrashView) {
@@ -301,9 +303,15 @@ export function InstitutionRegistryTab() {
                         </div>
                     );
                 }
-                if (!canEdit && !canDelete) return null;
                 return (
                     <div className="action_buttons">
+                        <Link
+                            href={getAdminInstitutionDetailRoutePath(params.row._id)}
+                            className="active_button"
+                            title="View institution"
+                        >
+                            <Eye className="h-4 w-4" />
+                        </Link>
                         {canEdit ? (
                             <button
                                 type="button"

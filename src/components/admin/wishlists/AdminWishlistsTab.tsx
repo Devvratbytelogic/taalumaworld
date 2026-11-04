@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import moment from 'moment';
 import { Download } from 'lucide-react';
 import { type GridColDef } from '@mui/x-data-grid';
@@ -14,6 +15,7 @@ import { useGetAdminWishlistsQuery } from '@/store/rtkQueries/adminWishlistsApi'
 import { useGetAllAdminChaptersQuery, useGetAllBooksQuery } from '@/store/rtkQueries/adminGetApi';
 import { useGetAllUsersQuery } from '@/store/rtkQueries/rolesPermissionsApi';
 import type { IAdminWishlistsDataEntity } from '@/types/adminWishlist';
+import { getAdminUserDetailRoutePath } from '@/routes/routes';
 import { API_BASE_URL } from '@/utils/config';
 import { authFetch } from '@/utils/refreshSession';
 import toast from '@/utils/toast';
@@ -121,7 +123,16 @@ export function AdminWishlistsTab({ scope = 'staff' }: { scope?: 'staff' | 'ment
       sortable: false,
       renderCell: ({ row }) => (
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{row.user?.name || '—'}</p>
+          {row.user?.id ? (
+            <Link
+              href={getAdminUserDetailRoutePath(row.user.id)}
+              className="block truncate text-sm font-medium text-primary hover:underline"
+            >
+              {row.user.name || '—'}
+            </Link>
+          ) : (
+            <p className="truncate text-sm font-medium">{row.user?.name || '—'}</p>
+          )}
           <p className="truncate text-xs text-muted-foreground">{row.user?.email}</p>
         </div>
       ),

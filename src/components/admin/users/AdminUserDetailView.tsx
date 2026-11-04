@@ -15,9 +15,11 @@ import CommonDataTable from '@/components/admin/CommonDataTable';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useGetUserByIdQuery } from '@/store/rtkQueries/rolesPermissionsApi';
+import { useGetAdminAddressesQuery } from '@/store/rtkQueries/adminAddressesApi';
 import { getAdminSectionRoutePath } from '@/routes/routes';
 import { AdminUserDetailSkeleton } from '@/components/skeleton-loader/admin';
 import type { ItemsEntity } from '@/types/rolesPermissions';
+import type { IAdminAddress } from '@/types/adminAddress';
 import { ROLE_NAME_MAP } from '@/constants/common';
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
@@ -36,12 +38,24 @@ interface AdminUserDetailViewProps {
 
 export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [addressPage, setAddressPage] = useState({ page: 0, pageSize: 10 });
 
   const { data, isLoading, isFetching, error } = useGetUserByIdQuery(userId, { skip: !userId });
+  const {
+    data: addressData,
+    isLoading: addressesLoading,
+    isFetching: addressesFetching,
+    isError: addressesError,
+  } = useGetAdminAddressesQuery(
+    { user_id: userId, page: addressPage.page + 1, limit: addressPage.pageSize },
+    { skip: !userId },
+  );
 
   const user = data?.data;
   const agreement = user?.agreement_status;
   const consents = agreement?.items ?? [];
+  const addresses = addressData?.data?.data ?? [];
+  const addressTotal = addressData?.data?.total ?? 0;
 
   const backLink = (
     <Link
@@ -79,6 +93,34 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
       </AdminPage>
     );
   }
+
+  const addressColumns: GridColDef<IAdminAddress>[] = [
+    { field: 'full_name', headerName: 'Name', minWidth: 160, flex: 1, sortable: false },
+    { field: 'phone', headerName: 'Phone', minWidth: 140, sortable: false, renderCell: ({ row }) => row.phone || '—' },
+    {
+      field: 'address',
+      headerName: 'Address',
+      minWidth: 260,
+      flex: 1.5,
+      sortable: false,
+      renderCell: ({ row }) =>
+        [row.address_line1, row.address_line2, row.landmark, row.city, row.state, row.country, row.postal_code]
+          .filter(Boolean)
+          .join(', ') || '—',
+    },
+    {
+      field: 'isDefault',
+      headerName: 'Default',
+      width: 120,
+      sortable: false,
+      renderCell: ({ row }) =>
+        row.isDefault ? (
+          <Badge className="border-emerald-200! bg-emerald-100 text-emerald-700">Default</Badge>
+        ) : (
+          '—'
+        ),
+    },
+  ];
 
   const columns: GridColDef<ItemsEntity>[] = [
     {
@@ -135,7 +177,7 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
       <AdminPageHeader
         eyebrow="Customers"
         title={user.name}
-        description="Customer profile and the agreement versions this person accepted."
+        description="Customer profile, saved addresses, and the agreement versions this person accepted."
       />
 
       <AdminPanel className="p-6">
@@ -215,7 +257,30 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
         </dl>
       </AdminPanel>
 
-      <div className="overflow-hidden rounded-md border border-gray-200">
+      <div>
+        <h2 className="mb-3 text-base font-semibold text-slate-900">Addresses</h2>
+        {addressesError ? (
+          <p className="text-sm text-red-600">Could not load addresses for this customer.</p>
+        ) : (
+          <div className="overflow-hidden rounded-md border border-gray-200">
+            <CommonDataTable
+              rows={addresses}
+              columns={addressColumns}
+              getRowId={(row) => row._id}
+              loading={addressesLoading || addressesFetching}
+              paginationMode="server"
+              rowCount={addressTotal}
+              paginationModel={addressPage}
+              onPaginationModelChange={setAddressPage}
+              pageSizeOptions={[10, 20, 50, 100]}
+            />
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-base font-semibold text-slate-900">Agreements</h2>
+        <div className="overflow-hidden rounded-md border border-gray-200">
         <CommonDataTable
           rows={consents}
           columns={columns}
@@ -226,6 +291,7 @@ export function AdminUserDetailView({ userId }: AdminUserDetailViewProps) {
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
         />
+        </div>
       </div>
     </AdminPage>
   );

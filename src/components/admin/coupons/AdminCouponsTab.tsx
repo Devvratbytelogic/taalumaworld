@@ -209,7 +209,7 @@ export function AdminCouponsTab() {
         <span className="text-sm text-slate-600">
           {params.row.coupon_for === 'university'
             ? 'Unlimited'
-            : `${params.row.used_count ?? 0}${params.row.usage_limit ? ` / ${params.row.usage_limit}` : ''}`}
+            : `${params.row.redeemed_count ?? 0}${params.row.usage_limit ? ` / ${params.row.usage_limit}` : ''}`}
         </span>
       ),
     },

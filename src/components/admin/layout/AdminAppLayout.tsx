@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Award, Banknote, BarChart3, Bell, Book, ClipboardList, FileEdit, FileSignature, FileText, Flag, FolderTree, GraduationCap, Handshake, Heart, History, Inbox, LayoutDashboard, LineChart, Link2, Mail, Megaphone, MessageSquare, Percent, Quote, Scale, ScrollText, Settings, Shield, ShieldCheck, ShoppingBag, Star, Tag, TrendingUp, UserCircle, UserCog, Users, Wallet } from 'lucide-react';
-import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorEquityRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
+import { getAdminDashboardRoutePath, getAdminMentorApplicationsRoutePath, getAdminMentorEquityRoutePath, getAdminMentorPerformanceRoutePath, getAdminMentorRevenueRoutePath, getAdminMentorTypesRoutePath, getAdminReferralPerformanceRoutePath, getAdminReferralWalletsRoutePath, getAdminSectionRoutePath, isMentorPanelPath } from '@/routes/routes';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { KshIcon } from '@/components/ui/AllSVG';
@@ -90,6 +90,7 @@ const NAV_GROUPS: SidebarNavGroup[] = [
         items: [
             { model: 'Setting', id: 'settings', label: 'Settings', href: getAdminSectionRoutePath('settings'), icon: Settings },
             { model: 'Referral Performance', id: 'referral_performance', label: 'Referral Performance', href: getAdminReferralPerformanceRoutePath(), icon: TrendingUp },
+            { id: 'referral_wallets', label: 'Referral Wallets', href: getAdminReferralWalletsRoutePath(), icon: Wallet },
             // { model: 'Referral Setting', id: 'referral_setting', label: 'Referral Setting', href: getAdminSectionRoutePath('referral_setting'), icon: Link2 },
             { model: 'Audit Log', id: 'audit_logs', label: 'Audit Logs', href: getAdminSectionRoutePath('audit_logs'), icon: ScrollText },
         ],

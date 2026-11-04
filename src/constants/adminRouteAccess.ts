@@ -9,6 +9,7 @@
  * matching `useAdminPermissions().hasAccess(undefined) === true`.
  * `/admin/analytics` is intentionally ungated like dashboard: commercial
  * analytics is staff-only at the API (mentors / CA / ICA receive 403).
+ * `/admin/referral-wallets` is the same: any staff member can open it.
  * Mentors use `/admin/mentor/wishlists`, which is outside this map.
  */
 export interface AdminRouteModelMapping {

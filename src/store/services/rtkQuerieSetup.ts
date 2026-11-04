@@ -296,6 +296,7 @@ export const rtkQuerieSetup = createApi({
         'AdminReviewReports',
         'AdminWishlists',
         'AdminAddresses',
+        'AdminReferralWallets',
         'AffiliateReferal',
         'AdminNotifications',
         'AdminCampaignUsers',

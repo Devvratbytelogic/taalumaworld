@@ -171,6 +171,10 @@ export function getAdminReferralPerformanceRoutePath(): string {
   return '/admin/referrals/performance';
 }
 
+export function getAdminReferralWalletsRoutePath(): string {
+  return '/admin/referral-wallets';
+}
+
 export function getAdminMentorApplicationsRoutePath(): string {
   return '/admin/applications/mentors';
 }

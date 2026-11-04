@@ -76,3 +76,45 @@ export interface ICouponPerformanceEntity {
   total_revenue: number;
   last_used_at: string;
 }
+
+export interface ICouponRedemptionsAPIResponse {
+  http_status_code: number;
+  http_status_msg: string;
+  success: boolean;
+  data: ICouponRedemptionsData;
+  message: string;
+  timestamp: string;
+}
+
+export interface ICouponRedemptionsData {
+  coupon: ICouponRedemptionCoupon;
+  data?: ICouponRedemption[] | null;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface ICouponRedemptionCoupon {
+  id: string;
+  coupon_code: string;
+  coupon_type: string;
+  coupon_for: string;
+  value: number;
+  status: string;
+}
+
+export interface ICouponRedemption {
+  id: string;
+  order_number: string;
+  redeemed_at: string;
+  discount: number;
+  order_total: number;
+  user: ICouponRedemptionUser | null;
+}
+
+export interface ICouponRedemptionUser {
+  id: string;
+  name: string;
+  email: string;
+}

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { type GridColDef } from '@mui/x-data-grid';
-import { BarChart3, Edit2, Percent, RotateCcw, ShoppingBag, Tag, TicketPercent, Trash2, Wallet } from 'lucide-react';
+import { BarChart3, Edit2, Eye, Percent, RotateCcw, ShoppingBag, Tag, TicketPercent, Trash2, Wallet } from 'lucide-react';
 import {
   useGetAdminAllCouponsQuery,
   useGetCouponPerformanceQuery,
@@ -25,6 +26,7 @@ import { AdminCouponsSearch } from './AdminCouponsSearch';
 import { MentorCouponPerformanceTab } from '@/components/admin/mentor/performance/MentorCouponPerformanceTab';
 import toast from '@/utils/toast';
 import { IAdminCouponEntity } from '@/types/coupon';
+import { getAdminCouponDetailRoutePath } from '@/routes/routes';
 import { CouponModal } from './CouponModal';
 import { AdminCouponsSkeleton } from '@/components/skeleton-loader/admin';
 
@@ -238,7 +240,7 @@ export function AdminCouponsTab() {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 120,
+      width: 150,
       sortable: false,
       renderCell: (params) => {
         if (isTrashView) {
@@ -266,9 +268,15 @@ export function AdminCouponsTab() {
             </div>
           );
         }
-        if (!canEdit && !canDelete) return null;
         return (
           <div className="action_buttons">
+            <Link
+              href={getAdminCouponDetailRoutePath(params.row._id || params.row.id)}
+              className="active_button"
+              title="View redemptions"
+            >
+              <Eye className="h-4 w-4" />
+            </Link>
             {canEdit ? (
               <button
                 type="button"

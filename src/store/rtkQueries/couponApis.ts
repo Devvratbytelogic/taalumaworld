@@ -2,6 +2,7 @@ import { rtkQuerieSetup } from '../services/rtkQuerieSetup';
 import type {
     IAllCouponsAPIResponse,
     ICouponPerformanceAPIResponse,
+    ICouponRedemptionsAPIResponse,
 } from '@/types/coupon';
 
 export const couponApi = rtkQuerieSetup.injectEndpoints({
@@ -60,6 +61,17 @@ export const couponApi = rtkQuerieSetup.injectEndpoints({
             }),
             invalidatesTags: ['AdminCoupons'],
         }),
+        getCouponRedemptions: builder.query<
+            ICouponRedemptionsAPIResponse,
+            { id: string; page?: number; limit?: number; search?: string; from?: string; to?: string }
+        >({
+            query: ({ id, ...params }) => ({
+                url: `/admin/coupons/${id}/redemptions`,
+                method: 'GET',
+                params,
+            }),
+            providesTags: ['AdminCoupons'],
+        }),
         getCouponPerformance: builder.query<ICouponPerformanceAPIResponse, { id?: string; page?: number; limit?: number; search?: string } | void>({
             query: (params) => ({
                 url: `/admin/coupons/performance`,
@@ -78,5 +90,6 @@ export const {
     useUpdateCouponTaalumaStatusMutation,
     useDeleteCouponMutation,
     useRestoreCouponMutation,
+    useGetCouponRedemptionsQuery,
     useGetCouponPerformanceQuery,
 } = couponApi;

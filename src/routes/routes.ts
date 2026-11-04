@@ -195,6 +195,10 @@ export function getAdminInstitutionDetailRoutePath(id: string): string {
   return `/admin/institutions/${id}`;
 }
 
+export function getAdminCouponDetailRoutePath(id: string): string {
+  return `/admin/coupons/${id}`;
+}
+
 export function getAdminMentorDetailRoutePath(id: string): string {
   return `/admin/authors/${id}`;
 }

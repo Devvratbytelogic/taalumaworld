@@ -178,8 +178,8 @@ export function AdminWishlistsTab({ scope = 'staff' }: { scope?: 'staff' | 'ment
         eyebrow="Content"
         title="Wishlists"
         description={scope === 'mentor'
-          ? 'Saves of series you created, and of blueprints on those series.'
-          : 'Every series and blueprint customers have saved.'}
+          ? 'Saves of series you created, and of books on those series.'
+          : 'Every series and books customers have saved.'}
       >
         <Button
           className="global_btn rounded_full bg_primary"

@@ -86,7 +86,7 @@ export function AdminWishlistsSearch({
           {select('wishlist-type', 'All types', TYPE_OPTIONS, filters.type, 'type')}
           {select('wishlist-user', 'All users', userOptions, filters.userId, 'userId')}
           {select('wishlist-series', 'All series', seriesOptions, filters.seriesId, 'seriesId')}
-          {select('wishlist-blueprint', 'All blueprints', blueprintOptions, filters.blueprintId, 'blueprintId')}
+          {select('wishlist-blueprint', 'All Books', blueprintOptions, filters.blueprintId, 'blueprintId')}
           <Input
             id="wishlist-from"
             type="date"

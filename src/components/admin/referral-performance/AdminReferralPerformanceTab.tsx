@@ -13,7 +13,7 @@ import CommonDataTable from '@/components/admin/CommonDataTable';
 import { Badge } from '@/components/ui/badge';
 import Button from '@/components/ui/Button';
 import { formatKes, ROLE_NAME_MAP } from '@/constants/common';
-import { getAdminMentorDetailRoutePath } from '@/routes/routes';
+import { getAdminMentorDetailRoutePath, getAdminUserDetailRoutePath } from '@/routes/routes';
 import { useGetReferralPerformanceQuery } from '@/store/rtkQueries/dashboard';
 import type { IReferralPerformanceEntity, ReferralPerformanceUserType } from '@/types/dashboard';
 import { API_BASE_URL } from '@/utils/config';
@@ -102,20 +102,20 @@ export function AdminReferralPerformanceTab() {
       flex: 1,
       sortable: false,
       renderCell: (params) => {
+        const href = params.row.user_type === 'mentor'
+          ? getAdminMentorDetailRoutePath(params.row.id)
+          : params.row.user_type === 'user'
+            ? getAdminUserDetailRoutePath(params.row.id)
+            : '';
         const content = (
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-slate-900">{params.row.name}</p>
+            <p className={`truncate text-sm font-medium text-slate-900 ${href ? 'group-hover:text-primary group-hover:underline' : ''}`}>
+              {params.row.name}
+            </p>
             <p className="truncate text-xs text-slate-500">{params.row.email}</p>
           </div>
         );
-        if (params.row.user_type === 'mentor') {
-          return (
-            <Link href={getAdminMentorDetailRoutePath(params.row.id)} className="min-w-0">
-              {content}
-            </Link>
-          );
-        }
-        return content;
+        return href ? <Link href={href} className="group min-w-0">{content}</Link> : content;
       },
     },
     {
